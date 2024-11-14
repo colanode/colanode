@@ -7,21 +7,21 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 WORKDIR /app
 
 # Copy root workspace files
-COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
+COPY ../../package.json ../../pnpm-workspace.yaml ../../pnpm-lock.yaml ./
 
 # Copy all package.json files first
-COPY packages/core/package.json ./packages/core/
-COPY packages/crdt/package.json ./packages/crdt/
-COPY apps/server/package.json ./apps/server/
+COPY ../../packages/core/package.json packages/core/package.json
+COPY ../../packages/crdt/package.json packages/crdt/package.json
+COPY ../../apps/server/package.json apps/server/package.json
 
 # Install all dependencies
 RUN pnpm install --frozen-lockfile
 
 # Copy source files
-COPY packages/core ./packages/core
-COPY packages/crdt ./packages/crdt
-COPY apps/server ./apps/server
-COPY tsconfig.base.json ./
+COPY ../../packages/core packages/core
+COPY ../../packages/crdt packages/crdt
+COPY ../../apps/server apps/server
+COPY ../../tsconfig.base.json ./
 
 # Build packages
 RUN pnpm --filter "@colanode/core" build
