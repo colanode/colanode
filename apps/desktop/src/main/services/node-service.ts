@@ -45,17 +45,17 @@ class NodeService {
       await databaseService.getWorkspaceDatabase(userId);
 
     await workspaceDatabase.transaction().execute(async (transaction) => {
-      for (const input of inputs) {
-        const model = registry.getModel(input.attributes.type);
-        if (!model.schema.safeParse(input.attributes).success) {
+      for (const inputItem of inputs) {
+        const model = registry.getModel(inputItem.attributes.type);
+        if (!model.schema.safeParse(inputItem.attributes).success) {
           throw new Error('Invalid attributes');
         }
 
         let ancestors: Node[] = [];
-        if (input.attributes.parentId) {
+        if (inputItem.attributes.parentId) {
           const ancestorRows = await fetchNodeAncestors(
             transaction,
-            input.attributes.parentId
+            inputItem.attributes.parentId
           );
           ancestors = ancestorRows.map(mapNode);
         }
@@ -68,19 +68,19 @@ class NodeService {
           ancestors
         );
 
-        if (!model.canCreate(context, input.attributes)) {
+        if (!model.canCreate(context, inputItem.attributes)) {
           throw new Error('Insufficient permissions');
         }
 
-        const ydoc = new YDoc(input.id);
-        ydoc.updateAttributes(input.attributes);
+        const ydoc = new YDoc(inputItem.id);
+        ydoc.updateAttributes(inputItem.attributes);
 
         const createdAt = new Date().toISOString();
         const versionId = generateId(IdType.Version);
 
         const changeData: LocalCreateNodeChangeData = {
           type: 'node_create',
-          id: input.id,
+          id: inputItem.id,
           state: ydoc.getEncodedState(),
           createdAt: createdAt,
           createdBy: context.userId,
@@ -91,8 +91,8 @@ class NodeService {
           .insertInto('nodes')
           .returningAll()
           .values({
-            id: input.id,
-            attributes: JSON.stringify(input.attributes),
+            id: inputItem.id,
+            attributes: JSON.stringify(inputItem.attributes),
             state: ydoc.getState(),
             created_at: createdAt,
             created_by: context.userId,
@@ -119,11 +119,11 @@ class NodeService {
           createdChangeIds.push(createdChange.id);
         }
 
-        if (input.upload) {
+        if (inputItem.upload) {
           const createdUploadRow = await transaction
             .insertInto('uploads')
             .returningAll()
-            .values(input.upload)
+            .values(inputItem.upload)
             .executeTakeFirst();
 
           if (createdUploadRow) {
@@ -137,11 +137,11 @@ class NodeService {
           }
         }
 
-        if (input.download) {
+        if (inputItem.download) {
           const createdDownloadRow = await transaction
             .insertInto('downloads')
             .returningAll()
-            .values(input.download)
+            .values(inputItem.download)
             .executeTakeFirst();
 
           if (createdDownloadRow) {

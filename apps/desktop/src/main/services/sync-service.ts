@@ -3,7 +3,7 @@ import { workspaceService } from '@/main/services/workspace-service';
 import { deviceService } from '@/main/services/device-service';
 
 // one minute
-const EVENT_LOOP_INTERVAL = 1000 * 5;
+const EVENT_LOOP_INTERVAL = 1000 * 60;
 
 class SyncService {
   private initiated: boolean = false;

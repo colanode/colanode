@@ -44,7 +44,7 @@ class QueryService {
   }
 
   private async checkForQueryChanges(event: Event): Promise<void> {
-    if (event.type !== 'query_result_updated') {
+    if (event.type === 'query_result_updated') {
       return;
     }
 

@@ -24,7 +24,7 @@
     "vitest": "^1.6.0"
   },
   "dependencies": {
-    "@colanode/core": "workspace:*",
+    "@colanode/core": "^1.0.0",
     "diff": "^7.0.0",
     "js-base64": "^3.7.7",
     "yjs": "^13.6.20",

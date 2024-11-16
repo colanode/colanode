@@ -1,28 +1,31 @@
-import { app, shell, BrowserWindow, ipcMain, protocol } from 'electron';
-import { join } from 'path';
-import { electronApp, optimizer, is } from '@electron-toolkit/utils';
+import { app, BrowserWindow, ipcMain, protocol } from 'electron';
+import path from 'path';
 import { eventBus } from '@/shared/lib/event-bus';
+import { avatarService } from '@/main/services/avatar-service';
+import { fileService } from '@/main/services/file-service';
+import { assetService } from '@/main/services/asset-service';
+import { MutationMap } from '@/shared/mutations';
+import { MutationInput } from '@/shared/mutations';
+import { QueryMap } from '@/shared/queries';
+import { mutationService } from '@/main/services/mutation-service';
+import { queryService } from '@/main/services/query-service';
+import { QueryInput } from '@/shared/queries';
+import { CommandMap } from '@/shared/commands';
+import { CommandInput } from '@/shared/commands';
+import { commandService } from '@/main/services/command-service';
 import { databaseService } from '@/main/data/database-service';
 import { socketService } from '@/main/services/socket-service';
 import { syncService } from '@/main/services/sync-service';
-import { avatarService } from '@/main/services/avatar-service';
-import { fileService } from '@/main/services/file-service';
-import { MutationInput, MutationMap } from '@/shared/mutations';
-import { QueryInput, QueryMap } from '@/shared/queries';
-import { assetService } from '@/main/services/asset-service';
 import { radarService } from '@/main/services/radar-service';
-import { mutationService } from '@/main/services/mutation-service';
-import { queryService } from '@/main/services/query-service';
-import { CommandInput } from '@/shared/commands';
-import { commandService } from '@/main/services/command-service';
-import { CommandMap } from '@/shared/commands';
 
 let subscriptionId: string | null = null;
-const icon = join(__dirname, '../assets/icon.png');
 
-app.setName('Colanode');
+// Handle creating/removing shortcuts on Windows when installing/uninstalling.
+if (require('electron-squirrel-startup')) {
+  app.quit();
+}
 
-const createWindow = async (): Promise<void> => {
+const createWindow = async () => {
   await databaseService.init();
   assetService.checkAssets();
   socketService.init();
@@ -32,31 +35,20 @@ const createWindow = async (): Promise<void> => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     fullscreen: true,
-    show: false,
-    autoHideMenuBar: true,
-    ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
-      preload: join(__dirname, '../preload/index.js'),
-      sandbox: false,
+      preload: path.join(__dirname, 'preload.js'),
     },
   });
 
-  mainWindow.on('ready-to-show', () => {
-    mainWindow.show();
-  });
-
-  mainWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url);
-    return { action: 'deny' };
-  });
-
-  // HMR for renderer base on electron-vite cli.
-  // Load the remote URL for development or the local html file for production.
-  const electronRendererUrl = process.env['ELECTRON_RENDERER_URL'];
-  if (is.dev && electronRendererUrl) {
-    mainWindow.loadURL(electronRendererUrl);
+  // and load the index.html of the app.
+  if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
+    mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
+    // Open the DevTools.
+    mainWindow.webContents.openDevTools();
   } else {
-    mainWindow.loadFile(join(__dirname, '../renderer/index.html'));
+    mainWindow.loadFile(
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
+    );
   }
 
   if (subscriptionId === null) {
@@ -95,45 +87,32 @@ const createWindow = async (): Promise<void> => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.whenReady().then(() => {
-  // Set app user model id for windows
-  electronApp.setAppUserModelId('com.colanode.desktop');
-
-  // Default open or close DevTools by F12 in development
-  // and ignore CommandOrControl + R in production.
-  // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
-  app.on('browser-window-created', (_, window) => {
-    optimizer.watchWindowShortcuts(window);
-  });
-
-  // IPC test
-  ipcMain.on('ping', () => console.log('pong'));
-
-  createWindow();
-
-  app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-});
+app.on('ready', createWindow);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
-  if (subscriptionId) {
-    eventBus.unsubscribe(subscriptionId);
-    subscriptionId = null;
-  }
-
   if (process.platform !== 'darwin') {
+    if (subscriptionId) {
+      eventBus.unsubscribe(subscriptionId);
+      subscriptionId = null;
+    }
+
     app.quit();
   }
 });
 
-// In this file you can include the rest of your app"s specific main process
-// code. You can also put them in separate files and require them here.
+app.on('activate', () => {
+  // On OS X it's common to re-create a window in the app when the
+  // dock icon is clicked and there are no other windows open.
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
+
+// In this file you can include the rest of your app's specific main process
+// code. You can also put them in separate files and import them here.
 ipcMain.handle(
   'execute-mutation',
   async <T extends MutationInput>(

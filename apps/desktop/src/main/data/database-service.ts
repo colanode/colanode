@@ -6,6 +6,7 @@ import { appDatabaseMigrations } from '@/main/data/app/migrations';
 import { workspaceDatabaseMigrations } from '@/main/data/workspace/migrations';
 import { appDatabasePath, getWorkspaceDirectoryPath } from '@/main/utils';
 import SQLite from 'better-sqlite3';
+
 class DatabaseService {
   private initPromise: Promise<void> | null = null;
   private readonly workspaceDatabases: Map<
