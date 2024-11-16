@@ -43,9 +43,6 @@ class DeviceService {
         isOnline,
       });
     }
-
-    console.log('device ip', this.deviceIp);
-    console.log('online state', this.onlineState);
   }
 
   private async checkIsOnline() {
