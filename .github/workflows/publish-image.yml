@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  SERVER_IMAGE_NAME: colanode/colanode/server
+  SERVER_IMAGE_NAME: colanode/server
 
 jobs:
   build:
