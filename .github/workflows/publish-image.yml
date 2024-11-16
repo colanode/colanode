@@ -33,7 +33,7 @@ jobs:
       - name: Build and push Colanode server image
         uses: docker/build-push-action@v5
         with:
-          context: ./apps/server
+          context: .
           file: ./apps/server/Dockerfile
           push: true
           tags: |
