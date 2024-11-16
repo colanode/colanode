@@ -7,7 +7,7 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  SERVER_IMAGE_NAME: neuronapp/neuron/server
+  SERVER_IMAGE_NAME: colanode/colanode/server
 
 jobs:
   build:
@@ -30,11 +30,11 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
-      - name: Build and push Neuron server image
+      - name: Build and push Colanode server image
         uses: docker/build-push-action@v5
         with:
-          context: ./server
-          file: ./server/Dockerfile
+          context: ./apps/server
+          file: ./apps/server/Dockerfile
           push: true
           tags: |
             ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:latest
