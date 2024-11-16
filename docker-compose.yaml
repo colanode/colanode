@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15
+    container_name: colanode_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: colanode_user
+      POSTGRES_PASSWORD: strongpassword
+      POSTGRES_DB: colanode_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - colanode_network
+
+  redis:
+    image: redis:7
+    container_name: colanode_redis
+    restart: always
+    command: ["redis-server", "--requirepass", "strongredispassword"]
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - colanode_network
+
+  minio:
+    image: minio/minio
+    container_name: colanode_minio
+    restart: always
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadminpassword
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+    command: server /data
+    networks:
+      - colanode_network
+
+  server:
+    build:
+      context: . 
+      dockerfile: apps/server/Dockerfile
+    image: colanode_server
+    container_name: colanode_server
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+      - minio
+    environment:
+      # Server Configuration
+      NODE_ENV: production
+      PORT: 3000
+
+      # Database Configuration
+      DATABASE_URL: postgres://colanode_user:strongpassword@postgres:5432/colanode_db
+
+      # Redis Configuration
+      REDIS_URL: redis://:strongredispassword@redis:6379/0
+      REDIS_HOST: redis
+      REDIS_PASSWORD: strongredispassword
+      REDIS_PORT: 6379
+      REDIS_DB: 0
+
+      # Redis Channel Configuration (updated)
+      REDIS_CHANGES_CHANNEL_NAME: colanode_changes
+
+      # MinIO (S3-Compatible Storage) Configuration
+      AVATARS_STORAGE_ENDPOINT: http://minio:9000
+      AVATARS_STORAGE_BUCKET_NAME: colanode-avatars
+      AVATARS_STORAGE_REGION: us-east-1
+      AVATARS_STORAGE_ACCESS_KEY: minioadmin
+      AVATARS_STORAGE_SECRET_KEY: minioadminpassword
+
+      FILES_STORAGE_ENDPOINT: http://minio:9000
+      FILES_STORAGE_BUCKET_NAME: colanode-files
+      FILES_STORAGE_REGION: us-east-1
+      FILES_STORAGE_ACCESS_KEY: minioadmin
+      FILES_STORAGE_SECRET_KEY: minioadminpassword
+
+      SMTP_HOST: smtp.example.com
+      SMTP_PORT: 587
+      SMTP_USER: user@example.com
+      SMTP_PASS: passsword
+      EMAIL_FROM: user@example.com
+    ports:
+      - "3000:3000"
+    networks:
+      - colanode_network
+
+volumes:
+  postgres_data:
+  redis_data:
+  minio_data:
+
+networks:
+  colanode_network:
+    driver: bridge
