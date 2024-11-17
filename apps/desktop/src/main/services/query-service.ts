@@ -3,6 +3,7 @@ import { QueryHandler, SubscribedQuery } from '@/main/types';
 import { queryHandlerMap } from '@/main/queries';
 import { eventBus } from '@/shared/lib/event-bus';
 import { Event } from '@/shared/types/events';
+import { isEqual } from 'lodash-es';
 
 class QueryService {
   private readonly subscribedQueries: Map<string, SubscribedQuery<QueryInput>> =
@@ -57,7 +58,11 @@ class QueryService {
         query.input,
         query.result
       );
-      if (changeCheckResult.hasChanges && changeCheckResult.result) {
+      if (
+        changeCheckResult.hasChanges &&
+        changeCheckResult.result &&
+        !isEqual(query.result, changeCheckResult.result)
+      ) {
         const newResult = changeCheckResult.result;
         this.subscribedQueries.set(id, {
           input: query.input,
