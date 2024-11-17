@@ -57,6 +57,11 @@ export type ServerCreatedEvent = {
   server: Server;
 };
 
+export type ServerUpdatedEvent = {
+  type: 'server_updated';
+  server: Server;
+};
+
 export type UserNodeCreatedEvent = {
   type: 'user_node_created';
   userId: string;
@@ -138,6 +143,7 @@ export type Event =
   | WorkspaceUpdatedEvent
   | WorkspaceDeletedEvent
   | ServerCreatedEvent
+  | ServerUpdatedEvent
   | UserNodeCreatedEvent
   | UserNodeUpdatedEvent
   | DownloadCreatedEvent

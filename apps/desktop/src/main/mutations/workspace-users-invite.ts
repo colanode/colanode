@@ -60,8 +60,7 @@ export class WorkspaceUsersInviteMutationHandler
         role: input.role,
       },
       {
-        serverDomain: server.domain,
-        serverAttributes: server.attributes,
+        domain: server.domain,
         token: account.token,
       }
     );

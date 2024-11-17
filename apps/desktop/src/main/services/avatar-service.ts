@@ -31,8 +31,7 @@ class AvatarService {
     }
 
     const response = await httpClient.get<any>(`/v1/avatars/${avatarId}`, {
-      serverDomain: credentials.domain,
-      serverAttributes: credentials.attributes,
+      domain: credentials.domain,
       token: credentials.token,
       responseType: 'stream',
     });

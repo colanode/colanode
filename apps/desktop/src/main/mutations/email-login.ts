@@ -34,8 +34,7 @@ export class EmailLoginMutationHandler
         password: input.password,
       },
       {
-        serverDomain: server.domain,
-        serverAttributes: server.attributes,
+        domain: server.domain,
       }
     );
 

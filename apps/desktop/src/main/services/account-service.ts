@@ -39,8 +39,7 @@ class AccountService {
     const { data, status } = await httpClient.get<AccountSyncOutput>(
       '/v1/accounts/sync',
       {
-        serverDomain: server.domain,
-        serverAttributes: server.attributes,
+        domain: server.domain,
         token: account.token,
       }
     );
@@ -213,8 +212,7 @@ class AccountService {
 
       try {
         const { status } = await httpClient.delete(`/v1/accounts/logout`, {
-          serverDomain: deletedToken.domain,
-          serverAttributes: deletedToken.attributes,
+          domain: deletedToken.domain,
           token: deletedToken.token,
         });
 

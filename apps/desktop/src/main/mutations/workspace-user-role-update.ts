@@ -58,8 +58,7 @@ export class WorkspaceUserRoleUpdateMutationHandler
         role: input.role,
       },
       {
-        serverDomain: server.domain,
-        serverAttributes: server.attributes,
+        domain: server.domain,
         token: account.token,
       }
     );

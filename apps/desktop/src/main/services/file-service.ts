@@ -155,8 +155,7 @@ class FileService {
           `/v1/files/${credentials.workspaceId}/${upload.node_id}`,
           {},
           {
-            serverDomain: credentials.serverDomain,
-            serverAttributes: credentials.serverAttributes,
+            domain: credentials.serverDomain,
             token: credentials.token,
           }
         );
@@ -273,8 +272,7 @@ class FileService {
         const { data } = await httpClient.get<ServerFileDownloadResponse>(
           `/v1/files/${credentials.workspaceId}/${download.node_id}`,
           {
-            serverDomain: credentials.serverDomain,
-            serverAttributes: credentials.serverAttributes,
+            domain: credentials.serverDomain,
             token: credentials.token,
           }
         );

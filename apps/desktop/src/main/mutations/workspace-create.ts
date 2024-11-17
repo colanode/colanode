@@ -42,8 +42,7 @@ export class WorkspaceCreateMutationHandler
         avatar: input.avatar,
       },
       {
-        serverDomain: server.domain,
-        serverAttributes: server.attributes,
+        domain: server.domain,
         token: account.token,
       }
     );

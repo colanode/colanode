@@ -1,3 +1,5 @@
+import { ServerAttributes } from '@colanode/core';
+
 export type Server = {
   domain: string;
   name: string;
@@ -6,15 +8,4 @@ export type Server = {
   version: string;
   createdAt: Date;
   lastSyncedAt: Date | null;
-};
-
-export type ServerAttributes = {
-  insecure?: string;
-};
-
-export type ServerConfig = {
-  name: string;
-  avatar: string;
-  version: string;
-  attributes: ServerAttributes;
 };

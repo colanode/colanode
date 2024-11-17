@@ -1,10 +1,9 @@
+import { serverService } from '@/main/services/server-service';
 import { BackoffCalculator } from '@/shared/lib/backoff-calculator';
-import { ServerAttributes } from '@/shared/types/servers';
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
 
 interface HttpClientRequestConfig extends AxiosRequestConfig {
-  serverDomain: string;
-  serverAttributes: string | ServerAttributes;
+  domain: string;
   token?: string | null;
 }
 
@@ -18,10 +17,10 @@ class HttpClient {
     path: string,
     config: HttpClientRequestConfig
   ): Promise<AxiosResponse<T>> {
-    if (this.backoffs.has(config.serverDomain)) {
-      const backoff = this.backoffs.get(config.serverDomain);
+    if (this.backoffs.has(config.domain)) {
+      const backoff = this.backoffs.get(config.domain);
       if (!backoff?.canRetry()) {
-        throw new Error(`Backoff in progress for key: ${config.serverDomain}`);
+        throw new Error(`Backoff in progress for key: ${config.domain}`);
       }
     }
 
@@ -34,19 +33,19 @@ class HttpClient {
       });
 
       // Reset backoff if successful
-      if (this.backoffs.has(config.serverDomain)) {
-        this.backoffs.get(config.serverDomain)?.reset();
+      if (this.backoffs.has(config.domain)) {
+        this.backoffs.get(config.domain)?.reset();
       }
 
       return response;
     } catch (error: any) {
       // If error is related to server availability, increase backoff
       if (this.isServerError(error)) {
-        if (!this.backoffs.has(config.serverDomain)) {
-          this.backoffs.set(config.serverDomain, new BackoffCalculator());
+        if (!this.backoffs.has(config.domain)) {
+          this.backoffs.set(config.domain, new BackoffCalculator());
         }
 
-        const backoff = this.backoffs.get(config.serverDomain);
+        const backoff = this.backoffs.get(config.domain);
         backoff?.increaseError();
       }
 
@@ -63,12 +62,7 @@ class HttpClient {
   }
 
   private buildAxiosInstance(config: HttpClientRequestConfig): AxiosInstance {
-    const parsedAttributes: ServerAttributes =
-      typeof config.serverAttributes === 'string'
-        ? JSON.parse(config.serverAttributes)
-        : config.serverAttributes;
-    const protocol = parsedAttributes?.insecure ? 'http' : 'https';
-    const baseURL = `${protocol}://${config.serverDomain}`;
+    const baseURL = serverService.buildApiBaseUrl(config.domain);
     const instance = axios.create({ baseURL });
 
     if (config.token) {

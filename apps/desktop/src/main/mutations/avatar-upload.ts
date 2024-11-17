@@ -42,8 +42,7 @@ export class AvatarUploadMutationHandler
       '/v1/avatars',
       formData,
       {
-        serverDomain: credentials.domain,
-        serverAttributes: credentials.attributes,
+        domain: credentials.domain,
         token: credentials.token,
         headers: formData.getHeaders(),
       }

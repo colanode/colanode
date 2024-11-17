@@ -35,8 +35,7 @@ export class EmailRegisterMutationHandler
         password: input.password,
       },
       {
-        serverDomain: server.domain,
-        serverAttributes: server.attributes,
+        domain: server.domain,
       }
     );
 

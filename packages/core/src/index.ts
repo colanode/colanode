@@ -22,3 +22,4 @@ export * from './types/nodes';
 export * from './types/sync';
 export * from './types/accounts';
 export * from './types/messages';
+export * from './types/servers';

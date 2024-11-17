@@ -1,5 +1,6 @@
 import axios from 'axios';
-import { Server, ServerConfig } from '@/shared/types/servers';
+import { Server } from '@/shared/types/servers';
+import { ServerConfig } from '@colanode/core';
 import { databaseService } from '@/main/data/database-service';
 import { mapServer } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
@@ -32,7 +33,7 @@ class ServerService {
   }
 
   private async syncServer(server: Server) {
-    const config = await this.fetchServerConfig(server);
+    const config = await this.fetchServerConfig(server.domain);
     const existingState = this.states.get(server.domain);
 
     const newState: ServerState = {
@@ -57,10 +58,32 @@ class ServerService {
     console.log(
       `Server ${server.domain} is ${isAvailable ? 'available' : 'unavailable'}`
     );
+
+    if (config) {
+      const updatedServer = await databaseService.appDatabase
+        .updateTable('servers')
+        .returningAll()
+        .set({
+          last_synced_at: new Date().toISOString(),
+          attributes: JSON.stringify(config.attributes),
+          avatar: config.avatar,
+          name: config.name,
+          version: config.version,
+        })
+        .where('domain', '=', server.domain)
+        .executeTakeFirst();
+
+      if (updatedServer) {
+        eventBus.publish({
+          type: 'server_updated',
+          server: mapServer(updatedServer),
+        });
+      }
+    }
   }
 
-  private async fetchServerConfig(server: Server) {
-    const baseUrl = this.buildApiBaseUrl(server.domain);
+  public async fetchServerConfig(domain: string) {
+    const baseUrl = this.buildApiBaseUrl(domain);
     const configUrl = `${baseUrl}/v1/config`;
     try {
       const { status, data } = await axios.get<ServerConfig>(configUrl);

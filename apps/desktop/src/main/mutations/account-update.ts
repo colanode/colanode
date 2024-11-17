@@ -41,8 +41,7 @@ export class AccountUpdateMutationHandler
         avatar: input.avatar,
       },
       {
-        serverDomain: server.domain,
-        serverAttributes: server.attributes,
+        domain: server.domain,
         token: account.token,
       }
     );

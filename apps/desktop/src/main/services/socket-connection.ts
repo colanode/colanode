@@ -1,15 +1,8 @@
 import { WebSocket } from 'ws';
 import { BackoffCalculator } from '@/shared/lib/backoff-calculator';
 import { Message } from '@colanode/core';
-import { SelectAccount, SelectServer } from '@/main/data/app/schema';
-import { ServerAttributes } from '@/shared/types/servers';
+import { SelectAccount } from '@/main/data/app/schema';
 import { mutationService } from '@/main/services/mutation-service';
-
-const buildSynapseUrl = (server: SelectServer, deviceId: string) => {
-  const attributes = JSON.parse(server.attributes) as ServerAttributes;
-  const protocol = attributes?.insecure ? 'ws' : 'wss';
-  return `${protocol}://${server.domain}/v1/synapse?device_id=${deviceId}`;
-};
 
 export class SocketConnection {
   private readonly synapseUrl: string;

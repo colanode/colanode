@@ -24,6 +24,14 @@ export class ServerListQueryHandler
         hasChanges: true,
         result: newServers,
       };
+    } else if (event.type === 'server_updated') {
+      const newServers = output.map((server) =>
+        server.domain === event.server.domain ? event.server : server
+      );
+      return {
+        hasChanges: true,
+        result: newServers,
+      };
     }
 
     return {

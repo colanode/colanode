@@ -134,8 +134,7 @@ class WorkspaceService {
           changes: changesToSync,
         },
         {
-          serverDomain: workspace.domain,
-          serverAttributes: workspace.attributes,
+          domain: workspace.domain,
           token: workspace.token,
         }
       );
