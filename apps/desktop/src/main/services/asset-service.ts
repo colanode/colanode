@@ -33,7 +33,7 @@ class AssetService {
       return path.join(this.assetsDir, url);
     }
 
-    return path.join(__dirname, 'assets', url);
+    return path.join(this.getAssetsSourcePath(), url);
   }
 
   public getEmojiData(): EmojiData {
