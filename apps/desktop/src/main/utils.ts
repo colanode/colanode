@@ -14,8 +14,13 @@ import {
 } from '@/main/data/workspace/schema';
 import { LocalChange, Node, NodeTypes } from '@colanode/core';
 import { Account } from '@/shared/types/accounts';
-import { SelectAccount, SelectWorkspace } from './data/app/schema';
+import {
+  SelectAccount,
+  SelectServer,
+  SelectWorkspace,
+} from './data/app/schema';
 import { Workspace } from '@/shared/types/workspaces';
+import { Server } from '@/shared/types/servers';
 
 export const appPath = app.getPath('userData');
 
@@ -120,10 +125,22 @@ export const mapWorkspace = (row: SelectWorkspace): Workspace => {
   };
 };
 
-export const mapChange = (change: SelectChange): LocalChange => {
+export const mapChange = (row: SelectChange): LocalChange => {
   return {
-    id: change.id,
-    data: JSON.parse(change.data),
-    createdAt: change.created_at,
+    id: row.id,
+    data: JSON.parse(row.data),
+    createdAt: row.created_at,
+  };
+};
+
+export const mapServer = (row: SelectServer): Server => {
+  return {
+    domain: row.domain,
+    name: row.name,
+    avatar: row.avatar,
+    attributes: JSON.parse(row.attributes),
+    version: row.version,
+    createdAt: new Date(row.created_at),
+    lastSyncedAt: row.last_synced_at ? new Date(row.last_synced_at) : null,
   };
 };

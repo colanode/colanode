@@ -13,10 +13,7 @@ import { QueryInput } from '@/shared/queries';
 import { CommandMap } from '@/shared/commands';
 import { CommandInput } from '@/shared/commands';
 import { commandService } from '@/main/services/command-service';
-import { databaseService } from '@/main/data/database-service';
-import { socketService } from '@/main/services/socket-service';
-import { syncService } from '@/main/services/sync-service';
-import { radarService } from '@/main/services/radar-service';
+import { bootstrapper } from '@/main/bootstrapper';
 import started from 'electron-squirrel-startup';
 
 let subscriptionId: string | null = null;
@@ -27,11 +24,7 @@ if (started) {
 }
 
 const createWindow = async () => {
-  await databaseService.init();
-  assetService.checkAssets();
-  socketService.init();
-  syncService.init();
-  radarService.init();
+  await bootstrapper.init();
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({

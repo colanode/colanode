@@ -10,6 +10,7 @@ import { LocalChange, SyncChangesOutput } from '@colanode/core';
 import { WorkspaceDatabaseSchema } from '@/main/data/workspace/schema';
 import { Kysely } from 'kysely';
 import { httpClient } from '@/shared/lib/http-client';
+import { serverService } from '@/main/services/server-service';
 
 type WorkspaceSyncState = {
   isSyncing: boolean;
@@ -118,6 +119,10 @@ class WorkspaceService {
       .executeTakeFirst();
 
     if (!workspace) {
+      return;
+    }
+
+    if (!serverService.isAvailable(workspace.domain)) {
       return;
     }
 

@@ -14,6 +14,7 @@ import { httpClient } from '@/shared/lib/http-client';
 import { getWorkspaceFilesDirectoryPath } from '@/main/utils';
 import { FileAttributes } from '@colanode/core';
 import { eventBus } from '@/shared/lib/event-bus';
+import { serverService } from '@/main/services/server-service';
 
 class FileService {
   public async handleFileRequest(request: Request): Promise<Response> {
@@ -145,6 +146,10 @@ class FileService {
         continue;
       }
 
+      if (!serverService.isAvailable(credentials.serverDomain)) {
+        continue;
+      }
+
       try {
         const { data } = await httpClient.post<ServerFileUploadResponse>(
           `/v1/files/${credentials.workspaceId}/${upload.node_id}`,
@@ -257,6 +262,10 @@ class FileService {
           },
         });
 
+        continue;
+      }
+
+      if (!serverService.isAvailable(credentials.serverDomain)) {
         continue;
       }
 

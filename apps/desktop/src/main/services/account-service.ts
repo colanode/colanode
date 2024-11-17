@@ -7,6 +7,7 @@ import { mapAccount, mapWorkspace } from '@/main/utils';
 import { getAccountAvatarsDirectoryPath } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
 import { workspaceService } from '@/main/services/workspace-service';
+import { serverService } from '@/main/services/server-service';
 
 class AccountService {
   async syncAccounts() {
@@ -29,6 +30,10 @@ class AccountService {
 
     if (!server) {
       throw new Error('Server not found!');
+    }
+
+    if (!serverService.isAvailable(server.domain)) {
+      return;
     }
 
     const { data, status } = await httpClient.get<AccountSyncOutput>(
@@ -202,6 +207,10 @@ class AccountService {
     }
 
     for (const deletedToken of deletedTokens) {
+      if (!serverService.isAvailable(deletedToken.domain)) {
+        continue;
+      }
+
       try {
         const { status } = await httpClient.delete(`/v1/accounts/logout`, {
           serverDomain: deletedToken.domain,

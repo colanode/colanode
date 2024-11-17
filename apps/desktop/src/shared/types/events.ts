@@ -121,9 +121,10 @@ export type ChangeCreatedEvent = {
   changeId: number;
 };
 
-export type OnlineStateChangedEvent = {
-  type: 'online_state_changed';
-  isOnline: boolean;
+export type ServerAvailabilityChangedEvent = {
+  type: 'server_availability_changed';
+  server: Server;
+  isAvailable: boolean;
 };
 
 export type Event =
@@ -148,4 +149,4 @@ export type Event =
   | QueryResultUpdatedEvent
   | RadarDataUpdatedEvent
   | ChangeCreatedEvent
-  | OnlineStateChangedEvent;
+  | ServerAvailabilityChangedEvent;
