@@ -10,6 +10,21 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 const config: ForgeConfig = {
   packagerConfig: {
     asar: true,
+    ignore: [
+      /^\/src/,
+      /^\/test/,
+      /^\/tools/,
+      /^\/release/,
+      /^\/docs/,
+      /^\/dist/,
+      /\.git/,
+      /\.vscode/,
+      /\.idea/,
+      /^\/\.env/,
+      // Don't ignore node_modules
+      // /^\/node_modules/
+    ],
+    extraResource: ['assets'],
   },
   rebuildConfig: {},
   makers: [

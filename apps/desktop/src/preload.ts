@@ -11,7 +11,6 @@ import { Event } from '@/shared/types/events';
 
 contextBridge.exposeInMainWorld('colanode', {
   init: () => ipcRenderer.invoke('init'),
-  logout: (accountId: string) => ipcRenderer.invoke('logout', accountId),
 
   executeMutation: <T extends MutationInput>(
     input: T
