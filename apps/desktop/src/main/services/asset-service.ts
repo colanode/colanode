@@ -64,7 +64,7 @@ class AssetService {
   }
 
   private async updateEmojis(): Promise<void> {
-    const emojisZipPath = path.join(__dirname, 'assets', 'emojis.zip');
+    const emojisZipPath = path.join(this.getAssetsSourcePath(), 'emojis.zip');
     const emojisDir = path.join(this.assetsDir, 'emojis');
     if (fs.existsSync(emojisDir)) {
       fs.rmSync(emojisDir, { recursive: true });
@@ -78,7 +78,7 @@ class AssetService {
   }
 
   private async updateIcons(): Promise<void> {
-    const iconsZipPath = path.join(__dirname, 'assets', 'icons.zip');
+    const iconsZipPath = path.join(this.getAssetsSourcePath(), 'icons.zip');
     const iconsDir = path.join(this.assetsDir, 'icons');
     if (fs.existsSync(iconsDir)) {
       fs.rmSync(iconsDir, { recursive: true });
@@ -122,6 +122,14 @@ class AssetService {
         icons: ICONS_VERSION,
       })
     );
+  }
+
+  private getAssetsSourcePath(): string {
+    if (app.isPackaged) {
+      return path.join(process.resourcesPath, 'assets');
+    }
+
+    return path.resolve(__dirname, '../../assets');
   }
 }
 
