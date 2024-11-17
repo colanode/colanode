@@ -16,6 +16,8 @@ import { useEventBus } from '@/renderer/hooks/use-event-bus';
 import { Event } from '@/shared/types/events';
 import { AccountRedirect } from '@/renderer/components/accounts/account-redirect';
 import { Account } from '@/renderer/components/accounts/account';
+import { DelayedComponent } from '@/renderer/components/ui/delayed-component';
+import { AppLoading } from '@/renderer/app-loading';
 
 const router = createHashRouter([
   {
@@ -56,6 +58,7 @@ const queryClient = new QueryClient();
 
 const Root = () => {
   const eventBus = useEventBus();
+  const [initialized, setInitialized] = React.useState(false);
 
   React.useEffect(() => {
     const id = eventBus.subscribe((event: Event) => {
@@ -93,10 +96,22 @@ const Root = () => {
       }
     });
 
+    window.colanode.init().then(() => {
+      setInitialized(true);
+    });
+
     return () => {
       eventBus.unsubscribe(id);
     };
   }, []);
+
+  if (!initialized) {
+    return (
+      <DelayedComponent>
+        <AppLoading />
+      </DelayedComponent>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
