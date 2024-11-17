@@ -68,7 +68,7 @@ export class ServerUserNodeSyncMutationHandler
       });
 
       if (createdUserNode) {
-        eventBus.publish({
+        await eventBus.publish({
           type: 'user_node_created',
           userId: userId,
           userNode: {

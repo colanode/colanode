@@ -45,7 +45,7 @@ class WorkspaceService {
       fs.rmSync(workspaceDir, { recursive: true });
     }
 
-    eventBus.publish({
+    await eventBus.publish({
       type: 'workspace_deleted',
       workspace: mapWorkspace(deletedWorkspace),
     });

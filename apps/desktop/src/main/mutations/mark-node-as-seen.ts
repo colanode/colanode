@@ -75,7 +75,7 @@ export class MarkNodeAsSeenMutationHandler
     });
 
     if (userNode) {
-      eventBus.publish({
+      await eventBus.publish({
         type: 'user_node_created',
         userId: input.userId,
         userNode,
@@ -83,7 +83,7 @@ export class MarkNodeAsSeenMutationHandler
     }
 
     if (changeId) {
-      eventBus.publish({
+      await eventBus.publish({
         type: 'change_created',
         userId: input.userId,
         changeId,

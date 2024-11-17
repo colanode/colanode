@@ -73,7 +73,7 @@ class AccountService {
       return;
     }
 
-    eventBus.publish({
+    await eventBus.publish({
       type: 'account_updated',
       account: mapAccount(updatedAccount),
     });
@@ -104,7 +104,7 @@ class AccountService {
           return;
         }
 
-        eventBus.publish({
+        await eventBus.publish({
           type: 'workspace_created',
           workspace: mapWorkspace(createdWorkspace),
         });
@@ -127,7 +127,7 @@ class AccountService {
           return;
         }
 
-        eventBus.publish({
+        await eventBus.publish({
           type: 'workspace_updated',
           workspace: mapWorkspace(updatedWorkspace),
         });
@@ -171,7 +171,7 @@ class AccountService {
       return false;
     }
 
-    eventBus.publish({
+    await eventBus.publish({
       type: 'account_deleted',
       account: mapAccount(deletedAccount),
     });

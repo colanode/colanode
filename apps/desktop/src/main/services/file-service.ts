@@ -219,7 +219,7 @@ class FileService {
           .where('node_id', '=', download.node_id)
           .execute();
 
-        eventBus.publish({
+        await eventBus.publish({
           type: 'download_deleted',
           userId: credentials.userId,
           download: {
@@ -249,7 +249,7 @@ class FileService {
           .where('node_id', '=', download.node_id)
           .execute();
 
-        eventBus.publish({
+        await eventBus.publish({
           type: 'download_updated',
           userId: credentials.userId,
           download: {
@@ -291,7 +291,7 @@ class FileService {
           .where('node_id', '=', download.node_id)
           .execute();
 
-        eventBus.publish({
+        await eventBus.publish({
           type: 'download_updated',
           userId: credentials.userId,
           download: {
@@ -311,7 +311,7 @@ class FileService {
           .where('node_id', '=', download.node_id)
           .execute();
 
-        eventBus.publish({
+        await eventBus.publish({
           type: 'download_updated',
           userId: credentials.userId,
           download: {

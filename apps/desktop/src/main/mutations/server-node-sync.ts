@@ -75,7 +75,7 @@ export class ServerNodeSyncMutationHandler
               workspaceId: input.workspaceId,
             });
 
-            eventBus.publish({
+            await eventBus.publish({
               type: 'node_created',
               userId: userId,
               node: mapNode(result),
@@ -118,7 +118,7 @@ export class ServerNodeSyncMutationHandler
               workspaceId: input.workspaceId,
             });
 
-            eventBus.publish({
+            await eventBus.publish({
               type: 'node_updated',
               userId: userId,
               node: mapNode(updatedNode),

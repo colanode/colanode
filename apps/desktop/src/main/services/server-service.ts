@@ -48,7 +48,7 @@ class ServerService {
     const wasAvailable = existingState?.isAvailable ?? false;
     const isAvailable = newState.isAvailable;
     if (wasAvailable !== isAvailable) {
-      eventBus.publish({
+      await eventBus.publish({
         type: 'server_availability_changed',
         server,
         isAvailable,
@@ -74,7 +74,7 @@ class ServerService {
         .executeTakeFirst();
 
       if (updatedServer) {
-        eventBus.publish({
+        await eventBus.publish({
           type: 'server_updated',
           server: mapServer(updatedServer),
         });

@@ -50,7 +50,9 @@ export const EmailRegister = ({ server }: EmailRegisterProps) => {
       },
       onSuccess(output) {
         if (output.success) {
-          navigate(`/${output.account.id}`);
+          const userId =
+            output.workspaces.length > 0 ? output.workspaces[0].id : '';
+          navigate(`/${output.account.id}/${userId}`);
         } else {
           toast({
             title: 'Failed to register',

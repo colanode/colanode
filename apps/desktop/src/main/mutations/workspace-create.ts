@@ -67,7 +67,7 @@ export class WorkspaceCreateMutationHandler
       throw new Error('Failed to create workspace!');
     }
 
-    eventBus.publish({
+    await eventBus.publish({
       type: 'workspace_created',
       workspace: {
         id: createdWorkspace.workspace_id,

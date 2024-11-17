@@ -88,7 +88,7 @@ export class WorkspaceUserRoleUpdateMutationHandler
       };
     }
 
-    eventBus.publish({
+    await eventBus.publish({
       type: 'node_updated',
       userId: input.userId,
       node: mapNode(updatedUser),

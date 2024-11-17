@@ -33,7 +33,7 @@ export class ServerCreateMutationHandler
       })
       .execute();
 
-    eventBus.publish({
+    await eventBus.publish({
       type: 'server_created',
       server: {
         domain: input.domain,

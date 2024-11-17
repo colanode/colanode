@@ -158,7 +158,7 @@ class NodeService {
     });
 
     for (const createdNode of createdNodes) {
-      eventBus.publish({
+      await eventBus.publish({
         type: 'node_created',
         userId,
         node: createdNode,
@@ -166,7 +166,7 @@ class NodeService {
     }
 
     for (const createdUpload of createdUploads) {
-      eventBus.publish({
+      await eventBus.publish({
         type: 'upload_created',
         userId,
         upload: createdUpload,
@@ -174,7 +174,7 @@ class NodeService {
     }
 
     for (const createdDownload of createdDownloads) {
-      eventBus.publish({
+      await eventBus.publish({
         type: 'download_created',
         userId,
         download: createdDownload,
@@ -182,7 +182,7 @@ class NodeService {
     }
 
     for (const createdChangeId of createdChangeIds) {
-      eventBus.publish({
+      await eventBus.publish({
         type: 'change_created',
         userId,
         changeId: createdChangeId,
@@ -315,7 +315,7 @@ class NodeService {
       });
 
     if (result) {
-      eventBus.publish({
+      await eventBus.publish({
         type: 'node_updated',
         userId,
         node,
@@ -323,7 +323,7 @@ class NodeService {
     }
 
     if (changeId) {
-      eventBus.publish({
+      await eventBus.publish({
         type: 'change_created',
         userId,
         changeId,
@@ -400,14 +400,14 @@ class NodeService {
       }
     });
 
-    eventBus.publish({
+    await eventBus.publish({
       type: 'node_deleted',
       userId,
       node: node,
     });
 
     if (changeId) {
-      eventBus.publish({
+      await eventBus.publish({
         type: 'change_created',
         userId,
         changeId,

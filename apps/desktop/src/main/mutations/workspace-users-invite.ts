@@ -99,7 +99,7 @@ export class WorkspaceUsersInviteMutationHandler
     }
 
     for (const createdNode of createdNodes) {
-      eventBus.publish({
+      await eventBus.publish({
         type: 'node_created',
         userId: input.userId,
         node: mapNode(createdNode),

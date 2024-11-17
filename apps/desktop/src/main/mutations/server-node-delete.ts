@@ -48,7 +48,7 @@ export class ServerNodeDeleteMutationHandler
     });
 
     if (deletedNode) {
-      eventBus.publish({
+      await eventBus.publish({
         type: 'node_deleted',
         userId,
         node: mapNode(deletedNode),
