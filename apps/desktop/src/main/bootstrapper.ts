@@ -29,8 +29,7 @@ class Bootstrapper {
     await assetService.checkAssets();
     await serverService.syncServers();
     await radarService.init();
-
-    socketService.init();
+    await socketService.checkConnections();
 
     if (!this.eventLoop) {
       this.eventLoop = setTimeout(this.executeEventLoop, EVENT_LOOP_INTERVAL);
@@ -41,6 +40,7 @@ class Bootstrapper {
     try {
       await serverService.syncServers();
       await accountService.syncAccounts();
+      await socketService.checkConnections();
       await accountService.syncDeletedTokens();
       await workspaceService.syncAllWorkspaces();
     } catch (error) {

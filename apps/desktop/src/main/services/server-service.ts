@@ -60,7 +60,7 @@ class ServerService {
   }
 
   private async fetchServerConfig(server: Server) {
-    const baseUrl = this.buildServerBaseUrl(server);
+    const baseUrl = this.buildApiBaseUrl(server.domain);
     const configUrl = `${baseUrl}/v1/config`;
     try {
       const { status, data } = await axios.get<ServerConfig>(configUrl);
@@ -70,10 +70,14 @@ class ServerService {
     }
   }
 
-  private buildServerBaseUrl(server: Server) {
-    const domain = server.domain;
+  public buildApiBaseUrl(domain: string) {
     const protocol = domain.startsWith('localhost:') ? 'http' : 'https';
     return `${protocol}://${domain}`;
+  }
+
+  public buildSynapseUrl(domain: string) {
+    const protocol = domain.startsWith('localhost:') ? 'ws' : 'wss';
+    return `${protocol}://${domain}/v1/synapse`;
   }
 }
 

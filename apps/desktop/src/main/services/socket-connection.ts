@@ -3,7 +3,7 @@ import { BackoffCalculator } from '@/shared/lib/backoff-calculator';
 import { Message } from '@colanode/core';
 import { SelectAccount, SelectServer } from '@/main/data/app/schema';
 import { ServerAttributes } from '@/shared/types/servers';
-import { mutationService } from './mutation-service';
+import { mutationService } from '@/main/services/mutation-service';
 
 const buildSynapseUrl = (server: SelectServer, deviceId: string) => {
   const attributes = JSON.parse(server.attributes) as ServerAttributes;
@@ -12,14 +12,14 @@ const buildSynapseUrl = (server: SelectServer, deviceId: string) => {
 };
 
 export class SocketConnection {
-  private readonly server: SelectServer;
+  private readonly synapseUrl: string;
   private readonly account: SelectAccount;
   private socket: WebSocket | null;
   private backoffCalculator: BackoffCalculator;
   private closingCount: number;
 
-  constructor(server: SelectServer, account: SelectAccount) {
-    this.server = server;
+  constructor(synapseUrl: string, account: SelectAccount) {
+    this.synapseUrl = synapseUrl;
     this.account = account;
     this.socket = null;
     this.backoffCalculator = new BackoffCalculator();
@@ -35,14 +35,11 @@ export class SocketConnection {
       return;
     }
 
-    this.socket = new WebSocket(
-      buildSynapseUrl(this.server, this.account.device_id),
-      {
-        headers: {
-          authorization: this.account.token,
-        },
-      }
-    );
+    this.socket = new WebSocket(this.synapseUrl, {
+      headers: {
+        authorization: this.account.token,
+      },
+    });
 
     this.socket.onmessage = async (event) => {
       let data: string;
@@ -100,6 +97,10 @@ export class SocketConnection {
     };
 
     this.socket.onerror = () => {
+      this.backoffCalculator.increaseError();
+    };
+
+    this.socket.onclose = () => {
       this.backoffCalculator.increaseError();
     };
   }
