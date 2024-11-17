@@ -6,9 +6,11 @@ import { MakerRpm } from '@electron-forge/maker-rpm';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { FuseV1Options, FuseVersion } from '@electron/fuses';
+import fs from 'fs/promises';
 
 const config: ForgeConfig = {
   packagerConfig: {
+    name: 'Colanode',
     asar: true,
     ignore: [
       /^\/src/,
@@ -22,7 +24,7 @@ const config: ForgeConfig = {
       /\.idea/,
       /^\/\.env/,
       // Don't ignore node_modules
-      // /^\/node_modules/
+      // /^\/node_modules/,
     ],
     extraResource: ['assets'],
   },
@@ -69,6 +71,32 @@ const config: ForgeConfig = {
       [FuseV1Options.OnlyLoadAppFromAsar]: true,
     }),
   ],
+  hooks: {
+    prePackage: async () => {
+      // This is a temporary fix to be able to package the app
+      // in a monorepo setup. When packaging the app, vite checks only in
+      // the node_modules directory of the current package for dependencies needed in the main process.
+      // This is why we need to copy the node_modules directory from the root to the build directory.
+
+      // to be removed when forge supports monorepos
+
+      const srcNodeModules = '../../node_modules';
+      const destNodeModules = './node_modules';
+
+      // Ensure the destination directory exists
+      await fs.mkdir(destNodeModules, { recursive: true });
+
+      // Copy the entire node_modules directory recursively
+      await fs.cp(srcNodeModules, destNodeModules, {
+        recursive: true,
+        force: true,
+      });
+    },
+    postPackage: async () => {
+      // remove the node_modules directory
+      await fs.rm('./node_modules', { recursive: true, force: true });
+    },
+  },
 };
 
 export default config;
