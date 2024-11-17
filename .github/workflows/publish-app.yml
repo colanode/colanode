@@ -36,6 +36,7 @@ jobs:
 
       - name: Update package.json version
         shell: bash
+        working-directory: apps/desktop
         run: |
           if [ "$RUNNER_OS" == "Windows" ]; then
             npm version ${VERSION} --no-git-tag-version
@@ -49,9 +50,11 @@ jobs:
       - name: Build Electron App
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        working-directory: apps/desktop
         run: npm run make
 
       - name: Publish Release to GitHub
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+        working-directory: apps/desktop
         run: npm run publish

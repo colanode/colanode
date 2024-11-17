@@ -35,6 +35,22 @@ const config: ForgeConfig = {
     new MakerRpm({}),
     new MakerDeb({}),
   ],
+  publishers: [
+    {
+      name: '@electron-forge/publisher-github',
+      config: {
+        repository: {
+          owner: 'colanode',
+          name: 'colanode'
+        },
+        // Publishing options: 
+        //    draft=true creates private release for review, 
+        //    prerelease=true marks as beta, false=stable/production
+        prerelease: false,
+        draft: true
+      }
+    }
+  ],
   plugins: [
     new VitePlugin({
       // `build` can specify multiple entry builds, which can be Main process, Preload scripts, Worker process, etc.
