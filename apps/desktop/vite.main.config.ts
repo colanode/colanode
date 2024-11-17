@@ -31,7 +31,6 @@ export default defineConfig((env) => {
       mainFields: ['module', 'jsnext:main', 'jsnext'],
       alias: {
         '@': path.resolve(__dirname, './src'),
-        node_modules: path.resolve(__dirname, '../../node_modules'),
       },
     },
   };
