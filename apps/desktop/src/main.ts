@@ -17,11 +17,12 @@ import { databaseService } from '@/main/data/database-service';
 import { socketService } from '@/main/services/socket-service';
 import { syncService } from '@/main/services/sync-service';
 import { radarService } from '@/main/services/radar-service';
+import started from 'electron-squirrel-startup';
 
 let subscriptionId: string | null = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
-if (require('electron-squirrel-startup')) {
+if (started) {
   app.quit();
 }
 
