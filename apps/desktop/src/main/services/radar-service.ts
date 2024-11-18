@@ -1,36 +1,72 @@
 import { databaseService } from '@/main/data/database-service';
-import { Kysely } from 'kysely';
-import { WorkspaceDatabaseSchema } from '@/main/data/workspace/schema';
 import { getIdType, IdType, NodeTypes } from '@colanode/core';
-import { WorkspaceReadState } from '@/shared/types/radars';
+import { WorkspaceRadarData } from '@/shared/types/radars';
 import { eventBus } from '@/shared/lib/event-bus';
 import { Event } from '@/shared/types/events';
 
 class RadarService {
-  private readonly workspaceStates: Record<string, WorkspaceReadState> = {};
+  private readonly workspaceStates: Record<string, WorkspaceRadarData> = {};
 
   constructor() {
     eventBus.subscribe(this.handleEvent.bind(this));
   }
 
   public async init(): Promise<void> {
-    const workspaceDatabases = await databaseService.getWorkspaceDatabases();
-    for (const [userId, workspaceDatabase] of workspaceDatabases.entries()) {
-      await this.initWorkspace(userId, workspaceDatabase);
+    const workspaces = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .select(['user_id', 'workspace_id', 'account_id'])
+      .execute();
+
+    for (const workspace of workspaces) {
+      this.workspaceStates[workspace.user_id] = {
+        userId: workspace.user_id,
+        workspaceId: workspace.workspace_id,
+        accountId: workspace.account_id,
+        nodeStates: {},
+        importantCount: 0,
+        hasUnseenChanges: false,
+      };
+
+      await this.initWorkspace(workspace.user_id);
     }
   }
 
-  public getWorkspaceStates(): Record<string, WorkspaceReadState> {
+  public getWorkspaceStates(): Record<string, WorkspaceRadarData> {
     return this.workspaceStates;
   }
 
-  private async initWorkspace(
-    userId: string,
-    workspaceDatabase: Kysely<WorkspaceDatabaseSchema>
-  ): Promise<void> {
-    const workspaceState: WorkspaceReadState = {
-      importantCount: 0,
+  private async initWorkspace(userId: string): Promise<void> {
+    let existingData = this.workspaceStates[userId];
+    if (!existingData) {
+      const workspace = await databaseService.appDatabase
+        .selectFrom('workspaces')
+        .select(['user_id', 'workspace_id', 'account_id'])
+        .where('user_id', '=', userId)
+        .executeTakeFirst();
+
+      if (!workspace) {
+        return;
+      }
+
+      existingData = {
+        userId,
+        workspaceId: workspace.workspace_id,
+        accountId: workspace.account_id,
+        nodeStates: {},
+        importantCount: 0,
+        hasUnseenChanges: false,
+      };
+    }
+
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const data: WorkspaceRadarData = {
+      accountId: existingData.accountId,
+      workspaceId: existingData.workspaceId,
+      userId: existingData.userId,
       hasUnseenChanges: false,
+      importantCount: 0,
       nodeStates: {},
     };
 
@@ -55,7 +91,7 @@ class RadarService {
       const mentionsCount = nodeUnreadMessageCount.mentions_count;
 
       if (idType === IdType.Chat) {
-        workspaceState.nodeStates[nodeId] = {
+        data.nodeStates[nodeId] = {
           type: 'chat',
           nodeId,
           unseenMessagesCount: messagesCount,
@@ -63,14 +99,14 @@ class RadarService {
         };
 
         if (mentionsCount > 0) {
-          workspaceState.importantCount += mentionsCount;
+          data.importantCount += mentionsCount;
         }
 
         if (messagesCount > 0) {
-          workspaceState.importantCount += messagesCount;
+          data.importantCount += messagesCount;
         }
       } else if (idType === IdType.Channel) {
-        workspaceState.nodeStates[nodeId] = {
+        data.nodeStates[nodeId] = {
           type: 'channel',
           nodeId,
           unseenMessagesCount: messagesCount,
@@ -78,14 +114,14 @@ class RadarService {
         };
 
         if (messagesCount > 0) {
-          workspaceState.hasUnseenChanges = true;
+          data.hasUnseenChanges = true;
         } else if (mentionsCount > 0) {
-          workspaceState.importantCount += messagesCount;
+          data.importantCount += messagesCount;
         }
       }
     }
 
-    this.workspaceStates[userId] = workspaceState;
+    this.workspaceStates[userId] = data;
   }
 
   private async handleEvent(event: Event) {
@@ -99,10 +135,7 @@ class RadarService {
       event.type === 'user_node_updated'
     ) {
       // to be optimized
-      const workspaceDatabase = await databaseService.getWorkspaceDatabase(
-        event.userId
-      );
-      await this.initWorkspace(event.userId, workspaceDatabase);
+      await this.initWorkspace(event.userId);
       eventBus.publish({
         type: 'radar_data_updated',
       });

@@ -1,4 +1,5 @@
 import {
+  AccountReadState,
   ChannelReadState,
   ChatReadState,
   WorkspaceReadState,
@@ -6,6 +7,7 @@ import {
 import { createContext, useContext } from 'react';
 
 interface RadarContext {
+  getAccountState: (accountId: string) => AccountReadState;
   getWorkspaceState: (userId: string) => WorkspaceReadState;
   getChatState: (userId: string, nodeId: string) => ChatReadState;
   getChannelState: (userId: string, nodeId: string) => ChannelReadState;

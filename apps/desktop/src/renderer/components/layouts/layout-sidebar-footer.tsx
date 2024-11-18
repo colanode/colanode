@@ -16,49 +16,28 @@ import {
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useAccount } from '@/renderer/contexts/account';
 import { Check, ChevronsUpDown, LogOut, Plus, Settings } from 'lucide-react';
-import { useApp } from '@/renderer/contexts/app';
 import { useNavigate } from 'react-router-dom';
 import { useRadar } from '@/renderer/contexts/radar';
 import { ReadStateIndicator } from '@/renderer/components/layouts/read-state-indicator';
-
-interface AccountReadState {
-  importantCount: number;
-  hasUnseenChanges: boolean;
-}
+import { useQuery } from '@/renderer/hooks/use-query';
+import { AccountReadState } from '@/shared/types/radars';
 
 export function LayoutSidebarFooter() {
-  const app = useApp();
   const account = useAccount();
   const sidebar = useSidebar();
   const navigate = useNavigate();
   const radar = useRadar();
 
   const [open, setOpen] = React.useState(false);
-  const otherAccounts = app.accounts.filter((a) => a.id !== account.id);
+  const { data } = useQuery({
+    type: 'account_list',
+  });
 
+  const accounts = data ?? [];
+  const otherAccounts = accounts.filter((a) => a.id !== account.id);
   const accountStates: Record<string, AccountReadState> = {};
-  for (const accountItem of app.accounts) {
-    const accountWorkspaces = app.workspaces.filter(
-      (w) => w.accountId === accountItem.id
-    );
-
-    const state: AccountReadState = {
-      importantCount: 0,
-      hasUnseenChanges: false,
-    };
-
-    for (const accountWorkspace of accountWorkspaces) {
-      const workspaceState = radar.getWorkspaceState(accountWorkspace.userId);
-      if (!workspaceState) {
-        continue;
-      }
-
-      state.importantCount += workspaceState.importantCount;
-      state.hasUnseenChanges =
-        state.hasUnseenChanges || workspaceState.hasUnseenChanges;
-    }
-
-    accountStates[accountItem.id] = state;
+  for (const accountItem of otherAccounts) {
+    accountStates[accountItem.id] = radar.getAccountState(accountItem.id);
   }
 
   const importantCount = Object.values(accountStates).reduce(
@@ -138,7 +117,7 @@ export function LayoutSidebarFooter() {
               <React.Fragment>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="mb-1">Accounts</DropdownMenuLabel>
-                {app.accounts.map((accountItem) => {
+                {accounts.map((accountItem) => {
                   const state = accountStates[accountItem.id];
                   return (
                     <DropdownMenuItem

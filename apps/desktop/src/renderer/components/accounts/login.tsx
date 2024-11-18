@@ -1,6 +1,19 @@
 import { LoginForm } from '@/renderer/components/accounts/login-form';
+import { useQuery } from '@/renderer/hooks/use-query';
 
 export const Login = () => {
+  const { data: accounts, isPending: isPendingAccounts } = useQuery({
+    type: 'account_list',
+  });
+
+  const { data: servers, isPending: isPendingServers } = useQuery({
+    type: 'server_list',
+  });
+
+  if (isPendingAccounts || isPendingServers) {
+    return null;
+  }
+
   return (
     <div className="grid h-screen min-h-screen w-full grid-cols-5">
       <div className="col-span-2 flex items-center justify-center bg-zinc-950">
@@ -16,7 +29,7 @@ export const Login = () => {
               Use one of the following methods to login
             </p>
           </div>
-          <LoginForm />
+          <LoginForm accounts={accounts} servers={servers} />
         </div>
       </div>
     </div>

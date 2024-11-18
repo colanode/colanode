@@ -17,7 +17,7 @@ import { Event } from '@/shared/types/events';
 import { AccountRedirect } from '@/renderer/components/accounts/account-redirect';
 import { Account } from '@/renderer/components/accounts/account';
 import { DelayedComponent } from '@/renderer/components/ui/delayed-component';
-import { AppLoading } from '@/renderer/app-loading';
+import { RootLoader } from '@/renderer/root-loader';
 
 const router = createHashRouter([
   {
@@ -108,7 +108,7 @@ const Root = () => {
   if (!initialized) {
     return (
       <DelayedComponent>
-        <AppLoading />
+        <RootLoader />
       </DelayedComponent>
     );
   }

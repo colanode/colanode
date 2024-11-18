@@ -7,23 +7,49 @@ interface RadarProviderProps {
 
 export const RadarProvider = ({ children }: RadarProviderProps) => {
   const { data } = useQuery({
-    type: 'read_states_get',
+    type: 'radar_data_get',
   });
 
+  const radarData = data ?? {};
   return (
     <RadarContext.Provider
       value={{
-        getWorkspaceState: (userId) => {
-          return (
-            data?.[userId] ?? {
-              nodeStates: {},
-              importantCount: 0,
-              hasUnseenChanges: false,
-            }
+        getAccountState: (accountId) => {
+          const workspaceStates = Object.values(radarData).filter(
+            (state) => state.accountId === accountId
           );
+
+          const importantCount = workspaceStates.reduce(
+            (acc, state) => acc + state.importantCount,
+            0
+          );
+
+          const hasUnseenChanges = workspaceStates.some(
+            (state) => state.hasUnseenChanges
+          );
+
+          return {
+            importantCount,
+            hasUnseenChanges,
+          };
+        },
+        getWorkspaceState: (userId) => {
+          const workspaceState = radarData[userId];
+          if (workspaceState) {
+            return {
+              hasUnseenChanges: workspaceState.hasUnseenChanges,
+              importantCount: workspaceState.importantCount,
+            };
+          }
+
+          return {
+            nodeStates: {},
+            importantCount: 0,
+            hasUnseenChanges: false,
+          };
         },
         getChatState: (userId, nodeId) => {
-          const workspaceState = data?.[userId];
+          const workspaceState = radarData[userId];
           if (workspaceState) {
             const chatState = workspaceState.nodeStates[nodeId];
             if (chatState && chatState.type === 'chat') {
@@ -39,7 +65,7 @@ export const RadarProvider = ({ children }: RadarProviderProps) => {
           };
         },
         getChannelState: (userId, nodeId) => {
-          const workspaceState = data?.[userId];
+          const workspaceState = radarData[userId];
           if (workspaceState) {
             const channelState = workspaceState.nodeStates[nodeId];
             if (channelState && channelState.type === 'channel') {

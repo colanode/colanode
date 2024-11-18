@@ -20,6 +20,7 @@ import {
 import { ChevronsUpDown, Settings, Plus, Bell, Check } from 'lucide-react';
 import { useRadar } from '@/renderer/contexts/radar';
 import { ReadStateIndicator } from '@/renderer/components/layouts/read-state-indicator';
+import { useQuery } from '@/renderer/hooks/use-query';
 
 export const LayoutSidebarHeader = () => {
   const workspace = useWorkspace();
@@ -29,9 +30,13 @@ export const LayoutSidebarHeader = () => {
   const radar = useRadar();
 
   const [open, setOpen] = React.useState(false);
-  const otherWorkspaces = account.workspaces.filter(
-    (w) => w.id !== workspace.id
-  );
+  const { data } = useQuery({
+    type: 'workspace_list',
+    accountId: account.id,
+  });
+
+  const workspaces = data ?? [];
+  const otherWorkspaces = workspaces.filter((w) => w.id !== workspace.id);
   const otherWorkspaceStates = otherWorkspaces.map((w) =>
     radar.getWorkspaceState(w.userId)
   );
@@ -108,7 +113,7 @@ export const LayoutSidebarHeader = () => {
                 <DropdownMenuLabel className="mb-1">
                   Workspaces
                 </DropdownMenuLabel>
-                {account.workspaces.map((workspaceItem) => {
+                {workspaces.map((workspaceItem) => {
                   const workspaceState = radar.getWorkspaceState(
                     workspaceItem.userId
                   );

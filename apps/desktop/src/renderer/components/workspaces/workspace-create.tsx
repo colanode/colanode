@@ -3,6 +3,7 @@ import { useMutation } from '@/renderer/hooks/use-mutation';
 import { useAccount } from '@/renderer/contexts/account';
 import { useNavigate } from 'react-router-dom';
 import { WorkspaceForm } from '@/renderer/components/workspaces/workspace-form';
+import { useQuery } from '@/renderer/hooks/use-query';
 
 export const WorkspaceCreate = () => {
   const account = useAccount();
@@ -10,8 +11,13 @@ export const WorkspaceCreate = () => {
 
   const { mutate, isPending } = useMutation();
 
-  const handleCancel =
-    account.workspaces.length > 0 ? () => navigate('/') : undefined;
+  const { data } = useQuery({
+    type: 'workspace_list',
+    accountId: account.id,
+  });
+
+  const workspaces = data ?? [];
+  const handleCancel = workspaces.length > 0 ? () => navigate('/') : undefined;
 
   return (
     <div className="container flex flex-row justify-center">

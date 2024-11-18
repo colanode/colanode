@@ -2,20 +2,25 @@ import React from 'react';
 import { EmailRegister } from '@/renderer/components/accounts/email-register';
 import { EmailLogin } from '@/renderer/components/accounts/email-login';
 import { ServerDropdown } from '@/renderer/components/servers/server-dropdown';
-import { useApp } from '@/renderer/contexts/app';
 import { useNavigate } from 'react-router-dom';
 import { Separator } from '@/renderer/components/ui/separator';
+import { Account } from '@/shared/types/accounts';
+import { Server } from '@/shared/types/servers';
 
-export const LoginForm = () => {
-  const app = useApp();
+interface LoginFormProps {
+  accounts: Account[];
+  servers: Server[];
+}
+
+export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
   const navigate = useNavigate();
 
   const [showRegister, setShowRegister] = React.useState(false);
-  const [server, setServer] = React.useState(app.servers[0]);
+  const [server, setServer] = React.useState(servers[0]);
 
   return (
     <div className="flex flex-col gap-4">
-      <ServerDropdown value={server} onChange={setServer} />
+      <ServerDropdown value={server} onChange={setServer} servers={servers} />
       {showRegister ? (
         <EmailRegister server={server} />
       ) : (
@@ -31,7 +36,7 @@ export const LoginForm = () => {
           ? 'Already have an account? Login'
           : 'No account yet? Register'}
       </p>
-      {app.accounts.length > 0 && (
+      {accounts.length > 0 && (
         <React.Fragment>
           <Separator className="w-full" />
           <p

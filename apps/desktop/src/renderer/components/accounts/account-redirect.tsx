@@ -1,19 +1,25 @@
 import React from 'react';
+import { useQuery } from '@/renderer/hooks/use-query';
 import { useNavigate } from 'react-router-dom';
-import { useApp } from '@/renderer/contexts/app';
 
 export const AccountRedirect = (): React.ReactNode => {
-  const app = useApp();
   const navigate = useNavigate();
+  const { data, isPending } = useQuery({
+    type: 'account_list',
+  });
 
   React.useEffect(() => {
-    if (app.accounts.length == 0) {
+    if (isPending) {
+      return;
+    }
+
+    if (data.length == 0) {
       navigate('/login');
       return;
     }
 
-    navigate(`/${app.accounts[0].id}`);
-  }, [app.accounts, navigate]);
+    navigate(`/${data[0].id}`);
+  }, [data, isPending, navigate]);
 
   return null;
 };

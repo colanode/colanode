@@ -10,15 +10,18 @@ import { Server } from '@/shared/types/servers';
 import { ServerCreateDialog } from '@/renderer/components/servers/server-create-dialog';
 import { DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu';
 import { ChevronDown } from 'lucide-react';
-import { useApp } from '@/renderer/contexts/app';
 
 interface ServerDropdownProps {
   value: Server;
   onChange: (server: Server) => void;
+  servers: Server[];
 }
 
-export const ServerDropdown = ({ value, onChange }: ServerDropdownProps) => {
-  const app = useApp();
+export const ServerDropdown = ({
+  value,
+  onChange,
+  servers,
+}: ServerDropdownProps) => {
   const [openCreate, setOpenCreate] = React.useState(false);
 
   return (
@@ -35,7 +38,7 @@ export const ServerDropdown = ({ value, onChange }: ServerDropdownProps) => {
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-96">
-          {app.servers.map((server) => (
+          {servers.map((server) => (
             <DropdownMenuItem
               key={server.domain}
               onSelect={() => {

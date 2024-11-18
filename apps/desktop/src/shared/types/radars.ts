@@ -41,10 +41,21 @@ export type FolderState = {
 export type WorkspaceReadState = {
   importantCount: number;
   hasUnseenChanges: boolean;
-  nodeStates: Record<string, ReadState>;
 };
 
-export type ReadState =
+export type AccountReadState = {
+  importantCount: number;
+  hasUnseenChanges: boolean;
+};
+
+export type WorkspaceRadarData = WorkspaceReadState & {
+  userId: string;
+  workspaceId: string;
+  accountId: string;
+  nodeStates: Record<string, NodeReadState>;
+};
+
+export type NodeReadState =
   | ChannelReadState
   | ChatReadState
   | DatabaseReadState

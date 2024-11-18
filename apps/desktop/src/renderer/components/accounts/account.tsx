@@ -2,8 +2,9 @@ import React from 'react';
 import { AccountContext } from '@/renderer/contexts/account';
 import { useApp } from '@/renderer/contexts/app';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
-import { AccountLogout } from './account-logout';
-import { AccountSettingsDialog } from './account-settings-dialog';
+import { AccountLogout } from '@/renderer/components/accounts/account-logout';
+import { AccountSettingsDialog } from '@/renderer/components/accounts/account-settings-dialog';
+import { useQuery } from '@/renderer/hooks/use-query';
 
 export const Account = () => {
   const { accountId } = useParams<{ accountId: string }>();
@@ -13,19 +14,20 @@ export const Account = () => {
   const [openSettings, setOpenSettings] = React.useState(false);
   const [openLogout, setOpenLogout] = React.useState(false);
 
-  const account = app.accounts.find((a) => a.id === accountId);
+  const { data } = useQuery({
+    type: 'account_get',
+    accountId,
+  });
 
-  if (!account) {
+  if (!data) {
     return <p>Account not found</p>;
   }
 
-  const workspaces = app.workspaces.filter((w) => w.accountId === account.id);
-
+  const account = data;
   return (
     <AccountContext.Provider
       value={{
         ...account,
-        workspaces,
         openSettings: () => setOpenSettings(true),
         openLogout: () => setOpenLogout(true),
       }}
@@ -42,14 +44,7 @@ export const Account = () => {
           onCancel={() => setOpenLogout(false)}
           onLogout={() => {
             setOpenLogout(false);
-            const activeAccounts =
-              app.accounts?.filter((a) => a.id !== account.id) ?? [];
-            if (activeAccounts.length > 0) {
-              navigate(`/${activeAccounts[0].id}`);
-              return;
-            }
-
-            navigate('/login');
+            navigate('/');
           }}
         />
       )}

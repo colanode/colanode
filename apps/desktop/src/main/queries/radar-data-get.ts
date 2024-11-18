@@ -1,24 +1,24 @@
 import { radarService } from '@/main/services/radar-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { ReadStatesGetQueryInput } from '@/shared/queries/read-states-get';
-import { WorkspaceReadState } from '@/shared/types/radars';
+import { RadarDataGetQueryInput } from '@/shared/queries/radar-data-get';
+import { WorkspaceRadarData } from '@/shared/types/radars';
 import { Event } from '@/shared/types/events';
 
-export class ReadStatesGetQueryHandler
-  implements QueryHandler<ReadStatesGetQueryInput>
+export class RadarDataGetQueryHandler
+  implements QueryHandler<RadarDataGetQueryInput>
 {
   public async handleQuery(
-    _: ReadStatesGetQueryInput
-  ): Promise<Record<string, WorkspaceReadState>> {
+    _: RadarDataGetQueryInput
+  ): Promise<Record<string, WorkspaceRadarData>> {
     const data = radarService.getWorkspaceStates();
     return data;
   }
 
   public async checkForChanges(
     event: Event,
-    _: ReadStatesGetQueryInput,
-    ___: Record<string, WorkspaceReadState>
-  ): Promise<ChangeCheckResult<ReadStatesGetQueryInput>> {
+    _: RadarDataGetQueryInput,
+    ___: Record<string, WorkspaceRadarData>
+  ): Promise<ChangeCheckResult<RadarDataGetQueryInput>> {
     if (event.type === 'radar_data_updated') {
       const data = radarService.getWorkspaceStates();
       return {

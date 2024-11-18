@@ -1,25 +1,30 @@
 import { WorkspaceListQueryInput } from '@/shared/queries/workspace-list';
 import { databaseService } from '@/main/data/database-service';
 import { Workspace } from '@/shared/types/workspaces';
-import { WorkspaceRole } from '@colanode/core';
 import { SelectWorkspace } from '@/main/data/app/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { Event } from '@/shared/types/events';
+import { mapWorkspace } from '@/main/utils';
 
 export class WorkspaceListQueryHandler
   implements QueryHandler<WorkspaceListQueryInput>
 {
-  public async handleQuery(_: WorkspaceListQueryInput): Promise<Workspace[]> {
-    const rows = await this.fetchWorkspaces();
-    return this.buildWorkspaces(rows);
+  public async handleQuery(
+    input: WorkspaceListQueryInput
+  ): Promise<Workspace[]> {
+    const rows = await this.fetchWorkspaces(input.accountId);
+    return rows.map(mapWorkspace);
   }
 
   public async checkForChanges(
     event: Event,
-    _: WorkspaceListQueryInput,
+    input: WorkspaceListQueryInput,
     output: Workspace[]
   ): Promise<ChangeCheckResult<WorkspaceListQueryInput>> {
-    if (event.type === 'workspace_created') {
+    if (
+      event.type === 'workspace_created' &&
+      event.workspace.accountId === input.accountId
+    ) {
       const newWorkspaces = [...output, event.workspace];
       return {
         hasChanges: true,
@@ -27,7 +32,10 @@ export class WorkspaceListQueryHandler
       };
     }
 
-    if (event.type === 'workspace_updated') {
+    if (
+      event.type === 'workspace_updated' &&
+      event.workspace.accountId === input.accountId
+    ) {
       const updatedWorkspaces = output.map((workspace) => {
         if (workspace.id === event.workspace.id) {
           return event.workspace;
@@ -41,7 +49,10 @@ export class WorkspaceListQueryHandler
       };
     }
 
-    if (event.type === 'workspace_deleted') {
+    if (
+      event.type === 'workspace_deleted' &&
+      event.workspace.accountId === input.accountId
+    ) {
       const activeWorkspaces = output.filter(
         (workspace) => workspace.id !== event.workspace.id
       );
@@ -57,33 +68,11 @@ export class WorkspaceListQueryHandler
     };
   }
 
-  private fetchWorkspaces(): Promise<SelectWorkspace[]> {
+  private fetchWorkspaces(accountId: string): Promise<SelectWorkspace[]> {
     return databaseService.appDatabase
       .selectFrom('workspaces')
       .selectAll()
-      .where(
-        'account_id',
-        'in',
-        databaseService.appDatabase
-          .selectFrom('accounts')
-          .where('status', '=', 'active')
-          .select('id')
-      )
+      .where('account_id', '=', accountId)
       .execute();
-  }
-
-  private buildWorkspaces(rows: SelectWorkspace[]): Workspace[] {
-    return rows.map((row) => {
-      return {
-        id: row.workspace_id,
-        name: row.name,
-        description: row.description,
-        avatar: row.avatar,
-        versionId: row.version_id,
-        accountId: row.account_id,
-        role: row.role as WorkspaceRole,
-        userId: row.user_id,
-      };
-    });
   }
 }

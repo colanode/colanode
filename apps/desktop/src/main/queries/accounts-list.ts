@@ -4,13 +4,14 @@ import { Account } from '@/shared/types/accounts';
 import { SelectAccount } from '@/main/data/app/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { Event } from '@/shared/types/events';
+import { mapAccount } from '@/main/utils';
 
 export class AccountListQueryHandler
   implements QueryHandler<AccountListQueryInput>
 {
   public async handleQuery(_: AccountListQueryInput): Promise<Account[]> {
     const rows = await this.fetchAccounts();
-    return this.buildAccounts(rows);
+    return rows.map(mapAccount);
   }
 
   public async checkForChanges(
@@ -62,20 +63,5 @@ export class AccountListQueryHandler
       .selectAll()
       .where('status', '=', 'active')
       .execute();
-  }
-
-  private buildAccounts(rows: SelectAccount[]): Account[] {
-    return rows.map((row) => {
-      return {
-        id: row.id,
-        name: row.name,
-        avatar: row.avatar,
-        token: row.token,
-        email: row.email,
-        deviceId: row.device_id,
-        status: row.status,
-        server: row.server,
-      };
-    });
   }
 }
