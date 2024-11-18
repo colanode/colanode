@@ -17,7 +17,7 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/renderer/components/ui/sidebar';
-import { ChevronsUpDown, Settings, Plus, Bell } from 'lucide-react';
+import { ChevronsUpDown, Settings, Plus, Bell, Check } from 'lucide-react';
 import { useRadar } from '@/renderer/contexts/radar';
 import { ReadStateIndicator } from '@/renderer/components/layouts/read-state-indicator';
 
@@ -106,34 +106,38 @@ export const LayoutSidebarHeader = () => {
               <React.Fragment>
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="mb-1">
-                  Other workspaces
+                  Workspaces
                 </DropdownMenuLabel>
-                {otherWorkspaces.map((otherWorkspace) => {
+                {account.workspaces.map((workspaceItem) => {
                   const workspaceState = radar.getWorkspaceState(
-                    otherWorkspace.userId
+                    workspaceItem.userId
                   );
                   return (
                     <DropdownMenuItem
-                      key={otherWorkspace.id}
+                      key={workspaceItem.id}
                       className="p-0"
                       onClick={() => {
-                        navigate(`/${account.id}/${otherWorkspace.id}`);
+                        navigate(`/${account.id}/${workspaceItem.id}`);
                       }}
                     >
                       <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                         <Avatar
                           className="h-8 w-8 rounded-lg"
-                          id={otherWorkspace.id}
-                          name={otherWorkspace.name}
-                          avatar={otherWorkspace.avatar}
+                          id={workspaceItem.id}
+                          name={workspaceItem.name}
+                          avatar={workspaceItem.avatar}
                         />
                         <p className="flex-1 text-left text-sm leading-tight truncate font-normal">
-                          {otherWorkspace.name}
+                          {workspaceItem.name}
                         </p>
-                        <ReadStateIndicator
-                          count={workspaceState.importantCount}
-                          hasChanges={workspaceState.hasUnseenChanges}
-                        />
+                        {workspaceItem.id === workspace.id ? (
+                          <Check className="size-4" />
+                        ) : (
+                          <ReadStateIndicator
+                            count={workspaceState.importantCount}
+                            hasChanges={workspaceState.hasUnseenChanges}
+                          />
+                        )}
                       </div>
                     </DropdownMenuItem>
                   );

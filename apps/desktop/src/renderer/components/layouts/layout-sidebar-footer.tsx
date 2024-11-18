@@ -15,7 +15,7 @@ import {
 } from '@/renderer/components/ui/sidebar';
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useAccount } from '@/renderer/contexts/account';
-import { ChevronsUpDown, LogOut, Plus, Settings } from 'lucide-react';
+import { Check, ChevronsUpDown, LogOut, Plus, Settings } from 'lucide-react';
 import { useApp } from '@/renderer/contexts/app';
 import { useNavigate } from 'react-router-dom';
 import { useRadar } from '@/renderer/contexts/radar';
@@ -37,9 +37,9 @@ export function LayoutSidebarFooter() {
   const otherAccounts = app.accounts.filter((a) => a.id !== account.id);
 
   const accountStates: Record<string, AccountReadState> = {};
-  for (const otherAccount of otherAccounts) {
+  for (const accountItem of app.accounts) {
     const accountWorkspaces = app.workspaces.filter(
-      (w) => w.accountId === otherAccount.id
+      (w) => w.accountId === accountItem.id
     );
 
     const state: AccountReadState = {
@@ -49,12 +49,16 @@ export function LayoutSidebarFooter() {
 
     for (const accountWorkspace of accountWorkspaces) {
       const workspaceState = radar.getWorkspaceState(accountWorkspace.userId);
+      if (!workspaceState) {
+        continue;
+      }
+
       state.importantCount += workspaceState.importantCount;
       state.hasUnseenChanges =
         state.hasUnseenChanges || workspaceState.hasUnseenChanges;
     }
 
-    accountStates[otherAccount.id] = state;
+    accountStates[accountItem.id] = state;
   }
 
   const importantCount = Object.values(accountStates).reduce(
@@ -133,38 +137,40 @@ export function LayoutSidebarFooter() {
             {otherAccounts.length > 0 && (
               <React.Fragment>
                 <DropdownMenuSeparator />
-                <DropdownMenuLabel className="mb-1">
-                  Other accounts
-                </DropdownMenuLabel>
-                {otherAccounts.map((otherAccount) => {
-                  const state = accountStates[otherAccount.id];
+                <DropdownMenuLabel className="mb-1">Accounts</DropdownMenuLabel>
+                {app.accounts.map((accountItem) => {
+                  const state = accountStates[accountItem.id];
                   return (
                     <DropdownMenuItem
-                      key={otherAccount.id}
+                      key={accountItem.id}
                       className="p-0"
                       onClick={() => {
-                        navigate(`/${otherAccount.id}`);
+                        navigate(`/${accountItem.id}`);
                       }}
                     >
                       <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                         <Avatar
                           className="h-8 w-8 rounded-lg"
-                          id={otherAccount.id}
-                          name={otherAccount.name}
-                          avatar={otherAccount.avatar}
+                          id={accountItem.id}
+                          name={accountItem.name}
+                          avatar={accountItem.avatar}
                         />
                         <div className="grid flex-1 text-left text-sm leading-tight">
                           <span className="truncate font-semibold">
-                            {otherAccount.name}
+                            {accountItem.name}
                           </span>
                           <span className="truncate text-xs">
-                            {otherAccount.email}
+                            {accountItem.email}
                           </span>
                         </div>
-                        <ReadStateIndicator
-                          count={state.importantCount}
-                          hasChanges={state.hasUnseenChanges}
-                        />
+                        {accountItem.id === account.id ? (
+                          <Check className="size-4" />
+                        ) : (
+                          <ReadStateIndicator
+                            count={state.importantCount}
+                            hasChanges={state.hasUnseenChanges}
+                          />
+                        )}
                       </div>
                     </DropdownMenuItem>
                   );
