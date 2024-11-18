@@ -49,7 +49,7 @@ const createUserNodesTable: Migration = {
       .createTable('user_nodes')
       .addColumn('user_id', 'text', (col) => col.notNull())
       .addColumn('node_id', 'text', (col) =>
-        col.notNull().references('nodes.id')
+        col.notNull().references('nodes.id').onDelete('cascade')
       )
       .addColumn('last_seen_version_id', 'text')
       .addColumn('last_seen_at', 'text')
