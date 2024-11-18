@@ -95,14 +95,14 @@ export class EmailLoginMutationHandler
       throw new Error('Failed to create account!');
     }
 
-    await eventBus.publish({
+    eventBus.publish({
       type: 'account_created',
       account,
     });
 
     if (data.workspaces.length > 0) {
       for (const workspace of data.workspaces) {
-        await eventBus.publish({
+        eventBus.publish({
           type: 'workspace_created',
           workspace: {
             id: workspace.id,

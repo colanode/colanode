@@ -156,7 +156,7 @@ class NodeService {
     });
 
     for (const createdNode of createdNodes) {
-      await eventBus.publish({
+      eventBus.publish({
         type: 'node_created',
         userId,
         node: createdNode,
@@ -164,7 +164,7 @@ class NodeService {
     }
 
     for (const createdUpload of createdUploads) {
-      await eventBus.publish({
+      eventBus.publish({
         type: 'upload_created',
         userId,
         upload: createdUpload,
@@ -172,7 +172,7 @@ class NodeService {
     }
 
     for (const createdDownload of createdDownloads) {
-      await eventBus.publish({
+      eventBus.publish({
         type: 'download_created',
         userId,
         download: createdDownload,
@@ -180,7 +180,7 @@ class NodeService {
     }
 
     for (const createdChangeId of createdChangeIds) {
-      await eventBus.publish({
+      eventBus.publish({
         type: 'change_created',
         userId,
         changeId: createdChangeId,
@@ -305,7 +305,7 @@ class NodeService {
       });
 
     if (result) {
-      await eventBus.publish({
+      eventBus.publish({
         type: 'node_updated',
         userId,
         node,
@@ -313,7 +313,7 @@ class NodeService {
     }
 
     if (changeId) {
-      await eventBus.publish({
+      eventBus.publish({
         type: 'change_created',
         userId,
         changeId,
@@ -382,14 +382,14 @@ class NodeService {
       }
     });
 
-    await eventBus.publish({
+    eventBus.publish({
       type: 'node_deleted',
       userId,
       node: node,
     });
 
     if (changeId) {
-      await eventBus.publish({
+      eventBus.publish({
         type: 'change_created',
         userId,
         changeId,
@@ -444,7 +444,7 @@ class NodeService {
         .executeTakeFirst();
 
       if (result) {
-        await eventBus.publish({
+        eventBus.publish({
           type: 'node_created',
           userId: userId,
           node: mapNode(result),
@@ -477,7 +477,7 @@ class NodeService {
         .executeTakeFirst();
 
       if (updatedNode) {
-        await eventBus.publish({
+        eventBus.publish({
           type: 'node_updated',
           userId: userId,
           node: mapNode(updatedNode),
@@ -501,7 +501,7 @@ class NodeService {
       .executeTakeFirst();
 
     if (deletedNode) {
-      await eventBus.publish({
+      eventBus.publish({
         type: 'node_deleted',
         userId,
         node: mapNode(deletedNode),
@@ -543,7 +543,7 @@ class NodeService {
       .executeTakeFirst();
 
     if (createdUserNode) {
-      await eventBus.publish({
+      eventBus.publish({
         type: 'user_node_created',
         userId: userId,
         userNode: {

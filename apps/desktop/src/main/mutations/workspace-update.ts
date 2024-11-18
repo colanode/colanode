@@ -69,7 +69,7 @@ export class WorkspaceUpdateMutationHandler
       throw new Error('Failed to update workspace!');
     }
 
-    await eventBus.publish({
+    eventBus.publish({
       type: 'workspace_updated',
       workspace: {
         id: updatedWorkspace.workspace_id,

@@ -51,7 +51,7 @@ export class FileDownloadMutationHandler
       })
       .execute();
 
-    await eventBus.publish({
+    eventBus.publish({
       type: 'download_created',
       userId: input.userId,
       download: {

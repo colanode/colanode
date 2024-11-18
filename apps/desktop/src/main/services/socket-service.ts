@@ -8,7 +8,7 @@ class SocketService {
   private readonly sockets: Map<string, SocketConnection> = new Map();
 
   constructor() {
-    eventBus.subscribe(async (event) => {
+    eventBus.subscribe((event) => {
       if (event.type === 'server_availability_changed' && event.isAvailable) {
         this.checkConnections();
       } else if (

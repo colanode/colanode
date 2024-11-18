@@ -10,8 +10,8 @@ class QueryService {
     new Map();
 
   constructor() {
-    eventBus.subscribe(async (event: Event) => {
-      await this.checkForQueryChanges(event);
+    eventBus.subscribe((event: Event) => {
+      this.checkForQueryChanges(event);
     });
   }
 
@@ -58,6 +58,7 @@ class QueryService {
         query.input,
         query.result
       );
+
       if (
         changeCheckResult.hasChanges &&
         changeCheckResult.result &&

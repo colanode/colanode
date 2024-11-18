@@ -76,7 +76,7 @@ class AccountService {
       return;
     }
 
-    await eventBus.publish({
+    eventBus.publish({
       type: 'account_updated',
       account: mapAccount(updatedAccount),
     });
@@ -107,7 +107,7 @@ class AccountService {
           return;
         }
 
-        await eventBus.publish({
+        eventBus.publish({
           type: 'workspace_created',
           workspace: mapWorkspace(createdWorkspace),
         });
@@ -130,7 +130,7 @@ class AccountService {
           return;
         }
 
-        await eventBus.publish({
+        eventBus.publish({
           type: 'workspace_updated',
           workspace: mapWorkspace(updatedWorkspace),
         });
@@ -174,7 +174,7 @@ class AccountService {
       return false;
     }
 
-    await eventBus.publish({
+    eventBus.publish({
       type: 'account_deleted',
       account: mapAccount(deletedAccount),
     });
@@ -251,7 +251,7 @@ class AccountService {
       fs.rmSync(workspaceDir, { recursive: true });
     }
 
-    await eventBus.publish({
+    eventBus.publish({
       type: 'workspace_deleted',
       workspace: mapWorkspace(deletedWorkspace),
     });

@@ -60,7 +60,7 @@ export class AccountUpdateMutationHandler
       throw new Error('Account not found');
     }
 
-    await eventBus.publish({
+    eventBus.publish({
       type: 'account_updated',
       account: {
         id: updatedAccount.id,
