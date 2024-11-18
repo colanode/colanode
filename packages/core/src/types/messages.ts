@@ -1,3 +1,5 @@
+import { ServerNodeState, ServerUserNodeState } from './sync';
+
 export type LocalNodeDeleteMessage = {
   type: 'local_node_delete';
   nodeId: string;
@@ -28,29 +30,12 @@ export type ServerNodeDeleteMessage = {
 
 export type ServerNodeSyncMessage = {
   type: 'server_node_sync';
-  id: string;
-  workspaceId: string;
-  state: string;
-  createdAt: string;
-  createdBy: string;
-  updatedAt: string | null;
-  updatedBy: string | null;
-  serverCreatedAt: string;
-  serverUpdatedAt: string | null;
-  versionId: string;
+  node: ServerNodeState;
 };
 
 export type ServerUserNodeSyncMessage = {
   type: 'server_user_node_sync';
-  nodeId: string;
-  userId: string;
-  workspaceId: string;
-  versionId: string;
-  lastSeenAt: string | null;
-  lastSeenVersionId: string | null;
-  mentionsCount: number;
-  createdAt: string;
-  updatedAt: string | null;
+  userNode: ServerUserNodeState;
 };
 
 export type Message =

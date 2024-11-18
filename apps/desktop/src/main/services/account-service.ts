@@ -3,10 +3,13 @@ import { databaseService } from '@/main/data/database-service';
 import { SelectAccount } from '@/main/data/app/schema';
 import { AccountSyncOutput } from '@colanode/core';
 import { httpClient } from '@/shared/lib/http-client';
-import { mapAccount, mapWorkspace } from '@/main/utils';
+import {
+  getWorkspaceDirectoryPath,
+  mapAccount,
+  mapWorkspace,
+} from '@/main/utils';
 import { getAccountAvatarsDirectoryPath } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
-import { workspaceService } from '@/main/services/workspace-service';
 import { serverService } from '@/main/services/server-service';
 
 class AccountService {
@@ -140,7 +143,7 @@ class AccountService {
       );
 
       if (!updatedWorkspace) {
-        await workspaceService.deleteWorkspace(workspace.user_id);
+        await this.deleteWorkspace(workspace.user_id);
       }
     }
   }
@@ -153,7 +156,7 @@ class AccountService {
       .execute();
 
     for (const workspace of workspaces) {
-      await workspaceService.deleteWorkspace(workspace.user_id);
+      await this.deleteWorkspace(workspace.user_id);
     }
 
     const avatarsDir = getAccountAvatarsDirectoryPath(account.id);
@@ -229,6 +232,31 @@ class AccountService {
         // console.log('error', error);
       }
     }
+  }
+
+  private async deleteWorkspace(userId: string): Promise<boolean> {
+    const deletedWorkspace = await databaseService.appDatabase
+      .deleteFrom('workspaces')
+      .returningAll()
+      .where('user_id', '=', userId)
+      .executeTakeFirst();
+
+    if (!deletedWorkspace) {
+      return false;
+    }
+
+    await databaseService.deleteWorkspaceDatabase(userId);
+    const workspaceDir = getWorkspaceDirectoryPath(userId);
+    if (fs.existsSync(workspaceDir)) {
+      fs.rmSync(workspaceDir, { recursive: true });
+    }
+
+    await eventBus.publish({
+      type: 'workspace_deleted',
+      workspace: mapWorkspace(deletedWorkspace),
+    });
+
+    return true;
   }
 }
 

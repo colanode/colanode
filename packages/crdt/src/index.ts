@@ -5,6 +5,14 @@ import { isEqual } from 'lodash-es';
 import { diffChars } from 'diff';
 import { fromUint8Array, toUint8Array } from 'js-base64';
 
+export const encodeState = (state: Uint8Array) => {
+  return fromUint8Array(state);
+};
+
+export const decodeState = (state: string) => {
+  return toUint8Array(state);
+};
+
 export class YDoc {
   private doc: Y.Doc;
   private updates: Uint8Array[] = [];

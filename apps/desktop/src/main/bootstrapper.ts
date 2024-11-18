@@ -4,7 +4,7 @@ import { radarService } from '@/main/services/radar-service';
 import { socketService } from '@/main/services/socket-service';
 import { serverService } from '@/main/services/server-service';
 import { accountService } from '@/main/services/account-service';
-import { workspaceService } from '@/main/services/workspace-service';
+import { syncService } from '@/main/services/sync-service';
 
 const EVENT_LOOP_INTERVAL = 1000 * 60;
 
@@ -42,7 +42,7 @@ class Bootstrapper {
       await accountService.syncAccounts();
       await socketService.checkConnections();
       await accountService.syncDeletedTokens();
-      await workspaceService.syncAllWorkspaces();
+      await syncService.syncAllWorkspaces();
     } catch (error) {
       console.log('error', error);
     }

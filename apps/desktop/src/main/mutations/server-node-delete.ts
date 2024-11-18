@@ -1,12 +1,11 @@
-import { eventBus } from '@/shared/lib/event-bus';
 import { databaseService } from '@/main/data/database-service';
 import { socketService } from '@/main/services/socket-service';
 import { MutationHandler } from '@/main/types';
-import { mapNode } from '@/main/utils';
 import {
   ServerNodeDeleteMutationInput,
   ServerNodeDeleteMutationOutput,
 } from '@/shared/mutations/server-node-delete';
+import { nodeService } from '@/main/services/node-service';
 
 export class ServerNodeDeleteMutationHandler
   implements MutationHandler<ServerNodeDeleteMutationInput>
@@ -32,26 +31,13 @@ export class ServerNodeDeleteMutationHandler
     }
 
     const userId = workspace.user_id;
-    const workspaceDatabase =
-      await databaseService.getWorkspaceDatabase(userId);
+    const deleted = await nodeService.serverDelete(userId, input.id);
 
-    const deletedNode = await workspaceDatabase
-      .deleteFrom('nodes')
-      .returningAll()
-      .where('id', '=', input.id)
-      .executeTakeFirst();
-
-    socketService.sendMessage(workspace.account_id, {
-      type: 'local_node_delete',
-      nodeId: input.id,
-      workspaceId: input.workspaceId,
-    });
-
-    if (deletedNode) {
-      await eventBus.publish({
-        type: 'node_deleted',
-        userId,
-        node: mapNode(deletedNode),
+    if (deleted) {
+      socketService.sendMessage(workspace.account_id, {
+        type: 'local_node_delete',
+        nodeId: input.id,
+        workspaceId: input.workspaceId,
       });
     }
 

@@ -300,16 +300,18 @@ class SynapseService {
         } else {
           this.sendSocketMessage(socketConnection, {
             type: 'server_node_sync',
-            id: node.id,
-            workspaceId: data.workspaceId,
-            state: fromUint8Array(node.state),
-            createdAt: node.created_at.toISOString(),
-            createdBy: node.created_by,
-            updatedAt: node.updated_at?.toISOString() ?? null,
-            updatedBy: node.updated_by ?? null,
-            serverCreatedAt: node.server_created_at.toISOString(),
-            serverUpdatedAt: node.server_updated_at?.toISOString() ?? null,
-            versionId: node.version_id,
+            node: {
+              id: node.id,
+              workspaceId: data.workspaceId,
+              state: fromUint8Array(node.state),
+              createdAt: node.created_at.toISOString(),
+              createdBy: node.created_by,
+              updatedAt: node.updated_at?.toISOString() ?? null,
+              updatedBy: node.updated_by ?? null,
+              serverCreatedAt: node.server_created_at.toISOString(),
+              serverUpdatedAt: node.server_updated_at?.toISOString() ?? null,
+              versionId: node.version_id,
+            },
           });
         }
       }
@@ -344,15 +346,17 @@ class SynapseService {
 
       this.sendSocketMessage(socketConnection, {
         type: 'server_user_node_sync',
-        userId: data.userId,
-        nodeId: data.nodeId,
-        lastSeenVersionId: userNode.last_seen_version_id,
-        workspaceId: data.workspaceId,
-        versionId: userNode.version_id,
-        lastSeenAt: userNode.last_seen_at?.toISOString() ?? null,
-        createdAt: userNode.created_at.toISOString(),
-        updatedAt: userNode.updated_at?.toISOString() ?? null,
-        mentionsCount: userNode.mentions_count,
+        userNode: {
+          userId: data.userId,
+          nodeId: data.nodeId,
+          lastSeenVersionId: userNode.last_seen_version_id,
+          workspaceId: data.workspaceId,
+          versionId: userNode.version_id,
+          lastSeenAt: userNode.last_seen_at?.toISOString() ?? null,
+          createdAt: userNode.created_at.toISOString(),
+          updatedAt: userNode.updated_at?.toISOString() ?? null,
+          mentionsCount: userNode.mentions_count,
+        },
       });
     }
   }
@@ -444,31 +448,35 @@ class SynapseService {
       if (row.node_version_id !== row.device_node_version_id) {
         this.sendSocketMessage(connection, {
           type: 'server_node_sync',
-          id: row.id,
-          workspaceId: row.workspace_id,
-          state: fromUint8Array(row.state!),
-          createdAt: row.created_at!.toISOString(),
-          createdBy: row.created_by!,
-          updatedAt: row.updated_at?.toISOString() ?? null,
-          updatedBy: row.updated_by ?? null,
-          serverCreatedAt: row.server_created_at!.toISOString(),
-          serverUpdatedAt: row.server_updated_at?.toISOString() ?? null,
-          versionId: row.node_version_id!,
+          node: {
+            id: row.id,
+            workspaceId: row.workspace_id,
+            state: fromUint8Array(row.state!),
+            createdAt: row.created_at!.toISOString(),
+            createdBy: row.created_by!,
+            updatedAt: row.updated_at?.toISOString() ?? null,
+            updatedBy: row.updated_by ?? null,
+            serverCreatedAt: row.server_created_at!.toISOString(),
+            serverUpdatedAt: row.server_updated_at?.toISOString() ?? null,
+            versionId: row.node_version_id!,
+          },
         });
       }
 
       if (row.user_node_version_id !== row.device_user_node_version_id) {
         this.sendSocketMessage(connection, {
           type: 'server_user_node_sync',
-          nodeId: row.node_id,
-          userId: row.user_id,
-          workspaceId: row.workspace_id,
-          versionId: row.user_node_version_id!,
-          lastSeenAt: row.last_seen_at?.toISOString() ?? null,
-          lastSeenVersionId: row.last_seen_version_id ?? null,
-          mentionsCount: row.mentions_count,
-          createdAt: row.created_at!.toISOString(),
-          updatedAt: row.updated_at?.toISOString() ?? null,
+          userNode: {
+            nodeId: row.node_id,
+            userId: row.user_id,
+            workspaceId: row.workspace_id,
+            versionId: row.user_node_version_id!,
+            lastSeenAt: row.last_seen_at?.toISOString() ?? null,
+            lastSeenVersionId: row.last_seen_version_id ?? null,
+            mentionsCount: row.mentions_count,
+            createdAt: row.created_at!.toISOString(),
+            updatedAt: row.updated_at?.toISOString() ?? null,
+          },
         });
       }
     }

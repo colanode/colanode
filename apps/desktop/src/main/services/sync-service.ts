@@ -1,23 +1,24 @@
-import fs from 'fs';
 import { databaseService } from '@/main/data/database-service';
-import {
-  getWorkspaceDirectoryPath,
-  mapChange,
-  mapWorkspace,
-} from '@/main/utils';
+import { mapChange } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
-import { LocalChange, SyncChangesOutput } from '@colanode/core';
+import {
+  LocalChange,
+  SyncChangesOutput,
+  SyncNodeStatesOutput,
+} from '@colanode/core';
 import { WorkspaceDatabaseSchema } from '@/main/data/workspace/schema';
 import { Kysely } from 'kysely';
 import { httpClient } from '@/shared/lib/http-client';
 import { serverService } from '@/main/services/server-service';
+import { nodeService } from '@/main/services/node-service';
+import { socketService } from '@/main/services/socket-service';
 
 type WorkspaceSyncState = {
   isSyncing: boolean;
   scheduledSync: boolean;
 };
 
-class WorkspaceService {
+class SyncService {
   private syncStates: Map<string, WorkspaceSyncState> = new Map();
 
   constructor() {
@@ -26,31 +27,6 @@ class WorkspaceService {
         this.syncWorkspace(event.userId);
       }
     });
-  }
-
-  public async deleteWorkspace(userId: string): Promise<boolean> {
-    const deletedWorkspace = await databaseService.appDatabase
-      .deleteFrom('workspaces')
-      .returningAll()
-      .where('user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!deletedWorkspace) {
-      return false;
-    }
-
-    await databaseService.deleteWorkspaceDatabase(userId);
-    const workspaceDir = getWorkspaceDirectoryPath(userId);
-    if (fs.existsSync(workspaceDir)) {
-      fs.rmSync(workspaceDir, { recursive: true });
-    }
-
-    await eventBus.publish({
-      type: 'workspace_deleted',
-      workspace: mapWorkspace(deletedWorkspace),
-    });
-
-    return true;
   }
 
   public async syncAllWorkspaces() {
@@ -162,14 +138,110 @@ class WorkspaceService {
           .set((eb) => ({ retry_count: eb('retry_count', '+', 1) }))
           .where('id', 'in', unsyncedChangeIds)
           .execute();
-
-        //we just delete changes that have failed to sync for more than 5 times.
-        //in the future we might need to revert the change locally.
-        await workspaceDatabase
-          .deleteFrom('changes')
-          .where('retry_count', '>=', 5)
-          .execute();
       }
+    }
+
+    const invalidChanges = await this.fetchInvalidChanges(workspaceDatabase);
+    if (invalidChanges.length === 0) {
+      return;
+    }
+
+    const nodeChanges: Record<string, number[]> = {};
+    const changesToDelete: number[] = [];
+    for (const change of invalidChanges) {
+      if (change.retryCount >= 100) {
+        // if the change has been retried 100 times, we delete it (it should never happen)
+        changesToDelete.push(change.id);
+        continue;
+      }
+
+      let nodeId: string | null = null;
+      if (
+        change.data.type === 'node_create' ||
+        change.data.type === 'node_update' ||
+        change.data.type === 'node_delete'
+      ) {
+        nodeId = change.data.id;
+      } else if (change.data.type === 'user_node_update') {
+        nodeId = change.data.nodeId;
+      }
+
+      if (nodeId) {
+        if (!nodeChanges[nodeId]) {
+          nodeChanges[nodeId] = [];
+        }
+
+        nodeChanges[nodeId].push(change.id);
+      }
+    }
+
+    const nodeIds = Object.keys(nodeChanges);
+    const { data, status } = await httpClient.post<SyncNodeStatesOutput>(
+      `/v1/sync/states/${workspace.workspace_id}`,
+      {
+        nodeIds,
+      },
+      { domain: workspace.domain, token: workspace.token }
+    );
+
+    if (status !== 200) {
+      return;
+    }
+
+    for (const nodeId of nodeIds) {
+      const changeIds = nodeChanges[nodeId];
+      const states = data.nodes[nodeId];
+
+      if (!states) {
+        const deleted = await nodeService.serverDelete(userId, nodeId);
+        if (deleted) {
+          changesToDelete.push(...changeIds);
+
+          socketService.sendMessage(workspace.account_id, {
+            type: 'local_node_delete',
+            nodeId,
+            workspaceId: workspace.workspace_id,
+          });
+        }
+
+        continue;
+      }
+
+      const nodeSynced = await nodeService.serverSync(userId, states.node);
+      if (nodeSynced) {
+        changesToDelete.push(...changeIds);
+        socketService.sendMessage(workspace.account_id, {
+          type: 'local_node_sync',
+          nodeId,
+          userId,
+          versionId: states.node.versionId,
+          workspaceId: workspace.workspace_id,
+        });
+
+        const userNodeSynced = await nodeService.serverUserNodeSync(
+          userId,
+          states.userNode
+        );
+
+        if (userNodeSynced) {
+          socketService.sendMessage(workspace.account_id, {
+            type: 'local_user_node_sync',
+            nodeId,
+            userId,
+            versionId: states.userNode.versionId,
+            workspaceId: workspace.workspace_id,
+          });
+        }
+
+        changesToDelete.push(...changeIds);
+      }
+    }
+
+    if (changesToDelete.length > 0) {
+      await workspaceDatabase
+        .deleteFrom('changes')
+        .where('id', 'in', changesToDelete)
+        .execute();
     }
   }
 
@@ -239,6 +311,20 @@ class WorkspaceService {
 
     return changes.filter((change) => !changesToDelete.has(change.id));
   }
+
+  private async fetchInvalidChanges(database: Kysely<WorkspaceDatabaseSchema>) {
+    const rows = await database
+      .selectFrom('changes')
+      .selectAll()
+      .where('retry_count', '>=', 5)
+      .execute();
+
+    if (rows.length === 0) {
+      return [];
+    }
+
+    return rows.map(mapChange);
+  }
 }
 
-export const workspaceService = new WorkspaceService();
+export const syncService = new SyncService();

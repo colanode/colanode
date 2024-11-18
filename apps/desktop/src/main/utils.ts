@@ -130,6 +130,7 @@ export const mapChange = (row: SelectChange): LocalChange => {
     id: row.id,
     data: JSON.parse(row.data),
     createdAt: row.created_at,
+    retryCount: row.retry_count,
   };
 };
 

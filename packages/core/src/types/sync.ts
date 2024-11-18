@@ -2,6 +2,19 @@ export type SyncChangesInput = {
   changes: LocalChange[];
 };
 
+export type SyncNodeStatesInput = {
+  ids: string[];
+};
+
+export type SyncNodeStatesOutput = {
+  nodes: Record<string, SyncNodeStateResult | null>;
+};
+
+export type SyncNodeStateResult = {
+  node: ServerNodeState;
+  userNode: ServerUserNodeState;
+};
+
 export type SyncChangesOutput = {
   results: SyncChangeResult[];
 };
@@ -17,6 +30,7 @@ export type LocalChange = {
   id: number;
   data: LocalChangeData;
   createdAt: string;
+  retryCount: number;
 };
 
 export type LocalCreateNodeChangeData = {
@@ -59,3 +73,28 @@ export type LocalChangeData =
   | LocalUpdateNodeChangeData
   | LocalDeleteNodeChangeData
   | LocalUserNodeChangeData;
+
+export type ServerNodeState = {
+  id: string;
+  workspaceId: string;
+  state: string;
+  createdAt: string;
+  createdBy: string;
+  updatedAt: string | null;
+  updatedBy: string | null;
+  serverCreatedAt: string;
+  serverUpdatedAt: string | null;
+  versionId: string;
+};
+
+export type ServerUserNodeState = {
+  nodeId: string;
+  userId: string;
+  workspaceId: string;
+  versionId: string;
+  lastSeenAt: string | null;
+  lastSeenVersionId: string | null;
+  mentionsCount: number;
+  createdAt: string;
+  updatedAt: string | null;
+};

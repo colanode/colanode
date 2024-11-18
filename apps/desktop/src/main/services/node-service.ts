@@ -6,6 +6,8 @@ import {
   LocalCreateNodeChangeData,
   LocalDeleteNodeChangeData,
   LocalUpdateNodeChangeData,
+  ServerNodeState,
+  ServerUserNodeState,
 } from '@colanode/core';
 import { YDoc } from '@colanode/crdt';
 import { generateId, IdType } from '@colanode/core';
@@ -15,6 +17,7 @@ import { CreateDownload, CreateUpload } from '@/main/data/workspace/schema';
 import { eventBus } from '@/shared/lib/event-bus';
 import { Download } from '@/shared/types/nodes';
 import { Upload } from '@/shared/types/nodes';
+import { SelectWorkspace } from '@/main/data/app/schema';
 
 export type CreateNodeInput = {
   id: string;
@@ -24,16 +27,11 @@ export type CreateNodeInput = {
 };
 
 class NodeService {
-  async createNode(userId: string, input: CreateNodeInput | CreateNodeInput[]) {
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .selectAll()
-      .where('user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
-      throw new Error('Workspace not found');
-    }
+  public async createNode(
+    userId: string,
+    input: CreateNodeInput | CreateNodeInput[]
+  ) {
+    const workspace = await this.fetchWorkspace(userId);
 
     const inputs = Array.isArray(input) ? input : [input];
     const createdNodes: Node[] = [];
@@ -190,7 +188,7 @@ class NodeService {
     }
   }
 
-  async updateNode(
+  public async updateNode(
     nodeId: string,
     userId: string,
     updater: (attributes: NodeAttributes) => NodeAttributes
@@ -211,15 +209,7 @@ class NodeService {
     userId: string,
     updater: (attributes: NodeAttributes) => NodeAttributes
   ): Promise<boolean> {
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .selectAll()
-      .where('user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
-      throw new Error('Workspace not found');
-    }
+    const workspace = await this.fetchWorkspace(userId);
 
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
@@ -333,16 +323,8 @@ class NodeService {
     return result;
   }
 
-  async deleteNode(nodeId: string, userId: string) {
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .selectAll()
-      .where('user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
-      throw new Error('Workspace not found');
-    }
+  public async deleteNode(nodeId: string, userId: string) {
+    const workspace = await this.fetchWorkspace(userId);
 
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
@@ -413,6 +395,188 @@ class NodeService {
         changeId,
       });
     }
+  }
+
+  public async serverSync(
+    userId: string,
+    node: ServerNodeState
+  ): Promise<boolean> {
+    let count = 0;
+    while (count++ < 20) {
+      const synced = await this.tryServerSync(userId, node);
+      if (synced) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private async tryServerSync(userId: string, node: ServerNodeState) {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const existingNode = await workspaceDatabase
+      .selectFrom('nodes')
+      .where('id', '=', node.id)
+      .selectAll()
+      .executeTakeFirst();
+
+    if (!existingNode) {
+      const ydoc = new YDoc(node.id, node.state);
+      const attributes = ydoc.getAttributes();
+      const state = ydoc.getState();
+
+      const result = await workspaceDatabase
+        .insertInto('nodes')
+        .returningAll()
+        .values({
+          id: node.id,
+          attributes: JSON.stringify(attributes),
+          state: state,
+          created_at: node.createdAt,
+          created_by: node.createdBy,
+          version_id: node.versionId,
+          server_created_at: node.serverCreatedAt,
+          server_version_id: node.versionId,
+        })
+        .onConflict((cb) => cb.doNothing())
+        .executeTakeFirst();
+
+      if (result) {
+        await eventBus.publish({
+          type: 'node_created',
+          userId: userId,
+          node: mapNode(result),
+        });
+
+        return true;
+      }
+    } else {
+      const ydoc = new YDoc(node.id, existingNode.state);
+      ydoc.applyUpdate(node.state);
+
+      const attributes = ydoc.getAttributes();
+      const state = ydoc.getState();
+
+      const updatedNode = await workspaceDatabase
+        .updateTable('nodes')
+        .returningAll()
+        .set({
+          state: state,
+          attributes: JSON.stringify(attributes),
+          server_created_at: node.serverCreatedAt,
+          server_updated_at: node.serverUpdatedAt,
+          server_version_id: node.versionId,
+          updated_at: node.updatedAt,
+          updated_by: node.updatedBy,
+          version_id: node.versionId,
+        })
+        .where('id', '=', node.id)
+        .where('version_id', '=', existingNode.version_id)
+        .executeTakeFirst();
+
+      if (updatedNode) {
+        await eventBus.publish({
+          type: 'node_updated',
+          userId: userId,
+          node: mapNode(updatedNode),
+        });
+
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  public async serverDelete(userId: string, nodeId: string) {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const deletedNode = await workspaceDatabase
+      .deleteFrom('nodes')
+      .returningAll()
+      .where('id', '=', nodeId)
+      .executeTakeFirst();
+
+    if (deletedNode) {
+      await eventBus.publish({
+        type: 'node_deleted',
+        userId,
+        node: mapNode(deletedNode),
+      });
+    }
+
+    return false;
+  }
+
+  public async serverUserNodeSync(
+    userId: string,
+    userNode: ServerUserNodeState
+  ): Promise<boolean> {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const createdUserNode = await workspaceDatabase
+      .insertInto('user_nodes')
+      .returningAll()
+      .values({
+        user_id: userNode.userId,
+        node_id: userNode.nodeId,
+        version_id: userNode.versionId,
+        last_seen_at: userNode.lastSeenAt,
+        last_seen_version_id: userNode.lastSeenVersionId,
+        mentions_count: userNode.mentionsCount,
+        created_at: userNode.createdAt,
+        updated_at: userNode.updatedAt,
+      })
+      .onConflict((cb) =>
+        cb.columns(['node_id', 'user_id']).doUpdateSet({
+          last_seen_at: userNode.lastSeenAt,
+          last_seen_version_id: userNode.lastSeenVersionId,
+          mentions_count: userNode.mentionsCount,
+          updated_at: userNode.updatedAt,
+          version_id: userNode.versionId,
+        })
+      )
+      .executeTakeFirst();
+
+    if (createdUserNode) {
+      await eventBus.publish({
+        type: 'user_node_created',
+        userId: userId,
+        userNode: {
+          userId: createdUserNode.user_id,
+          nodeId: createdUserNode.node_id,
+          lastSeenAt: createdUserNode.last_seen_at,
+          lastSeenVersionId: createdUserNode.last_seen_version_id,
+          mentionsCount: createdUserNode.mentions_count,
+          attributes: createdUserNode.attributes,
+          versionId: createdUserNode.version_id,
+          createdAt: createdUserNode.created_at,
+          updatedAt: createdUserNode.updated_at,
+        },
+      });
+
+      return true;
+    }
+
+    return false;
+  }
+
+  async fetchWorkspace(userId: string): Promise<SelectWorkspace> {
+    const workspace = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .selectAll()
+      .where('user_id', '=', userId)
+      .executeTakeFirst();
+
+    if (!workspace) {
+      throw new Error('Workspace not found');
+    }
+
+    return workspace;
   }
 }
 

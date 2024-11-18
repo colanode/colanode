@@ -21,22 +21,27 @@ import {
   SyncChangeResult,
   SyncChangesInput,
   SyncChangeStatus,
+  SyncNodeStatesInput,
+  SyncNodeStatesOutput,
+  ServerNodeState,
+  ServerUserNodeState,
 } from '@colanode/core';
-import { YDoc } from '@colanode/crdt';
+import { encodeState, YDoc } from '@colanode/crdt';
 
 export const syncRouter = Router();
 
 syncRouter.post(
   '/:workspaceId',
   async (req: ColanodeRequest, res: ColanodeResponse) => {
-    const workspaceId = req.params.workspaceId as string;
-    const input = req.body as SyncChangesInput;
     if (!req.account) {
       return res.status(401).json({
         code: ApiError.Unauthorized,
         message: 'Unauthorized.',
       });
     }
+
+    const workspaceId = req.params.workspaceId as string;
+    const input = req.body as SyncChangesInput;
 
     const workspaceUser = await database
       .selectFrom('workspace_users')
@@ -71,6 +76,97 @@ syncRouter.post(
 
     console.log('executed mutations', results);
     res.status(200).json({ results });
+  }
+);
+
+syncRouter.post(
+  '/:workspaceId/states',
+  async (req: ColanodeRequest, res: ColanodeResponse) => {
+    if (!req.account) {
+      return res.status(401).json({
+        code: ApiError.Unauthorized,
+        message: 'Unauthorized.',
+      });
+    }
+
+    const workspaceId = req.params.workspaceId as string;
+    const input = req.body as SyncNodeStatesInput;
+    const ids = input.ids;
+
+    const workspaceUser = await database
+      .selectFrom('workspace_users')
+      .selectAll()
+      .where('workspace_id', '=', workspaceId)
+      .where('account_id', '=', req.account.id)
+      .executeTakeFirst();
+
+    if (!workspaceUser) {
+      return res.status(403).json({
+        code: ApiError.Forbidden,
+        message: 'Forbidden.',
+      });
+    }
+
+    const rows = await database
+      .selectFrom('nodes as n')
+      .innerJoin('user_nodes as un', 'un.node_id', 'n.id')
+      .select([
+        'n.id as node_id',
+        'n.state as node_state',
+        'n.created_at as node_created_at',
+        'n.created_by as node_created_by',
+        'n.updated_at as node_updated_at',
+        'n.updated_by as node_updated_by',
+        'n.version_id as node_version_id',
+        'un.version_id as user_node_version_id',
+        'un.last_seen_at as user_node_last_seen_at',
+        'un.last_seen_version_id as user_node_last_seen_version_id',
+        'un.mentions_count as user_node_mentions_count',
+        'un.created_at as user_node_created_at',
+        'un.updated_at as user_node_updated_at',
+      ])
+      .where('un.user_id', '=', workspaceUser.id)
+      .where('n.workspace_id', '=', workspaceId)
+      .where('n.id', 'in', ids)
+      .execute();
+
+    const states: SyncNodeStatesOutput = {
+      nodes: {},
+    };
+
+    for (const row of rows) {
+      const nodeState: ServerNodeState = {
+        id: row.node_id,
+        workspaceId: workspaceId,
+        state: encodeState(row.node_state),
+        createdAt: row.node_created_at.toISOString(),
+        createdBy: row.node_created_by,
+        updatedAt: row.node_updated_at?.toISOString() ?? null,
+        updatedBy: row.node_updated_by,
+        serverCreatedAt: new Date().toISOString(),
+        serverUpdatedAt: row.user_node_updated_at?.toISOString() ?? null,
+        versionId: row.node_version_id,
+      };
+
+      const userNodeState: ServerUserNodeState = {
+        nodeId: row.node_id,
+        userId: workspaceUser.id,
+        workspaceId: workspaceId,
+        versionId: row.user_node_version_id,
+        lastSeenAt: row.user_node_last_seen_at?.toISOString() ?? null,
+        lastSeenVersionId: row.user_node_last_seen_version_id,
+        mentionsCount: row.user_node_mentions_count,
+        createdAt: row.user_node_created_at.toISOString(),
+        updatedAt: row.user_node_updated_at?.toISOString() ?? null,
+      };
+
+      states.nodes[row.node_id] = {
+        node: nodeState,
+        userNode: userNodeState,
+      };
+    }
+
+    res.status(200).json({ nodes: states });
   }
 );
 

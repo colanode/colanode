@@ -1,16 +1,9 @@
+import { ServerNodeState } from '@colanode/core';
+
 export type ServerNodeSyncMutationInput = {
   type: 'server_node_sync';
   accountId: string;
-  id: string;
-  workspaceId: string;
-  state: string;
-  createdAt: string;
-  createdBy: string;
-  updatedAt: string | null;
-  updatedBy: string | null;
-  serverCreatedAt: string;
-  serverUpdatedAt: string | null;
-  versionId: string;
+  node: ServerNodeState;
 };
 
 export type ServerNodeSyncMutationOutput = {

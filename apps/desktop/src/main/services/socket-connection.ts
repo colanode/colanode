@@ -57,30 +57,13 @@ export class SocketConnection {
         mutationService.executeMutation({
           type: 'server_node_sync',
           accountId: this.account.id,
-          id: message.id,
-          workspaceId: message.workspaceId,
-          state: message.state,
-          createdAt: message.createdAt,
-          createdBy: message.createdBy,
-          updatedAt: message.updatedAt,
-          updatedBy: message.updatedBy,
-          serverCreatedAt: message.serverCreatedAt,
-          serverUpdatedAt: message.serverUpdatedAt,
-          versionId: message.versionId,
+          node: message.node,
         });
       } else if (message.type === 'server_user_node_sync') {
         mutationService.executeMutation({
           type: 'server_user_node_sync',
           accountId: this.account.id,
-          nodeId: message.nodeId,
-          userId: message.userId,
-          workspaceId: message.workspaceId,
-          versionId: message.versionId,
-          lastSeenAt: message.lastSeenAt,
-          lastSeenVersionId: message.lastSeenVersionId,
-          mentionsCount: message.mentionsCount,
-          createdAt: message.createdAt,
-          updatedAt: message.updatedAt,
+          userNode: message.userNode,
         });
       }
     };
