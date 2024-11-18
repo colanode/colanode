@@ -18,6 +18,26 @@ export class MarkNodeAsSeenMutationHandler
       input.userId
     );
 
+    const existingUserNode = await workspaceDatabase
+      .selectFrom('user_nodes')
+      .where('node_id', '=', input.nodeId)
+      .where('user_id', '=', input.userId)
+      .selectAll()
+      .executeTakeFirst();
+
+    if (
+      existingUserNode &&
+      existingUserNode.last_seen_version_id === input.versionId
+    ) {
+      const lastSeenAt = new Date(existingUserNode.last_seen_at);
+      // if has been seen in the last 10 minutes, skip it. We don't want to spam the server with seen events.
+      if (Date.now() - lastSeenAt.getTime() < 10 * 60 * 1000) {
+        return {
+          success: true,
+        };
+      }
+    }
+
     let changeId: number | undefined;
     let userNode: UserNode | undefined;
 
