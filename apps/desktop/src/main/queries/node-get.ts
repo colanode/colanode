@@ -28,6 +28,17 @@ export class NodeGetQueryHandler implements QueryHandler<NodeGetQueryInput> {
     }
 
     if (
+      event.type === 'node_created' &&
+      event.userId === input.userId &&
+      event.node.id === input.nodeId
+    ) {
+      return {
+        hasChanges: true,
+        result: event.node,
+      };
+    }
+
+    if (
       event.type === 'node_updated' &&
       event.userId === input.userId &&
       event.node.id === input.nodeId

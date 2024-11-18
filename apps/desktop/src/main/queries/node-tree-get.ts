@@ -30,6 +30,18 @@ export class NodeTreeGetQueryHandler
       };
     }
 
+    if (
+      event.type === 'node_created' &&
+      event.userId === input.userId &&
+      event.node.id === input.nodeId
+    ) {
+      const newResult = await this.handleQuery(input);
+      return {
+        hasChanges: true,
+        result: newResult,
+      };
+    }
+
     if (event.type === 'node_updated' && event.userId === input.userId) {
       const node = output.find((node) => node.id === event.node.id);
       if (node) {
