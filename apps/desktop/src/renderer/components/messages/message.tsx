@@ -6,16 +6,12 @@ import {
 } from '@/renderer/components/ui/tooltip';
 import { formatDate, timeAgo } from '@/shared/lib/utils';
 import { InView } from 'react-intersection-observer';
-import { MessageReactionCreatePopover } from '@/renderer/components/messages/message-reaction-create-popover';
-import { MessageDeleteButton } from '@/renderer/components/messages/message-delete-button';
 import { NodeRenderer } from '@/renderer/editor/renderers/node';
 import { MessageNode } from '@/shared/types/messages';
 import { MessageReactions } from '@/renderer/components/messages/message-reactions';
-import { useMutation } from '@/renderer/hooks/use-mutation';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { MessagesSquare, Reply } from 'lucide-react';
-import { useConversation } from '@/renderer/contexts/conversation';
 import { useRadar } from '@/renderer/contexts/radar';
+import { MessageActions } from '@/renderer/components/messages/message-actions';
 
 interface MessageProps {
   message: MessageNode;
@@ -42,13 +38,8 @@ const shouldDisplayUserInfo = (
 
 export const Message = ({ message, previousMessage }: MessageProps) => {
   const workspace = useWorkspace();
-  const conversation = useConversation();
   const radar = useRadar();
 
-  const { mutate, isPending } = useMutation();
-
-  const canDelete = conversation.canDeleteMessage(message);
-  const canReplyInThread = false;
   const displayUserInfo = shouldDisplayUserInfo(message, previousMessage);
 
   return (
@@ -97,46 +88,7 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
             }
           }}
         >
-          <ul className="invisible absolute -top-2 right-1 z-10 flex flex-row bg-gray-100 text-muted-foreground shadow group-hover:visible">
-            {canReplyInThread && (
-              <li className="flex h-8 w-7 cursor-pointer items-center justify-center hover:bg-gray-200">
-                <MessagesSquare className="size-4 cursor-pointer" />
-              </li>
-            )}
-            <li className="flex h-8 w-7 cursor-pointer items-center justify-center hover:bg-gray-200">
-              <MessageReactionCreatePopover
-                onReactionClick={(reaction) => {
-                  if (isPending) {
-                    return;
-                  }
-
-                  mutate({
-                    input: {
-                      type: 'node_reaction_create',
-                      nodeId: message.id,
-                      userId: workspace.userId,
-                      reaction,
-                    },
-                  });
-                }}
-              />
-            </li>
-            {conversation.canCreateMessage && (
-              <li className="flex h-8 w-7 cursor-pointer items-center justify-center hover:bg-gray-200">
-                <Reply
-                  className="size-4 cursor-pointer"
-                  onClick={() => {
-                    conversation.onReply(message);
-                  }}
-                />
-              </li>
-            )}
-            {canDelete && (
-              <li className="flex h-8 w-7 cursor-pointer items-center justify-center hover:bg-gray-200">
-                <MessageDeleteButton id={message.id} />
-              </li>
-            )}
-          </ul>
+          <MessageActions message={message} />
           <div className="text-foreground">
             {message.content.map((node) => (
               <NodeRenderer
@@ -146,42 +98,7 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
               />
             ))}
           </div>
-          {message.reactionCounts?.length > 0 && (
-            <MessageReactions
-              message={message}
-              onReactionClick={(reaction) => {
-                if (isPending) {
-                  return;
-                }
-
-                if (
-                  message.reactionCounts.some(
-                    (reactionCount) =>
-                      reactionCount.reaction === reaction &&
-                      reactionCount.isReactedTo
-                  )
-                ) {
-                  mutate({
-                    input: {
-                      type: 'node_reaction_delete',
-                      nodeId: message.id,
-                      userId: workspace.userId,
-                      reaction,
-                    },
-                  });
-                } else {
-                  mutate({
-                    input: {
-                      type: 'node_reaction_create',
-                      nodeId: message.id,
-                      userId: workspace.userId,
-                      reaction,
-                    },
-                  });
-                }
-              }}
-            />
-          )}
+          <MessageReactions message={message} />
         </InView>
       </div>
     </div>

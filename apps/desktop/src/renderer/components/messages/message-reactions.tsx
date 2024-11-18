@@ -1,16 +1,17 @@
 import { MessageNode } from '@/shared/types/messages';
 import { EmojiElement } from '@/renderer/components/emojis/emoji-element';
 import { cn } from '@/shared/lib/utils';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 
 interface MessageReactionsProps {
   message: MessageNode;
-  onReactionClick: (reaction: string) => void;
 }
 
-export const MessageReactions = ({
-  message,
-  onReactionClick,
-}: MessageReactionsProps) => {
+export const MessageReactions = ({ message }: MessageReactionsProps) => {
+  const workspace = useWorkspace();
+  const { mutate, isPending } = useMutation();
+
   if (message.reactionCounts.length === 0) {
     return null;
   }
@@ -31,9 +32,39 @@ export const MessageReactions = ({
               'cursor-pointer text-sm text-muted-foreground hover:text-foreground',
               hasReacted ? 'bg-blue-100' : 'bg-gray-50'
             )}
-            onClick={() => onReactionClick(reaction.reaction)}
+            onClick={() => {
+              if (isPending) {
+                return;
+              }
+
+              if (
+                message.reactionCounts.some(
+                  (reactionCount) =>
+                    reactionCount.reaction === reaction.reaction &&
+                    reactionCount.isReactedTo
+                )
+              ) {
+                mutate({
+                  input: {
+                    type: 'node_reaction_delete',
+                    nodeId: message.id,
+                    userId: workspace.userId,
+                    reaction: reaction.reaction,
+                  },
+                });
+              } else {
+                mutate({
+                  input: {
+                    type: 'node_reaction_create',
+                    nodeId: message.id,
+                    userId: workspace.userId,
+                    reaction: reaction.reaction,
+                  },
+                });
+              }
+            }}
           >
-            <EmojiElement id={reaction.reaction} className="h-5 w-5" />
+            <EmojiElement id={reaction.reaction} className="size-5" />
             <span>{reaction.count}</span>
           </div>
         );
