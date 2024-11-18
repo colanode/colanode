@@ -27,6 +27,23 @@ export type CreateNodeInput = {
 };
 
 class NodeService {
+  public async fetchNode(nodeId: string, userId: string): Promise<Node | null> {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const nodeRow = await workspaceDatabase
+      .selectFrom('nodes')
+      .where('id', '=', nodeId)
+      .selectAll()
+      .executeTakeFirst();
+
+    if (!nodeRow) {
+      return null;
+    }
+
+    return mapNode(nodeRow);
+  }
+
   public async createNode(
     userId: string,
     input: CreateNodeInput | CreateNodeInput[]

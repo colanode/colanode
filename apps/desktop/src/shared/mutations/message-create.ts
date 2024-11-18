@@ -5,6 +5,7 @@ export type MessageCreateMutationInput = {
   userId: string;
   conversationId: string;
   content: JSONContent;
+  referenceId?: string;
 };
 
 export type MessageCreateMutationOutput = {

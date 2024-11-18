@@ -56,7 +56,8 @@ export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {
       event.node.type === 'file' &&
       event.node.parentId === input.parentId
     ) {
-      const file = output.find((file) => file.id === event.node.id);
+      const newOutput = [...output];
+      const file = newOutput.find((file) => file.id === event.node.id);
       if (file) {
         file.name = event.node.attributes.name;
         file.mimeType = event.node.attributes.mimeType;
@@ -66,7 +67,7 @@ export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {
 
         return {
           hasChanges: true,
-          result: output,
+          result: newOutput,
         };
       }
     }
@@ -79,10 +80,10 @@ export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {
     ) {
       const file = output.find((file) => file.id === event.node.id);
       if (file) {
-        output = output.filter((file) => file.id !== event.node.id);
+        const newOutput = output.filter((file) => file.id !== event.node.id);
         return {
           hasChanges: true,
-          result: output,
+          result: newOutput,
         };
       }
     }
@@ -92,13 +93,14 @@ export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {
         event.type === 'download_updated') &&
       event.userId === input.userId
     ) {
+      const newOutput = [...output];
       const nodeId = event.download.nodeId;
-      const file = output.find((file) => file.id === nodeId);
+      const file = newOutput.find((file) => file.id === nodeId);
       if (file) {
         file.downloadProgress = event.download.progress;
         return {
           hasChanges: true,
-          result: output,
+          result: newOutput,
         };
       }
     }

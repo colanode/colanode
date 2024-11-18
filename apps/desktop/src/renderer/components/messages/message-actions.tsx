@@ -1,5 +1,6 @@
+import React from 'react';
 import { useConversation } from '@/renderer/contexts/conversation';
-import { MessageNode } from '@/shared/types/messages';
+import { MessageNode } from '@colanode/core';
 import { MessagesSquare, Reply } from 'lucide-react';
 import { MessageReactionCreatePopover } from '@/renderer/components/messages/message-reaction-create-popover';
 import { useMutation } from '@/renderer/hooks/use-mutation';
@@ -7,7 +8,6 @@ import { useWorkspace } from '@/renderer/contexts/workspace';
 import { MessageDeleteButton } from '@/renderer/components/messages/message-delete-button';
 import { EmojiElement } from '@/renderer/components/emojis/emoji-element';
 import { Separator } from '@/renderer/components/ui/separator';
-import React from 'react';
 
 const MessageAction = ({ children }: { children: React.ReactNode }) => {
   return (

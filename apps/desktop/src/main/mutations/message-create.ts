@@ -4,7 +4,7 @@ import {
   MessageCreateMutationInput,
   MessageCreateMutationOutput,
 } from '@/shared/mutations/message-create';
-import { mapContentsToBlocks } from '@/shared/lib/editor';
+import { mapBlocksToContents, mapContentsToBlocks } from '@/shared/lib/editor';
 import { fileService } from '@/main/services/file-service';
 import { Block, FileAttributes, MessageAttributes } from '@colanode/core';
 import { CreateNodeInput, nodeService } from '@/main/services/node-service';
@@ -17,13 +17,35 @@ export class MessageCreateMutationHandler
   ): Promise<MessageCreateMutationOutput> {
     const inputs: CreateNodeInput[] = [];
 
+    const messageContent = input.content.content ?? [];
+    if (input.referenceId) {
+      const referenceNode = await nodeService.fetchNode(
+        input.referenceId,
+        input.userId
+      );
+
+      if (!referenceNode || referenceNode.type !== 'message') {
+        throw new Error('Reference node not found');
+      }
+
+      const referenceContent = mapBlocksToContents(
+        referenceNode.id,
+        Object.values(referenceNode.attributes.content)
+      );
+
+      messageContent.unshift({
+        type: 'messageReference',
+        attrs: {
+          id: input.referenceId,
+          conversationId: input.conversationId,
+        },
+        content: referenceContent,
+      });
+    }
+
     const messageId = generateId(IdType.Message);
     const createdAt = new Date().toISOString();
-    const blocks = mapContentsToBlocks(
-      messageId,
-      input.content.content ?? [],
-      new Map()
-    );
+    const blocks = mapContentsToBlocks(messageId, messageContent, new Map());
 
     // check if there are nested nodes (files, pages, folders etc.)
     for (const block of blocks) {

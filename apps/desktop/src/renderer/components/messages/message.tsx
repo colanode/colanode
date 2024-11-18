@@ -1,24 +1,19 @@
-import { Avatar } from '@/renderer/components/avatars/avatar';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/renderer/components/ui/tooltip';
-import { formatDate, timeAgo } from '@/shared/lib/utils';
 import { InView } from 'react-intersection-observer';
-import { NodeRenderer } from '@/renderer/editor/renderers/node';
-import { MessageNode } from '@/shared/types/messages';
+import { MessageNode } from '@colanode/core';
 import { MessageReactions } from '@/renderer/components/messages/message-reactions';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useRadar } from '@/renderer/contexts/radar';
 import { MessageActions } from '@/renderer/components/messages/message-actions';
+import { MessageAvatar } from '@/renderer/components/messages/message-avatar';
+import { MessageHeader } from '@/renderer/components/messages/message-header';
+import { MessageContent } from '@/renderer/components/messages/message-content';
 
 interface MessageProps {
   message: MessageNode;
   previousMessage?: MessageNode | null;
 }
 
-const shouldDisplayUserInfo = (
+const shouldDisplayAuthor = (
   message: MessageNode,
   previousMessage?: MessageNode | null
 ) => {
@@ -33,53 +28,28 @@ const shouldDisplayUserInfo = (
     return true;
   }
 
-  return previousMessage.author.id !== message.author.id;
+  return previousMessage.createdBy !== message.createdBy;
 };
 
 export const Message = ({ message, previousMessage }: MessageProps) => {
   const workspace = useWorkspace();
   const radar = useRadar();
-
-  const displayUserInfo = shouldDisplayUserInfo(message, previousMessage);
+  const displayAuthor = shouldDisplayAuthor(message, previousMessage);
 
   return (
     <div
       id={`message-${message.id}`}
       key={`message-${message.id}`}
       className={`group flex flex-row px-1 hover:bg-gray-50 ${
-        displayUserInfo ? 'mt-2 first:mt-0' : ''
+        displayAuthor ? 'mt-2 first:mt-0' : ''
       }`}
     >
       <div className="mr-2 w-10 pt-1">
-        {displayUserInfo && (
-          <Avatar
-            id={message.author.id}
-            name={message.author.name}
-            avatar={message.author.avatar}
-            size="medium"
-          />
-        )}
+        {displayAuthor && <MessageAvatar message={message} />}
       </div>
 
       <div className="relative w-full">
-        {displayUserInfo && (
-          <div className="font-medium">
-            <span>{message.author.name}</span>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <span className="ml-2 text-xs text-muted-foreground">
-                  {timeAgo(message.createdAt)}
-                </span>
-              </TooltipTrigger>
-              <TooltipContent>
-                <span className="text-sm shadow-md">
-                  {formatDate(message.createdAt)}
-                </span>
-              </TooltipContent>
-            </Tooltip>
-          </div>
-        )}
-
+        {displayAuthor && <MessageHeader message={message} />}
         <InView
           rootMargin="50px"
           onChange={(inView) => {
@@ -89,15 +59,7 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
           }}
         >
           <MessageActions message={message} />
-          <div className="text-foreground">
-            {message.content.map((node) => (
-              <NodeRenderer
-                key={node.attrs?.id}
-                node={node}
-                keyPrefix={node.attrs?.id}
-              />
-            ))}
-          </div>
+          <MessageContent message={message} />
           <MessageReactions message={message} />
         </InView>
       </div>

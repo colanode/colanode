@@ -90,7 +90,7 @@ export const Conversation = ({ conversationId, role }: ConversationProps) => {
           }
         },
         canDeleteMessage: (message) => {
-          return isAdmin || message.author.id === workspace.userId;
+          return isAdmin || message.createdBy === workspace.userId;
         },
       }}
     >

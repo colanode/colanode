@@ -12,7 +12,6 @@ export const MessageReferenceRenderer = ({
 }: MessageReferenceRendererProps) => {
   return (
     <div className="items-top flex flex-col gap-2 border-l-4 p-2 text-sm text-foreground">
-      <p className="font-medium">{node.attrs?.name ?? 'Unknown'}</p>
       <NodeChildrenRenderer node={node} keyPrefix={keyPrefix} />
     </div>
   );

@@ -1,4 +1,4 @@
-import { MessageNode } from '@/shared/types/messages';
+import { MessageNode } from '@colanode/core';
 
 export type MessageListQueryInput = {
   type: 'message_list';

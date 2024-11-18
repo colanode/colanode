@@ -27,7 +27,7 @@ export class AccountListQueryHandler
     }
 
     if (event.type === 'account_updated') {
-      const updatedAccounts = output.map((account) => {
+      const updatedAccounts = [...output].map((account) => {
         if (account.id === event.account.id) {
           return event.account;
         }
@@ -41,7 +41,7 @@ export class AccountListQueryHandler
     }
 
     if (event.type === 'account_deleted') {
-      const activeAccounts = output.filter(
+      const activeAccounts = [...output].filter(
         (account) => account.id !== event.account.id
       );
 

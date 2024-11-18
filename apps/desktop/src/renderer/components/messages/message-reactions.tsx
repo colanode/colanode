@@ -1,4 +1,4 @@
-import { MessageNode } from '@/shared/types/messages';
+import { MessageNode } from '@colanode/core';
 import { EmojiElement } from '@/renderer/components/emojis/emoji-element';
 import { cn } from '@/shared/lib/utils';
 import { useWorkspace } from '@/renderer/contexts/workspace';
@@ -12,13 +12,21 @@ export const MessageReactions = ({ message }: MessageReactionsProps) => {
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
-  if (message.reactionCounts.length === 0) {
+  const reactionCounts = Object.entries(message.attributes.reactions ?? {})
+    .map(([reaction, users]) => ({
+      reaction,
+      count: users.length,
+      isReactedTo: users.includes(workspace.userId),
+    }))
+    .filter((reactionCount) => reactionCount.count > 0);
+
+  if (reactionCounts.length === 0) {
     return null;
   }
 
   return (
     <div className="my-1 flex flex-row gap-2">
-      {message.reactionCounts.map((reaction) => {
+      {reactionCounts.map((reaction) => {
         if (reaction.count === 0) {
           return null;
         }
@@ -38,7 +46,7 @@ export const MessageReactions = ({ message }: MessageReactionsProps) => {
               }
 
               if (
-                message.reactionCounts.some(
+                reactionCounts.some(
                   (reactionCount) =>
                     reactionCount.reaction === reaction.reaction &&
                     reactionCount.isReactedTo

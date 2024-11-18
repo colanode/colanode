@@ -5,7 +5,7 @@ import {
 } from '@/renderer/components/messages/message-editor';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { MessageNode } from '@/shared/types/messages';
+import { MessageNode } from '@colanode/core';
 import { editorHasContent } from '@/shared/lib/editor';
 import { useConversation } from '@/renderer/contexts/conversation';
 import { MessageReplyBanner } from '@/renderer/components/messages/message-reply-banner';
@@ -63,23 +63,13 @@ export const MessageCreate = React.forwardRef<MessageCreateRefProps>(
         return;
       }
 
-      if (replyTo) {
-        content.content.unshift({
-          type: 'messageReference',
-          attrs: {
-            id: replyTo.id,
-            name: replyTo.author.name,
-          },
-          content: replyTo.content,
-        });
-      }
-
       mutate({
         input: {
           type: 'message_create',
           conversationId: conversation.id,
           content: content,
           userId: workspace.userId,
+          referenceId: replyTo?.id,
         },
         onSuccess: () => {
           setReplyTo(null);
