@@ -48,7 +48,7 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
   const { mutate, isPending } = useMutation();
 
   const canDelete = conversation.canDeleteMessage(message);
-  const canReplyInThread = conversation.canCreateMessage;
+  const canReplyInThread = false;
   const displayUserInfo = shouldDisplayUserInfo(message, previousMessage);
 
   return (
