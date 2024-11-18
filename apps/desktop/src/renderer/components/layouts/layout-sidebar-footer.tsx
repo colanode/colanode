@@ -11,7 +11,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from '@/renderer/components/ui/sidebar';
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useAccount } from '@/renderer/contexts/account';
@@ -24,7 +23,6 @@ import { AccountReadState } from '@/shared/types/radars';
 
 export function LayoutSidebarFooter() {
   const account = useAccount();
-  const sidebar = useSidebar();
   const navigate = useNavigate();
   const radar = useRadar();
 
@@ -76,7 +74,7 @@ export function LayoutSidebarFooter() {
           </DropdownMenuTrigger>
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-80 rounded-lg"
-            side={sidebar.isMobile ? 'bottom' : 'right'}
+            side="right"
             align="end"
             sideOffset={4}
           >

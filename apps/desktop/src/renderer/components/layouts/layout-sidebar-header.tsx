@@ -15,7 +15,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  useSidebar,
 } from '@/renderer/components/ui/sidebar';
 import { ChevronsUpDown, Settings, Plus, Bell, Check } from 'lucide-react';
 import { useRadar } from '@/renderer/contexts/radar';
@@ -26,7 +25,6 @@ export const LayoutSidebarHeader = () => {
   const workspace = useWorkspace();
   const account = useAccount();
   const navigate = useNavigate();
-  const sidebar = useSidebar();
   const radar = useRadar();
 
   const [open, setOpen] = React.useState(false);
@@ -77,7 +75,7 @@ export const LayoutSidebarHeader = () => {
           <DropdownMenuContent
             className="w-[--radix-dropdown-menu-trigger-width] min-w-80 rounded-lg"
             align="start"
-            side={sidebar.isMobile ? 'bottom' : 'right'}
+            side="right"
             sideOffset={4}
           >
             <DropdownMenuItem key={workspace.id} className="p-0">
