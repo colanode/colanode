@@ -6,7 +6,6 @@ import {
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
 import { Button } from '@/renderer/components/ui/button';
-import { SortDirections } from '@colanode/core';
 import { useView } from '@/renderer/contexts/view';
 import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
 import { ChevronDown, Trash2 } from 'lucide-react';
@@ -28,11 +27,7 @@ export const ViewSortRow = ({ sort, field }: ViewSortProps) => {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <div className="flex flex-grow flex-row items-center gap-1 rounded-md p-1 font-semibold hover:cursor-pointer hover:bg-gray-100">
-            <p>
-              {sort.direction === SortDirections.Ascending
-                ? 'Ascending'
-                : 'Descending'}
-            </p>
+            <p>{sort.direction === 'asc' ? 'Ascending' : 'Descending'}</p>
             <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </div>
         </DropdownMenuTrigger>

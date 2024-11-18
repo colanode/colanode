@@ -984,6 +984,11 @@ const recordMatchesUrlFilter = (
   return false;
 };
 
+export const isFilterableField = (field: FieldAttributes) => {
+  // TODO: Implement this
+  return true;
+};
+
 export const isSortableField = (field: FieldAttributes) => {
   return (
     field.type === 'text' ||

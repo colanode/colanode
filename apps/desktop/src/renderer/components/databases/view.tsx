@@ -1,6 +1,7 @@
 import React from 'react';
 import { match } from 'ts-pattern';
 import {
+  SortDirection,
   ViewAttributes,
   ViewFieldFilterAttributes,
   ViewFilterAttributes,
@@ -269,12 +270,13 @@ export const View = ({ view }: ViewProps) => {
             },
           });
         },
-        initFieldSort: (fieldId: string) => {
+        initFieldSort: (fieldId: string, direction: SortDirection) => {
           if (!database.canEdit) {
             return;
           }
 
-          if (view.sorts[fieldId]) {
+          const existingSort = view.sorts[fieldId];
+          if (existingSort && existingSort.direction === direction) {
             return;
           }
 
@@ -286,7 +288,7 @@ export const View = ({ view }: ViewProps) => {
           const sort: ViewSortAttributes = {
             id: fieldId,
             fieldId,
-            direction: 'asc',
+            direction,
           };
 
           const viewCopy = { ...view };

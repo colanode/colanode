@@ -1,4 +1,8 @@
-import { ViewFilterAttributes, ViewSortAttributes } from '@colanode/core';
+import {
+  SortDirection,
+  ViewFilterAttributes,
+  ViewSortAttributes,
+} from '@colanode/core';
 import { ViewField } from '@/shared/types/databases';
 import { createContext, useContext } from 'react';
 
@@ -21,7 +25,7 @@ interface ViewContext {
   initFieldFilter: (fieldId: string) => void;
   updateFilter: (id: string, filter: ViewFilterAttributes) => void;
   removeFilter: (id: string) => void;
-  initFieldSort: (fieldId: string) => void;
+  initFieldSort: (fieldId: string, direction: SortDirection) => void;
   updateSort: (id: string, sort: ViewSortAttributes) => void;
   removeSort: (id: string) => void;
   openSearchBar: () => void;

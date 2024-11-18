@@ -32,10 +32,7 @@ export const EditorNodeTypes = {
   FilePlaceholder: 'filePlaceholder',
 };
 
-export const SortDirections = {
-  Ascending: 'asc',
-  Descending: 'desc',
-};
+export type SortDirection = 'asc' | 'desc';
 
 export const NodeRoles = {
   Admin: 'admin',

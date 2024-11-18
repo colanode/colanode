@@ -49,7 +49,7 @@ export const ViewSortAddPopover = ({ children }: ViewSortAddPopoverProps) => {
                 <CommandItem
                   key={field.id}
                   onSelect={() => {
-                    view.initFieldSort(field.id);
+                    view.initFieldSort(field.id, 'asc');
                     setOpen(false);
                   }}
                 >

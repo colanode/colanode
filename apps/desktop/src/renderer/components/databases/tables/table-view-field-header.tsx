@@ -15,6 +15,7 @@ import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
 import { ArrowDownAz, ArrowDownZa, EyeOff, Filter, Trash2 } from 'lucide-react';
 import { ViewField } from '@/shared/types/databases';
 import { useDatabase } from '@/renderer/contexts/database';
+import { isFilterableField, isSortableField } from '@/shared/lib/databases';
 
 interface TableViewFieldHeaderProps {
   viewField: ViewField;
@@ -26,6 +27,7 @@ export const TableViewFieldHeader = ({
   const database = useDatabase();
   const view = useView();
 
+  const [openPopover, setOpenPopover] = React.useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
 
   const [, dragRef] = useDrag<ViewField>({
@@ -56,6 +58,9 @@ export const TableViewFieldHeader = ({
 
   const divRef = React.useRef<HTMLDivElement>(null);
   const dragDropRef = dragRef(dropRef(divRef));
+
+  const canFilter = isFilterableField(viewField.field);
+  const canSort = isSortableField(viewField.field);
 
   return (
     <React.Fragment>
@@ -94,7 +99,7 @@ export const TableViewFieldHeader = ({
           view.resizeField(viewField.field.id, newWidth);
         }}
       >
-        <Popover modal={true}>
+        <Popover modal={true} open={openPopover} onOpenChange={setOpenPopover}>
           <PopoverTrigger asChild>
             <div
               className={cn(
@@ -112,17 +117,13 @@ export const TableViewFieldHeader = ({
           <PopoverContent className="ml-1 flex w-72 flex-col gap-1 p-2 text-sm">
             <FieldRenameInput field={viewField.field} />
             <Separator />
-            {true && (
-              <>
+            {canSort && (
+              <React.Fragment>
                 <div
                   className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
                   onClick={() => {
-                    // eventBus.publish({
-                    //   __typename: 'AddSortEvent',
-                    //   field: viewField.field,
-                    //   viewId: view.id,
-                    //   direction: 'ASC',
-                    // });
+                    view.initFieldSort(viewField.field.id, 'asc');
+                    setOpenPopover(false);
                   }}
                 >
                   <ArrowDownAz className="size-4" />
@@ -132,23 +133,27 @@ export const TableViewFieldHeader = ({
                 <div
                   className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
                   onClick={() => {
-                    // eventBus.publish({
-                    //   __typename: 'AddSortEvent',
-                    //   field: viewField.field,
-                    //   viewId: view.id,
-                    //   direction: 'DESC',
-                    // });
+                    view.initFieldSort(viewField.field.id, 'desc');
+                    setOpenPopover(false);
                   }}
                 >
                   <ArrowDownZa className="size-4" />
                   <span>Sort descending</span>
                 </div>
-              </>
+              </React.Fragment>
             )}
-            <div className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100">
-              <Filter className="size-4" />
-              <span>Filter</span>
-            </div>
+            {canFilter && (
+              <div
+                className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
+                onClick={() => {
+                  view.initFieldFilter(viewField.field.id);
+                  setOpenPopover(false);
+                }}
+              >
+                <Filter className="size-4" />
+                <span>Filter</span>
+              </div>
+            )}
             <Separator />
             {database.canEdit && (
               <div
