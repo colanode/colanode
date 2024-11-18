@@ -9,9 +9,17 @@ class QueryService {
   private readonly subscribedQueries: Map<string, SubscribedQuery<QueryInput>> =
     new Map();
 
+  private readonly eventsQueue: Event[] = [];
+  private isProcessingEvents = false;
+
   constructor() {
     eventBus.subscribe((event: Event) => {
-      this.checkForQueryChanges(event);
+      if (event.type === 'query_result_updated') {
+        return;
+      }
+
+      this.eventsQueue.push(event);
+      this.processEventsQueue();
     });
   }
 
@@ -44,38 +52,51 @@ class QueryService {
     this.subscribedQueries.delete(id);
   }
 
-  private async checkForQueryChanges(event: Event): Promise<void> {
-    if (event.type === 'query_result_updated') {
+  private async processEventsQueue() {
+    if (this.isProcessingEvents) {
       return;
     }
 
+    this.isProcessingEvents = true;
+
+    const events = this.eventsQueue.splice(0, this.eventsQueue.length);
     for (const [id, query] of this.subscribedQueries) {
       const handler = queryHandlerMap[query.input.type] as QueryHandler<
         typeof query.input
       >;
-      const changeCheckResult = await handler.checkForChanges(
-        event,
-        query.input,
-        query.result
-      );
 
-      if (
-        changeCheckResult.hasChanges &&
-        changeCheckResult.result &&
-        !isEqual(query.result, changeCheckResult.result)
-      ) {
-        const newResult = changeCheckResult.result;
-        this.subscribedQueries.set(id, {
-          input: query.input,
-          result: newResult,
-        });
+      let result = query.result;
+      for (const event of events) {
+        const changeCheckResult = await handler.checkForChanges(
+          event,
+          query.input,
+          result
+        );
 
-        eventBus.publish({
-          type: 'query_result_updated',
-          id,
-          result: newResult,
-        });
+        if (changeCheckResult.hasChanges) {
+          result = changeCheckResult.result;
+        }
       }
+
+      if (isEqual(result, query.result)) {
+        continue;
+      }
+
+      this.subscribedQueries.set(id, {
+        input: query.input,
+        result,
+      });
+
+      eventBus.publish({
+        type: 'query_result_updated',
+        id,
+        result,
+      });
+    }
+
+    this.isProcessingEvents = false;
+    if (this.eventsQueue.length > 0) {
+      this.processEventsQueue();
     }
   }
 }

@@ -41,8 +41,6 @@ export const MessageActions = ({ message }: MessageActionsProps) => {
         return;
       }
 
-      console.log('reaction', reaction);
-
       mutate({
         input: {
           type: 'node_reaction_create',
