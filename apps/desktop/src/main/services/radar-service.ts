@@ -5,7 +5,7 @@ import { eventBus } from '@/shared/lib/event-bus';
 import { Event } from '@/shared/types/events';
 
 class RadarService {
-  private readonly workspaceStates: Record<string, WorkspaceRadarData> = {};
+  private readonly workspaceStates: Map<string, WorkspaceRadarData> = new Map();
 
   constructor() {
     eventBus.subscribe(this.handleEvent.bind(this));
@@ -18,25 +18,25 @@ class RadarService {
       .execute();
 
     for (const workspace of workspaces) {
-      this.workspaceStates[workspace.user_id] = {
+      this.workspaceStates.set(workspace.user_id, {
         userId: workspace.user_id,
         workspaceId: workspace.workspace_id,
         accountId: workspace.account_id,
         nodeStates: {},
         importantCount: 0,
         hasUnseenChanges: false,
-      };
+      });
 
       await this.initWorkspace(workspace.user_id);
     }
   }
 
-  public getWorkspaceStates(): Record<string, WorkspaceRadarData> {
-    return this.workspaceStates;
+  public getData(): Record<string, WorkspaceRadarData> {
+    return Object.fromEntries(this.workspaceStates);
   }
 
   private async initWorkspace(userId: string): Promise<void> {
-    let existingData = this.workspaceStates[userId];
+    let existingData = this.workspaceStates.get(userId);
     if (!existingData) {
       const workspace = await databaseService.appDatabase
         .selectFrom('workspaces')
@@ -121,12 +121,12 @@ class RadarService {
       }
     }
 
-    this.workspaceStates[userId] = data;
+    this.workspaceStates.set(userId, data);
   }
 
   private async handleEvent(event: Event) {
     if (event.type === 'workspace_deleted') {
-      delete this.workspaceStates[event.workspace.userId];
+      this.workspaceStates.delete(event.workspace.userId);
       eventBus.publish({
         type: 'radar_data_updated',
       });

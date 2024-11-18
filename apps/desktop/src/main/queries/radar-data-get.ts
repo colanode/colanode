@@ -10,7 +10,7 @@ export class RadarDataGetQueryHandler
   public async handleQuery(
     _: RadarDataGetQueryInput
   ): Promise<Record<string, WorkspaceRadarData>> {
-    const data = radarService.getWorkspaceStates();
+    const data = radarService.getData();
     return data;
   }
 
@@ -20,7 +20,7 @@ export class RadarDataGetQueryHandler
     ___: Record<string, WorkspaceRadarData>
   ): Promise<ChangeCheckResult<RadarDataGetQueryInput>> {
     if (event.type === 'radar_data_updated') {
-      const data = radarService.getWorkspaceStates();
+      const data = radarService.getData();
       return {
         hasChanges: true,
         result: data,
