@@ -1,14 +1,26 @@
-import { QueryInput } from '@/shared/queries';
+import { QueryInput, QueryMap } from '@/shared/queries';
 import { sha256 } from 'js-sha256';
-import { useQuery as useTanstackQuery } from '@tanstack/react-query';
+import {
+  useQuery as useTanstackQuery,
+  UseQueryOptions as TanstackUseQueryOptions,
+} from '@tanstack/react-query';
 
-export const useQuery = <T extends QueryInput>(input: T) => {
+type UseQueryOptions<T extends QueryInput> = Omit<
+  TanstackUseQueryOptions<QueryMap[T['type']]['output']>,
+  'queryFn' | 'queryKey'
+>;
+
+export const useQuery = <T extends QueryInput>(
+  input: T,
+  options?: UseQueryOptions<T>
+) => {
   const inputJson = JSON.stringify(input);
   const hash = sha256(inputJson);
 
   const { data, isPending } = useTanstackQuery({
     queryKey: [hash],
     queryFn: () => window.colanode.executeQueryAndSubscribe(hash, input),
+    ...options,
   });
 
   return {
