@@ -7,62 +7,66 @@ import {
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { IdType } from '@colanode/core';
-import { generateId } from '@colanode/core';
-import { FolderForm } from './folder-form';
+import { FolderNode, hasEditorAccess, NodeRole } from '@colanode/core';
+import { toast } from '@/renderer/hooks/use-toast';
+import { FolderForm } from '@/renderer/components/folders/folder-form';
 
-interface FolderCreateDialogProps {
-  spaceId: string;
+interface FolderUpdateDialogProps {
+  folder: FolderNode;
+  role: NodeRole;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const FolderCreateDialog = ({
-  spaceId,
+export const FolderUpdateDialog = ({
+  folder,
+  role,
   open,
   onOpenChange,
-}: FolderCreateDialogProps) => {
+}: FolderUpdateDialogProps) => {
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
+  const canEdit = hasEditorAccess(role);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create folder</DialogTitle>
-          <DialogDescription>
-            Create a new folder to organize your pages
-          </DialogDescription>
+          <DialogTitle>Update folder</DialogTitle>
+          <DialogDescription>Update the folder name and icon</DialogDescription>
         </DialogHeader>
         <FolderForm
-          id={generateId(IdType.Folder)}
+          id={folder.id}
           values={{
-            name: '',
-            avatar: null,
+            name: folder.attributes.name,
+            avatar: folder.attributes.avatar,
           }}
           isPending={isPending}
-          submitText="Create"
+          submitText="Update"
+          readOnly={!canEdit}
           handleCancel={() => {
             onOpenChange(false);
           }}
           handleSubmit={(values) => {
-            console.log('submit', values);
             if (isPending) {
               return;
             }
 
             mutate({
               input: {
-                type: 'folder_create',
-                parentId: spaceId,
+                type: 'folder_update',
+                folderId: folder.id,
                 name: values.name,
                 avatar: values.avatar,
                 userId: workspace.userId,
-                generateIndex: true,
               },
-              onSuccess(output) {
+              onSuccess() {
                 onOpenChange(false);
-                workspace.openInMain(output.id);
+                toast({
+                  title: 'Folder updated',
+                  description: 'Folder was updated successfully',
+                  variant: 'default',
+                });
               },
             });
           }}

@@ -3,6 +3,7 @@ export type FolderCreateMutationInput = {
   userId: string;
   parentId: string;
   name: string;
+  avatar: string | null;
   generateIndex: boolean;
 };
 

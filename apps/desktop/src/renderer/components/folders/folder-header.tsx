@@ -30,7 +30,7 @@ export const FolderHeader = ({ nodes, folder, role }: FolderHeaderProps) => {
             nodes={nodes}
             role={role}
           />
-          <FolderSettings nodeId={folder.id} />
+          <FolderSettings folder={folder} role={role} />
         </div>
       </div>
     </Header>

@@ -41,6 +41,8 @@ import { ViewUpdateMutationHandler } from '@/main/mutations/view-update';
 import { ViewDeleteMutationHandler } from '@/main/mutations/view-delete';
 import { ChannelUpdateMutationHandler } from '@/main/mutations/channel-update';
 import { PageUpdateMutationHandler } from '@/main/mutations/page-update';
+import { FolderUpdateMutationHandler } from '@/main/mutations/folder-update';
+
 type MutationHandlerMap = {
   [K in keyof MutationMap]: MutationHandler<MutationMap[K]['input']>;
 };
@@ -87,4 +89,5 @@ export const mutationHandlerMap: MutationHandlerMap = {
   view_delete: new ViewDeleteMutationHandler(),
   channel_update: new ChannelUpdateMutationHandler(),
   page_update: new PageUpdateMutationHandler(),
+  folder_update: new FolderUpdateMutationHandler(),
 };

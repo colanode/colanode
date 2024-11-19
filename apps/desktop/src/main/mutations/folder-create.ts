@@ -18,6 +18,7 @@ export class FolderCreateMutationHandler
       type: 'folder',
       parentId: input.parentId,
       name: input.name,
+      avatar: input.avatar,
       collaborators: {},
     };
 
