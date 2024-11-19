@@ -3,6 +3,7 @@ export type DatabaseCreateMutationInput = {
   userId: string;
   spaceId: string;
   name: string;
+  avatar?: string | null;
 };
 
 export type DatabaseCreateMutationOutput = {

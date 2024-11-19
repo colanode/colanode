@@ -34,7 +34,7 @@ export const DatabaseHeader = ({
             nodes={nodes}
             role={role}
           />
-          <DatabaseSettings nodeId={database.id} />
+          <DatabaseSettings database={database} role={role} />
         </div>
       </div>
     </Header>

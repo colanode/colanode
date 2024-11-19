@@ -21,6 +21,7 @@ export class DatabaseCreateMutationHandler
     const attributes: DatabaseAttributes = {
       type: 'database',
       name: input.name,
+      avatar: input.avatar,
       parentId: input.spaceId,
       fields: {
         [fieldId]: {
