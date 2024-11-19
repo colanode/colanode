@@ -30,7 +30,7 @@ export const PageHeader = ({ nodes, page, role }: PageHeaderProps) => {
             nodes={nodes}
             role={role}
           />
-          <PageSettings nodeId={page.id} />
+          <PageSettings page={page} role={role} />
         </div>
       </div>
     </Header>

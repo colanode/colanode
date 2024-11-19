@@ -62,7 +62,7 @@ export const ChannelUpdateDialog = ({
                 avatar: values.avatar,
                 userId: workspace.userId,
               },
-              onSuccess(output) {
+              onSuccess() {
                 onOpenChange(false);
                 toast({
                   title: 'Channel updated',

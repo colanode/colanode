@@ -17,6 +17,7 @@ export class PageCreateMutationHandler
     const attributes: PageAttributes = {
       type: 'page',
       parentId: input.parentId,
+      avatar: input.avatar,
       name: input.name,
       content: {},
     };

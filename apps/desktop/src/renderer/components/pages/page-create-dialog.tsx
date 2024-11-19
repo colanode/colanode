@@ -3,29 +3,13 @@ import {
   Dialog,
   DialogContent,
   DialogDescription,
-  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
-import { z } from 'zod';
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@/renderer/components/ui/form';
-import { Input } from '@/renderer/components/ui/input';
-import { Button } from '@/renderer/components/ui/button';
-import { Spinner } from '@/renderer/components/ui/spinner';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-
-const formSchema = z.object({
-  name: z.string().min(3, 'Name must be at least 3 characters long.'),
-});
+import { IdType } from '@colanode/core';
+import { PageForm } from '@/renderer/components/pages/page-form';
+import { generateId } from '@colanode/core';
 
 interface PageCreateDialogProps {
   spaceId: string;
@@ -41,35 +25,6 @@ export const PageCreateDialog = ({
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-    },
-  });
-
-  const handleCancel = () => {
-    form.reset();
-    onOpenChange(false);
-  };
-
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    mutate({
-      input: {
-        type: 'page_create',
-        parentId: spaceId,
-        name: values.name,
-        generateIndex: true,
-        userId: workspace.userId,
-      },
-      onSuccess(output) {
-        onOpenChange(false);
-        form.reset();
-        workspace.openInMain(output.id);
-      },
-    });
-  };
-
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
@@ -79,37 +34,39 @@ export const PageCreateDialog = ({
             Create a new page to collaborate with your peers
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form
-            className="flex flex-col"
-            onSubmit={form.handleSubmit(handleSubmit)}
-          >
-            <div className="flex-grow space-y-4 py-2 pb-4">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending && <Spinner className="mr-1" />}
-                Create
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+        <PageForm
+          id={generateId(IdType.Page)}
+          values={{
+            name: '',
+            avatar: null,
+          }}
+          isPending={isPending}
+          submitText="Create"
+          handleCancel={() => {
+            onOpenChange(false);
+          }}
+          handleSubmit={(values) => {
+            console.log('submit', values);
+            if (isPending) {
+              return;
+            }
+
+            mutate({
+              input: {
+                type: 'page_create',
+                parentId: spaceId,
+                name: values.name,
+                avatar: values.avatar,
+                userId: workspace.userId,
+                generateIndex: true,
+              },
+              onSuccess(output) {
+                onOpenChange(false);
+                workspace.openInMain(output.id);
+              },
+            });
+          }}
+        />
       </DialogContent>
     </Dialog>
   );

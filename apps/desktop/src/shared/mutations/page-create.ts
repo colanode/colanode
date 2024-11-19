@@ -2,6 +2,7 @@ export type PageCreateMutationInput = {
   type: 'page_create';
   userId: string;
   parentId: string;
+  avatar?: string | null;
   name: string;
   generateIndex: boolean;
 };

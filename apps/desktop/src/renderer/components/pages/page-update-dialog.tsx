@@ -7,60 +7,72 @@ import {
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { IdType } from '@colanode/core';
+import {
+  ChannelNode,
+  hasEditorAccess,
+  NodeRole,
+  PageNode,
+} from '@colanode/core';
 import { ChannelForm } from '@/renderer/components/channels/channel-form';
-import { generateId } from '@colanode/core';
+import { toast } from '@/renderer/hooks/use-toast';
+import { PageForm } from './page-form';
 
-interface ChannelCreateDialogProps {
-  spaceId: string;
+interface PageUpdateDialogProps {
+  page: PageNode;
+  role: NodeRole;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const ChannelCreateDialog = ({
-  spaceId,
+export const PageUpdateDialog = ({
+  page,
+  role,
   open,
   onOpenChange,
-}: ChannelCreateDialogProps) => {
+}: PageUpdateDialogProps) => {
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
+  const canEdit = hasEditorAccess(role);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create channel</DialogTitle>
-          <DialogDescription>
-            Create a new channel to collaborate with your peers
-          </DialogDescription>
+          <DialogTitle>Update page</DialogTitle>
+          <DialogDescription>Update the page name and icon</DialogDescription>
         </DialogHeader>
-        <ChannelForm
-          id={generateId(IdType.Channel)}
+        <PageForm
+          id={page.id}
           values={{
-            name: '',
-            avatar: null,
+            name: page.attributes.name,
+            avatar: page.attributes.avatar,
           }}
           isPending={isPending}
-          submitText="Create"
+          submitText="Update"
+          readOnly={!canEdit}
           handleCancel={() => {
             onOpenChange(false);
           }}
           handleSubmit={(values) => {
-            console.log('submit', values);
             if (isPending) {
               return;
             }
 
             mutate({
               input: {
-                type: 'channel_create',
-                spaceId: spaceId,
+                type: 'page_update',
+                pageId: page.id,
                 name: values.name,
+                avatar: values.avatar,
                 userId: workspace.userId,
               },
-              onSuccess(output) {
+              onSuccess() {
                 onOpenChange(false);
-                workspace.openInMain(output.id);
+                toast({
+                  title: 'Page updated',
+                  description: 'Page was updated successfully',
+                  variant: 'default',
+                });
               },
             });
           }}

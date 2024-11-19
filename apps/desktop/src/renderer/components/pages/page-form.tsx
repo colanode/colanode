@@ -19,7 +19,7 @@ const formSchema = z.object({
   avatar: z.string().optional().nullable(),
 });
 
-interface ChannelFormProps {
+interface PageFormProps {
   id: string;
   values: z.infer<typeof formSchema>;
   isPending: boolean;
@@ -29,7 +29,7 @@ interface ChannelFormProps {
   readOnly?: boolean;
 }
 
-export const ChannelForm = ({
+export const PageForm = ({
   id,
   values,
   isPending,
@@ -37,7 +37,7 @@ export const ChannelForm = ({
   handleCancel,
   handleSubmit,
   readOnly = false,
-}: ChannelFormProps) => {
+}: PageFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: values,
