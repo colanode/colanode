@@ -1,3 +1,4 @@
+import React from 'react';
 import { RecordName } from '@/renderer/components/records/record-name';
 import { useDatabase } from '@/renderer/contexts/database';
 import { RecordField } from '@/renderer/components/records/record-field';
@@ -13,17 +14,19 @@ export const RecordAttributes = () => {
         <RecordAvatar />
         <RecordName />
       </div>
-      <div className="flex flex-row gap-2">
-        <div className="flex w-60 flex-col gap-2">
-          {database.fields.map((field) => (
-            <RecordField key={field.id} field={field} />
-          ))}
-        </div>
-        <div className="flex flex-1 flex-col gap-2">
-          {database.fields.map((field) => {
-            return <RecordFieldValue key={`value-${field.id}`} field={field} />;
-          })}
-        </div>
+      <div className="flex flex-col gap-2">
+        {database.fields.map((field) => (
+          <React.Fragment key={field.id}>
+            <div className="flex flex-row gap-2 h-8">
+              <div className="w-60 max-w-60">
+                <RecordField field={field} />
+              </div>
+              <div className="flex-1 max-w-128">
+                <RecordFieldValue field={field} />
+              </div>
+            </div>
+          </React.Fragment>
+        ))}
       </div>
     </div>
   );

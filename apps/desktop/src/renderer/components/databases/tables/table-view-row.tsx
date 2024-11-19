@@ -1,5 +1,5 @@
 import { TableViewNameCell } from '@/renderer/components/databases/tables/table-view-name-cell';
-import { TableViewFieldCell } from '@/renderer/components/databases/tables/table-view-field-cell';
+import { RecordFieldValue } from '@/renderer/components/records/record-field-value';
 import { extractNodeRole, RecordNode } from '@colanode/core';
 import { useView } from '@/renderer/contexts/view';
 import { RecordProvider } from '@/renderer/components/records/record-provider';
@@ -39,7 +39,7 @@ export const TableViewRow = ({ index, record }: TableViewRowProps) => {
               className="h-8 border-r"
               style={{ width: `${field.width}px` }}
             >
-              <TableViewFieldCell record={record} field={field.field} />
+              <RecordFieldValue field={field.field} />
             </div>
           );
         })}

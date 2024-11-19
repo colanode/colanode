@@ -9,6 +9,7 @@ import { RecordPhoneValue } from '@/renderer/components/records/values/record-ph
 import { RecordEmailValue } from '@/renderer/components/records/values/record-email-value';
 import { RecordUrlValue } from '@/renderer/components/records/values/record-url-value';
 import { RecordMultiSelectValue } from '@/renderer/components/records/values/record-multi-select-value';
+import { RecordDateValue } from '@/renderer/components/records/values/record-date-value';
 
 interface RecordFieldValueProps {
   field: FieldAttributes;
@@ -16,26 +17,28 @@ interface RecordFieldValueProps {
 
 export const RecordFieldValue = ({ field }: RecordFieldValueProps) => {
   switch (field.type) {
-    case 'text':
-      return <RecordTextValue field={field} />;
-    case 'number':
-      return <RecordNumberValue field={field} />;
     case 'boolean':
       return <RecordBooleanValue field={field} />;
     case 'createdAt':
       return <RecordCreatedAtValue field={field} />;
     case 'createdBy':
       return <RecordCreatedByValue field={field} />;
-    case 'select':
-      return <RecordSelectValue field={field} />;
-    case 'phone':
-      return <RecordPhoneValue field={field} />;
+    case 'date':
+      return <RecordDateValue field={field} />;
     case 'email':
       return <RecordEmailValue field={field} />;
-    case 'url':
-      return <RecordUrlValue field={field} />;
     case 'multiSelect':
       return <RecordMultiSelectValue field={field} />;
+    case 'number':
+      return <RecordNumberValue field={field} />;
+    case 'phone':
+      return <RecordPhoneValue field={field} />;
+    case 'select':
+      return <RecordSelectValue field={field} />;
+    case 'text':
+      return <RecordTextValue field={field} />;
+    case 'url':
+      return <RecordUrlValue field={field} />;
     default:
       return null;
   }
