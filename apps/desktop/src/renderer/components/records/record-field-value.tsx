@@ -10,6 +10,7 @@ import { RecordEmailValue } from '@/renderer/components/records/values/record-em
 import { RecordUrlValue } from '@/renderer/components/records/values/record-url-value';
 import { RecordMultiSelectValue } from '@/renderer/components/records/values/record-multi-select-value';
 import { RecordDateValue } from '@/renderer/components/records/values/record-date-value';
+import { RecordCollaboratorValue } from '@/renderer/components/records/values/record-collaborator-value';
 
 interface RecordFieldValueProps {
   field: FieldAttributes;
@@ -23,6 +24,8 @@ export const RecordFieldValue = ({ field }: RecordFieldValueProps) => {
       return <RecordCreatedAtValue field={field} />;
     case 'createdBy':
       return <RecordCreatedByValue field={field} />;
+    case 'collaborator':
+      return <RecordCollaboratorValue field={field} />;
     case 'date':
       return <RecordDateValue field={field} />;
     case 'email':

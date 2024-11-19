@@ -9,10 +9,15 @@ import {
 } from '@/renderer/components/ui/command';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { useMutation } from '@/renderer/hooks/use-mutation';
 import { Avatar } from '@/renderer/components/avatars/avatar';
+import { UserNode } from '@colanode/core';
 
-export const ChatCreateCommand = () => {
+interface UserSearchProps {
+  exclude?: string[];
+  onSelect: (user: UserNode) => void;
+}
+
+export const UserSearch = ({ exclude, onSelect }: UserSearchProps) => {
   const workspace = useWorkspace();
 
   const [query, setQuery] = React.useState('');
@@ -20,9 +25,8 @@ export const ChatCreateCommand = () => {
     type: 'user_search',
     searchQuery: query,
     userId: workspace.userId,
+    exclude,
   });
-
-  const { mutate } = useMutation();
 
   return (
     <Command className="min-h-min" shouldFilter={false}>
@@ -39,18 +43,8 @@ export const ChatCreateCommand = () => {
             <CommandItem
               key={user.id}
               onSelect={() => {
-                mutate({
-                  input: {
-                    type: 'chat_create',
-                    userId: workspace.userId,
-                    otherUserId: user.id,
-                    workspaceId: workspace.id,
-                  },
-                  onSuccess(output) {
-                    workspace.openInMain(output.id);
-                    setQuery('');
-                  },
-                });
+                onSelect(user);
+                setQuery('');
               }}
             >
               <div className="flex w-full flex-row items-center gap-2">
