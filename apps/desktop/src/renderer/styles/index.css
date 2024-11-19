@@ -82,6 +82,13 @@
   body {
     @apply bg-background text-foreground;
   }
+  *:focus {
+    outline: none;
+  }
+
+  *:focus-visible {
+    outline: none;
+  }
 }
 
 @font-face {
