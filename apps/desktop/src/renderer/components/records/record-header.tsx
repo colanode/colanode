@@ -30,7 +30,7 @@ export const RecordHeader = ({ nodes, record, role }: RecordHeaderProps) => {
             nodes={nodes}
             role={role}
           />
-          <RecordSettings nodeId={record.id} />
+          <RecordSettings record={record} role={role} />
         </div>
       </div>
     </Header>

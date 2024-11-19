@@ -11,6 +11,7 @@ export const RecordName = () => {
   return (
     <SmartTextInput
       value={record.name}
+      readOnly={!record.canEdit}
       onChange={(value) => {
         if (isPending) {
           return;
