@@ -68,17 +68,25 @@ export class RecordListQueryHandler
       ) {
         const record = output.find((record) => record.id === event.node.id);
         if (record) {
-          const newResult = output.map((record) => {
-            if (record.id === event.node.id) {
-              return event.node as RecordNode;
-            }
-            return record;
-          });
+          if (input.filters.length === 0 && input.sorts.length === 0) {
+            const newResult = output.map((record) => {
+              if (record.id === event.node.id) {
+                return event.node as RecordNode;
+              }
+              return record;
+            });
 
-          return {
-            hasChanges: true,
-            result: newResult,
-          };
+            return {
+              hasChanges: true,
+              result: newResult,
+            };
+          } else {
+            const newResult = await this.handleQuery(input);
+            return {
+              hasChanges: true,
+              result: newResult,
+            };
+          }
         }
       }
 
