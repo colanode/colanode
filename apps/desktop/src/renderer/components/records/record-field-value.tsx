@@ -11,6 +11,8 @@ import { RecordUrlValue } from '@/renderer/components/records/values/record-url-
 import { RecordMultiSelectValue } from '@/renderer/components/records/values/record-multi-select-value';
 import { RecordDateValue } from '@/renderer/components/records/values/record-date-value';
 import { RecordCollaboratorValue } from '@/renderer/components/records/values/record-collaborator-value';
+import { RecordUpdatedAtValue } from '@/renderer/components/records/values/record-updated-at-value';
+import { RecordUpdatedByValue } from '@/renderer/components/records/values/record-updated-by-value';
 
 interface RecordFieldValueProps {
   field: FieldAttributes;
@@ -42,6 +44,10 @@ export const RecordFieldValue = ({ field }: RecordFieldValueProps) => {
       return <RecordTextValue field={field} />;
     case 'url':
       return <RecordUrlValue field={field} />;
+    case 'updatedAt':
+      return <RecordUpdatedAtValue field={field} />;
+    case 'updatedBy':
+      return <RecordUpdatedByValue field={field} />;
     default:
       return null;
   }

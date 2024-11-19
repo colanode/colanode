@@ -76,6 +76,14 @@ const fieldTypes: FieldTypeOption[] = [
     name: 'Url',
     type: 'url',
   },
+  {
+    name: 'Last Updated Date & Time',
+    type: 'updatedAt',
+  },
+  {
+    name: 'Last Updated by user',
+    type: 'updatedBy',
+  },
 ];
 
 interface FieldTypeSelectProps {

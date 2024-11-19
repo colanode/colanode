@@ -47,6 +47,10 @@ export const FieldIcon = ({ type, className }: FieldIconProps) => {
       return <Text className={className} />;
     case 'url':
       return <Link className={className} />;
+    case 'updatedAt':
+      return <Calendar className={className} />;
+    case 'updatedBy':
+      return <User className={className} />;
     default:
       return <ShieldQuestion className={className} />;
   }
