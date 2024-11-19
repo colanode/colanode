@@ -39,6 +39,7 @@ import { ServerUserNodeSyncMutationHandler } from '@/main/mutations/server-user-
 import { MarkNodeAsSeenMutationHandler } from '@/main/mutations/mark-node-as-seen';
 import { ViewUpdateMutationHandler } from '@/main/mutations/view-update';
 import { ViewDeleteMutationHandler } from '@/main/mutations/view-delete';
+import { ChannelUpdateMutationHandler } from '@/main/mutations/channel-update';
 
 type MutationHandlerMap = {
   [K in keyof MutationMap]: MutationHandler<MutationMap[K]['input']>;
@@ -84,4 +85,5 @@ export const mutationHandlerMap: MutationHandlerMap = {
   mark_node_as_seen: new MarkNodeAsSeenMutationHandler(),
   view_update: new ViewUpdateMutationHandler(),
   view_delete: new ViewDeleteMutationHandler(),
+  channel_update: new ChannelUpdateMutationHandler(),
 };

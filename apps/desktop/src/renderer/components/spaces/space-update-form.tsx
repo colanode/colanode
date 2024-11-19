@@ -93,7 +93,6 @@ export const SpaceUpdateForm = ({ space }: SpaceUpdateFormProps) => {
                 />
               </Button>
             </AvatarPopover>
-
             <FormField
               control={form.control}
               name="name"

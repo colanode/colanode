@@ -43,6 +43,7 @@ export class ChannelCreateMutationHandler
     const attributes: ChannelAttributes = {
       type: 'channel',
       name: input.name,
+      avatar: input.avatar,
       parentId: input.spaceId,
       index: generateNodeIndex(maxIndex, null),
       collaborators: null,

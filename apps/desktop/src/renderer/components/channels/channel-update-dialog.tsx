@@ -7,60 +7,68 @@ import {
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { IdType } from '@colanode/core';
-import { ChannelForm } from './channel-form';
-import { generateId } from '@colanode/core';
+import { ChannelNode, hasEditorAccess, NodeRole } from '@colanode/core';
+import { ChannelForm } from '@/renderer/components/channels/channel-form';
+import { toast } from '@/renderer/hooks/use-toast';
 
-interface ChannelCreateDialogProps {
-  spaceId: string;
+interface ChannelUpdateDialogProps {
+  channel: ChannelNode;
+  role: NodeRole;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export const ChannelCreateDialog = ({
-  spaceId,
+export const ChannelUpdateDialog = ({
+  channel,
+  role,
   open,
   onOpenChange,
-}: ChannelCreateDialogProps) => {
+}: ChannelUpdateDialogProps) => {
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
+  const canEdit = hasEditorAccess(role);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create channel</DialogTitle>
+          <DialogTitle>Update channel</DialogTitle>
           <DialogDescription>
-            Create a new channel to collaborate with your peers
+            Update the channel name and icon
           </DialogDescription>
         </DialogHeader>
         <ChannelForm
-          id={generateId(IdType.Channel)}
+          id={channel.id}
           values={{
-            name: '',
-            avatar: null,
+            name: channel.attributes.name,
+            avatar: channel.attributes.avatar,
           }}
           isPending={isPending}
-          submitText="Create"
+          submitText="Update"
+          readOnly={!canEdit}
           handleCancel={() => {
             onOpenChange(false);
           }}
           handleSubmit={(values) => {
-            console.log('submit', values);
             if (isPending) {
               return;
             }
 
             mutate({
               input: {
-                type: 'channel_create',
-                spaceId: spaceId,
+                type: 'channel_update',
+                channelId: channel.id,
                 name: values.name,
+                avatar: values.avatar,
                 userId: workspace.userId,
               },
               onSuccess(output) {
                 onOpenChange(false);
-                workspace.openInMain(output.id);
+                toast({
+                  title: 'Channel updated',
+                  description: 'Channel was updated successfully',
+                  variant: 'default',
+                });
               },
             });
           }}

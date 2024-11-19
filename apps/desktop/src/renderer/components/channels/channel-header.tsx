@@ -30,7 +30,7 @@ export const ChannelHeader = ({ nodes, channel, role }: ChannelHeaderProps) => {
             nodes={nodes}
             role={role}
           />
-          <ChannelSettings nodeId={channel.id} />
+          <ChannelSettings channel={channel} role={role} />
         </div>
       </div>
     </Header>
