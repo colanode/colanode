@@ -78,6 +78,7 @@ export const databaseAttributesSchema = z.object({
 });
 
 export type DatabaseAttributes = z.infer<typeof databaseAttributesSchema>;
+export type ViewType = 'table' | 'board' | 'calendar';
 
 export const databaseModel: NodeModel = {
   type: 'database',

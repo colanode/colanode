@@ -34,7 +34,7 @@ interface RecordContext {
   getCollaboratorValue: (field: CollaboratorFieldAttributes) => string[] | null;
   getDateValue: (field: DateFieldAttributes) => Date | null;
   getEmailValue: (field: EmailFieldAttributes) => string | null;
-  getFileValue: (field: FileFieldAttributes) => string | null;
+  getFileValue: (field: FileFieldAttributes) => string[] | null;
   getMultiSelectValue: (field: MultiSelectFieldAttributes) => string[];
   getNumberValue: (field: NumberFieldAttributes) => number | null;
   getPhoneValue: (field: PhoneFieldAttributes) => string | null;

@@ -2,6 +2,7 @@ import {
   SortDirection,
   ViewFilterAttributes,
   ViewSortAttributes,
+  ViewType,
 } from '@colanode/core';
 import { ViewField } from '@/shared/types/databases';
 import { createContext, useContext } from 'react';
@@ -10,6 +11,7 @@ interface ViewContext {
   id: string;
   name: string;
   avatar: string | null;
+  type: ViewType;
   fields: ViewField[];
   filters: ViewFilterAttributes[];
   sorts: ViewSortAttributes[];
@@ -17,6 +19,8 @@ interface ViewContext {
   nameWidth: number;
   isSearchBarOpened: boolean;
   isSortsOpened: boolean;
+  rename: (name: string) => void;
+  updateAvatar: (avatar: string) => void;
   setFieldDisplay: (id: string, display: boolean) => void;
   resizeField: (id: string, width: number) => void;
   resizeName: (width: number) => void;

@@ -1,6 +1,6 @@
 import { cn } from '@/shared/lib/utils';
-import { Avatar } from '@/renderer/components/avatars/avatar';
 import { ViewAttributes } from '@colanode/core';
+import { ViewIcon } from '@/renderer/components/databases/view-icon';
 
 interface ViewTabProps {
   view: ViewAttributes;
@@ -19,7 +19,13 @@ export const ViewTab = ({ view, isActive, onClick }: ViewTabProps) => {
       onClick={() => onClick()}
       onKeyDown={() => onClick()}
     >
-      <Avatar id={view.id} name={view.name} avatar={view.avatar} size="small" />
+      <ViewIcon
+        id={view.id}
+        name={view.name}
+        avatar={view.avatar}
+        type={view.type}
+        className="size-4"
+      />
       {view.name}
     </div>
   );

@@ -61,6 +61,7 @@ export const View = ({ view }: ViewProps) => {
         id: view.id,
         name: view.name,
         avatar: view.avatar,
+        type: view.type,
         fields,
         filters: Object.values(view.filters),
         sorts: Object.values(view.sorts),
@@ -68,6 +69,40 @@ export const View = ({ view }: ViewProps) => {
         nameWidth: view.nameWidth ?? getDefaultNameWidth(),
         isSearchBarOpened,
         isSortsOpened,
+        rename: (name: string) => {
+          if (!database.canEdit) {
+            return;
+          }
+
+          const viewCopy = { ...view };
+          viewCopy.name = name;
+
+          mutate({
+            input: {
+              type: 'view_update',
+              userId: workspace.userId,
+              databaseId: database.id,
+              view: viewCopy,
+            },
+          });
+        },
+        updateAvatar: (avatar: string) => {
+          if (!database.canEdit) {
+            return;
+          }
+
+          const viewCopy = { ...view };
+          viewCopy.avatar = avatar;
+
+          mutate({
+            input: {
+              type: 'view_update',
+              userId: workspace.userId,
+              databaseId: database.id,
+              view: viewCopy,
+            },
+          });
+        },
         setFieldDisplay: (id: string, display: boolean) => {
           if (!database.canEdit) {
             return;

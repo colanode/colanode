@@ -14,22 +14,18 @@ import {
   TooltipTrigger,
 } from '@/renderer/components/ui/tooltip';
 import { FieldDeleteDialog } from '@/renderer/components/databases/fields/field-delete-dialog';
-import { useMutation } from '@/renderer/hooks/use-mutation';
 import { ViewDeleteDialog } from '@/renderer/components/databases/view-delete-dialog';
 import { SmartTextInput } from '@/renderer/components/ui/smart-text-input';
-import { useWorkspace } from '@/renderer/contexts/workspace';
 import { AvatarPopover } from '@/renderer/components/avatars/avatar-popover';
 import { Button } from '@/renderer/components/ui/button';
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { Eye, EyeOff, Settings, Trash2 } from 'lucide-react';
 import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
+import { ViewIcon } from '../view-icon';
 
 export const TableViewSettingsPopover = () => {
-  const workspace = useWorkspace();
   const database = useDatabase();
   const view = useView();
-
-  const { mutate, isPending } = useMutation();
 
   const [open, setOpen] = React.useState(false);
   const [openDelete, setOpenDelete] = React.useState(false);
@@ -48,36 +44,27 @@ export const TableViewSettingsPopover = () => {
             {database.canEdit ? (
               <AvatarPopover
                 onPick={(avatar) => {
-                  if (isPending) return;
-                  if (avatar === view.avatar) return;
-
-                  mutate({
-                    input: {
-                      type: 'node_attribute_set',
-                      nodeId: view.id,
-                      path: 'avatar',
-                      value: avatar,
-                      userId: workspace.userId,
-                    },
-                  });
+                  view.updateAvatar(avatar);
                 }}
               >
                 <Button type="button" variant="outline" size="icon">
-                  <Avatar
+                  <ViewIcon
                     id={view.id}
                     name={view.name}
                     avatar={view.avatar}
-                    className="h-6 w-6"
+                    type={view.type}
+                    className="size-4"
                   />
                 </Button>
               </AvatarPopover>
             ) : (
               <Button type="button" variant="outline" size="icon">
-                <Avatar
+                <ViewIcon
                   id={view.id}
                   name={view.name}
                   avatar={view.avatar}
-                  className="h-6 w-6"
+                  type={view.type}
+                  className="size-4"
                 />
               </Button>
             )}
@@ -85,18 +72,9 @@ export const TableViewSettingsPopover = () => {
               value={view.name}
               readOnly={!database.canEdit}
               onChange={(newName) => {
-                if (isPending) return;
                 if (newName === view.name) return;
 
-                mutate({
-                  input: {
-                    type: 'node_attribute_set',
-                    nodeId: view.id,
-                    path: 'name',
-                    value: newName,
-                    userId: workspace.userId,
-                  },
-                });
+                view.rename(newName);
               }}
             />
           </div>
