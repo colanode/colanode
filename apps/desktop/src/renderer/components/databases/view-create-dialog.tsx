@@ -28,6 +28,7 @@ import { toast } from '@/renderer/hooks/use-toast';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { Calendar, Columns, Table } from 'lucide-react';
+import { FieldAttributes, FieldType } from '@colanode/core';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),
@@ -59,6 +60,9 @@ const viewTypes: ViewTypeOption[] = [
   },
 ];
 
+const boardGroupFields: FieldType[] = ['select'];
+const calendarGroupFields: FieldType[] = ['date', 'createdAt'];
+
 interface ViewCreateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -80,6 +84,17 @@ export const ViewCreateDialog = ({
     },
   });
   const type = form.watch('type');
+
+  let groupByFields: FieldAttributes[] | null = null;
+  if (type === 'board') {
+    groupByFields = database.fields.filter((field) =>
+      boardGroupFields.includes(field.type)
+    );
+  } else if (type === 'calendar') {
+    groupByFields = database.fields.filter((field) =>
+      calendarGroupFields.includes(field.type)
+    );
+  }
 
   const handleCancel = () => {
     form.reset();
@@ -177,7 +192,10 @@ export const ViewCreateDialog = ({
                             ? 'border-gray-500 text-primary'
                             : ''
                         )}
-                        onClick={() => field.onChange(viewType.type)}
+                        onClick={() => {
+                          field.onChange(viewType.type);
+                          form.setValue('groupBy', null);
+                        }}
                       >
                         <viewType.icon />
                         <p>{viewType.name}</p>
@@ -186,7 +204,7 @@ export const ViewCreateDialog = ({
                   </div>
                 )}
               />
-              {type === 'board' && (
+              {groupByFields && (
                 <FormField
                   control={form.control}
                   name="groupBy"
@@ -195,36 +213,12 @@ export const ViewCreateDialog = ({
                       <FormLabel>Group by</FormLabel>
                       <FormControl>
                         <FieldSelect
-                          fields={database.fields.filter(
-                            (field) => field.type === 'select'
-                          )}
+                          fields={groupByFields}
                           value={field.value ?? null}
                           onChange={field.onChange}
                         />
                       </FormControl>
                       <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
-              {type === 'calendar' && (
-                <FormField
-                  control={form.control}
-                  name="groupBy"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Group by</FormLabel>
-                      <FormControl>
-                        <FieldSelect
-                          fields={database.fields.filter(
-                            (field) =>
-                              field.type === 'date' ||
-                              field.type === 'createdAt'
-                          )}
-                          value={field.value ?? null}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
                     </FormItem>
                   )}
                 />
