@@ -51,6 +51,7 @@ export const RecordDeleteDialog = ({
                 },
                 onSuccess() {
                   onOpenChange(false);
+                  workspace.closeNode(nodeId);
                 },
               });
             }}

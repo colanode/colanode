@@ -44,6 +44,9 @@ export const Workspace = () => {
         isNodeActive(id) {
           return id === main;
         },
+        isModalActive(id) {
+          return id === modal;
+        },
         openInModal(modal) {
           setSearchParams((prev) => {
             prev.set('modal', modal);
@@ -55,6 +58,25 @@ export const Workspace = () => {
             prev.delete('modal');
             return prev;
           });
+        },
+        closeMain() {
+          setSearchParams((prev) => {
+            prev.delete('main');
+            return prev;
+          });
+        },
+        closeNode(id) {
+          if (id === main) {
+            setSearchParams((prev) => {
+              prev.delete('main');
+              return prev;
+            });
+          } else if (id === modal) {
+            setSearchParams((prev) => {
+              prev.delete('modal');
+              return prev;
+            });
+          }
         },
         openSettings() {
           setOpenSettings(true);

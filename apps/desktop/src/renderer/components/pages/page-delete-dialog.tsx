@@ -51,6 +51,7 @@ export const PageDeleteDialog = ({
                 },
                 onSuccess() {
                   onOpenChange(false);
+                  workspace.closeNode(nodeId);
                 },
               });
             }}

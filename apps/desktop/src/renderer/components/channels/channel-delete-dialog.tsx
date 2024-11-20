@@ -51,6 +51,7 @@ export const ChannelDeleteDialog = ({
                 },
                 onSuccess() {
                   onOpenChange(false);
+                  workspace.closeNode(nodeId);
                 },
               });
             }}

@@ -51,6 +51,7 @@ export const DatabaseDeleteDialog = ({
                 },
                 onSuccess() {
                   onOpenChange(false);
+                  workspace.closeNode(nodeId);
                 },
               });
             }}

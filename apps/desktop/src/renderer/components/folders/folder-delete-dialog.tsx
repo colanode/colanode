@@ -51,6 +51,7 @@ export const FolderDeleteDialog = ({
                 },
                 onSuccess() {
                   onOpenChange(false);
+                  workspace.closeNode(nodeId);
                 },
               });
             }}

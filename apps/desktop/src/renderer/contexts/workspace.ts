@@ -5,7 +5,10 @@ interface WorkspaceContext extends Workspace {
   openInMain: (nodeId: string) => void;
   isNodeActive: (nodeId: string) => boolean;
   openInModal: (nodeId: string) => void;
+  isModalActive: (nodeId: string) => boolean;
   closeModal: () => void;
+  closeMain: () => void;
+  closeNode: (nodeId: string) => void;
   openSettings: () => void;
 }
 
