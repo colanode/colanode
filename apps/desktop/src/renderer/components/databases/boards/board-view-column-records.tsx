@@ -4,12 +4,13 @@ import {
   SelectOptionAttributes,
   ViewFilterAttributes,
 } from '@colanode/core';
-import { BoardViewRecord } from '@/renderer/components/databases/boards/board-view-record';
+import { BoardViewRecordCard } from '@/renderer/components/databases/boards/board-view-record-card';
 import { useView } from '@/renderer/contexts/view';
 import { useRecordsQuery } from '@/renderer/hooks/user-records-query';
 import { RecordProvider } from '@/renderer/components/records/record-provider';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useDatabase } from '@/renderer/contexts/database';
+import { BoardViewRecordCreateCard } from '@/renderer/components/databases/boards/board-view-record-create-card';
 
 interface BoardViewColumnRecordsProps {
   field: SelectFieldAttributes;
@@ -24,16 +25,16 @@ export const BoardViewColumnRecords = ({
   const database = useDatabase();
   const view = useView();
 
-  const filters: ViewFilterAttributes[] = [
-    ...view.filters,
-    {
-      id: '1',
-      type: 'field',
-      fieldId: field.id,
-      operator: 'is_in',
-      value: [option.id],
-    },
-  ];
+  const filter: ViewFilterAttributes = {
+    id: '1',
+    type: 'field',
+    fieldId: field.id,
+    operator: 'is_in',
+    value: [option.id],
+  };
+
+  const filters: ViewFilterAttributes[] = [...view.filters, filter];
+
   const { records } = useRecordsQuery(filters, view.sorts);
   return (
     <div className="mt-3 flex flex-col gap-2">
@@ -42,10 +43,11 @@ export const BoardViewColumnRecords = ({
 
         return (
           <RecordProvider key={record.id} record={record} role={role}>
-            <BoardViewRecord />
+            <BoardViewRecordCard />
           </RecordProvider>
         );
       })}
+      <BoardViewRecordCreateCard filters={filters} />
     </div>
   );
 };

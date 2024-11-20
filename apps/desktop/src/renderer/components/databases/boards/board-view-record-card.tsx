@@ -11,7 +11,7 @@ interface DragResult {
   field: SelectFieldAttributes;
 }
 
-export const BoardViewRecord = () => {
+export const BoardViewRecordCard = () => {
   const workspace = useWorkspace();
   const view = useView();
   const record = useRecord();
@@ -54,7 +54,7 @@ export const BoardViewRecord = () => {
       onClick={() => workspace.openInModal(record.id)}
     >
       <p className={hasName ? '' : 'text-muted-foreground'}>
-        {name ?? 'Unnamed'}
+        {hasName ? name : 'Unnamed'}
       </p>
       {view.fields.length > 0 && (
         <div className="flex flex-col gap-1 mt-2">

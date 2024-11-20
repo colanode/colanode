@@ -1,6 +1,6 @@
 import { cn, isSameDay } from '@/shared/lib/utils';
 import { extractNodeRole, RecordNode } from '@colanode/core';
-import { CalendarViewRecord } from '@/renderer/components/databases/calendars/calendar-view-record';
+import { CalendarViewRecordCard } from '@/renderer/components/databases/calendars/calendar-view-record-card';
 import { Plus } from 'lucide-react';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useDatabase } from '@/renderer/contexts/database';
@@ -52,7 +52,7 @@ export const CalendarViewDay = ({
 
         return (
           <RecordProvider key={record.id} record={record} role={role}>
-            <CalendarViewRecord />
+            <CalendarViewRecordCard />
           </RecordProvider>
         );
       })}

@@ -3,7 +3,7 @@ import { useRecord } from '@/renderer/contexts/record';
 import { useView } from '@/renderer/contexts/view';
 import { RecordFieldValue } from '@/renderer/components/records/record-field-value';
 
-export const CalendarViewRecord = () => {
+export const CalendarViewRecordCard = () => {
   const workspace = useWorkspace();
   const view = useView();
   const record = useRecord();
