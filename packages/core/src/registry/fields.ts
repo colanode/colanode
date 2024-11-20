@@ -129,7 +129,7 @@ export type FileFieldAttributes = z.infer<typeof fileFieldAttributesSchema>;
 
 export const fileFieldValueSchema = z.object({
   type: z.literal('file'),
-  value: z.string(),
+  value: z.array(z.string()),
 });
 
 export type FileFieldValue = z.infer<typeof fileFieldValueSchema>;

@@ -15,18 +15,20 @@ export const RecordAttributes = () => {
         <RecordName />
       </div>
       <div className="flex flex-col gap-2">
-        {database.fields.map((field) => (
-          <React.Fragment key={field.id}>
-            <div className="flex flex-row gap-2 h-8">
-              <div className="w-60 max-w-60">
-                <RecordField field={field} />
+        {database.fields
+          .sort((a, b) => a.index.localeCompare(b.index))
+          .map((field) => (
+            <React.Fragment key={field.id}>
+              <div className="flex flex-row gap-2 h-8">
+                <div className="w-60 max-w-60">
+                  <RecordField field={field} />
+                </div>
+                <div className="flex-1 max-w-128">
+                  <RecordFieldValue field={field} />
+                </div>
               </div>
-              <div className="flex-1 max-w-128">
-                <RecordFieldValue field={field} />
-              </div>
-            </div>
-          </React.Fragment>
-        ))}
+            </React.Fragment>
+          ))}
       </div>
     </div>
   );

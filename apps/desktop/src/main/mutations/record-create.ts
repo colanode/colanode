@@ -19,7 +19,7 @@ export class RecordCreateMutationHandler
       parentId: input.databaseId,
       databaseId: input.databaseId,
       name: input.name ?? '',
-      fields: {},
+      fields: input.fields ?? {},
       content: {},
     };
 

@@ -15,6 +15,7 @@ import { useDatabase } from '@/renderer/contexts/database';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { compareString } from '@/shared/lib/utils';
 import {
+  generateFieldValuesFromFilters,
   generateViewFieldIndex,
   getDefaultFieldWidth,
   getDefaultNameWidth,
@@ -373,6 +374,29 @@ export const View = ({ view }: ViewProps) => {
         },
         closeFieldFilter: (fieldId: string) => {
           setOpenedFieldFilters((prev) => prev.filter((id) => id !== fieldId));
+        },
+        createRecord: (filters?: ViewFilterAttributes[]) => {
+          const viewFilters = Object.values(view.filters) ?? [];
+          const extraFilters = filters ?? [];
+
+          const allFilters = [...viewFilters, ...extraFilters];
+          const fields = generateFieldValuesFromFilters(
+            database.fields,
+            allFilters,
+            workspace.userId
+          );
+
+          mutate({
+            input: {
+              type: 'record_create',
+              databaseId: database.id,
+              userId: workspace.userId,
+              fields,
+            },
+            onSuccess: (output) => {
+              workspace.openInModal(output.id);
+            },
+          });
         },
       }}
     >

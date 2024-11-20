@@ -9,7 +9,8 @@ const RECORDS_PER_PAGE = 50;
 
 export const useRecordsQuery = (
   filters: ViewFilterAttributes[],
-  sorts: ViewSortAttributes[]
+  sorts: ViewSortAttributes[],
+  count?: number
 ) => {
   const workspace = useWorkspace();
   const database = useDatabase();
@@ -24,14 +25,15 @@ export const useRecordsQuery = (
     filters: filters,
     sorts: sorts,
     page: i + 1,
-    count: RECORDS_PER_PAGE,
+    count: count ?? RECORDS_PER_PAGE,
     userId: workspace.userId,
   }));
 
   const result = useQueries(inputs);
   const records = result.flatMap((data) => data.data ?? []);
   const isPending = result.some((data) => data.isPending);
-  const hasMore = !isPending && records.length === lastPage * RECORDS_PER_PAGE;
+  const hasMore =
+    !isPending && records.length === lastPage * (count ?? RECORDS_PER_PAGE);
 
   const loadMore = React.useCallback(() => {
     if (hasMore && !isPending) {

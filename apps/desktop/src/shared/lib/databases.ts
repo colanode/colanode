@@ -5,6 +5,9 @@ import {
   ViewFilterAttributes,
   ViewFieldAttributes,
   RecordNode,
+  FieldValue,
+  MultiSelectFieldAttributes,
+  SelectFieldAttributes,
 } from '@colanode/core';
 import { compareString, isStringArray } from '@/shared/lib/utils';
 import { generateNodeIndex } from '@/shared/lib/nodes';
@@ -1071,4 +1074,321 @@ export const generateViewFieldIndex = (
   }
 
   return newIndex;
+};
+
+export const generateFieldValuesFromFilters = (
+  fields: FieldAttributes[],
+  filters: ViewFilterAttributes[],
+  userId: string
+): Record<string, FieldValue> => {
+  if (fields.length === 0 || filters.length === 0) {
+    return {};
+  }
+
+  const fieldValues: Record<string, FieldValue> = {};
+
+  for (const filter of filters) {
+    if (filter.type !== 'field') continue;
+
+    const field = fields.find((f) => f.id === filter.fieldId);
+    if (!field) continue;
+
+    const value = generateValueFromFilter(field, filter, userId);
+    if (!value) continue;
+
+    fieldValues[field.id] = value;
+  }
+
+  return fieldValues;
+};
+
+const generateValueFromFilter = (
+  field: FieldAttributes,
+  filter: ViewFieldFilterAttributes,
+  userId: string
+): FieldValue | null => {
+  switch (field.type) {
+    case 'boolean': {
+      return generateBooleanValue(filter);
+    }
+    case 'collaborator': {
+      return generateCollaboratorValue(filter, userId);
+    }
+    case 'date': {
+      return generateDateValue(filter);
+    }
+    case 'email': {
+      return generateEmailValue(filter);
+    }
+    case 'file': {
+      return generateFileValue(filter);
+    }
+    case 'multiSelect': {
+      return generateMultiSelectValue(field, filter);
+    }
+    case 'number': {
+      return generateNumberValue(filter);
+    }
+    case 'phone': {
+      return generatePhoneValue(filter);
+    }
+    case 'select': {
+      return generateSelectValue(field, filter);
+    }
+    case 'text': {
+      return generateTextValue(filter);
+    }
+    case 'url': {
+      return generateUrlValue(filter);
+    }
+    default:
+      return null;
+  }
+};
+
+const generateBooleanValue = (
+  filter: ViewFieldFilterAttributes
+): FieldValue | null => {
+  if (filter.operator === 'is_true') {
+    return { type: 'boolean', value: true };
+  }
+
+  if (filter.operator === 'is_false') {
+    return { type: 'boolean', value: false };
+  }
+
+  return null;
+};
+
+const generateCollaboratorValue = (
+  filter: ViewFieldFilterAttributes,
+  userId: string
+): FieldValue | null => {
+  if (filter.operator === 'is_me') {
+    return { type: 'collaborator', value: [userId] };
+  }
+
+  if (
+    filter.operator === 'is_in' &&
+    Array.isArray(filter.value) &&
+    filter.value.length > 0
+  ) {
+    return { type: 'collaborator', value: [filter.value[0]] };
+  }
+
+  if (filter.operator === 'is_not_empty') {
+    return { type: 'collaborator', value: [userId] };
+  }
+
+  return null;
+};
+
+const generateDateValue = (
+  filter: ViewFieldFilterAttributes
+): FieldValue | null => {
+  if (typeof filter.value !== 'string') {
+    return null;
+  }
+
+  if (filter.operator === 'is_equal_to') {
+    return { type: 'date', value: filter.value };
+  }
+
+  if (filter.operator === 'is_on_or_after') {
+    return { type: 'date', value: filter.value };
+  }
+
+  if (filter.operator === 'is_on_or_before') {
+    return { type: 'date', value: filter.value };
+  }
+
+  if (filter.operator === 'is_after') {
+    const date = new Date(filter.value);
+    date.setDate(date.getDate() + 1);
+    return { type: 'date', value: date.toISOString() };
+  }
+
+  if (filter.operator === 'is_before') {
+    const date = new Date(filter.value);
+    date.setDate(date.getDate() - 1);
+    return { type: 'date', value: date.toISOString() };
+  }
+
+  if (filter.operator === 'is_not_empty') {
+    return { type: 'date', value: new Date().toISOString() };
+  }
+
+  return null;
+};
+
+const generateEmailValue = (
+  filter: ViewFieldFilterAttributes
+): FieldValue | null => {
+  if (typeof filter.value !== 'string') {
+    return null;
+  }
+
+  if (filter.operator === 'is_equal_to') {
+    return { type: 'email', value: filter.value };
+  }
+
+  if (filter.operator === 'contains') {
+    return { type: 'email', value: filter.value };
+  }
+
+  if (filter.operator === 'is_not_empty') {
+    return { type: 'email', value: '#' };
+  }
+
+  return null;
+};
+
+const generateFileValue = (
+  filter: ViewFieldFilterAttributes
+): FieldValue | null => {
+  if (filter.operator === 'is_in' && Array.isArray(filter.value)) {
+    return { type: 'file', value: [filter.value[0]] };
+  }
+
+  return null;
+};
+
+const generateMultiSelectValue = (
+  field: MultiSelectFieldAttributes,
+  filter: ViewFieldFilterAttributes
+): FieldValue | null => {
+  if (filter.operator === 'is_in' && Array.isArray(filter.value)) {
+    return { type: 'multiSelect', value: [filter.value[0]] };
+  }
+
+  if (
+    filter.operator === 'is_not_empty' &&
+    field.options &&
+    Object.keys(field.options).length > 0
+  ) {
+    const firstOption = Object.values(field.options)[0];
+    return { type: 'multiSelect', value: [firstOption.id] };
+  }
+
+  return null;
+};
+
+const generateNumberValue = (
+  filter: ViewFieldFilterAttributes
+): FieldValue | null => {
+  if (typeof filter.value !== 'number') {
+    return null;
+  }
+
+  if (filter.operator === 'is_equal_to') {
+    return { type: 'number', value: filter.value };
+  }
+
+  if (filter.operator === 'is_greater_than') {
+    return { type: 'number', value: filter.value + 1 };
+  }
+
+  if (filter.operator === 'is_less_than') {
+    return { type: 'number', value: filter.value - 1 };
+  }
+
+  if (filter.operator === 'is_greater_than_or_equal_to') {
+    return { type: 'number', value: filter.value };
+  }
+
+  if (filter.operator === 'is_less_than_or_equal_to') {
+    return { type: 'number', value: filter.value };
+  }
+
+  if (filter.operator === 'is_not_empty') {
+    return { type: 'number', value: 0 };
+  }
+
+  return null;
+};
+
+const generatePhoneValue = (
+  filter: ViewFieldFilterAttributes
+): FieldValue | null => {
+  if (typeof filter.value !== 'string') {
+    return null;
+  }
+
+  if (filter.operator === 'is_equal_to') {
+    return { type: 'phone', value: filter.value };
+  }
+
+  if (filter.operator === 'contains') {
+    return { type: 'phone', value: filter.value };
+  }
+
+  if (filter.operator === 'is_not_empty') {
+    return { type: 'phone', value: '#' };
+  }
+
+  return null;
+};
+
+const generateSelectValue = (
+  field: SelectFieldAttributes,
+  filter: ViewFieldFilterAttributes
+): FieldValue | null => {
+  if (filter.operator === 'is_in' && Array.isArray(filter.value)) {
+    return { type: 'select', value: filter.value[0] };
+  }
+
+  if (
+    filter.operator === 'is_not_empty' &&
+    field.options &&
+    Object.keys(field.options).length > 0
+  ) {
+    const firstOption = Object.values(field.options)[0];
+    return { type: 'select', value: firstOption.id };
+  }
+
+  return null;
+};
+
+const generateTextValue = (
+  filter: ViewFieldFilterAttributes
+): FieldValue | null => {
+  if (typeof filter.value !== 'string') {
+    return null;
+  }
+
+  if (filter.operator === 'is_equal_to') {
+    return { type: 'text', value: filter.value };
+  }
+
+  if (filter.operator === 'contains') {
+    return { type: 'text', value: filter.value };
+  }
+
+  if (filter.operator === 'is_not_empty') {
+    return { type: 'text', value: '#' };
+  }
+
+  return null;
+};
+
+const generateUrlValue = (
+  filter: ViewFieldFilterAttributes
+): FieldValue | null => {
+  if (typeof filter.value !== 'string') {
+    return null;
+  }
+
+  if (filter.operator === 'is_equal_to') {
+    return { type: 'url', value: filter.value };
+  }
+
+  if (filter.operator === 'contains') {
+    return { type: 'url', value: filter.value };
+  }
+
+  if (filter.operator === 'is_not_empty') {
+    return { type: 'url', value: '#' };
+  }
+
+  return null;
 };

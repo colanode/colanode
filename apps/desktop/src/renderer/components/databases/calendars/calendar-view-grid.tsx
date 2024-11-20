@@ -1,6 +1,11 @@
 import React from 'react';
 import { buttonVariants } from '@/renderer/components/ui/button';
-import { cn, getDisplayedDates, toUTCDate } from '@/shared/lib/utils';
+import {
+  cn,
+  getDisplayedDates,
+  isSameDay,
+  toUTCDate,
+} from '@/shared/lib/utils';
 import { DayPicker, DayProps } from 'react-day-picker';
 import { CalendarViewDay } from '@/renderer/components/databases/calendars/calendar-view-day';
 import { FieldAttributes, ViewFilterAttributes } from '@colanode/core';
@@ -9,6 +14,7 @@ import { filterRecords } from '@/shared/lib/databases';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useView } from '@/renderer/contexts/view';
+import { useDatabase } from '@/renderer/contexts/database';
 
 interface CalendarViewGridProps {
   field: FieldAttributes;
@@ -16,6 +22,7 @@ interface CalendarViewGridProps {
 
 export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
   const workspace = useWorkspace();
+  const database = useDatabase();
   const view = useView();
 
   const [month, setMonth] = React.useState(new Date());
@@ -39,7 +46,7 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
     },
   ];
 
-  const { records } = useRecordsQuery(filters, view.sorts);
+  const { records } = useRecordsQuery(filters, view.sorts, 200);
 
   return (
     <DayPicker
@@ -96,11 +103,21 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
             workspace.userId
           );
 
+          const canCreate =
+            (field.type === 'createdAt' && isSameDay(props.date, new Date())) ||
+            field.type === 'date';
+
+          const onCreate =
+            database.canCreateRecord && canCreate
+              ? () => view.createRecord([filter])
+              : undefined;
+
           return (
             <CalendarViewDay
               date={toUTCDate(props.date)}
               month={props.displayMonth}
               records={dayRecords}
+              onCreate={onCreate}
             />
           );
         },

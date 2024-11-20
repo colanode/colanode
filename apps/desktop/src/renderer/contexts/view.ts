@@ -34,6 +34,7 @@ interface ViewContext {
   closeSorts: () => void;
   openFieldFilter: (fieldId: string) => void;
   closeFieldFilter: (fieldId: string) => void;
+  createRecord: (filters?: ViewFilterAttributes[]) => void;
 }
 
 export const ViewContext = createContext<ViewContext>({} as ViewContext);
