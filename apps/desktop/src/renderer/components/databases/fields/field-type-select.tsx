@@ -113,15 +113,16 @@ export const FieldTypeSelect = ({ type, onChange }: FieldTypeSelectProps) => {
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-96 p-1">
+      <PopoverContent className="w-96 p-1 overflow-hidden">
         <Command className="min-h-min">
           <CommandInput placeholder="Search field types..." className="h-9" />
           <CommandEmpty>No field type found.</CommandEmpty>
           <CommandList>
-            <CommandGroup className="h-min max-h-96">
+            <CommandGroup className="h-min overflow-y-auto">
               {fieldTypes.map((fieldType) => (
                 <CommandItem
                   key={fieldType.type}
+                  value={`${fieldType.type} - ${fieldType.name}`}
                   onSelect={() => {
                     onChange(fieldType.type);
                     setOpen(false);
