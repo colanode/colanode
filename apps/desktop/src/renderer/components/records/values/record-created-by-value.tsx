@@ -30,7 +30,7 @@ export const RecordCreatedByValue = ({ field }: RecordCreatedByValueProps) => {
 
   return (
     <div
-      className="flex h-full w-full flex-row items-center gap-1 p-1 text-sm"
+      className="flex h-full w-full flex-row items-center gap-1 text-sm p-0"
       data-field={field.id}
     >
       <Avatar

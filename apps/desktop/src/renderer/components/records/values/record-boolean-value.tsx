@@ -19,7 +19,7 @@ export const RecordBooleanValue = ({ field }: RecordBooleanValueProps) => {
   }, [record.versionId]);
 
   return (
-    <div className="flex h-full w-full flex-row items-center justify-start p-1">
+    <div className="flex h-full w-full flex-row items-center justify-start p-0">
       <Checkbox
         checked={input}
         disabled={!record.canEdit}

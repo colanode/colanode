@@ -8,6 +8,7 @@ import {
   FieldValue,
   MultiSelectFieldAttributes,
   SelectFieldAttributes,
+  ViewType,
 } from '@colanode/core';
 import { compareString, isStringArray } from '@/shared/lib/utils';
 import { generateNodeIndex } from '@/shared/lib/nodes';
@@ -65,6 +66,10 @@ export const getDefaultFieldWidth = (type: FieldType): number => {
 
 export const getDefaultNameWidth = (): number => {
   return 300;
+};
+
+export const getDefaultViewFieldDisplay = (viewType: ViewType): boolean => {
+  return viewType === 'table';
 };
 
 interface SelectOptionColor {

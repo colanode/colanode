@@ -25,7 +25,7 @@ export const RecordEmailValue = ({ field }: RecordEmailValueProps) => {
           });
         }
       }}
-      className="flex h-full w-full cursor-pointer flex-row items-center gap-1 border-none p-1 text-sm shadow-none focus-visible:cursor-text"
+      className="flex h-full w-full cursor-pointer flex-row items-center gap-1 border-none text-sm p-0 shadow-none focus-visible:cursor-text"
     />
   );
 };

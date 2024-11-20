@@ -19,6 +19,7 @@ import {
   generateViewFieldIndex,
   getDefaultFieldWidth,
   getDefaultNameWidth,
+  getDefaultViewFieldDisplay,
   getFieldFilterOperators,
 } from '@/shared/lib/databases';
 import { ViewField } from '@/shared/types/databases';
@@ -40,7 +41,7 @@ export const View = ({ view }: ViewProps) => {
 
         return {
           field,
-          display: viewField?.display ?? true,
+          display: viewField?.display ?? getDefaultViewFieldDisplay(view.type),
           index: viewField?.index ?? field.index,
           width: viewField?.width ?? getDefaultFieldWidth(field.type),
         };

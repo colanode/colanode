@@ -6,6 +6,7 @@ import { ViewSearchBar } from '@/renderer/components/databases/search/view-searc
 import { ViewSortButton } from '@/renderer/components/databases/search/view-sort-button';
 import { ViewFilterButton } from '@/renderer/components/databases/search/view-filter-button';
 import { useView } from '@/renderer/contexts/view';
+import { BoardViewSettings } from '@/renderer/components/databases/boards/board-view-settings';
 
 export const BoardView = () => {
   const database = useDatabase();
@@ -25,6 +26,7 @@ export const BoardView = () => {
       <div className="mt-2 flex flex-row justify-between border-b">
         <ViewTabs />
         <div className="invisible flex flex-row items-center justify-end group-hover/database:visible">
+          <BoardViewSettings />
           <ViewSortButton />
           <ViewFilterButton />
         </div>

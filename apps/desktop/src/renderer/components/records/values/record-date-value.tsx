@@ -25,7 +25,7 @@ export const RecordDateValue = ({ field }: RecordDateValueProps) => {
           });
         }
       }}
-      className="flex h-full w-full cursor-pointer flex-row items-center gap-1 border-none p-1 text-sm focus-visible:cursor-text"
+      className="flex h-full w-full cursor-pointer flex-row items-center gap-1 border-none text-sm focus-visible:cursor-text p-0"
     />
   );
 };

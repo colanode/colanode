@@ -36,7 +36,7 @@ export const TableViewRow = ({ index, record }: TableViewRowProps) => {
           return (
             <div
               key={`row-${record.id}-${field.field.id}`}
-              className="h-8 border-r"
+              className="h-8 border-r p-1"
               style={{ width: `${field.width}px` }}
             >
               <RecordFieldValue field={field.field} />

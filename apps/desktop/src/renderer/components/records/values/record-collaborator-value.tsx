@@ -59,7 +59,7 @@ export const RecordCollaboratorValue = ({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <div className="flex h-full w-full cursor-pointer flex-wrap gap-1 p-1 overflow-hidden">
+        <div className="flex h-full w-full cursor-pointer flex-wrap gap-1 p-0 overflow-hidden">
           {collaborators.map((collaborator) => (
             <CollaboratorBadge
               key={collaborator.id}

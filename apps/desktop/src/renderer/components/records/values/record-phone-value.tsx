@@ -29,7 +29,7 @@ export const RecordPhoneValue = ({ field }: RecordPhoneValueProps) => {
           });
         }
       }}
-      className="flex h-full w-full cursor-pointer flex-row items-center gap-1 border-none p-1 text-sm focus-visible:cursor-text"
+      className="flex h-full w-full cursor-pointer flex-row items-center gap-1 p-0 border-none text-sm focus-visible:cursor-text"
     />
   );
 };

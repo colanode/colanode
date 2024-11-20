@@ -29,7 +29,7 @@ export const RecordTextValue = ({ field }: RecordTextValueProps) => {
           });
         }
       }}
-      className="flex h-full w-full cursor-pointer flex-row items-center gap-1 border-none p-1 text-sm shadow-none focus-visible:cursor-text"
+      className="flex h-full w-full cursor-pointer flex-row items-center gap-1 border-none p-0 text-sm shadow-none focus-visible:cursor-text"
     />
   );
 };

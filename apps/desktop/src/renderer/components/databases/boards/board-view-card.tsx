@@ -1,26 +1,20 @@
 import React from 'react';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { useMutation } from '@/renderer/hooks/use-mutation';
-import {
-  RecordNode,
-  SelectFieldAttributes,
-  SelectOptionAttributes,
-} from '@colanode/core';
+import { SelectFieldAttributes, SelectOptionAttributes } from '@colanode/core';
 import { useDrag } from 'react-dnd';
-import { cn } from '@/shared/lib/utils';
-
-interface BoardViewCardProps {
-  record: RecordNode;
-}
+import { useView } from '@/renderer/contexts/view';
+import { RecordFieldValue } from '@/renderer/components/records/record-field-value';
+import { useRecord } from '@/renderer/contexts/record';
 
 interface DragResult {
   option: SelectOptionAttributes;
   field: SelectFieldAttributes;
 }
 
-export const BoardViewCard = ({ record }: BoardViewCardProps) => {
+export const BoardViewCard = () => {
   const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
+  const view = useView();
+  const record = useRecord();
 
   const [, drag] = useDrag({
     type: 'board-record',
@@ -28,28 +22,16 @@ export const BoardViewCard = ({ record }: BoardViewCardProps) => {
     end: (_, monitor) => {
       const dropResult = monitor.getDropResult<DragResult>();
       if (dropResult != null) {
-        if (isPending) return;
         const optionId = dropResult.option.id;
-        const fieldId = dropResult.field.id;
+        const currentFieldValue = record.getSelectValue(dropResult.field);
 
-        const currentFieldValue = record.attributes.fields[fieldId];
-        const currentOptionId =
-          currentFieldValue?.type === 'select'
-            ? currentFieldValue.value
-            : undefined;
-
-        if (currentOptionId === optionId) {
+        if (currentFieldValue === optionId) {
           return;
         }
 
-        mutate({
-          input: {
-            type: 'node_attribute_set',
-            nodeId: record.id,
-            path: fieldId,
-            value: optionId,
-            userId: workspace.userId,
-          },
+        record.updateFieldValue(dropResult.field, {
+          type: 'select',
+          value: optionId,
         });
       }
     },
@@ -57,21 +39,33 @@ export const BoardViewCard = ({ record }: BoardViewCardProps) => {
 
   const buttonRef = React.useRef<HTMLButtonElement>(null);
   const dragRef = drag(buttonRef);
-  const name = record.attributes.name;
+  const name = record.name;
   const hasName = name !== null && name !== '';
 
   return (
-    <button
+    <div
       ref={dragRef as any}
       role="presentation"
       key={record.id}
-      className={cn(
-        'animate-fade-in flex cursor-pointer flex-col gap-1 rounded-md border p-2 text-left hover:bg-gray-50',
-        hasName ? '' : 'text-muted-foreground'
-      )}
+      className="animate-fade-in flex cursor-pointer flex-col gap-1 rounded-md border p-2 text-left hover:bg-gray-50"
       onClick={() => workspace.openInModal(record.id)}
     >
-      {name ?? 'Unnamed'}
-    </button>
+      <p className={hasName ? '' : 'text-muted-foreground'}>
+        {name ?? 'Unnamed'}
+      </p>
+      <div className="flex flex-col gap-1 mt-2">
+        {view.fields.map((viewField) => {
+          if (!viewField.display) {
+            return null;
+          }
+
+          return (
+            <div key={viewField.field.id}>
+              <RecordFieldValue field={viewField.field} />
+            </div>
+          );
+        })}
+      </div>
+    </div>
   );
 };

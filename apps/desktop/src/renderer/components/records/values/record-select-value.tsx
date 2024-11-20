@@ -29,7 +29,7 @@ export const RecordSelectValue = ({ field }: RecordSelectValueProps) => {
 
   if (!record.canEdit) {
     return (
-      <div className="h-full w-full cursor-pointer p-1">
+      <div className="h-full w-full cursor-pointer p-0">
         {selectedOption ? (
           <SelectOptionBadge
             name={selectedOption.name}
@@ -45,7 +45,7 @@ export const RecordSelectValue = ({ field }: RecordSelectValueProps) => {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <div className="h-full w-full cursor-pointer p-1">
+        <div className="h-full w-full cursor-pointer p-0">
           {selectedOption ? (
             <SelectOptionBadge
               name={selectedOption.name}

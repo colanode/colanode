@@ -3,7 +3,7 @@ import { TableViewHeader } from '@/renderer/components/databases/tables/table-vi
 import { TableViewBody } from '@/renderer/components/databases/tables/table-view-body';
 import { TableViewRecordCreateRow } from '@/renderer/components/databases/tables/table-view-record-create-row';
 import { ViewTabs } from '@/renderer/components/databases/view-tabs';
-import { TableViewSettingsPopover } from '@/renderer/components/databases/tables/table-view-settings-popover';
+import { TableViewSettings } from '@/renderer/components/databases/tables/table-view-settings';
 import { ViewSearchBar } from '@/renderer/components/databases/search/view-search-bar';
 import { ViewFilterButton } from '@/renderer/components/databases/search/view-filter-button';
 import { ViewSortButton } from '@/renderer/components/databases/search/view-sort-button';
@@ -14,7 +14,7 @@ export const TableView = () => {
       <div className="mt-2 flex flex-row justify-between border-b">
         <ViewTabs />
         <div className="invisible flex flex-row items-center justify-end group-hover/database:visible">
-          <TableViewSettingsPopover />
+          <TableViewSettings />
           <ViewSortButton />
           <ViewFilterButton />
         </div>

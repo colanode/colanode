@@ -18,12 +18,12 @@ import { ViewDeleteDialog } from '@/renderer/components/databases/view-delete-di
 import { SmartTextInput } from '@/renderer/components/ui/smart-text-input';
 import { AvatarPopover } from '@/renderer/components/avatars/avatar-popover';
 import { Button } from '@/renderer/components/ui/button';
-import { Avatar } from '@/renderer/components/avatars/avatar';
-import { Eye, EyeOff, Settings, Trash2 } from 'lucide-react';
+import { Eye, EyeOff, Trash2 } from 'lucide-react';
 import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
-import { ViewIcon } from '../view-icon';
+import { ViewIcon } from '@/renderer/components/databases/view-icon';
+import { ViewSettingsButton } from '@/renderer/components/databases/view-settings-button';
 
-export const TableViewSettingsPopover = () => {
+export const BoardViewSettings = () => {
   const database = useDatabase();
   const view = useView();
 
@@ -35,9 +35,7 @@ export const TableViewSettingsPopover = () => {
     <React.Fragment>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger>
-          <div className="flex cursor-pointer items-center rounded-md p-1.5 hover:bg-gray-50">
-            <Settings className="size-4" />
-          </div>
+          <ViewSettingsButton />
         </PopoverTrigger>
         <PopoverContent className="mr-4 flex w-[600px] flex-col gap-1.5 p-2">
           <div className="flex flex-row items-center gap-2">
@@ -82,9 +80,9 @@ export const TableViewSettingsPopover = () => {
           <div className="flex flex-col gap-2 text-sm">
             <p className="my-1 font-semibold">Fields</p>
             {database.fields.map((field) => {
-              const isHidden = !!view.fields.find(
-                (f) => f.field.id === field.id
-              );
+              const isDisplayed =
+                view.fields.find((f) => f.field.id === field.id)?.display ??
+                false;
 
               return (
                 <div
@@ -108,20 +106,20 @@ export const TableViewSettingsPopover = () => {
                           onClick={() => {
                             if (!database.canEdit) return;
 
-                            view.setFieldDisplay(field.id, !isHidden);
+                            view.setFieldDisplay(field.id, !isDisplayed);
                           }}
                         >
-                          {isHidden ? (
-                            <EyeOff className="size-4" />
-                          ) : (
+                          {isDisplayed ? (
                             <Eye className="size-4" />
+                          ) : (
+                            <EyeOff className="size-4" />
                           )}
                         </span>
                       </TooltipTrigger>
                       <TooltipContent className="flex flex-row items-center gap-2">
-                        {isHidden
-                          ? 'Show field in this view'
-                          : 'Hide field from this view'}
+                        {isDisplayed
+                          ? 'Hide field from this view'
+                          : 'Show field in this view'}
                       </TooltipContent>
                     </Tooltip>
                     {database.canEdit && (
