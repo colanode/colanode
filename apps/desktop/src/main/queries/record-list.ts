@@ -66,27 +66,27 @@ export class RecordListQueryHandler
         event.node.type === 'record' &&
         event.node.attributes.databaseId === input.databaseId
       ) {
+        if (input.filters.length > 0 || input.sorts.length > 0) {
+          const newResult = await this.handleQuery(input);
+          return {
+            hasChanges: true,
+            result: newResult,
+          };
+        }
+
         const record = output.find((record) => record.id === event.node.id);
         if (record) {
-          if (input.filters.length === 0 && input.sorts.length === 0) {
-            const newResult = output.map((record) => {
-              if (record.id === event.node.id) {
-                return event.node as RecordNode;
-              }
-              return record;
-            });
+          const newResult = output.map((record) => {
+            if (record.id === event.node.id) {
+              return event.node as RecordNode;
+            }
+            return record;
+          });
 
-            return {
-              hasChanges: true,
-              result: newResult,
-            };
-          } else {
-            const newResult = await this.handleQuery(input);
-            return {
-              hasChanges: true,
-              result: newResult,
-            };
-          }
+          return {
+            hasChanges: true,
+            result: newResult,
+          };
         }
       }
 
