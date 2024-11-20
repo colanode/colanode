@@ -4,17 +4,18 @@ import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordTextValueProps {
   field: TextFieldAttributes;
+  readOnly?: boolean;
 }
 
-export const RecordTextValue = ({ field }: RecordTextValueProps) => {
+export const RecordTextValue = ({ field, readOnly }: RecordTextValueProps) => {
   const record = useRecord();
 
   return (
     <SmartTextInput
       value={record.getTextValue(field)}
-      readOnly={!record.canEdit}
+      readOnly={!record.canEdit || readOnly}
       onChange={(newValue) => {
-        if (!record.canEdit) return;
+        if (!record.canEdit || readOnly) return;
 
         if (newValue === record.getTextValue(field)) {
           return;

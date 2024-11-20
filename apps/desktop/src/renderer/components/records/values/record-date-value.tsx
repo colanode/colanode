@@ -4,17 +4,18 @@ import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordDateValueProps {
   field: DateFieldAttributes;
+  readOnly?: boolean;
 }
 
-export const RecordDateValue = ({ field }: RecordDateValueProps) => {
+export const RecordDateValue = ({ field, readOnly }: RecordDateValueProps) => {
   const record = useRecord();
 
   return (
     <DatePicker
       value={record.getDateValue(field)}
-      readonly={!record.canEdit}
+      readonly={!record.canEdit || readOnly}
       onChange={(newValue) => {
-        if (!record.canEdit) return;
+        if (!record.canEdit || readOnly) return;
 
         if (newValue === null || newValue === undefined) {
           record.removeFieldValue(field);

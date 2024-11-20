@@ -30,7 +30,7 @@ export const CalendarViewRecordCard = () => {
 
             return (
               <div key={viewField.field.id}>
-                <RecordFieldValue field={viewField.field} />
+                <RecordFieldValue field={viewField.field} readOnly={true} />
               </div>
             );
           })}

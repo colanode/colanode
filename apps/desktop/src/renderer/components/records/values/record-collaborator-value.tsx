@@ -16,6 +16,7 @@ import { X } from 'lucide-react';
 
 interface RecordCollaboratorValueProps {
   field: CollaboratorFieldAttributes;
+  readOnly?: boolean;
 }
 
 const CollaboratorBadge = ({ collaborator }: { collaborator: UserNode }) => {
@@ -34,6 +35,7 @@ const CollaboratorBadge = ({ collaborator }: { collaborator: UserNode }) => {
 
 export const RecordCollaboratorValue = ({
   field,
+  readOnly,
 }: RecordCollaboratorValueProps) => {
   const workspace = useWorkspace();
   const record = useRecord();
@@ -98,25 +100,27 @@ export const RecordCollaboratorValue = ({
                       {collaborator.attributes.email}
                     </p>
                   </div>
-                  <X
-                    className="size-4 cursor-pointer"
-                    onClick={() => {
-                      if (!record.canEdit) return;
+                  {record.canEdit && !readOnly && (
+                    <X
+                      className="size-4 cursor-pointer"
+                      onClick={() => {
+                        if (!record.canEdit || readOnly) return;
 
-                      const newCollaborators = collaboratorIds.filter(
-                        (id) => id !== collaborator.id
-                      );
+                        const newCollaborators = collaboratorIds.filter(
+                          (id) => id !== collaborator.id
+                        );
 
-                      if (newCollaborators.length === 0) {
-                        record.removeFieldValue(field);
-                      } else {
-                        record.updateFieldValue(field, {
-                          type: 'collaborator',
-                          value: newCollaborators,
-                        });
-                      }
-                    }}
-                  />
+                        if (newCollaborators.length === 0) {
+                          record.removeFieldValue(field);
+                        } else {
+                          record.updateFieldValue(field, {
+                            type: 'collaborator',
+                            value: newCollaborators,
+                          });
+                        }
+                      }}
+                    />
+                  )}
                 </div>
               ))}
               <Separator className="w-full my-2" />
@@ -125,11 +129,11 @@ export const RecordCollaboratorValue = ({
             <p className="text-sm text-muted-foreground">No collaborators</p>
           )}
         </div>
-        {record.canEdit && (
+        {record.canEdit && !readOnly && (
           <UserSearch
             exclude={collaboratorIds}
             onSelect={(user) => {
-              if (!record.canEdit) return;
+              if (!record.canEdit || readOnly) return;
 
               const newCollaborators = collaboratorIds.includes(user.id)
                 ? collaboratorIds.filter((id) => id !== user.id)

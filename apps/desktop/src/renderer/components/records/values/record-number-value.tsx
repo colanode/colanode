@@ -4,17 +4,21 @@ import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordNumberValueProps {
   field: NumberFieldAttributes;
+  readOnly?: boolean;
 }
 
-export const RecordNumberValue = ({ field }: RecordNumberValueProps) => {
+export const RecordNumberValue = ({
+  field,
+  readOnly,
+}: RecordNumberValueProps) => {
   const record = useRecord();
 
   return (
     <SmartNumberInput
       value={record.getNumberValue(field)}
-      readOnly={!record.canEdit}
+      readOnly={!record.canEdit || readOnly}
       onChange={(newValue) => {
-        if (!record.canEdit) return;
+        if (!record.canEdit || readOnly) return;
 
         if (newValue === record.getNumberValue(field)) {
           return;

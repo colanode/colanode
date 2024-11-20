@@ -11,9 +11,13 @@ import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordSelectValueProps {
   field: SelectFieldAttributes;
+  readOnly?: boolean;
 }
 
-export const RecordSelectValue = ({ field }: RecordSelectValueProps) => {
+export const RecordSelectValue = ({
+  field,
+  readOnly,
+}: RecordSelectValueProps) => {
   const record = useRecord();
 
   const [open, setOpen] = React.useState(false);
@@ -27,7 +31,7 @@ export const RecordSelectValue = ({ field }: RecordSelectValueProps) => {
 
   const selectedOption = field.options?.[selectedValue ?? ''];
 
-  if (!record.canEdit) {
+  if (!record.canEdit || readOnly) {
     return (
       <div className="h-full w-full cursor-pointer p-0">
         {selectedOption ? (
@@ -61,7 +65,7 @@ export const RecordSelectValue = ({ field }: RecordSelectValueProps) => {
           field={field}
           values={[selectedValue ?? '']}
           onSelect={(id) => {
-            if (!record.canEdit) return;
+            if (!record.canEdit || readOnly) return;
 
             setSelectedValue(id);
             setOpen(false);

@@ -5,9 +5,13 @@ import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordBooleanValueProps {
   field: BooleanFieldAttributes;
+  readOnly?: boolean;
 }
 
-export const RecordBooleanValue = ({ field }: RecordBooleanValueProps) => {
+export const RecordBooleanValue = ({
+  field,
+  readOnly,
+}: RecordBooleanValueProps) => {
   const record = useRecord();
 
   const [input, setInput] = React.useState<boolean>(
@@ -22,9 +26,9 @@ export const RecordBooleanValue = ({ field }: RecordBooleanValueProps) => {
     <div className="flex h-full w-full flex-row items-center justify-start p-0">
       <Checkbox
         checked={input}
-        disabled={!record.canEdit}
+        disabled={!record.canEdit || readOnly}
         onCheckedChange={(e) => {
-          if (!record.canEdit) return;
+          if (!record.canEdit || readOnly) return;
 
           if (typeof e === 'boolean') {
             setInput(e.valueOf());

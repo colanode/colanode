@@ -11,10 +11,12 @@ import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordMultiSelectValueProps {
   field: MultiSelectFieldAttributes;
+  readOnly?: boolean;
 }
 
 export const RecordMultiSelectValue = ({
   field,
+  readOnly,
 }: RecordMultiSelectValueProps) => {
   const record = useRecord();
 
@@ -32,7 +34,7 @@ export const RecordMultiSelectValue = ({
     selectedValues.includes(option.id)
   );
 
-  if (!record.canEdit) {
+  if (!record.canEdit || readOnly) {
     return (
       <div className="flex h-full w-full cursor-pointer flex-wrap gap-1 p-0">
         {selectedOptions?.map((option) => (
@@ -66,7 +68,7 @@ export const RecordMultiSelectValue = ({
           field={field}
           values={selectedValues}
           onSelect={(id) => {
-            if (!record.canEdit) return;
+            if (!record.canEdit || readOnly) return;
 
             const newValues = selectedValues.includes(id)
               ? selectedValues.filter((v) => v !== id)

@@ -4,15 +4,19 @@ import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordEmailValueProps {
   field: EmailFieldAttributes;
+  readOnly?: boolean;
 }
 
-export const RecordEmailValue = ({ field }: RecordEmailValueProps) => {
+export const RecordEmailValue = ({
+  field,
+  readOnly,
+}: RecordEmailValueProps) => {
   const record = useRecord();
 
   return (
     <SmartTextInput
       value={record.getEmailValue(field)}
-      readOnly={!record.canEdit}
+      readOnly={!record.canEdit || readOnly}
       onChange={(newValue) => {
         if (!record.canEdit) return;
 

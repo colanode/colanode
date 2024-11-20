@@ -4,17 +4,21 @@ import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordPhoneValueProps {
   field: PhoneFieldAttributes;
+  readOnly?: boolean;
 }
 
-export const RecordPhoneValue = ({ field }: RecordPhoneValueProps) => {
+export const RecordPhoneValue = ({
+  field,
+  readOnly,
+}: RecordPhoneValueProps) => {
   const record = useRecord();
 
   return (
     <SmartTextInput
       value={record.getPhoneValue(field)}
-      readOnly={!record.canEdit}
+      readOnly={!record.canEdit || readOnly}
       onChange={(newValue) => {
-        if (!record.canEdit) return;
+        if (!record.canEdit || readOnly) return;
 
         if (newValue === record.getPhoneValue(field)) {
           return;

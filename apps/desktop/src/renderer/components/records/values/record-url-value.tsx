@@ -11,9 +11,10 @@ import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordUrlValueProps {
   field: UrlFieldAttributes;
+  readOnly?: boolean;
 }
 
-export const RecordUrlValue = ({ field }: RecordUrlValueProps) => {
+export const RecordUrlValue = ({ field, readOnly }: RecordUrlValueProps) => {
   const record = useRecord();
 
   const text = record.getUrlValue(field);
@@ -24,9 +25,9 @@ export const RecordUrlValue = ({ field }: RecordUrlValueProps) => {
       <HoverCardTrigger>
         <SmartTextInput
           value={text}
-          readOnly={!record.canEdit}
+          readOnly={!record.canEdit || readOnly}
           onChange={(newValue) => {
-            if (!record.canEdit) return;
+            if (!record.canEdit || readOnly) return;
 
             if (newValue === text) {
               return;

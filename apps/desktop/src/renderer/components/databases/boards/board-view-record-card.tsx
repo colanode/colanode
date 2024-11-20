@@ -65,7 +65,7 @@ export const BoardViewRecordCard = () => {
 
             return (
               <div key={viewField.field.id}>
-                <RecordFieldValue field={viewField.field} />
+                <RecordFieldValue field={viewField.field} readOnly={true} />
               </div>
             );
           })}

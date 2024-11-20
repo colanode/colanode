@@ -16,34 +16,38 @@ import { RecordUpdatedByValue } from '@/renderer/components/records/values/recor
 
 interface RecordFieldValueProps {
   field: FieldAttributes;
+  readOnly?: boolean;
 }
 
-export const RecordFieldValue = ({ field }: RecordFieldValueProps) => {
+export const RecordFieldValue = ({
+  field,
+  readOnly,
+}: RecordFieldValueProps) => {
   switch (field.type) {
     case 'boolean':
-      return <RecordBooleanValue field={field} />;
+      return <RecordBooleanValue field={field} readOnly={readOnly} />;
     case 'createdAt':
       return <RecordCreatedAtValue field={field} />;
     case 'createdBy':
       return <RecordCreatedByValue field={field} />;
     case 'collaborator':
-      return <RecordCollaboratorValue field={field} />;
+      return <RecordCollaboratorValue field={field} readOnly={readOnly} />;
     case 'date':
-      return <RecordDateValue field={field} />;
+      return <RecordDateValue field={field} readOnly={readOnly} />;
     case 'email':
-      return <RecordEmailValue field={field} />;
+      return <RecordEmailValue field={field} readOnly={readOnly} />;
     case 'multiSelect':
-      return <RecordMultiSelectValue field={field} />;
+      return <RecordMultiSelectValue field={field} readOnly={readOnly} />;
     case 'number':
-      return <RecordNumberValue field={field} />;
+      return <RecordNumberValue field={field} readOnly={readOnly} />;
     case 'phone':
-      return <RecordPhoneValue field={field} />;
+      return <RecordPhoneValue field={field} readOnly={readOnly} />;
     case 'select':
-      return <RecordSelectValue field={field} />;
+      return <RecordSelectValue field={field} readOnly={readOnly} />;
     case 'text':
-      return <RecordTextValue field={field} />;
+      return <RecordTextValue field={field} readOnly={readOnly} />;
     case 'url':
-      return <RecordUrlValue field={field} />;
+      return <RecordUrlValue field={field} readOnly={readOnly} />;
     case 'updatedAt':
       return <RecordUpdatedAtValue field={field} />;
     case 'updatedBy':
