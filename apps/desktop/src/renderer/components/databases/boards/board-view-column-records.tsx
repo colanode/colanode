@@ -4,7 +4,7 @@ import {
   SelectOptionAttributes,
   ViewFilterAttributes,
 } from '@colanode/core';
-import { BoardViewCard } from '@/renderer/components/databases/boards/board-view-card';
+import { BoardViewRecord } from '@/renderer/components/databases/boards/board-view-record';
 import { useView } from '@/renderer/contexts/view';
 import { useRecordsQuery } from '@/renderer/hooks/user-records-query';
 import { RecordProvider } from '@/renderer/components/records/record-provider';
@@ -42,7 +42,7 @@ export const BoardViewColumnRecords = ({
 
         return (
           <RecordProvider key={record.id} record={record} role={role}>
-            <BoardViewCard />
+            <BoardViewRecord />
           </RecordProvider>
         );
       })}

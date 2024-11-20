@@ -6,6 +6,7 @@ import { ViewSearchBar } from '@/renderer/components/databases/search/view-searc
 import { ViewSortButton } from '@/renderer/components/databases/search/view-sort-button';
 import { ViewFilterButton } from '@/renderer/components/databases/search/view-filter-button';
 import { useView } from '@/renderer/contexts/view';
+import { CalendarViewSettings } from '@/renderer/components/databases/calendars/calendar-view-settings';
 
 export const CalendarView = () => {
   const database = useDatabase();
@@ -24,6 +25,7 @@ export const CalendarView = () => {
       <div className="mt-2 flex flex-row justify-between border-b">
         <ViewTabs />
         <div className="invisible flex flex-row items-center justify-end group-hover/database:visible">
+          <CalendarViewSettings />
           <ViewSortButton />
           <ViewFilterButton />
         </div>

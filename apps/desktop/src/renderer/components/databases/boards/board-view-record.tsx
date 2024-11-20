@@ -11,7 +11,7 @@ interface DragResult {
   field: SelectFieldAttributes;
 }
 
-export const BoardViewCard = () => {
+export const BoardViewRecord = () => {
   const workspace = useWorkspace();
   const view = useView();
   const record = useRecord();
@@ -19,6 +19,9 @@ export const BoardViewCard = () => {
   const [, drag] = useDrag({
     type: 'board-record',
     item: { id: record.id },
+    canDrag: () => {
+      return record.canEdit;
+    },
     end: (_, monitor) => {
       const dropResult = monitor.getDropResult<DragResult>();
       if (dropResult != null) {
@@ -53,19 +56,21 @@ export const BoardViewCard = () => {
       <p className={hasName ? '' : 'text-muted-foreground'}>
         {name ?? 'Unnamed'}
       </p>
-      <div className="flex flex-col gap-1 mt-2">
-        {view.fields.map((viewField) => {
-          if (!viewField.display) {
-            return null;
-          }
+      {view.fields.length > 0 && (
+        <div className="flex flex-col gap-1 mt-2">
+          {view.fields.map((viewField) => {
+            if (!viewField.display) {
+              return null;
+            }
 
-          return (
-            <div key={viewField.field.id}>
-              <RecordFieldValue field={viewField.field} />
-            </div>
-          );
-        })}
-      </div>
+            return (
+              <div key={viewField.field.id}>
+                <RecordFieldValue field={viewField.field} />
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 };

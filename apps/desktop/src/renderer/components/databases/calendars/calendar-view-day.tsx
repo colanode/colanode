@@ -1,7 +1,10 @@
 import { cn, isSameDay } from '@/shared/lib/utils';
-import { RecordNode } from '@colanode/core';
-import { CalendarViewCard } from '@/renderer/components/databases/calendars/calendar-view-card';
+import { extractNodeRole, RecordNode } from '@colanode/core';
+import { CalendarViewRecord } from '@/renderer/components/databases/calendars/calendar-view-record';
 import { Plus } from 'lucide-react';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useDatabase } from '@/renderer/contexts/database';
+import { RecordProvider } from '@/renderer/components/records/record-provider';
 
 interface CalendarViewDayProps {
   date: Date;
@@ -16,6 +19,9 @@ export const CalendarViewDay = ({
   records,
   onCreate,
 }: CalendarViewDayProps) => {
+  const workspace = useWorkspace();
+  const database = useDatabase();
+
   const isToday = isSameDay(date, new Date());
   const dateMonth = date.getMonth();
   const displayMonth = month.getMonth();
@@ -42,7 +48,13 @@ export const CalendarViewDay = ({
         </p>
       </div>
       {records.map((record) => {
-        return <CalendarViewCard key={record.id} record={record} />;
+        const role = extractNodeRole(record, workspace.userId) ?? database.role;
+
+        return (
+          <RecordProvider key={record.id} record={record} role={role}>
+            <CalendarViewRecord />
+          </RecordProvider>
+        );
       })}
     </div>
   );
