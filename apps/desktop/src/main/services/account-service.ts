@@ -20,8 +20,10 @@ class AccountService {
       .execute();
 
     for (const account of accounts) {
-      this.syncAccount(account);
+      await this.syncAccount(account);
     }
+
+    await this.syncDeletedTokens();
   }
 
   private async syncAccount(account: SelectAccount) {

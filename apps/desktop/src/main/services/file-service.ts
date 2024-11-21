@@ -3,20 +3,40 @@ import path from 'path';
 import fs from 'fs';
 import axios from 'axios';
 import mime from 'mime-types';
-import {
-  FileMetadata,
-  ServerFileDownloadResponse,
-  ServerFileUploadResponse,
-} from '@/shared/types/files';
-import { WorkspaceCredentials } from '@/shared/types/workspaces';
+import { FileMetadata } from '@/shared/types/files';
 import { databaseService } from '@/main/data/database-service';
 import { httpClient } from '@/shared/lib/http-client';
 import { getWorkspaceFilesDirectoryPath } from '@/main/utils';
-import { FileAttributes } from '@colanode/core';
+import {
+  CompleteUploadOutput,
+  CreateDownloadOutput,
+  CreateUploadOutput,
+  extractFileType,
+  FileAttributes,
+} from '@colanode/core';
 import { eventBus } from '@/shared/lib/event-bus';
 import { serverService } from '@/main/services/server-service';
 
+type WorkspaceFileState = {
+  isUploading: boolean;
+  isDownloading: boolean;
+  isUploadScheduled: boolean;
+  isDownloadScheduled: boolean;
+};
+
 class FileService {
+  private fileStates: Map<string, WorkspaceFileState> = new Map();
+
+  constructor() {
+    eventBus.subscribe((event) => {
+      if (event.type === 'download_created') {
+        this.syncWorkspaceDownloads(event.userId);
+      } else if (event.type === 'upload_created') {
+        this.syncWorkspaceUploads(event.userId);
+      }
+    });
+  }
+
   public async handleFileRequest(request: Request): Promise<Response> {
     const url = request.url.replace('local-file://', '');
     const [userId, file] = url.split('/');
@@ -39,6 +59,7 @@ class FileService {
   public copyFileToWorkspace(
     filePath: string,
     fileId: string,
+    uploadId: string,
     fileExtension: string,
     userId: string
   ): void {
@@ -50,7 +71,7 @@ class FileService {
 
     const destinationFilePath = path.join(
       filesDir,
-      `${fileId}${fileExtension}`
+      `${fileId}_${uploadId}${fileExtension}`
     );
     fs.copyFileSync(filePath, destinationFilePath);
   }
@@ -78,6 +99,7 @@ class FileService {
     }
 
     const stats = fs.statSync(filePath);
+    const type = extractFileType(mimeType);
 
     return {
       path: filePath,
@@ -85,15 +107,101 @@ class FileService {
       extension: path.extname(filePath),
       name: path.basename(filePath),
       size: stats.size,
+      type,
     };
   }
 
-  public async checkForUploads(
-    credentials: WorkspaceCredentials
-  ): Promise<void> {
-    const workspaceDatabase = await databaseService.getWorkspaceDatabase(
-      credentials.userId
-    );
+  public async syncFiles() {
+    const workspaces = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .select(['user_id'])
+      .execute();
+
+    for (const workspace of workspaces) {
+      this.uploadWorkspaceFiles(workspace.user_id);
+    }
+  }
+
+  public async syncWorkspaceUploads(userId: string): Promise<void> {
+    if (!this.fileStates.has(userId)) {
+      this.fileStates.set(userId, {
+        isUploading: false,
+        isDownloading: false,
+        isUploadScheduled: false,
+        isDownloadScheduled: false,
+      });
+    }
+
+    const fileState = this.fileStates.get(userId)!;
+    if (fileState.isUploading) {
+      fileState.isUploadScheduled = true;
+      return;
+    }
+
+    fileState.isUploading = true;
+    try {
+      await this.uploadWorkspaceFiles(userId);
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      fileState.isUploading = false;
+      if (fileState.isUploadScheduled) {
+        fileState.isUploadScheduled = false;
+        this.syncWorkspaceUploads(userId);
+      }
+    }
+  }
+
+  public async syncWorkspaceDownloads(userId: string): Promise<void> {
+    if (!this.fileStates.has(userId)) {
+      this.fileStates.set(userId, {
+        isUploading: false,
+        isDownloading: false,
+        isUploadScheduled: false,
+        isDownloadScheduled: false,
+      });
+    }
+
+    const fileState = this.fileStates.get(userId)!;
+    if (fileState.isDownloading) {
+      fileState.isDownloadScheduled = true;
+      return;
+    }
+
+    fileState.isDownloading = true;
+    try {
+      await this.downloadWorkspaceFiles(userId);
+    } catch (error) {
+      console.log('error', error);
+    } finally {
+      fileState.isDownloading = false;
+      if (fileState.isDownloadScheduled) {
+        fileState.isDownloadScheduled = false;
+        this.syncWorkspaceDownloads(userId);
+      }
+    }
+  }
+
+  private async uploadWorkspaceFiles(userId: string): Promise<void> {
+    if (!this.fileStates.has(userId)) {
+      this.fileStates.set(userId, {
+        isUploading: false,
+        isDownloading: false,
+        isUploadScheduled: false,
+        isDownloadScheduled: false,
+      });
+    }
+
+    const fileState = this.fileStates.get(userId)!;
+    if (fileState.isUploading) {
+      fileState.isUploadScheduled = true;
+      return;
+    }
+
+    fileState.isUploading = true;
+
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
 
     const uploads = await workspaceDatabase
       .selectFrom('uploads')
@@ -105,7 +213,26 @@ class FileService {
       return;
     }
 
-    const filesDir = getWorkspaceFilesDirectoryPath(credentials.userId);
+    const workspace = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
+      .innerJoin('servers', 'accounts.server', 'servers.domain')
+      .select([
+        'workspaces.workspace_id',
+        'workspaces.user_id',
+        'workspaces.account_id',
+        'accounts.token',
+        'servers.domain',
+        'servers.attributes',
+      ])
+      .where('workspaces.user_id', '=', userId)
+      .executeTakeFirst();
+
+    if (!workspace) {
+      return;
+    }
+
+    const filesDir = getWorkspaceFilesDirectoryPath(userId);
     for (const upload of uploads) {
       if (upload.retry_count >= 5) {
         await workspaceDatabase
@@ -134,7 +261,7 @@ class FileService {
       const attributes: FileAttributes = JSON.parse(file.attributes);
       const filePath = path.join(
         filesDir,
-        `${upload.node_id}${attributes.extension}`
+        `${upload.node_id}_${upload.upload_id}${attributes.extension}`
       );
 
       if (!fs.existsSync(filePath)) {
@@ -146,17 +273,20 @@ class FileService {
         continue;
       }
 
-      if (!serverService.isAvailable(credentials.serverDomain)) {
+      if (!serverService.isAvailable(workspace.domain)) {
         continue;
       }
 
       try {
-        const { data } = await httpClient.post<ServerFileUploadResponse>(
-          `/v1/files/${credentials.workspaceId}/${upload.node_id}`,
-          {},
+        const { data } = await httpClient.post<CreateUploadOutput>(
+          `/v1/files/${workspace.workspace_id}`,
           {
-            domain: credentials.serverDomain,
-            token: credentials.token,
+            fileId: file.id,
+            uploadId: upload.upload_id,
+          },
+          {
+            domain: workspace.domain,
+            token: workspace.token,
           }
         );
 
@@ -168,6 +298,19 @@ class FileService {
             'Content-Length': attributes.size,
           },
         });
+
+        const { status } = await httpClient.put<CompleteUploadOutput>(
+          `/v1/files/${workspace.workspace_id}/${data.uploadId}`,
+          {},
+          {
+            domain: workspace.domain,
+            token: workspace.token,
+          }
+        );
+
+        if (status !== 200) {
+          continue;
+        }
 
         await workspaceDatabase
           .deleteFrom('uploads')
@@ -184,12 +327,9 @@ class FileService {
     }
   }
 
-  public async checkForDownloads(
-    credentials: WorkspaceCredentials
-  ): Promise<void> {
-    const workspaceDatabase = await databaseService.getWorkspaceDatabase(
-      credentials.userId
-    );
+  public async downloadWorkspaceFiles(userId: string): Promise<void> {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
 
     const downloads = await workspaceDatabase
       .selectFrom('downloads')
@@ -201,7 +341,15 @@ class FileService {
       return;
     }
 
-    const filesDir = getWorkspaceFilesDirectoryPath(credentials.userId);
+    const workspace = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
+      .innerJoin('servers', 'accounts.server', 'servers.domain')
+      .select(['workspaces.workspace_id', 'accounts.token', 'servers.domain'])
+      .where('workspaces.user_id', '=', userId)
+      .executeTakeFirst();
+
+    const filesDir = getWorkspaceFilesDirectoryPath(userId);
     if (!fs.existsSync(filesDir)) {
       fs.mkdirSync(filesDir, { recursive: true });
     }
@@ -221,9 +369,10 @@ class FileService {
 
         eventBus.publish({
           type: 'download_deleted',
-          userId: credentials.userId,
+          userId,
           download: {
             nodeId: download.node_id,
+            uploadId: download.upload_id,
             createdAt: download.created_at,
             updatedAt: download.updated_at,
             progress: download.progress,
@@ -237,7 +386,7 @@ class FileService {
       const attributes: FileAttributes = JSON.parse(file.attributes);
       const filePath = path.join(
         filesDir,
-        `${download.node_id}${attributes.extension}`
+        `${download.node_id}_${download.upload_id}${attributes.extension}`
       );
 
       if (fs.existsSync(filePath)) {
@@ -245,15 +394,17 @@ class FileService {
           .updateTable('downloads')
           .set({
             progress: 100,
+            completed_at: new Date().toISOString(),
           })
           .where('node_id', '=', download.node_id)
           .execute();
 
         eventBus.publish({
           type: 'download_updated',
-          userId: credentials.userId,
+          userId,
           download: {
             nodeId: download.node_id,
+            uploadId: download.upload_id,
             createdAt: download.created_at,
             updatedAt: download.updated_at,
             progress: 100,
@@ -264,16 +415,16 @@ class FileService {
         continue;
       }
 
-      if (!serverService.isAvailable(credentials.serverDomain)) {
+      if (!serverService.isAvailable(workspace.domain)) {
         continue;
       }
 
       try {
-        const { data } = await httpClient.get<ServerFileDownloadResponse>(
-          `/v1/files/${credentials.workspaceId}/${download.node_id}`,
+        const { data } = await httpClient.get<CreateDownloadOutput>(
+          `/v1/files/${workspace.workspace_id}/${download.node_id}`,
           {
-            domain: credentials.serverDomain,
-            token: credentials.token,
+            domain: workspace.domain,
+            token: workspace.token,
           }
         );
 
@@ -293,9 +444,10 @@ class FileService {
 
         eventBus.publish({
           type: 'download_updated',
-          userId: credentials.userId,
+          userId,
           download: {
             nodeId: download.node_id,
+            uploadId: download.upload_id,
             createdAt: download.created_at,
             updatedAt: download.updated_at,
             progress: 100,
@@ -313,9 +465,10 @@ class FileService {
 
         eventBus.publish({
           type: 'download_updated',
-          userId: credentials.userId,
+          userId,
           download: {
             nodeId: download.node_id,
+            uploadId: download.upload_id,
             createdAt: download.created_at,
             updatedAt: download.updated_at,
             progress: download.progress,

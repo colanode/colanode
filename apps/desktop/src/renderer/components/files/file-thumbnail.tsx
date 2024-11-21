@@ -1,37 +1,43 @@
 import { getFileUrl } from '@/shared/lib/files';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { cn } from '@/shared/lib/utils';
 import { FileIcon } from '@/renderer/components/files/file-icon';
+import { cn } from '@/shared/lib/utils';
+import { FileNode } from '@colanode/core';
+import { useQuery } from '@/renderer/hooks/use-query';
 
 interface FileThumbnailProps {
-  id: string;
-  name: string;
-  mimeType: string;
-  extension: string;
-  downloadProgress?: number | null;
+  file: FileNode;
   className?: string;
 }
 
-export const FileThumbnail = ({
-  id,
-  name,
-  mimeType,
-  extension,
-  downloadProgress,
-  className,
-}: FileThumbnailProps) => {
+export const FileThumbnail = ({ file, className }: FileThumbnailProps) => {
   const workspace = useWorkspace();
+  const { data } = useQuery({
+    type: 'download_get',
+    nodeId: file.id,
+    userId: workspace.userId,
+  });
 
-  if (downloadProgress === 100 && mimeType.startsWith('image')) {
-    const url = getFileUrl(workspace.userId, id, extension);
+  if (
+    file.attributes.subtype === 'image' &&
+    data &&
+    data.progress === 100 &&
+    data.uploadId === file.attributes.uploadId
+  ) {
+    const url = getFileUrl(
+      workspace.userId,
+      file.id,
+      file.attributes.uploadId,
+      file.attributes.extension
+    );
     return (
       <img
         src={url}
-        alt={name}
+        alt={file.attributes.name}
         className={cn('object-contain object-center', className)}
       />
     );
   }
 
-  return <FileIcon mimeType={mimeType} className="size-10" />;
+  return <FileIcon mimeType={file.attributes.mimeType} className="size-10" />;
 };

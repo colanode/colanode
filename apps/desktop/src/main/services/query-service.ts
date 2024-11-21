@@ -66,6 +66,7 @@ class QueryService {
       >;
 
       let result = query.result;
+      let hasChanges = false;
       for (const event of events) {
         const changeCheckResult = await handler.checkForChanges(
           event,
@@ -75,7 +76,12 @@ class QueryService {
 
         if (changeCheckResult.hasChanges) {
           result = changeCheckResult.result;
+          hasChanges = true;
         }
+      }
+
+      if (!hasChanges) {
+        continue;
       }
 
       if (isEqual(result, query.result)) {

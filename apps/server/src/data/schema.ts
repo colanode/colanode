@@ -146,6 +146,19 @@ export type SelectDeviceNode = Selectable<DeviceNodeTable>;
 export type CreateDeviceNode = Insertable<DeviceNodeTable>;
 export type UpdateDeviceNode = Updateable<DeviceNodeTable>;
 
+interface UploadTable {
+  node_id: ColumnType<string, string, never>;
+  upload_id: ColumnType<string, string, never>;
+  workspace_id: ColumnType<string, string, never>;
+  path: ColumnType<string, string, string>;
+  size: ColumnType<number, number, number>;
+  mime_type: ColumnType<string, string, string>;
+  type: ColumnType<string, string, string>;
+  created_by: ColumnType<string, string, never>;
+  created_at: ColumnType<Date, Date, never>;
+  completed_at: ColumnType<Date, Date, never>;
+}
+
 export interface DatabaseSchema {
   accounts: AccountTable;
   devices: DeviceTable;
@@ -155,4 +168,5 @@ export interface DatabaseSchema {
   node_paths: NodePathTable;
   user_nodes: UserNodeTable;
   device_nodes: DeviceNodeTable;
+  uploads: UploadTable;
 }

@@ -1,4 +1,4 @@
-import { FileNode } from '@/shared/types/files';
+import { FileNode } from '@colanode/core';
 
 export type FileListQueryInput = {
   type: 'file_list';

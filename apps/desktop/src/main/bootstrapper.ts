@@ -6,6 +6,7 @@ import { serverService } from '@/main/services/server-service';
 import { accountService } from '@/main/services/account-service';
 import { syncService } from '@/main/services/sync-service';
 import { notificationService } from '@/main/services/notification-service';
+import { fileService } from '@/main/services/file-service';
 
 const EVENT_LOOP_INTERVAL = 1000 * 60;
 
@@ -34,7 +35,7 @@ class Bootstrapper {
     notificationService.init();
 
     if (!this.eventLoop) {
-      this.eventLoop = setTimeout(this.executeEventLoop, EVENT_LOOP_INTERVAL);
+      this.eventLoop = setTimeout(this.executeEventLoop, 50);
     }
   }
 
@@ -45,6 +46,8 @@ class Bootstrapper {
       await socketService.checkConnections();
       await accountService.syncDeletedTokens();
       await syncService.syncAllWorkspaces();
+      await fileService.syncFiles();
+
       notificationService.checkBadge();
     } catch (error) {
       console.log('error', error);

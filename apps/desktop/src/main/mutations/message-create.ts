@@ -1,4 +1,10 @@
-import { generateId, IdType, EditorNodeTypes, NodeTypes } from '@colanode/core';
+import {
+  generateId,
+  IdType,
+  EditorNodeTypes,
+  NodeTypes,
+  extractFileType,
+} from '@colanode/core';
 import { MutationHandler } from '@/main/types';
 import {
   MessageCreateMutationInput,
@@ -57,6 +63,7 @@ export class MessageCreateMutationHandler
         }
 
         const fileId = generateId(IdType.File);
+        const uploadId = generateId(IdType.Upload);
 
         block.id = fileId;
         block.type = NodeTypes.File;
@@ -65,18 +72,22 @@ export class MessageCreateMutationHandler
         fileService.copyFileToWorkspace(
           path,
           fileId,
+          uploadId,
           metadata.extension,
           input.userId
         );
 
         const fileAttributes: FileAttributes = {
           type: 'file',
+          subtype: extractFileType(metadata.mimeType),
           parentId: messageId,
           name: metadata.name,
           fileName: metadata.name,
           mimeType: metadata.mimeType,
           size: metadata.size,
           extension: metadata.extension,
+          uploadId,
+          uploadStatus: 'pending',
         };
 
         inputs.push({
@@ -84,12 +95,15 @@ export class MessageCreateMutationHandler
           attributes: fileAttributes,
           download: {
             node_id: fileId,
+            upload_id: uploadId,
             created_at: createdAt,
             progress: 100,
             retry_count: 0,
+            completed_at: new Date().toISOString(),
           },
           upload: {
             node_id: fileId,
+            upload_id: uploadId,
             created_at: createdAt,
             progress: 0,
             retry_count: 0,

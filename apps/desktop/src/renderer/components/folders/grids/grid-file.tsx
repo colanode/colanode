@@ -1,7 +1,7 @@
-import { FileNode } from '@/shared/types/files';
+import { FileNode } from '@colanode/core';
 import { FileThumbnail } from '@/renderer/components/files/file-thumbnail';
 import { FileContextMenu } from '@/renderer/components/files/file-context-menu';
-import { GridItem } from './grid-item';
+import { GridItem } from '@/renderer/components/folders/grids/grid-item';
 
 interface GridFileProps {
   file: FileNode;
@@ -12,20 +12,13 @@ export const GridFile = ({ file }: GridFileProps) => {
     <FileContextMenu id={file.id}>
       <GridItem id={file.id}>
         <div className="flex w-full justify-center">
-          <FileThumbnail
-            id={file.id}
-            mimeType={file.mimeType}
-            extension={file.extension}
-            downloadProgress={file.downloadProgress}
-            name={file.name}
-            className="h-14 w-14"
-          />
+          <FileThumbnail file={file} className="h-14 w-14" />
         </div>
         <p
           className="line-clamp-2 w-full break-words text-center text-xs text-foreground/80"
-          title={file.name}
+          title={file.attributes.name}
         >
-          {file.name}
+          {file.attributes.name}
         </p>
       </GridItem>
     </FileContextMenu>

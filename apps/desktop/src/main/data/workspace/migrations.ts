@@ -90,8 +90,10 @@ const createDownloadsTable: Migration = {
       .addColumn('node_id', 'text', (col) =>
         col.notNull().primaryKey().references('nodes.id')
       )
+      .addColumn('upload_id', 'text', (col) => col.notNull())
       .addColumn('created_at', 'text', (col) => col.notNull())
       .addColumn('updated_at', 'text')
+      .addColumn('completed_at', 'text')
       .addColumn('progress', 'integer', (col) => col.defaultTo(0))
       .addColumn('retry_count', 'integer', (col) => col.defaultTo(0))
       .execute();
@@ -108,6 +110,7 @@ const createUploadsTable: Migration = {
       .addColumn('node_id', 'text', (col) =>
         col.notNull().primaryKey().references('nodes.id')
       )
+      .addColumn('upload_id', 'text', (col) => col.notNull())
       .addColumn('created_at', 'text', (col) => col.notNull())
       .addColumn('updated_at', 'text')
       .addColumn('progress', 'integer', (col) => col.defaultTo(0))

@@ -9,6 +9,7 @@ import {
 import path from 'path';
 import {
   SelectChange,
+  SelectDownload,
   SelectNode,
   WorkspaceDatabaseSchema,
 } from '@/main/data/workspace/schema';
@@ -21,6 +22,7 @@ import {
 } from './data/app/schema';
 import { Workspace } from '@/shared/types/workspaces';
 import { Server } from '@/shared/types/servers';
+import { Download } from '@/shared/types/nodes';
 
 export const appPath = app.getPath('userData');
 
@@ -143,5 +145,16 @@ export const mapServer = (row: SelectServer): Server => {
     version: row.version,
     createdAt: new Date(row.created_at),
     lastSyncedAt: row.last_synced_at ? new Date(row.last_synced_at) : null,
+  };
+};
+
+export const mapDownload = (row: SelectDownload): Download => {
+  return {
+    nodeId: row.node_id,
+    uploadId: row.upload_id,
+    progress: row.progress,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    retryCount: row.retry_count,
   };
 };

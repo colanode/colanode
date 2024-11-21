@@ -5,6 +5,7 @@ import {
   FileDownloadMutationInput,
   FileDownloadMutationOutput,
 } from '@/shared/mutations/file-download';
+import { mapNode } from '@/main/utils';
 
 export class FileDownloadMutationHandler
   implements MutationHandler<FileDownloadMutationInput>
@@ -28,6 +29,13 @@ export class FileDownloadMutationHandler
       };
     }
 
+    const file = mapNode(node);
+    if (file.attributes.type !== 'file') {
+      return {
+        success: false,
+      };
+    }
+
     const download = await workspaceDatabase
       .selectFrom('downloads')
       .selectAll()
@@ -45,6 +53,7 @@ export class FileDownloadMutationHandler
       .insertInto('downloads')
       .values({
         node_id: input.fileId,
+        upload_id: file.attributes.uploadId,
         created_at: createdAt.toISOString(),
         progress: 0,
         retry_count: 0,
@@ -56,6 +65,7 @@ export class FileDownloadMutationHandler
       userId: input.userId,
       download: {
         nodeId: node.id,
+        uploadId: file.attributes.uploadId,
         createdAt: createdAt.toISOString(),
         updatedAt: null,
         progress: 0,

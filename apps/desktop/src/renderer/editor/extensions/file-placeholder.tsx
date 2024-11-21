@@ -32,6 +32,9 @@ export const FilePlaceholderNode = Node.create({
       mimeType: {
         default: null,
       },
+      type: {
+        default: null,
+      },
     };
   },
   renderHTML({ HTMLAttributes }) {
@@ -57,6 +60,7 @@ export const FilePlaceholderNode = Node.create({
                 extension: metadata.extension,
                 mimeType: metadata.mimeType,
                 name: metadata.name,
+                type: metadata.type,
               },
             })
             .run();

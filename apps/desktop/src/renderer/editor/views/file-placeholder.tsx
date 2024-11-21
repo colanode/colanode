@@ -1,8 +1,11 @@
 import { type NodeViewProps } from '@tiptap/core';
+import { match } from 'ts-pattern';
 import { NodeViewWrapper } from '@tiptap/react';
-import { FilePreview } from '@/renderer/components/files/file-preview';
 import { getFilePlaceholderUrl } from '@/shared/lib/files';
 import { X } from 'lucide-react';
+import { FilePreviewImage } from '@/renderer/components/files/previews/file-preview-image';
+import { FilePreviewVideo } from '@/renderer/components/files/previews/file-preview-video';
+import { FilePreviewOther } from '@/renderer/components/files/previews/file-preview-other';
 
 export const FilePlaceholderNodeView = ({
   node,
@@ -11,6 +14,7 @@ export const FilePlaceholderNodeView = ({
   const path = node.attrs.path;
   const mimeType = node.attrs.mimeType;
   const name = node.attrs.name;
+  const type = node.attrs.type;
 
   if (!path || !mimeType) {
     return null;
@@ -29,7 +33,11 @@ export const FilePlaceholderNodeView = ({
         >
           <X className="size-4" />
         </button>
-        <FilePreview url={url} name={name} mimeType={mimeType} />
+        {match(type)
+          .with('image', () => <FilePreviewImage url={url} name={name} />)
+          .with('video', () => <FilePreviewVideo url={url} />)
+          .with('other', () => <FilePreviewOther mimeType={mimeType} />)
+          .otherwise(() => null)}
       </div>
     </NodeViewWrapper>
   );

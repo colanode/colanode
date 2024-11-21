@@ -1,4 +1,4 @@
-import { FileNode } from '@/shared/types/files';
+import { FileNode } from '@colanode/core';
 import { createContext, useContext } from 'react';
 
 interface FolderContext {

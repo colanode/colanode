@@ -9,7 +9,6 @@ import { useQuery } from '@/renderer/hooks/use-query';
 
 interface FileSidebarProps {
   file: FileNode;
-  downloadProgress: number;
 }
 
 const FileMeta = ({ title, value }: { title: string; value: string }) => {
@@ -21,7 +20,7 @@ const FileMeta = ({ title, value }: { title: string; value: string }) => {
   );
 };
 
-export const FileSidebar = ({ file, downloadProgress }: FileSidebarProps) => {
+export const FileSidebar = ({ file }: FileSidebarProps) => {
   const workspace = useWorkspace();
   const { data } = useQuery({
     type: 'node_get',
@@ -35,11 +34,7 @@ export const FileSidebar = ({ file, downloadProgress }: FileSidebarProps) => {
     <React.Fragment>
       <div className="flex items-center gap-x-4 p-2">
         <FileThumbnail
-          id={file.id}
-          name={file.attributes.name}
-          mimeType={file.attributes.mimeType}
-          extension={file.attributes.extension}
-          downloadProgress={downloadProgress}
+          file={file}
           className="h-12 w-9 min-w-[36px] overflow-hidden rounded object-contain"
         />
         <div

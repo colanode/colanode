@@ -12,7 +12,8 @@ export const FileDownload = ({ id, downloadProgress }: FileDownloadProps) => {
   const workspace = useWorkspace();
   const { mutate } = useMutation();
 
-  if (downloadProgress === null) {
+  const isDownloading = typeof downloadProgress === 'number';
+  if (!isDownloading) {
     return (
       <div
         className="flex cursor-pointer flex-col items-center gap-3 text-muted-foreground hover:text-primary"

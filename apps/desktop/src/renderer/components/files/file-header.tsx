@@ -19,7 +19,7 @@ export const FileHeader = ({ nodes, file, role }: FileHeaderProps) => {
     <Header>
       <div className="flex w-full items-center gap-2 px-4">
         <div className="flex-grow">
-          <NodeBreadcrumb nodes={nodes} />
+          {container.mode === 'main' && <NodeBreadcrumb nodes={nodes} />}
           {container.mode === 'modal' && (
             <NodeFullscreenButton nodeId={file.id} />
           )}

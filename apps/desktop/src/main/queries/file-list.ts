@@ -1,20 +1,11 @@
 import { FileListQueryInput } from '@/shared/queries/file-list';
 import { databaseService } from '@/main/data/database-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { NodeTypes } from '@colanode/core';
+import { NodeTypes, FileNode } from '@colanode/core';
 import { compareString } from '@/shared/lib/utils';
-import { FileNode } from '@/shared/types/files';
 import { Event } from '@/shared/types/events';
-
-interface FileRow {
-  id: string;
-  attributes: string;
-  parent_id: string | null;
-  type: string;
-  download_progress?: number | null;
-  created_at: string;
-  created_by: string;
-}
+import { SelectNode } from '@/main/data/workspace/schema';
+import { mapNode } from '@/main/utils';
 
 export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {
   public async handleQuery(input: FileListQueryInput): Promise<FileNode[]> {
@@ -56,18 +47,19 @@ export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {
       event.node.type === 'file' &&
       event.node.parentId === input.parentId
     ) {
-      const newOutput = [...output];
-      const file = newOutput.find((file) => file.id === event.node.id);
+      const file = output.find((file) => file.id === event.node.id);
       if (file) {
-        file.name = event.node.attributes.name;
-        file.mimeType = event.node.attributes.mimeType;
-        file.size = event.node.attributes.size;
-        file.extension = event.node.attributes.extension;
-        file.fileName = event.node.attributes.fileName;
+        const newResult = output.map((file) => {
+          if (file.id === event.node.id) {
+            return event.node as FileNode;
+          }
+
+          return file;
+        });
 
         return {
           hasChanges: true,
-          result: newOutput,
+          result: newResult,
         };
       }
     }
@@ -80,27 +72,10 @@ export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {
     ) {
       const file = output.find((file) => file.id === event.node.id);
       if (file) {
-        const newOutput = output.filter((file) => file.id !== event.node.id);
+        const newResult = await this.handleQuery(input);
         return {
           hasChanges: true,
-          result: newOutput,
-        };
-      }
-    }
-
-    if (
-      (event.type === 'download_created' ||
-        event.type === 'download_updated') &&
-      event.userId === input.userId
-    ) {
-      const newOutput = [...output];
-      const nodeId = event.download.nodeId;
-      const file = newOutput.find((file) => file.id === nodeId);
-      if (file) {
-        file.downloadProgress = event.download.progress;
-        return {
-          hasChanges: true,
-          result: newOutput,
+          result: newResult,
         };
       }
     }
@@ -110,7 +85,7 @@ export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {
     };
   }
 
-  private async fetchFiles(input: FileListQueryInput): Promise<FileRow[]> {
+  private async fetchFiles(input: FileListQueryInput): Promise<SelectNode[]> {
     const workspaceDatabase = await databaseService.getWorkspaceDatabase(
       input.userId
     );
@@ -118,18 +93,7 @@ export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {
     const offset = (input.page - 1) * input.count;
     const files = await workspaceDatabase
       .selectFrom('nodes')
-      .leftJoin('downloads', (join) =>
-        join.onRef('nodes.id', '=', 'downloads.node_id')
-      )
-      .select([
-        'nodes.id',
-        'nodes.attributes',
-        'nodes.parent_id',
-        'nodes.type',
-        'downloads.progress as download_progress',
-        'nodes.created_at',
-        'nodes.created_by',
-      ])
+      .selectAll()
       .where((eb) =>
         eb.and([
           eb('parent_id', '=', input.parentId),
@@ -144,20 +108,16 @@ export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {
     return files;
   }
 
-  private buildFiles = (fileRows: FileRow[]): FileNode[] => {
+  private buildFiles = (rows: SelectNode[]): FileNode[] => {
+    const nodes = rows.map(mapNode);
     const files: FileNode[] = [];
-    for (const fileRow of fileRows) {
-      const attributes = JSON.parse(fileRow.attributes);
-      files.push({
-        id: fileRow.id,
-        name: attributes.name,
-        mimeType: attributes.mimeType,
-        size: attributes.size,
-        extension: attributes.extension,
-        fileName: attributes.fileName,
-        createdAt: fileRow.created_at,
-        downloadProgress: fileRow.download_progress,
-      });
+
+    for (const node of nodes) {
+      if (node.type !== 'file') {
+        continue;
+      }
+
+      files.push(node);
     }
 
     return files.sort((a, b) => compareString(a.id, b.id));

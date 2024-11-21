@@ -162,6 +162,7 @@ class NodeService {
           if (createdDownloadRow) {
             createdDownloads.push({
               nodeId: createdDownloadRow.node_id,
+              uploadId: createdDownloadRow.upload_id,
               createdAt: createdDownloadRow.created_at,
               updatedAt: createdDownloadRow.updated_at,
               progress: createdDownloadRow.progress,

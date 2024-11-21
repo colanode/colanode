@@ -1,5 +1,3 @@
-import { FilePreviewType } from '@/shared/types/files';
-
 export const formatBytes = (bytes: number, decimals?: number): string => {
   if (bytes === 0) {
     return '0 Bytes';
@@ -12,24 +10,13 @@ export const formatBytes = (bytes: number, decimals?: number): string => {
   return `${parseFloat((bytes / k ** i).toFixed(dm))} ${sizes[i]}`;
 };
 
-export const getFilePreviewType = (mimeType: string): FilePreviewType => {
-  if (mimeType.startsWith('image')) {
-    return 'image';
-  }
-
-  if (mimeType.startsWith('video')) {
-    return 'video';
-  }
-
-  return 'other';
-};
-
 export const getFileUrl = (
   userId: string,
   fileId: string,
+  uploadId: string,
   extension: string
 ) => {
-  return `local-file://${userId}/${fileId}${extension}`;
+  return `local-file://${userId}/${fileId}_${uploadId}${extension}`;
 };
 
 export const getFilePlaceholderUrl = (path: string) => {

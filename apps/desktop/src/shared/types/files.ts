@@ -1,25 +1,4 @@
-export type ServerFileUploadResponse = {
-  id: string;
-  url: string;
-};
-
-export type ServerFileDownloadResponse = {
-  id: string;
-  url: string;
-};
-
-export type FileNode = {
-  id: string;
-  name: string;
-  mimeType: string;
-  size: number;
-  extension: string;
-  fileName: string;
-  createdAt: string;
-  downloadProgress?: number | null;
-};
-
-export type FilePreviewType = 'image' | 'video' | 'other';
+import { FileType } from '@colanode/core';
 
 export type FileMetadata = {
   path: string;
@@ -27,4 +6,5 @@ export type FileMetadata = {
   extension: string;
   name: string;
   size: number;
+  type: FileType;
 };

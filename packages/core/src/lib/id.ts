@@ -44,6 +44,7 @@ export enum IdType {
   File = 'fi',
   FilePlaceholder = 'fp',
   Device = 'dv',
+  Upload = 'up',
 }
 
 export const generateId = (type: IdType): string => {

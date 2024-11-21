@@ -3,12 +3,17 @@ import { NodeModel } from './core';
 
 export const fileAttributesSchema = z.object({
   type: z.literal('file'),
+  subtype: z.enum(['image', 'video', 'audio', 'document', 'other']),
   name: z.string(),
   parentId: z.string(),
   mimeType: z.string(),
   size: z.number(),
   extension: z.string(),
   fileName: z.string(),
+  uploadStatus: z
+    .enum(['pending', 'completed', 'failed', 'no_space'])
+    .default('pending'),
+  uploadId: z.string(),
 });
 
 export type FileAttributes = z.infer<typeof fileAttributesSchema>;

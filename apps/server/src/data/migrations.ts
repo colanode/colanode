@@ -253,6 +253,29 @@ const createDeviceNodesTable: Migration = {
   },
 };
 
+const createUploadsTable: Migration = {
+  up: async (db) => {
+    await db.schema
+      .createTable('uploads')
+      .addColumn('node_id', 'varchar(30)', (col) =>
+        col.notNull().references('nodes.id').onDelete('no action').primaryKey()
+      )
+      .addColumn('upload_id', 'varchar(30)', (col) => col.notNull())
+      .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
+      .addColumn('path', 'varchar(256)', (col) => col.notNull())
+      .addColumn('size', 'integer', (col) => col.notNull())
+      .addColumn('mime_type', 'varchar(256)', (col) => col.notNull())
+      .addColumn('type', 'varchar(30)', (col) => col.notNull())
+      .addColumn('created_by', 'varchar(30)', (col) => col.notNull())
+      .addColumn('created_at', 'timestamptz', (col) => col.notNull())
+      .addColumn('completed_at', 'timestamptz', (col) => col.notNull())
+      .execute();
+  },
+  down: async (db) => {
+    await db.schema.dropTable('uploads').execute();
+  },
+};
+
 export const databaseMigrations: Record<string, Migration> = {
   '00001_create_accounts_table': createAccountsTable,
   '00002_create_devices_table': createDevicesTable,
@@ -262,4 +285,5 @@ export const databaseMigrations: Record<string, Migration> = {
   '00006_create_node_paths_table': createNodePathsTable,
   '00007_create_user_nodes_table': createUserNodesTable,
   '00008_create_device_nodes_table': createDeviceNodesTable,
+  '00009_create_uploads_table': createUploadsTable,
 };

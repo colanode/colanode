@@ -1,5 +1,5 @@
 import { MutationHandler } from '@/main/types';
-import { generateId, IdType } from '@colanode/core';
+import { extractFileType, generateId, IdType } from '@colanode/core';
 import {
   FileCreateMutationInput,
   FileCreateMutationOutput,
@@ -19,43 +19,50 @@ export class FileCreateMutationHandler
       throw new Error('Invalid file');
     }
 
-    const id = generateId(IdType.File);
+    const fileId = generateId(IdType.File);
+    const uploadId = generateId(IdType.Upload);
     fileService.copyFileToWorkspace(
       input.filePath,
-      id,
+      fileId,
       metadata.extension,
       input.userId
     );
 
     const attributes: FileAttributes = {
       type: 'file',
+      subtype: extractFileType(metadata.mimeType),
       parentId: input.parentId,
       name: metadata.name,
       fileName: metadata.name,
       extension: metadata.extension,
       size: metadata.size,
       mimeType: metadata.mimeType,
+      uploadId,
+      uploadStatus: 'pending',
     };
 
     await nodeService.createNode(input.userId, {
-      id,
+      id: fileId,
       attributes,
       upload: {
-        node_id: id,
+        node_id: fileId,
         created_at: new Date().toISOString(),
         progress: 0,
         retry_count: 0,
+        upload_id: uploadId,
       },
       download: {
-        node_id: id,
+        node_id: fileId,
+        upload_id: uploadId,
         created_at: new Date().toISOString(),
-        progress: 0,
+        progress: 100,
         retry_count: 0,
+        completed_at: new Date().toISOString(),
       },
     });
 
     return {
-      id: id,
+      id: fileId,
     };
   }
 }

@@ -20,6 +20,7 @@ export type UserNode = {
 
 export type Download = {
   nodeId: string;
+  uploadId: string;
   createdAt: string;
   updatedAt: string | null;
   progress: number;

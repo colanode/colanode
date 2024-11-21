@@ -74,14 +74,7 @@ const Root = () => {
           return;
         }
 
-        const existingData = queryClient.getQueryData<any>([queryId]);
-
-        if (!existingData) {
-          window.colanode.unsubscribeQuery(queryId);
-          return;
-        } else {
-          queryClient.setQueryData([queryId], result);
-        }
+        queryClient.setQueryData([queryId], result);
       }
     });
 

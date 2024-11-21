@@ -58,6 +58,7 @@ export type UpdateChange = Updateable<ChangeTable>;
 
 interface UploadTable {
   node_id: ColumnType<string, string, never>;
+  upload_id: ColumnType<string, string, never>;
   created_at: ColumnType<string, string, never>;
   updated_at: ColumnType<string | null, string | null, string | null>;
   progress: ColumnType<number, number, number>;
@@ -70,8 +71,10 @@ export type UpdateUpload = Updateable<UploadTable>;
 
 interface DownloadTable {
   node_id: ColumnType<string, string, never>;
+  upload_id: ColumnType<string, string, never>;
   created_at: ColumnType<string, string, never>;
   updated_at: ColumnType<string | null, string | null, string | null>;
+  completed_at: ColumnType<string | null, string | null, string | null>;
   progress: ColumnType<number, number, number>;
   retry_count: ColumnType<number, number, number>;
 }
