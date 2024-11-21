@@ -35,6 +35,10 @@ export const ViewBooleanFieldFilter = ({
       (operator) => operator.value === filter.operator
     ) ?? booleanFieldFilterOperators[0];
 
+  if (!operator) {
+    return null;
+  }
+
   return (
     <Popover
       open={view.isFieldFilterOpened(filter.id)}

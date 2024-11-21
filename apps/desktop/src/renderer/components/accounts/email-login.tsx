@@ -47,8 +47,7 @@ export const EmailLogin = ({ server }: EmailLoginProps) => {
       },
       onSuccess(output) {
         if (output.success) {
-          const userId =
-            output.workspaces.length > 0 ? output.workspaces[0].id : '';
+          const userId = output.workspaces[0]?.id ?? '';
           navigate(`/${output.account.id}/${userId}`);
         } else {
           toast({

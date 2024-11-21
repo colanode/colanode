@@ -106,6 +106,10 @@ export const MessageCreate = React.forwardRef<MessageCreateRefProps>(
       }
 
       const filePath = result.filePaths[0];
+      if (!filePath) {
+        return;
+      }
+
       const fileMetadata = await window.colanode.executeQuery({
         type: 'file_metadata_get',
         path: filePath,

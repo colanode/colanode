@@ -1,4 +1,4 @@
-import { EmojiPickerRowData } from '@/shared/types/emojis';
+import { Emoji, EmojiPickerRowData } from '@/shared/types/emojis';
 import React from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
@@ -15,6 +15,10 @@ export const EmojiPickerBrowser = () => {
 
     for (let i = 0; i < data.categories.length; i++) {
       const category = data.categories[i];
+      if (!category) {
+        continue;
+      }
+
       // Add the category label
       rows.push({
         type: 'label',
@@ -28,7 +32,14 @@ export const EmojiPickerBrowser = () => {
         const start = rowIndex * emojisPerRow;
         const end = start + emojisPerRow;
         const emojisIds = category.emojis.slice(start, end);
-        const emojisInRow = emojisIds.map((id) => data.emojis[id]);
+        const emojisInRow: Emoji[] = [];
+        for (const id of emojisIds) {
+          const emoji = data.emojis[id];
+          if (!emoji) {
+            continue;
+          }
+          emojisInRow.push(emoji);
+        }
 
         rows.push({
           type: 'emoji',

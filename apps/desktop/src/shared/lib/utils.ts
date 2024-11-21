@@ -147,6 +147,8 @@ export const isValidEmail = (email: string) => {
   const account = emailParts[0];
   const address = emailParts[1];
 
+  if (!account || !address) return false;
+
   if (account.length > 64) return false;
 
   if (address.length > 255) return false;

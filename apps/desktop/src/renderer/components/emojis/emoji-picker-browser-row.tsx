@@ -17,6 +17,10 @@ export const EmojiPickerBrowserRow = ({
 }: EmojiPickerBrowserRowProps) => {
   const rowData = data.rows[index];
 
+  if (!rowData) {
+    return null;
+  }
+
   if (rowData.type === 'label') {
     return (
       <div

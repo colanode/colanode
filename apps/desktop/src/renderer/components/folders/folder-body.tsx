@@ -86,13 +86,20 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
       return;
     }
 
+    const filePath = result.filePaths[0];
+
+    if (!filePath) {
+      isDialogOpenedRef.current = false;
+      return;
+    }
+
     mutate({
       input: {
         type: 'file_create',
         accountId: workspace.accountId,
         workspaceId: workspace.id,
         userId: workspace.userId,
-        filePath: result.filePaths[0],
+        filePath,
         parentId: folder.id,
       },
     });

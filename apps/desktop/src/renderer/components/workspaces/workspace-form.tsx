@@ -94,6 +94,11 @@ export const WorkspaceForm = ({
                 }
 
                 const filePath = result.filePaths[0];
+                if (!filePath) {
+                  setIsFileDialogOpen(false);
+                  return;
+                }
+
                 mutate({
                   input: {
                     type: 'avatar_upload',

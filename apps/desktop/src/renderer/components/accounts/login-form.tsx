@@ -16,7 +16,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
   const navigate = useNavigate();
 
   const [showRegister, setShowRegister] = React.useState(false);
-  const [server, setServer] = React.useState(servers[0]);
+  const [server, setServer] = React.useState(servers[0]!);
 
   return (
     <div className="flex flex-col gap-4">

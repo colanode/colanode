@@ -27,10 +27,15 @@ export const FileCommand: EditorCommand = {
       return;
     }
 
+    const filePath = result.filePaths[0];
+    if (!filePath) {
+      return;
+    }
+
     const { userId, documentId } = context;
     const output = await window.colanode.executeMutation({
       type: 'file_create',
-      filePath: result.filePaths[0],
+      filePath,
       userId,
       parentId: documentId,
       generateIndex: false,

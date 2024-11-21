@@ -14,10 +14,10 @@ export const Workspace = () => {
 
   const [openSettings, setOpenSettings] = React.useState(false);
 
-  const { data, isPending } = useQuery({
+  const { data } = useQuery({
     type: 'workspace_get',
     accountId: account.id,
-    workspaceId,
+    workspaceId: workspaceId!,
   });
 
   const workspace = data ?? null;

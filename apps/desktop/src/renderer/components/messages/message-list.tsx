@@ -39,6 +39,10 @@ export const MessageList = () => {
   React.useEffect(() => {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
+      if (!lastMessage) {
+        return;
+      }
+
       if (lastMessage.id !== lastMessageId.current) {
         lastMessageId.current = lastMessage.id;
         conversation.onLastMessageIdChange(lastMessageId.current);

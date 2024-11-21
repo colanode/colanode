@@ -40,6 +40,10 @@ class FileService {
   public async handleFileRequest(request: Request): Promise<Response> {
     const url = request.url.replace('local-file://', '');
     const [userId, file] = url.split('/');
+    if (!userId || !file) {
+      return new Response(null, { status: 400 });
+    }
+
     const filesDir = getWorkspaceFilesDirectoryPath(userId);
     const filePath = path.join(filesDir, file);
 
@@ -348,6 +352,10 @@ class FileService {
       .select(['workspaces.workspace_id', 'accounts.token', 'servers.domain'])
       .where('workspaces.user_id', '=', userId)
       .executeTakeFirst();
+
+    if (!workspace) {
+      return;
+    }
 
     const filesDir = getWorkspaceFilesDirectoryPath(userId);
     if (!fs.existsSync(filesDir)) {

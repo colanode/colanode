@@ -13,6 +13,10 @@ export const IconPicker = ({ onPick }: IconPickerProps) => {
   const [query, setQuery] = React.useState('');
   const { data, isPending } = useQuery({ type: 'icons_get' });
 
+  if (!data) {
+    return null;
+  }
+
   return (
     <IconPickerContext.Provider value={{ data, onPick }}>
       <div className="flex flex-col gap-1 p-1">

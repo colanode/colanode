@@ -3,7 +3,7 @@ export type FolderUpdateMutationInput = {
   userId: string;
   folderId: string;
   name: string;
-  avatar: string | null;
+  avatar?: string | null;
 };
 
 export type FolderUpdateMutationOutput = {

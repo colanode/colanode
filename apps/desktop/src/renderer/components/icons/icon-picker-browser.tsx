@@ -1,7 +1,7 @@
 import React from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
-import { IconPickerRowData } from '@/shared/types/icons';
+import { Icon, IconPickerRowData } from '@/shared/types/icons';
 import { IconPickerBrowserRow } from '@/renderer/components/icons/icon-picker-browser-row';
 import { useIconPicker } from '@/renderer/contexts/icon-picker';
 
@@ -14,6 +14,11 @@ export const IconPickerBrowser = () => {
 
     for (let i = 0; i < data.categories.length; i++) {
       const category = data.categories[i];
+
+      if (!category) {
+        continue;
+      }
+
       // Add the category label
       rows.push({
         type: 'label',
@@ -27,7 +32,14 @@ export const IconPickerBrowser = () => {
         const start = rowIndex * iconsPerRow;
         const end = start + iconsPerRow;
         const iconIds = category.icons.slice(start, end);
-        const iconsInRow = iconIds.map((id) => data.icons[id]);
+        const iconsInRow: Icon[] = [];
+        for (const id of iconIds) {
+          const icon = data.icons[id];
+          if (!icon) {
+            continue;
+          }
+          iconsInRow.push(icon);
+        }
 
         rows.push({
           type: 'icon',

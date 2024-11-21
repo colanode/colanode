@@ -14,10 +14,11 @@ export const WorkspaceRedirect = (): React.ReactNode => {
       })
       .then((data) => {
         const workspaces = data ?? [];
-        if (workspaces.length === 0) {
-          navigate(`/${account.id}/create`);
+        const firstWorkspace = workspaces[0];
+        if (firstWorkspace) {
+          navigate(`/${account.id}/${firstWorkspace.id}`);
         } else {
-          navigate(`/${account.id}/${workspaces[0].id}`);
+          navigate(`/${account.id}/create`);
         }
       });
   }, [navigate]);

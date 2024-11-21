@@ -10,10 +10,12 @@ export const AccountRedirect = (): React.ReactNode => {
         type: 'account_list',
       })
       .then((data) => {
-        if (data.length === 0) {
-          navigate('/login');
+        const firstAccount = data?.[0];
+
+        if (firstAccount) {
+          navigate(`/${firstAccount.id}`);
         } else {
-          navigate(`/${data[0].id}`);
+          navigate('/login');
         }
       });
   }, [navigate]);

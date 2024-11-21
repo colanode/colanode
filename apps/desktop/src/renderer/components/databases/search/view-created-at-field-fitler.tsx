@@ -36,6 +36,10 @@ export const ViewCreatedAtFieldFilter = ({
       (operator) => operator.value === filter.operator
     ) ?? dateFieldFilterOperators[0];
 
+  if (!operator) {
+    return null;
+  }
+
   const dateTextValue = (filter.value as string) ?? null;
   const dateValue = dateTextValue ? new Date(dateTextValue) : null;
 

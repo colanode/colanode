@@ -116,7 +116,11 @@ export function LayoutSidebarFooter() {
                 <DropdownMenuSeparator />
                 <DropdownMenuLabel className="mb-1">Accounts</DropdownMenuLabel>
                 {accounts.map((accountItem) => {
-                  const state = accountStates[accountItem.id];
+                  const state = accountStates[accountItem.id] ?? {
+                    importantCount: 0,
+                    hasUnseenChanges: false,
+                  };
+
                   return (
                     <DropdownMenuItem
                       key={accountItem.id}

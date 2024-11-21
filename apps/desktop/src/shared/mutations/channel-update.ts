@@ -3,7 +3,7 @@ export type ChannelUpdateMutationInput = {
   userId: string;
   channelId: string;
   name: string;
-  avatar?: string;
+  avatar?: string | null;
 };
 
 export type ChannelUpdateMutationOutput = {

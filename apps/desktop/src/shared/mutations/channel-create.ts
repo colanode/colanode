@@ -3,7 +3,7 @@ export type ChannelCreateMutationInput = {
   userId: string;
   spaceId: string;
   name: string;
-  avatar?: string;
+  avatar?: string | null;
 };
 
 export type ChannelCreateMutationOutput = {

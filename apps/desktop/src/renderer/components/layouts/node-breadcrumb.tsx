@@ -39,6 +39,10 @@ export const NodeBreadcrumb = ({ nodes }: NodeBreadcrumbProps) => {
     <Breadcrumb>
       <BreadcrumbList>
         {visibleNodes.map((node, index) => {
+          if (!node) {
+            return null;
+          }
+
           const isFirst = index === 0;
           const isClickableNode = isClickable(node.type);
 

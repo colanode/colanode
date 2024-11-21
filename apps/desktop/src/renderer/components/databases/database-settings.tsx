@@ -88,7 +88,7 @@ export const DatabaseSettings = ({ database, role }: DatabaseSettingsProps) => {
               date={database.createdAt}
             />
           </DropdownMenuItem>
-          {database.updatedBy && (
+          {database.updatedBy && database.updatedAt && (
             <React.Fragment>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Last updated by</DropdownMenuLabel>

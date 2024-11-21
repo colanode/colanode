@@ -33,7 +33,7 @@ import { FieldAttributes, FieldType } from '@colanode/core';
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),
   type: z.enum(['table', 'board', 'calendar']),
-  groupBy: z.string().optional(),
+  groupBy: z.string().optional().nullable(),
 });
 
 interface ViewTypeOption {

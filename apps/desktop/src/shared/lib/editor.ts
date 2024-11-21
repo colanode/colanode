@@ -159,28 +159,39 @@ const validateBlocksIndexes = (blocks: Block[]) => {
   //group by parentId
   const groupedBlocks: { [key: string]: Block[] } = {};
   for (const block of blocks) {
-    if (!groupedBlocks[block.parentId]) {
-      groupedBlocks[block.parentId] = [];
-    }
-    groupedBlocks[block.parentId].push(block);
+    const parentBlocks = groupedBlocks[block.parentId] ?? [];
+    parentBlocks.push(block);
+    groupedBlocks[block.parentId] = parentBlocks;
   }
 
   for (const parentId in groupedBlocks) {
     const blocks = groupedBlocks[parentId];
+    if (!blocks) {
+      continue;
+    }
+
     for (let i = 1; i < blocks.length; i++) {
-      const currentIndex = blocks[i].index;
-      const beforeIndex = blocks[i - 1].index;
+      const currentBlock = blocks[i];
+      const beforeBlock = blocks[i - 1];
+
+      if (!currentBlock || !beforeBlock) {
+        continue;
+      }
+
+      const currentIndex = currentBlock.index;
+      const beforeIndex = beforeBlock.index;
 
       if (currentIndex <= beforeIndex) {
-        let afterIndex = i < blocks.length - 1 ? blocks[i + 1].index : null;
+        const afterBlock = i < blocks.length - 1 ? blocks[i + 1] : null;
+        const afterIndex = afterBlock?.index ?? null;
         if (
           afterIndex &&
           afterIndex > currentIndex &&
           afterIndex > beforeIndex
         ) {
-          blocks[i].index = generateNodeIndex(beforeIndex, afterIndex);
+          currentBlock.index = generateNodeIndex(beforeIndex, afterIndex);
         } else {
-          blocks[i].index = generateNodeIndex(beforeIndex, null);
+          currentBlock.index = generateNodeIndex(beforeIndex, null);
         }
       }
     }

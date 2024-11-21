@@ -167,11 +167,9 @@ class SyncService {
       }
 
       if (nodeId) {
-        if (!nodeChanges[nodeId]) {
-          nodeChanges[nodeId] = [];
-        }
-
-        nodeChanges[nodeId].push(change.id);
+        const changeIds = nodeChanges[nodeId] ?? [];
+        changeIds.push(change.id);
+        nodeChanges[nodeId] = changeIds;
       }
     }
 
@@ -189,7 +187,7 @@ class SyncService {
     }
 
     for (const nodeId of nodeIds) {
-      const changeIds = nodeChanges[nodeId];
+      const changeIds = nodeChanges[nodeId] ?? [];
       const states = data.nodes[nodeId];
 
       if (!states) {
@@ -263,6 +261,9 @@ class SyncService {
     const changesToDelete = new Set<number>();
     for (let i = changes.length - 1; i >= 0; i--) {
       const change = changes[i];
+      if (!change) {
+        continue;
+      }
 
       if (changesToDelete.has(change.id)) {
         continue;
@@ -271,6 +272,10 @@ class SyncService {
       if (change.data.type === 'node_delete') {
         for (let j = i - 1; j >= 0; j--) {
           const otherChange = changes[j];
+          if (!otherChange) {
+            continue;
+          }
+
           if (
             otherChange.data.type === 'node_create' &&
             otherChange.data.id === change.data.id
@@ -290,6 +295,10 @@ class SyncService {
       } else if (change.data.type === 'user_node_update') {
         for (let j = i - 1; j >= 0; j--) {
           const otherChange = changes[j];
+          if (!otherChange) {
+            continue;
+          }
+
           if (
             otherChange.data.type === 'user_node_update' &&
             otherChange.data.nodeId === change.data.nodeId &&

@@ -66,7 +66,7 @@ export class WorkspaceGetQueryHandler
   private fetchWorkspace(
     accountId: string,
     workspaceId: string
-  ): Promise<SelectWorkspace | null> {
+  ): Promise<SelectWorkspace | undefined> {
     return databaseService.appDatabase
       .selectFrom('workspaces')
       .selectAll()

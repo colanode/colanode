@@ -65,7 +65,7 @@ class QueryService {
         typeof query.input
       >;
 
-      let result = query.result;
+      let result: any = query.result;
       let hasChanges = false;
       for (const event of events) {
         const changeCheckResult = await handler.checkForChanges(

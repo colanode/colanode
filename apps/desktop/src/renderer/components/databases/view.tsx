@@ -239,7 +239,7 @@ export const View = ({ view }: ViewProps) => {
             type: 'field',
             id: fieldId,
             fieldId,
-            operator: operators[0].value,
+            operator: operators[0]?.value ?? '',
             value: null,
           };
 

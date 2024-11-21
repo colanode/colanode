@@ -7,13 +7,13 @@ import { useDatabase } from '@/renderer/contexts/database';
 export const DatabaseViews = () => {
   const database = useDatabase();
   const [activeViewId, setActiveViewId] = React.useState<string>(
-    database.views[0].id
+    database.views[0]?.id ?? ''
   );
   const activeView = database.views.find((view) => view.id === activeViewId);
 
   React.useEffect(() => {
     if (!activeView) {
-      setActiveViewId(database.views[0].id);
+      setActiveViewId(database.views[0]?.id ?? '');
     }
   }, [database.views, activeViewId]);
 

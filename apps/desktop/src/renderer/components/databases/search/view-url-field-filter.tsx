@@ -33,6 +33,10 @@ export const ViewUrlFieldFilter = ({
       (operator) => operator.value === filter.operator
     ) ?? urlFieldFilterOperators[0];
 
+  if (!operator) {
+    return null;
+  }
+
   const urlValue = filter.value as string | null;
 
   const hideInput =

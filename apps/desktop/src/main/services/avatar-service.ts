@@ -9,6 +9,10 @@ class AvatarService {
   public async handleAvatarRequest(request: Request): Promise<Response> {
     const url = request.url.replace('avatar://', '');
     const [accountId, avatarId] = url.split('/');
+    if (!accountId || !avatarId) {
+      return new Response(null, { status: 400 });
+    }
+
     const avatarsDir = getAccountAvatarsDirectoryPath(accountId);
     const avatarPath = path.join(avatarsDir, `${avatarId}.jpeg`);
     const avatarLocalUrl = `file://${avatarPath}`;

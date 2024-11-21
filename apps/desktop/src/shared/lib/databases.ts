@@ -139,9 +139,10 @@ export const getSelectOptionLightColorClass = (color: string): string => {
 };
 
 export const getRandomSelectOptionColor = (): string => {
-  return selectOptionColors[
-    Math.floor(Math.random() * selectOptionColors.length)
-  ].value;
+  const randomIndex = Math.floor(Math.random() * selectOptionColors.length);
+  const randomColor = selectOptionColors[randomIndex] ?? selectOptionColors[0]!;
+
+  return randomColor.value;
 };
 
 export interface FieldFilterOperator {
@@ -1045,6 +1046,10 @@ export const generateViewFieldIndex = (
   let nextIndex: string | null = null;
   if (after === 'name') {
     const lowestIndex = mergedIndexes[0];
+    if (!lowestIndex) {
+      return null;
+    }
+
     nextIndex = lowestIndex.viewIndex ?? lowestIndex.databaseIndex;
   } else {
     const afterFieldArrayIndex = mergedIndexes.findIndex((f) => f.id === after);
@@ -1052,14 +1057,14 @@ export const generateViewFieldIndex = (
       return null;
     }
 
+    const afterFieldIndex = mergedIndexes[afterFieldArrayIndex];
     previousIndex =
-      mergedIndexes[afterFieldArrayIndex].viewIndex ??
-      mergedIndexes[afterFieldArrayIndex].databaseIndex;
+      afterFieldIndex?.viewIndex ?? afterFieldIndex?.databaseIndex ?? null;
 
     if (afterFieldArrayIndex < mergedIndexes.length) {
+      const nextFieldIndex = mergedIndexes[afterFieldArrayIndex + 1];
       nextIndex =
-        mergedIndexes[afterFieldArrayIndex + 1].viewIndex ??
-        mergedIndexes[afterFieldArrayIndex + 1].databaseIndex;
+        nextFieldIndex?.viewIndex ?? nextFieldIndex?.databaseIndex ?? null;
     }
   }
 
@@ -1067,7 +1072,7 @@ export const generateViewFieldIndex = (
 
   const lastDatabaseField = mergedIndexes.sort((a, b) =>
     compareString(a.databaseIndex, b.databaseIndex)
-  )[mergedIndexes.length - 1];
+  )[mergedIndexes.length - 1]!;
 
   const newPotentialFieldIndex = generateNodeIndex(
     lastDatabaseField.databaseIndex,
@@ -1173,12 +1178,13 @@ const generateCollaboratorValue = (
     return { type: 'collaborator', value: [userId] };
   }
 
-  if (
-    filter.operator === 'is_in' &&
-    Array.isArray(filter.value) &&
-    filter.value.length > 0
-  ) {
-    return { type: 'collaborator', value: [filter.value[0]] };
+  if (filter.operator === 'is_in' && Array.isArray(filter.value)) {
+    const firstValue = filter.value[0];
+    if (!firstValue) {
+      return null;
+    }
+
+    return { type: 'collaborator', value: [firstValue] };
   }
 
   if (filter.operator === 'is_not_empty') {
@@ -1252,7 +1258,12 @@ const generateFileValue = (
   filter: ViewFieldFilterAttributes
 ): FieldValue | null => {
   if (filter.operator === 'is_in' && Array.isArray(filter.value)) {
-    return { type: 'file', value: [filter.value[0]] };
+    const firstValue = filter.value[0];
+    if (!firstValue) {
+      return null;
+    }
+
+    return { type: 'file', value: [firstValue] };
   }
 
   return null;
@@ -1263,7 +1274,12 @@ const generateMultiSelectValue = (
   filter: ViewFieldFilterAttributes
 ): FieldValue | null => {
   if (filter.operator === 'is_in' && Array.isArray(filter.value)) {
-    return { type: 'multiSelect', value: [filter.value[0]] };
+    const firstValue = filter.value[0];
+    if (!firstValue) {
+      return null;
+    }
+
+    return { type: 'multiSelect', value: [firstValue] };
   }
 
   if (
@@ -1272,6 +1288,10 @@ const generateMultiSelectValue = (
     Object.keys(field.options).length > 0
   ) {
     const firstOption = Object.values(field.options)[0];
+    if (!firstOption) {
+      return null;
+    }
+
     return { type: 'multiSelect', value: [firstOption.id] };
   }
 
@@ -1339,7 +1359,12 @@ const generateSelectValue = (
   filter: ViewFieldFilterAttributes
 ): FieldValue | null => {
   if (filter.operator === 'is_in' && Array.isArray(filter.value)) {
-    return { type: 'select', value: filter.value[0] };
+    const firstValue = filter.value[0];
+    if (!firstValue) {
+      return null;
+    }
+
+    return { type: 'select', value: firstValue };
   }
 
   if (
@@ -1348,6 +1373,10 @@ const generateSelectValue = (
     Object.keys(field.options).length > 0
   ) {
     const firstOption = Object.values(field.options)[0];
+    if (!firstOption) {
+      return null;
+    }
+
     return { type: 'select', value: firstOption.id };
   }
 

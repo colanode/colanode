@@ -29,7 +29,7 @@ export const Login = () => {
               Use one of the following methods to login
             </p>
           </div>
-          <LoginForm accounts={accounts} servers={servers} />
+          <LoginForm accounts={accounts ?? []} servers={servers ?? []} />
         </div>
       </div>
     </div>

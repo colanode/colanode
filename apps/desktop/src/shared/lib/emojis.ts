@@ -1,6 +1,10 @@
 import { EmojiData, Emoji } from '@/shared/types/emojis';
 
-export const getEmojiUrl = (id: string): string => {
+export const getEmojiUrl = (id: string | null | undefined): string => {
+  if (!id) {
+    return '';
+  }
+
   return `asset://emojis/${id}.svg`;
 };
 

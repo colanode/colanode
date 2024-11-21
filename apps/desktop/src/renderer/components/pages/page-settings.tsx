@@ -88,7 +88,7 @@ export const PageSettings = ({ page, role }: PageSettingsProps) => {
               date={page.createdAt}
             />
           </DropdownMenuItem>
-          {page.updatedBy && (
+          {page.updatedBy && page.updatedAt && (
             <React.Fragment>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Last updated by</DropdownMenuLabel>

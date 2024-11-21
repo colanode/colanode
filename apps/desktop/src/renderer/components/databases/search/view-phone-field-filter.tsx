@@ -36,6 +36,10 @@ export const ViewPhoneFieldFilter = ({
       (operator) => operator.value === filter.operator
     ) ?? phoneFieldFilterOperators[0];
 
+  if (!operator) {
+    return null;
+  }
+
   const phoneValue = filter.value as string | null;
 
   const hideInput =

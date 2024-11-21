@@ -60,7 +60,7 @@ export class AccountGetQueryHandler
     };
   }
 
-  private fetchAccount(accountId: string): Promise<SelectAccount | null> {
+  private fetchAccount(accountId: string): Promise<SelectAccount | undefined> {
     return databaseService.appDatabase
       .selectFrom('accounts')
       .selectAll()

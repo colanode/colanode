@@ -23,12 +23,11 @@ export class SelectOptionCreateMutationHandler
           throw new Error('Node is not a database');
         }
 
-        const fields = attributes.fields;
-        if (!fields[input.fieldId]) {
+        const field = attributes.fields[input.fieldId];
+        if (!field) {
           throw new Error('Field not found');
         }
 
-        const field = fields[input.fieldId];
         if (field.type !== 'select' && field.type !== 'multiSelect') {
           throw new Error('Field is not a select');
         }

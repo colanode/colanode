@@ -16,7 +16,7 @@ export const RecordUpdatedByValue = ({ field }: RecordUpdatedByValueProps) => {
   const { data } = useQuery(
     {
       type: 'node_get',
-      nodeId: record.updatedBy,
+      nodeId: record.updatedBy!,
       userId: workspace.userId,
     },
     {
@@ -40,7 +40,7 @@ export const RecordUpdatedByValue = ({ field }: RecordUpdatedByValueProps) => {
       {updatedBy && (
         <React.Fragment>
           <Avatar
-            id={record.updatedBy}
+            id={record.updatedBy!}
             name={updatedBy.name}
             avatar={updatedBy.avatar}
             size="small"

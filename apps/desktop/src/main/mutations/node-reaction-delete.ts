@@ -16,19 +16,18 @@ export class NodeReactionDeleteMutationHandler
         throw new Error('Node is not a message');
       }
 
-      const reactions = attributes.reactions;
-      if (!reactions[input.reaction]) {
+      const reactionUsers = attributes.reactions[input.reaction] ?? [];
+      if (!reactionUsers.includes(input.userId)) {
         return attributes;
       }
 
-      const reactionArray = reactions[input.reaction];
-
-      const index = reactionArray.indexOf(input.userId);
+      const index = reactionUsers.indexOf(input.userId);
       if (index === -1) {
         return attributes;
       }
 
-      reactionArray.splice(index, 1);
+      reactionUsers.splice(index, 1);
+      attributes.reactions[input.reaction] = reactionUsers;
       return attributes;
     });
 

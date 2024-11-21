@@ -32,8 +32,8 @@ export class ChatCreateMutationHandler
     `.compile(workspaceDatabase);
 
     const existingChats = await workspaceDatabase.executeQuery(query);
-    if (existingChats.rows?.length > 0) {
-      const chat = existingChats.rows[0];
+    const chat = existingChats.rows?.[0];
+    if (chat) {
       return {
         id: chat.id,
       };

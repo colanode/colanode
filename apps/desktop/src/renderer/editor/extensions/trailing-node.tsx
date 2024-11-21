@@ -38,7 +38,7 @@ export const TrailingNode = Extension.create<TrailingNodeOptions>({
           const endPosition = doc.content.size;
           const type = schema.nodes[this.options.node];
 
-          if (!shouldInsertNodeAtEnd) {
+          if (!shouldInsertNodeAtEnd || !type) {
             return null;
           }
 

@@ -16,16 +16,13 @@ export class NodeReactionCreateMutationHandler
         throw new Error('Node is not a message');
       }
 
-      const reactions = attributes.reactions;
-      if (!reactions[input.reaction]) {
-        reactions[input.reaction] = [];
-      }
-
-      if (reactions[input.reaction].includes(input.userId)) {
+      const reactionsUsers = attributes.reactions[input.reaction] ?? [];
+      if (reactionsUsers.includes(input.userId)) {
         return attributes;
       }
 
-      reactions[input.reaction].push(input.userId);
+      reactionsUsers.push(input.userId);
+      attributes.reactions[input.reaction] = reactionsUsers;
       return attributes;
     });
 

@@ -36,6 +36,10 @@ export const ViewEmailFieldFilter = ({
       (operator) => operator.value === filter.operator
     ) ?? emailFieldFilterOperators[0];
 
+  if (!operator) {
+    return null;
+  }
+
   const textValue = filter.value as string | null;
 
   const hideInput =

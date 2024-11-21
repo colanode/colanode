@@ -88,7 +88,7 @@ export const FolderSettings = ({ folder, role }: FolderSettingsProps) => {
               date={folder.createdAt}
             />
           </DropdownMenuItem>
-          {folder.updatedBy && (
+          {folder.updatedBy && folder.updatedAt && (
             <React.Fragment>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Last updated by</DropdownMenuLabel>

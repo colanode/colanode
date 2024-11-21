@@ -29,9 +29,11 @@ export class MarkNodeAsSeenMutationHandler
       existingUserNode &&
       existingUserNode.last_seen_version_id === input.versionId
     ) {
-      const lastSeenAt = new Date(existingUserNode.last_seen_at);
+      const lastSeenAt = existingUserNode.last_seen_at
+        ? new Date(existingUserNode.last_seen_at)
+        : null;
       // if has been seen in the last 10 minutes, skip it. We don't want to spam the server with seen events.
-      if (Date.now() - lastSeenAt.getTime() < 10 * 60 * 1000) {
+      if (lastSeenAt && Date.now() - lastSeenAt.getTime() < 10 * 60 * 1000) {
         return {
           success: true,
         };

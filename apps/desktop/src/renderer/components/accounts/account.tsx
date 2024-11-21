@@ -1,6 +1,5 @@
 import React from 'react';
 import { AccountContext } from '@/renderer/contexts/account';
-import { useApp } from '@/renderer/contexts/app';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
 import { AccountLogout } from '@/renderer/components/accounts/account-logout';
 import { AccountSettingsDialog } from '@/renderer/components/accounts/account-settings-dialog';
@@ -9,17 +8,21 @@ import { useQuery } from '@/renderer/hooks/use-query';
 export const Account = () => {
   const { accountId } = useParams<{ accountId: string }>();
   const navigate = useNavigate();
-  const app = useApp();
 
   const [openSettings, setOpenSettings] = React.useState(false);
   const [openLogout, setOpenLogout] = React.useState(false);
 
-  const { data } = useQuery({
-    type: 'account_get',
-    accountId,
-  });
+  const { data } = useQuery(
+    {
+      type: 'account_get',
+      accountId: accountId ?? '',
+    },
+    {
+      enabled: !!accountId,
+    }
+  );
 
-  if (!data) {
+  if (!accountId || !data) {
     return <p>Account not found</p>;
   }
 

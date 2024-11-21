@@ -9,9 +9,11 @@ interface EmojiPickerItemProps {
 export const EmojiPickerItem = ({ emoji }: EmojiPickerItemProps) => {
   const { skinTone, onPick: onEmojiClick } = useEmojiPicker();
 
-  let id = emoji.skins[0].id;
-  if (skinTone !== 0 && skinTone < emoji.skins.length) {
-    id = emoji.skins[skinTone].id;
+  const skin = emoji.skins[skinTone];
+  const id = skin?.id ?? emoji.skins[0]?.id ?? '';
+
+  if (!id) {
+    return null;
   }
 
   return (

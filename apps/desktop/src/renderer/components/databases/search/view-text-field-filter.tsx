@@ -33,6 +33,10 @@ export const ViewTextFieldFilter = ({
       (operator) => operator.value === filter.operator
     ) ?? textFieldFilterOperators[0];
 
+  if (!operator) {
+    return null;
+  }
+
   const textValue = filter.value as string | null;
 
   const hideInput =

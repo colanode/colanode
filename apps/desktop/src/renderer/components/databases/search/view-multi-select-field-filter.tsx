@@ -37,6 +37,10 @@ export const ViewMultiSelectFieldFilter = ({
       (operator) => operator.value === filter.operator
     ) ?? selectFieldFilterOperators[0];
 
+  if (!operator) {
+    return null;
+  }
+
   const selectOptionIds = (filter.value as string[]) ?? [];
   const selectedOptions = selectOptions.filter((option) =>
     selectOptionIds.includes(option.id)

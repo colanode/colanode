@@ -36,6 +36,10 @@ export const ViewNumberFieldFilter = ({
       (operator) => operator.value === filter.operator
     ) ?? numberFieldFilterOperators[0];
 
+  if (!operator) {
+    return null;
+  }
+
   const numberValue = filter.value as number | null;
 
   const hideInput =

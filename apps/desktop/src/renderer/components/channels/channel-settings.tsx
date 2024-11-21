@@ -88,7 +88,7 @@ export const ChannelSettings = ({ channel, role }: ChannelSettingsProps) => {
               date={channel.createdAt}
             />
           </DropdownMenuItem>
-          {channel.updatedBy && (
+          {channel.updatedBy && channel.updatedAt && (
             <React.Fragment>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Last updated by</DropdownMenuLabel>

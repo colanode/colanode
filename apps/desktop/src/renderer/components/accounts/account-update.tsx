@@ -109,6 +109,11 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
                 }
 
                 const filePath = result.filePaths[0];
+                if (!filePath) {
+                  setIsFileDialogOpen(false);
+                  return;
+                }
+
                 uploadAvatar({
                   input: {
                     type: 'avatar_upload',

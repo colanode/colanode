@@ -59,7 +59,7 @@ export const RecordSettings = ({ record, role }: RecordSettingsProps) => {
               date={record.createdAt}
             />
           </DropdownMenuItem>
-          {record.updatedBy && (
+          {record.updatedBy && record.updatedAt && (
             <React.Fragment>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Last updated by</DropdownMenuLabel>
