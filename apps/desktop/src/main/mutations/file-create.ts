@@ -21,9 +21,11 @@ export class FileCreateMutationHandler
 
     const fileId = generateId(IdType.File);
     const uploadId = generateId(IdType.Upload);
+
     fileService.copyFileToWorkspace(
       input.filePath,
       fileId,
+      uploadId,
       metadata.extension,
       input.userId
     );
