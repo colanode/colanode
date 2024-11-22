@@ -70,6 +70,10 @@ class QueryService {
     this.subscribedQueries.delete(id);
   }
 
+  public clearSubscriptions() {
+    this.subscribedQueries.clear();
+  }
+
   private async processEventsQueue() {
     if (this.isProcessingEvents) {
       return;

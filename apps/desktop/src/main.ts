@@ -99,6 +99,8 @@ app.on('window-all-closed', () => {
 
     app.quit();
   }
+
+  queryService.clearSubscriptions();
 });
 
 app.on('activate', () => {
