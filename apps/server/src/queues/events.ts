@@ -20,7 +20,10 @@ import {
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { Job, Queue, Worker } from 'bullmq';
 import { difference } from 'lodash-es';
-import { enqueueTask } from './tasks';
+import { enqueueTask } from '@/queues/tasks';
+import { logService } from '@/services/log';
+
+const logger = logService.createLogger('events');
 
 const eventQueue = new Queue('events', {
   connection: {
@@ -35,10 +38,14 @@ const eventQueue = new Queue('events', {
 });
 
 export const enqueueEvent = async (event: NodeEvent): Promise<void> => {
+  logger.trace(event, 'Enqueuing event');
+
   await eventQueue.add('event', event);
 };
 
 export const initEventWorker = () => {
+  logger.info('Initializing event worker');
+
   return new Worker('events', handleEventJob, {
     connection: {
       host: redisConfig.host,
@@ -51,6 +58,7 @@ export const initEventWorker = () => {
 
 const handleEventJob = async (job: Job) => {
   const event = job.data as NodeEvent;
+  logger.trace(event, 'Handling event');
 
   switch (event.type) {
     case 'node_created':
@@ -89,6 +97,8 @@ const handleNodeUpdatedEvent = async (
 const handleNodeDeletedEvent = async (
   event: NodeDeletedEvent
 ): Promise<void> => {
+  logger.trace(event, 'Handling node deleted event');
+
   if (event.attributes.type === 'file') {
     const command = new DeleteObjectCommand({
       Bucket: BUCKET_NAMES.FILES,
@@ -106,6 +116,8 @@ const handleNodeDeletedEvent = async (
 };
 
 const createUserNodes = async (event: NodeCreatedEvent): Promise<void> => {
+  logger.trace(event, 'Creating user nodes');
+
   const userNodesToCreate: CreateUserNode[] = [];
 
   if (event.attributes.type === NodeTypes.User) {
@@ -191,6 +203,8 @@ const createUserNodes = async (event: NodeCreatedEvent): Promise<void> => {
   }
 
   if (userNodesToCreate.length > 0) {
+    logger.trace(userNodesToCreate, 'Creating user nodes');
+
     await database
       .insertInto('user_nodes')
       .values(userNodesToCreate)
@@ -202,6 +216,8 @@ const createUserNodes = async (event: NodeCreatedEvent): Promise<void> => {
 const checkForCollaboratorsChange = async (
   event: NodeUpdatedEvent
 ): Promise<void> => {
+  logger.trace(event, 'Checking for collaborators change');
+
   const beforeCollaborators = Object.keys(
     extractNodeCollaborators(event.beforeAttributes)
   );
@@ -308,6 +324,8 @@ const checkForCollaboratorsChange = async (
 const checkForUserRoleChange = async (
   event: NodeUpdatedEvent
 ): Promise<void> => {
+  logger.trace(event, 'Checking for user role change');
+
   if (
     event.beforeAttributes.type !== 'user' ||
     event.afterAttributes.type !== 'user'

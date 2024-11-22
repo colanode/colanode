@@ -10,6 +10,9 @@ import { configRouter } from '@/routes/config';
 import { avatarsRouter } from '@/routes/avatars';
 import { filesRouter } from '@/routes/files';
 import { synapse } from '@/services/synapse';
+import { logService } from '@/services/log';
+
+const logger = logService.createLogger('api');
 
 export const initApi = async () => {
   const app = express();
@@ -37,6 +40,6 @@ export const initApi = async () => {
   await synapse.init(server);
 
   server.listen(port, () => {
-    console.log(`Server is running at http://localhost:${port}`);
+    logger.info(`Server is running at http://localhost:${port}`);
   });
 };

@@ -11,7 +11,8 @@ import {
 } from '@/types/synapse';
 import { getIdType, IdType } from '@colanode/core';
 import { Message } from '@colanode/core';
-import { fromUint8Array } from 'js-base64';
+import { logService } from '@/services/log';
+import { encodeState } from '@colanode/crdt';
 
 interface SynapseConnection {
   accountId: string;
@@ -26,9 +27,12 @@ interface SynapseConnection {
 }
 
 class SynapseService {
+  private readonly logger = logService.createLogger('synapse-service');
   private readonly connections: Map<string, SynapseConnection> = new Map();
 
   public async init(server: Server) {
+    this.logger.info('Initializing synapse service');
+
     const wss = new WebSocketServer({
       server,
       path: '/v1/synapse',
@@ -58,6 +62,7 @@ class SynapseService {
       }
 
       const account = result.account;
+      this.logger.info(`New synapse connection from ${account.id}`);
 
       socket.on('close', () => {
         const connection = this.connections.get(account.deviceId);
@@ -104,6 +109,8 @@ class SynapseService {
     connection: SynapseConnection,
     message: Message
   ) {
+    this.logger.trace(message, `Socket message from ${connection.deviceId}`);
+
     if (message.type === 'local_node_sync') {
       await database
         .insertInto('device_nodes')
@@ -200,6 +207,8 @@ class SynapseService {
 
   private async handleSynapseMessage(message: string) {
     const data: SynapseMessage = JSON.parse(message);
+    this.logger.trace(data, 'Synapse message');
+
     if (
       data.type === 'node_create' ||
       data.type === 'node_update' ||
@@ -226,6 +235,11 @@ class SynapseService {
     if (userIds.length === 0) {
       return;
     }
+
+    this.logger.trace(
+      userIds,
+      `Broadcasting node change for ${data.nodeId} to ${userIds.length} users`
+    );
 
     const userNodes = await database
       .selectFrom('user_nodes')
@@ -303,7 +317,7 @@ class SynapseService {
             node: {
               id: node.id,
               workspaceId: data.workspaceId,
-              state: fromUint8Array(node.state),
+              state: encodeState(node.state),
               createdAt: node.created_at.toISOString(),
               createdBy: node.created_by,
               updatedAt: node.updated_at?.toISOString() ?? null,
@@ -376,11 +390,14 @@ class SynapseService {
       (workspaceUser) => workspaceUser.userId
     );
 
-    console.log('sendPendingChanges', userIds);
-
     if (userIds.length === 0) {
       return;
     }
+
+    this.logger.trace(
+      userIds,
+      `Sending pending changes for ${connection.deviceId} with ${userIds.length} users`
+    );
 
     const unsyncedNodes = await database
       .selectFrom('user_nodes as nus')
@@ -451,7 +468,7 @@ class SynapseService {
           node: {
             id: row.id,
             workspaceId: row.workspace_id,
-            state: fromUint8Array(row.state!),
+            state: encodeState(row.state!),
             createdAt: row.created_at!.toISOString(),
             createdBy: row.created_by!,
             updatedAt: row.updated_at?.toISOString() ?? null,
@@ -483,6 +500,11 @@ class SynapseService {
   }
 
   private async addNewWorkspaceUser(userId: string, workspaceId: string) {
+    this.logger.trace(
+      userId,
+      `Adding new workspace user ${userId} to ${workspaceId}`
+    );
+
     const workspaceUser = await database
       .selectFrom('workspace_users')
       .selectAll()
