@@ -18,7 +18,6 @@ import started from 'electron-squirrel-startup';
 import { logService } from '@/main/services/log-service';
 
 const logger = logService.createLogger('main');
-let subscriptionId: string | null = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -47,13 +46,15 @@ const createWindow = () => {
     );
   }
 
-  if (subscriptionId === null) {
-    subscriptionId = eventBus.subscribe((event) => {
-      if (event.type === 'query_result_updated') {
-        mainWindow.webContents.send('event', event);
-      }
-    });
-  }
+  const subscriptionId = eventBus.subscribe((event) => {
+    if (event.type === 'query_result_updated') {
+      mainWindow.webContents.send('event', event);
+    }
+  });
+
+  mainWindow.on('close', () => {
+    eventBus.unsubscribe(subscriptionId);
+  });
 
   if (!protocol.isProtocolHandled('avatar')) {
     protocol.handle('avatar', (request) => {
@@ -92,11 +93,6 @@ app.on('ready', createWindow);
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    if (subscriptionId) {
-      eventBus.unsubscribe(subscriptionId);
-      subscriptionId = null;
-    }
-
     app.quit();
   }
 
