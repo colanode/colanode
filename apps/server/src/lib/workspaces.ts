@@ -209,7 +209,6 @@ const buildChannelNodeCreate = (
     type: 'channel',
     name: 'Discussions',
     parentId: spaceId,
-    index: '0',
   };
 
   const ydoc = new YDoc(id);

@@ -86,7 +86,6 @@ interface NodeTable {
   workspace_id: ColumnType<string, string, never>;
   parent_id: ColumnType<string, never, never>;
   type: ColumnType<string, never, never>;
-  index: ColumnType<string | null, never, never>;
   attributes: JSONColumnType<NodeAttributes, string | null, string | null>;
   state: ColumnType<Uint8Array, Uint8Array, Uint8Array>;
   created_at: ColumnType<Date, Date, never>;

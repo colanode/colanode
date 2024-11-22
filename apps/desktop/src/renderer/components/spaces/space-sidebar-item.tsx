@@ -40,6 +40,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useQuery } from '@/renderer/hooks/use-query';
+import { compareString } from '@/shared/lib/utils';
 
 interface SettingsState {
   open: boolean;
@@ -60,7 +61,7 @@ export const SpaceSidebarItem = ({ node }: SpaceSidebarItemProps) => {
     types: ['page', 'channel', 'database', 'folder'],
   });
 
-  const children = data ?? [];
+  const children = (data ?? []).toSorted((a, b) => compareString(a.id, b.id));
 
   const [openCreatePage, setOpenCreatePage] = React.useState(false);
   const [openCreateChannel, setOpenCreateChannel] = React.useState(false);

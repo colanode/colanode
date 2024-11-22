@@ -19,9 +19,6 @@ const createNodesTable: Migration = {
           .onDelete('cascade')
           .notNull()
       )
-      .addColumn('index', 'text', (col) =>
-        col.generatedAlwaysAs(sql`json_extract(attributes, '$.index')`).stored()
-      )
       .addColumn('attributes', 'text', (col) => col.notNull())
       .addColumn('state', 'blob', (col) => col.notNull())
       .addColumn('created_at', 'text', (col) => col.notNull())

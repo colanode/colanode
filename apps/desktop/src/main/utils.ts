@@ -87,7 +87,6 @@ export const mapNode = (row: SelectNode): Node => {
   return {
     id: row.id,
     type: row.type as any,
-    index: row.index,
     parentId: row.parent_id,
     attributes: JSON.parse(row.attributes),
     createdAt: row.created_at,

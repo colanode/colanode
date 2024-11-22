@@ -14,7 +14,6 @@ import { WorkspaceAttributes, workspaceModel } from './workspace';
 type NodeBase = {
   id: string;
   parentId: string;
-  index: string | null;
   createdAt: string;
   createdBy: string;
   updatedAt: string | null;

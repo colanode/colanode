@@ -9,9 +9,9 @@ import {
   MultiSelectFieldAttributes,
   SelectFieldAttributes,
   ViewType,
+  generateNodeIndex,
 } from '@colanode/core';
 import { compareString, isStringArray } from '@/shared/lib/utils';
-import { generateNodeIndex } from '@/shared/lib/nodes';
 
 export const getDefaultFieldWidth = (type: FieldType): number => {
   if (!type) return 0;

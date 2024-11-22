@@ -1,16 +1,5 @@
-import { generateKeyBetween } from 'fractional-indexing-jittered';
 import { extractNodeCollaborators, Node, NodeTypes } from '@colanode/core';
 import { NodeCollaborator } from '@/shared/types/nodes';
-
-export const generateNodeIndex = (
-  previous?: string | null,
-  next?: string | null
-) => {
-  const lower = previous === undefined ? null : previous;
-  const upper = next === undefined ? null : next;
-
-  return generateKeyBetween(lower, upper);
-};
 
 export const getDefaultNodeIcon = (type: string) => {
   switch (type) {

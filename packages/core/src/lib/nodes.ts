@@ -1,4 +1,5 @@
 import { Node, NodeAttributes, NodeRole } from '../index';
+import { generateKeyBetween } from 'fractional-indexing-jittered';
 
 export const extractNodeCollaborators = (
   attributes: NodeAttributes
@@ -54,4 +55,14 @@ export const hasViewerAccess = (role: NodeRole | null): boolean => {
     role === 'collaborator' ||
     role === 'viewer'
   );
+};
+
+export const generateNodeIndex = (
+  previous?: string | null,
+  next?: string | null
+) => {
+  const lower = previous === undefined ? null : previous;
+  const upper = next === undefined ? null : next;
+
+  return generateKeyBetween(lower, upper);
 };

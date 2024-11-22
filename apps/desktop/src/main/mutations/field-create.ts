@@ -1,5 +1,4 @@
-import { generateId, IdType } from '@colanode/core';
-import { generateNodeIndex } from '@/shared/lib/nodes';
+import { generateId, IdType, generateNodeIndex } from '@colanode/core';
 import { compareString } from '@/shared/lib/utils';
 import { MutationHandler } from '@/main/types';
 import {

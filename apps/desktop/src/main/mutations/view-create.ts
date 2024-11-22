@@ -1,11 +1,10 @@
-import { generateId, IdType } from '@colanode/core';
+import { generateId, IdType, generateNodeIndex } from '@colanode/core';
 import { MutationHandler } from '@/main/types';
 import {
   ViewCreateMutationInput,
   ViewCreateMutationOutput,
 } from '@/shared/mutations/view-create';
 import { compareString } from '@/shared/lib/utils';
-import { generateNodeIndex } from '@/shared/lib/nodes';
 import { nodeService } from '@/main/services/node-service';
 
 export class ViewCreateMutationHandler

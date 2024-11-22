@@ -5,7 +5,6 @@ export type NodeOutput = {
   workspaceId: string;
   parentId: string;
   type: string;
-  index: string | null;
   attributes: NodeAttributes;
   state: string;
   createdAt: string;

@@ -1,5 +1,4 @@
 import { generateId, IdType, NodeRoles } from '@colanode/core';
-import { generateNodeIndex } from '@/shared/lib/nodes';
 import { MutationHandler } from '@/main/types';
 import {
   SpaceCreateMutationInput,
@@ -59,7 +58,6 @@ export class SpaceCreateMutationHandler
       type: 'channel',
       name: 'Discussions',
       parentId: spaceId,
-      index: generateNodeIndex(null, null),
     };
 
     await nodeService.createNode(input.userId, [

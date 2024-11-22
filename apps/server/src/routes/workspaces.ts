@@ -619,7 +619,6 @@ workspacesRouter.post(
         serverCreatedAt: new Date().toISOString(),
         versionId: userVersionId,
         workspaceId: workspace.id,
-        index: null,
       };
 
       usersToCreate.push({
@@ -776,7 +775,6 @@ workspacesRouter.put(
       id: user.id,
       type: user.type,
       workspaceId: user.workspace_id,
-      index: null,
       parentId: workspace.id,
       attributes: userDoc.getAttributes(),
       state: userDoc.getEncodedState(),

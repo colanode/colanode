@@ -25,6 +25,7 @@
     "vitest": "^2.1.5"
   },
   "dependencies": {
+    "fractional-indexing-jittered": "^0.9.1",
     "ulid": "^2.3.0",
     "zod": "^3.23.8"
   }

@@ -1,11 +1,14 @@
-import { generateId, IdType } from '@colanode/core';
-import { generateNodeIndex } from '@/shared/lib/nodes';
+import {
+  generateId,
+  IdType,
+  DatabaseAttributes,
+  generateNodeIndex,
+} from '@colanode/core';
 import { MutationHandler } from '@/main/types';
 import {
   DatabaseCreateMutationInput,
   DatabaseCreateMutationOutput,
 } from '@/shared/mutations/database-create';
-import { DatabaseAttributes } from '@colanode/core';
 import { nodeService } from '@/main/services/node-service';
 
 export class DatabaseCreateMutationHandler

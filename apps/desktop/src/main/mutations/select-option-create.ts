@@ -1,5 +1,4 @@
-import { generateId, IdType } from '@colanode/core';
-import { generateNodeIndex } from '@/shared/lib/nodes';
+import { generateId, IdType, generateNodeIndex } from '@colanode/core';
 import { MutationHandler } from '@/main/types';
 import {
   SelectOptionCreateMutationInput,
