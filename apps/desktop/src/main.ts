@@ -15,7 +15,9 @@ import { CommandInput } from '@/shared/commands';
 import { commandService } from '@/main/services/command-service';
 import { bootstrapper } from '@/main/bootstrapper';
 import started from 'electron-squirrel-startup';
+import { logService } from '@/main/services/log-service';
 
+const logger = logService.createLogger('main');
 let subscriptionId: string | null = null;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
@@ -76,6 +78,8 @@ const createWindow = () => {
       return assetService.handleAssetRequest(request);
     });
   }
+
+  logger.info('Window created');
 };
 
 // This method will be called when Electron has finished
