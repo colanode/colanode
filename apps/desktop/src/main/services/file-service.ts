@@ -176,7 +176,7 @@ class FileService {
     try {
       await this.uploadWorkspaceFiles(userId);
     } catch (error) {
-      this.logger.error(`Error uploading files for user ${userId}`, error);
+      this.logger.error(error, `Error uploading files for user ${userId}`);
     } finally {
       fileState.isUploading = false;
       if (fileState.isUploadScheduled) {
@@ -209,7 +209,7 @@ class FileService {
     try {
       await this.downloadWorkspaceFiles(userId);
     } catch (error) {
-      this.logger.error(`Error downloading files for user ${userId}`, error);
+      this.logger.error(error, `Error downloading files for user ${userId}`);
     } finally {
       fileState.isDownloading = false;
       if (fileState.isDownloadScheduled) {
@@ -513,7 +513,12 @@ class FileService {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
-    const files = fs.readdirSync(getWorkspaceFilesDirectoryPath(userId));
+    const filesDir = getWorkspaceFilesDirectoryPath(userId);
+    if (!fs.existsSync(filesDir)) {
+      return;
+    }
+
+    const files = fs.readdirSync(filesDir);
     while (files.length > 0) {
       const batch = files.splice(0, 100);
       const fileIdMap: Record<string, string> = {};

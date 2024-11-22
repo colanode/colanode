@@ -55,7 +55,7 @@ class Bootstrapper {
 
       notificationService.checkBadge();
     } catch (error) {
-      this.logger.error('Error executing event loop', error);
+      this.logger.error(error, 'Error executing event loop');
     }
 
     this.eventLoop = setTimeout(this.executeEventLoop, EVENT_LOOP_INTERVAL);
