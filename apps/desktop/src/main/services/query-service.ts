@@ -4,8 +4,10 @@ import { queryHandlerMap } from '@/main/queries';
 import { eventBus } from '@/shared/lib/event-bus';
 import { Event } from '@/shared/types/events';
 import { isEqual } from 'lodash-es';
+import { logService } from '@/main/services/log-service';
 
 class QueryService {
+  private readonly logger = logService.createLogger('query-service');
   private readonly subscribedQueries: Map<string, SubscribedQuery<QueryInput>> =
     new Map();
 
@@ -26,7 +28,15 @@ class QueryService {
   public async executeQuery<T extends QueryInput>(
     input: T
   ): Promise<QueryMap[T['type']]['output']> {
+    this.logger.debug(`Executing query: ${input.type}`);
+
     const handler = queryHandlerMap[input.type] as unknown as QueryHandler<T>;
+
+    if (!handler) {
+      this.logger.warn(`No handler found for query type: ${input.type}`);
+      throw new Error(`No handler found for query type: ${input.type}`);
+    }
+
     const result = await handler.handleQuery(input);
     return result;
   }
@@ -35,11 +45,18 @@ class QueryService {
     id: string,
     input: T
   ): Promise<QueryMap[T['type']]['output']> {
+    this.logger.debug(`Executing query and subscribing: ${input.type}`);
+
     if (this.subscribedQueries.has(id)) {
       return this.subscribedQueries.get(id)!.result;
     }
 
     const handler = queryHandlerMap[input.type] as unknown as QueryHandler<T>;
+    if (!handler) {
+      this.logger.warn(`No handler found for query type: ${input.type}`);
+      throw new Error(`No handler found for query type: ${input.type}`);
+    }
+
     const result = await handler.handleQuery(input);
     this.subscribedQueries.set(id, {
       input,
@@ -49,6 +66,7 @@ class QueryService {
   }
 
   public unsubscribeQuery(id: string) {
+    this.logger.debug(`Unsubscribing query: ${id}`);
     this.subscribedQueries.delete(id);
   }
 

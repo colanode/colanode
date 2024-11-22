@@ -4,12 +4,16 @@ import fs from 'fs';
 import { databaseService } from '@/main/data/database-service';
 import { httpClient } from '@/shared/lib/http-client';
 import { getAccountAvatarsDirectoryPath } from '@/main/utils';
+import { logService } from '@/main/services/log-service';
 
 class AvatarService {
+  private readonly logger = logService.createLogger('avatar-service');
+
   public async handleAvatarRequest(request: Request): Promise<Response> {
     const url = request.url.replace('avatar://', '');
     const [accountId, avatarId] = url.split('/');
     if (!accountId || !avatarId) {
+      this.logger.warn(`Invalid avatar request url: ${url}`);
       return new Response(null, { status: 400 });
     }
 
@@ -22,6 +26,9 @@ class AvatarService {
       return net.fetch(avatarLocalUrl);
     }
 
+    this.logger.debug(
+      `Downloading avatar ${avatarId} for account ${accountId}`
+    );
     // Download the avatar file if it doesn't exist
     const credentials = await databaseService.appDatabase
       .selectFrom('accounts')
@@ -31,6 +38,7 @@ class AvatarService {
       .executeTakeFirst();
 
     if (!credentials) {
+      this.logger.warn(`Account ${accountId} not found`);
       return new Response(null, { status: 404 });
     }
 
@@ -41,6 +49,9 @@ class AvatarService {
     });
 
     if (response.status !== 200 || !response.data) {
+      this.logger.warn(
+        `Failed to download avatar ${avatarId} for account ${accountId}`
+      );
       return new Response(null, { status: 404 });
     }
 
@@ -55,10 +66,16 @@ class AvatarService {
 
       fileStream.on('finish', async () => {
         // Ensure the file is written before trying to fetch it
+        this.logger.debug(
+          `Avatar ${avatarId} for account ${accountId} downloaded`
+        );
         resolve(net.fetch(avatarLocalUrl));
       });
 
       fileStream.on('error', (err) => {
+        this.logger.warn(
+          `Failed to download avatar ${avatarId} for account ${accountId}`
+        );
         reject(new Response(null, { status: 500, statusText: err.message }));
       });
     });

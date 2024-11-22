@@ -16,6 +16,7 @@ import {
 } from '@colanode/core';
 import { eventBus } from '@/shared/lib/event-bus';
 import { serverService } from '@/main/services/server-service';
+import { logService } from '@/main/services/log-service';
 
 type WorkspaceFileState = {
   isUploading: boolean;
@@ -25,7 +26,8 @@ type WorkspaceFileState = {
 };
 
 class FileService {
-  private fileStates: Map<string, WorkspaceFileState> = new Map();
+  private readonly logger = logService.createLogger('file-service');
+  private readonly fileStates: Map<string, WorkspaceFileState> = new Map();
 
   constructor() {
     eventBus.subscribe((event) => {
@@ -41,6 +43,7 @@ class FileService {
     const url = request.url.replace('local-file://', '');
     const [userId, file] = url.split('/');
     if (!userId || !file) {
+      this.logger.warn(`Invalid file request url: ${url}`);
       return new Response(null, { status: 400 });
     }
 
@@ -52,6 +55,7 @@ class FileService {
       return net.fetch(fileUrl);
     }
 
+    this.logger.warn(`File ${file} not found for user ${userId}`);
     return new Response(null, { status: 404 });
   }
 
@@ -77,18 +81,26 @@ class FileService {
       filesDir,
       `${fileId}_${uploadId}${fileExtension}`
     );
+
+    this.logger.debug(
+      `Copying file ${filePath} to ${destinationFilePath} for user ${userId}`
+    );
     fs.copyFileSync(filePath, destinationFilePath);
   }
 
   public openFile(userId: string, id: string, extension: string): void {
     const filesDir = getWorkspaceFilesDirectoryPath(userId);
     const filePath = path.join(filesDir, `${id}${extension}`);
+
+    this.logger.debug(`Opening file ${filePath} for user ${userId}`);
     shell.openPath(filePath);
   }
 
   public deleteFile(userId: string, id: string, extension: string): void {
     const filesDir = getWorkspaceFilesDirectoryPath(userId);
     const filePath = path.join(filesDir, `${id}${extension}`);
+
+    this.logger.debug(`Deleting file ${filePath} for user ${userId}`);
     fs.rmSync(filePath, { force: true });
   }
 
@@ -105,6 +117,8 @@ class FileService {
     const stats = fs.statSync(filePath);
     const type = extractFileType(mimeType);
 
+    this.logger.debug(`Getting file metadata for ${filePath}`);
+
     return {
       path: filePath,
       mimeType,
@@ -116,6 +130,8 @@ class FileService {
   }
 
   public async syncFiles() {
+    this.logger.info('Syncing files');
+
     const workspaces = await databaseService.appDatabase
       .selectFrom('workspaces')
       .select(['user_id'])
@@ -139,6 +155,9 @@ class FileService {
     const fileState = this.fileStates.get(userId)!;
     if (fileState.isUploading) {
       fileState.isUploadScheduled = true;
+      this.logger.debug(
+        `Uploading files for user ${userId} is in progress, scheduling upload`
+      );
       return;
     }
 
@@ -146,7 +165,7 @@ class FileService {
     try {
       await this.uploadWorkspaceFiles(userId);
     } catch (error) {
-      console.log('error', error);
+      this.logger.error(`Error uploading files for user ${userId}`, error);
     } finally {
       fileState.isUploading = false;
       if (fileState.isUploadScheduled) {
@@ -169,6 +188,9 @@ class FileService {
     const fileState = this.fileStates.get(userId)!;
     if (fileState.isDownloading) {
       fileState.isDownloadScheduled = true;
+      this.logger.debug(
+        `Downloading files for user ${userId} is in progress, scheduling download`
+      );
       return;
     }
 
@@ -176,7 +198,7 @@ class FileService {
     try {
       await this.downloadWorkspaceFiles(userId);
     } catch (error) {
-      console.log('error', error);
+      this.logger.error(`Error downloading files for user ${userId}`, error);
     } finally {
       fileState.isDownloading = false;
       if (fileState.isDownloadScheduled) {
@@ -187,6 +209,8 @@ class FileService {
   }
 
   private async uploadWorkspaceFiles(userId: string): Promise<void> {
+    this.logger.debug(`Uploading files for user ${userId}`);
+
     if (!this.fileStates.has(userId)) {
       this.fileStates.set(userId, {
         isUploading: false,
@@ -199,6 +223,9 @@ class FileService {
     const fileState = this.fileStates.get(userId)!;
     if (fileState.isUploading) {
       fileState.isUploadScheduled = true;
+      this.logger.debug(
+        `Uploading files for user ${userId} is in progress, scheduling upload`
+      );
       return;
     }
 
@@ -233,6 +260,7 @@ class FileService {
       .executeTakeFirst();
 
     if (!workspace) {
+      this.logger.warn(`Workspace not found for user ${userId}`);
       return;
     }
 
@@ -354,6 +382,7 @@ class FileService {
       .executeTakeFirst();
 
     if (!workspace) {
+      this.logger.warn(`Workspace not found for user ${userId}`);
       return;
     }
 
