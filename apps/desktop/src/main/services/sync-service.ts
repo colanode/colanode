@@ -205,7 +205,7 @@ class SyncService {
         continue;
       }
 
-      const nodeSynced = await nodeService.serverSync(userId, states.node);
+      const nodeSynced = await nodeService.serverUpsert(userId, states.node);
       if (nodeSynced) {
         changesToDelete.push(...changeIds);
         socketService.sendMessage(workspace.account_id, {

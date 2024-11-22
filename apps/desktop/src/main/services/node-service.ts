@@ -508,6 +508,67 @@ class NodeService {
     return false;
   }
 
+  public async serverUpsert(userId: string, node: ServerNodeState) {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const existingNode = await workspaceDatabase
+      .selectFrom('nodes')
+      .where('id', '=', node.id)
+      .selectAll()
+      .executeTakeFirst();
+
+    const ydoc = new YDoc(node.id, existingNode?.state);
+    const attributes = ydoc.getAttributes();
+
+    const result = await workspaceDatabase
+      .insertInto('nodes')
+      .returningAll()
+      .values({
+        id: node.id,
+        attributes: JSON.stringify(attributes),
+        state: ydoc.getState(),
+        created_at: node.createdAt,
+        created_by: node.createdBy,
+        version_id: node.versionId,
+        server_created_at: node.serverCreatedAt,
+        server_version_id: node.versionId,
+      })
+      .onConflict((cb) =>
+        cb.columns(['id']).doUpdateSet({
+          state: ydoc.getState(),
+          attributes: JSON.stringify(attributes),
+          updated_at: node.updatedAt,
+          updated_by: node.updatedBy,
+          version_id: node.versionId,
+          server_created_at: node.serverCreatedAt,
+          server_updated_at: node.serverUpdatedAt,
+          server_version_id: node.versionId,
+        })
+      )
+      .executeTakeFirst();
+
+    if (result) {
+      if (existingNode) {
+        eventBus.publish({
+          type: 'node_updated',
+          userId: userId,
+          node: mapNode(result),
+        });
+      } else {
+        eventBus.publish({
+          type: 'node_created',
+          userId: userId,
+          node: mapNode(result),
+        });
+      }
+
+      return true;
+    }
+
+    return false;
+  }
+
   public async serverDelete(userId: string, nodeId: string) {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
