@@ -7,6 +7,7 @@ import { DatabaseBreadcrumbItem } from '@/renderer/components/databases/database
 import { RecordBreadcrumbItem } from '@/renderer/components/records/record-breadcrumb-item';
 import { FolderBreadcrumbItem } from '@/renderer/components/folders/folder-breadcrumb-item';
 import { FileBreadcrumbItem } from '@/renderer/components/files/file-breadcrumb-item';
+import { MessageBreadcrumbItem } from '@/renderer/components/messages/message-breadcrumb-item';
 
 interface NodeBreadcrumbItemProps {
   node: Node;
@@ -30,6 +31,8 @@ export const NodeBreadcrumbItem = ({ node }: NodeBreadcrumbItemProps) => {
       return <FolderBreadcrumbItem node={node} />;
     case 'file':
       return <FileBreadcrumbItem node={node} />;
+    case 'message':
+      return <MessageBreadcrumbItem node={node} />;
     default:
       return null;
   }

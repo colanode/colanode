@@ -3,19 +3,19 @@ import { IdType } from '@colanode/core';
 
 export const getAvatarSizeClasses = (size?: string) => {
   if (size === 'small') {
-    return 'w-5 h-5';
+    return 'size-5';
   }
   if (size === 'medium') {
-    return 'w-9 h-9';
+    return 'size-9';
   }
   if (size === 'large') {
     return 'w-12 h-12';
   }
   if (size === 'extra-large') {
-    return 'w-16 h-16';
+    return 'size-16';
   }
 
-  return 'w-9 h-9';
+  return 'size-9';
 };
 
 const colors = [
