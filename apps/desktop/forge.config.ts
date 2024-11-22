@@ -19,10 +19,23 @@ const config: ForgeConfig = {
       /^\/release/,
       /^\/docs/,
       /^\/dist/,
+      /^\/assets/,
       /\.git/,
       /\.vscode/,
       /\.idea/,
       /^\/\.env/,
+      // Config files
+      /\.eslintrc\.json$/,
+      /components\.json$/,
+      /postcss\.config\.js$/,
+      /tailwind\.config\.js$/,
+      /tsconfig\.json$/,
+      /forge\.config\.ts$/,
+      /forge\.env\.d\.ts$/,
+      /vite\.base\.config\.ts$/,
+      /vite\.main\.config\.ts$/,
+      /vite\.renderer\.config\.ts$/,
+      /vite\.preload\.config\.ts$/,
       // Don't ignore node_modules
       // /^\/node_modules/,
     ],
@@ -41,15 +54,15 @@ const config: ForgeConfig = {
       config: {
         repository: {
           owner: 'colanode',
-          name: 'colanode'
+          name: 'colanode',
         },
-        // Publishing options: 
-        //    draft=true creates private release for review, 
+        // Publishing options:
+        //    draft=true creates private release for review,
         //    prerelease=true marks as beta, false=stable/production
         prerelease: false,
-        draft: true
-      }
-    }
+        draft: true,
+      },
+    },
   ],
   plugins: [
     new VitePlugin({
@@ -98,6 +111,9 @@ const config: ForgeConfig = {
 
       const srcNodeModules = '../../node_modules';
       const destNodeModules = './node_modules';
+
+      // First clear the node_modules directory
+      await fs.rm(destNodeModules, { recursive: true, force: true });
 
       // Ensure the destination directory exists
       await fs.mkdir(destNodeModules, { recursive: true });
