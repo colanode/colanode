@@ -85,7 +85,7 @@ const createDownloadsTable: Migration = {
     await db.schema
       .createTable('downloads')
       .addColumn('node_id', 'text', (col) =>
-        col.notNull().primaryKey().references('nodes.id')
+        col.notNull().primaryKey().references('nodes.id').onDelete('cascade')
       )
       .addColumn('upload_id', 'text', (col) => col.notNull())
       .addColumn('created_at', 'text', (col) => col.notNull())
@@ -105,7 +105,7 @@ const createUploadsTable: Migration = {
     await db.schema
       .createTable('uploads')
       .addColumn('node_id', 'text', (col) =>
-        col.notNull().primaryKey().references('nodes.id')
+        col.notNull().primaryKey().references('nodes.id').onDelete('cascade')
       )
       .addColumn('upload_id', 'text', (col) => col.notNull())
       .addColumn('created_at', 'text', (col) => col.notNull())

@@ -377,13 +377,7 @@ class NodeService {
     };
 
     await workspaceDatabase.transaction().execute(async (trx) => {
-      await trx
-        .deleteFrom('user_nodes')
-        .where('node_id', '=', nodeId)
-        .execute();
       await trx.deleteFrom('nodes').where('id', '=', nodeId).execute();
-      await trx.deleteFrom('uploads').where('node_id', '=', nodeId).execute();
-      await trx.deleteFrom('downloads').where('node_id', '=', nodeId).execute();
 
       const createdChange = await trx
         .insertInto('changes')

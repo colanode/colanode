@@ -4,6 +4,7 @@ import pino, { Level } from 'pino';
 const logConfig: Record<string, Level> = {
   main: 'info',
   'server-service': 'debug',
+  'file-service': 'debug',
 };
 
 class LogService {

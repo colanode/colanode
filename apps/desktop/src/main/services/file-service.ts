@@ -35,6 +35,15 @@ class FileService {
         this.syncWorkspaceDownloads(event.userId);
       } else if (event.type === 'upload_created') {
         this.syncWorkspaceUploads(event.userId);
+      } else if (event.type === 'node_created' && event.node.type === 'file') {
+        this.syncWorkspaceDownloads(event.userId);
+        this.syncWorkspaceUploads(event.userId);
+      } else if (event.type === 'node_updated' && event.node.type === 'file') {
+        this.syncWorkspaceDownloads(event.userId);
+        this.syncWorkspaceUploads(event.userId);
+      } else if (event.type === 'node_deleted' && event.node.type === 'file') {
+        this.syncWorkspaceDownloads(event.userId);
+        this.syncWorkspaceUploads(event.userId);
       }
     });
   }
@@ -138,7 +147,9 @@ class FileService {
       .execute();
 
     for (const workspace of workspaces) {
-      this.uploadWorkspaceFiles(workspace.user_id);
+      await this.syncWorkspaceUploads(workspace.user_id);
+      await this.syncWorkspaceDownloads(workspace.user_id);
+      await this.checkDeletedFiles(workspace.user_id);
     }
   }
 
@@ -210,26 +221,6 @@ class FileService {
 
   private async uploadWorkspaceFiles(userId: string): Promise<void> {
     this.logger.debug(`Uploading files for user ${userId}`);
-
-    if (!this.fileStates.has(userId)) {
-      this.fileStates.set(userId, {
-        isUploading: false,
-        isDownloading: false,
-        isUploadScheduled: false,
-        isDownloadScheduled: false,
-      });
-    }
-
-    const fileState = this.fileStates.get(userId)!;
-    if (fileState.isUploading) {
-      fileState.isUploadScheduled = true;
-      this.logger.debug(
-        `Uploading files for user ${userId} is in progress, scheduling upload`
-      );
-      return;
-    }
-
-    fileState.isUploading = true;
 
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
@@ -512,6 +503,40 @@ class FileService {
             retryCount: download.retry_count + 1,
           },
         });
+      }
+    }
+  }
+
+  private async checkDeletedFiles(userId: string): Promise<void> {
+    this.logger.debug(`Checking deleted files for user ${userId}`);
+
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const files = fs.readdirSync(getWorkspaceFilesDirectoryPath(userId));
+    while (files.length > 0) {
+      const batch = files.splice(0, 100);
+      const fileIdMap: Record<string, string> = {};
+
+      for (const file of batch) {
+        fileIdMap[file.split('_')[0]!] = file;
+      }
+
+      const fileIds = Object.keys(fileIdMap);
+      const downloads = await workspaceDatabase
+        .selectFrom('downloads')
+        .select(['node_id'])
+        .where('node_id', 'in', fileIds)
+        .execute();
+
+      for (const fileId of fileIds) {
+        if (!downloads.some((d) => d.node_id === fileId)) {
+          const filePath = path.join(
+            getWorkspaceFilesDirectoryPath(userId),
+            fileIdMap[fileId]!
+          );
+          fs.rmSync(filePath, { force: true });
+        }
       }
     }
   }
