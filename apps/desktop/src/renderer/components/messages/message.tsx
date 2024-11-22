@@ -4,9 +4,11 @@ import { MessageReactions } from '@/renderer/components/messages/message-reactio
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useRadar } from '@/renderer/contexts/radar';
 import { MessageActions } from '@/renderer/components/messages/message-actions';
-import { MessageAvatar } from '@/renderer/components/messages/message-avatar';
-import { MessageHeader } from '@/renderer/components/messages/message-header';
+import { MessageAuthorAvatar } from '@/renderer/components/messages/message-author-avatar';
+import { MessageAuthorName } from '@/renderer/components/messages/message-author-name';
 import { MessageContent } from '@/renderer/components/messages/message-content';
+import { MessageReference } from '@/renderer/components/messages/message-reference';
+import { MessageTime } from '@/renderer/components/messages/message-time';
 
 interface MessageProps {
   message: MessageNode;
@@ -45,11 +47,16 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
       }`}
     >
       <div className="mr-2 w-10 pt-1">
-        {displayAuthor && <MessageAvatar message={message} />}
+        {displayAuthor && <MessageAuthorAvatar message={message} />}
       </div>
 
       <div className="relative w-full">
-        {displayAuthor && <MessageHeader message={message} />}
+        {displayAuthor && (
+          <div className="flex flex-row items-center gap-0.5">
+            <MessageAuthorName message={message} />
+            <MessageTime message={message} />
+          </div>
+        )}
         <InView
           rootMargin="50px"
           onChange={(inView) => {
@@ -59,6 +66,9 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
           }}
         >
           <MessageActions message={message} />
+          {message.attributes.subtype === 'reply' && (
+            <MessageReference messageId={message.attributes.referenceId} />
+          )}
           <MessageContent message={message} />
           <MessageReactions message={message} />
         </InView>

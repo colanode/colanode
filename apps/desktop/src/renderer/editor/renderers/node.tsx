@@ -13,7 +13,6 @@ import { ParagraphRenderer } from '@/renderer/editor/renderers/paragraph';
 import { TaskItemRenderer } from '@/renderer/editor/renderers/task-item';
 import { TaskListRenderer } from '@/renderer/editor/renderers/task-list';
 import { TextRenderer } from '@/renderer/editor/renderers/text';
-import { MessageReferenceRenderer } from '@/renderer/editor/renderers/message-reference';
 import { MarkRenderer } from '@/renderer/editor/renderers/mark';
 import { FileRenderer } from '@/renderer/editor/renderers/file';
 import { match } from 'ts-pattern';
@@ -70,9 +69,6 @@ export const NodeRenderer = ({
         ))
         .with('codeBlock', () => (
           <CodeBlockRenderer node={node} keyPrefix={keyPrefix} />
-        ))
-        .with('messageReference', () => (
-          <MessageReferenceRenderer node={node} keyPrefix={keyPrefix} />
         ))
         .with('file', () => <FileRenderer node={node} keyPrefix={keyPrefix} />)
         .otherwise(() => null)}

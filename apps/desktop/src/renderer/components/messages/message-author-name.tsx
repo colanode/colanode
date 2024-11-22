@@ -1,13 +1,18 @@
+import { MessageNode, UserNode } from '@colanode/core';
+
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { MessageNode, UserNode } from '@colanode/core';
-import { Avatar } from '@/renderer/components/avatars/avatar';
+import { cn } from '@/shared/lib/utils';
 
-interface MessageAvatarProps {
+interface MessageAuthorNameProps {
   message: MessageNode;
+  className?: string;
 }
 
-export const MessageAvatar = ({ message }: MessageAvatarProps) => {
+export const MessageAuthorName = ({
+  message,
+  className,
+}: MessageAuthorNameProps) => {
   const workspace = useWorkspace();
   const { data } = useQuery({
     type: 'node_get',
@@ -22,11 +27,8 @@ export const MessageAvatar = ({ message }: MessageAvatarProps) => {
   const author = data as UserNode;
 
   return (
-    <Avatar
-      id={author.id}
-      name={author.attributes.name}
-      avatar={author.attributes.avatar}
-      size="medium"
-    />
+    <span className={cn('font-medium', className)}>
+      {author.attributes.name}
+    </span>
   );
 };

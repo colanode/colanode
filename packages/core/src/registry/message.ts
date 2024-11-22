@@ -3,12 +3,27 @@ import { NodeModel } from './core';
 import { blockSchema } from './block';
 import { isEqual } from 'lodash-es';
 
-export const messageAttributesSchema = z.object({
+const standardMessageAttributesSchema = z.object({
   type: z.literal('message'),
+  subtype: z.literal('standard'),
   parentId: z.string(),
   content: z.record(z.string(), blockSchema),
   reactions: z.record(z.string(), z.array(z.string())),
 });
+
+const replyMessageAttributesSchema = z.object({
+  type: z.literal('message'),
+  subtype: z.literal('reply'),
+  parentId: z.string(),
+  content: z.record(z.string(), blockSchema),
+  reactions: z.record(z.string(), z.array(z.string())),
+  referenceId: z.string(),
+});
+
+export const messageAttributesSchema = z.discriminatedUnion('subtype', [
+  standardMessageAttributesSchema,
+  replyMessageAttributesSchema,
+]);
 
 export type MessageAttributes = z.infer<typeof messageAttributesSchema>;
 

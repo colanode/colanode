@@ -10,7 +10,7 @@ import {
   MessageCreateMutationInput,
   MessageCreateMutationOutput,
 } from '@/shared/mutations/message-create';
-import { mapBlocksToContents, mapContentsToBlocks } from '@/shared/lib/editor';
+import { mapContentsToBlocks } from '@/shared/lib/editor';
 import { fileService } from '@/main/services/file-service';
 import { Block, FileAttributes, MessageAttributes } from '@colanode/core';
 import { CreateNodeInput, nodeService } from '@/main/services/node-service';
@@ -24,31 +24,6 @@ export class MessageCreateMutationHandler
     const inputs: CreateNodeInput[] = [];
 
     const messageContent = input.content.content ?? [];
-    if (input.referenceId) {
-      const referenceNode = await nodeService.fetchNode(
-        input.referenceId,
-        input.userId
-      );
-
-      if (!referenceNode || referenceNode.type !== 'message') {
-        throw new Error('Reference node not found');
-      }
-
-      const referenceContent = mapBlocksToContents(
-        referenceNode.id,
-        Object.values(referenceNode.attributes.content)
-      );
-
-      messageContent.unshift({
-        type: 'messageReference',
-        attrs: {
-          id: input.referenceId,
-          conversationId: input.conversationId,
-        },
-        content: referenceContent,
-      });
-    }
-
     const messageId = generateId(IdType.Message);
     const createdAt = new Date().toISOString();
     const blocks = mapContentsToBlocks(messageId, messageContent, new Map());
@@ -112,20 +87,46 @@ export class MessageCreateMutationHandler
       }
     }
 
-    const messageAttributes: MessageAttributes = {
-      type: 'message',
-      parentId: input.conversationId,
-      content: blocks.reduce(
-        (acc, block) => {
-          acc[block.id] = block;
-          return acc;
-        },
-        {} as Record<string, Block>
-      ),
-      reactions: {},
-    };
+    const blocksRecord = blocks.reduce(
+      (acc, block) => {
+        acc[block.id] = block;
+        return acc;
+      },
+      {} as Record<string, Block>
+    );
 
-    inputs.unshift({ id: messageId, attributes: messageAttributes });
+    if (input.referenceId) {
+      const reference = await nodeService.fetchNode(
+        input.referenceId,
+        input.userId
+      );
+
+      if (!reference || reference.type !== 'message') {
+        throw new Error('Reference node not found');
+      }
+
+      const messageAttributes: MessageAttributes = {
+        type: 'message',
+        subtype: 'reply',
+        parentId: input.conversationId,
+        referenceId: input.referenceId,
+        content: blocksRecord,
+        reactions: {},
+      };
+
+      inputs.unshift({ id: messageId, attributes: messageAttributes });
+    } else {
+      const messageAttributes: MessageAttributes = {
+        type: 'message',
+        subtype: 'standard',
+        parentId: input.conversationId,
+        content: blocksRecord,
+        reactions: {},
+      };
+
+      inputs.unshift({ id: messageId, attributes: messageAttributes });
+    }
+
     await nodeService.createNode(input.userId, inputs);
 
     return {

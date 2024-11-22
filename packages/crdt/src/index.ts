@@ -34,7 +34,7 @@ export class YDoc {
   public updateAttributes(attributes: NodeAttributes) {
     const model = registry.getModel(attributes.type);
 
-    const schema = model.schema;
+    const schema = this.extractType(model.schema, attributes);
     if (!(schema instanceof z.ZodObject)) {
       throw new Error('Schema must be a ZodObject');
     }
@@ -345,7 +345,10 @@ export class YDoc {
       return this.extractType(schema.unwrap(), value);
     }
 
-    if (schema instanceof z.ZodUnion) {
+    if (
+      schema instanceof z.ZodUnion ||
+      schema instanceof z.ZodDiscriminatedUnion
+    ) {
       for (const option of schema.options) {
         if (option.safeParse(value).success) {
           return this.extractType(option, value);
