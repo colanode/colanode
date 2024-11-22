@@ -143,7 +143,7 @@ export class RecordListQueryHandler
       database.attributes.fields
     );
 
-    const orderByQuery = `ORDER BY ${input.sorts.length > 0 ? this.buildSortOrdersQuery(input.sorts, database.attributes.fields) : 'n."index" ASC'}`;
+    const orderByQuery = `ORDER BY ${input.sorts.length > 0 ? this.buildSortOrdersQuery(input.sorts, database.attributes.fields) : 'n."id" ASC'}`;
     const offset = (input.page - 1) * input.count;
     const query = sql<SelectNode>`
         SELECT n.*
