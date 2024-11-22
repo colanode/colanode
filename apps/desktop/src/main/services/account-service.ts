@@ -230,7 +230,7 @@ class AccountService {
       .execute();
 
     if (deletedTokens.length === 0) {
-      this.logger.info('No deleted tokens found');
+      this.logger.debug('No deleted tokens found');
       return;
     }
 

@@ -50,7 +50,6 @@ class Bootstrapper {
       await serverService.syncServers();
       await accountService.syncAccounts();
       await socketService.checkConnections();
-      await accountService.syncDeletedTokens();
       await syncService.syncAllWorkspaces();
       await fileService.syncFiles();
 

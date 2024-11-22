@@ -78,12 +78,15 @@ module.exports = {
       },
       spacing: {
         128: '32rem',
+        256: '64rem',
       },
       width: {
         128: '32rem',
+        256: '64rem',
       },
       height: {
         128: '32rem',
+        256: '64rem',
       },
     },
   },

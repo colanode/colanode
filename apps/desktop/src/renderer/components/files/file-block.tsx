@@ -21,7 +21,7 @@ export const FileBlock = ({ id }: FileBlockProps) => {
 
   return (
     <div
-      className="flex h-72 max-h-72 w-full cursor-pointer overflow-hidden rounded-md p-2 hover:bg-gray-100"
+      className="flex h-72 max-h-72 max-w-128 w-full cursor-pointer overflow-hidden rounded-md p-2 hover:bg-gray-100"
       onClick={() => {
         workspace.openInModal(id);
       }}
