@@ -226,18 +226,6 @@ class SynapseService {
     const idType = getIdType(data.nodeId);
     if (idType === IdType.User) {
       await this.addNewWorkspaceUser(data.nodeId, data.workspaceId);
-    } else if (idType === IdType.Workspace) {
-      const userDevices = this.getWorkspaceUserDevices(data.workspaceId);
-      for (const deviceIds of userDevices.values()) {
-        for (const deviceId of deviceIds) {
-          const socketConnection = this.connections.get(deviceId);
-          if (!socketConnection) {
-            continue;
-          }
-
-          this.sendPendingChangesDebounced(socketConnection);
-        }
-      }
     }
 
     await this.broadcastNodeChange(data);
@@ -262,6 +250,11 @@ class SynapseService {
         eb.and([eb('user_id', 'in', userIds), eb('node_id', '=', data.nodeId)])
       )
       .execute();
+
+    this.logger.trace(
+      userNodes,
+      `User nodes for ${data.nodeId} with ${userNodes.length} users`
+    );
 
     if (userNodes.length === 0) {
       return;
@@ -546,6 +539,8 @@ class SynapseService {
         workspaceId,
         userId,
       });
+
+      this.sendPendingChangesDebounced(connection);
     }
   }
 
