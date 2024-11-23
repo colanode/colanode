@@ -219,11 +219,11 @@ export const editorHasContent = (block?: JSONContent) => {
     return true;
   }
 
-  if (block.type === 'file' && block.attrs?.fileId) {
+  if (block.type === 'file' && block.attrs?.id) {
     return true;
   }
 
-  if (block.type === 'upload' && block.attrs?.uploadId) {
+  if (block.type === 'filePlaceholder' && block.attrs?.id) {
     return true;
   }
 
