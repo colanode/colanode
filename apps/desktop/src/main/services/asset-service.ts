@@ -4,7 +4,8 @@ import fs from 'fs';
 import unzipper from 'unzipper';
 import { EmojiData } from '@/shared/types/emojis';
 import { IconData } from '@/shared/types/icons';
-import { logService } from './log-service';
+import { logService } from '@/main/services/log-service';
+import { getAssetsSourcePath } from '@/main/utils';
 
 type AssetsVersion = {
   date: string;
@@ -34,7 +35,7 @@ class AssetService {
       return path.join(this.assetsDir, url);
     }
 
-    return path.join(this.getAssetsSourcePath(), url);
+    return path.join(getAssetsSourcePath(), url);
   }
 
   public getEmojiData(): EmojiData {
@@ -70,7 +71,7 @@ class AssetService {
   private async updateEmojis(): Promise<void> {
     this.logger.debug('Updating emojis');
 
-    const emojisZipPath = path.join(this.getAssetsSourcePath(), 'emojis.zip');
+    const emojisZipPath = path.join(getAssetsSourcePath(), 'emojis.zip');
     const emojisDir = path.join(this.assetsDir, 'emojis');
     if (fs.existsSync(emojisDir)) {
       fs.rmSync(emojisDir, { recursive: true });
@@ -86,7 +87,7 @@ class AssetService {
   private async updateIcons(): Promise<void> {
     this.logger.debug('Updating icons');
 
-    const iconsZipPath = path.join(this.getAssetsSourcePath(), 'icons.zip');
+    const iconsZipPath = path.join(getAssetsSourcePath(), 'icons.zip');
     const iconsDir = path.join(this.assetsDir, 'icons');
     if (fs.existsSync(iconsDir)) {
       fs.rmSync(iconsDir, { recursive: true });
@@ -132,14 +133,6 @@ class AssetService {
         icons: ICONS_VERSION,
       })
     );
-  }
-
-  private getAssetsSourcePath(): string {
-    if (app.isPackaged) {
-      return path.join(process.resourcesPath, 'assets');
-    }
-
-    return path.resolve(__dirname, '../../assets');
   }
 }
 

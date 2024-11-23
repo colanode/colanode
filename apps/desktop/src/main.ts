@@ -16,8 +16,12 @@ import { commandService } from '@/main/services/command-service';
 import { bootstrapper } from '@/main/bootstrapper';
 import started from 'electron-squirrel-startup';
 import { logService } from '@/main/services/log-service';
+import { getAppIconPath } from '@/main/utils';
 
 const logger = logService.createLogger('main');
+
+app.setName('Colanode');
+app.setAppUserModelId('com.colanode.desktop');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -30,6 +34,7 @@ const createWindow = () => {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     fullscreen: true,
+    icon: getAppIconPath(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },

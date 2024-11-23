@@ -40,6 +40,18 @@ export const getAccountAvatarsDirectoryPath = (accountId: string): string => {
   return path.join(appPath, 'avatars', accountId);
 };
 
+export const getAssetsSourcePath = (): string => {
+  if (app.isPackaged) {
+    return path.join(process.resourcesPath, 'assets');
+  }
+
+  return path.resolve(__dirname, '../../assets');
+};
+
+export const getAppIconPath = (): string => {
+  return path.join(getAssetsSourcePath(), 'colanode_logo_black.png');
+};
+
 export const hasInsertChanges = (result: InsertResult[]): boolean => {
   if (result.length === 0) {
     return false;

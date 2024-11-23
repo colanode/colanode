@@ -11,6 +11,9 @@ import fs from 'fs/promises';
 const config: ForgeConfig = {
   packagerConfig: {
     name: 'Colanode',
+    executableName: 'Colanode',
+    icon: 'assets/colanode_logo_black',
+    appBundleId: 'com.colanode.desktop',
     asar: true,
     ignore: [
       /^\/src/,
