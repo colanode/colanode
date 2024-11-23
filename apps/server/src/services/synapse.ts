@@ -214,16 +214,30 @@ class SynapseService {
       data.type === 'node_update' ||
       data.type === 'node_delete'
     ) {
-      this.handleNodeChangeMessage(data);
+      await this.handleNodeChangeMessage(data);
     } else if (data.type === 'user_node_update') {
-      this.handleUserNodeUpdateMessage(data);
+      await this.handleUserNodeUpdateMessage(data);
     }
   }
 
   private async handleNodeChangeMessage(data: SynapseNodeChangeMessage) {
+    this.logger.trace(data, 'Handling node change message');
+
     const idType = getIdType(data.nodeId);
     if (idType === IdType.User) {
       await this.addNewWorkspaceUser(data.nodeId, data.workspaceId);
+    } else if (idType === IdType.Workspace) {
+      const userDevices = this.getWorkspaceUserDevices(data.workspaceId);
+      for (const deviceIds of userDevices.values()) {
+        for (const deviceId of deviceIds) {
+          const socketConnection = this.connections.get(deviceId);
+          if (!socketConnection) {
+            continue;
+          }
+
+          this.sendPendingChangesDebounced(socketConnection);
+        }
+      }
     }
 
     await this.broadcastNodeChange(data);
@@ -500,10 +514,7 @@ class SynapseService {
   }
 
   private async addNewWorkspaceUser(userId: string, workspaceId: string) {
-    this.logger.trace(
-      userId,
-      `Adding new workspace user ${userId} to ${workspaceId}`
-    );
+    this.logger.trace(`Adding new workspace user ${userId} to ${workspaceId}`);
 
     const workspaceUser = await database
       .selectFrom('workspace_users')
