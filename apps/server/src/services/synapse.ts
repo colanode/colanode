@@ -188,7 +188,7 @@ class SynapseService {
 
     let query = database
       .selectFrom('node_transactions as nt')
-      .leftJoin('collaborations as c', (join) =>
+      .innerJoin('collaborations as c', (join) =>
         join.on('c.user_id', '=', userId).onRef('c.node_id', '=', 'nt.node_id')
       )
       .selectAll('nt');
