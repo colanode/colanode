@@ -210,6 +210,7 @@ class SyncService {
         .updateTable('node_transactions')
         .set({ status: 'sent' })
         .where('id', 'in', syncedTransactionIds)
+        .where('status', '=', 'pending')
         .execute();
     }
 
@@ -218,6 +219,7 @@ class SyncService {
         .updateTable('node_transactions')
         .set((eb) => ({ retry_count: eb('retry_count', '+', 1) }))
         .where('id', 'in', unsyncedTransactionIds)
+        .where('status', '=', 'pending')
         .execute();
     }
   }
