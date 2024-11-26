@@ -3,6 +3,7 @@ import { BackoffCalculator } from '@/shared/lib/backoff-calculator';
 import { Message } from '@colanode/core';
 import { SelectAccount } from '@/main/data/app/schema';
 import { syncService } from '@/main/services/sync-service';
+import { eventBus } from '@/shared/lib/event-bus';
 
 export class SocketConnection {
   private readonly synapseUrl: string;
@@ -55,6 +56,10 @@ export class SocketConnection {
 
     this.socket.onopen = () => {
       this.backoffCalculator.reset();
+      eventBus.publish({
+        type: 'socket_connection_opened',
+        accountId: this.account.id,
+      });
     };
 
     this.socket.onerror = () => {
@@ -71,7 +76,7 @@ export class SocketConnection {
   }
 
   public sendMessage(message: Message): void {
-    if (this.socket) {
+    if (this.socket && this.isConnected()) {
       this.socket.send(JSON.stringify(message));
     }
   }

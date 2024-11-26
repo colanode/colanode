@@ -132,6 +132,11 @@ export type ServerAvailabilityChangedEvent = {
   isAvailable: boolean;
 };
 
+export type SocketConnectionOpenedEvent = {
+  type: 'socket_connection_opened';
+  accountId: string;
+};
+
 export type Event =
   | NodeCreatedEvent
   | NodeUpdatedEvent
@@ -155,4 +160,5 @@ export type Event =
   | QueryResultUpdatedEvent
   | RadarDataUpdatedEvent
   | NodeTransactionCreatedEvent
-  | ServerAvailabilityChangedEvent;
+  | ServerAvailabilityChangedEvent
+  | SocketConnectionOpenedEvent;
