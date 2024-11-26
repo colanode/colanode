@@ -35,8 +35,7 @@ class SyncService {
       } else if (event.type === 'workspace_created') {
         this.requireNodeTransactions(event.workspace.userId);
       } else if (event.type === 'socket_connection_opened') {
-        this.requireNodeTransactions(event.accountId);
-        this.requireCollaborations(event.accountId);
+        this.syncAllWorkspaces();
       }
     });
   }
