@@ -1,6 +1,6 @@
 import { database } from '@/data/database';
 import { BUCKET_NAMES, filesStorage } from '@/data/storage';
-import { hasCollaboratorAccess, hasViewerAccess } from '@/lib/constants';
+import { hasCollaboratorAccess } from '@/lib/constants';
 import { fetchNodeRole } from '@/lib/nodes';
 import { ApiError, ColanodeRequest, ColanodeResponse } from '@/types/api';
 import {
@@ -15,13 +15,10 @@ import {
   CreateUploadInput,
   CreateUploadOutput,
   extractFileType,
-  generateId,
-  IdType,
   UploadMetadata,
 } from '@colanode/core';
 import { redis } from '@/data/redis';
-import { YDoc } from '@colanode/crdt';
-import { enqueueEvent } from '@/queues/events';
+import { nodeService } from '@/services/node-service';
 
 export const filesRouter = Router();
 
@@ -336,63 +333,34 @@ filesRouter.put(
       });
     }
 
-    const ydoc = new YDoc(file.id, file.state);
-    ydoc.updateAttributes({
-      ...file.attributes,
-      uploadStatus: 'completed',
-      uploadId: metadata.uploadId,
-    });
+    await database
+      .insertInto('uploads')
+      .values({
+        node_id: file.id,
+        upload_id: uploadId,
+        workspace_id: workspace.id,
+        path: metadata.path,
+        mime_type: metadata.mimeType,
+        size: metadata.size,
+        type: extractFileType(metadata.mimeType),
+        created_by: workspaceUser.id,
+        created_at: new Date(metadata.createdAt),
+        completed_at: new Date(),
+      })
+      .execute();
 
-    const attributes = ydoc.getAttributes();
-    const state = ydoc.getState();
-    const fileVersionId = generateId(IdType.Version);
-    const updatedAt = new Date();
-
-    await database.transaction().execute(async (tx) => {
-      await database
-        .insertInto('uploads')
-        .values({
-          node_id: file.id,
-          upload_id: uploadId,
-          workspace_id: workspace.id,
-          path: metadata.path,
-          mime_type: metadata.mimeType,
-          size: metadata.size,
-          type: extractFileType(metadata.mimeType),
-          created_by: workspaceUser.id,
-          created_at: new Date(metadata.createdAt),
-          completed_at: updatedAt,
-        })
-        .execute();
-
-      await tx
-        .updateTable('nodes')
-        .set({
-          attributes: JSON.stringify(attributes),
-          state: state,
-          updated_at: updatedAt,
-          updated_by: workspaceUser.id,
-          version_id: fileVersionId,
-          server_updated_at: updatedAt,
-        })
-        .where('id', '=', file.id)
-        .execute();
-    });
-
-    await enqueueEvent({
-      type: 'node_updated',
-      id: file.id,
+    await nodeService.updateNode({
+      nodeId: file.id,
+      userId: workspaceUser.id,
       workspaceId: workspace.id,
-      beforeAttributes: file.attributes,
-      afterAttributes: attributes,
-      updatedBy: workspaceUser.id,
-      updatedAt: updatedAt.toISOString(),
-      serverUpdatedAt: updatedAt.toISOString(),
-      versionId: fileVersionId,
+      updater: (attributes) => ({
+        ...attributes,
+        uploadStatus: 'completed',
+        uploadId: metadata.uploadId,
+      }),
     });
 
     await redis.del(uploadId);
-
     res.status(200).json({ success: true });
   }
 );

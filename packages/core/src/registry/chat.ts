@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { NodeModel } from './core';
+import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
 
 export const chatAttributesSchema = z.object({
   type: z.literal('chat'),
   parentId: z.string(),
-  collaborators: z.record(z.string()),
+  collaborators: z.record(z.string(), nodeRoleEnum),
 });
 
 export type ChatAttributes = z.infer<typeof chatAttributesSchema>;
@@ -34,4 +34,17 @@ export const chatModel: NodeModel = {
   canDelete: async () => {
     return false;
   },
+};
+
+export const chatCollaborationAttributesSchema = z.object({
+  type: z.literal('chat'),
+});
+
+export type ChatCollaborationAttributes = z.infer<
+  typeof chatCollaborationAttributesSchema
+>;
+
+export const chatCollaborationModel: CollaborationModel = {
+  type: 'chat',
+  schema: chatCollaborationAttributesSchema,
 };

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { NodeModel } from './core';
+import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
 import { blockSchema } from './block';
 import { isEqual } from 'lodash-es';
 
@@ -9,7 +9,7 @@ export const pageAttributesSchema = z.object({
   avatar: z.string().nullable().optional(),
   parentId: z.string(),
   content: z.record(blockSchema),
-  collaborators: z.record(z.string()).nullable().optional(),
+  collaborators: z.record(z.string(), nodeRoleEnum).nullable().optional(),
 });
 
 export type PageAttributes = z.infer<typeof pageAttributesSchema>;
@@ -43,4 +43,16 @@ export const pageModel: NodeModel = {
   canDelete: async (context, _) => {
     return context.hasEditorAccess();
   },
+};
+export const pageCollaborationAttributesSchema = z.object({
+  type: z.literal('page'),
+});
+
+export type PageCollaborationAttributes = z.infer<
+  typeof pageCollaborationAttributesSchema
+>;
+
+export const pageCollaborationModel: CollaborationModel = {
+  type: 'page',
+  schema: pageCollaborationAttributesSchema,
 };

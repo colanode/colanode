@@ -28,14 +28,11 @@ import { WorkspaceUpdateMutationHandler } from '@/main/mutations/workspace-updat
 import { DocumentSaveMutationHandler } from '@/main/mutations/document-save';
 import { AvatarUploadMutationHandler } from '@/main/mutations/avatar-upload';
 import { AccountLogoutMutationHandler } from '@/main/mutations/account-logout';
-import { ServerNodeSyncMutationHandler } from '@/main/mutations/server-node-sync';
-import { ServerNodeDeleteMutationHandler } from '@/main/mutations/server-node-delete';
 import { FolderCreateMutationHandler } from '@/main/mutations/folder-create';
 import { FileCreateMutationHandler } from '@/main/mutations/file-create';
 import { FileDownloadMutationHandler } from '@/main/mutations/file-download';
 import { SpaceUpdateMutationHandler } from '@/main/mutations/space-update';
 import { AccountUpdateMutationHandler } from '@/main/mutations/account-update';
-import { ServerUserNodeSyncMutationHandler } from '@/main/mutations/server-user-node-sync';
 import { MarkNodeAsSeenMutationHandler } from '@/main/mutations/mark-node-as-seen';
 import { ViewUpdateMutationHandler } from '@/main/mutations/view-update';
 import { ViewDeleteMutationHandler } from '@/main/mutations/view-delete';
@@ -77,14 +74,11 @@ export const mutationHandlerMap: MutationHandlerMap = {
   document_save: new DocumentSaveMutationHandler(),
   avatar_upload: new AvatarUploadMutationHandler(),
   account_logout: new AccountLogoutMutationHandler(),
-  server_node_sync: new ServerNodeSyncMutationHandler(),
-  server_node_delete: new ServerNodeDeleteMutationHandler(),
   folder_create: new FolderCreateMutationHandler(),
   file_create: new FileCreateMutationHandler(),
   file_download: new FileDownloadMutationHandler(),
   space_update: new SpaceUpdateMutationHandler(),
   account_update: new AccountUpdateMutationHandler(),
-  server_user_node_sync: new ServerUserNodeSyncMutationHandler(),
   mark_node_as_seen: new MarkNodeAsSeenMutationHandler(),
   view_update: new ViewUpdateMutationHandler(),
   view_delete: new ViewDeleteMutationHandler(),

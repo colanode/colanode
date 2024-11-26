@@ -1,6 +1,6 @@
-import { z } from 'zod';
+import { z, ZodSchema } from 'zod';
 import * as Y from 'yjs';
-import { NodeAttributes, registry, ZodText } from '@colanode/core';
+import { ZodText } from '@colanode/core';
 import { isEqual } from 'lodash-es';
 import { diffChars } from 'diff';
 import { fromUint8Array, toUint8Array } from 'js-base64';
@@ -14,45 +14,74 @@ export const decodeState = (state: string) => {
 };
 
 export class YDoc {
-  private doc: Y.Doc;
-  private updates: Uint8Array[] = [];
+  private readonly doc: Y.Doc;
 
-  constructor(id: string, state?: Uint8Array | string) {
-    this.doc = new Y.Doc({ guid: id });
+  constructor(state?: Uint8Array | string | Uint8Array[] | string[]) {
+    this.doc = new Y.Doc();
     if (state) {
-      Y.applyUpdate(
-        this.doc,
-        typeof state === 'string' ? toUint8Array(state) : state
-      );
+      if (Array.isArray(state)) {
+        for (const update of state) {
+          Y.applyUpdate(
+            this.doc,
+            typeof update === 'string' ? toUint8Array(update) : update
+          );
+        }
+      } else {
+        Y.applyUpdate(
+          this.doc,
+          typeof state === 'string' ? toUint8Array(state) : state
+        );
+      }
     }
-
-    this.doc.on('update', (update) => {
-      this.updates.push(update);
-    });
   }
 
-  public updateAttributes(attributes: NodeAttributes) {
-    const model = registry.getModel(attributes.type);
+  public updateAttributes(
+    schema: ZodSchema,
+    attributes: z.infer<typeof schema>
+  ): Uint8Array {
+    if (!schema.safeParse(attributes).success) {
+      throw new Error('Invalid attributes', schema.safeParse(attributes).error);
+    }
 
-    const schema = this.extractType(model.schema, attributes);
-    if (!(schema instanceof z.ZodObject)) {
+    const attributesSchema = this.extractType(schema, attributes);
+    if (!(attributesSchema instanceof z.ZodObject)) {
       throw new Error('Schema must be a ZodObject');
     }
 
+    const updates: Uint8Array[] = [];
+    const onUpdateCallback: (update: Uint8Array) => void = (update) => {
+      updates.push(update);
+    };
+
+    this.doc.on('update', onUpdateCallback);
+
     const attributesMap = this.doc.getMap('attributes');
     this.doc.transact(() => {
-      this.applyObjectChanges(schema, attributes, attributesMap);
+      this.applyObjectChanges(attributesSchema, attributes, attributesMap);
 
       const parseResult = schema.safeParse(attributesMap.toJSON());
       if (!parseResult.success) {
         throw new Error('Invalid attributes', parseResult.error);
       }
     });
+
+    this.doc.off('update', onUpdateCallback);
+
+    if (updates.length === 0 || updates.length > 1) {
+      throw new Error('Invalid number of updates');
+    }
+
+    const update = updates[0];
+    if (!update) {
+      throw new Error('No update found');
+    }
+
+    return update;
   }
 
-  public getAttributes(): NodeAttributes {
+  public getAttributes<T>(): T {
     const attributesMap = this.doc.getMap('attributes');
-    const attributes = attributesMap.toJSON() as NodeAttributes;
+    const attributes = attributesMap.toJSON() as T;
     return attributes;
   }
 
@@ -69,14 +98,6 @@ export class YDoc {
 
   public getEncodedState(): string {
     return fromUint8Array(this.getState());
-  }
-
-  public getUpdates(): Uint8Array[] {
-    return this.updates;
-  }
-
-  public getEncodedUpdates(): string[] {
-    return this.updates.map((update) => fromUint8Array(update));
   }
 
   private applyObjectChanges(

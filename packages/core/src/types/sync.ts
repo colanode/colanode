@@ -1,100 +1,97 @@
-export type SyncChangesInput = {
-  changes: LocalChange[];
+export type SyncNodeTransactionsInput = {
+  transactions: LocalNodeTransaction[];
 };
 
-export type SyncNodeStatesInput = {
-  ids: string[];
+export type SyncNodeTransactionsOutput = {
+  results: SyncNodeTransactionResult[];
 };
 
-export type SyncNodeStatesOutput = {
-  nodes: Record<string, SyncNodeStateResult | null>;
-};
+export type SyncNodeTransactionStatus = 'success' | 'error';
 
-export type SyncNodeStateResult = {
-  node: ServerNodeState;
-  userNode: ServerUserNodeState;
-};
-
-export type SyncChangesOutput = {
-  results: SyncChangeResult[];
-};
-
-export type SyncChangeStatus = 'success' | 'error';
-
-export type SyncChangeResult = {
-  id: number;
-  status: SyncChangeStatus;
-};
-
-export type LocalChange = {
-  id: number;
-  data: LocalChangeData;
-  createdAt: string;
-  retryCount: number;
-};
-
-export type LocalCreateNodeChangeData = {
-  type: 'node_create';
+export type SyncNodeTransactionResult = {
   id: string;
-  state: string;
-  createdAt: string;
-  createdBy: string;
-  versionId: string;
+  status: SyncNodeTransactionStatus;
 };
 
-export type LocalUpdateNodeChangeData = {
-  type: 'node_update';
+export type LocalNodeTransaction =
+  | LocalCreateNodeTransaction
+  | LocalUpdateNodeTransaction
+  | LocalDeleteNodeTransaction;
+
+export type LocalCreateNodeTransaction = {
   id: string;
-  updates: string[];
-  updatedAt: string;
-  updatedBy: string;
-  versionId: string;
-};
-
-export type LocalDeleteNodeChangeData = {
-  type: 'node_delete';
-  id: string;
-  deletedAt: string;
-  deletedBy: string;
-};
-
-export type LocalUserNodeChangeData = {
-  type: 'user_node_update';
   nodeId: string;
-  userId: string;
-  lastSeenVersionId: string;
-  lastSeenAt: string;
-  mentionsCount: number;
-  versionId: string;
-};
-
-export type LocalChangeData =
-  | LocalCreateNodeChangeData
-  | LocalUpdateNodeChangeData
-  | LocalDeleteNodeChangeData
-  | LocalUserNodeChangeData;
-
-export type ServerNodeState = {
-  id: string;
-  workspaceId: string;
-  state: string;
+  type: 'create';
+  data: string;
   createdAt: string;
   createdBy: string;
-  updatedAt: string | null;
-  updatedBy: string | null;
+};
+
+export type LocalUpdateNodeTransaction = {
+  id: string;
+  nodeId: string;
+  type: 'update';
+  data: string;
+  createdAt: string;
+  createdBy: string;
+};
+
+export type LocalDeleteNodeTransaction = {
+  id: string;
+  nodeId: string;
+  type: 'delete';
+  createdAt: string;
+  createdBy: string;
+};
+
+export type ServerNodeCreateTransaction = {
+  id: string;
+  type: 'create';
+  nodeId: string;
+  workspaceId: string;
+  data: string;
+  createdAt: string;
+  createdBy: string;
   serverCreatedAt: string;
-  serverUpdatedAt: string | null;
-  versionId: string;
+  number: string;
 };
 
-export type ServerUserNodeState = {
+export type ServerNodeUpdateTransaction = {
+  id: string;
+  type: 'update';
   nodeId: string;
-  userId: string;
   workspaceId: string;
-  versionId: string;
-  lastSeenAt: string | null;
-  lastSeenVersionId: string | null;
-  mentionsCount: number;
+  data: string;
+  createdAt: string;
+  createdBy: string;
+  serverCreatedAt: string;
+  number: string;
+};
+
+export type ServerNodeDeleteTransaction = {
+  id: string;
+  type: 'delete';
+  nodeId: string;
+  workspaceId: string;
+  createdAt: string;
+  createdBy: string;
+  serverCreatedAt: string;
+  number: string;
+};
+
+export type ServerNodeTransaction =
+  | ServerNodeCreateTransaction
+  | ServerNodeUpdateTransaction
+  | ServerNodeDeleteTransaction;
+
+export type ServerCollaboration = {
+  userId: string;
+  nodeId: string;
+  type: string;
+  workspaceId: string;
+  state: string;
   createdAt: string;
   updatedAt: string | null;
+  deletedAt: string | null;
+  number: string;
 };

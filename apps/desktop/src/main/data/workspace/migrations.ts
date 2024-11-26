@@ -15,20 +15,14 @@ const createNodesTable: Migration = {
         col
           .generatedAlwaysAs(sql`json_extract(attributes, '$.parentId')`)
           .stored()
-          .references('nodes.id')
-          .onDelete('cascade')
           .notNull()
       )
       .addColumn('attributes', 'text', (col) => col.notNull())
-      .addColumn('state', 'blob', (col) => col.notNull())
       .addColumn('created_at', 'text', (col) => col.notNull())
       .addColumn('updated_at', 'text')
       .addColumn('created_by', 'text', (col) => col.notNull())
       .addColumn('updated_by', 'text')
-      .addColumn('version_id', 'text', (col) => col.notNull())
-      .addColumn('server_created_at', 'text')
-      .addColumn('server_updated_at', 'text')
-      .addColumn('server_version_id', 'text')
+      .addColumn('transaction_id', 'text', (col) => col.notNull())
       .execute();
 
     await sql`
@@ -40,43 +34,49 @@ const createNodesTable: Migration = {
   },
 };
 
-const createUserNodesTable: Migration = {
+const createNodeTransactionsTable: Migration = {
   up: async (db) => {
     await db.schema
-      .createTable('user_nodes')
-      .addColumn('user_id', 'text', (col) => col.notNull())
-      .addColumn('node_id', 'text', (col) =>
-        col.notNull().references('nodes.id').onDelete('cascade')
-      )
-      .addColumn('last_seen_version_id', 'text')
-      .addColumn('last_seen_at', 'text')
-      .addColumn('mentions_count', 'integer', (col) =>
-        col.notNull().defaultTo(0)
-      )
-      .addColumn('attributes', 'text')
-      .addColumn('version_id', 'text', (col) => col.notNull())
+      .createTable('node_transactions')
+      .addColumn('id', 'text', (col) => col.notNull().primaryKey())
+      .addColumn('node_id', 'text', (col) => col.notNull())
+      .addColumn('type', 'text', (col) => col.notNull())
+      .addColumn('data', 'blob')
       .addColumn('created_at', 'text', (col) => col.notNull())
-      .addColumn('updated_at', 'text')
-      .addPrimaryKeyConstraint('user_nodes_pk', ['user_id', 'node_id'])
+      .addColumn('created_by', 'text', (col) => col.notNull())
+      .addColumn('server_created_at', 'text')
+      .addColumn('retry_count', 'integer', (col) => col.defaultTo(0))
+      .addColumn('status', 'text', (col) => col.defaultTo('pending'))
+      .addColumn('number', 'integer')
       .execute();
   },
   down: async (db) => {
-    await db.schema.dropTable('user_nodes').execute();
+    await db.schema.dropTable('node_transactions').execute();
   },
 };
 
-const createChangesTable: Migration = {
+const createCollaborationsTable: Migration = {
   up: async (db) => {
     await db.schema
-      .createTable('changes')
-      .addColumn('id', 'integer', (col) => col.notNull().primaryKey())
-      .addColumn('data', 'text', (col) => col.notNull())
+      .createTable('collaborations')
+      .addColumn('user_id', 'text', (col) => col.notNull())
+      .addColumn('node_id', 'text', (col) => col.notNull())
+      .addColumn('type', 'text', (col) =>
+        col
+          .notNull()
+          .generatedAlwaysAs(sql`json_extract(attributes, '$.type')`)
+          .stored()
+      )
+      .addColumn('attributes', 'text', (col) => col.notNull())
+      .addColumn('state', 'blob', (col) => col.notNull())
       .addColumn('created_at', 'text', (col) => col.notNull())
-      .addColumn('retry_count', 'integer', (col) => col.defaultTo(0))
+      .addColumn('updated_at', 'text')
+      .addColumn('number', 'integer')
+      .addPrimaryKeyConstraint('collaborations_pk', ['user_id', 'node_id'])
       .execute();
   },
   down: async (db) => {
-    await db.schema.dropTable('changes').execute();
+    await db.schema.dropTable('collaborations').execute();
   },
 };
 
@@ -259,8 +259,8 @@ const createNodeDeleteNameTrigger: Migration = {
 
 export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00001_create_nodes_table': createNodesTable,
-  '00002_create_user_nodes_table': createUserNodesTable,
-  '00003_create_changes_table': createChangesTable,
+  '00002_create_node_transactions_table': createNodeTransactionsTable,
+  '00003_create_collaborations_table': createCollaborationsTable,
   '00004_create_uploads_table': createUploadsTable,
   '00005_create_downloads_table': createDownloadsTable,
   '00006_create_node_paths_table': createNodePathsTable,

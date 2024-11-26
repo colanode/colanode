@@ -49,8 +49,13 @@ export type WorkspaceUsersInviteInput = {
   role: WorkspaceRole;
 };
 
+export type WorkspaceUserInviteResult = {
+  email: string;
+  result: 'success' | 'error' | 'exists';
+};
+
 export type WorkspaceUsersInviteOutput = {
-  users: NodeOutput[];
+  results: WorkspaceUserInviteResult[];
 };
 
 export type WorkspaceUserRoleUpdateInput = {

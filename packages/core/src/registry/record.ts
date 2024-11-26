@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { NodeModel } from './core';
+import { CollaborationModel, NodeModel } from './core';
 import { fieldValueSchema } from './fields';
 import { blockSchema } from './block';
 
@@ -47,4 +47,17 @@ export const recordModel: NodeModel = {
 
     return context.hasEditorAccess();
   },
+};
+
+export const recordCollaborationAttributesSchema = z.object({
+  type: z.literal('record'),
+});
+
+export type RecordCollaborationAttributes = z.infer<
+  typeof recordCollaborationAttributesSchema
+>;
+
+export const recordCollaborationModel: CollaborationModel = {
+  type: 'record',
+  schema: recordCollaborationAttributesSchema,
 };

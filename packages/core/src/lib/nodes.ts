@@ -2,13 +2,20 @@ import { Node, NodeAttributes, NodeRole } from '../index';
 import { generateKeyBetween } from 'fractional-indexing-jittered';
 
 export const extractNodeCollaborators = (
-  attributes: NodeAttributes
+  attributes: NodeAttributes | NodeAttributes[]
 ): Record<string, NodeRole> => {
-  if ('collaborators' in attributes && attributes.collaborators) {
-    return attributes.collaborators as Record<string, NodeRole>;
+  const items = Array.isArray(attributes) ? attributes : [attributes];
+  const collaborators: Record<string, NodeRole> = {};
+
+  for (const item of items) {
+    if ('collaborators' in item && item.collaborators) {
+      for (const [collaboratorId, role] of Object.entries(item.collaborators)) {
+        collaborators[collaboratorId] = role as NodeRole;
+      }
+    }
   }
 
-  return {};
+  return collaborators;
 };
 
 export const extractNodeName = (attributes: NodeAttributes): string | null => {
@@ -20,10 +27,10 @@ export const extractNodeName = (attributes: NodeAttributes): string | null => {
 };
 
 export const extractNodeRole = (
-  nodeTree: Node | Node[],
+  tree: Node | Node[],
   collaboratorId: string
 ): NodeRole | null => {
-  const nodes = Array.isArray(nodeTree) ? nodeTree : [nodeTree];
+  const nodes = Array.isArray(tree) ? tree : [tree];
   let role: NodeRole | null = null;
   for (const node of nodes) {
     const collaborators = extractNodeCollaborators(node.attributes);

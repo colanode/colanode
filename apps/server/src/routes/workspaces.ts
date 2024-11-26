@@ -4,33 +4,18 @@ import {
   WorkspaceCreateInput,
   WorkspaceOutput,
   WorkspaceRole,
-  WorkspaceStatus,
   WorkspaceUserStatus,
   WorkspaceUpdateInput,
-  NodeOutput,
+  WorkspaceUserInviteResult,
 } from '@colanode/core';
 import { ApiError, ColanodeRequest, ColanodeResponse } from '@/types/api';
-import {
-  generateId,
-  IdType,
-  UserAttributes,
-  WorkspaceAttributes,
-  AccountStatus,
-} from '@colanode/core';
+import { generateId, IdType, AccountStatus } from '@colanode/core';
 import { database } from '@/data/database';
 import { Router } from 'express';
-import {
-  CreateAccount,
-  CreateNode,
-  CreateWorkspaceUser,
-  SelectNode,
-  SelectWorkspaceUser,
-} from '@/data/schema';
 import { getNameFromEmail } from '@/lib/utils';
-import { mapNodeOutput } from '@/lib/nodes';
-import { NodeCreatedEvent, NodeUpdatedEvent } from '@/types/events';
-import { enqueueEvent } from '@/queues/events';
-import { YDoc } from '@colanode/crdt';
+import { fetchNode, mapNode, mapNodeTransaction } from '@/lib/nodes';
+import { nodeService } from '@/services/node-service';
+import { workspaceService } from '@/services/workspace-service';
 
 export const workspacesRouter = Router();
 
@@ -66,135 +51,7 @@ workspacesRouter.post(
       });
     }
 
-    const createdAt = new Date();
-
-    const workspaceId = generateId(IdType.Workspace);
-    const workspaceVersionId = generateId(IdType.Version);
-    const workspaceDoc = new YDoc(workspaceId);
-
-    const workspaceAttributes: WorkspaceAttributes = {
-      type: 'workspace',
-      name: input.name,
-      description: input.description,
-      avatar: input.avatar,
-      parentId: workspaceId,
-    };
-
-    workspaceDoc.updateAttributes(workspaceAttributes);
-
-    const userId = generateId(IdType.User);
-    const userVersionId = generateId(IdType.Version);
-    const userDoc = new YDoc(userId);
-
-    const userAttributes: UserAttributes = {
-      type: 'user',
-      name: account.name,
-      avatar: account.avatar,
-      email: account.email,
-      accountId: account.id,
-      role: 'owner',
-      parentId: workspaceId,
-    };
-
-    userDoc.updateAttributes(userAttributes);
-
-    await database.transaction().execute(async (trx) => {
-      await trx
-        .insertInto('workspaces')
-        .values({
-          id: workspaceId,
-          name: input.name,
-          description: input.description,
-          avatar: input.avatar,
-          created_at: createdAt,
-          created_by: account.id,
-          status: WorkspaceStatus.Active,
-          version_id: workspaceVersionId,
-        })
-        .execute();
-
-      await trx
-        .insertInto('workspace_users')
-        .values({
-          id: userId,
-          account_id: account.id,
-          workspace_id: workspaceId,
-          role: 'owner',
-          created_at: createdAt,
-          created_by: account.id,
-          status: WorkspaceUserStatus.Active,
-          version_id: generateId(IdType.Version),
-        })
-        .execute();
-
-      await trx
-        .insertInto('nodes')
-        .values({
-          id: workspaceId,
-          workspace_id: workspaceId,
-          attributes: JSON.stringify(workspaceAttributes),
-          state: workspaceDoc.getState(),
-          created_at: createdAt,
-          created_by: account.id,
-          version_id: workspaceVersionId,
-          server_created_at: createdAt,
-        })
-        .execute();
-
-      await trx
-        .insertInto('nodes')
-        .values({
-          id: userId,
-          workspace_id: workspaceId,
-          attributes: JSON.stringify(userAttributes),
-          state: userDoc.getState(),
-          created_at: createdAt,
-          created_by: account.id,
-          version_id: userVersionId,
-          server_created_at: createdAt,
-        })
-        .execute();
-    });
-
-    const workspaceEvent: NodeCreatedEvent = {
-      type: 'node_created',
-      id: workspaceId,
-      workspaceId: workspaceId,
-      attributes: workspaceAttributes,
-      createdBy: account.id,
-      createdAt: createdAt.toISOString(),
-      versionId: workspaceVersionId,
-      serverCreatedAt: createdAt.toISOString(),
-    };
-
-    await enqueueEvent(workspaceEvent);
-
-    const userEvent: NodeCreatedEvent = {
-      type: 'node_created',
-      id: userId,
-      workspaceId: workspaceId,
-      attributes: userAttributes,
-      createdBy: account.id,
-      createdAt: createdAt.toISOString(),
-      versionId: userVersionId,
-      serverCreatedAt: createdAt.toISOString(),
-    };
-
-    await enqueueEvent(userEvent);
-
-    const output: WorkspaceOutput = {
-      id: workspaceId,
-      name: input.name,
-      description: input.description,
-      avatar: input.avatar,
-      versionId: workspaceVersionId,
-      user: {
-        id: userId,
-        accountId: account.id,
-        role: 'owner',
-      },
-    };
-
+    const output = await workspaceService.createWorkspace(account, input);
     return res.status(200).json(output);
   }
 );
@@ -265,6 +122,23 @@ workspacesRouter.put(
         message: 'Internal server error.',
       });
     }
+
+    await nodeService.updateNode({
+      nodeId: updatedWorkspace.id,
+      userId: req.account.id,
+      workspaceId: id,
+      updater: (attributes) => {
+        if (attributes.type !== 'workspace') {
+          return null;
+        }
+
+        attributes.name = input.name;
+        attributes.description = input.description;
+        attributes.avatar = input.avatar;
+
+        return attributes;
+      },
+    });
 
     const output: WorkspaceOutput = {
       id: updatedWorkspace.id,
@@ -500,181 +374,110 @@ workspacesRouter.post(
       });
     }
 
-    const existingAccounts = await database
-      .selectFrom('accounts')
-      .selectAll()
-      .where('email', 'in', input.emails)
-      .execute();
-
-    let existingWorkspaceUsers: SelectWorkspaceUser[] = [];
-    let existingUsers: SelectNode[] = [];
-    if (existingAccounts.length > 0) {
-      const existingAccountIds = existingAccounts.map((account) => account.id);
-      existingWorkspaceUsers = await database
-        .selectFrom('workspace_users')
-        .selectAll()
-        .where((eb) =>
-          eb.and([
-            eb('account_id', 'in', existingAccountIds),
-            eb('workspace_id', '=', workspace.id),
-          ])
-        )
-        .execute();
+    const workspaceNodeRow = await fetchNode(workspace.id);
+    if (!workspaceNodeRow) {
+      return res.status(500).json({
+        code: ApiError.InternalServerError,
+        message: 'Something went wrong.',
+      });
     }
 
-    if (existingWorkspaceUsers.length > 0) {
-      const existingUserIds = existingWorkspaceUsers.map(
-        (workspaceAccount) => workspaceAccount.id
-      );
-      existingUsers = await database
-        .selectFrom('nodes')
-        .selectAll()
-        .where('id', 'in', existingUserIds)
-        .execute();
-    }
-
-    const accountsToCreate: CreateAccount[] = [];
-    const workspaceUsersToCreate: CreateWorkspaceUser[] = [];
-    const usersToCreate: CreateNode[] = [];
-
-    const users: NodeOutput[] = [];
+    const workspaceNode = mapNode(workspaceNodeRow);
+    const results: WorkspaceUserInviteResult[] = [];
     for (const email of input.emails) {
-      let account = existingAccounts.find((account) => account.email === email);
+      let account = await database
+        .selectFrom('accounts')
+        .select(['id', 'name', 'email', 'avatar'])
+        .where('email', '=', email)
+        .executeTakeFirst();
 
       if (!account) {
-        account = {
-          id: generateId(IdType.Account),
-          name: getNameFromEmail(email),
-          email: email,
-          avatar: null,
-          attrs: null,
-          password: null,
-          status: AccountStatus.Pending,
-          created_at: new Date(),
-          updated_at: null,
-        };
-
-        accountsToCreate.push({
-          id: account.id,
-          email: account.email,
-          name: account.name,
-          status: account.status,
-          created_at: account.created_at,
-        });
+        account = await database
+          .insertInto('accounts')
+          .returning(['id', 'name', 'email', 'avatar'])
+          .values({
+            id: generateId(IdType.Account),
+            name: getNameFromEmail(email),
+            email: email,
+            avatar: null,
+            attrs: null,
+            password: null,
+            status: AccountStatus.Pending,
+            created_at: new Date(),
+            updated_at: null,
+          })
+          .executeTakeFirst();
       }
 
-      const existingWorkspaceUser = existingWorkspaceUsers.find(
-        (workspaceUser) => workspaceUser.account_id === account!.id
-      );
+      if (!account) {
+        results.push({
+          email: email,
+          result: 'error',
+        });
+        continue;
+      }
+
+      const existingWorkspaceUser = await database
+        .selectFrom('workspace_users')
+        .selectAll()
+        .where('account_id', '=', account.id)
+        .where('workspace_id', '=', id)
+        .executeTakeFirst();
 
       if (existingWorkspaceUser) {
-        const existingUser = existingUsers.find(
-          (user) => user.id === existingWorkspaceUser.id
-        );
-        if (!existingUser) {
-          return res.status(500).json({
-            code: ApiError.InternalServerError,
-            message: 'Something went wrong.',
-          });
-        }
-
-        users.push(mapNodeOutput(existingUser));
+        results.push({
+          email: email,
+          result: 'exists',
+        });
         continue;
       }
 
       const userId = generateId(IdType.User);
-      const userVersionId = generateId(IdType.Version);
-      const userDoc = new YDoc(userId);
+      const newWorkspaceUser = await database
+        .insertInto('workspace_users')
+        .returningAll()
+        .values({
+          id: userId,
+          account_id: account.id,
+          workspace_id: id,
+          role: input.role,
+          created_at: new Date(),
+          created_by: req.account.id,
+          status: WorkspaceUserStatus.Active,
+          version_id: generateId(IdType.Version),
+        })
+        .executeTakeFirst();
 
-      const userAttributes: UserAttributes = {
-        type: 'user',
-        name: account!.name,
-        avatar: account!.avatar,
-        email: account!.email,
-        role: input.role,
-        accountId: account!.id,
-        parentId: workspace.id,
-      };
-      userDoc.updateAttributes(userAttributes);
+      if (!newWorkspaceUser) {
+        results.push({
+          email: email,
+          result: 'error',
+        });
+      }
 
-      workspaceUsersToCreate.push({
-        id: userId,
-        account_id: account!.id,
-        workspace_id: workspace.id,
-        role: input.role,
-        created_at: new Date(),
-        created_by: req.account.id,
-        status: WorkspaceUserStatus.Active,
-        version_id: userVersionId,
+      await nodeService.createNode({
+        nodeId: userId,
+        attributes: {
+          type: 'user',
+          name: account.name,
+          email: account.email,
+          role: input.role,
+          accountId: account.id,
+          parentId: id,
+        },
+        userId: workspaceUser.id,
+        workspaceId: id,
+        ancestors: [workspaceNode],
       });
 
-      const user: NodeOutput = {
-        id: userId,
-        type: 'user',
-        parentId: workspace.id,
-        attributes: userAttributes,
-        state: userDoc.getEncodedState(),
-        createdAt: new Date().toISOString(),
-        createdBy: workspaceUser.id,
-        serverCreatedAt: new Date().toISOString(),
-        versionId: userVersionId,
-        workspaceId: workspace.id,
-      };
-
-      usersToCreate.push({
-        id: user.id,
-        attributes: JSON.stringify(userAttributes),
-        state: userDoc.getState(),
-        created_at: new Date(user.createdAt),
-        created_by: user.createdBy,
-        server_created_at: new Date(user.serverCreatedAt),
-        version_id: user.versionId,
-        workspace_id: user.workspaceId,
-      });
-
-      users.push(user);
-    }
-
-    if (
-      accountsToCreate.length > 0 ||
-      workspaceUsersToCreate.length > 0 ||
-      usersToCreate.length > 0
-    ) {
-      await database.transaction().execute(async (trx) => {
-        if (accountsToCreate.length > 0) {
-          await trx.insertInto('accounts').values(accountsToCreate).execute();
-        }
-
-        if (workspaceUsersToCreate.length > 0) {
-          await trx
-            .insertInto('workspace_users')
-            .values(workspaceUsersToCreate)
-            .execute();
-        }
-
-        if (usersToCreate.length > 0) {
-          await trx.insertInto('nodes').values(usersToCreate).execute();
-
-          for (const user of usersToCreate) {
-            const userEvent: NodeCreatedEvent = {
-              type: 'node_created',
-              id: user.id,
-              workspaceId: user.workspace_id,
-              attributes: JSON.parse(user.attributes ?? '{}'),
-              createdBy: user.created_by,
-              createdAt: user.created_at.toISOString(),
-              serverCreatedAt: user.server_created_at.toISOString(),
-              versionId: user.version_id,
-            };
-
-            await enqueueEvent(userEvent);
-          }
-        }
+      results.push({
+        email: email,
+        result: 'success',
       });
     }
 
     return res.status(200).json({
-      users: users,
+      results: results,
     });
   }
 );
@@ -756,79 +559,40 @@ workspacesRouter.put(
       });
     }
 
-    const attributes = user.attributes;
-    if (attributes.type !== 'user') {
-      return res.status(400).json({
-        code: ApiError.BadRequest,
-        message: 'BadRequest.',
+    await database
+      .updateTable('workspace_users')
+      .set({
+        role: input.role,
+        updated_at: new Date(),
+        updated_by: currentWorkspaceUser.account_id,
+        version_id: generateId(IdType.Version),
+      })
+      .where('id', '=', userId)
+      .execute();
+
+    const updateUserOutput = await nodeService.updateNode({
+      nodeId: user.id,
+      userId: currentWorkspaceUser.account_id,
+      workspaceId: workspace.id,
+      updater: (attributes) => {
+        if (attributes.type !== 'user') {
+          return null;
+        }
+
+        attributes.role = input.role;
+        return attributes;
+      },
+    });
+
+    if (!updateUserOutput) {
+      return res.status(500).json({
+        code: ApiError.InternalServerError,
+        message: 'Something went wrong.',
       });
     }
 
-    const updatedAt = new Date();
-    const userDoc = new YDoc(user.id, user.state);
-    userDoc.updateAttributes({
-      ...attributes,
-      role: input.role,
-    });
-
-    const userNode: NodeOutput = {
-      id: user.id,
-      type: user.type,
-      workspaceId: user.workspace_id,
-      parentId: workspace.id,
-      attributes: userDoc.getAttributes(),
-      state: userDoc.getEncodedState(),
-      createdAt: user.created_at.toISOString(),
-      createdBy: user.created_by,
-      serverCreatedAt: user.server_created_at.toISOString(),
-      serverUpdatedAt: updatedAt.toISOString(),
-      versionId: generateId(IdType.Version),
-      updatedAt: updatedAt.toISOString(),
-      updatedBy: currentWorkspaceUser.id,
-    };
-
-    await database.transaction().execute(async (trx) => {
-      await trx
-        .updateTable('workspace_users')
-        .set({
-          role: input.role,
-          updated_at: new Date(),
-          updated_by: currentWorkspaceUser.account_id,
-          version_id: generateId(IdType.Version),
-        })
-        .where('id', '=', userId)
-        .execute();
-
-      await trx
-        .updateTable('nodes')
-        .set({
-          attributes: JSON.stringify(userDoc.getAttributes()),
-          state: userDoc.getState(),
-          server_updated_at: updatedAt,
-          updated_at: updatedAt,
-          updated_by: currentWorkspaceUser.id,
-          version_id: userNode.versionId,
-        })
-        .where('id', '=', userNode.id)
-        .execute();
-    });
-
-    const event: NodeUpdatedEvent = {
-      type: 'node_updated',
-      id: userNode.id,
-      workspaceId: userNode.workspaceId,
-      beforeAttributes: attributes,
-      afterAttributes: userDoc.getAttributes(),
-      updatedBy: currentWorkspaceUser.id,
-      updatedAt: updatedAt.toISOString(),
-      serverUpdatedAt: updatedAt.toISOString(),
-      versionId: userNode.versionId,
-    };
-
-    await enqueueEvent(event);
-
     return res.status(200).json({
-      user: userNode,
+      transaction: mapNodeTransaction(updateUserOutput.transaction),
     });
   }
 );

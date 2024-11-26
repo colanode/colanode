@@ -11,7 +11,5 @@ export type NodeOutput = {
   createdBy: string;
   updatedAt?: string | null;
   updatedBy?: string | null;
-  versionId: string;
-  serverCreatedAt: string;
-  serverUpdatedAt?: string | null;
+  transactionId: string;
 };

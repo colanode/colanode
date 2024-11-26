@@ -1,17 +1,20 @@
 import { databaseService } from '@/main/data/database-service';
-import { mapChange } from '@/main/utils';
+import { mapTransaction } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
-import {
-  LocalChange,
-  SyncChangesOutput,
-  SyncNodeStatesOutput,
-} from '@colanode/core';
-import { WorkspaceDatabaseSchema } from '@/main/data/workspace/schema';
-import { Kysely } from 'kysely';
 import { httpClient } from '@/shared/lib/http-client';
 import { serverService } from '@/main/services/server-service';
+import {
+  CollaborationsBatchMessage,
+  FetchCollaborationsMessage,
+  FetchNodeTransactionsMessage,
+  LocalNodeTransaction,
+  NodeTransactionsBatchMessage,
+  SyncNodeTransactionsOutput,
+} from '@colanode/core';
+import { logService } from '@/main/services/log-service';
 import { nodeService } from '@/main/services/node-service';
 import { socketService } from '@/main/services/socket-service';
+import { collaborationService } from '@/main/services/collaboration-service';
 
 type WorkspaceSyncState = {
   isSyncing: boolean;
@@ -19,12 +22,18 @@ type WorkspaceSyncState = {
 };
 
 class SyncService {
-  private syncStates: Map<string, WorkspaceSyncState> = new Map();
+  private readonly logger = logService.createLogger('sync-service');
+  private readonly localSyncStates: Map<string, WorkspaceSyncState> = new Map();
+
+  private readonly syncingTransactions: Set<string> = new Set();
+  private readonly syncingCollaborations: Set<string> = new Set();
 
   constructor() {
     eventBus.subscribe((event) => {
-      if (event.type === 'change_created') {
-        this.syncWorkspace(event.userId);
+      if (event.type === 'node_transaction_created') {
+        this.syncLocalTransactions(event.userId);
+      } else if (event.type === 'workspace_created') {
+        this.requireNodeTransactions(event.workspace.userId);
       }
     });
   }
@@ -36,19 +45,21 @@ class SyncService {
       .execute();
 
     for (const workspace of workspaces) {
-      this.syncWorkspace(workspace.user_id);
+      this.syncLocalTransactions(workspace.user_id);
+      this.requireNodeTransactions(workspace.user_id);
+      this.requireCollaborations(workspace.user_id);
     }
   }
 
-  public async syncWorkspace(userId: string) {
-    if (!this.syncStates.has(userId)) {
-      this.syncStates.set(userId, {
+  public async syncLocalTransactions(userId: string) {
+    if (!this.localSyncStates.has(userId)) {
+      this.localSyncStates.set(userId, {
         isSyncing: false,
         scheduledSync: false,
       });
     }
 
-    const syncState = this.syncStates.get(userId)!;
+    const syncState = this.localSyncStates.get(userId)!;
     if (syncState.isSyncing) {
       syncState.scheduledSync = true;
       return;
@@ -56,26 +67,92 @@ class SyncService {
 
     syncState.isSyncing = true;
     try {
-      await this.syncWorkspaceChanges(userId);
+      await this.sendLocalTransactions(userId);
     } catch (error) {
-      console.log('error', error);
+      this.logger.error(
+        error,
+        `Error syncing local transactions for user ${userId}`
+      );
     } finally {
       syncState.isSyncing = false;
 
       if (syncState.scheduledSync) {
         syncState.scheduledSync = false;
-        this.syncWorkspace(userId);
+        this.syncLocalTransactions(userId);
       }
     }
   }
 
-  private async syncWorkspaceChanges(userId: string) {
+  public async syncServerTransactions(message: NodeTransactionsBatchMessage) {
+    if (this.syncingTransactions.has(message.userId)) {
+      return;
+    }
+
+    this.syncingTransactions.add(message.userId);
+    let cursor: bigint | null = null;
+    try {
+      for (const transaction of message.transactions) {
+        await nodeService.applyServerTransaction(message.userId, transaction);
+        cursor = BigInt(transaction.number);
+      }
+
+      if (cursor) {
+        this.updateNodeTransactionCursor(message.userId, cursor);
+      }
+    } catch (error) {
+      this.logger.error(
+        error,
+        `Error syncing server transactions for user ${message.userId}`
+      );
+    } finally {
+      this.syncingTransactions.delete(message.userId);
+      this.requireNodeTransactions(message.userId);
+    }
+  }
+
+  public async syncServerCollaborations(message: CollaborationsBatchMessage) {
+    if (this.syncingCollaborations.has(message.userId)) {
+      return;
+    }
+
+    this.syncingCollaborations.add(message.userId);
+    let cursor: bigint | null = null;
+    try {
+      for (const collaboration of message.collaborations) {
+        await collaborationService.applyServerCollaboration(
+          message.userId,
+          collaboration
+        );
+        cursor = BigInt(collaboration.number);
+      }
+
+      if (cursor) {
+        this.updateNodeCollaborationCursor(message.userId, cursor);
+      }
+    } catch (error) {
+      this.logger.error(
+        error,
+        `Error syncing server collaborations for user ${message.userId}`
+      );
+    } finally {
+      this.syncingCollaborations.delete(message.userId);
+      this.requireCollaborations(message.userId);
+    }
+  }
+
+  private async sendLocalTransactions(userId: string) {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
-    const changes =
-      await this.fetchAndCompactWorkspaceChanges(workspaceDatabase);
-    if (changes.length === 0) {
+    const unsyncedTransactions = await workspaceDatabase
+      .selectFrom('node_transactions')
+      .selectAll()
+      .where('status', '=', 'pending')
+      .orderBy('id', 'asc')
+      .limit(20)
+      .execute();
+
+    if (unsyncedTransactions.length === 0) {
       return;
     }
 
@@ -102,237 +179,135 @@ class SyncService {
       return;
     }
 
-    while (changes.length > 0) {
-      const changesToSync = changes.splice(0, 20);
-      const { data } = await httpClient.post<SyncChangesOutput>(
-        `/v1/sync/${workspace.workspace_id}`,
-        {
-          changes: changesToSync,
-        },
-        {
-          domain: workspace.domain,
-          token: workspace.token,
-        }
-      );
-
-      const syncedChangeIds: number[] = [];
-      const unsyncedChangeIds: number[] = [];
-      for (const result of data.results) {
-        if (result.status === 'success') {
-          syncedChangeIds.push(result.id);
-        } else {
-          unsyncedChangeIds.push(result.id);
-        }
-      }
-
-      if (syncedChangeIds.length > 0) {
-        await workspaceDatabase
-          .deleteFrom('changes')
-          .where('id', 'in', syncedChangeIds)
-          .execute();
-      }
-
-      if (unsyncedChangeIds.length > 0) {
-        await workspaceDatabase
-          .updateTable('changes')
-          .set((eb) => ({ retry_count: eb('retry_count', '+', 1) }))
-          .where('id', 'in', unsyncedChangeIds)
-          .execute();
-      }
-    }
-
-    const invalidChanges = await this.fetchInvalidChanges(workspaceDatabase);
-    if (invalidChanges.length === 0) {
-      return;
-    }
-
-    const nodeChanges: Record<string, number[]> = {};
-    const changesToDelete: number[] = [];
-    for (const change of invalidChanges) {
-      if (change.retryCount >= 100) {
-        // if the change has been retried 100 times, we delete it (it should never happen)
-        changesToDelete.push(change.id);
-        continue;
-      }
-
-      let nodeId: string | null = null;
-      if (
-        change.data.type === 'node_create' ||
-        change.data.type === 'node_update' ||
-        change.data.type === 'node_delete'
-      ) {
-        nodeId = change.data.id;
-      } else if (change.data.type === 'user_node_update') {
-        nodeId = change.data.nodeId;
-      }
-
-      if (nodeId) {
-        const changeIds = nodeChanges[nodeId] ?? [];
-        changeIds.push(change.id);
-        nodeChanges[nodeId] = changeIds;
-      }
-    }
-
-    const nodeIds = Object.keys(nodeChanges);
-    const { data, status } = await httpClient.post<SyncNodeStatesOutput>(
-      `/v1/sync/states/${workspace.workspace_id}`,
+    const transactions: LocalNodeTransaction[] =
+      unsyncedTransactions.map(mapTransaction);
+    const { data } = await httpClient.post<SyncNodeTransactionsOutput>(
+      `/v1/sync/${workspace.workspace_id}`,
       {
-        nodeIds,
+        transactions,
       },
-      { domain: workspace.domain, token: workspace.token }
+      {
+        domain: workspace.domain,
+        token: workspace.token,
+      }
     );
 
-    if (status !== 200) {
+    const syncedTransactionIds: string[] = [];
+    const unsyncedTransactionIds: string[] = [];
+
+    for (const result of data.results) {
+      if (result.status === 'success') {
+        syncedTransactionIds.push(result.id);
+      } else {
+        unsyncedTransactionIds.push(result.id);
+      }
+    }
+
+    if (syncedTransactionIds.length > 0) {
+      await workspaceDatabase
+        .updateTable('node_transactions')
+        .set({ status: 'sent' })
+        .where('id', 'in', syncedTransactionIds)
+        .execute();
+    }
+
+    if (unsyncedTransactionIds.length > 0) {
+      await workspaceDatabase
+        .updateTable('node_transactions')
+        .set((eb) => ({ retry_count: eb('retry_count', '+', 1) }))
+        .where('id', 'in', unsyncedTransactionIds)
+        .execute();
+    }
+  }
+
+  private async requireNodeTransactions(userId: string) {
+    const workspaceWithCursor = await databaseService.appDatabase
+      .selectFrom('workspaces as w')
+      .leftJoin('workspace_cursors as wc', 'w.user_id', 'wc.user_id')
+      .select([
+        'w.user_id',
+        'w.workspace_id',
+        'w.account_id',
+        'wc.node_transactions',
+      ])
+      .where('w.user_id', '=', userId)
+      .executeTakeFirst();
+
+    if (!workspaceWithCursor) {
       return;
     }
 
-    for (const nodeId of nodeIds) {
-      const changeIds = nodeChanges[nodeId] ?? [];
-      const states = data.nodes[nodeId];
+    const message: FetchNodeTransactionsMessage = {
+      type: 'fetch_node_transactions',
+      userId: workspaceWithCursor.user_id,
+      workspaceId: workspaceWithCursor.workspace_id,
+      cursor: workspaceWithCursor.node_transactions?.toString() ?? null,
+    };
 
-      if (!states) {
-        const deleted = await nodeService.serverDelete(userId, nodeId);
-        if (deleted) {
-          changesToDelete.push(...changeIds);
-
-          socketService.sendMessage(workspace.account_id, {
-            type: 'local_node_delete',
-            nodeId,
-            workspaceId: workspace.workspace_id,
-          });
-        }
-
-        continue;
-      }
-
-      const nodeSynced = await nodeService.serverUpsert(userId, states.node);
-      if (nodeSynced) {
-        changesToDelete.push(...changeIds);
-        socketService.sendMessage(workspace.account_id, {
-          type: 'local_node_sync',
-          nodeId,
-          userId,
-          versionId: states.node.versionId,
-          workspaceId: workspace.workspace_id,
-        });
-
-        const userNodeSynced = await nodeService.serverUserNodeSync(
-          userId,
-          states.userNode
-        );
-
-        if (userNodeSynced) {
-          socketService.sendMessage(workspace.account_id, {
-            type: 'local_user_node_sync',
-            nodeId,
-            userId,
-            versionId: states.userNode.versionId,
-            workspaceId: workspace.workspace_id,
-          });
-        }
-
-        changesToDelete.push(...changeIds);
-      }
-    }
-
-    if (changesToDelete.length > 0) {
-      await workspaceDatabase
-        .deleteFrom('changes')
-        .where('id', 'in', changesToDelete)
-        .execute();
-    }
+    socketService.sendMessage(workspaceWithCursor.account_id, message);
   }
 
-  private async fetchAndCompactWorkspaceChanges(
-    database: Kysely<WorkspaceDatabaseSchema>
-  ): Promise<LocalChange[]> {
-    const changeRows = await database
-      .selectFrom('changes')
-      .selectAll()
-      .orderBy('id asc')
-      .limit(1000)
-      .execute();
+  private async requireCollaborations(userId: string) {
+    const workspaceWithCursor = await databaseService.appDatabase
+      .selectFrom('workspaces as w')
+      .leftJoin('workspace_cursors as wc', 'w.user_id', 'wc.user_id')
+      .select([
+        'w.user_id',
+        'w.workspace_id',
+        'w.account_id',
+        'wc.collaborations',
+      ])
+      .where('w.user_id', '=', userId)
+      .executeTakeFirst();
 
-    if (changeRows.length === 0) {
-      return [];
+    if (!workspaceWithCursor) {
+      return;
     }
 
-    const changes: LocalChange[] = changeRows.map(mapChange);
-    const changesToDelete = new Set<number>();
-    for (let i = changes.length - 1; i >= 0; i--) {
-      const change = changes[i];
-      if (!change) {
-        continue;
-      }
+    const message: FetchCollaborationsMessage = {
+      type: 'fetch_collaborations',
+      userId: workspaceWithCursor.user_id,
+      workspaceId: workspaceWithCursor.workspace_id,
+      cursor: workspaceWithCursor.collaborations?.toString() ?? null,
+    };
 
-      if (changesToDelete.has(change.id)) {
-        continue;
-      }
-
-      if (change.data.type === 'node_delete') {
-        for (let j = i - 1; j >= 0; j--) {
-          const otherChange = changes[j];
-          if (!otherChange) {
-            continue;
-          }
-
-          if (
-            otherChange.data.type === 'node_create' &&
-            otherChange.data.id === change.data.id
-          ) {
-            // if the node has been created and then deleted, we don't need to sync the delete
-            changesToDelete.add(change.id);
-            changesToDelete.add(otherChange.id);
-          }
-
-          if (
-            otherChange.data.type === 'node_update' &&
-            otherChange.data.id === change.data.id
-          ) {
-            changesToDelete.add(otherChange.id);
-          }
-        }
-      } else if (change.data.type === 'user_node_update') {
-        for (let j = i - 1; j >= 0; j--) {
-          const otherChange = changes[j];
-          if (!otherChange) {
-            continue;
-          }
-
-          if (
-            otherChange.data.type === 'user_node_update' &&
-            otherChange.data.nodeId === change.data.nodeId &&
-            otherChange.data.userId === change.data.userId
-          ) {
-            changesToDelete.add(otherChange.id);
-          }
-        }
-      }
-    }
-
-    if (changesToDelete.size > 0) {
-      const toDeleteIds = Array.from(changesToDelete);
-      await database
-        .deleteFrom('changes')
-        .where('id', 'in', toDeleteIds)
-        .execute();
-    }
-
-    return changes.filter((change) => !changesToDelete.has(change.id));
+    socketService.sendMessage(workspaceWithCursor.account_id, message);
   }
 
-  private async fetchInvalidChanges(database: Kysely<WorkspaceDatabaseSchema>) {
-    const rows = await database
-      .selectFrom('changes')
-      .selectAll()
-      .where('retry_count', '>=', 5)
+  private async updateNodeTransactionCursor(userId: string, cursor: bigint) {
+    await databaseService.appDatabase
+      .insertInto('workspace_cursors')
+      .values({
+        user_id: userId,
+        node_transactions: cursor,
+        collaborations: 0n,
+        created_at: new Date().toISOString(),
+      })
+      .onConflict((eb) =>
+        eb.column('user_id').doUpdateSet({
+          node_transactions: cursor,
+          updated_at: new Date().toISOString(),
+        })
+      )
       .execute();
+  }
 
-    if (rows.length === 0) {
-      return [];
-    }
-
-    return rows.map(mapChange);
+  private async updateNodeCollaborationCursor(userId: string, cursor: bigint) {
+    await databaseService.appDatabase
+      .insertInto('workspace_cursors')
+      .values({
+        user_id: userId,
+        collaborations: cursor,
+        node_transactions: 0n,
+        created_at: new Date().toISOString(),
+      })
+      .onConflict((eb) =>
+        eb.column('user_id').doUpdateSet({
+          collaborations: cursor,
+          updated_at: new Date().toISOString(),
+        })
+      )
+      .execute();
   }
 }
 

@@ -107,23 +107,50 @@ const createNodesTable: Migration = {
         col
           .generatedAlwaysAs(sql`(attributes->>'parentId')::VARCHAR(30)`)
           .stored()
-          .references('nodes.id')
-          .onDelete('cascade')
           .notNull()
       )
       .addColumn('attributes', 'jsonb', (col) => col.notNull())
-      .addColumn('state', 'bytea', (col) => col.notNull())
       .addColumn('created_at', 'timestamptz', (col) => col.notNull())
       .addColumn('updated_at', 'timestamptz')
       .addColumn('created_by', 'varchar(30)', (col) => col.notNull())
       .addColumn('updated_by', 'varchar(30)')
-      .addColumn('version_id', 'varchar(30)', (col) => col.notNull())
-      .addColumn('server_created_at', 'timestamptz', (col) => col.notNull())
-      .addColumn('server_updated_at', 'timestamptz')
+      .addColumn('transaction_id', 'varchar(30)', (col) => col.notNull())
       .execute();
   },
   down: async (db) => {
     await db.schema.dropTable('nodes').execute();
+  },
+};
+
+const createNodeTransactionsTable: Migration = {
+  up: async (db) => {
+    await sql`
+      CREATE SEQUENCE IF NOT EXISTS node_transactions_number_seq
+      START WITH 1000000000
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      CACHE 1;
+    `.execute(db);
+
+    await db.schema
+      .createTable('node_transactions')
+      .addColumn('id', 'varchar(30)', (col) => col.notNull().primaryKey())
+      .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
+      .addColumn('node_id', 'varchar(30)', (col) => col.notNull())
+      .addColumn('type', 'varchar(30)', (col) => col.notNull())
+      .addColumn('data', 'bytea')
+      .addColumn('created_at', 'timestamptz', (col) => col.notNull())
+      .addColumn('created_by', 'varchar(30)', (col) => col.notNull())
+      .addColumn('server_created_at', 'timestamptz', (col) => col.notNull())
+      .addColumn('number', 'bigint', (col) =>
+        col.notNull().defaultTo(sql`nextval('node_transactions_number_seq')`)
+      )
+      .execute();
+  },
+  down: async (db) => {
+    await db.schema.dropTable('node_transactions').execute();
+    await sql`DROP SEQUENCE IF EXISTS node_transactions_number_seq`.execute(db);
   },
 };
 
@@ -201,52 +228,60 @@ const createNodePathsTable: Migration = {
   },
 };
 
-const createUserNodesTable: Migration = {
+const createCollaborationsTable: Migration = {
   up: async (db) => {
+    await sql`
+      CREATE SEQUENCE IF NOT EXISTS collaboration_number_seq
+      START WITH 1000000000
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      CACHE 1;
+    `.execute(db);
+
     await db.schema
-      .createTable('user_nodes')
+      .createTable('collaborations')
       .addColumn('user_id', 'varchar(30)', (col) => col.notNull())
       .addColumn('node_id', 'varchar(30)', (col) => col.notNull())
-      .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
-      .addColumn('last_seen_version_id', 'varchar(30)')
-      .addColumn('last_seen_at', 'timestamptz')
-      .addColumn('mentions_count', 'integer', (col) =>
-        col.notNull().defaultTo(0)
+      .addColumn('type', 'varchar(30)', (col) =>
+        col.generatedAlwaysAs(sql`(attributes->>'type')::VARCHAR(30)`).stored()
       )
-      .addColumn('attributes', 'jsonb')
+      .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
+      .addColumn('attributes', 'jsonb', (col) => col.notNull())
+      .addColumn('state', 'bytea', (col) => col.notNull())
       .addColumn('created_at', 'timestamptz', (col) => col.notNull())
       .addColumn('updated_at', 'timestamptz')
-      .addColumn('access_removed_at', 'timestamptz')
-      .addColumn('version_id', 'varchar(30)', (col) => col.notNull())
-      .addPrimaryKeyConstraint('user_nodes_pkey', ['user_id', 'node_id'])
+      .addColumn('deleted_at', 'timestamptz')
+      .addColumn('number', 'bigint', (col) =>
+        col.notNull().defaultTo(sql`nextval('collaboration_number_seq')`)
+      )
+      .addPrimaryKeyConstraint('collaborations_pkey', ['user_id', 'node_id'])
       .execute();
-  },
-  down: async (db) => {
-    await db.schema.dropTable('user_nodes').execute();
-  },
-};
 
-const createDeviceNodesTable: Migration = {
-  up: async (db) => {
-    await db.schema
-      .createTable('device_nodes')
-      .addColumn('device_id', 'varchar(30)', (col) => col.notNull())
-      .addColumn('user_id', 'varchar(30)', (col) => col.notNull())
-      .addColumn('node_id', 'varchar(30)', (col) => col.notNull())
-      .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
-      .addColumn('node_version_id', 'varchar(30)')
-      .addColumn('user_node_version_id', 'varchar(30)')
-      .addColumn('node_synced_at', 'timestamptz')
-      .addColumn('user_node_synced_at', 'timestamptz')
-      .addPrimaryKeyConstraint('device_nodes_pkey', [
-        'device_id',
-        'user_id',
-        'node_id',
-      ])
-      .execute();
+    // Add trigger to update number on each update
+    await sql`
+      CREATE OR REPLACE FUNCTION fn_update_collaboration_number() RETURNS TRIGGER AS $$
+      BEGIN
+        NEW.number = nextval('collaboration_number_seq');
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+
+      CREATE TRIGGER trg_update_collaboration_number
+      BEFORE UPDATE ON collaborations
+      FOR EACH ROW
+      EXECUTE FUNCTION fn_update_collaboration_number();
+    `.execute(db);
   },
   down: async (db) => {
-    await db.schema.dropTable('device_nodes').execute();
+    // Drop trigger and function first
+    await sql`
+      DROP TRIGGER IF EXISTS trg_update_collaboration_number ON collaborations;
+      DROP FUNCTION IF EXISTS fn_update_collaboration_number();
+      DROP SEQUENCE IF EXISTS collaboration_number_seq;
+    `.execute(db);
+
+    await db.schema.dropTable('collaborations').execute();
   },
 };
 
@@ -279,8 +314,8 @@ export const databaseMigrations: Record<string, Migration> = {
   '00003_create_workspaces_table': createWorkspacesTable,
   '00004_create_workspace_users_table': createWorkspaceUsersTable,
   '00005_create_nodes_table': createNodesTable,
-  '00006_create_node_paths_table': createNodePathsTable,
-  '00007_create_user_nodes_table': createUserNodesTable,
-  '00008_create_device_nodes_table': createDeviceNodesTable,
+  '00006_create_node_transactions_table': createNodeTransactionsTable,
+  '00007_create_node_paths_table': createNodePathsTable,
+  '00008_create_collaborations_table': createCollaborationsTable,
   '00009_create_uploads_table': createUploadsTable,
 };

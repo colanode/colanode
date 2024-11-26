@@ -2,33 +2,50 @@ import { database } from '@/data/database';
 import { Server } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import { verifyToken } from '@/lib/tokens';
-import { CHANNEL_NAMES } from '@/data/redis';
-import { redis } from '@/data/redis';
 import {
-  SynapseMessage,
-  SynapseNodeChangeMessage,
-  SynapseUserNodeChangeMessage,
-} from '@/types/synapse';
-import { getIdType, IdType } from '@colanode/core';
-import { Message } from '@colanode/core';
+  CollaborationsBatchMessage,
+  Message,
+  NodeTransactionsBatchMessage,
+} from '@colanode/core';
 import { logService } from '@/services/log';
-import { encodeState } from '@colanode/crdt';
+import { mapCollaboration, mapNodeTransaction } from '@/lib/nodes';
+import { eventBus } from '@/lib/event-bus';
+import {
+  CollaborationCreatedEvent,
+  CollaborationUpdatedEvent,
+  NodeTransactionCreatedEvent,
+} from '@/types/events';
+
+interface SynapseUserCursor {
+  workspaceId: string;
+  userId: string;
+  cursor: string | null;
+  syncing: boolean;
+}
 
 interface SynapseConnection {
   accountId: string;
   deviceId: string;
-  workspaceUsers: {
-    workspaceId: string;
-    userId: string;
-  }[];
-  pendingSyncs: Set<string>;
   socket: WebSocket;
-  pendingSyncTimeout: NodeJS.Timeout | null;
+  nodeTransactions: Map<string, SynapseUserCursor>;
+  collaborations: Map<string, SynapseUserCursor>;
 }
 
 class SynapseService {
   private readonly logger = logService.createLogger('synapse-service');
   private readonly connections: Map<string, SynapseConnection> = new Map();
+
+  constructor() {
+    eventBus.subscribe((event) => {
+      if (event.type === 'node_transaction_created') {
+        this.handleNodeTransactionCreatedEvent(event);
+      } else if (event.type === 'collaboration_created') {
+        this.handleCollaborationCreatedEvent(event);
+      } else if (event.type === 'collaboration_updated') {
+        this.handleCollaborationUpdatedEvent(event);
+      }
+    });
+  }
 
   public async init(server: Server) {
     this.logger.info('Initializing synapse service');
@@ -67,10 +84,6 @@ class SynapseService {
       socket.on('close', () => {
         const connection = this.connections.get(account.deviceId);
         if (connection) {
-          if (connection.pendingSyncTimeout) {
-            clearTimeout(connection.pendingSyncTimeout);
-          }
-
           this.connections.delete(account.deviceId);
         }
       });
@@ -78,10 +91,9 @@ class SynapseService {
       const connection: SynapseConnection = {
         accountId: account.id,
         deviceId: account.deviceId,
-        workspaceUsers: [],
-        pendingSyncs: new Set(),
-        pendingSyncTimeout: null,
         socket,
+        nodeTransactions: new Map(),
+        collaborations: new Map(),
       };
 
       socket.on('message', (message) => {
@@ -89,19 +101,10 @@ class SynapseService {
       });
 
       this.connections.set(account.deviceId, connection);
-      this.fetchWorkspaceUsers(connection).then(() => {
-        this.sendPendingChangesDebounced(connection);
-      });
     });
-
-    const subscriber = redis.duplicate();
-    await subscriber.connect();
-    await subscriber.subscribe(CHANNEL_NAMES.SYNAPSE, (message) =>
-      this.handleSynapseMessage(message.toString())
-    );
   }
 
-  private sendSocketMessage(connection: SynapseConnection, message: Message) {
+  private sendMessage(connection: SynapseConnection, message: Message) {
     connection.socket.send(JSON.stringify(message));
   }
 
@@ -111,472 +114,229 @@ class SynapseService {
   ) {
     this.logger.trace(message, `Socket message from ${connection.deviceId}`);
 
-    if (message.type === 'local_node_sync') {
-      await database
-        .insertInto('device_nodes')
-        .values({
-          node_id: message.nodeId,
-          user_id: message.userId,
-          device_id: connection.deviceId,
-          node_version_id: message.versionId,
-          user_node_version_id: null,
-          user_node_synced_at: null,
-          workspace_id: message.workspaceId,
-          node_synced_at: new Date(),
-        })
-        .onConflict((cb) =>
-          cb.columns(['node_id', 'user_id', 'device_id']).doUpdateSet({
-            workspace_id: message.workspaceId,
-            node_version_id: message.versionId,
-            node_synced_at: new Date(),
-          })
-        )
-        .execute();
-    } else if (message.type === 'local_user_node_sync') {
-      await database
-        .insertInto('device_nodes')
-        .values({
-          node_id: message.nodeId,
-          user_id: message.userId,
-          device_id: connection.deviceId,
-          node_version_id: null,
-          user_node_version_id: message.versionId,
-          user_node_synced_at: new Date(),
-          workspace_id: message.workspaceId,
-          node_synced_at: new Date(),
-        })
-        .onConflict((cb) =>
-          cb.columns(['node_id', 'user_id', 'device_id']).doUpdateSet({
-            workspace_id: message.workspaceId,
-            user_node_version_id: message.versionId,
-            user_node_synced_at: new Date(),
-          })
-        )
-        .execute();
-    } else if (message.type === 'local_node_delete') {
-      await database
-        .deleteFrom('device_nodes')
-        .where('device_id', '=', connection.deviceId)
-        .where('node_id', '=', message.nodeId)
-        .execute();
+    if (message.type === 'fetch_node_transactions') {
+      const state = connection.nodeTransactions.get(message.userId);
+      if (!state) {
+        connection.nodeTransactions.set(message.userId, {
+          userId: message.userId,
+          workspaceId: message.workspaceId,
+          cursor: message.cursor,
+          syncing: false,
+        });
 
-      const userId = connection.workspaceUsers.find(
-        (wu) => wu.workspaceId === message.workspaceId
-      )?.userId;
+        this.sendPendingTransactions(connection, message.userId);
+      } else if (!state.syncing && !(state.cursor, message.cursor)) {
+        state.cursor = message.cursor;
+        this.sendPendingTransactions(connection, message.userId);
+      }
+    } else if (message.type === 'fetch_collaborations') {
+      const state = connection.collaborations.get(message.userId);
+      if (!state) {
+        connection.collaborations.set(message.userId, {
+          userId: message.userId,
+          workspaceId: message.workspaceId,
+          cursor: message.cursor,
+          syncing: false,
+        });
 
-      if (userId) {
-        const userDevices = await database
-          .selectFrom('devices')
-          .select('id')
-          .where(
-            'account_id',
-            'in',
-            database
-              .selectFrom('workspace_users')
-              .select('account_id')
-              .where('id', '=', userId)
-          )
-          .execute();
-
-        const deviceIds = userDevices.map((device) => device.id);
-        if (deviceIds.length > 0) {
-          const deviceNodes = await database
-            .selectFrom('device_nodes')
-            .select('node_id')
-            .where('device_id', 'in', deviceIds)
-            .where('node_id', '=', message.nodeId)
-            .execute();
-
-          if (deviceNodes.length === 0) {
-            await database
-              .deleteFrom('user_nodes')
-              .where('node_id', '=', message.nodeId)
-              .where('user_id', '=', userId)
-              .execute();
-          }
-        }
+        this.sendPendingCollaborations(connection, message.userId);
+      } else if (!state.syncing && !(state.cursor, message.cursor)) {
+        state.cursor = message.cursor;
+        this.sendPendingCollaborations(connection, message.userId);
       }
     }
-
-    this.sendPendingChangesDebounced(connection);
   }
 
-  public async sendSynapseMessage(message: SynapseMessage) {
-    await redis.publish(CHANNEL_NAMES.SYNAPSE, JSON.stringify(message));
-  }
-
-  private async handleSynapseMessage(message: string) {
-    const data: SynapseMessage = JSON.parse(message);
-    this.logger.trace(data, 'Synapse message');
-
-    if (
-      data.type === 'node_create' ||
-      data.type === 'node_update' ||
-      data.type === 'node_delete'
-    ) {
-      await this.handleNodeChangeMessage(data);
-    } else if (data.type === 'user_node_update') {
-      await this.handleUserNodeUpdateMessage(data);
-    }
-  }
-
-  private async handleNodeChangeMessage(data: SynapseNodeChangeMessage) {
-    this.logger.trace(data, 'Handling node change message');
-
-    const idType = getIdType(data.nodeId);
-    if (idType === IdType.User) {
-      await this.addNewWorkspaceUser(data.nodeId, data.workspaceId);
+  private async sendPendingTransactions(
+    connection: SynapseConnection,
+    userId: string
+  ) {
+    const state = connection.nodeTransactions.get(userId);
+    if (!state || state.syncing) {
+      return;
     }
 
-    await this.broadcastNodeChange(data);
+    state.syncing = true;
+    this.logger.trace(
+      state,
+      `Sending pending node transactions for ${connection.deviceId} with ${userId}`
+    );
+
+    let query = database
+      .selectFrom('node_transactions as nt')
+      .leftJoin('collaborations as c', (join) =>
+        join.on('c.user_id', '=', userId).onRef('c.node_id', '=', 'nt.node_id')
+      )
+      .selectAll('nt');
+
+    if (state.cursor) {
+      query = query.where('nt.number', '>', BigInt(state.cursor));
+    }
+
+    const unsyncedTransactions = await query
+      .orderBy('nt.number', 'asc')
+      .limit(20)
+      .execute();
+
+    if (unsyncedTransactions.length === 0) {
+      state.syncing = false;
+      return;
+    }
+
+    const transactions = unsyncedTransactions.map(mapNodeTransaction);
+    const message: NodeTransactionsBatchMessage = {
+      type: 'node_transactions_batch',
+      userId,
+      transactions,
+    };
+
+    connection.nodeTransactions.delete(userId);
+    this.sendMessage(connection, message);
   }
 
-  private async broadcastNodeChange(data: SynapseNodeChangeMessage) {
-    const userDevices = this.getWorkspaceUserDevices(data.workspaceId);
+  private async sendPendingCollaborations(
+    connection: SynapseConnection,
+    userId: string
+  ) {
+    const state = connection.collaborations.get(userId);
+    if (!state || state.syncing) {
+      return;
+    }
+
+    state.syncing = true;
+    this.logger.trace(
+      state,
+      `Sending pending collaborations for ${connection.deviceId} with ${userId}`
+    );
+
+    let query = database
+      .selectFrom('collaborations as c')
+      .selectAll()
+      .where('c.user_id', '=', userId);
+
+    if (state.cursor) {
+      query = query.where('c.number', '>', BigInt(state.cursor));
+    }
+
+    const unsyncedCollaborations = await query
+      .orderBy('c.number', 'asc')
+      .limit(20)
+      .execute();
+
+    if (unsyncedCollaborations.length === 0) {
+      state.syncing = false;
+      return;
+    }
+
+    const collaborations = unsyncedCollaborations.map(mapCollaboration);
+    const message: CollaborationsBatchMessage = {
+      type: 'collaborations_batch',
+      userId,
+      collaborations,
+    };
+
+    connection.collaborations.delete(userId);
+    this.sendMessage(connection, message);
+  }
+
+  private async handleNodeTransactionCreatedEvent(
+    event: NodeTransactionCreatedEvent
+  ) {
+    const userDevices = this.getPendingNodeTransactionCursors(
+      event.workspaceId
+    );
     const userIds = Array.from(userDevices.keys());
     if (userIds.length === 0) {
       return;
     }
 
-    this.logger.trace(
-      userIds,
-      `Broadcasting node change for ${data.nodeId} to ${userIds.length} users`
-    );
-
-    const userNodes = await database
-      .selectFrom('user_nodes')
+    const collaborations = await database
+      .selectFrom('collaborations')
       .selectAll()
       .where((eb) =>
-        eb.and([eb('user_id', 'in', userIds), eb('node_id', '=', data.nodeId)])
+        eb.and([eb('user_id', 'in', userIds), eb('node_id', '=', event.nodeId)])
       )
       .execute();
 
-    this.logger.trace(
-      userNodes,
-      `User nodes for ${data.nodeId} with ${userNodes.length} users`
-    );
-
-    if (userNodes.length === 0) {
+    if (collaborations.length === 0) {
       return;
     }
 
-    if (data.type === 'node_delete') {
-      for (const userNode of userNodes) {
-        const deviceIds = userDevices.get(userNode.user_id) ?? [];
-        for (const deviceId of deviceIds) {
-          const socketConnection = this.connections.get(deviceId);
-          if (socketConnection === undefined) {
-            continue;
-          }
-
-          this.sendSocketMessage(socketConnection, {
-            type: 'server_node_delete',
-            id: data.nodeId,
-            workspaceId: data.workspaceId,
-          });
-        }
-      }
-
-      return;
-    }
-
-    const node = await database
-      .selectFrom('nodes')
-      .select([
-        'id',
-        'state',
-        'created_at',
-        'created_by',
-        'updated_at',
-        'updated_by',
-        'server_created_at',
-        'server_updated_at',
-        'version_id',
-      ])
-      .where('id', '=', data.nodeId)
-      .executeTakeFirst();
-
-    if (!node) {
-      return;
-    }
-
-    for (const userNode of userNodes) {
-      const deviceIds = userDevices.get(userNode.user_id) ?? [];
-      if (deviceIds.length === 0) {
-        continue;
-      }
-
+    for (const collaboration of collaborations) {
+      const deviceIds = userDevices.get(collaboration.user_id) ?? [];
       for (const deviceId of deviceIds) {
         const socketConnection = this.connections.get(deviceId);
         if (socketConnection === undefined) {
           continue;
         }
 
-        if (userNode.access_removed_at !== null) {
-          this.sendSocketMessage(socketConnection, {
-            type: 'server_node_delete',
-            id: data.nodeId,
-            workspaceId: data.workspaceId,
-          });
-        } else {
-          this.sendSocketMessage(socketConnection, {
-            type: 'server_node_sync',
-            node: {
-              id: node.id,
-              workspaceId: data.workspaceId,
-              state: encodeState(node.state),
-              createdAt: node.created_at.toISOString(),
-              createdBy: node.created_by,
-              updatedAt: node.updated_at?.toISOString() ?? null,
-              updatedBy: node.updated_by ?? null,
-              serverCreatedAt: node.server_created_at.toISOString(),
-              serverUpdatedAt: node.server_updated_at?.toISOString() ?? null,
-              versionId: node.version_id,
-            },
-          });
-        }
+        this.sendPendingTransactions(socketConnection, collaboration.user_id);
       }
     }
   }
 
-  private async handleUserNodeUpdateMessage(
-    data: SynapseUserNodeChangeMessage
-  ) {
-    const userDevices = this.getWorkspaceUserDevices(data.workspaceId);
-    if (!userDevices.has(data.userId)) {
+  private handleCollaborationCreatedEvent(event: CollaborationCreatedEvent) {
+    const userDevices = this.getPendingCollaborationCursors(event.userId);
+    if (userDevices.length === 0) {
       return;
     }
 
-    const userNode = await database
-      .selectFrom('user_nodes')
-      .selectAll()
-      .where('user_id', '=', data.userId)
-      .where('node_id', '=', data.nodeId)
-      .executeTakeFirst();
-
-    if (!userNode) {
-      return;
-    }
-
-    const deviceIds = userDevices.get(data.userId) ?? [];
-    for (const deviceId of deviceIds) {
+    for (const deviceId of userDevices) {
       const socketConnection = this.connections.get(deviceId);
       if (socketConnection === undefined) {
         continue;
       }
 
-      this.sendSocketMessage(socketConnection, {
-        type: 'server_user_node_sync',
-        userNode: {
-          userId: data.userId,
-          nodeId: data.nodeId,
-          lastSeenVersionId: userNode.last_seen_version_id,
-          workspaceId: data.workspaceId,
-          versionId: userNode.version_id,
-          lastSeenAt: userNode.last_seen_at?.toISOString() ?? null,
-          createdAt: userNode.created_at.toISOString(),
-          updatedAt: userNode.updated_at?.toISOString() ?? null,
-          mentionsCount: userNode.mentions_count,
-        },
-      });
+      this.sendPendingCollaborations(socketConnection, event.userId);
     }
   }
 
-  private sendPendingChangesDebounced(connection: SynapseConnection) {
-    if (connection.pendingSyncTimeout) {
-      clearTimeout(connection.pendingSyncTimeout);
-    }
-
-    connection.pendingSyncTimeout = setTimeout(async () => {
-      await this.sendPendingChanges(connection);
-    }, 500);
-  }
-
-  private async sendPendingChanges(connection: SynapseConnection) {
-    const userIds = connection.workspaceUsers.map(
-      (workspaceUser) => workspaceUser.userId
-    );
-
-    if (userIds.length === 0) {
+  private handleCollaborationUpdatedEvent(event: CollaborationUpdatedEvent) {
+    const userDevices = this.getPendingCollaborationCursors(event.userId);
+    if (userDevices.length === 0) {
       return;
     }
 
-    this.logger.trace(
-      userIds,
-      `Sending pending changes for ${connection.deviceId} with ${userIds.length} users`
-    );
-
-    const unsyncedNodes = await database
-      .selectFrom('user_nodes as nus')
-      .leftJoin('nodes as n', 'n.id', 'nus.node_id')
-      .leftJoin('device_nodes as nds', (join) =>
-        join
-          .onRef('nds.node_id', '=', 'nus.node_id')
-          .on('nds.device_id', '=', connection.deviceId)
-      )
-      .select([
-        'n.id',
-        'n.state',
-        'n.created_at',
-        'n.created_by',
-        'n.updated_at',
-        'n.updated_by',
-        'n.server_created_at',
-        'n.server_updated_at',
-        'nus.access_removed_at',
-        'n.version_id as node_version_id',
-        'nus.node_id',
-        'nus.user_id',
-        'nus.workspace_id',
-        'nus.last_seen_version_id',
-        'nus.last_seen_at',
-        'nus.mentions_count',
-        'nus.created_at',
-        'nus.updated_at',
-        'nus.version_id as user_node_version_id',
-        'nds.node_version_id as device_node_version_id',
-        'nds.user_node_version_id as device_user_node_version_id',
-      ])
-      .where((eb) =>
-        eb.and([
-          eb('nus.user_id', 'in', userIds),
-          eb.or([
-            eb('n.id', 'is', null),
-            eb('nus.access_removed_at', 'is not', null),
-            eb('nds.node_version_id', 'is', null),
-            eb('nds.node_version_id', '!=', eb.ref('n.version_id')),
-            eb('nds.user_node_version_id', 'is', null),
-            eb('nds.user_node_version_id', '!=', eb.ref('nus.version_id')),
-          ]),
-        ])
-      )
-      .orderBy('n.id', 'asc')
-      .limit(100)
-      .execute();
-
-    if (unsyncedNodes.length === 0) {
-      return;
-    }
-
-    for (const row of unsyncedNodes) {
-      connection.pendingSyncs.add(row.node_id);
-      if (row.id === null) {
-        this.sendSocketMessage(connection, {
-          type: 'server_node_delete',
-          id: row.node_id,
-          workspaceId: row.workspace_id,
-        });
+    for (const deviceId of userDevices) {
+      const socketConnection = this.connections.get(deviceId);
+      if (socketConnection === undefined) {
         continue;
       }
 
-      if (row.node_version_id !== row.device_node_version_id) {
-        this.sendSocketMessage(connection, {
-          type: 'server_node_sync',
-          node: {
-            id: row.id,
-            workspaceId: row.workspace_id,
-            state: encodeState(row.state!),
-            createdAt: row.created_at!.toISOString(),
-            createdBy: row.created_by!,
-            updatedAt: row.updated_at?.toISOString() ?? null,
-            updatedBy: row.updated_by ?? null,
-            serverCreatedAt: row.server_created_at!.toISOString(),
-            serverUpdatedAt: row.server_updated_at?.toISOString() ?? null,
-            versionId: row.node_version_id!,
-          },
-        });
-      }
-
-      if (row.user_node_version_id !== row.device_user_node_version_id) {
-        this.sendSocketMessage(connection, {
-          type: 'server_user_node_sync',
-          userNode: {
-            nodeId: row.node_id,
-            userId: row.user_id,
-            workspaceId: row.workspace_id,
-            versionId: row.user_node_version_id!,
-            lastSeenAt: row.last_seen_at?.toISOString() ?? null,
-            lastSeenVersionId: row.last_seen_version_id ?? null,
-            mentionsCount: row.mentions_count,
-            createdAt: row.created_at!.toISOString(),
-            updatedAt: row.updated_at?.toISOString() ?? null,
-          },
-        });
-      }
+      this.sendPendingCollaborations(socketConnection, event.userId);
     }
   }
 
-  private async addNewWorkspaceUser(userId: string, workspaceId: string) {
-    this.logger.trace(`Adding new workspace user ${userId} to ${workspaceId}`);
-
-    const workspaceUser = await database
-      .selectFrom('workspace_users')
-      .selectAll()
-      .where('id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspaceUser) {
-      return;
-    }
-
-    const devices = await database
-      .selectFrom('devices')
-      .selectAll()
-      .where('account_id', '=', workspaceUser.account_id)
-      .execute();
-
-    for (const device of devices) {
-      const connection = this.connections.get(device.id);
-      if (!connection) {
-        continue;
-      }
-
-      if (connection.workspaceUsers.find((wu) => wu.userId === userId)) {
-        continue;
-      }
-
-      connection.workspaceUsers.push({
-        workspaceId,
-        userId,
-      });
-
-      this.sendPendingChangesDebounced(connection);
-    }
-  }
-
-  private async fetchWorkspaceUsers(
-    connection: SynapseConnection
-  ): Promise<void> {
-    const workspaceUsers = await database
-      .selectFrom('workspace_users')
-      .selectAll()
-      .where('account_id', '=', connection.accountId)
-      .execute();
-
-    for (const workspaceUser of workspaceUsers) {
-      if (
-        !connection.workspaceUsers.find((wu) => wu.userId === workspaceUser.id)
-      ) {
-        connection.workspaceUsers.push({
-          workspaceId: workspaceUser.workspace_id,
-          userId: workspaceUser.id,
-        });
-      }
-    }
-  }
-
-  private getWorkspaceUserDevices(workspaceId: string): Map<string, string[]> {
+  private getPendingNodeTransactionCursors(
+    workspaceId: string
+  ): Map<string, string[]> {
     const userDevices = new Map<string, string[]>();
     for (const connection of this.connections.values()) {
-      const workspaceUsers = connection.workspaceUsers;
-      for (const workspaceUser of workspaceUsers) {
-        if (workspaceUser.workspaceId !== workspaceId) {
+      const connectionUsers = connection.nodeTransactions.values();
+      for (const user of connectionUsers) {
+        if (user.workspaceId !== workspaceId || user.syncing) {
           continue;
         }
 
-        const userIds = userDevices.get(workspaceUser.userId) ?? [];
+        const userIds = userDevices.get(user.userId) ?? [];
         userIds.push(connection.deviceId);
-        userDevices.set(workspaceUser.userId, userIds);
+        userDevices.set(user.userId, userIds);
+      }
+    }
+
+    return userDevices;
+  }
+
+  private getPendingCollaborationCursors(userId: string): string[] {
+    const userDevices: string[] = [];
+    for (const connection of this.connections.values()) {
+      const connectionUsers = connection.collaborations.values();
+      for (const user of connectionUsers) {
+        if (user.userId !== userId || user.syncing) {
+          continue;
+        }
+
+        userDevices.push(connection.deviceId);
       }
     }
 

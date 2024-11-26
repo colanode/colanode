@@ -1,4 +1,4 @@
-import { ZodSchema } from 'zod';
+import { z, ZodSchema } from 'zod';
 import { Node, NodeAttributes } from './';
 import {
   extractNodeRole,
@@ -10,6 +10,12 @@ import {
 import { WorkspaceRole } from '../types/workspaces';
 
 export type NodeRole = 'admin' | 'editor' | 'collaborator' | 'viewer';
+export const nodeRoleEnum = z.enum([
+  'admin',
+  'editor',
+  'collaborator',
+  'viewer',
+]);
 
 export class NodeMutationContext {
   public accountId: string;
@@ -65,3 +71,8 @@ export interface NodeModel {
   ) => Promise<boolean>;
   canDelete: (context: NodeMutationContext, node: Node) => Promise<boolean>;
 }
+
+export type CollaborationModel = {
+  type: string;
+  schema: ZodSchema;
+};

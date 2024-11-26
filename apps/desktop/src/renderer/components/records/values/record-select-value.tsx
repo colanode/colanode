@@ -27,7 +27,7 @@ export const RecordSelectValue = ({
 
   React.useEffect(() => {
     setSelectedValue(record.getSelectValue(field));
-  }, [record.versionId]);
+  }, [record.transactionId]);
 
   const selectedOption = field.options?.[selectedValue ?? ''];
 

@@ -1,34 +1,25 @@
-import { NodeAttributes } from '@colanode/core';
-
-export type NodeEvent = NodeCreatedEvent | NodeUpdatedEvent | NodeDeletedEvent;
-
-export type NodeCreatedEvent = {
-  type: 'node_created';
-  id: string;
+export type NodeTransactionCreatedEvent = {
+  type: 'node_transaction_created';
+  transactionId: string;
+  nodeId: string;
   workspaceId: string;
-  attributes: NodeAttributes;
-  createdBy: string;
-  createdAt: string;
-  serverCreatedAt: string;
-  versionId: string;
 };
 
-export type NodeUpdatedEvent = {
-  type: 'node_updated';
-  id: string;
+export type CollaborationCreatedEvent = {
+  type: 'collaboration_created';
+  userId: string;
+  nodeId: string;
   workspaceId: string;
-  beforeAttributes: NodeAttributes;
-  afterAttributes: NodeAttributes;
-  updatedBy: string;
-  updatedAt: string;
-  serverUpdatedAt: string;
-  versionId: string;
 };
 
-export type NodeDeletedEvent = {
-  type: 'node_deleted';
-  id: string;
+export type CollaborationUpdatedEvent = {
+  type: 'collaboration_updated';
+  userId: string;
+  nodeId: string;
   workspaceId: string;
-  attributes: NodeAttributes;
-  deletedAt: string;
 };
+
+export type Event =
+  | NodeTransactionCreatedEvent
+  | CollaborationCreatedEvent
+  | CollaborationUpdatedEvent;

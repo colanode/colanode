@@ -3,20 +3,30 @@ import {
   NodeAttributes,
   NodeMutationContext,
   registry,
-  LocalCreateNodeChangeData,
-  LocalDeleteNodeChangeData,
-  LocalUpdateNodeChangeData,
-  ServerNodeState,
-  ServerUserNodeState,
+  ServerNodeCreateTransaction,
+  ServerNodeDeleteTransaction,
+  ServerNodeTransaction,
+  ServerNodeUpdateTransaction,
 } from '@colanode/core';
-import { YDoc } from '@colanode/crdt';
+import { decodeState, YDoc } from '@colanode/crdt';
 import { generateId, IdType } from '@colanode/core';
 import { databaseService } from '@/main/data/database-service';
-import { fetchNodeAncestors, mapNode } from '@/main/utils';
-import { CreateDownload, CreateUpload } from '@/main/data/workspace/schema';
+import {
+  fetchNodeAncestors,
+  mapDownload,
+  mapNode,
+  mapTransaction,
+  mapUpload,
+} from '@/main/utils';
+import {
+  CreateDownload,
+  CreateUpload,
+  SelectDownload,
+  SelectNode,
+  SelectNodeTransaction,
+  SelectUpload,
+} from '@/main/data/workspace/schema';
 import { eventBus } from '@/shared/lib/event-bus';
-import { Download } from '@/shared/types/nodes';
-import { Upload } from '@/shared/types/nodes';
 import { SelectWorkspace } from '@/main/data/app/schema';
 
 export type CreateNodeInput = {
@@ -51,17 +61,17 @@ class NodeService {
     const workspace = await this.fetchWorkspace(userId);
 
     const inputs = Array.isArray(input) ? input : [input];
-    const createdNodes: Node[] = [];
-    const createdUploads: Upload[] = [];
-    const createdDownloads: Download[] = [];
-    const createdChangeIds: number[] = [];
+    const createdNodes: SelectNode[] = [];
+    const createdNodeTransactions: SelectNodeTransaction[] = [];
+    const createdUploads: SelectUpload[] = [];
+    const createdDownloads: SelectDownload[] = [];
 
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
     await workspaceDatabase.transaction().execute(async (transaction) => {
       for (const inputItem of inputs) {
-        const model = registry.getModel(inputItem.attributes.type);
+        const model = registry.getNodeModel(inputItem.attributes.type);
         if (!model.schema.safeParse(inputItem.attributes).success) {
           throw new Error('Invalid attributes');
         }
@@ -87,88 +97,80 @@ class NodeService {
           throw new Error('Insufficient permissions');
         }
 
-        const ydoc = new YDoc(inputItem.id);
-        ydoc.updateAttributes(inputItem.attributes);
+        const ydoc = new YDoc();
+        const update = ydoc.updateAttributes(
+          model.schema,
+          inputItem.attributes
+        );
 
         const createdAt = new Date().toISOString();
-        const versionId = generateId(IdType.Version);
+        const transactionId = generateId(IdType.Transaction);
 
-        const changeData: LocalCreateNodeChangeData = {
-          type: 'node_create',
-          id: inputItem.id,
-          state: ydoc.getEncodedState(),
-          createdAt: createdAt,
-          createdBy: context.userId,
-          versionId: versionId,
-        };
-
-        const createdNodeRow = await transaction
+        const createdNode = await transaction
           .insertInto('nodes')
           .returningAll()
           .values({
             id: inputItem.id,
             attributes: JSON.stringify(inputItem.attributes),
-            state: ydoc.getState(),
             created_at: createdAt,
             created_by: context.userId,
-            version_id: versionId,
+            transaction_id: transactionId,
           })
           .executeTakeFirst();
 
-        if (createdNodeRow) {
-          const createdNode = mapNode(createdNodeRow);
-          createdNodes.push(createdNode);
+        if (!createdNode) {
+          throw new Error('Failed to create node');
         }
 
-        const createdChange = await transaction
-          .insertInto('changes')
-          .returning('id')
+        createdNodes.push(createdNode);
+
+        const createdTransaction = await transaction
+          .insertInto('node_transactions')
+          .returningAll()
           .values({
-            data: JSON.stringify(changeData),
+            id: transactionId,
+            node_id: inputItem.id,
+            type: 'create',
+            data: update,
             created_at: createdAt,
+            created_by: context.userId,
             retry_count: 0,
+            status: 'pending',
           })
           .executeTakeFirst();
 
-        if (createdChange) {
-          createdChangeIds.push(createdChange.id);
+        if (!createdTransaction) {
+          throw new Error('Failed to create transaction');
         }
+
+        createdNodeTransactions.push(createdTransaction);
 
         if (inputItem.upload) {
-          const createdUploadRow = await transaction
+          const createdUpload = await transaction
             .insertInto('uploads')
             .returningAll()
             .values(inputItem.upload)
             .executeTakeFirst();
 
-          if (createdUploadRow) {
-            createdUploads.push({
-              nodeId: createdUploadRow.node_id,
-              createdAt: createdUploadRow.created_at,
-              updatedAt: createdUploadRow.updated_at,
-              progress: createdUploadRow.progress,
-              retryCount: createdUploadRow.retry_count,
-            });
+          if (!createdUpload) {
+            throw new Error('Failed to create upload');
           }
+
+          createdUploads.push(createdUpload);
         }
 
         if (inputItem.download) {
-          const createdDownloadRow = await transaction
+          const createdDownload = await transaction
             .insertInto('downloads')
             .returningAll()
             .values(inputItem.download)
             .executeTakeFirst();
 
-          if (createdDownloadRow) {
-            createdDownloads.push({
-              nodeId: createdDownloadRow.node_id,
-              uploadId: createdDownloadRow.upload_id,
-              createdAt: createdDownloadRow.created_at,
-              updatedAt: createdDownloadRow.updated_at,
-              progress: createdDownloadRow.progress,
-              retryCount: createdDownloadRow.retry_count,
-            });
+          if (!createdDownload) {
+            throw new Error('Failed to create download');
           }
+
+          createdDownloads.push(createdDownload);
         }
       }
     });
@@ -177,7 +179,15 @@ class NodeService {
       eventBus.publish({
         type: 'node_created',
         userId,
-        node: createdNode,
+        node: mapNode(createdNode),
+      });
+    }
+
+    for (const createdTransaction of createdNodeTransactions) {
+      eventBus.publish({
+        type: 'node_transaction_created',
+        userId,
+        transaction: mapTransaction(createdTransaction),
       });
     }
 
@@ -185,7 +195,7 @@ class NodeService {
       eventBus.publish({
         type: 'upload_created',
         userId,
-        upload: createdUpload,
+        upload: mapUpload(createdUpload),
       });
     }
 
@@ -193,15 +203,7 @@ class NodeService {
       eventBus.publish({
         type: 'download_created',
         userId,
-        download: createdDownload,
-      });
-    }
-
-    for (const createdChangeId of createdChangeIds) {
-      eventBus.publish({
-        type: 'change_created',
-        userId,
-        changeId: createdChangeId,
+        download: mapDownload(createdDownload),
       });
     }
   }
@@ -253,11 +255,11 @@ class NodeService {
       ancestors
     );
 
-    const versionId = generateId(IdType.Version);
+    const transactionId = generateId(IdType.Transaction);
     const updatedAt = new Date().toISOString();
     const updatedAttributes = updater(node.attributes);
 
-    const model = registry.getModel(node.type);
+    const model = registry.getNodeModel(node.type);
     if (!model.schema.safeParse(updatedAttributes).success) {
       throw new Error('Invalid attributes');
     }
@@ -266,23 +268,22 @@ class NodeService {
       throw new Error('Insufficient permissions');
     }
 
-    const ydoc = new YDoc(nodeRow.id, nodeRow.state);
-    ydoc.updateAttributes(updatedAttributes);
+    const ydoc = new YDoc();
+    const previousTransactions = await workspaceDatabase
+      .selectFrom('node_transactions')
+      .where('node_id', '=', nodeId)
+      .selectAll()
+      .execute();
 
-    const updates = ydoc.getEncodedUpdates();
-    if (updates.length === 0) {
-      return true;
+    for (const previousTransaction of previousTransactions) {
+      if (previousTransaction.data === null) {
+        throw new Error('Node has been deleted');
+      }
+
+      ydoc.applyUpdate(previousTransaction.data);
     }
 
-    let changeId: number | undefined;
-    const changeData: LocalUpdateNodeChangeData = {
-      type: 'node_update',
-      id: nodeId,
-      updatedAt: updatedAt,
-      updatedBy: context.userId,
-      versionId: versionId,
-      updates: updates,
-    };
+    const update = ydoc.updateAttributes(model.schema, updatedAttributes);
 
     const result = await workspaceDatabase
       .transaction()
@@ -292,31 +293,30 @@ class NodeService {
           .returningAll()
           .set({
             attributes: JSON.stringify(ydoc.getAttributes()),
-            state: ydoc.getState(),
             updated_at: updatedAt,
             updated_by: context.userId,
-            version_id: versionId,
+            transaction_id: transactionId,
           })
           .where('id', '=', nodeId)
-          .where('version_id', '=', node.versionId)
+          .where('transaction_id', '=', node.transactionId)
           .executeTakeFirst();
 
         if (updatedRow) {
           node = mapNode(updatedRow);
 
-          const createdChange = await trx
-            .insertInto('changes')
-            .returning('id')
+          await trx
+            .insertInto('node_transactions')
             .values({
-              data: JSON.stringify(changeData),
+              id: transactionId,
+              node_id: nodeId,
+              type: 'update',
+              data: update,
               created_at: updatedAt,
+              created_by: context.userId,
               retry_count: 0,
+              status: 'pending',
             })
-            .executeTakeFirst();
-
-          if (createdChange) {
-            changeId = createdChange.id;
-          }
+            .execute();
         }
 
         return true;
@@ -330,32 +330,23 @@ class NodeService {
       });
     }
 
-    if (changeId) {
-      eventBus.publish({
-        type: 'change_created',
-        userId,
-        changeId,
-      });
-    }
-
     return result;
   }
 
   public async deleteNode(nodeId: string, userId: string) {
     const workspace = await this.fetchWorkspace(userId);
-
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
     const ancestorRows = await fetchNodeAncestors(workspaceDatabase, nodeId);
     const ancestors = ancestorRows.map(mapNode);
-    const node = ancestors.find((ancestor) => ancestor.id === nodeId);
 
+    const node = ancestors.find((ancestor) => ancestor.id === nodeId);
     if (!node) {
       throw new Error('Node not found');
     }
 
-    const model = registry.getModel(node.type);
+    const model = registry.getNodeModel(node.type);
     const context = new NodeMutationContext(
       workspace.account_id,
       workspace.workspace_id,
@@ -368,30 +359,26 @@ class NodeService {
       throw new Error('Insufficient permissions');
     }
 
-    let changeId: number | undefined;
-    const changeData: LocalDeleteNodeChangeData = {
-      type: 'node_delete',
-      id: nodeId,
-      deletedAt: new Date().toISOString(),
-      deletedBy: context.userId,
-    };
-
     await workspaceDatabase.transaction().execute(async (trx) => {
       await trx.deleteFrom('nodes').where('id', '=', nodeId).execute();
+      await trx
+        .deleteFrom('node_transactions')
+        .where('node_id', '=', nodeId)
+        .execute();
 
-      const createdChange = await trx
-        .insertInto('changes')
-        .returning('id')
+      await trx
+        .insertInto('node_transactions')
         .values({
-          data: JSON.stringify(changeData),
+          id: generateId(IdType.Transaction),
+          node_id: nodeId,
+          type: 'delete',
+          data: null,
           created_at: new Date().toISOString(),
+          created_by: context.userId,
           retry_count: 0,
+          status: 'pending',
         })
         .executeTakeFirst();
-
-      if (createdChange) {
-        changeId = createdChange.id;
-      }
     });
 
     eventBus.publish({
@@ -399,243 +386,233 @@ class NodeService {
       userId,
       node: node,
     });
-
-    if (changeId) {
-      eventBus.publish({
-        type: 'change_created',
-        userId,
-        changeId,
-      });
-    }
   }
 
-  public async serverSync(
+  public async applyServerTransaction(
     userId: string,
-    node: ServerNodeState
-  ): Promise<boolean> {
-    let count = 0;
-    while (count++ < 20) {
-      const synced = await this.tryServerSync(userId, node);
-      if (synced) {
-        return true;
-      }
+    transaction: ServerNodeTransaction
+  ) {
+    if (transaction.type === 'create') {
+      await this.applyServerCreateTransaction(userId, transaction);
+    } else if (transaction.type === 'update') {
+      await this.applyServerUpdateTransaction(userId, transaction);
+    } else if (transaction.type === 'delete') {
+      await this.applyServerDeleteTransaction(userId, transaction);
     }
-
-    return false;
   }
 
-  private async tryServerSync(userId: string, node: ServerNodeState) {
+  private async applyServerCreateTransaction(
+    userId: string,
+    transaction: ServerNodeCreateTransaction
+  ) {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
-    const existingNode = await workspaceDatabase
-      .selectFrom('nodes')
-      .where('id', '=', node.id)
-      .selectAll()
+    const number = BigInt(transaction.number);
+    const existingTransaction = await workspaceDatabase
+      .selectFrom('node_transactions')
+      .select(['id', 'status', 'number', 'server_created_at'])
+      .where('id', '=', transaction.id)
       .executeTakeFirst();
 
-    if (!existingNode) {
-      const ydoc = new YDoc(node.id, node.state);
-      const attributes = ydoc.getAttributes();
-      const state = ydoc.getState();
-
-      const result = await workspaceDatabase
-        .insertInto('nodes')
-        .returningAll()
-        .values({
-          id: node.id,
-          attributes: JSON.stringify(attributes),
-          state: state,
-          created_at: node.createdAt,
-          created_by: node.createdBy,
-          version_id: node.versionId,
-          server_created_at: node.serverCreatedAt,
-          server_version_id: node.versionId,
-        })
-        .onConflict((cb) => cb.doNothing())
-        .executeTakeFirst();
-
-      if (result) {
-        eventBus.publish({
-          type: 'node_created',
-          userId: userId,
-          node: mapNode(result),
-        });
-
-        return true;
+    if (existingTransaction) {
+      if (
+        existingTransaction.status === 'synced' &&
+        existingTransaction.number === number &&
+        existingTransaction.server_created_at === transaction.serverCreatedAt
+      ) {
+        return;
       }
-    } else {
-      const ydoc = new YDoc(node.id, existingNode.state);
-      ydoc.applyUpdate(node.state);
 
-      const attributes = ydoc.getAttributes();
-      const state = ydoc.getState();
-
-      const updatedNode = await workspaceDatabase
-        .updateTable('nodes')
-        .returningAll()
+      await workspaceDatabase
+        .updateTable('node_transactions')
         .set({
-          state: state,
-          attributes: JSON.stringify(attributes),
-          server_created_at: node.serverCreatedAt,
-          server_updated_at: node.serverUpdatedAt,
-          server_version_id: node.versionId,
-          updated_at: node.updatedAt,
-          updated_by: node.updatedBy,
-          version_id: node.versionId,
+          status: 'synced',
+          number,
+          server_created_at: transaction.serverCreatedAt,
         })
-        .where('id', '=', node.id)
-        .where('version_id', '=', existingNode.version_id)
-        .executeTakeFirst();
+        .where('id', '=', transaction.id)
+        .execute();
 
-      if (updatedNode) {
-        eventBus.publish({
-          type: 'node_updated',
-          userId: userId,
-          node: mapNode(updatedNode),
-        });
-
-        return true;
-      }
+      return;
     }
 
-    return false;
-  }
+    const ydoc = new YDoc();
+    ydoc.applyUpdate(transaction.data);
 
-  public async serverUpsert(userId: string, node: ServerNodeState) {
-    const workspaceDatabase =
-      await databaseService.getWorkspaceDatabase(userId);
-
-    const existingNode = await workspaceDatabase
-      .selectFrom('nodes')
-      .where('id', '=', node.id)
-      .selectAll()
-      .executeTakeFirst();
-
-    const ydoc = new YDoc(node.id, existingNode?.state);
     const attributes = ydoc.getAttributes();
 
     const result = await workspaceDatabase
-      .insertInto('nodes')
-      .returningAll()
-      .values({
-        id: node.id,
-        attributes: JSON.stringify(attributes),
-        state: ydoc.getState(),
-        created_at: node.createdAt,
-        created_by: node.createdBy,
-        version_id: node.versionId,
-        server_created_at: node.serverCreatedAt,
-        server_version_id: node.versionId,
-      })
-      .onConflict((cb) =>
-        cb.columns(['id']).doUpdateSet({
-          state: ydoc.getState(),
-          attributes: JSON.stringify(attributes),
-          updated_at: node.updatedAt,
-          updated_by: node.updatedBy,
-          version_id: node.versionId,
-          server_created_at: node.serverCreatedAt,
-          server_updated_at: node.serverUpdatedAt,
-          server_version_id: node.versionId,
-        })
-      )
-      .executeTakeFirst();
+      .transaction()
+      .execute(async (trx) => {
+        await trx
+          .insertInto('node_transactions')
+          .values({
+            id: transaction.id,
+            node_id: transaction.nodeId,
+            type: 'create',
+            data: decodeState(transaction.data),
+            created_at: transaction.createdAt,
+            created_by: transaction.createdBy,
+            retry_count: 0,
+            status: 'synced',
+            number,
+            server_created_at: transaction.serverCreatedAt,
+          })
+          .execute();
+
+        const nodeRow = await trx
+          .insertInto('nodes')
+          .returningAll()
+          .values({
+            id: transaction.nodeId,
+            attributes: JSON.stringify(attributes),
+            created_at: transaction.createdAt,
+            created_by: transaction.createdBy,
+            transaction_id: transaction.id,
+          })
+          .executeTakeFirst();
+
+        return nodeRow;
+      });
 
     if (result) {
-      if (existingNode) {
-        eventBus.publish({
-          type: 'node_updated',
-          userId: userId,
-          node: mapNode(result),
-        });
-      } else {
-        eventBus.publish({
-          type: 'node_created',
-          userId: userId,
-          node: mapNode(result),
-        });
-      }
-
-      return true;
+      eventBus.publish({
+        type: 'node_created',
+        userId,
+        node: mapNode(result),
+      });
     }
-
-    return false;
   }
 
-  public async serverDelete(userId: string, nodeId: string) {
+  private async applyServerUpdateTransaction(
+    userId: string,
+    transaction: ServerNodeUpdateTransaction
+  ) {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
-    const deletedNode = await workspaceDatabase
-      .deleteFrom('nodes')
-      .returningAll()
-      .where('id', '=', nodeId)
+    const number = BigInt(transaction.number);
+    const existingTransaction = await workspaceDatabase
+      .selectFrom('node_transactions')
+      .select(['id', 'status', 'number', 'server_created_at'])
+      .where('id', '=', transaction.id)
       .executeTakeFirst();
 
-    if (deletedNode) {
+    if (existingTransaction) {
+      if (
+        existingTransaction.status === 'synced' &&
+        existingTransaction.number === number &&
+        existingTransaction.server_created_at === transaction.serverCreatedAt
+      ) {
+        return;
+      }
+
+      await workspaceDatabase
+        .updateTable('node_transactions')
+        .set({
+          status: 'synced',
+          number,
+          server_created_at: transaction.serverCreatedAt,
+        })
+        .where('id', '=', transaction.id)
+        .execute();
+
+      return;
+    }
+
+    const previousTransactions = await workspaceDatabase
+      .selectFrom('node_transactions')
+      .selectAll()
+      .where('node_id', '=', transaction.nodeId)
+      .orderBy('id', 'asc')
+      .execute();
+
+    const ydoc = new YDoc();
+
+    for (const previousTransaction of previousTransactions) {
+      if (previousTransaction.data) {
+        ydoc.applyUpdate(previousTransaction.data);
+      }
+    }
+
+    ydoc.applyUpdate(transaction.data);
+    const attributes = ydoc.getAttributes();
+
+    const result = await workspaceDatabase
+      .transaction()
+      .execute(async (trx) => {
+        await trx
+          .insertInto('node_transactions')
+          .values({
+            id: transaction.id,
+            node_id: transaction.nodeId,
+            type: 'update',
+            data: decodeState(transaction.data),
+            created_at: transaction.createdAt,
+            created_by: transaction.createdBy,
+            retry_count: 0,
+            status: 'synced',
+            number,
+            server_created_at: transaction.serverCreatedAt,
+          })
+          .execute();
+
+        const nodeRow = await trx
+          .updateTable('nodes')
+          .returningAll()
+          .set({
+            attributes: JSON.stringify(attributes),
+            updated_at: transaction.createdAt,
+            updated_by: transaction.createdBy,
+            transaction_id: transaction.id,
+          })
+          .where('id', '=', transaction.nodeId)
+          .executeTakeFirst();
+
+        return nodeRow;
+      });
+
+    if (result) {
+      eventBus.publish({
+        type: 'node_updated',
+        userId,
+        node: mapNode(result),
+      });
+    }
+  }
+
+  private async applyServerDeleteTransaction(
+    userId: string,
+    transaction: ServerNodeDeleteTransaction
+  ) {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const result = await workspaceDatabase
+      .transaction()
+      .execute(async (trx) => {
+        await trx
+          .deleteFrom('node_transactions')
+          .where('node_id', '=', transaction.nodeId)
+          .execute();
+
+        const nodeRow = await trx
+          .deleteFrom('nodes')
+          .returningAll()
+          .where('id', '=', transaction.nodeId)
+          .executeTakeFirst();
+
+        return nodeRow;
+      });
+
+    if (result) {
       eventBus.publish({
         type: 'node_deleted',
         userId,
-        node: mapNode(deletedNode),
+        node: mapNode(result),
       });
     }
-
-    return false;
-  }
-
-  public async serverUserNodeSync(
-    userId: string,
-    userNode: ServerUserNodeState
-  ): Promise<boolean> {
-    const workspaceDatabase =
-      await databaseService.getWorkspaceDatabase(userId);
-
-    const createdUserNode = await workspaceDatabase
-      .insertInto('user_nodes')
-      .returningAll()
-      .values({
-        user_id: userNode.userId,
-        node_id: userNode.nodeId,
-        version_id: userNode.versionId,
-        last_seen_at: userNode.lastSeenAt,
-        last_seen_version_id: userNode.lastSeenVersionId,
-        mentions_count: userNode.mentionsCount,
-        created_at: userNode.createdAt,
-        updated_at: userNode.updatedAt,
-      })
-      .onConflict((cb) =>
-        cb.columns(['node_id', 'user_id']).doUpdateSet({
-          last_seen_at: userNode.lastSeenAt,
-          last_seen_version_id: userNode.lastSeenVersionId,
-          mentions_count: userNode.mentionsCount,
-          updated_at: userNode.updatedAt,
-          version_id: userNode.versionId,
-        })
-      )
-      .executeTakeFirst();
-
-    if (createdUserNode) {
-      eventBus.publish({
-        type: 'user_node_created',
-        userId: userId,
-        userNode: {
-          userId: createdUserNode.user_id,
-          nodeId: createdUserNode.node_id,
-          lastSeenAt: createdUserNode.last_seen_at,
-          lastSeenVersionId: createdUserNode.last_seen_version_id,
-          mentionsCount: createdUserNode.mentions_count,
-          attributes: createdUserNode.attributes,
-          versionId: createdUserNode.version_id,
-          createdAt: createdUserNode.created_at,
-          updatedAt: createdUserNode.updated_at,
-        },
-      });
-
-      return true;
-    }
-
-    return false;
   }
 
   async fetchWorkspace(userId: string): Promise<SelectWorkspace> {

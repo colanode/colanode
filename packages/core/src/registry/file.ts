@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { NodeModel } from './core';
+import { CollaborationModel, NodeModel } from './core';
 
 export const fileAttributesSchema = z.object({
   type: z.literal('file'),
@@ -30,4 +30,17 @@ export const fileModel: NodeModel = {
   canDelete: async (_, __) => {
     return true;
   },
+};
+
+export const fileCollaborationAttributesSchema = z.object({
+  type: z.literal('file'),
+});
+
+export type FileCollaborationAttributes = z.infer<
+  typeof fileCollaborationAttributesSchema
+>;
+
+export const fileCollaborationModel: CollaborationModel = {
+  type: 'file',
+  schema: fileCollaborationAttributesSchema,
 };

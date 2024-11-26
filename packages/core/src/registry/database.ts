@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { NodeModel } from './core';
+import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
 import { fieldAttributesSchema } from './fields';
 import { isEqual } from 'lodash-es';
 
@@ -72,7 +72,7 @@ export const databaseAttributesSchema = z.object({
   name: z.string(),
   avatar: z.string().nullable().optional(),
   parentId: z.string(),
-  collaborators: z.record(z.string()).nullable().optional(),
+  collaborators: z.record(z.string(), nodeRoleEnum).nullable().optional(),
   fields: z.record(z.string(), fieldAttributesSchema),
   views: z.record(z.string(), viewAttributesSchema),
 });
@@ -109,4 +109,17 @@ export const databaseModel: NodeModel = {
   canDelete: async (context, _) => {
     return context.hasEditorAccess();
   },
+};
+
+export const databaseCollaborationAttributesSchema = z.object({
+  type: z.literal('database'),
+});
+
+export type DatabaseCollaborationAttributes = z.infer<
+  typeof databaseCollaborationAttributesSchema
+>;
+
+export const databaseCollaborationModel: CollaborationModel = {
+  type: 'database',
+  schema: databaseCollaborationAttributesSchema,
 };

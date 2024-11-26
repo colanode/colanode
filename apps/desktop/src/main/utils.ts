@@ -8,12 +8,13 @@ import {
 } from 'kysely';
 import path from 'path';
 import {
-  SelectChange,
   SelectDownload,
   SelectNode,
+  SelectNodeTransaction,
+  SelectUpload,
   WorkspaceDatabaseSchema,
 } from '@/main/data/workspace/schema';
-import { LocalChange, Node, NodeTypes } from '@colanode/core';
+import { LocalNodeTransaction, Node, NodeTypes } from '@colanode/core';
 import { Account } from '@/shared/types/accounts';
 import {
   SelectAccount,
@@ -22,7 +23,8 @@ import {
 } from './data/app/schema';
 import { Workspace } from '@/shared/types/workspaces';
 import { Server } from '@/shared/types/servers';
-import { Download } from '@/shared/types/nodes';
+import { Download, Upload } from '@/shared/types/nodes';
+import { encodeState } from '@colanode/crdt';
 
 export const appPath = app.getPath('userData');
 
@@ -105,10 +107,7 @@ export const mapNode = (row: SelectNode): Node => {
     createdBy: row.created_by,
     updatedAt: row.updated_at,
     updatedBy: row.updated_by,
-    versionId: row.version_id,
-    serverCreatedAt: row.server_created_at,
-    serverUpdatedAt: row.server_updated_at,
-    serverVersionId: row.server_version_id,
+    transactionId: row.transaction_id,
   };
 };
 
@@ -138,13 +137,42 @@ export const mapWorkspace = (row: SelectWorkspace): Workspace => {
   };
 };
 
-export const mapChange = (row: SelectChange): LocalChange => {
-  return {
-    id: row.id,
-    data: JSON.parse(row.data),
-    createdAt: row.created_at,
-    retryCount: row.retry_count,
-  };
+export const mapTransaction = (
+  row: SelectNodeTransaction
+): LocalNodeTransaction => {
+  if (row.type === 'create' && row.data) {
+    return {
+      id: row.id,
+      nodeId: row.node_id,
+      type: row.type,
+      data: encodeState(row.data),
+      createdAt: row.created_at,
+      createdBy: row.created_by,
+    };
+  }
+
+  if (row.type === 'update' && row.data) {
+    return {
+      id: row.id,
+      nodeId: row.node_id,
+      type: row.type,
+      data: encodeState(row.data),
+      createdAt: row.created_at,
+      createdBy: row.created_by,
+    };
+  }
+
+  if (row.type === 'delete') {
+    return {
+      id: row.id,
+      nodeId: row.node_id,
+      type: row.type,
+      createdAt: row.created_at,
+      createdBy: row.created_by,
+    };
+  }
+
+  throw new Error('Invalid transaction type');
 };
 
 export const mapServer = (row: SelectServer): Server => {
@@ -156,6 +184,16 @@ export const mapServer = (row: SelectServer): Server => {
     version: row.version,
     createdAt: new Date(row.created_at),
     lastSyncedAt: row.last_synced_at ? new Date(row.last_synced_at) : null,
+  };
+};
+
+export const mapUpload = (row: SelectUpload): Upload => {
+  return {
+    nodeId: row.node_id,
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+    progress: row.progress,
+    retryCount: row.retry_count,
   };
 };
 

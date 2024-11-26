@@ -27,7 +27,7 @@ export const RecordMultiSelectValue = ({
 
   React.useEffect(() => {
     setSelectedValues(record.getMultiSelectValue(field));
-  }, [record.versionId]);
+  }, [record.transactionId]);
 
   const selectOptions = Object.values(field.options ?? {});
   const selectedOptions = selectOptions.filter((option) =>

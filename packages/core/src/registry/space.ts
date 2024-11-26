@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { NodeModel } from './core';
+import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
 
 export const spaceAttributesSchema = z.object({
   type: z.literal('space'),
@@ -7,7 +7,7 @@ export const spaceAttributesSchema = z.object({
   parentId: z.string(),
   description: z.string().nullable(),
   avatar: z.string().nullable().optional(),
-  collaborators: z.record(z.string()),
+  collaborators: z.record(z.string(), nodeRoleEnum),
 });
 
 export type SpaceAttributes = z.infer<typeof spaceAttributesSchema>;
@@ -28,4 +28,17 @@ export const spaceModel: NodeModel = {
   canDelete: async (context, _) => {
     return context.hasAdminAccess();
   },
+};
+
+export const spaceCollaborationAttributesSchema = z.object({
+  type: z.literal('space'),
+});
+
+export type SpaceCollaborationAttributes = z.infer<
+  typeof spaceCollaborationAttributesSchema
+>;
+
+export const spaceCollaborationModel: CollaborationModel = {
+  type: 'space',
+  schema: spaceCollaborationAttributesSchema,
 };

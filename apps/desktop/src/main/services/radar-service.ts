@@ -70,56 +70,56 @@ class RadarService {
       nodeStates: {},
     };
 
-    const nodeUnreadMessageCounts = await workspaceDatabase
-      .selectFrom('user_nodes as un')
-      .innerJoin('nodes as n', 'un.node_id', 'n.id')
-      .where('un.user_id', '=', userId)
-      .where('n.type', '=', NodeTypes.Message)
-      .where('un.last_seen_version_id', 'is', null)
-      .select(['n.parent_id as node_id'])
-      .select((eb) => [
-        eb.fn.count<number>('un.node_id').as('messages_count'),
-        eb.fn.sum<number>('un.mentions_count').as('mentions_count'),
-      ])
-      .groupBy('n.parent_id')
-      .execute();
+    // const nodeUnreadMessageCounts = await workspaceDatabase
+    //   .selectFrom('user_nodes as un')
+    //   .innerJoin('nodes as n', 'un.node_id', 'n.id')
+    //   .where('un.user_id', '=', userId)
+    //   .where('n.type', '=', NodeTypes.Message)
+    //   .where('un.last_seen_version_id', 'is', null)
+    //   .select(['n.parent_id as node_id'])
+    //   .select((eb) => [
+    //     eb.fn.count<number>('un.node_id').as('messages_count'),
+    //     eb.fn.sum<number>('un.mentions_count').as('mentions_count'),
+    //   ])
+    //   .groupBy('n.parent_id')
+    //   .execute();
 
-    for (const nodeUnreadMessageCount of nodeUnreadMessageCounts) {
-      const idType = getIdType(nodeUnreadMessageCount.node_id);
-      const nodeId = nodeUnreadMessageCount.node_id;
-      const messagesCount = nodeUnreadMessageCount.messages_count;
-      const mentionsCount = nodeUnreadMessageCount.mentions_count;
+    // for (const nodeUnreadMessageCount of nodeUnreadMessageCounts) {
+    //   const idType = getIdType(nodeUnreadMessageCount.node_id);
+    //   const nodeId = nodeUnreadMessageCount.node_id;
+    //   const messagesCount = nodeUnreadMessageCount.messages_count;
+    //   const mentionsCount = nodeUnreadMessageCount.mentions_count;
 
-      if (idType === IdType.Chat) {
-        data.nodeStates[nodeId] = {
-          type: 'chat',
-          nodeId,
-          unseenMessagesCount: messagesCount,
-          mentionsCount,
-        };
+    //   if (idType === IdType.Chat) {
+    //     data.nodeStates[nodeId] = {
+    //       type: 'chat',
+    //       nodeId,
+    //       unseenMessagesCount: messagesCount,
+    //       mentionsCount,
+    //     };
 
-        if (mentionsCount > 0) {
-          data.importantCount += mentionsCount;
-        }
+    //     if (mentionsCount > 0) {
+    //       data.importantCount += mentionsCount;
+    //     }
 
-        if (messagesCount > 0) {
-          data.importantCount += messagesCount;
-        }
-      } else if (idType === IdType.Channel) {
-        data.nodeStates[nodeId] = {
-          type: 'channel',
-          nodeId,
-          unseenMessagesCount: messagesCount,
-          mentionsCount,
-        };
+    //     if (messagesCount > 0) {
+    //       data.importantCount += messagesCount;
+    //     }
+    //   } else if (idType === IdType.Channel) {
+    //     data.nodeStates[nodeId] = {
+    //       type: 'channel',
+    //       nodeId,
+    //       unseenMessagesCount: messagesCount,
+    //       mentionsCount,
+    //     };
 
-        if (messagesCount > 0) {
-          data.hasUnseenChanges = true;
-        } else if (mentionsCount > 0) {
-          data.importantCount += messagesCount;
-        }
-      }
-    }
+    //     if (messagesCount > 0) {
+    //       data.hasUnseenChanges = true;
+    //     } else if (mentionsCount > 0) {
+    //       data.importantCount += messagesCount;
+    //     }
+    //   }
+    // }
 
     this.workspaceStates.set(userId, data);
   }

@@ -59,21 +59,21 @@ import { useMutation } from '@/renderer/hooks/use-mutation';
 interface DocumentEditorProps {
   documentId: string;
   content: JSONContent;
-  versionId: string;
+  transactionId: string;
   canEdit: boolean;
 }
 
 export const DocumentEditor = ({
   documentId,
   content,
-  versionId,
+  transactionId,
   canEdit,
 }: DocumentEditorProps) => {
   const workspace = useWorkspace();
   const { mutate } = useMutation();
 
   const hasPendingChanges = React.useRef(false);
-  const versionIdRef = React.useRef(versionId);
+  const transactionIdRef = React.useRef(transactionId);
   const debouncedSave = React.useMemo(
     () =>
       debounce((content: JSONContent) => {
@@ -179,7 +179,7 @@ export const DocumentEditor = ({
       return;
     }
 
-    if (versionIdRef.current === versionId) {
+    if (transactionIdRef.current === transactionId) {
       return;
     }
 
@@ -190,8 +190,8 @@ export const DocumentEditor = ({
       editor.chain().setContent(content).run();
     }
 
-    versionIdRef.current = versionId;
-  }, [content, versionId]);
+    transactionIdRef.current = transactionId;
+  }, [content, transactionId]);
 
   return (
     <div className="min-h-[500px]">

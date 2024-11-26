@@ -2,7 +2,7 @@ import { WebSocket } from 'ws';
 import { BackoffCalculator } from '@/shared/lib/backoff-calculator';
 import { Message } from '@colanode/core';
 import { SelectAccount } from '@/main/data/app/schema';
-import { mutationService } from '@/main/services/mutation-service';
+import { syncService } from '@/main/services/sync-service';
 
 export class SocketConnection {
   private readonly synapseUrl: string;
@@ -46,25 +46,10 @@ export class SocketConnection {
         return;
       }
       const message: Message = JSON.parse(data);
-      if (message.type === 'server_node_delete') {
-        mutationService.executeMutation({
-          type: 'server_node_delete',
-          id: message.id,
-          accountId: this.account.id,
-          workspaceId: message.workspaceId,
-        });
-      } else if (message.type === 'server_node_sync') {
-        mutationService.executeMutation({
-          type: 'server_node_sync',
-          accountId: this.account.id,
-          node: message.node,
-        });
-      } else if (message.type === 'server_user_node_sync') {
-        mutationService.executeMutation({
-          type: 'server_user_node_sync',
-          accountId: this.account.id,
-          userNode: message.userNode,
-        });
+      if (message.type === 'node_transactions_batch') {
+        syncService.syncServerTransactions(message);
+      } else if (message.type === 'collaborations_batch') {
+        syncService.syncServerCollaborations(message);
       }
     };
 

@@ -39,7 +39,7 @@ export const RecordBody = ({
         <Document
           nodeId={record.id}
           content={record.attributes.content}
-          versionId={record.versionId}
+          transactionId={record.transactionId}
           canEdit={canEdit}
         />
       </ScrollArea>

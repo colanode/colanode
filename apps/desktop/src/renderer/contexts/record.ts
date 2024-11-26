@@ -26,7 +26,7 @@ interface RecordContext {
   createdAt: string;
   updatedBy?: string | null;
   updatedAt?: string | null;
-  versionId: string;
+  transactionId: string;
   canEdit: boolean;
   updateFieldValue: (field: FieldAttributes, value: FieldValue) => void;
   removeFieldValue: (field: FieldAttributes) => void;

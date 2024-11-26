@@ -5,15 +5,11 @@ interface NodeTable {
   parent_id: ColumnType<string, never, never>;
   type: ColumnType<string, never, never>;
   attributes: ColumnType<string, string, string>;
-  state: ColumnType<Uint8Array, Uint8Array, Uint8Array>;
   created_at: ColumnType<string, string, never>;
   updated_at: ColumnType<string | null, string | null, string | null>;
   created_by: ColumnType<string, string, never>;
   updated_by: ColumnType<string | null, string | null, string | null>;
-  version_id: ColumnType<string, string, string>;
-  server_created_at: ColumnType<string | null, string | null, string | null>;
-  server_updated_at: ColumnType<string | null, string | null, string | null>;
-  server_version_id: ColumnType<string | null, string | null, string | null>;
+  transaction_id: ColumnType<string, string, string>;
 }
 
 export type SelectNode = Selectable<NodeTable>;
@@ -28,32 +24,37 @@ interface NodePathTable {
 
 export type SelectNodePath = Selectable<NodePathTable>;
 
-interface UserNodeTable {
+interface NodeTransactionTable {
+  id: ColumnType<string, string, never>;
+  node_id: ColumnType<string, string, never>;
+  type: ColumnType<string, string, never>;
+  data: ColumnType<Uint8Array | null, Uint8Array | null, never>;
+  created_at: ColumnType<string, string, never>;
+  created_by: ColumnType<string, string, never>;
+  server_created_at: ColumnType<string | null, string | null, string | null>;
+  retry_count: ColumnType<number, number, number>;
+  status: ColumnType<string, string, string>;
+  number: ColumnType<bigint | null, bigint | null, bigint | null>;
+}
+
+export type SelectNodeTransaction = Selectable<NodeTransactionTable>;
+export type CreateNodeTransaction = Insertable<NodeTransactionTable>;
+export type UpdateNodeTransaction = Updateable<NodeTransactionTable>;
+
+interface CollaborationTable {
   user_id: ColumnType<string, string, never>;
   node_id: ColumnType<string, string, never>;
-  last_seen_version_id: ColumnType<string | null, string | null, string | null>;
-  last_seen_at: ColumnType<string | null, string | null, string | null>;
-  mentions_count: ColumnType<number, number, number>;
-  attributes: ColumnType<string | null, string | null, string | null>;
-  version_id: ColumnType<string, string, string>;
+  type: ColumnType<string, never, never>;
+  attributes: ColumnType<string, string, string>;
+  state: ColumnType<Uint8Array, Uint8Array, Uint8Array>;
   created_at: ColumnType<string, string, never>;
   updated_at: ColumnType<string | null, string | null, string | null>;
+  number: ColumnType<bigint | null, bigint | null, bigint | null>;
 }
 
-export type SelectUserNode = Selectable<UserNodeTable>;
-export type CreateUserNode = Insertable<UserNodeTable>;
-export type UpdateUserNode = Updateable<UserNodeTable>;
-
-interface ChangeTable {
-  id: ColumnType<number, never, never>;
-  data: ColumnType<string, string, never>;
-  created_at: ColumnType<string, string, never>;
-  retry_count: ColumnType<number, number, number>;
-}
-
-export type SelectChange = Selectable<ChangeTable>;
-export type CreateChange = Insertable<ChangeTable>;
-export type UpdateChange = Updateable<ChangeTable>;
+export type SelectCollaboration = Selectable<CollaborationTable>;
+export type CreateCollaboration = Insertable<CollaborationTable>;
+export type UpdateCollaboration = Updateable<CollaborationTable>;
 
 interface UploadTable {
   node_id: ColumnType<string, string, never>;
@@ -84,9 +85,9 @@ export type UpdateDownload = Updateable<DownloadTable>;
 
 export interface WorkspaceDatabaseSchema {
   nodes: NodeTable;
+  node_transactions: NodeTransactionTable;
   node_paths: NodePathTable;
-  user_nodes: UserNodeTable;
-  changes: ChangeTable;
+  collaborations: CollaborationTable;
   uploads: UploadTable;
   downloads: DownloadTable;
 }

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { NodeModel } from './core';
+import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
 import { isEqual } from 'lodash-es';
 
 export const channelAttributesSchema = z.object({
@@ -7,7 +7,7 @@ export const channelAttributesSchema = z.object({
   name: z.string(),
   avatar: z.string().nullable().optional(),
   parentId: z.string(),
-  collaborators: z.record(z.string()).nullable().optional(),
+  collaborators: z.record(z.string(), nodeRoleEnum).nullable().optional(),
 });
 
 export type ChannelAttributes = z.infer<typeof channelAttributesSchema>;
@@ -50,4 +50,17 @@ export const channelModel: NodeModel = {
   canDelete: async (context, _) => {
     return context.hasEditorAccess();
   },
+};
+
+export const channelCollaborationAttributesSchema = z.object({
+  type: z.literal('channel'),
+});
+
+export type ChannelCollaborationAttributes = z.infer<
+  typeof channelCollaborationAttributesSchema
+>;
+
+export const channelCollaborationModel: CollaborationModel = {
+  type: 'channel',
+  schema: channelCollaborationAttributesSchema,
 };

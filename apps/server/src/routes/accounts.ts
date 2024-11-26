@@ -20,14 +20,10 @@ import { database } from '@/data/database';
 import bcrypt from 'bcrypt';
 import { authMiddleware } from '@/middlewares/auth';
 import { generateToken } from '@/lib/tokens';
-import { enqueueTask } from '@/queues/tasks';
-import { CompiledQuery } from 'kysely';
-import { NodeUpdatedEvent } from '@/types/events';
-import { enqueueEvent } from '@/queues/events';
 import { SelectAccount } from '@/data/schema';
-import { createDefaultWorkspace } from '@/lib/workspaces';
+import { workspaceService } from '@/services/workspace-service';
 import { sha256 } from 'js-sha256';
-import { YDoc } from '@colanode/crdt';
+import { nodeService } from '@/services/node-service';
 
 const GoogleUserInfoUrl = 'https://www.googleapis.com/oauth2/v1/userinfo';
 const SaltRounds = 10;
@@ -230,11 +226,6 @@ accountsRouter.delete(
       .where('id', '=', req.account.deviceId)
       .execute();
 
-    await enqueueTask({
-      type: 'clean_device_data',
-      deviceId: req.account.deviceId,
-    });
-
     return res.status(200).end();
   }
 );
@@ -283,6 +274,16 @@ accountsRouter.put(
       });
     }
 
+    await database
+      .updateTable('accounts')
+      .set({
+        name: input.name,
+        avatar: input.avatar,
+        updated_at: new Date(),
+      })
+      .where('id', '=', req.account.id)
+      .execute();
+
     const users = await database
       .selectFrom('nodes')
       .selectAll()
@@ -296,21 +297,6 @@ accountsRouter.put(
       )
       .execute();
 
-    const updates: CompiledQuery[] = [];
-    const events: NodeUpdatedEvent[] = [];
-
-    updates.push(
-      database
-        .updateTable('accounts')
-        .set({
-          name: input.name,
-          avatar: input.avatar,
-          updated_at: new Date(),
-        })
-        .where('id', '=', req.account.id)
-        .compile()
-    );
-
     for (const user of users) {
       if (user.attributes.type !== 'user') {
         throw new Error('User node not found.');
@@ -323,57 +309,22 @@ accountsRouter.put(
         continue;
       }
 
-      const ydoc = new YDoc(user.id, user.state);
-      ydoc.updateAttributes({
-        ...user.attributes,
-        name: input.name,
-        avatar: input.avatar ?? null,
-      });
-
-      const attributes = ydoc.getAttributes();
-      const state = ydoc.getState();
-
-      const updatedAt = new Date();
-      const versionId = generateId(IdType.Version);
-
-      updates.push(
-        database
-          .updateTable('nodes')
-          .set({
-            attributes: JSON.stringify(attributes),
-            state: state,
-            updated_at: updatedAt,
-            updated_by: user.id,
-            version_id: versionId,
-            server_updated_at: updatedAt,
-          })
-          .where('id', '=', user.id)
-          .compile()
-      );
-
-      const event: NodeUpdatedEvent = {
-        type: 'node_updated',
-        id: user.id,
+      await nodeService.updateNode({
+        nodeId: user.id,
+        userId: user.created_by,
         workspaceId: user.workspace_id,
-        beforeAttributes: user.attributes,
-        afterAttributes: attributes,
-        updatedBy: user.id,
-        updatedAt: updatedAt.toISOString(),
-        serverUpdatedAt: updatedAt.toISOString(),
-        versionId,
-      };
+        updater: (attributes) => {
+          if (attributes.type !== 'user') {
+            return null;
+          }
 
-      events.push(event);
-    }
-
-    await database.transaction().execute(async (trx) => {
-      for (const update of updates) {
-        await trx.executeQuery(update);
-      }
-    });
-
-    for (const event of events) {
-      await enqueueEvent(event);
+          return {
+            ...attributes,
+            name: input.name,
+            avatar: input.avatar,
+          };
+        },
+      });
     }
 
     const output: AccountUpdateOutput = {
@@ -466,21 +417,11 @@ accountsRouter.get(
 const buildLoginOutput = async (
   account: SelectAccount
 ): Promise<LoginOutput> => {
-  let workspaceUsers = await database
+  const workspaceUsers = await database
     .selectFrom('workspace_users')
     .where('account_id', '=', account.id)
     .selectAll()
     .execute();
-
-  if (workspaceUsers.length === 0) {
-    await createDefaultWorkspace(account);
-
-    workspaceUsers = await database
-      .selectFrom('workspace_users')
-      .where('account_id', '=', account.id)
-      .selectAll()
-      .execute();
-  }
 
   const workspaceOutputs: WorkspaceOutput[] = [];
   if (workspaceUsers.length > 0) {
@@ -513,6 +454,11 @@ const buildLoginOutput = async (
         },
       });
     }
+  }
+
+  if (workspaceOutputs.length === 0) {
+    const workspace = await workspaceService.createDefaultWorkspace(account);
+    workspaceOutputs.push(workspace);
   }
 
   const deviceId = generateId(IdType.Device);

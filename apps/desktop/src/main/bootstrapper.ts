@@ -9,6 +9,7 @@ import { notificationService } from '@/main/services/notification-service';
 import { fileService } from '@/main/services/file-service';
 import { logService } from '@/main/services/log-service';
 
+// one minute
 const EVENT_LOOP_INTERVAL = 1000 * 60;
 
 class Bootstrapper {

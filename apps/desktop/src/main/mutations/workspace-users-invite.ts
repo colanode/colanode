@@ -6,10 +6,6 @@ import {
 } from '@/shared/mutations/workspace-users-invite';
 import { MutationHandler } from '@/main/types';
 import { WorkspaceUsersInviteOutput } from '@colanode/core';
-import { CreateNode } from '@/main/data/workspace/schema';
-import { toUint8Array } from 'js-base64';
-import { eventBus } from '@/shared/lib/event-bus';
-import { mapNode } from '@/main/utils';
 
 export class WorkspaceUsersInviteMutationHandler
   implements MutationHandler<WorkspaceUsersInviteMutationInput>
@@ -64,47 +60,6 @@ export class WorkspaceUsersInviteMutationHandler
         token: account.token,
       }
     );
-
-    const workspaceDatabase = await databaseService.getWorkspaceDatabase(
-      input.userId
-    );
-
-    const usersToCreate: CreateNode[] = data.users.map((user) => {
-      return {
-        id: user.id,
-        attributes: JSON.stringify(user.attributes),
-        state: toUint8Array(user.state),
-        created_at: user.createdAt,
-        created_by: user.createdBy,
-        updated_at: user.updatedAt,
-        updated_by: user.updatedBy,
-        server_created_at: user.serverCreatedAt,
-        server_updated_at: user.serverUpdatedAt,
-        server_version_id: user.versionId,
-        version_id: user.versionId,
-      };
-    });
-
-    const createdNodes = await workspaceDatabase
-      .insertInto('nodes')
-      .returningAll()
-      .values(usersToCreate)
-      .onConflict((cb) => cb.doNothing())
-      .execute();
-
-    if (createdNodes.length !== usersToCreate.length) {
-      return {
-        success: false,
-      };
-    }
-
-    for (const createdNode of createdNodes) {
-      eventBus.publish({
-        type: 'node_created',
-        userId: input.userId,
-        node: mapNode(createdNode),
-      });
-    }
 
     return {
       success: true,

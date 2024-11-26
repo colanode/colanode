@@ -17,14 +17,6 @@ const createServersTable: Migration = {
       .insertInto('servers')
       .values([
         {
-          domain: 'localhost:3000',
-          name: 'Localhost',
-          avatar: '',
-          attributes: '{ "insecure": true }',
-          version: '0.1.0',
-          created_at: new Date().toISOString(),
-        },
-        {
           domain: 'eu.colanode.com',
           name: 'Colanode Cloud (EU)',
           avatar: '',
@@ -88,6 +80,28 @@ const createWorkspacesTable: Migration = {
   },
 };
 
+const createWorkspaceCursorsTable: Migration = {
+  up: async (db) => {
+    await db.schema
+      .createTable('workspace_cursors')
+      .addColumn('user_id', 'text', (col) =>
+        col
+          .notNull()
+          .primaryKey()
+          .references('workspaces.user_id')
+          .onDelete('cascade')
+      )
+      .addColumn('node_transactions', 'integer', (col) => col.notNull())
+      .addColumn('collaborations', 'integer', (col) => col.notNull())
+      .addColumn('created_at', 'text', (col) => col.notNull())
+      .addColumn('updated_at', 'text')
+      .execute();
+  },
+  down: async (db) => {
+    await db.schema.dropTable('workspace_cursors').execute();
+  },
+};
+
 const createDeletedTokensTable: Migration = {
   up: async (db) => {
     await db.schema
@@ -107,5 +121,6 @@ export const appDatabaseMigrations: Record<string, Migration> = {
   '00001_create_servers_table': createServersTable,
   '00002_create_accounts_table': createAccountsTable,
   '00003_create_workspaces_table': createWorkspacesTable,
-  '00004_create_deleted_tokens_table': createDeletedTokensTable,
+  '00004_create_workspace_cursors_table': createWorkspaceCursorsTable,
+  '00005_create_deleted_tokens_table': createDeletedTokensTable,
 };

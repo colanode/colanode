@@ -37,7 +37,7 @@ export class SpaceCreateMutationHandler
       type: 'space',
       name: input.name,
       collaborators: {
-        [input.userId]: NodeRoles.Admin,
+        [input.userId]: 'admin',
       },
       parentId: input.workspaceId,
       description: input.description,

@@ -156,7 +156,7 @@ export const RecordProvider = ({
 
           return null;
         },
-        versionId: record.versionId,
+        transactionId: record.transactionId,
       }}
     >
       {children}

@@ -87,19 +87,49 @@ interface NodeTable {
   parent_id: ColumnType<string, never, never>;
   type: ColumnType<string, never, never>;
   attributes: JSONColumnType<NodeAttributes, string | null, string | null>;
-  state: ColumnType<Uint8Array, Uint8Array, Uint8Array>;
   created_at: ColumnType<Date, Date, never>;
   updated_at: ColumnType<Date | null, Date | null, Date>;
   created_by: ColumnType<string, string, never>;
   updated_by: ColumnType<string | null, string | null, string>;
-  version_id: ColumnType<string, string, string>;
-  server_created_at: ColumnType<Date, Date, never>;
-  server_updated_at: ColumnType<Date | null, Date | null, Date>;
+  transaction_id: ColumnType<string, string, string>;
 }
 
 export type SelectNode = Selectable<NodeTable>;
 export type CreateNode = Insertable<NodeTable>;
 export type UpdateNode = Updateable<NodeTable>;
+
+interface NodeTransactionTable {
+  id: ColumnType<string, string, never>;
+  node_id: ColumnType<string, string, never>;
+  workspace_id: ColumnType<string, string, never>;
+  type: ColumnType<string, string, never>;
+  data: ColumnType<Uint8Array | null, Uint8Array | null, Uint8Array | null>;
+  created_at: ColumnType<Date, Date, never>;
+  created_by: ColumnType<string, string, never>;
+  server_created_at: ColumnType<Date, Date, never>;
+  number: ColumnType<bigint, never, never>;
+}
+
+export type SelectNodeTransaction = Selectable<NodeTransactionTable>;
+export type CreateNodeTransaction = Insertable<NodeTransactionTable>;
+export type UpdateNodeTransaction = Updateable<NodeTransactionTable>;
+
+interface CollaborationTable {
+  user_id: ColumnType<string, string, never>;
+  node_id: ColumnType<string, string, never>;
+  type: ColumnType<string, never, never>;
+  workspace_id: ColumnType<string, string, never>;
+  attributes: JSONColumnType<any, string, string>;
+  state: ColumnType<Uint8Array, Uint8Array, Uint8Array>;
+  created_at: ColumnType<Date, Date, never>;
+  updated_at: ColumnType<Date | null, Date | null, Date>;
+  deleted_at: ColumnType<Date | null, Date | null, Date>;
+  number: ColumnType<bigint, never, never>;
+}
+
+export type SelectCollaboration = Selectable<CollaborationTable>;
+export type CreateCollaboration = Insertable<CollaborationTable>;
+export type UpdateCollaboration = Updateable<CollaborationTable>;
 
 interface NodePathTable {
   ancestor_id: ColumnType<string, string, never>;
@@ -111,39 +141,6 @@ interface NodePathTable {
 export type SelectNodePath = Selectable<NodePathTable>;
 export type CreateNodePath = Insertable<NodePathTable>;
 export type UpdateNodePath = Updateable<NodePathTable>;
-
-interface UserNodeTable {
-  node_id: ColumnType<string, string, never>;
-  user_id: ColumnType<string, string, never>;
-  workspace_id: ColumnType<string, string, never>;
-  last_seen_version_id: ColumnType<string | null, string | null, string | null>;
-  last_seen_at: ColumnType<Date | null, Date | null, Date>;
-  mentions_count: ColumnType<number, number, number>;
-  attributes: JSONColumnType<any, string | null, string | null>;
-  created_at: ColumnType<Date, Date, never>;
-  updated_at: ColumnType<Date | null, Date | null, Date>;
-  access_removed_at: ColumnType<Date | null, Date | null, Date>;
-  version_id: ColumnType<string, string, string>;
-}
-
-export type SelectUserNode = Selectable<UserNodeTable>;
-export type CreateUserNode = Insertable<UserNodeTable>;
-export type UpdateUserNode = Updateable<UserNodeTable>;
-
-interface DeviceNodeTable {
-  device_id: ColumnType<string, string, never>;
-  user_id: ColumnType<string, string, never>;
-  node_id: ColumnType<string, string, never>;
-  workspace_id: ColumnType<string, string, string>;
-  node_version_id: ColumnType<string | null, string | null, string | null>;
-  user_node_version_id: ColumnType<string | null, string | null, string | null>;
-  node_synced_at: ColumnType<Date | null, Date | null, Date>;
-  user_node_synced_at: ColumnType<Date | null, Date | null, Date>;
-}
-
-export type SelectDeviceNode = Selectable<DeviceNodeTable>;
-export type CreateDeviceNode = Insertable<DeviceNodeTable>;
-export type UpdateDeviceNode = Updateable<DeviceNodeTable>;
 
 interface UploadTable {
   node_id: ColumnType<string, string, never>;
@@ -164,8 +161,8 @@ export interface DatabaseSchema {
   workspaces: WorkspaceTable;
   workspace_users: WorkspaceUserTable;
   nodes: NodeTable;
+  node_transactions: NodeTransactionTable;
+  collaborations: CollaborationTable;
   node_paths: NodePathTable;
-  user_nodes: UserNodeTable;
-  device_nodes: DeviceNodeTable;
   uploads: UploadTable;
 }

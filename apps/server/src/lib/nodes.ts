@@ -1,14 +1,22 @@
 import { database } from '@/data/database';
-import { SelectNode } from '@/data/schema';
+import {
+  SelectCollaboration,
+  SelectNode,
+  SelectNodeTransaction,
+} from '@/data/schema';
 import { NodeCollaborator } from '@/types/nodes';
-import { NodeOutput } from '@colanode/core';
-import { fromUint8Array } from 'js-base64';
+import {
+  NodeOutput,
+  ServerCollaboration,
+  ServerNodeTransaction,
+} from '@colanode/core';
 import {
   extractNodeCollaborators,
   extractNodeRole,
   Node,
   NodeType,
 } from '@colanode/core';
+import { encodeState } from '@colanode/crdt';
 
 export const mapNodeOutput = (node: SelectNode): NodeOutput => {
   return {
@@ -17,14 +25,12 @@ export const mapNodeOutput = (node: SelectNode): NodeOutput => {
     workspaceId: node.workspace_id,
     type: node.type,
     attributes: node.attributes,
-    state: fromUint8Array(node.state),
+    state: '',
     createdAt: node.created_at.toISOString(),
     createdBy: node.created_by,
-    versionId: node.version_id,
+    transactionId: node.transaction_id,
     updatedAt: node.updated_at?.toISOString() ?? null,
     updatedBy: node.updated_by ?? null,
-    serverCreatedAt: node.server_created_at.toISOString(),
-    serverUpdatedAt: node.server_updated_at?.toISOString() ?? null,
   };
 };
 
@@ -38,11 +44,71 @@ export const mapNode = (node: SelectNode): Node => {
     createdBy: node.created_by,
     updatedAt: node.updated_at?.toISOString() ?? null,
     updatedBy: node.updated_by ?? null,
-    versionId: node.version_id,
-    serverCreatedAt: node.server_created_at.toISOString(),
-    serverUpdatedAt: node.server_updated_at?.toISOString() ?? null,
-    serverVersionId: node.version_id,
+    transactionId: node.transaction_id,
   } as Node;
+};
+
+export const mapNodeTransaction = (
+  transaction: SelectNodeTransaction
+): ServerNodeTransaction => {
+  if (transaction.type === 'create' && transaction.data) {
+    return {
+      id: transaction.id,
+      type: 'create',
+      nodeId: transaction.node_id,
+      workspaceId: transaction.workspace_id,
+      data: encodeState(transaction.data),
+      createdAt: transaction.created_at.toISOString(),
+      createdBy: transaction.created_by,
+      serverCreatedAt: transaction.server_created_at.toISOString(),
+      number: transaction.number.toString(),
+    };
+  }
+
+  if (transaction.type === 'update' && transaction.data) {
+    return {
+      id: transaction.id,
+      type: 'update',
+      nodeId: transaction.node_id,
+      workspaceId: transaction.workspace_id,
+      data: encodeState(transaction.data),
+      createdAt: transaction.created_at.toISOString(),
+      createdBy: transaction.created_by,
+      serverCreatedAt: transaction.server_created_at.toISOString(),
+      number: transaction.number.toString(),
+    };
+  }
+
+  if (transaction.type === 'delete') {
+    return {
+      id: transaction.id,
+      type: 'delete',
+      nodeId: transaction.node_id,
+      workspaceId: transaction.workspace_id,
+      createdAt: transaction.created_at.toISOString(),
+      createdBy: transaction.created_by,
+      serverCreatedAt: transaction.server_created_at.toISOString(),
+      number: transaction.number.toString(),
+    };
+  }
+
+  throw new Error('Unknown transaction type');
+};
+
+export const mapCollaboration = (
+  collaboration: SelectCollaboration
+): ServerCollaboration => {
+  return {
+    userId: collaboration.user_id,
+    nodeId: collaboration.node_id,
+    type: collaboration.type,
+    workspaceId: collaboration.workspace_id,
+    state: encodeState(collaboration.state),
+    createdAt: collaboration.created_at.toISOString(),
+    updatedAt: collaboration.updated_at?.toISOString() ?? null,
+    deletedAt: collaboration.deleted_at?.toISOString() ?? null,
+    number: collaboration.number.toString(),
+  };
 };
 
 export const fetchNode = async (nodeId: string): Promise<SelectNode | null> => {

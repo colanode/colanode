@@ -45,6 +45,18 @@ export type SelectWorkspace = Selectable<WorkspaceTable>;
 export type CreateWorkspace = Insertable<WorkspaceTable>;
 export type UpdateWorkspace = Updateable<WorkspaceTable>;
 
+interface WorkspaceCursorTable {
+  user_id: ColumnType<string, string, never>;
+  node_transactions: ColumnType<bigint, bigint, bigint>;
+  collaborations: ColumnType<bigint, bigint, bigint>;
+  created_at: ColumnType<string, string, string>;
+  updated_at: ColumnType<string | null, string | null, string>;
+}
+
+export type SelectWorkspaceCursor = Selectable<WorkspaceCursorTable>;
+export type CreateWorkspaceCursor = Insertable<WorkspaceCursorTable>;
+export type UpdateWorkspaceCursor = Updateable<WorkspaceCursorTable>;
+
 interface DeletedTokenTable {
   token: ColumnType<string, string, never>;
   account_id: ColumnType<string, string, never>;
@@ -56,5 +68,6 @@ export interface AppDatabaseSchema {
   servers: ServerTable;
   accounts: AccountTable;
   workspaces: WorkspaceTable;
+  workspace_cursors: WorkspaceCursorTable;
   deleted_tokens: DeletedTokenTable;
 }

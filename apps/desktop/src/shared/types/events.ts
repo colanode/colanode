@@ -1,4 +1,4 @@
-import { Node } from '@colanode/core';
+import { LocalNodeTransaction, Node } from '@colanode/core';
 import { Account } from '@/shared/types/accounts';
 import { Workspace } from '@/shared/types/workspaces';
 import { Server } from '@/shared/types/servers';
@@ -120,10 +120,10 @@ export type RadarDataUpdatedEvent = {
   type: 'radar_data_updated';
 };
 
-export type ChangeCreatedEvent = {
-  type: 'change_created';
+export type NodeTransactionCreatedEvent = {
+  type: 'node_transaction_created';
   userId: string;
-  changeId: number;
+  transaction: LocalNodeTransaction;
 };
 
 export type ServerAvailabilityChangedEvent = {
@@ -154,5 +154,5 @@ export type Event =
   | UploadDeletedEvent
   | QueryResultUpdatedEvent
   | RadarDataUpdatedEvent
-  | ChangeCreatedEvent
+  | NodeTransactionCreatedEvent
   | ServerAvailabilityChangedEvent;
