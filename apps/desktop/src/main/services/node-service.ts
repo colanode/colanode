@@ -285,10 +285,10 @@ class NodeService {
 
     const update = ydoc.updateAttributes(model.schema, updatedAttributes);
 
-    const result = await workspaceDatabase
+    const { updatedNode, createdTransaction } = await workspaceDatabase
       .transaction()
       .execute(async (trx) => {
-        const updatedRow = await trx
+        const updatedNode = await trx
           .updateTable('nodes')
           .returningAll()
           .set({
@@ -301,11 +301,10 @@ class NodeService {
           .where('transaction_id', '=', node.transactionId)
           .executeTakeFirst();
 
-        if (updatedRow) {
-          node = mapNode(updatedRow);
-
-          await trx
+        if (updatedNode) {
+          const createdTransaction = await trx
             .insertInto('node_transactions')
+            .returningAll()
             .values({
               id: transactionId,
               node_id: nodeId,
@@ -316,21 +315,31 @@ class NodeService {
               retry_count: 0,
               status: 'pending',
             })
-            .execute();
+            .executeTakeFirst();
+
+          return { updatedNode, createdTransaction };
         }
 
-        return true;
+        return { updatedNode: undefined, createdTransaction: undefined };
       });
 
-    if (result) {
+    if (updatedNode) {
       eventBus.publish({
         type: 'node_updated',
         userId,
-        node,
+        node: mapNode(updatedNode),
       });
     }
 
-    return result;
+    if (createdTransaction) {
+      eventBus.publish({
+        type: 'node_transaction_created',
+        userId,
+        transaction: mapTransaction(createdTransaction),
+      });
+    }
+
+    return updatedNode !== undefined;
   }
 
   public async deleteNode(nodeId: string, userId: string) {
@@ -359,33 +368,57 @@ class NodeService {
       throw new Error('Insufficient permissions');
     }
 
-    await workspaceDatabase.transaction().execute(async (trx) => {
-      await trx.deleteFrom('nodes').where('id', '=', nodeId).execute();
-      await trx
-        .deleteFrom('node_transactions')
-        .where('node_id', '=', nodeId)
-        .execute();
+    const { deletedNode, createdTransaction } = await workspaceDatabase
+      .transaction()
+      .execute(async (trx) => {
+        const deletedNode = await trx
+          .deleteFrom('nodes')
+          .returningAll()
+          .where('id', '=', nodeId)
+          .executeTakeFirst();
 
-      await trx
-        .insertInto('node_transactions')
-        .values({
-          id: generateId(IdType.Transaction),
-          node_id: nodeId,
-          type: 'delete',
-          data: null,
-          created_at: new Date().toISOString(),
-          created_by: context.userId,
-          retry_count: 0,
-          status: 'pending',
-        })
-        .executeTakeFirst();
-    });
+        if (!deletedNode) {
+          return { deletedNode: undefined, createdTransaction: undefined };
+        }
 
-    eventBus.publish({
-      type: 'node_deleted',
-      userId,
-      node: node,
-    });
+        await trx
+          .deleteFrom('node_transactions')
+          .where('node_id', '=', nodeId)
+          .execute();
+
+        const createdTransaction = await trx
+          .insertInto('node_transactions')
+          .returningAll()
+          .values({
+            id: generateId(IdType.Transaction),
+            node_id: nodeId,
+            type: 'delete',
+            data: null,
+            created_at: new Date().toISOString(),
+            created_by: context.userId,
+            retry_count: 0,
+            status: 'pending',
+          })
+          .executeTakeFirst();
+
+        return { deletedNode, createdTransaction };
+      });
+
+    if (deletedNode) {
+      eventBus.publish({
+        type: 'node_deleted',
+        userId,
+        node: mapNode(deletedNode),
+      });
+    }
+
+    if (createdTransaction) {
+      eventBus.publish({
+        type: 'node_transaction_created',
+        userId,
+        transaction: mapTransaction(createdTransaction),
+      });
+    }
   }
 
   public async applyServerTransaction(
