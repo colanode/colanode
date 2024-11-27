@@ -17,19 +17,19 @@ interface RecordUrlValueProps {
 export const RecordUrlValue = ({ field, readOnly }: RecordUrlValueProps) => {
   const record = useRecord();
 
-  const text = record.getUrlValue(field);
-  const isUrl = text && isValidUrl(text);
+  const url = record.getUrlValue(field);
+  const canOpen = url && isValidUrl(url);
 
   return (
     <HoverCard openDelay={300}>
       <HoverCardTrigger>
         <SmartTextInput
-          value={text}
+          value={url}
           readOnly={!record.canEdit || readOnly}
           onChange={(newValue) => {
             if (!record.canEdit || readOnly) return;
 
-            if (newValue === text) {
+            if (newValue === url) {
               return;
             }
 
@@ -48,17 +48,22 @@ export const RecordUrlValue = ({ field, readOnly }: RecordUrlValueProps) => {
       <HoverCardContent
         className={cn(
           'flex w-full min-w-80 max-w-128 flex-row items-center justify-between gap-2 text-ellipsis',
-          !isUrl && 'hidden'
+          !canOpen && 'hidden'
         )}
       >
-        <a
+        <span
           className="text-blue-500 underline hover:cursor-pointer hover:text-blue-600"
-          href={text ?? ''}
-          target="_blank"
-          rel="noreferrer"
+          onClick={() => {
+            if (!canOpen) return;
+
+            window.colanode.executeCommand({
+              type: 'url_open',
+              url,
+            });
+          }}
         >
-          {text}
-        </a>
+          {url}
+        </span>
         <ExternalLink className="size-4 min-h-4 min-w-4 text-muted-foreground" />
       </HoverCardContent>
     </HoverCard>
