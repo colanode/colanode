@@ -302,8 +302,8 @@ accountsRouter.put(
         throw new Error('User node not found.');
       }
 
-      const name = user.attributes.name;
-      const avatar = user.attributes.avatar;
+      const name = user.attributes.name ?? null;
+      const avatar = user.attributes.avatar ?? null;
 
       if (account.name !== name || account.avatar !== avatar) {
         continue;
