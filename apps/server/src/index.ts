@@ -1,7 +1,7 @@
 import { initApi } from '@/api';
 import { initRedis } from '@/data/redis';
 import { migrate } from '@/data/database';
-import { initTaskWorker } from '@/queues/tasks';
+import { jobService } from '@/services/job-service';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -11,7 +11,8 @@ const init = async () => {
   await initRedis();
   await initApi();
 
-  initTaskWorker();
+  jobService.initQueue();
+  await jobService.initWorker();
 };
 
 init();
