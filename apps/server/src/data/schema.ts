@@ -123,7 +123,7 @@ interface CollaborationTable {
   state: ColumnType<Uint8Array, Uint8Array, Uint8Array>;
   created_at: ColumnType<Date, Date, never>;
   updated_at: ColumnType<Date | null, Date | null, Date>;
-  deleted_at: ColumnType<Date | null, Date | null, Date>;
+  deleted_at: ColumnType<Date | null, Date | null, Date | null>;
   number: ColumnType<bigint, never, never>;
 }
 

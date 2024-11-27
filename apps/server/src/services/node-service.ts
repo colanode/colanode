@@ -33,7 +33,8 @@ import {
 } from '@/types/nodes';
 import { buildDefaultCollaboration } from '@/lib/collaborations';
 import { eventBus } from '@/lib/event-bus';
-import { logService } from './log';
+import { logService } from '@/services/log';
+import { jobService } from '@/services/job-service';
 
 const UPDATE_RETRIES_LIMIT = 10;
 
@@ -186,103 +187,58 @@ class NodeService {
     const date = new Date();
     const transactionId = generateId(IdType.Transaction);
 
-    const { removedCollaborators, addedCollaborators } =
+    const { addedCollaborators, removedCollaborators } =
       this.checkCollaboratorChanges(
         node,
         ancestors.filter((a) => a.id !== input.nodeId),
         attributes
       );
 
-    const collaborations: CreateCollaboration[] = addedCollaborators.map(
-      (collaboratorId) =>
-        buildDefaultCollaboration(
-          collaboratorId,
-          input.nodeId,
-          attributes.type,
-          input.workspaceId
-        )
-    );
-
     try {
-      const {
-        updatedNode,
-        createdTransaction,
-        createdCollaborations,
-        updatedCollaborations,
-      } = await database.transaction().execute(async (trx) => {
-        const updatedNode = await trx
-          .updateTable('nodes')
-          .returningAll()
-          .set({
-            attributes: attributesJson,
-            updated_at: date,
-            updated_by: input.userId,
-            transaction_id: transactionId,
-          })
-          .where('id', '=', input.nodeId)
-          .where('transaction_id', '=', node.transactionId)
-          .executeTakeFirst();
-
-        if (!updatedNode) {
-          throw new Error('Failed to update node');
-        }
-
-        const createdTransaction = await trx
-          .insertInto('node_transactions')
-          .returningAll()
-          .values({
-            id: transactionId,
-            node_id: input.nodeId,
-            workspace_id: input.workspaceId,
-            type: 'update',
-            data: update,
-            created_at: date,
-            created_by: input.userId,
-            server_created_at: date,
-          })
-          .executeTakeFirst();
-
-        if (!createdTransaction) {
-          throw new Error('Failed to create transaction');
-        }
-
-        let createdCollaborations: SelectCollaboration[] = [];
-        let updatedCollaborations: SelectCollaboration[] = [];
-        if (collaborations.length > 0) {
-          createdCollaborations = await trx
-            .insertInto('collaborations')
-            .returningAll()
-            .values(collaborations)
-            .execute();
-
-          if (createdCollaborations.length !== collaborations.length) {
-            throw new Error('Failed to create collaborations');
-          }
-        }
-
-        if (removedCollaborators.length > 0) {
-          updatedCollaborations = await trx
-            .updateTable('collaborations')
+      const { updatedNode, createdTransaction } = await database
+        .transaction()
+        .execute(async (trx) => {
+          const updatedNode = await trx
+            .updateTable('nodes')
             .returningAll()
             .set({
-              deleted_at: date,
+              attributes: attributesJson,
+              updated_at: date,
+              updated_by: input.userId,
+              transaction_id: transactionId,
             })
-            .where('node_id', '=', input.nodeId)
-            .where('user_id', 'in', removedCollaborators)
-            .execute();
+            .where('id', '=', input.nodeId)
+            .where('transaction_id', '=', node.transactionId)
+            .executeTakeFirst();
 
-          if (updatedCollaborations.length !== removedCollaborators.length) {
-            throw new Error('Failed to remove collaborations');
+          if (!updatedNode) {
+            throw new Error('Failed to update node');
           }
-        }
 
-        return {
-          updatedNode,
-          createdTransaction,
-          createdCollaborations,
-          updatedCollaborations,
-        };
-      });
+          const createdTransaction = await trx
+            .insertInto('node_transactions')
+            .returningAll()
+            .values({
+              id: transactionId,
+              node_id: input.nodeId,
+              workspace_id: input.workspaceId,
+              type: 'update',
+              data: update,
+              created_at: date,
+              created_by: input.userId,
+              server_created_at: date,
+            })
+            .executeTakeFirst();
+
+          if (!createdTransaction) {
+            throw new Error('Failed to create transaction');
+          }
+
+          return {
+            updatedNode,
+            createdTransaction,
+          };
+        });
 
       eventBus.publish({
         type: 'node_transaction_created',
@@ -291,21 +247,21 @@ class NodeService {
         workspaceId: input.workspaceId,
       });
 
-      for (const collaboration of createdCollaborations) {
-        eventBus.publish({
-          type: 'collaboration_created',
-          userId: collaboration.user_id,
-          nodeId: collaboration.node_id,
-          workspaceId: collaboration.workspace_id,
+      for (const addedCollaborator of addedCollaborators) {
+        jobService.addJob({
+          type: 'create_collaborations',
+          nodeId: input.nodeId,
+          userId: addedCollaborator,
+          workspaceId: input.workspaceId,
         });
       }
 
-      for (const collaboration of updatedCollaborations) {
-        eventBus.publish({
-          type: 'collaboration_updated',
-          userId: collaboration.user_id,
-          nodeId: collaboration.node_id,
-          workspaceId: collaboration.workspace_id,
+      for (const removedCollaborator of removedCollaborators) {
+        jobService.addJob({
+          type: 'delete_collaborations',
+          nodeId: input.nodeId,
+          userId: removedCollaborator,
+          workspaceId: input.workspaceId,
         });
       }
 
@@ -314,8 +270,6 @@ class NodeService {
         output: {
           node: updatedNode,
           transaction: createdTransaction,
-          createdCollaborations,
-          updatedCollaborations,
         },
       };
     } catch (error) {
@@ -491,106 +445,61 @@ class NodeService {
       return { type: 'error', output: null };
     }
 
-    const { removedCollaborators, addedCollaborators } =
+    const { addedCollaborators, removedCollaborators } =
       this.checkCollaboratorChanges(
         node,
         ancestors.filter((a) => a.id !== input.nodeId),
         attributes
       );
 
-    const collaborations: CreateCollaboration[] = addedCollaborators.map(
-      (collaboratorId) =>
-        buildDefaultCollaboration(
-          collaboratorId,
-          input.nodeId,
-          attributes.type,
-          context.workspaceId
-        )
-    );
-
     try {
-      const {
-        updatedNode,
-        createdTransaction,
-        createdCollaborations,
-        updatedCollaborations,
-      } = await database.transaction().execute(async (trx) => {
-        const updatedNode = await trx
-          .updateTable('nodes')
-          .returningAll()
-          .set({
-            attributes: attributesJson,
-            updated_at: input.createdAt,
-            updated_by: input.userId,
-            transaction_id: input.id,
-          })
-          .where('id', '=', input.nodeId)
-          .where('transaction_id', '=', node.transactionId)
-          .executeTakeFirst();
-
-        if (!updatedNode) {
-          throw new Error('Failed to update node');
-        }
-
-        const createdTransaction = await trx
-          .insertInto('node_transactions')
-          .returningAll()
-          .values({
-            id: input.id,
-            node_id: input.nodeId,
-            workspace_id: context.workspaceId,
-            type: 'update',
-            data:
-              typeof input.data === 'string'
-                ? decodeState(input.data)
-                : input.data,
-            created_at: input.createdAt,
-            created_by: input.userId,
-            server_created_at: new Date(),
-          })
-          .executeTakeFirst();
-
-        if (!createdTransaction) {
-          throw new Error('Failed to create transaction');
-        }
-
-        let createdCollaborations: SelectCollaboration[] = [];
-        let updatedCollaborations: SelectCollaboration[] = [];
-        if (collaborations.length > 0) {
-          createdCollaborations = await trx
-            .insertInto('collaborations')
-            .returningAll()
-            .values(collaborations)
-            .execute();
-
-          if (createdCollaborations.length !== collaborations.length) {
-            throw new Error('Failed to create collaborations');
-          }
-        }
-
-        if (removedCollaborators.length > 0) {
-          updatedCollaborations = await trx
-            .updateTable('collaborations')
+      const { updatedNode, createdTransaction } = await database
+        .transaction()
+        .execute(async (trx) => {
+          const updatedNode = await trx
+            .updateTable('nodes')
             .returningAll()
             .set({
-              deleted_at: input.createdAt,
+              attributes: attributesJson,
+              updated_at: input.createdAt,
+              updated_by: input.userId,
+              transaction_id: input.id,
             })
-            .where('node_id', '=', input.nodeId)
-            .where('user_id', 'in', removedCollaborators)
-            .execute();
+            .where('id', '=', input.nodeId)
+            .where('transaction_id', '=', node.transactionId)
+            .executeTakeFirst();
 
-          if (updatedCollaborations.length !== removedCollaborators.length) {
-            throw new Error('Failed to remove collaborations');
+          if (!updatedNode) {
+            throw new Error('Failed to update node');
           }
-        }
 
-        return {
-          updatedNode,
-          createdTransaction,
-          createdCollaborations,
-          updatedCollaborations,
-        };
-      });
+          const createdTransaction = await trx
+            .insertInto('node_transactions')
+            .returningAll()
+            .values({
+              id: input.id,
+              node_id: input.nodeId,
+              workspace_id: context.workspaceId,
+              type: 'update',
+              data:
+                typeof input.data === 'string'
+                  ? decodeState(input.data)
+                  : input.data,
+              created_at: input.createdAt,
+              created_by: input.userId,
+              server_created_at: new Date(),
+            })
+            .executeTakeFirst();
+
+          if (!createdTransaction) {
+            throw new Error('Failed to create transaction');
+          }
+
+          return {
+            updatedNode,
+            createdTransaction,
+          };
+        });
 
       eventBus.publish({
         type: 'node_transaction_created',
@@ -599,21 +508,21 @@ class NodeService {
         workspaceId: context.workspaceId,
       });
 
-      for (const collaboration of createdCollaborations) {
-        eventBus.publish({
-          type: 'collaboration_created',
-          userId: collaboration.user_id,
-          nodeId: collaboration.node_id,
-          workspaceId: collaboration.workspace_id,
+      for (const addedCollaborator of addedCollaborators) {
+        jobService.addJob({
+          type: 'create_collaborations',
+          nodeId: input.nodeId,
+          userId: addedCollaborator,
+          workspaceId: context.workspaceId,
         });
       }
 
-      for (const collaboration of updatedCollaborations) {
-        eventBus.publish({
-          type: 'collaboration_updated',
-          userId: collaboration.user_id,
-          nodeId: collaboration.node_id,
-          workspaceId: collaboration.workspace_id,
+      for (const removedCollaborator of removedCollaborators) {
+        jobService.addJob({
+          type: 'delete_collaborations',
+          nodeId: input.nodeId,
+          userId: removedCollaborator,
+          workspaceId: context.workspaceId,
         });
       }
 
@@ -622,8 +531,6 @@ class NodeService {
         output: {
           node: updatedNode,
           transaction: createdTransaction,
-          createdCollaborations,
-          updatedCollaborations,
         },
       };
     } catch (error) {

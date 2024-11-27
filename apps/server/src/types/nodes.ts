@@ -35,8 +35,6 @@ export type UpdateNodeInput = {
 export type UpdateNodeOutput = {
   node: SelectNode;
   transaction: SelectNodeTransaction;
-  createdCollaborations: SelectCollaboration[];
-  updatedCollaborations: SelectCollaboration[];
 };
 
 export type ApplyNodeCreateTransactionInput = {
@@ -63,8 +61,6 @@ export type ApplyNodeUpdateTransactionInput = {
 export type ApplyNodeUpdateTransactionOutput = {
   node: SelectNode;
   transaction: SelectNodeTransaction;
-  createdCollaborations: SelectCollaboration[];
-  updatedCollaborations: SelectCollaboration[];
 };
 
 export type ApplyNodeDeleteTransactionInput = {
