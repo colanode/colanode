@@ -6,6 +6,7 @@ import {
   CollaborationRevocationsBatchMessage,
   Message,
   NodeTransactionsBatchMessage,
+  NodeType,
 } from '@colanode/core';
 import { logService } from '@/services/log-service';
 import { mapCollaborationRevocation, mapNodeTransaction } from '@/lib/nodes';
@@ -29,6 +30,8 @@ interface SynapseConnection {
   transactions: Map<string, SynapseUserCursor>;
   revocations: Map<string, SynapseUserCursor>;
 }
+
+const PUBLIC_NODES: NodeType[] = ['workspace', 'user'];
 
 class SynapseService {
   private readonly logger = logService.createLogger('synapse-service');
@@ -270,27 +273,37 @@ class SynapseService {
       return;
     }
 
-    const collaborations = await database
-      .selectFrom('collaborations')
-      .selectAll()
-      .where((eb) =>
-        eb.and([eb('user_id', 'in', userIds), eb('node_id', '=', event.nodeId)])
-      )
-      .execute();
+    let usersToSend: string[] = [];
+    if (PUBLIC_NODES.includes(event.nodeType)) {
+      usersToSend = userIds;
+    } else {
+      const collaborations = await database
+        .selectFrom('collaborations')
+        .selectAll()
+        .where((eb) =>
+          eb.and([
+            eb('user_id', 'in', userIds),
+            eb('node_id', '=', event.nodeId),
+          ])
+        )
+        .execute();
 
-    if (collaborations.length === 0) {
+      usersToSend = collaborations.map((c) => c.user_id);
+    }
+
+    if (usersToSend.length === 0) {
       return;
     }
 
-    for (const collaboration of collaborations) {
-      const deviceIds = userDevices.get(collaboration.user_id) ?? [];
+    for (const userId of usersToSend) {
+      const deviceIds = userDevices.get(userId) ?? [];
       for (const deviceId of deviceIds) {
         const socketConnection = this.connections.get(deviceId);
         if (socketConnection === undefined) {
           continue;
         }
 
-        this.sendPendingTransactions(socketConnection, collaboration.user_id);
+        this.sendPendingTransactions(socketConnection, userId);
       }
     }
   }

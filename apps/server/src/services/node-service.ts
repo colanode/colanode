@@ -96,6 +96,7 @@ class NodeService {
         type: 'node_transaction_created',
         transactionId: transactionId,
         nodeId: input.nodeId,
+        nodeType: input.attributes.type,
         workspaceId: input.workspaceId,
       });
 
@@ -234,6 +235,7 @@ class NodeService {
         type: 'node_transaction_created',
         transactionId: transactionId,
         nodeId: input.nodeId,
+        nodeType: node.type,
         workspaceId: input.workspaceId,
       });
 
@@ -313,6 +315,7 @@ class NodeService {
         type: 'node_transaction_created',
         transactionId: input.id,
         nodeId: input.nodeId,
+        nodeType: attributes.type,
         workspaceId: context.workspaceId,
       });
 
@@ -465,6 +468,7 @@ class NodeService {
         type: 'node_transaction_created',
         transactionId: input.id,
         nodeId: input.nodeId,
+        nodeType: node.type,
         workspaceId: context.workspaceId,
       });
 
@@ -566,6 +570,7 @@ class NodeService {
       type: 'node_transaction_created',
       transactionId: input.id,
       nodeId: input.nodeId,
+      nodeType: node.type,
       workspaceId: workspaceUser.workspace_id,
     });
 

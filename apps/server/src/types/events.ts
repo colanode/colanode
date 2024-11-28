@@ -1,7 +1,10 @@
+import { NodeType } from '@colanode/core';
+
 export type NodeTransactionCreatedEvent = {
   type: 'node_transaction_created';
   transactionId: string;
   nodeId: string;
+  nodeType: NodeType;
   workspaceId: string;
 };
 
