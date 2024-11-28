@@ -27,14 +27,15 @@ export type SelectNodePath = Selectable<NodePathTable>;
 interface NodeTransactionTable {
   id: ColumnType<string, string, never>;
   node_id: ColumnType<string, string, never>;
-  type: ColumnType<string, string, never>;
+  node_type: ColumnType<string, string, never>;
+  operation: ColumnType<string, string, never>;
   data: ColumnType<Uint8Array | null, Uint8Array | null, never>;
   created_at: ColumnType<string, string, never>;
   created_by: ColumnType<string, string, never>;
   server_created_at: ColumnType<string | null, string | null, string | null>;
   retry_count: ColumnType<number, number, number>;
   status: ColumnType<string, string, string>;
-  number: ColumnType<bigint | null, bigint | null, bigint | null>;
+  version: ColumnType<bigint | null, bigint | null, bigint | null>;
 }
 
 export type SelectNodeTransaction = Selectable<NodeTransactionTable>;

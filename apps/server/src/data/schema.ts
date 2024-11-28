@@ -1,4 +1,4 @@
-import { NodeAttributes, WorkspaceRole } from '@colanode/core';
+import { NodeAttributes, NodeRole, WorkspaceRole } from '@colanode/core';
 import {
   ColumnType,
   Insertable,
@@ -101,13 +101,14 @@ export type UpdateNode = Updateable<NodeTable>;
 interface NodeTransactionTable {
   id: ColumnType<string, string, never>;
   node_id: ColumnType<string, string, never>;
+  node_type: ColumnType<string, string, never>;
+  operation: ColumnType<string, string, never>;
   workspace_id: ColumnType<string, string, never>;
-  type: ColumnType<string, string, never>;
   data: ColumnType<Uint8Array | null, Uint8Array | null, Uint8Array | null>;
   created_at: ColumnType<Date, Date, never>;
   created_by: ColumnType<string, string, never>;
   server_created_at: ColumnType<Date, Date, never>;
-  number: ColumnType<bigint, never, never>;
+  version: ColumnType<bigint, never, never>;
 }
 
 export type SelectNodeTransaction = Selectable<NodeTransactionTable>;
@@ -119,17 +120,29 @@ interface CollaborationTable {
   node_id: ColumnType<string, string, never>;
   type: ColumnType<string, never, never>;
   workspace_id: ColumnType<string, string, never>;
-  attributes: JSONColumnType<any, string, string>;
-  state: ColumnType<Uint8Array, Uint8Array, Uint8Array>;
+  roles: JSONColumnType<Record<string, NodeRole>, string, string>;
   created_at: ColumnType<Date, Date, never>;
   updated_at: ColumnType<Date | null, Date | null, Date>;
-  deleted_at: ColumnType<Date | null, Date | null, Date | null>;
-  number: ColumnType<bigint, never, never>;
 }
 
 export type SelectCollaboration = Selectable<CollaborationTable>;
 export type CreateCollaboration = Insertable<CollaborationTable>;
 export type UpdateCollaboration = Updateable<CollaborationTable>;
+
+interface CollaborationRevocationTable {
+  user_id: ColumnType<string, never, never>;
+  node_id: ColumnType<string, never, never>;
+  workspace_id: ColumnType<string, string, never>;
+  created_at: ColumnType<Date, never, never>;
+  version: ColumnType<bigint, never, never>;
+}
+
+export type SelectCollaborationRevocation =
+  Selectable<CollaborationRevocationTable>;
+export type CreateCollaborationRevocation =
+  Insertable<CollaborationRevocationTable>;
+export type UpdateCollaborationRevocation =
+  Updateable<CollaborationRevocationTable>;
 
 interface NodePathTable {
   ancestor_id: ColumnType<string, string, never>;
@@ -163,6 +176,7 @@ export interface DatabaseSchema {
   nodes: NodeTable;
   node_transactions: NodeTransactionTable;
   collaborations: CollaborationTable;
+  collaboration_revocations: CollaborationRevocationTable;
   node_paths: NodePathTable;
   uploads: UploadTable;
 }

@@ -71,11 +71,11 @@ const handleLocalNodeTransaction = async (
   workspaceUser: SelectWorkspaceUser,
   transaction: LocalNodeTransaction
 ): Promise<SyncNodeTransactionStatus> => {
-  if (transaction.type === 'create') {
+  if (transaction.operation === 'create') {
     return await handleCreateNodeTransaction(workspaceUser, transaction);
-  } else if (transaction.type === 'update') {
+  } else if (transaction.operation === 'update') {
     return await handleUpdateNodeTransaction(workspaceUser, transaction);
-  } else if (transaction.type === 'delete') {
+  } else if (transaction.operation === 'delete') {
     return await handleDeleteNodeTransaction(workspaceUser, transaction);
   } else {
     return 'error';

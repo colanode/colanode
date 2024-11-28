@@ -1,13 +1,13 @@
 import { database } from '@/data/database';
 import {
-  SelectCollaboration,
+  SelectCollaborationRevocation,
   SelectNode,
   SelectNodeTransaction,
 } from '@/data/schema';
 import { NodeCollaborator } from '@/types/nodes';
 import {
   NodeOutput,
-  ServerCollaboration,
+  ServerCollaborationRevocation,
   ServerNodeTransaction,
 } from '@colanode/core';
 import {
@@ -51,63 +51,62 @@ export const mapNode = (node: SelectNode): Node => {
 export const mapNodeTransaction = (
   transaction: SelectNodeTransaction
 ): ServerNodeTransaction => {
-  if (transaction.type === 'create' && transaction.data) {
+  if (transaction.operation === 'create' && transaction.data) {
     return {
       id: transaction.id,
-      type: 'create',
+      operation: 'create',
       nodeId: transaction.node_id,
+      nodeType: transaction.node_type,
       workspaceId: transaction.workspace_id,
       data: encodeState(transaction.data),
       createdAt: transaction.created_at.toISOString(),
       createdBy: transaction.created_by,
       serverCreatedAt: transaction.server_created_at.toISOString(),
-      number: transaction.number.toString(),
+      version: transaction.version.toString(),
     };
   }
 
-  if (transaction.type === 'update' && transaction.data) {
+  if (transaction.operation === 'update' && transaction.data) {
     return {
       id: transaction.id,
-      type: 'update',
+      operation: 'update',
       nodeId: transaction.node_id,
+      nodeType: transaction.node_type,
       workspaceId: transaction.workspace_id,
       data: encodeState(transaction.data),
       createdAt: transaction.created_at.toISOString(),
       createdBy: transaction.created_by,
       serverCreatedAt: transaction.server_created_at.toISOString(),
-      number: transaction.number.toString(),
+      version: transaction.version.toString(),
     };
   }
 
-  if (transaction.type === 'delete') {
+  if (transaction.operation === 'delete') {
     return {
       id: transaction.id,
-      type: 'delete',
+      operation: 'delete',
       nodeId: transaction.node_id,
+      nodeType: transaction.node_type,
       workspaceId: transaction.workspace_id,
       createdAt: transaction.created_at.toISOString(),
       createdBy: transaction.created_by,
       serverCreatedAt: transaction.server_created_at.toISOString(),
-      number: transaction.number.toString(),
+      version: transaction.version.toString(),
     };
   }
 
   throw new Error('Unknown transaction type');
 };
 
-export const mapCollaboration = (
-  collaboration: SelectCollaboration
-): ServerCollaboration => {
+export const mapCollaborationRevocation = (
+  revocation: SelectCollaborationRevocation
+): ServerCollaborationRevocation => {
   return {
-    userId: collaboration.user_id,
-    nodeId: collaboration.node_id,
-    type: collaboration.type,
-    workspaceId: collaboration.workspace_id,
-    state: encodeState(collaboration.state),
-    createdAt: collaboration.created_at.toISOString(),
-    updatedAt: collaboration.updated_at?.toISOString() ?? null,
-    deletedAt: collaboration.deleted_at?.toISOString() ?? null,
-    number: collaboration.number.toString(),
+    userId: revocation.user_id,
+    nodeId: revocation.node_id,
+    workspaceId: revocation.workspace_id,
+    createdAt: revocation.created_at.toISOString(),
+    version: revocation.version.toString(),
   };
 };
 

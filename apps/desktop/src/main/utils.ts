@@ -140,33 +140,36 @@ export const mapWorkspace = (row: SelectWorkspace): Workspace => {
 export const mapTransaction = (
   row: SelectNodeTransaction
 ): LocalNodeTransaction => {
-  if (row.type === 'create' && row.data) {
+  if (row.operation === 'create' && row.data) {
     return {
       id: row.id,
       nodeId: row.node_id,
-      type: row.type,
+      nodeType: row.node_type,
+      operation: 'create',
       data: encodeState(row.data),
       createdAt: row.created_at,
       createdBy: row.created_by,
     };
   }
 
-  if (row.type === 'update' && row.data) {
+  if (row.operation === 'update' && row.data) {
     return {
       id: row.id,
       nodeId: row.node_id,
-      type: row.type,
+      nodeType: row.node_type,
+      operation: 'update',
       data: encodeState(row.data),
       createdAt: row.created_at,
       createdBy: row.created_by,
     };
   }
 
-  if (row.type === 'delete') {
+  if (row.operation === 'delete') {
     return {
       id: row.id,
       nodeId: row.node_id,
-      type: row.type,
+      nodeType: row.node_type,
+      operation: 'delete',
       createdAt: row.created_at,
       createdBy: row.created_by,
     };

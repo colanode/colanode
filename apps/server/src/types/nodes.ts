@@ -1,8 +1,4 @@
-import {
-  SelectCollaboration,
-  SelectNode,
-  SelectNodeTransaction,
-} from '@/data/schema';
+import { SelectNode, SelectNodeTransaction } from '@/data/schema';
 import { Node, NodeAttributes } from '@colanode/core';
 
 export type NodeCollaborator = {
@@ -22,7 +18,6 @@ export type CreateNodeInput = {
 export type CreateNodeOutput = {
   node: SelectNode;
   transaction: SelectNodeTransaction;
-  createdCollaborations: SelectCollaboration[];
 };
 
 export type UpdateNodeInput = {
@@ -47,7 +42,6 @@ export type ApplyNodeCreateTransactionInput = {
 export type ApplyNodeCreateTransactionOutput = {
   node: SelectNode;
   transaction: SelectNodeTransaction;
-  collaborations: SelectCollaboration[];
 };
 
 export type ApplyNodeUpdateTransactionInput = {
@@ -72,5 +66,4 @@ export type ApplyNodeDeleteTransactionInput = {
 export type ApplyNodeDeleteTransactionOutput = {
   node: SelectNode;
   transaction: SelectNodeTransaction;
-  updatedCollaborations: SelectCollaboration[];
 };

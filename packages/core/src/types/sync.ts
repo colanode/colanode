@@ -21,7 +21,8 @@ export type LocalNodeTransaction =
 export type LocalCreateNodeTransaction = {
   id: string;
   nodeId: string;
-  type: 'create';
+  nodeType: string;
+  operation: 'create';
   data: string;
   createdAt: string;
   createdBy: string;
@@ -30,7 +31,8 @@ export type LocalCreateNodeTransaction = {
 export type LocalUpdateNodeTransaction = {
   id: string;
   nodeId: string;
-  type: 'update';
+  nodeType: string;
+  operation: 'update';
   data: string;
   createdAt: string;
   createdBy: string;
@@ -39,44 +41,48 @@ export type LocalUpdateNodeTransaction = {
 export type LocalDeleteNodeTransaction = {
   id: string;
   nodeId: string;
-  type: 'delete';
+  nodeType: string;
+  operation: 'delete';
   createdAt: string;
   createdBy: string;
 };
 
 export type ServerNodeCreateTransaction = {
   id: string;
-  type: 'create';
+  operation: 'create';
   nodeId: string;
+  nodeType: string;
   workspaceId: string;
   data: string;
   createdAt: string;
   createdBy: string;
   serverCreatedAt: string;
-  number: string;
+  version: string;
 };
 
 export type ServerNodeUpdateTransaction = {
   id: string;
-  type: 'update';
+  operation: 'update';
   nodeId: string;
+  nodeType: string;
   workspaceId: string;
   data: string;
   createdAt: string;
   createdBy: string;
   serverCreatedAt: string;
-  number: string;
+  version: string;
 };
 
 export type ServerNodeDeleteTransaction = {
   id: string;
-  type: 'delete';
+  operation: 'delete';
   nodeId: string;
+  nodeType: string;
   workspaceId: string;
   createdAt: string;
   createdBy: string;
   serverCreatedAt: string;
-  number: string;
+  version: string;
 };
 
 export type ServerNodeTransaction =
@@ -84,14 +90,10 @@ export type ServerNodeTransaction =
   | ServerNodeUpdateTransaction
   | ServerNodeDeleteTransaction;
 
-export type ServerCollaboration = {
+export type ServerCollaborationRevocation = {
   userId: string;
   nodeId: string;
-  type: string;
   workspaceId: string;
-  state: string;
   createdAt: string;
-  updatedAt: string | null;
-  deletedAt: string | null;
-  number: string;
+  version: string;
 };

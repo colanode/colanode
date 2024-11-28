@@ -91,8 +91,8 @@ const createWorkspaceCursorsTable: Migration = {
           .references('workspaces.user_id')
           .onDelete('cascade')
       )
-      .addColumn('node_transactions', 'integer', (col) => col.notNull())
-      .addColumn('collaborations', 'integer', (col) => col.notNull())
+      .addColumn('transactions', 'integer', (col) => col.notNull().defaultTo(0))
+      .addColumn('revocations', 'integer', (col) => col.notNull().defaultTo(0))
       .addColumn('created_at', 'text', (col) => col.notNull())
       .addColumn('updated_at', 'text')
       .execute();

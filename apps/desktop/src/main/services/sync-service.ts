@@ -4,8 +4,8 @@ import { eventBus } from '@/shared/lib/event-bus';
 import { httpClient } from '@/shared/lib/http-client';
 import { serverService } from '@/main/services/server-service';
 import {
-  CollaborationsBatchMessage,
-  FetchCollaborationsMessage,
+  CollaborationRevocationsBatchMessage,
+  FetchCollaborationRevocationsMessage,
   FetchNodeTransactionsMessage,
   LocalNodeTransaction,
   NodeTransactionsBatchMessage,
@@ -26,7 +26,7 @@ class SyncService {
   private readonly localSyncStates: Map<string, WorkspaceSyncState> = new Map();
 
   private readonly syncingTransactions: Set<string> = new Set();
-  private readonly syncingCollaborations: Set<string> = new Set();
+  private readonly syncingRevocations: Set<string> = new Set();
 
   constructor() {
     eventBus.subscribe((event) => {
@@ -49,7 +49,7 @@ class SyncService {
     for (const workspace of workspaces) {
       this.syncLocalTransactions(workspace.user_id);
       this.requireNodeTransactions(workspace.user_id);
-      this.requireCollaborations(workspace.user_id);
+      this.requireCollaborationRevocations(workspace.user_id);
     }
   }
 
@@ -95,7 +95,7 @@ class SyncService {
     try {
       for (const transaction of message.transactions) {
         await nodeService.applyServerTransaction(message.userId, transaction);
-        cursor = BigInt(transaction.number);
+        cursor = BigInt(transaction.version);
       }
 
       if (cursor) {
@@ -112,33 +112,35 @@ class SyncService {
     }
   }
 
-  public async syncServerCollaborations(message: CollaborationsBatchMessage) {
-    if (this.syncingCollaborations.has(message.userId)) {
+  public async syncServerRevocations(
+    message: CollaborationRevocationsBatchMessage
+  ) {
+    if (this.syncingRevocations.has(message.userId)) {
       return;
     }
 
-    this.syncingCollaborations.add(message.userId);
+    this.syncingRevocations.add(message.userId);
     let cursor: bigint | null = null;
     try {
-      for (const collaboration of message.collaborations) {
-        await collaborationService.applyServerCollaboration(
+      for (const revocation of message.revocations) {
+        await collaborationService.applyServerCollaborationRevocation(
           message.userId,
-          collaboration
+          revocation
         );
-        cursor = BigInt(collaboration.number);
+        cursor = BigInt(revocation.version);
       }
 
       if (cursor) {
-        this.updateNodeCollaborationCursor(message.userId, cursor);
+        this.updateCollaborationRevocationCursor(message.userId, cursor);
       }
     } catch (error) {
       this.logger.error(
         error,
-        `Error syncing server collaborations for user ${message.userId}`
+        `Error syncing server revocations for user ${message.userId}`
       );
     } finally {
-      this.syncingCollaborations.delete(message.userId);
-      this.requireCollaborations(message.userId);
+      this.syncingRevocations.delete(message.userId);
+      this.requireCollaborationRevocations(message.userId);
     }
   }
 
@@ -232,7 +234,7 @@ class SyncService {
         'w.user_id',
         'w.workspace_id',
         'w.account_id',
-        'wc.node_transactions',
+        'wc.transactions',
       ])
       .where('w.user_id', '=', userId)
       .executeTakeFirst();
@@ -245,22 +247,17 @@ class SyncService {
       type: 'fetch_node_transactions',
       userId: workspaceWithCursor.user_id,
       workspaceId: workspaceWithCursor.workspace_id,
-      cursor: workspaceWithCursor.node_transactions?.toString() ?? null,
+      cursor: workspaceWithCursor.transactions?.toString() ?? '0',
     };
 
     socketService.sendMessage(workspaceWithCursor.account_id, message);
   }
 
-  private async requireCollaborations(userId: string) {
+  private async requireCollaborationRevocations(userId: string) {
     const workspaceWithCursor = await databaseService.appDatabase
       .selectFrom('workspaces as w')
       .leftJoin('workspace_cursors as wc', 'w.user_id', 'wc.user_id')
-      .select([
-        'w.user_id',
-        'w.workspace_id',
-        'w.account_id',
-        'wc.collaborations',
-      ])
+      .select(['w.user_id', 'w.workspace_id', 'w.account_id', 'wc.revocations'])
       .where('w.user_id', '=', userId)
       .executeTakeFirst();
 
@@ -268,11 +265,11 @@ class SyncService {
       return;
     }
 
-    const message: FetchCollaborationsMessage = {
-      type: 'fetch_collaborations',
+    const message: FetchCollaborationRevocationsMessage = {
+      type: 'fetch_collaboration_revocations',
       userId: workspaceWithCursor.user_id,
       workspaceId: workspaceWithCursor.workspace_id,
-      cursor: workspaceWithCursor.collaborations?.toString() ?? null,
+      cursor: workspaceWithCursor.revocations?.toString() ?? '0',
     };
 
     socketService.sendMessage(workspaceWithCursor.account_id, message);
@@ -283,31 +280,34 @@ class SyncService {
       .insertInto('workspace_cursors')
       .values({
         user_id: userId,
-        node_transactions: cursor,
-        collaborations: 0n,
+        transactions: cursor,
+        revocations: 0n,
         created_at: new Date().toISOString(),
       })
       .onConflict((eb) =>
         eb.column('user_id').doUpdateSet({
-          node_transactions: cursor,
+          transactions: cursor,
           updated_at: new Date().toISOString(),
         })
       )
       .execute();
   }
 
-  private async updateNodeCollaborationCursor(userId: string, cursor: bigint) {
+  private async updateCollaborationRevocationCursor(
+    userId: string,
+    cursor: bigint
+  ) {
     await databaseService.appDatabase
       .insertInto('workspace_cursors')
       .values({
         user_id: userId,
-        collaborations: cursor,
-        node_transactions: 0n,
+        revocations: cursor,
+        transactions: 0n,
         created_at: new Date().toISOString(),
       })
       .onConflict((eb) =>
         eb.column('user_id').doUpdateSet({
-          collaborations: cursor,
+          revocations: cursor,
           updated_at: new Date().toISOString(),
         })
       )

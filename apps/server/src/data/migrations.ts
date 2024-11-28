@@ -125,7 +125,7 @@ const createNodesTable: Migration = {
 const createNodeTransactionsTable: Migration = {
   up: async (db) => {
     await sql`
-      CREATE SEQUENCE IF NOT EXISTS node_transactions_number_seq
+      CREATE SEQUENCE IF NOT EXISTS node_transactions_version_seq
       START WITH 1000000000
       INCREMENT BY 1
       NO MINVALUE
@@ -138,19 +138,22 @@ const createNodeTransactionsTable: Migration = {
       .addColumn('id', 'varchar(30)', (col) => col.notNull().primaryKey())
       .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
       .addColumn('node_id', 'varchar(30)', (col) => col.notNull())
-      .addColumn('type', 'varchar(30)', (col) => col.notNull())
+      .addColumn('node_type', 'varchar(30)', (col) => col.notNull())
+      .addColumn('operation', 'varchar(30)', (col) => col.notNull())
       .addColumn('data', 'bytea')
       .addColumn('created_at', 'timestamptz', (col) => col.notNull())
       .addColumn('created_by', 'varchar(30)', (col) => col.notNull())
       .addColumn('server_created_at', 'timestamptz', (col) => col.notNull())
-      .addColumn('number', 'bigint', (col) =>
-        col.notNull().defaultTo(sql`nextval('node_transactions_number_seq')`)
+      .addColumn('version', 'bigint', (col) =>
+        col.notNull().defaultTo(sql`nextval('node_transactions_version_seq')`)
       )
       .execute();
   },
   down: async (db) => {
     await db.schema.dropTable('node_transactions').execute();
-    await sql`DROP SEQUENCE IF EXISTS node_transactions_number_seq`.execute(db);
+    await sql`DROP SEQUENCE IF EXISTS node_transactions_version_seq`.execute(
+      db
+    );
   },
 };
 
@@ -230,8 +233,26 @@ const createNodePathsTable: Migration = {
 
 const createCollaborationsTable: Migration = {
   up: async (db) => {
+    await db.schema
+      .createTable('collaborations')
+      .addColumn('user_id', 'varchar(30)', (col) => col.notNull())
+      .addColumn('node_id', 'varchar(30)', (col) => col.notNull())
+      .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
+      .addColumn('roles', 'jsonb', (col) => col.notNull().defaultTo('{}'))
+      .addColumn('created_at', 'timestamptz', (col) => col.notNull())
+      .addColumn('updated_at', 'timestamptz')
+      .addPrimaryKeyConstraint('collaborations_pkey', ['user_id', 'node_id'])
+      .execute();
+  },
+  down: async (db) => {
+    await db.schema.dropTable('collaborations').execute();
+  },
+};
+
+const createCollaborationRevocationsTable: Migration = {
+  up: async (db) => {
     await sql`
-      CREATE SEQUENCE IF NOT EXISTS collaboration_number_seq
+      CREATE SEQUENCE IF NOT EXISTS collaboration_revocations_version_seq
       START WITH 1000000000
       INCREMENT BY 1
       NO MINVALUE
@@ -240,48 +261,47 @@ const createCollaborationsTable: Migration = {
     `.execute(db);
 
     await db.schema
-      .createTable('collaborations')
+      .createTable('collaboration_revocations')
       .addColumn('user_id', 'varchar(30)', (col) => col.notNull())
       .addColumn('node_id', 'varchar(30)', (col) => col.notNull())
-      .addColumn('type', 'varchar(30)', (col) =>
-        col.generatedAlwaysAs(sql`(attributes->>'type')::VARCHAR(30)`).stored()
-      )
       .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
-      .addColumn('attributes', 'jsonb', (col) => col.notNull())
-      .addColumn('state', 'bytea', (col) => col.notNull())
       .addColumn('created_at', 'timestamptz', (col) => col.notNull())
-      .addColumn('updated_at', 'timestamptz')
-      .addColumn('deleted_at', 'timestamptz')
-      .addColumn('number', 'bigint', (col) =>
-        col.notNull().defaultTo(sql`nextval('collaboration_number_seq')`)
+      .addColumn('version', 'bigint', (col) =>
+        col
+          .notNull()
+          .defaultTo(sql`nextval('collaboration_revocations_version_seq')`)
       )
-      .addPrimaryKeyConstraint('collaborations_pkey', ['user_id', 'node_id'])
+      .addPrimaryKeyConstraint('collaboration_revocations_pkey', [
+        'user_id',
+        'node_id',
+      ])
       .execute();
 
-    // Add trigger to update number on each update
     await sql`
-      CREATE OR REPLACE FUNCTION fn_update_collaboration_number() RETURNS TRIGGER AS $$
+      CREATE OR REPLACE FUNCTION handle_collaboration_update() RETURNS TRIGGER AS $$
       BEGIN
-        NEW.number = nextval('collaboration_number_seq');
-        RETURN NEW;
+        IF NEW.roles = '{}' THEN
+          DELETE FROM collaborations WHERE user_id = NEW.user_id AND node_id = NEW.node_id;
+          INSERT INTO collaboration_revocations (user_id, node_id, workspace_id, created_at)
+          VALUES (NEW.user_id, NEW.node_id, NEW.workspace_id, NOW());
+        ELSE
+          DELETE FROM collaboration_revocations WHERE user_id = NEW.user_id AND node_id = NEW.node_id;
+        END IF;
+        RETURN NULL;
       END;
       $$ LANGUAGE plpgsql;
 
-      CREATE TRIGGER trg_update_collaboration_number
-      BEFORE UPDATE ON collaborations
-      FOR EACH ROW
-      EXECUTE FUNCTION fn_update_collaboration_number();
+      CREATE TRIGGER after_collaboration_insert
+      AFTER INSERT ON collaborations
+      FOR EACH ROW EXECUTE FUNCTION handle_collaboration_update();
+
+      CREATE TRIGGER after_collaboration_update
+      AFTER UPDATE ON collaborations
+      FOR EACH ROW EXECUTE FUNCTION handle_collaboration_update();
     `.execute(db);
   },
   down: async (db) => {
-    // Drop trigger and function first
-    await sql`
-      DROP TRIGGER IF EXISTS trg_update_collaboration_number ON collaborations;
-      DROP FUNCTION IF EXISTS fn_update_collaboration_number();
-      DROP SEQUENCE IF EXISTS collaboration_number_seq;
-    `.execute(db);
-
-    await db.schema.dropTable('collaborations').execute();
+    await db.schema.dropTable('collaboration_revocations').execute();
   },
 };
 
@@ -317,5 +337,7 @@ export const databaseMigrations: Record<string, Migration> = {
   '00006_create_node_transactions_table': createNodeTransactionsTable,
   '00007_create_node_paths_table': createNodePathsTable,
   '00008_create_collaborations_table': createCollaborationsTable,
-  '00009_create_uploads_table': createUploadsTable,
+  '00009_create_collaboration_revocations_table':
+    createCollaborationRevocationsTable,
+  '00010_create_uploads_table': createUploadsTable,
 };

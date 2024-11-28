@@ -2,9 +2,9 @@ import {
   extractNodeCollaborators,
   generateId,
   IdType,
-  Node,
   NodeAttributes,
   NodeMutationContext,
+  NodeRole,
   registry,
 } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
@@ -12,11 +12,11 @@ import {
   CreateCollaboration,
   CreateNode,
   CreateNodeTransaction,
-  SelectCollaboration,
+  DatabaseSchema,
   SelectWorkspaceUser,
 } from '@/data/schema';
-import { cloneDeep, difference } from 'lodash-es';
-import { fetchWorkspaceUsers, mapNode } from '@/lib/nodes';
+import { cloneDeep } from 'lodash-es';
+import { mapNode } from '@/lib/nodes';
 import { database } from '@/data/database';
 import { fetchNodeAncestors } from '@/lib/nodes';
 import {
@@ -31,10 +31,9 @@ import {
   UpdateNodeInput,
   UpdateNodeOutput,
 } from '@/types/nodes';
-import { buildDefaultCollaboration } from '@/lib/collaborations';
 import { eventBus } from '@/lib/event-bus';
 import { logService } from '@/services/log';
-import { jobService } from '@/services/job-service';
+import { sql, Transaction } from 'kysely';
 
 const UPDATE_RETRIES_LIMIT = 10;
 
@@ -44,8 +43,9 @@ type UpdateResult<T> = {
 };
 
 type CollaboratorChangeResult = {
-  removedCollaborators: string[];
-  addedCollaborators: string[];
+  addedCollaborators: Record<string, NodeRole>;
+  updatedCollaborators: Record<string, NodeRole>;
+  removedCollaborators: Record<string, NodeRole>;
 };
 
 class NodeService {
@@ -57,7 +57,8 @@ class NodeService {
     const model = registry.getNodeModel(input.attributes.type);
     const ydoc = new YDoc();
     const update = ydoc.updateAttributes(model.schema, input.attributes);
-    const attributesJson = JSON.stringify(ydoc.getAttributes<NodeAttributes>());
+    const attributes = ydoc.getAttributes<NodeAttributes>();
+    const attributesJson = JSON.stringify(attributes);
 
     const date = new Date();
     const transactionId = generateId(IdType.Transaction);
@@ -74,27 +75,21 @@ class NodeService {
     const createTransaction: CreateNodeTransaction = {
       id: transactionId,
       node_id: input.nodeId,
+      node_type: input.attributes.type,
       workspace_id: input.workspaceId,
-      type: 'create',
+      operation: 'create',
       data: update,
       created_at: date,
       created_by: input.userId,
       server_created_at: date,
     };
 
-    const createCollaborations = await this.buildCollaborations(
-      input.nodeId,
-      input.workspaceId,
-      input.attributes,
-      input.ancestors
-    );
-
     try {
-      const { createdNode, createdTransaction, createdCollaborations } =
+      const { createdNode, createdTransaction } =
         await this.applyDatabaseCreateTransaction(
+          attributes,
           createNode,
-          createTransaction,
-          createCollaborations
+          createTransaction
         );
 
       eventBus.publish({
@@ -104,19 +99,9 @@ class NodeService {
         workspaceId: input.workspaceId,
       });
 
-      for (const collaboration of createdCollaborations) {
-        eventBus.publish({
-          type: 'collaboration_created',
-          userId: collaboration.user_id,
-          nodeId: collaboration.node_id,
-          workspaceId: collaboration.workspace_id,
-        });
-      }
-
       return {
         node: createdNode,
         transaction: createdTransaction,
-        createdCollaborations: createdCollaborations,
       };
     } catch (error) {
       this.logger.error(error, 'Failed to create node transaction');
@@ -187,12 +172,10 @@ class NodeService {
     const date = new Date();
     const transactionId = generateId(IdType.Transaction);
 
-    const { addedCollaborators, removedCollaborators } =
-      this.checkCollaboratorChanges(
-        node,
-        ancestors.filter((a) => a.id !== input.nodeId),
-        attributes
-      );
+    const collaboratorChanges = this.checkCollaboratorChanges(
+      node.attributes,
+      attributes
+    );
 
     try {
       const { updatedNode, createdTransaction } = await database
@@ -221,8 +204,9 @@ class NodeService {
             .values({
               id: transactionId,
               node_id: input.nodeId,
+              node_type: node.type,
               workspace_id: input.workspaceId,
-              type: 'update',
+              operation: 'update',
               data: update,
               created_at: date,
               created_by: input.userId,
@@ -233,6 +217,12 @@ class NodeService {
           if (!createdTransaction) {
             throw new Error('Failed to create transaction');
           }
+
+          await this.applyCollaborationUpdates(
+            trx,
+            input.nodeId,
+            collaboratorChanges
+          );
 
           return {
             updatedNode,
@@ -246,24 +236,6 @@ class NodeService {
         nodeId: input.nodeId,
         workspaceId: input.workspaceId,
       });
-
-      for (const addedCollaborator of addedCollaborators) {
-        jobService.addJob({
-          type: 'create_collaborations',
-          nodeId: input.nodeId,
-          userId: addedCollaborator,
-          workspaceId: input.workspaceId,
-        });
-      }
-
-      for (const removedCollaborator of removedCollaborators) {
-        jobService.addJob({
-          type: 'delete_collaborations',
-          nodeId: input.nodeId,
-          userId: removedCollaborator,
-          workspaceId: input.workspaceId,
-        });
-      }
 
       return {
         type: 'success',
@@ -319,8 +291,9 @@ class NodeService {
     const createTransaction: CreateNodeTransaction = {
       id: input.id,
       node_id: input.nodeId,
+      node_type: attributes.type,
       workspace_id: context.workspaceId,
-      type: 'create',
+      operation: 'create',
       data:
         typeof input.data === 'string' ? decodeState(input.data) : input.data,
       created_at: input.createdAt,
@@ -328,20 +301,12 @@ class NodeService {
       server_created_at: new Date(),
     };
 
-    const createCollaborations: CreateCollaboration[] =
-      await this.buildCollaborations(
-        input.nodeId,
-        context.workspaceId,
-        attributes,
-        ancestors
-      );
-
     try {
-      const { createdNode, createdTransaction, createdCollaborations } =
+      const { createdNode, createdTransaction } =
         await this.applyDatabaseCreateTransaction(
+          attributes,
           createNode,
-          createTransaction,
-          createCollaborations
+          createTransaction
         );
 
       eventBus.publish({
@@ -351,19 +316,9 @@ class NodeService {
         workspaceId: context.workspaceId,
       });
 
-      for (const collaboration of createdCollaborations) {
-        eventBus.publish({
-          type: 'collaboration_created',
-          userId: collaboration.user_id,
-          nodeId: collaboration.node_id,
-          workspaceId: collaboration.workspace_id,
-        });
-      }
-
       return {
         node: createdNode,
         transaction: createdTransaction,
-        collaborations: createdCollaborations,
       };
     } catch (error) {
       this.logger.error(error, 'Failed to apply node create transaction');
@@ -412,7 +367,7 @@ class NodeService {
       .selectFrom('node_transactions')
       .selectAll()
       .where('node_id', '=', input.nodeId)
-      .orderBy('number', 'asc')
+      .orderBy('version', 'asc')
       .execute();
 
     const ydoc = new YDoc();
@@ -445,12 +400,10 @@ class NodeService {
       return { type: 'error', output: null };
     }
 
-    const { addedCollaborators, removedCollaborators } =
-      this.checkCollaboratorChanges(
-        node,
-        ancestors.filter((a) => a.id !== input.nodeId),
-        attributes
-      );
+    const collaboratorChanges = this.checkCollaboratorChanges(
+      node.attributes,
+      attributes
+    );
 
     try {
       const { updatedNode, createdTransaction } = await database
@@ -480,7 +433,8 @@ class NodeService {
               id: input.id,
               node_id: input.nodeId,
               workspace_id: context.workspaceId,
-              type: 'update',
+              node_type: node.type,
+              operation: 'update',
               data:
                 typeof input.data === 'string'
                   ? decodeState(input.data)
@@ -495,6 +449,12 @@ class NodeService {
             throw new Error('Failed to create transaction');
           }
 
+          await this.applyCollaborationUpdates(
+            trx,
+            input.nodeId,
+            collaboratorChanges
+          );
+
           return {
             updatedNode,
             createdTransaction,
@@ -508,24 +468,6 @@ class NodeService {
         workspaceId: context.workspaceId,
       });
 
-      for (const addedCollaborator of addedCollaborators) {
-        jobService.addJob({
-          type: 'create_collaborations',
-          nodeId: input.nodeId,
-          userId: addedCollaborator,
-          workspaceId: context.workspaceId,
-        });
-      }
-
-      for (const removedCollaborator of removedCollaborators) {
-        jobService.addJob({
-          type: 'delete_collaborations',
-          nodeId: input.nodeId,
-          userId: removedCollaborator,
-          workspaceId: context.workspaceId,
-        });
-      }
-
       return {
         type: 'success',
         output: {
@@ -534,6 +476,7 @@ class NodeService {
         },
       };
     } catch (error) {
+      console.log('error', error);
       return { type: 'retry', output: null };
     }
   }
@@ -562,8 +505,9 @@ class NodeService {
       return null;
     }
 
-    const { deletedNode, createdTransaction, updatedCollaborations } =
-      await database.transaction().execute(async (trx) => {
+    const { deletedNode, createdTransaction } = await database
+      .transaction()
+      .execute(async (trx) => {
         const deletedNode = await trx
           .deleteFrom('nodes')
           .returningAll()
@@ -586,7 +530,8 @@ class NodeService {
             id: input.id,
             node_id: input.nodeId,
             workspace_id: workspaceUser.workspace_id,
-            type: 'delete',
+            node_type: node.type,
+            operation: 'delete',
             created_at: input.createdAt,
             created_by: workspaceUser.id,
             server_created_at: new Date(),
@@ -597,19 +542,9 @@ class NodeService {
           throw new Error('Failed to create transaction');
         }
 
-        const updatedCollaborations = await trx
-          .updateTable('collaborations')
-          .returningAll()
-          .set({
-            deleted_at: input.createdAt,
-          })
-          .where('node_id', '=', input.nodeId)
-          .execute();
-
         return {
           deletedNode,
           createdTransaction,
-          updatedCollaborations,
         };
       });
 
@@ -620,27 +555,27 @@ class NodeService {
       workspaceId: workspaceUser.workspace_id,
     });
 
-    for (const collaboration of updatedCollaborations) {
-      eventBus.publish({
-        type: 'collaboration_updated',
-        userId: collaboration.user_id,
-        nodeId: collaboration.node_id,
-        workspaceId: collaboration.workspace_id,
-      });
-    }
-
     return {
       node: deletedNode,
       transaction: createdTransaction,
-      updatedCollaborations,
     };
   }
 
   private async applyDatabaseCreateTransaction(
+    attributes: NodeAttributes,
     node: CreateNode,
-    transaction: CreateNodeTransaction,
-    collaborations: CreateCollaboration[]
+    transaction: CreateNodeTransaction
   ) {
+    const collaborationsToCreate: CreateCollaboration[] = Object.entries(
+      extractNodeCollaborators(attributes)
+    ).map(([userId, role]) => ({
+      user_id: userId,
+      node_id: node.id,
+      workspace_id: node.workspace_id,
+      roles: JSON.stringify({ [node.id]: role }),
+      created_at: new Date(),
+    }));
+
     return await database.transaction().execute(async (trx) => {
       const createdNode = await trx
         .insertInto('nodes')
@@ -662,128 +597,138 @@ class NodeService {
         throw new Error('Failed to create transaction');
       }
 
-      let createdCollaborations: SelectCollaboration[] = [];
-      if (collaborations.length > 0) {
-        createdCollaborations = await trx
+      if (collaborationsToCreate.length > 0) {
+        const createdCollaborations = await trx
           .insertInto('collaborations')
           .returningAll()
-          .values(collaborations)
+          .values(collaborationsToCreate)
           .execute();
 
-        if (createdCollaborations.length !== collaborations.length) {
+        if (createdCollaborations.length !== collaborationsToCreate.length) {
           throw new Error('Failed to create collaborations');
         }
       }
 
-      return { createdNode, createdTransaction, createdCollaborations };
+      await sql`
+        INSERT INTO collaborations (user_id, node_id, workspace_id, roles, created_at)
+        SELECT 
+          c.user_id,
+          ${node.id} as node_id,
+          ${node.workspace_id} as workspace_id,
+          c.roles,
+          ${new Date()} as created_at
+        FROM collaborations as c
+        WHERE c.node_id = ${attributes.parentId}
+        ON CONFLICT (user_id, node_id) DO UPDATE
+        SET
+          roles = collaborations.roles || EXCLUDED.roles,
+          updated_at = NOW()
+      `.execute(trx);
+
+      return { createdNode, createdTransaction };
     });
   }
 
-  private async buildCollaborations(
+  private async applyCollaborationUpdates(
+    transaction: Transaction<DatabaseSchema>,
     nodeId: string,
-    workspaceId: string,
-    attributes: NodeAttributes,
-    ancestors: Node[]
+    updateResult: CollaboratorChangeResult
   ) {
-    if (attributes.type === 'user') {
-      return this.buildUserCollaborations(nodeId, workspaceId);
+    for (const [userId, role] of Object.entries(
+      updateResult.addedCollaborators
+    )) {
+      const roles = JSON.stringify({ [nodeId]: role });
+      await sql`
+        INSERT INTO collaborations (user_id, node_id, workspace_id, roles, created_at)
+        SELECT 
+          ${userId} as user_id,
+          np.descendant_id as node_id,
+          np.workspace_id as workspace_id,
+          ${roles},
+          ${new Date()} as created_at
+        FROM node_paths as np
+        WHERE np.ancestor_id = ${nodeId}
+        ON CONFLICT (user_id, node_id) DO UPDATE
+        SET
+          roles = collaborations.roles || EXCLUDED.roles,
+          updated_at = NOW()
+      `.execute(transaction);
     }
 
-    return this.buildNodeCollaborations(
-      nodeId,
-      workspaceId,
-      attributes,
-      ancestors
-    );
-  }
-
-  private async buildUserCollaborations(
-    userId: string,
-    workspaceId: string
-  ): Promise<CreateCollaboration[]> {
-    const createCollaborations: CreateCollaboration[] = [];
-    createCollaborations.push(
-      buildDefaultCollaboration(userId, workspaceId, 'workspace', workspaceId)
-    );
-
-    const workspaceUserIds = await fetchWorkspaceUsers(workspaceId);
-
-    for (const workspaceUserId of workspaceUserIds) {
-      createCollaborations.push(
-        buildDefaultCollaboration(workspaceUserId, userId, 'user', workspaceId)
-      );
-
-      if (workspaceUserId === userId) {
-        continue;
-      }
-
-      createCollaborations.push(
-        buildDefaultCollaboration(userId, workspaceUserId, 'user', workspaceId)
-      );
+    for (const [userId, role] of Object.entries(
+      updateResult.updatedCollaborators
+    )) {
+      const roles = JSON.stringify({ [nodeId]: role });
+      await sql`
+        INSERT INTO collaborations (user_id, node_id, workspace_id, roles, created_at)
+        SELECT 
+          ${userId} as user_id,
+          np.descendant_id as node_id,
+          np.workspace_id as workspace_id,
+          ${roles},
+          ${new Date()} as created_at
+        FROM node_paths as np
+        WHERE np.ancestor_id = ${nodeId}
+        ON CONFLICT (user_id, node_id) DO UPDATE
+        SET
+          roles = collaborations.roles || EXCLUDED.roles,
+          updated_at = NOW()
+      `.execute(transaction);
     }
 
-    return createCollaborations;
-  }
-
-  private buildNodeCollaborations(
-    nodeId: string,
-    workspaceId: string,
-    attributes: NodeAttributes,
-    ancestors: Node[]
-  ): CreateCollaboration[] {
-    const collaborators = extractNodeCollaborators([
-      ...ancestors.map((a) => a.attributes),
-      attributes,
-    ]);
-
-    const collaboratorIds = Object.keys(collaborators);
-    const createCollaborations: CreateCollaboration[] = collaboratorIds.map(
-      (userId) =>
-        buildDefaultCollaboration(userId, nodeId, attributes.type, workspaceId)
+    const removedCollaboratorIds = Object.keys(
+      updateResult.removedCollaborators
     );
 
-    return createCollaborations;
+    if (removedCollaboratorIds.length > 0) {
+      await sql`
+        UPDATE collaborations
+        SET
+          roles = collaborations.roles - ${nodeId},
+          updated_at = NOW()
+        WHERE user_id IN (${sql.join(removedCollaboratorIds, sql`, `)}) 
+        AND node_id IN 
+          (
+            SELECT np.descendant_id 
+            FROM node_paths as np 
+            WHERE np.ancestor_id = ${nodeId}
+          )
+      `.execute(transaction);
+    }
   }
 
   private checkCollaboratorChanges(
-    node: Node,
-    ancestors: Node[],
-    newAttributes: NodeAttributes
+    beforeAttributes: NodeAttributes,
+    afterAttributes: NodeAttributes
   ): CollaboratorChangeResult {
-    const beforeCollaborators = Object.keys(
-      extractNodeCollaborators(node.attributes)
-    );
+    const beforeCollaborators = extractNodeCollaborators(beforeAttributes);
+    const afterCollaborators = extractNodeCollaborators(afterAttributes);
 
-    const afterCollaborators = Object.keys(
-      extractNodeCollaborators(newAttributes)
-    );
+    const addedCollaborators: Record<string, NodeRole> = {};
+    const updatedCollaborators: Record<string, NodeRole> = {};
+    const removedCollaborators: Record<string, NodeRole> = {};
 
-    if (beforeCollaborators.length === 0 && afterCollaborators.length === 0) {
-      return { removedCollaborators: [], addedCollaborators: [] };
+    // Check for added and updated collaborators
+    for (const [userId, newRole] of Object.entries(afterCollaborators)) {
+      if (!(userId in beforeCollaborators)) {
+        addedCollaborators[userId] = newRole;
+      } else if (beforeCollaborators[userId] !== newRole) {
+        updatedCollaborators[userId] = newRole;
+      }
     }
 
-    const addedCollaborators = difference(
-      afterCollaborators,
-      beforeCollaborators
-    );
-
-    const removedCollaborators = difference(
-      beforeCollaborators,
-      afterCollaborators
-    );
-
-    if (addedCollaborators.length === 0 && removedCollaborators.length === 0) {
-      return { removedCollaborators: [], addedCollaborators: [] };
+    // Check for removed collaborators
+    for (const [userId, oldRole] of Object.entries(beforeCollaborators)) {
+      if (!(userId in afterCollaborators)) {
+        removedCollaborators[userId] = oldRole;
+      }
     }
 
-    const inheritedCollaborators = Object.keys(
-      extractNodeCollaborators(ancestors.map((a) => a.attributes))
-    );
-
-    const added = difference(addedCollaborators, inheritedCollaborators);
-    const removed = difference(removedCollaborators, inheritedCollaborators);
-
-    return { removedCollaborators: removed, addedCollaborators: added };
+    return {
+      addedCollaborators,
+      updatedCollaborators,
+      removedCollaborators,
+    };
   }
 }
 

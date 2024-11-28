@@ -130,7 +130,8 @@ class NodeService {
           .values({
             id: transactionId,
             node_id: inputItem.id,
-            type: 'create',
+            operation: 'create',
+            node_type: inputItem.attributes.type,
             data: update,
             created_at: createdAt,
             created_by: context.userId,
@@ -308,7 +309,8 @@ class NodeService {
             .values({
               id: transactionId,
               node_id: nodeId,
-              type: 'update',
+              node_type: node.type,
+              operation: 'update',
               data: update,
               created_at: updatedAt,
               created_by: context.userId,
@@ -392,7 +394,8 @@ class NodeService {
           .values({
             id: generateId(IdType.Transaction),
             node_id: nodeId,
-            type: 'delete',
+            node_type: node.type,
+            operation: 'delete',
             data: null,
             created_at: new Date().toISOString(),
             created_by: context.userId,
@@ -425,11 +428,11 @@ class NodeService {
     userId: string,
     transaction: ServerNodeTransaction
   ) {
-    if (transaction.type === 'create') {
+    if (transaction.operation === 'create') {
       await this.applyServerCreateTransaction(userId, transaction);
-    } else if (transaction.type === 'update') {
+    } else if (transaction.operation === 'update') {
       await this.applyServerUpdateTransaction(userId, transaction);
-    } else if (transaction.type === 'delete') {
+    } else if (transaction.operation === 'delete') {
       await this.applyServerDeleteTransaction(userId, transaction);
     }
   }
@@ -441,17 +444,17 @@ class NodeService {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
-    const number = BigInt(transaction.number);
+    const version = BigInt(transaction.version);
     const existingTransaction = await workspaceDatabase
       .selectFrom('node_transactions')
-      .select(['id', 'status', 'number', 'server_created_at'])
+      .select(['id', 'status', 'version', 'server_created_at'])
       .where('id', '=', transaction.id)
       .executeTakeFirst();
 
     if (existingTransaction) {
       if (
         existingTransaction.status === 'synced' &&
-        existingTransaction.number === number &&
+        existingTransaction.version === version &&
         existingTransaction.server_created_at === transaction.serverCreatedAt
       ) {
         return;
@@ -461,7 +464,7 @@ class NodeService {
         .updateTable('node_transactions')
         .set({
           status: 'synced',
-          number,
+          version,
           server_created_at: transaction.serverCreatedAt,
         })
         .where('id', '=', transaction.id)
@@ -483,13 +486,14 @@ class NodeService {
           .values({
             id: transaction.id,
             node_id: transaction.nodeId,
-            type: 'create',
+            node_type: transaction.nodeType,
+            operation: 'create',
             data: decodeState(transaction.data),
             created_at: transaction.createdAt,
             created_by: transaction.createdBy,
             retry_count: 0,
             status: 'synced',
-            number,
+            version,
             server_created_at: transaction.serverCreatedAt,
           })
           .execute();
@@ -525,17 +529,17 @@ class NodeService {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
-    const number = BigInt(transaction.number);
+    const version = BigInt(transaction.version);
     const existingTransaction = await workspaceDatabase
       .selectFrom('node_transactions')
-      .select(['id', 'status', 'number', 'server_created_at'])
+      .select(['id', 'status', 'version', 'server_created_at'])
       .where('id', '=', transaction.id)
       .executeTakeFirst();
 
     if (existingTransaction) {
       if (
         existingTransaction.status === 'synced' &&
-        existingTransaction.number === number &&
+        existingTransaction.version === version &&
         existingTransaction.server_created_at === transaction.serverCreatedAt
       ) {
         return;
@@ -545,7 +549,7 @@ class NodeService {
         .updateTable('node_transactions')
         .set({
           status: 'synced',
-          number,
+          version,
           server_created_at: transaction.serverCreatedAt,
         })
         .where('id', '=', transaction.id)
@@ -580,13 +584,14 @@ class NodeService {
           .values({
             id: transaction.id,
             node_id: transaction.nodeId,
-            type: 'update',
+            node_type: transaction.nodeType,
+            operation: 'update',
             data: decodeState(transaction.data),
             created_at: transaction.createdAt,
             created_by: transaction.createdBy,
             retry_count: 0,
             status: 'synced',
-            number,
+            version,
             server_created_at: transaction.serverCreatedAt,
           })
           .execute();

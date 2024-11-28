@@ -3,23 +3,19 @@ import { Server } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import { verifyToken } from '@/lib/tokens';
 import {
-  CollaborationsBatchMessage,
+  CollaborationRevocationsBatchMessage,
   Message,
   NodeTransactionsBatchMessage,
 } from '@colanode/core';
 import { logService } from '@/services/log';
-import { mapCollaboration, mapNodeTransaction } from '@/lib/nodes';
+import { mapCollaborationRevocation, mapNodeTransaction } from '@/lib/nodes';
 import { eventBus } from '@/lib/event-bus';
-import {
-  CollaborationCreatedEvent,
-  CollaborationUpdatedEvent,
-  NodeTransactionCreatedEvent,
-} from '@/types/events';
+import { NodeTransactionCreatedEvent } from '@/types/events';
 
 interface SynapseUserCursor {
   workspaceId: string;
   userId: string;
-  cursor: string | null;
+  cursor: string;
   syncing: boolean;
 }
 
@@ -27,8 +23,8 @@ interface SynapseConnection {
   accountId: string;
   deviceId: string;
   socket: WebSocket;
-  nodeTransactions: Map<string, SynapseUserCursor>;
-  collaborations: Map<string, SynapseUserCursor>;
+  transactions: Map<string, SynapseUserCursor>;
+  revocations: Map<string, SynapseUserCursor>;
 }
 
 class SynapseService {
@@ -39,10 +35,6 @@ class SynapseService {
     eventBus.subscribe((event) => {
       if (event.type === 'node_transaction_created') {
         this.handleNodeTransactionCreatedEvent(event);
-      } else if (event.type === 'collaboration_created') {
-        this.handleCollaborationCreatedEvent(event);
-      } else if (event.type === 'collaboration_updated') {
-        this.handleCollaborationUpdatedEvent(event);
       }
     });
   }
@@ -114,8 +106,8 @@ class SynapseService {
         accountId: account.id,
         deviceId: account.deviceId,
         socket,
-        nodeTransactions: new Map(),
-        collaborations: new Map(),
+        transactions: new Map(),
+        revocations: new Map(),
       };
 
       this.connections.set(account.deviceId, connection);
@@ -139,9 +131,9 @@ class SynapseService {
     this.logger.trace(message, `Socket message from ${connection.deviceId}`);
 
     if (message.type === 'fetch_node_transactions') {
-      const state = connection.nodeTransactions.get(message.userId);
+      const state = connection.transactions.get(message.userId);
       if (!state) {
-        connection.nodeTransactions.set(message.userId, {
+        connection.transactions.set(message.userId, {
           userId: message.userId,
           workspaceId: message.workspaceId,
           cursor: message.cursor,
@@ -153,20 +145,20 @@ class SynapseService {
         state.cursor = message.cursor;
         this.sendPendingTransactions(connection, message.userId);
       }
-    } else if (message.type === 'fetch_collaborations') {
-      const state = connection.collaborations.get(message.userId);
+    } else if (message.type === 'fetch_collaboration_revocations') {
+      const state = connection.revocations.get(message.userId);
       if (!state) {
-        connection.collaborations.set(message.userId, {
+        connection.revocations.set(message.userId, {
           userId: message.userId,
           workspaceId: message.workspaceId,
           cursor: message.cursor,
           syncing: false,
         });
 
-        this.sendPendingCollaborations(connection, message.userId);
+        this.sendPendingRevocations(connection, message.userId);
       } else if (!state.syncing && state.cursor !== message.cursor) {
         state.cursor = message.cursor;
-        this.sendPendingCollaborations(connection, message.userId);
+        this.sendPendingRevocations(connection, message.userId);
       }
     }
   }
@@ -175,7 +167,7 @@ class SynapseService {
     connection: SynapseConnection,
     userId: string
   ) {
-    const state = connection.nodeTransactions.get(userId);
+    const state = connection.transactions.get(userId);
     if (!state || state.syncing) {
       return;
     }
@@ -186,19 +178,23 @@ class SynapseService {
       `Sending pending node transactions for ${connection.deviceId} with ${userId}`
     );
 
-    let query = database
+    const unsyncedTransactions = await database
       .selectFrom('node_transactions as nt')
-      .innerJoin('collaborations as c', (join) =>
+      .leftJoin('collaborations as c', (join) =>
         join.on('c.user_id', '=', userId).onRef('c.node_id', '=', 'nt.node_id')
       )
-      .selectAll('nt');
-
-    if (state.cursor) {
-      query = query.where('nt.number', '>', BigInt(state.cursor));
-    }
-
-    const unsyncedTransactions = await query
-      .orderBy('nt.number', 'asc')
+      .selectAll('nt')
+      .where((eb) =>
+        eb.or([
+          eb.and([
+            eb('nt.workspace_id', '=', state.workspaceId),
+            eb('nt.node_type', 'in', ['workspace', 'user']),
+          ]),
+          eb('c.node_id', '=', eb.ref('nt.node_id')),
+        ])
+      )
+      .where('nt.version', '>', BigInt(state.cursor))
+      .orderBy('nt.version', 'asc')
       .limit(20)
       .execute();
 
@@ -214,15 +210,15 @@ class SynapseService {
       transactions,
     };
 
-    connection.nodeTransactions.delete(userId);
+    connection.transactions.delete(userId);
     this.sendMessage(connection, message);
   }
 
-  private async sendPendingCollaborations(
+  private async sendPendingRevocations(
     connection: SynapseConnection,
     userId: string
   ) {
-    const state = connection.collaborations.get(userId);
+    const state = connection.revocations.get(userId);
     if (!state || state.syncing) {
       return;
     }
@@ -230,36 +226,31 @@ class SynapseService {
     state.syncing = true;
     this.logger.trace(
       state,
-      `Sending pending collaborations for ${connection.deviceId} with ${userId}`
+      `Sending pending collaboration revocations for ${connection.deviceId} with ${userId}`
     );
 
-    let query = database
-      .selectFrom('collaborations as c')
+    const unsyncedRevocations = await database
+      .selectFrom('collaboration_revocations as cr')
       .selectAll()
-      .where('c.user_id', '=', userId);
-
-    if (state.cursor) {
-      query = query.where('c.number', '>', BigInt(state.cursor));
-    }
-
-    const unsyncedCollaborations = await query
-      .orderBy('c.number', 'asc')
+      .where('cr.user_id', '=', userId)
+      .where('cr.version', '>', BigInt(state.cursor))
+      .orderBy('cr.version', 'asc')
       .limit(20)
       .execute();
 
-    if (unsyncedCollaborations.length === 0) {
+    if (unsyncedRevocations.length === 0) {
       state.syncing = false;
       return;
     }
 
-    const collaborations = unsyncedCollaborations.map(mapCollaboration);
-    const message: CollaborationsBatchMessage = {
-      type: 'collaborations_batch',
+    const revocations = unsyncedRevocations.map(mapCollaborationRevocation);
+    const message: CollaborationRevocationsBatchMessage = {
+      type: 'collaboration_revocations_batch',
       userId,
-      collaborations,
+      revocations,
     };
 
-    connection.collaborations.delete(userId);
+    connection.revocations.delete(userId);
     this.sendMessage(connection, message);
   }
 
@@ -299,44 +290,12 @@ class SynapseService {
     }
   }
 
-  private handleCollaborationCreatedEvent(event: CollaborationCreatedEvent) {
-    const userDevices = this.getPendingCollaborationCursors(event.userId);
-    if (userDevices.length === 0) {
-      return;
-    }
-
-    for (const deviceId of userDevices) {
-      const socketConnection = this.connections.get(deviceId);
-      if (socketConnection === undefined) {
-        continue;
-      }
-
-      this.sendPendingCollaborations(socketConnection, event.userId);
-    }
-  }
-
-  private handleCollaborationUpdatedEvent(event: CollaborationUpdatedEvent) {
-    const userDevices = this.getPendingCollaborationCursors(event.userId);
-    if (userDevices.length === 0) {
-      return;
-    }
-
-    for (const deviceId of userDevices) {
-      const socketConnection = this.connections.get(deviceId);
-      if (socketConnection === undefined) {
-        continue;
-      }
-
-      this.sendPendingCollaborations(socketConnection, event.userId);
-    }
-  }
-
   private getPendingNodeTransactionCursors(
     workspaceId: string
   ): Map<string, string[]> {
     const userDevices = new Map<string, string[]>();
     for (const connection of this.connections.values()) {
-      const connectionUsers = connection.nodeTransactions.values();
+      const connectionUsers = connection.transactions.values();
       for (const user of connectionUsers) {
         if (user.workspaceId !== workspaceId || user.syncing) {
           continue;
@@ -354,7 +313,7 @@ class SynapseService {
   private getPendingCollaborationCursors(userId: string): string[] {
     const userDevices: string[] = [];
     for (const connection of this.connections.values()) {
-      const connectionUsers = connection.collaborations.values();
+      const connectionUsers = connection.revocations.values();
       for (const user of connectionUsers) {
         if (user.userId !== userId || user.syncing) {
           continue;

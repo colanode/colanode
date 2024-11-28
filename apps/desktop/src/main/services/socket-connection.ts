@@ -49,8 +49,8 @@ export class SocketConnection {
       const message: Message = JSON.parse(data);
       if (message.type === 'node_transactions_batch') {
         syncService.syncServerTransactions(message);
-      } else if (message.type === 'collaborations_batch') {
-        syncService.syncServerCollaborations(message);
+      } else if (message.type === 'collaboration_revocations_batch') {
+        syncService.syncServerRevocations(message);
       }
     };
 

@@ -40,14 +40,15 @@ const createNodeTransactionsTable: Migration = {
       .createTable('node_transactions')
       .addColumn('id', 'text', (col) => col.notNull().primaryKey())
       .addColumn('node_id', 'text', (col) => col.notNull())
-      .addColumn('type', 'text', (col) => col.notNull())
+      .addColumn('node_type', 'text', (col) => col.notNull())
+      .addColumn('operation', 'text', (col) => col.notNull())
       .addColumn('data', 'blob')
       .addColumn('created_at', 'text', (col) => col.notNull())
       .addColumn('created_by', 'text', (col) => col.notNull())
       .addColumn('server_created_at', 'text')
       .addColumn('retry_count', 'integer', (col) => col.defaultTo(0))
       .addColumn('status', 'text', (col) => col.defaultTo('pending'))
-      .addColumn('number', 'integer')
+      .addColumn('version', 'integer')
       .execute();
   },
   down: async (db) => {
