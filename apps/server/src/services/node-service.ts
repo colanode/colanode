@@ -468,6 +468,20 @@ class NodeService {
         workspaceId: context.workspaceId,
       });
 
+      const removedCollaboratorIds = Object.keys(
+        collaboratorChanges.removedCollaborators
+      );
+
+      if (removedCollaboratorIds.length > 0) {
+        for (const userId of removedCollaboratorIds) {
+          eventBus.publish({
+            type: 'collaborator_removed',
+            userId,
+            nodeId: input.nodeId,
+          });
+        }
+      }
+
       return {
         type: 'success',
         output: {

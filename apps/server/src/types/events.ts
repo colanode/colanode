@@ -5,4 +5,10 @@ export type NodeTransactionCreatedEvent = {
   workspaceId: string;
 };
 
-export type Event = NodeTransactionCreatedEvent;
+export type CollaboratorRemovedEvent = {
+  type: 'collaborator_removed';
+  userId: string;
+  nodeId: string;
+};
+
+export type Event = NodeTransactionCreatedEvent | CollaboratorRemovedEvent;

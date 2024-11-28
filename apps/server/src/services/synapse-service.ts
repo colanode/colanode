@@ -10,7 +10,10 @@ import {
 import { logService } from '@/services/log-service';
 import { mapCollaborationRevocation, mapNodeTransaction } from '@/lib/nodes';
 import { eventBus } from '@/lib/event-bus';
-import { NodeTransactionCreatedEvent } from '@/types/events';
+import {
+  CollaboratorRemovedEvent,
+  NodeTransactionCreatedEvent,
+} from '@/types/events';
 
 interface SynapseUserCursor {
   workspaceId: string;
@@ -35,6 +38,8 @@ class SynapseService {
     eventBus.subscribe((event) => {
       if (event.type === 'node_transaction_created') {
         this.handleNodeTransactionCreatedEvent(event);
+      } else if (event.type === 'collaborator_removed') {
+        this.handleCollaboratorRemovedEvent(event);
       }
     });
   }
@@ -290,6 +295,18 @@ class SynapseService {
     }
   }
 
+  private handleCollaboratorRemovedEvent(event: CollaboratorRemovedEvent) {
+    const deviceIds = this.getPendingRevocationsCursors(event.userId);
+    for (const deviceId of deviceIds) {
+      const socketConnection = this.connections.get(deviceId);
+      if (socketConnection === undefined) {
+        continue;
+      }
+
+      this.sendPendingRevocations(socketConnection, event.userId);
+    }
+  }
+
   private getPendingNodeTransactionCursors(
     workspaceId: string
   ): Map<string, string[]> {
@@ -310,7 +327,7 @@ class SynapseService {
     return userDevices;
   }
 
-  private getPendingCollaborationCursors(userId: string): string[] {
+  private getPendingRevocationsCursors(userId: string): string[] {
     const userDevices: string[] = [];
     for (const connection of this.connections.values()) {
       const connectionUsers = connection.revocations.values();
