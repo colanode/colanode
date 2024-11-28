@@ -7,6 +7,7 @@ import {
 import { NodeCollaborator } from '@/types/nodes';
 import {
   NodeOutput,
+  NodeRole,
   ServerCollaborationRevocation,
   ServerNodeTransaction,
 } from '@colanode/core';
@@ -172,7 +173,7 @@ export const fetchNodeCollaborators = async (
 export const fetchNodeRole = async (
   nodeId: string,
   collaboratorId: string
-): Promise<string | null> => {
+): Promise<NodeRole | null> => {
   const ancestors = await fetchNodeAncestors(nodeId);
   if (ancestors.length === 0) {
     return null;

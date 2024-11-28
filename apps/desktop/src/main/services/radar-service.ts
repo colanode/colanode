@@ -1,5 +1,4 @@
 import { databaseService } from '@/main/data/database-service';
-import { getIdType, IdType, NodeTypes } from '@colanode/core';
 import { WorkspaceRadarData } from '@/shared/types/radars';
 import { eventBus } from '@/shared/lib/event-bus';
 import { Event } from '@/shared/types/events';
@@ -127,15 +126,6 @@ class RadarService {
   private async handleEvent(event: Event) {
     if (event.type === 'workspace_deleted') {
       this.workspaceStates.delete(event.workspace.userId);
-      eventBus.publish({
-        type: 'radar_data_updated',
-      });
-    } else if (
-      event.type === 'user_node_created' ||
-      event.type === 'user_node_updated'
-    ) {
-      // to be optimized
-      await this.initWorkspace(event.userId);
       eventBus.publish({
         type: 'radar_data_updated',
       });

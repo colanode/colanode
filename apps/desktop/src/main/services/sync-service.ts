@@ -7,6 +7,7 @@ import {
   CollaborationRevocationsBatchMessage,
   FetchCollaborationRevocationsMessage,
   FetchNodeTransactionsMessage,
+  GetNodeTransactionsOutput,
   LocalNodeTransaction,
   NodeTransactionsBatchMessage,
   SyncNodeTransactionsOutput,
@@ -15,6 +16,8 @@ import { logService } from '@/main/services/log-service';
 import { nodeService } from '@/main/services/node-service';
 import { socketService } from '@/main/services/socket-service';
 import { collaborationService } from '@/main/services/collaboration-service';
+import { SelectNodeTransaction } from '@/main/data/workspace/schema';
+import { sql } from 'kysely';
 
 type WorkspaceSyncState = {
   isSyncing: boolean;
@@ -23,7 +26,15 @@ type WorkspaceSyncState = {
 
 class SyncService {
   private readonly logger = logService.createLogger('sync-service');
-  private readonly localSyncStates: Map<string, WorkspaceSyncState> = new Map();
+  private readonly localPendingTransactionStates: Map<
+    string,
+    WorkspaceSyncState
+  > = new Map();
+
+  private readonly localIncompleteTransactionStates: Map<
+    string,
+    WorkspaceSyncState
+  > = new Map();
 
   private readonly syncingTransactions: Set<string> = new Set();
   private readonly syncingRevocations: Set<string> = new Set();
@@ -31,7 +42,9 @@ class SyncService {
   constructor() {
     eventBus.subscribe((event) => {
       if (event.type === 'node_transaction_created') {
-        this.syncLocalTransactions(event.userId);
+        this.syncLocalPendingTransactions(event.userId);
+      } else if (event.type === 'node_transaction_incomplete') {
+        this.syncLocalIncompleteTransactions(event.userId);
       } else if (event.type === 'workspace_created') {
         this.requireNodeTransactions(event.workspace.userId);
       } else if (event.type === 'socket_connection_opened') {
@@ -47,21 +60,22 @@ class SyncService {
       .execute();
 
     for (const workspace of workspaces) {
-      this.syncLocalTransactions(workspace.user_id);
+      this.syncLocalPendingTransactions(workspace.user_id);
+      this.syncLocalIncompleteTransactions(workspace.user_id);
       this.requireNodeTransactions(workspace.user_id);
       this.requireCollaborationRevocations(workspace.user_id);
     }
   }
 
-  public async syncLocalTransactions(userId: string) {
-    if (!this.localSyncStates.has(userId)) {
-      this.localSyncStates.set(userId, {
+  public async syncLocalPendingTransactions(userId: string) {
+    if (!this.localPendingTransactionStates.has(userId)) {
+      this.localPendingTransactionStates.set(userId, {
         isSyncing: false,
         scheduledSync: false,
       });
     }
 
-    const syncState = this.localSyncStates.get(userId)!;
+    const syncState = this.localPendingTransactionStates.get(userId)!;
     if (syncState.isSyncing) {
       syncState.scheduledSync = true;
       return;
@@ -80,7 +94,39 @@ class SyncService {
 
       if (syncState.scheduledSync) {
         syncState.scheduledSync = false;
-        this.syncLocalTransactions(userId);
+        this.syncLocalPendingTransactions(userId);
+      }
+    }
+  }
+
+  public async syncLocalIncompleteTransactions(userId: string) {
+    if (!this.localIncompleteTransactionStates.has(userId)) {
+      this.localIncompleteTransactionStates.set(userId, {
+        isSyncing: false,
+        scheduledSync: false,
+      });
+    }
+
+    const syncState = this.localIncompleteTransactionStates.get(userId)!;
+    if (syncState.isSyncing) {
+      syncState.scheduledSync = true;
+      return;
+    }
+
+    syncState.isSyncing = true;
+    try {
+      await this.syncIncompleteTransactions(userId);
+    } catch (error) {
+      this.logger.error(
+        error,
+        `Error syncing incomplete transactions for user ${userId}`
+      );
+    } finally {
+      syncState.isSyncing = false;
+
+      if (syncState.scheduledSync) {
+        syncState.scheduledSync = false;
+        this.syncLocalIncompleteTransactions(userId);
       }
     }
   }
@@ -141,6 +187,112 @@ class SyncService {
     } finally {
       this.syncingRevocations.delete(message.userId);
       this.requireCollaborationRevocations(message.userId);
+    }
+  }
+
+  private async syncIncompleteTransactions(userId: string) {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const incompleteTransactions = await workspaceDatabase
+      .selectFrom('node_transactions')
+      .selectAll()
+      .where('status', '=', 'incomplete')
+      .execute();
+
+    if (incompleteTransactions.length === 0) {
+      return;
+    }
+
+    const workspace = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
+      .innerJoin('servers', 'accounts.server', 'servers.domain')
+      .select([
+        'workspaces.workspace_id',
+        'workspaces.user_id',
+        'workspaces.account_id',
+        'accounts.token',
+        'servers.domain',
+        'servers.attributes',
+      ])
+      .where('workspaces.user_id', '=', userId)
+      .executeTakeFirst();
+
+    if (!workspace) {
+      return;
+    }
+
+    if (!serverService.isAvailable(workspace.domain)) {
+      return;
+    }
+
+    const groupedByNodeId = incompleteTransactions.reduce<
+      Record<string, SelectNodeTransaction[]>
+    >((acc, transaction) => {
+      acc[transaction.node_id] = [
+        ...(acc[transaction.node_id] ?? []),
+        transaction,
+      ];
+      return acc;
+    }, {});
+
+    for (const [nodeId, transactions] of Object.entries(groupedByNodeId)) {
+      try {
+        const { data } = await httpClient.get<GetNodeTransactionsOutput>(
+          `/v1/nodes/${workspace.workspace_id}/transactions/${nodeId}`,
+          {
+            domain: workspace.domain,
+            token: workspace.token,
+          }
+        );
+
+        if (data.transactions.length === 0) {
+          await workspaceDatabase
+            .deleteFrom('node_transactions')
+            .where(
+              'id',
+              'in',
+              transactions.map((t) => t.id)
+            )
+            .execute();
+          continue;
+        }
+
+        const synced = await nodeService.replaceTransactions(
+          userId,
+          nodeId,
+          data.transactions
+        );
+
+        if (!synced) {
+          await workspaceDatabase
+            .updateTable('node_transactions')
+            .set({ retry_count: sql`retry_count + 1` })
+            .where(
+              'id',
+              'in',
+              transactions.map((t) => t.id)
+            )
+            .execute();
+        } else {
+          await workspaceDatabase
+            .updateTable('node_transactions')
+            .set({ retry_count: sql`retry_count + 1` })
+            .where(
+              'id',
+              'in',
+              transactions.map((t) => t.id)
+            )
+            .where('status', '=', 'incomplete')
+            .execute();
+        }
+      } catch (error) {
+        this.logger.error(
+          error,
+          `Error syncing incomplete transactions for node ${nodeId} for user ${userId}`
+        );
+      }
     }
   }
 

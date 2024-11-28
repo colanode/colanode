@@ -1,4 +1,5 @@
 import { NodeAttributes } from '../registry';
+import { ServerNodeTransaction } from './sync';
 
 export type NodeOutput = {
   id: string;
@@ -12,4 +13,8 @@ export type NodeOutput = {
   updatedAt?: string | null;
   updatedBy?: string | null;
   transactionId: string;
+};
+
+export type GetNodeTransactionsOutput = {
+  transactions: ServerNodeTransaction[];
 };

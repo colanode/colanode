@@ -62,18 +62,6 @@ export type ServerUpdatedEvent = {
   server: Server;
 };
 
-export type UserNodeCreatedEvent = {
-  type: 'user_node_created';
-  userId: string;
-  userNode: UserNode;
-};
-
-export type UserNodeUpdatedEvent = {
-  type: 'user_node_updated';
-  userId: string;
-  userNode: UserNode;
-};
-
 export type DownloadCreatedEvent = {
   type: 'download_created';
   userId: string;
@@ -126,6 +114,12 @@ export type NodeTransactionCreatedEvent = {
   transaction: LocalNodeTransaction;
 };
 
+export type NodeTransactionIncompleteEvent = {
+  type: 'node_transaction_incomplete';
+  userId: string;
+  transactionId: string;
+};
+
 export type ServerAvailabilityChangedEvent = {
   type: 'server_availability_changed';
   server: Server;
@@ -149,8 +143,6 @@ export type Event =
   | WorkspaceDeletedEvent
   | ServerCreatedEvent
   | ServerUpdatedEvent
-  | UserNodeCreatedEvent
-  | UserNodeUpdatedEvent
   | DownloadCreatedEvent
   | DownloadUpdatedEvent
   | DownloadDeletedEvent
@@ -160,5 +152,6 @@ export type Event =
   | QueryResultUpdatedEvent
   | RadarDataUpdatedEvent
   | NodeTransactionCreatedEvent
+  | NodeTransactionIncompleteEvent
   | ServerAvailabilityChangedEvent
   | SocketConnectionOpenedEvent;

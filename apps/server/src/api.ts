@@ -9,6 +9,7 @@ import { syncRouter } from '@/routes/sync';
 import { configRouter } from '@/routes/config';
 import { avatarsRouter } from '@/routes/avatars';
 import { filesRouter } from '@/routes/files';
+import { nodesRouter } from '@/routes/nodes';
 import { synapse } from '@/services/synapse-service';
 import { logService } from '@/services/log-service';
 
@@ -35,6 +36,7 @@ export const initApi = async () => {
   app.use('/v1/sync', authMiddleware, syncRouter);
   app.use('/v1/avatars', authMiddleware, avatarsRouter);
   app.use('/v1/files', authMiddleware, filesRouter);
+  app.use('/v1/nodes', authMiddleware, nodesRouter);
 
   const server = http.createServer(app);
   await synapse.init(server);

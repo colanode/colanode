@@ -28,6 +28,7 @@ import {
 } from '@/main/data/workspace/schema';
 import { eventBus } from '@/shared/lib/event-bus';
 import { SelectWorkspace } from '@/main/data/app/schema';
+import { sql } from 'kysely';
 
 export type CreateNodeInput = {
   id: string;
@@ -437,6 +438,96 @@ class NodeService {
     }
   }
 
+  public async replaceTransactions(
+    userId: string,
+    nodeId: string,
+    transactions: ServerNodeTransaction[]
+  ): Promise<boolean> {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const firstTransaction = transactions[0];
+    if (!firstTransaction) {
+      return false;
+    }
+
+    const lastTransaction = transactions[transactions.length - 1];
+    if (!lastTransaction) {
+      return false;
+    }
+
+    const ydoc = new YDoc();
+    for (const transaction of transactions) {
+      if (transaction.operation === 'delete') {
+        await this.applyServerDeleteTransaction(userId, transaction);
+        return true;
+      }
+
+      ydoc.applyUpdate(transaction.data);
+    }
+
+    const attributes = ydoc.getAttributes<NodeAttributes>();
+    const attributesJson = JSON.stringify(attributes);
+
+    await workspaceDatabase.transaction().execute(async (trx) => {
+      await trx
+        .insertInto('nodes')
+        .values({
+          id: nodeId,
+          attributes: attributesJson,
+          created_at: firstTransaction.createdAt,
+          created_by: firstTransaction.createdBy,
+          updated_at:
+            firstTransaction.id !== lastTransaction.id
+              ? lastTransaction.createdAt
+              : null,
+          updated_by:
+            firstTransaction.id !== lastTransaction.id
+              ? lastTransaction.createdBy
+              : null,
+          transaction_id: lastTransaction.id,
+        })
+        .onConflict((oc) =>
+          oc.columns(['id']).doUpdateSet({
+            attributes: attributesJson,
+            updated_at: lastTransaction.createdAt,
+            updated_by: lastTransaction.createdBy,
+            transaction_id: lastTransaction.id,
+          })
+        )
+        .execute();
+
+      await trx
+        .insertInto('node_transactions')
+        .values(
+          transactions.map((t) => ({
+            id: t.id,
+            node_id: t.nodeId,
+            node_type: t.nodeType,
+            operation: t.operation,
+            data:
+              t.operation !== 'delete' && t.data ? decodeState(t.data) : null,
+            created_at: t.createdAt,
+            created_by: t.createdBy,
+            retry_count: 0,
+            status: 'synced',
+            version: BigInt(t.version),
+            server_created_at: t.serverCreatedAt,
+          }))
+        )
+        .onConflict((oc) =>
+          oc.columns(['id']).doUpdateSet({
+            status: 'synced',
+            version: sql`excluded.version`,
+            server_created_at: sql`excluded.server_created_at`,
+          })
+        )
+        .execute();
+    });
+
+    return true;
+  }
+
   private async applyServerCreateTransaction(
     userId: string,
     transaction: ServerNodeCreateTransaction
@@ -481,23 +572,6 @@ class NodeService {
     const result = await workspaceDatabase
       .transaction()
       .execute(async (trx) => {
-        await trx
-          .insertInto('node_transactions')
-          .values({
-            id: transaction.id,
-            node_id: transaction.nodeId,
-            node_type: transaction.nodeType,
-            operation: 'create',
-            data: decodeState(transaction.data),
-            created_at: transaction.createdAt,
-            created_by: transaction.createdBy,
-            retry_count: 0,
-            status: 'synced',
-            version,
-            server_created_at: transaction.serverCreatedAt,
-          })
-          .execute();
-
         const nodeRow = await trx
           .insertInto('nodes')
           .returningAll()
@@ -510,6 +584,23 @@ class NodeService {
           })
           .executeTakeFirst();
 
+        await trx
+          .insertInto('node_transactions')
+          .values({
+            id: transaction.id,
+            node_id: transaction.nodeId,
+            node_type: transaction.nodeType,
+            operation: 'create',
+            data: decodeState(transaction.data),
+            created_at: transaction.createdAt,
+            created_by: transaction.createdBy,
+            retry_count: 0,
+            status: nodeRow ? 'synced' : 'incomplete',
+            version,
+            server_created_at: transaction.serverCreatedAt,
+          })
+          .execute();
+
         return nodeRow;
       });
 
@@ -518,6 +609,12 @@ class NodeService {
         type: 'node_created',
         userId,
         node: mapNode(result),
+      });
+    } else {
+      eventBus.publish({
+        type: 'node_transaction_incomplete',
+        userId,
+        transactionId: transaction.id,
       });
     }
   }
@@ -579,23 +676,6 @@ class NodeService {
     const result = await workspaceDatabase
       .transaction()
       .execute(async (trx) => {
-        await trx
-          .insertInto('node_transactions')
-          .values({
-            id: transaction.id,
-            node_id: transaction.nodeId,
-            node_type: transaction.nodeType,
-            operation: 'update',
-            data: decodeState(transaction.data),
-            created_at: transaction.createdAt,
-            created_by: transaction.createdBy,
-            retry_count: 0,
-            status: 'synced',
-            version,
-            server_created_at: transaction.serverCreatedAt,
-          })
-          .execute();
-
         const nodeRow = await trx
           .updateTable('nodes')
           .returningAll()
@@ -608,6 +688,23 @@ class NodeService {
           .where('id', '=', transaction.nodeId)
           .executeTakeFirst();
 
+        await trx
+          .insertInto('node_transactions')
+          .values({
+            id: transaction.id,
+            node_id: transaction.nodeId,
+            node_type: transaction.nodeType,
+            operation: 'update',
+            data: decodeState(transaction.data),
+            created_at: transaction.createdAt,
+            created_by: transaction.createdBy,
+            retry_count: 0,
+            status: nodeRow ? 'synced' : 'incomplete',
+            version,
+            server_created_at: transaction.serverCreatedAt,
+          })
+          .execute();
+
         return nodeRow;
       });
 
@@ -616,6 +713,12 @@ class NodeService {
         type: 'node_updated',
         userId,
         node: mapNode(result),
+      });
+    } else {
+      eventBus.publish({
+        type: 'node_transaction_incomplete',
+        userId,
+        transactionId: transaction.id,
       });
     }
   }
