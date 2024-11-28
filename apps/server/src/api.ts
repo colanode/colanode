@@ -9,8 +9,8 @@ import { syncRouter } from '@/routes/sync';
 import { configRouter } from '@/routes/config';
 import { avatarsRouter } from '@/routes/avatars';
 import { filesRouter } from '@/routes/files';
-import { synapse } from '@/services/synapse';
-import { logService } from '@/services/log';
+import { synapse } from '@/services/synapse-service';
+import { logService } from '@/services/log-service';
 
 const logger = logService.createLogger('api');
 

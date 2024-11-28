@@ -7,7 +7,7 @@ import {
   Message,
   NodeTransactionsBatchMessage,
 } from '@colanode/core';
-import { logService } from '@/services/log';
+import { logService } from '@/services/log-service';
 import { mapCollaborationRevocation, mapNodeTransaction } from '@/lib/nodes';
 import { eventBus } from '@/lib/event-bus';
 import { NodeTransactionCreatedEvent } from '@/types/events';

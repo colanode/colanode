@@ -32,7 +32,7 @@ import {
   UpdateNodeOutput,
 } from '@/types/nodes';
 import { eventBus } from '@/lib/event-bus';
-import { logService } from '@/services/log';
+import { logService } from '@/services/log-service';
 import { sql, Transaction } from 'kysely';
 
 const UPDATE_RETRIES_LIMIT = 10;
