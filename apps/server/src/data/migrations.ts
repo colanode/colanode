@@ -233,6 +233,17 @@ const createNodePathsTable: Migration = {
 
 const createCollaborationsTable: Migration = {
   up: async (db) => {
+    // Create sequence first
+    await sql`
+      CREATE SEQUENCE IF NOT EXISTS collaborations_version_seq
+      START WITH 1000000000
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      CACHE 1;
+    `.execute(db);
+
+    // Create table with version column
     await db.schema
       .createTable('collaborations')
       .addColumn('user_id', 'varchar(30)', (col) => col.notNull())
@@ -241,10 +252,33 @@ const createCollaborationsTable: Migration = {
       .addColumn('roles', 'jsonb', (col) => col.notNull().defaultTo('{}'))
       .addColumn('created_at', 'timestamptz', (col) => col.notNull())
       .addColumn('updated_at', 'timestamptz')
+      .addColumn('version', 'bigint', (col) =>
+        col.notNull().defaultTo(sql`nextval('collaborations_version_seq')`)
+      )
       .addPrimaryKeyConstraint('collaborations_pkey', ['user_id', 'node_id'])
       .execute();
+
+    // Add trigger to update version on update
+    await sql`
+      CREATE OR REPLACE FUNCTION update_collaboration_version() RETURNS TRIGGER AS $$
+      BEGIN
+        NEW.version = nextval('collaborations_version_seq');
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+
+      CREATE TRIGGER trg_update_collaboration_version
+      BEFORE UPDATE ON collaborations
+      FOR EACH ROW
+      EXECUTE FUNCTION update_collaboration_version();
+    `.execute(db);
   },
   down: async (db) => {
+    await sql`
+      DROP TRIGGER IF EXISTS trg_update_collaboration_version ON collaborations;
+      DROP FUNCTION IF EXISTS update_collaboration_version();
+      DROP SEQUENCE IF EXISTS collaborations_version_seq;
+    `.execute(db);
     await db.schema.dropTable('collaborations').execute();
   },
 };

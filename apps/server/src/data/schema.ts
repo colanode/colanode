@@ -118,11 +118,11 @@ export type UpdateNodeTransaction = Updateable<NodeTransactionTable>;
 interface CollaborationTable {
   user_id: ColumnType<string, string, never>;
   node_id: ColumnType<string, string, never>;
-  type: ColumnType<string, never, never>;
   workspace_id: ColumnType<string, string, never>;
   roles: JSONColumnType<Record<string, NodeRole>, string, string>;
   created_at: ColumnType<Date, Date, never>;
   updated_at: ColumnType<Date | null, Date | null, Date>;
+  version: ColumnType<bigint, never, never>;
 }
 
 export type SelectCollaboration = Selectable<CollaborationTable>;

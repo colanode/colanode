@@ -4,12 +4,17 @@ import { WebSocketServer, WebSocket } from 'ws';
 import { verifyToken } from '@/lib/tokens';
 import {
   CollaborationRevocationsBatchMessage,
+  CollaborationsBatchMessage,
   Message,
   NodeTransactionsBatchMessage,
   NodeType,
 } from '@colanode/core';
 import { logService } from '@/services/log-service';
-import { mapCollaborationRevocation, mapNodeTransaction } from '@/lib/nodes';
+import {
+  mapCollaboration,
+  mapCollaborationRevocation,
+  mapNodeTransaction,
+} from '@/lib/nodes';
 import { eventBus } from '@/lib/event-bus';
 import {
   CollaboratorRemovedEvent,
@@ -29,6 +34,7 @@ interface SynapseConnection {
   socket: WebSocket;
   transactions: Map<string, SynapseUserCursor>;
   revocations: Map<string, SynapseUserCursor>;
+  collaborations: Map<string, SynapseUserCursor>;
 }
 
 const PUBLIC_NODES: NodeType[] = ['workspace', 'user'];
@@ -116,6 +122,7 @@ class SynapseService {
         socket,
         transactions: new Map(),
         revocations: new Map(),
+        collaborations: new Map(),
       };
 
       this.connections.set(account.deviceId, connection);
@@ -167,6 +174,21 @@ class SynapseService {
       } else if (!state.syncing && state.cursor !== message.cursor) {
         state.cursor = message.cursor;
         this.sendPendingRevocations(connection, message.userId);
+      }
+    } else if (message.type === 'fetch_collaborations') {
+      const state = connection.collaborations.get(message.userId);
+      if (!state) {
+        connection.collaborations.set(message.userId, {
+          userId: message.userId,
+          workspaceId: message.workspaceId,
+          cursor: message.cursor,
+          syncing: false,
+        });
+
+        this.sendPendingCollaborations(connection, message.userId);
+      } else if (!state.syncing && state.cursor !== message.cursor) {
+        state.cursor = message.cursor;
+        this.sendPendingCollaborations(connection, message.userId);
       }
     }
   }
@@ -259,6 +281,46 @@ class SynapseService {
     };
 
     connection.revocations.delete(userId);
+    this.sendMessage(connection, message);
+  }
+
+  private async sendPendingCollaborations(
+    connection: SynapseConnection,
+    userId: string
+  ) {
+    const state = connection.collaborations.get(userId);
+    if (!state || state.syncing) {
+      return;
+    }
+
+    state.syncing = true;
+    this.logger.trace(
+      state,
+      `Sending pending collaborations for ${connection.deviceId} with ${userId}`
+    );
+
+    const unsyncedCollaborations = await database
+      .selectFrom('collaborations as c')
+      .selectAll()
+      .where('c.user_id', '=', userId)
+      .where('c.version', '>', BigInt(state.cursor))
+      .orderBy('c.version', 'asc')
+      .limit(50)
+      .execute();
+
+    if (unsyncedCollaborations.length === 0) {
+      state.syncing = false;
+      return;
+    }
+
+    const collaborations = unsyncedCollaborations.map(mapCollaboration);
+    const message: CollaborationsBatchMessage = {
+      type: 'collaborations_batch',
+      userId,
+      collaborations,
+    };
+
+    connection.collaborations.delete(userId);
     this.sendMessage(connection, message);
   }
 

@@ -1,3 +1,5 @@
+import { NodeRole } from '~/registry/core';
+
 export type SyncNodeTransactionsInput = {
   transactions: LocalNodeTransaction[];
 };
@@ -95,5 +97,15 @@ export type ServerCollaborationRevocation = {
   nodeId: string;
   workspaceId: string;
   createdAt: string;
+  version: string;
+};
+
+export type ServerCollaboration = {
+  userId: string;
+  nodeId: string;
+  workspaceId: string;
+  roles: Record<string, NodeRole>;
+  createdAt: string;
+  updatedAt: string | null;
   version: string;
 };

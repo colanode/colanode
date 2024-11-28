@@ -1,5 +1,6 @@
 import { database } from '@/data/database';
 import {
+  SelectCollaboration,
   SelectCollaborationRevocation,
   SelectNode,
   SelectNodeTransaction,
@@ -8,6 +9,7 @@ import { NodeCollaborator } from '@/types/nodes';
 import {
   NodeOutput,
   NodeRole,
+  ServerCollaboration,
   ServerCollaborationRevocation,
   ServerNodeTransaction,
 } from '@colanode/core';
@@ -108,6 +110,20 @@ export const mapCollaborationRevocation = (
     workspaceId: revocation.workspace_id,
     createdAt: revocation.created_at.toISOString(),
     version: revocation.version.toString(),
+  };
+};
+
+export const mapCollaboration = (
+  collaboration: SelectCollaboration
+): ServerCollaboration => {
+  return {
+    userId: collaboration.user_id,
+    nodeId: collaboration.node_id,
+    workspaceId: collaboration.workspace_id,
+    roles: collaboration.roles,
+    createdAt: collaboration.created_at.toISOString(),
+    updatedAt: collaboration.updated_at?.toISOString() ?? null,
+    version: collaboration.version.toString(),
   };
 };
 

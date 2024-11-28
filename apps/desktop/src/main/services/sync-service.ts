@@ -5,7 +5,9 @@ import { httpClient } from '@/shared/lib/http-client';
 import { serverService } from '@/main/services/server-service';
 import {
   CollaborationRevocationsBatchMessage,
+  CollaborationsBatchMessage,
   FetchCollaborationRevocationsMessage,
+  FetchCollaborationsMessage,
   FetchNodeTransactionsMessage,
   GetNodeTransactionsOutput,
   LocalNodeTransaction,
@@ -37,6 +39,7 @@ class SyncService {
   > = new Map();
 
   private readonly syncingTransactions: Set<string> = new Set();
+  private readonly syncingCollaborations: Set<string> = new Set();
   private readonly syncingRevocations: Set<string> = new Set();
 
   constructor() {
@@ -49,6 +52,8 @@ class SyncService {
         this.requireNodeTransactions(event.workspace.userId);
       } else if (event.type === 'socket_connection_opened') {
         this.syncAllWorkspaces();
+      } else if (event.type === 'collaboration_synced') {
+        this.checkForMissingNode(event.userId, event.nodeId);
       }
     });
   }
@@ -63,7 +68,9 @@ class SyncService {
       this.syncLocalPendingTransactions(workspace.user_id);
       this.syncLocalIncompleteTransactions(workspace.user_id);
       this.requireNodeTransactions(workspace.user_id);
+      this.requireCollaborations(workspace.user_id);
       this.requireCollaborationRevocations(workspace.user_id);
+      this.syncMissingNodes(workspace.user_id);
     }
   }
 
@@ -155,6 +162,36 @@ class SyncService {
     } finally {
       this.syncingTransactions.delete(message.userId);
       this.requireNodeTransactions(message.userId);
+    }
+  }
+
+  public async syncServerCollaborations(message: CollaborationsBatchMessage) {
+    if (this.syncingCollaborations.has(message.userId)) {
+      return;
+    }
+
+    this.syncingCollaborations.add(message.userId);
+    let cursor: bigint | null = null;
+    try {
+      for (const collaboration of message.collaborations) {
+        await collaborationService.applyServerCollaboration(
+          message.userId,
+          collaboration
+        );
+        cursor = BigInt(collaboration.version);
+      }
+
+      if (cursor) {
+        this.updateCollaborationCursor(message.userId, cursor);
+      }
+    } catch (error) {
+      this.logger.error(
+        error,
+        `Error syncing server collaborations for user ${message.userId}`
+      );
+    } finally {
+      this.syncingCollaborations.delete(message.userId);
+      this.requireCollaborations(message.userId);
     }
   }
 
@@ -296,6 +333,127 @@ class SyncService {
     }
   }
 
+  private async syncMissingNodes(userId: string) {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const missingNodes = await workspaceDatabase
+      .selectFrom('collaborations')
+      .leftJoin('nodes', 'collaborations.node_id', 'nodes.id')
+      .select('collaborations.node_id')
+      .where('nodes.id', 'is', null)
+      .execute();
+
+    console.log('missingNodes', missingNodes);
+
+    if (missingNodes.length === 0) {
+      return;
+    }
+
+    const workspace = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
+      .innerJoin('servers', 'accounts.server', 'servers.domain')
+      .select([
+        'workspaces.workspace_id',
+        'workspaces.user_id',
+        'workspaces.account_id',
+        'accounts.token',
+        'servers.domain',
+        'servers.attributes',
+      ])
+      .where('workspaces.user_id', '=', userId)
+      .executeTakeFirst();
+
+    if (!workspace) {
+      return;
+    }
+
+    if (!serverService.isAvailable(workspace.domain)) {
+      return;
+    }
+
+    for (const node of missingNodes) {
+      try {
+        const { data } = await httpClient.get<GetNodeTransactionsOutput>(
+          `/v1/nodes/${workspace.workspace_id}/transactions/${node.node_id}`,
+          {
+            domain: workspace.domain,
+            token: workspace.token,
+          }
+        );
+
+        console.log('missing node data', data);
+
+        await nodeService.replaceTransactions(
+          userId,
+          node.node_id,
+          data.transactions
+        );
+      } catch (error) {
+        this.logger.error(
+          error,
+          `Error syncing missing node ${node.node_id} for user ${userId}`
+        );
+      }
+    }
+  }
+
+  private async checkForMissingNode(userId: string, nodeId: string) {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const node = await workspaceDatabase
+      .selectFrom('nodes')
+      .selectAll()
+      .where('id', '=', nodeId)
+      .executeTakeFirst();
+
+    if (node) {
+      return;
+    }
+
+    const workspace = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
+      .innerJoin('servers', 'accounts.server', 'servers.domain')
+      .select([
+        'workspaces.workspace_id',
+        'workspaces.user_id',
+        'workspaces.account_id',
+        'accounts.token',
+        'servers.domain',
+        'servers.attributes',
+      ])
+      .where('workspaces.user_id', '=', userId)
+      .executeTakeFirst();
+
+    if (!workspace) {
+      return;
+    }
+
+    if (!serverService.isAvailable(workspace.domain)) {
+      return;
+    }
+
+    try {
+      const { data } = await httpClient.get<GetNodeTransactionsOutput>(
+        `/v1/nodes/${workspace.workspace_id}/transactions/${nodeId}`,
+        {
+          domain: workspace.domain,
+          token: workspace.token,
+        }
+      );
+
+      await nodeService.replaceTransactions(userId, nodeId, data.transactions);
+    } catch (error) {
+      this.logger.error(
+        error,
+        `Error checking for missing node ${nodeId} for user ${userId}`
+      );
+    }
+  }
+
   private async sendLocalTransactions(userId: string) {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
@@ -405,6 +563,33 @@ class SyncService {
     socketService.sendMessage(workspaceWithCursor.account_id, message);
   }
 
+  private async requireCollaborations(userId: string) {
+    const workspaceWithCursor = await databaseService.appDatabase
+      .selectFrom('workspaces as w')
+      .leftJoin('workspace_cursors as wc', 'w.user_id', 'wc.user_id')
+      .select([
+        'w.user_id',
+        'w.workspace_id',
+        'w.account_id',
+        'wc.collaborations',
+      ])
+      .where('w.user_id', '=', userId)
+      .executeTakeFirst();
+
+    if (!workspaceWithCursor) {
+      return;
+    }
+
+    const message: FetchCollaborationsMessage = {
+      type: 'fetch_collaborations',
+      userId: workspaceWithCursor.user_id,
+      workspaceId: workspaceWithCursor.workspace_id,
+      cursor: workspaceWithCursor.collaborations?.toString() ?? '0',
+    };
+
+    socketService.sendMessage(workspaceWithCursor.account_id, message);
+  }
+
   private async requireCollaborationRevocations(userId: string) {
     const workspaceWithCursor = await databaseService.appDatabase
       .selectFrom('workspaces as w')
@@ -433,12 +618,32 @@ class SyncService {
       .values({
         user_id: userId,
         transactions: cursor,
+        collaborations: 0n,
         revocations: 0n,
         created_at: new Date().toISOString(),
       })
       .onConflict((eb) =>
         eb.column('user_id').doUpdateSet({
           transactions: cursor,
+          updated_at: new Date().toISOString(),
+        })
+      )
+      .execute();
+  }
+
+  private async updateCollaborationCursor(userId: string, cursor: bigint) {
+    await databaseService.appDatabase
+      .insertInto('workspace_cursors')
+      .values({
+        user_id: userId,
+        collaborations: cursor,
+        revocations: 0n,
+        transactions: 0n,
+        created_at: new Date().toISOString(),
+      })
+      .onConflict((eb) =>
+        eb.column('user_id').doUpdateSet({
+          collaborations: cursor,
           updated_at: new Date().toISOString(),
         })
       )
@@ -455,6 +660,7 @@ class SyncService {
         user_id: userId,
         revocations: cursor,
         transactions: 0n,
+        collaborations: 0n,
         created_at: new Date().toISOString(),
       })
       .onConflict((eb) =>

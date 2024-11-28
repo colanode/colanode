@@ -1,4 +1,8 @@
-import { ServerCollaborationRevocation, ServerNodeTransaction } from './sync';
+import {
+  ServerCollaboration,
+  ServerCollaborationRevocation,
+  ServerNodeTransaction,
+} from './sync';
 
 export type FetchNodeTransactionsMessage = {
   type: 'fetch_node_transactions';
@@ -9,6 +13,13 @@ export type FetchNodeTransactionsMessage = {
 
 export type FetchCollaborationRevocationsMessage = {
   type: 'fetch_collaboration_revocations';
+  userId: string;
+  workspaceId: string;
+  cursor: string;
+};
+
+export type FetchCollaborationsMessage = {
+  type: 'fetch_collaborations';
   userId: string;
   workspaceId: string;
   cursor: string;
@@ -26,8 +37,16 @@ export type CollaborationRevocationsBatchMessage = {
   revocations: ServerCollaborationRevocation[];
 };
 
+export type CollaborationsBatchMessage = {
+  type: 'collaborations_batch';
+  userId: string;
+  collaborations: ServerCollaboration[];
+};
+
 export type Message =
   | FetchNodeTransactionsMessage
   | NodeTransactionsBatchMessage
   | FetchCollaborationRevocationsMessage
-  | CollaborationRevocationsBatchMessage;
+  | CollaborationRevocationsBatchMessage
+  | FetchCollaborationsMessage
+  | CollaborationsBatchMessage;
