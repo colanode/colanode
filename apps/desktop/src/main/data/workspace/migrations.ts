@@ -56,31 +56,6 @@ const createNodeTransactionsTable: Migration = {
   },
 };
 
-const createCollaborationsTable: Migration = {
-  up: async (db) => {
-    await db.schema
-      .createTable('collaborations')
-      .addColumn('user_id', 'text', (col) => col.notNull())
-      .addColumn('node_id', 'text', (col) => col.notNull())
-      .addColumn('type', 'text', (col) =>
-        col
-          .notNull()
-          .generatedAlwaysAs(sql`json_extract(attributes, '$.type')`)
-          .stored()
-      )
-      .addColumn('attributes', 'text', (col) => col.notNull())
-      .addColumn('state', 'blob', (col) => col.notNull())
-      .addColumn('created_at', 'text', (col) => col.notNull())
-      .addColumn('updated_at', 'text')
-      .addColumn('number', 'integer')
-      .addPrimaryKeyConstraint('collaborations_pk', ['user_id', 'node_id'])
-      .execute();
-  },
-  down: async (db) => {
-    await db.schema.dropTable('collaborations').execute();
-  },
-};
-
 const createDownloadsTable: Migration = {
   up: async (db) => {
     await db.schema
@@ -261,12 +236,11 @@ const createNodeDeleteNameTrigger: Migration = {
 export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00001_create_nodes_table': createNodesTable,
   '00002_create_node_transactions_table': createNodeTransactionsTable,
-  '00003_create_collaborations_table': createCollaborationsTable,
-  '00004_create_uploads_table': createUploadsTable,
-  '00005_create_downloads_table': createDownloadsTable,
-  '00006_create_node_paths_table': createNodePathsTable,
-  '00007_create_node_names_table': createNodeNamesTable,
-  '00008_create_node_insert_name_trigger': createNodeInsertNameTrigger,
-  '00009_create_node_update_name_trigger': createNodeUpdateNameTrigger,
-  '00010_create_node_delete_name_trigger': createNodeDeleteNameTrigger,
+  '00003_create_uploads_table': createUploadsTable,
+  '00004_create_downloads_table': createDownloadsTable,
+  '00005_create_node_paths_table': createNodePathsTable,
+  '00006_create_node_names_table': createNodeNamesTable,
+  '00007_create_node_insert_name_trigger': createNodeInsertNameTrigger,
+  '00008_create_node_update_name_trigger': createNodeUpdateNameTrigger,
+  '00009_create_node_delete_name_trigger': createNodeDeleteNameTrigger,
 };

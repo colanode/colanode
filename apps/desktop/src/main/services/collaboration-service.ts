@@ -16,12 +16,6 @@ class CollaborationService {
         .execute();
 
       await tx
-        .deleteFrom('collaborations')
-        .where('user_id', '=', userId)
-        .where('node_id', '=', revocation.nodeId)
-        .execute();
-
-      await tx
         .deleteFrom('node_transactions')
         .where('node_id', '=', revocation.nodeId)
         .execute();

@@ -235,7 +235,7 @@ class SynapseService {
       .where('cr.user_id', '=', userId)
       .where('cr.version', '>', BigInt(state.cursor))
       .orderBy('cr.version', 'asc')
-      .limit(20)
+      .limit(50)
       .execute();
 
     if (unsyncedRevocations.length === 0) {

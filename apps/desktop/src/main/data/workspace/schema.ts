@@ -42,21 +42,6 @@ export type SelectNodeTransaction = Selectable<NodeTransactionTable>;
 export type CreateNodeTransaction = Insertable<NodeTransactionTable>;
 export type UpdateNodeTransaction = Updateable<NodeTransactionTable>;
 
-interface CollaborationTable {
-  user_id: ColumnType<string, string, never>;
-  node_id: ColumnType<string, string, never>;
-  type: ColumnType<string, never, never>;
-  attributes: ColumnType<string, string, string>;
-  state: ColumnType<Uint8Array, Uint8Array, Uint8Array>;
-  created_at: ColumnType<string, string, never>;
-  updated_at: ColumnType<string | null, string | null, string | null>;
-  number: ColumnType<bigint | null, bigint | null, bigint | null>;
-}
-
-export type SelectCollaboration = Selectable<CollaborationTable>;
-export type CreateCollaboration = Insertable<CollaborationTable>;
-export type UpdateCollaboration = Updateable<CollaborationTable>;
-
 interface UploadTable {
   node_id: ColumnType<string, string, never>;
   upload_id: ColumnType<string, string, never>;
@@ -88,7 +73,6 @@ export interface WorkspaceDatabaseSchema {
   nodes: NodeTable;
   node_transactions: NodeTransactionTable;
   node_paths: NodePathTable;
-  collaborations: CollaborationTable;
   uploads: UploadTable;
   downloads: DownloadTable;
 }
