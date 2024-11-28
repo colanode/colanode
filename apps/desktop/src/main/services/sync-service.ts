@@ -344,8 +344,6 @@ class SyncService {
       .where('nodes.id', 'is', null)
       .execute();
 
-    console.log('missingNodes', missingNodes);
-
     if (missingNodes.length === 0) {
       return;
     }
@@ -382,8 +380,6 @@ class SyncService {
             token: workspace.token,
           }
         );
-
-        console.log('missing node data', data);
 
         await nodeService.replaceTransactions(
           userId,

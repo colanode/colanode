@@ -35,7 +35,7 @@ class DatabaseService {
   public async getWorkspaceDatabase(
     userId: string
   ): Promise<Kysely<WorkspaceDatabaseSchema>> {
-    this.waitForInit();
+    await this.waitForInit();
 
     if (this.workspaceDatabases.has(userId)) {
       return this.workspaceDatabases.get(userId)!;
