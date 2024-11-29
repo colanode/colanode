@@ -22,7 +22,10 @@ import { eventBus } from '@/lib/event-bus';
 import {
   CollaboratorRemovedEvent,
   InteractionUpdatedEvent,
-  NodeTransactionCreatedEvent,
+  NodeCreatedEvent,
+  NodeUpdatedEvent,
+  NodeDeletedEvent,
+  CollaboratorAddedEvent,
 } from '@/types/events';
 
 interface SynapseUserCursor {
@@ -50,8 +53,14 @@ class SynapseService {
 
   constructor() {
     eventBus.subscribe((event) => {
-      if (event.type === 'node_transaction_created') {
-        this.handleNodeTransactionCreatedEvent(event);
+      if (event.type === 'node_created') {
+        this.handleNodeCreatedEvent(event);
+      } else if (event.type === 'node_updated') {
+        this.handleNodeUpdatedEvent(event);
+      } else if (event.type === 'node_deleted') {
+        this.handleNodeDeletedEvent(event);
+      } else if (event.type === 'collaborator_added') {
+        this.handleCollaboratorAddedEvent(event);
       } else if (event.type === 'collaborator_removed') {
         this.handleCollaboratorRemovedEvent(event);
       } else if (event.type === 'interaction_updated') {
@@ -400,9 +409,96 @@ class SynapseService {
     this.sendMessage(connection, message);
   }
 
-  private async handleNodeTransactionCreatedEvent(
-    event: NodeTransactionCreatedEvent
-  ) {
+  private async handleNodeCreatedEvent(event: NodeCreatedEvent) {
+    const userDevices = this.getPendingNodeTransactionCursors(
+      event.workspaceId
+    );
+    const userIds = Array.from(userDevices.keys());
+    if (userIds.length === 0) {
+      return;
+    }
+
+    let usersToSend: string[] = [];
+    if (PUBLIC_NODES.includes(event.nodeType)) {
+      usersToSend = userIds;
+    } else {
+      const collaborations = await database
+        .selectFrom('collaborations')
+        .selectAll()
+        .where((eb) =>
+          eb.and([
+            eb('user_id', 'in', userIds),
+            eb('node_id', '=', event.nodeId),
+          ])
+        )
+        .execute();
+
+      usersToSend = collaborations.map((c) => c.user_id);
+    }
+
+    if (usersToSend.length === 0) {
+      return;
+    }
+
+    for (const userId of usersToSend) {
+      const deviceIds = userDevices.get(userId) ?? [];
+      for (const deviceId of deviceIds) {
+        const socketConnection = this.connections.get(deviceId);
+        if (socketConnection === undefined) {
+          continue;
+        }
+
+        this.sendPendingTransactions(socketConnection, userId);
+        this.sendPendingCollaborations(socketConnection, userId);
+      }
+    }
+  }
+
+  private async handleNodeUpdatedEvent(event: NodeUpdatedEvent) {
+    const userDevices = this.getPendingNodeTransactionCursors(
+      event.workspaceId
+    );
+    const userIds = Array.from(userDevices.keys());
+    if (userIds.length === 0) {
+      return;
+    }
+
+    let usersToSend: string[] = [];
+    if (PUBLIC_NODES.includes(event.nodeType)) {
+      usersToSend = userIds;
+    } else {
+      const collaborations = await database
+        .selectFrom('collaborations')
+        .selectAll()
+        .where((eb) =>
+          eb.and([
+            eb('user_id', 'in', userIds),
+            eb('node_id', '=', event.nodeId),
+          ])
+        )
+        .execute();
+
+      usersToSend = collaborations.map((c) => c.user_id);
+    }
+
+    if (usersToSend.length === 0) {
+      return;
+    }
+
+    for (const userId of usersToSend) {
+      const deviceIds = userDevices.get(userId) ?? [];
+      for (const deviceId of deviceIds) {
+        const socketConnection = this.connections.get(deviceId);
+        if (socketConnection === undefined) {
+          continue;
+        }
+
+        this.sendPendingTransactions(socketConnection, userId);
+      }
+    }
+  }
+
+  private async handleNodeDeletedEvent(event: NodeDeletedEvent) {
     const userDevices = this.getPendingNodeTransactionCursors(
       event.workspaceId
     );
@@ -453,14 +549,6 @@ class SynapseService {
       return;
     }
 
-    const collaborations = await database
-      .selectFrom('collaborations')
-      .selectAll()
-      .where((eb) =>
-        eb.and([eb('user_id', 'in', userIds), eb('node_id', '=', event.nodeId)])
-      )
-      .execute();
-
     let usersToSend: string[] = [];
     if (PUBLIC_NODES.includes(event.nodeType)) {
       usersToSend = userIds;
@@ -489,6 +577,18 @@ class SynapseService {
 
         this.sendPendingTransactions(socketConnection, userId);
       }
+    }
+  }
+
+  private handleCollaboratorAddedEvent(event: CollaboratorAddedEvent) {
+    const deviceIds = this.getPendingCollaborationsCursors(event.userId);
+    for (const deviceId of deviceIds) {
+      const socketConnection = this.connections.get(deviceId);
+      if (socketConnection === undefined) {
+        continue;
+      }
+
+      this.sendPendingCollaborations(socketConnection, event.userId);
     }
   }
 
@@ -538,6 +638,22 @@ class SynapseService {
         const userIds = userDevices.get(user.userId) ?? [];
         userIds.push(connection.deviceId);
         userDevices.set(user.userId, userIds);
+      }
+    }
+
+    return userDevices;
+  }
+
+  private getPendingCollaborationsCursors(userId: string): string[] {
+    const userDevices: string[] = [];
+    for (const connection of this.connections.values()) {
+      const connectionUsers = connection.collaborations.values();
+      for (const user of connectionUsers) {
+        if (user.userId !== userId || user.syncing) {
+          continue;
+        }
+
+        userDevices.push(connection.deviceId);
       }
     }
 

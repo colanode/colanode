@@ -93,8 +93,7 @@ class NodeService {
         );
 
       eventBus.publish({
-        type: 'node_transaction_created',
-        transactionId: transactionId,
+        type: 'node_created',
         nodeId: input.nodeId,
         nodeType: input.attributes.type,
         workspaceId: input.workspaceId,
@@ -232,8 +231,7 @@ class NodeService {
         });
 
       eventBus.publish({
-        type: 'node_transaction_created',
-        transactionId: transactionId,
+        type: 'node_updated',
         nodeId: input.nodeId,
         nodeType: node.type,
         workspaceId: input.workspaceId,
@@ -312,8 +310,7 @@ class NodeService {
         );
 
       eventBus.publish({
-        type: 'node_transaction_created',
-        transactionId: input.id,
+        type: 'node_created',
         nodeId: input.nodeId,
         nodeType: attributes.type,
         workspaceId: context.workspaceId,
@@ -465,12 +462,25 @@ class NodeService {
         });
 
       eventBus.publish({
-        type: 'node_transaction_created',
-        transactionId: input.id,
+        type: 'node_updated',
         nodeId: input.nodeId,
         nodeType: node.type,
         workspaceId: context.workspaceId,
       });
+
+      const addedCollaboratorIds = Object.keys(
+        collaboratorChanges.addedCollaborators
+      );
+
+      if (addedCollaboratorIds.length > 0) {
+        for (const userId of addedCollaboratorIds) {
+          eventBus.publish({
+            type: 'collaborator_added',
+            userId,
+            nodeId: input.nodeId,
+          });
+        }
+      }
 
       const removedCollaboratorIds = Object.keys(
         collaboratorChanges.removedCollaborators
@@ -567,8 +577,7 @@ class NodeService {
       });
 
     eventBus.publish({
-      type: 'node_transaction_created',
-      transactionId: input.id,
+      type: 'node_deleted',
       nodeId: input.nodeId,
       nodeType: node.type,
       workspaceId: workspaceUser.workspace_id,

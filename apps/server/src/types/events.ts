@@ -1,11 +1,30 @@
 import { NodeType } from '@colanode/core';
 
-export type NodeTransactionCreatedEvent = {
-  type: 'node_transaction_created';
-  transactionId: string;
+export type NodeCreatedEvent = {
+  type: 'node_created';
   nodeId: string;
   nodeType: NodeType;
   workspaceId: string;
+};
+
+export type NodeUpdatedEvent = {
+  type: 'node_updated';
+  nodeId: string;
+  nodeType: NodeType;
+  workspaceId: string;
+};
+
+export type NodeDeletedEvent = {
+  type: 'node_deleted';
+  nodeId: string;
+  nodeType: NodeType;
+  workspaceId: string;
+};
+
+export type CollaboratorAddedEvent = {
+  type: 'collaborator_added';
+  userId: string;
+  nodeId: string;
 };
 
 export type CollaboratorRemovedEvent = {
@@ -23,6 +42,9 @@ export type InteractionUpdatedEvent = {
 };
 
 export type Event =
-  | NodeTransactionCreatedEvent
+  | NodeCreatedEvent
+  | NodeUpdatedEvent
+  | NodeDeletedEvent
+  | CollaboratorAddedEvent
   | CollaboratorRemovedEvent
   | InteractionUpdatedEvent;
