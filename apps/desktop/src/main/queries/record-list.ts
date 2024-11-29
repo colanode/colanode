@@ -20,8 +20,8 @@ import {
   ViewSortAttributes,
   DatabaseNode,
   RecordNode,
+  isStringArray,
 } from '@colanode/core';
-import { isStringArray } from '@/shared/lib/utils';
 import { mapNode } from '@/main/utils';
 import { NodeTypes } from '@colanode/core';
 import { Event } from '@/shared/types/events';

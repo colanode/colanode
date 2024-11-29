@@ -113,7 +113,7 @@ export class UserSearchQueryHandler
     const exclude = input.exclude ?? [];
     return workspaceDatabase
       .selectFrom('nodes')
-      .where('type', '=', NodeTypes.User)
+      .where('type', '=', 'user')
       .where('id', '!=', input.userId)
       .where('id', 'not in', exclude)
       .selectAll()

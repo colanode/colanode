@@ -1,4 +1,6 @@
 import { NodeRole } from '~/registry/core';
+import { InteractionAttributes } from './interactions';
+import { NodeType } from '~/registry';
 
 export type SyncNodeTransactionsInput = {
   transactions: LocalNodeTransaction[];
@@ -53,7 +55,7 @@ export type ServerNodeCreateTransaction = {
   id: string;
   operation: 'create';
   nodeId: string;
-  nodeType: string;
+  nodeType: NodeType;
   workspaceId: string;
   data: string;
   createdAt: string;
@@ -66,7 +68,7 @@ export type ServerNodeUpdateTransaction = {
   id: string;
   operation: 'update';
   nodeId: string;
-  nodeType: string;
+  nodeType: NodeType;
   workspaceId: string;
   data: string;
   createdAt: string;
@@ -79,7 +81,7 @@ export type ServerNodeDeleteTransaction = {
   id: string;
   operation: 'delete';
   nodeId: string;
-  nodeType: string;
+  nodeType: NodeType;
   workspaceId: string;
   createdAt: string;
   createdBy: string;
@@ -107,5 +109,18 @@ export type ServerCollaboration = {
   roles: Record<string, NodeRole>;
   createdAt: string;
   updatedAt: string | null;
+  version: string;
+};
+
+export type ServerInteraction = {
+  userId: string;
+  nodeId: string;
+  nodeType: NodeType;
+  workspaceId: string;
+  attributes: InteractionAttributes;
+  createdAt: string;
+  updatedAt: string | null;
+  serverCreatedAt: string;
+  serverUpdatedAt: string | null;
   version: string;
 };

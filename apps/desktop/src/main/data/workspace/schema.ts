@@ -1,9 +1,14 @@
+import {
+  InteractionAttribute,
+  InteractionAttributes,
+  NodeType,
+} from '@colanode/core';
 import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
 
 interface NodeTable {
   id: ColumnType<string, string, never>;
   parent_id: ColumnType<string, never, never>;
-  type: ColumnType<string, never, never>;
+  type: ColumnType<NodeType, never, never>;
   attributes: ColumnType<string, string, string>;
   created_at: ColumnType<string, string, never>;
   updated_at: ColumnType<string | null, string | null, string | null>;
@@ -27,7 +32,7 @@ export type SelectNodePath = Selectable<NodePathTable>;
 interface NodeTransactionTable {
   id: ColumnType<string, string, never>;
   node_id: ColumnType<string, string, never>;
-  node_type: ColumnType<string, string, never>;
+  node_type: ColumnType<NodeType, NodeType, never>;
   operation: ColumnType<string, string, never>;
   data: ColumnType<Uint8Array | null, Uint8Array | null, never>;
   created_at: ColumnType<string, string, never>;
@@ -83,6 +88,36 @@ export type SelectDownload = Selectable<DownloadTable>;
 export type CreateDownload = Insertable<DownloadTable>;
 export type UpdateDownload = Updateable<DownloadTable>;
 
+interface InteractionTable {
+  user_id: ColumnType<string, string, never>;
+  node_id: ColumnType<string, string, never>;
+  node_type: ColumnType<NodeType, NodeType, never>;
+  attributes: ColumnType<InteractionAttributes, string, string>;
+  created_at: ColumnType<string, string, never>;
+  updated_at: ColumnType<string | null, string | null, string | null>;
+  server_created_at: ColumnType<string | null, string | null, string | null>;
+  server_updated_at: ColumnType<string | null, string | null, string | null>;
+  version: ColumnType<bigint | null, bigint | null, bigint | null>;
+}
+
+export type SelectInteraction = Selectable<InteractionTable>;
+export type CreateInteraction = Insertable<InteractionTable>;
+export type UpdateInteraction = Updateable<InteractionTable>;
+
+interface InteractionEventTable {
+  node_id: ColumnType<string, string, never>;
+  node_type: ColumnType<NodeType, NodeType, never>;
+  attribute: ColumnType<InteractionAttribute, string, string>;
+  value: ColumnType<string, string, string>;
+  created_at: ColumnType<string, string, never>;
+  sent_at: ColumnType<string | null, string | null, string | null>;
+  event_id: ColumnType<string, string, string>;
+}
+
+export type SelectInteractionEvent = Selectable<InteractionEventTable>;
+export type CreateInteractionEvent = Insertable<InteractionEventTable>;
+export type UpdateInteractionEvent = Updateable<InteractionEventTable>;
+
 export interface WorkspaceDatabaseSchema {
   nodes: NodeTable;
   node_transactions: NodeTransactionTable;
@@ -90,4 +125,6 @@ export interface WorkspaceDatabaseSchema {
   collaborations: CollaborationTable;
   uploads: UploadTable;
   downloads: DownloadTable;
+  interactions: InteractionTable;
+  interaction_events: InteractionEventTable;
 }

@@ -1,8 +1,7 @@
 import { FileListQueryInput } from '@/shared/queries/file-list';
 import { databaseService } from '@/main/data/database-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { NodeTypes, FileNode } from '@colanode/core';
-import { compareString } from '@/shared/lib/utils';
+import { FileNode, compareString } from '@colanode/core';
 import { Event } from '@/shared/types/events';
 import { SelectNode } from '@/main/data/workspace/schema';
 import { mapNode } from '@/main/utils';
@@ -95,10 +94,7 @@ export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {
       .selectFrom('nodes')
       .selectAll()
       .where((eb) =>
-        eb.and([
-          eb('parent_id', '=', input.parentId),
-          eb('type', '=', NodeTypes.File),
-        ])
+        eb.and([eb('parent_id', '=', input.parentId), eb('type', '=', 'file')])
       )
       .orderBy('id', 'asc')
       .limit(input.count)

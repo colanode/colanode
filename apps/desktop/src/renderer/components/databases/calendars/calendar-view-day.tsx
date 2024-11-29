@@ -1,5 +1,5 @@
-import { cn, isSameDay } from '@/shared/lib/utils';
-import { extractNodeRole, RecordNode } from '@colanode/core';
+import { cn } from '@/shared/lib/utils';
+import { extractNodeRole, RecordNode, isSameDay } from '@colanode/core';
 import { CalendarViewRecordCard } from '@/renderer/components/databases/calendars/calendar-view-record-card';
 import { Plus } from 'lucide-react';
 import { useWorkspace } from '@/renderer/contexts/workspace';

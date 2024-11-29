@@ -1,8 +1,11 @@
+import { NodeType } from '~/registry';
 import {
+  ServerInteraction,
   ServerCollaboration,
   ServerCollaborationRevocation,
   ServerNodeTransaction,
 } from './sync';
+import { InteractionEvent } from './interactions';
 
 export type FetchNodeTransactionsMessage = {
   type: 'fetch_node_transactions';
@@ -20,6 +23,13 @@ export type FetchCollaborationRevocationsMessage = {
 
 export type FetchCollaborationsMessage = {
   type: 'fetch_collaborations';
+  userId: string;
+  workspaceId: string;
+  cursor: string;
+};
+
+export type FetchInteractionsMessage = {
+  type: 'fetch_interactions';
   userId: string;
   workspaceId: string;
   cursor: string;
@@ -43,10 +53,27 @@ export type CollaborationsBatchMessage = {
   collaborations: ServerCollaboration[];
 };
 
+export type InteractionsBatchMessage = {
+  type: 'interactions_batch';
+  userId: string;
+  interactions: ServerInteraction[];
+};
+
+export type SyncInteractionsMessage = {
+  type: 'sync_interactions';
+  userId: string;
+  nodeId: string;
+  nodeType: NodeType;
+  events: InteractionEvent[];
+};
+
 export type Message =
   | FetchNodeTransactionsMessage
   | NodeTransactionsBatchMessage
   | FetchCollaborationRevocationsMessage
   | CollaborationRevocationsBatchMessage
   | FetchCollaborationsMessage
-  | CollaborationsBatchMessage;
+  | CollaborationsBatchMessage
+  | FetchInteractionsMessage
+  | InteractionsBatchMessage
+  | SyncInteractionsMessage;

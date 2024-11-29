@@ -1,7 +1,7 @@
 import { SocketConnection } from '@/main/services/socket-connection';
 import { databaseService } from '@/main/data/database-service';
 import { Message } from '@colanode/core';
-import { serverService } from './server-service';
+import { serverService } from '@/main/services/server-service';
 import { eventBus } from '@/shared/lib/event-bus';
 
 class SocketService {
@@ -21,13 +21,13 @@ class SocketService {
     });
   }
 
-  public sendMessage(accountId: string, message: Message) {
+  public sendMessage(accountId: string, message: Message): boolean {
     const connection = this.sockets.get(accountId);
     if (!connection) {
-      return;
+      return false;
     }
 
-    connection.sendMessage(message);
+    return connection.sendMessage(message);
   }
 
   public async checkConnections() {

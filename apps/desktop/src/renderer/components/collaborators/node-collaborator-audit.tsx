@@ -1,7 +1,7 @@
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
 import { Avatar } from '@/renderer/components/avatars/avatar';
-import { timeAgo } from '@/shared/lib/utils';
+import { timeAgo } from '@colanode/core';
 
 interface NodeCollaboratorAuditProps {
   collaboratorId: string;

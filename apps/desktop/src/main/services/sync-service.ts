@@ -4,21 +4,28 @@ import { eventBus } from '@/shared/lib/event-bus';
 import { httpClient } from '@/shared/lib/http-client';
 import { serverService } from '@/main/services/server-service';
 import {
+  InteractionsBatchMessage,
   CollaborationRevocationsBatchMessage,
   CollaborationsBatchMessage,
+  FetchInteractionsMessage,
   FetchCollaborationRevocationsMessage,
   FetchCollaborationsMessage,
   FetchNodeTransactionsMessage,
   GetNodeTransactionsOutput,
   LocalNodeTransaction,
   NodeTransactionsBatchMessage,
+  SyncInteractionsMessage,
   SyncNodeTransactionsOutput,
 } from '@colanode/core';
 import { logService } from '@/main/services/log-service';
 import { nodeService } from '@/main/services/node-service';
 import { socketService } from '@/main/services/socket-service';
 import { collaborationService } from '@/main/services/collaboration-service';
-import { SelectNodeTransaction } from '@/main/data/workspace/schema';
+import { interactionService } from '@/main/services/interaction-service';
+import {
+  SelectInteractionEvent,
+  SelectNodeTransaction,
+} from '@/main/data/workspace/schema';
 import { sql } from 'kysely';
 
 type WorkspaceSyncState = {
@@ -38,9 +45,15 @@ class SyncService {
     WorkspaceSyncState
   > = new Map();
 
+  private readonly localPendingInteractionStates: Map<
+    string,
+    WorkspaceSyncState
+  > = new Map();
+
   private readonly syncingTransactions: Set<string> = new Set();
   private readonly syncingCollaborations: Set<string> = new Set();
   private readonly syncingRevocations: Set<string> = new Set();
+  private readonly syncingInteractions: Set<string> = new Set();
 
   constructor() {
     eventBus.subscribe((event) => {
@@ -54,6 +67,8 @@ class SyncService {
         this.syncAllWorkspaces();
       } else if (event.type === 'collaboration_synced') {
         this.checkForMissingNode(event.userId, event.nodeId);
+      } else if (event.type === 'interaction_event_created') {
+        this.syncLocalPendingInteractions(event.userId);
       }
     });
   }
@@ -67,9 +82,13 @@ class SyncService {
     for (const workspace of workspaces) {
       this.syncLocalPendingTransactions(workspace.user_id);
       this.syncLocalIncompleteTransactions(workspace.user_id);
+      this.syncLocalPendingInteractions(workspace.user_id);
+
       this.requireNodeTransactions(workspace.user_id);
       this.requireCollaborations(workspace.user_id);
       this.requireCollaborationRevocations(workspace.user_id);
+      this.requireInteractions(workspace.user_id);
+
       this.syncMissingNodes(workspace.user_id);
     }
   }
@@ -102,6 +121,38 @@ class SyncService {
       if (syncState.scheduledSync) {
         syncState.scheduledSync = false;
         this.syncLocalPendingTransactions(userId);
+      }
+    }
+  }
+
+  public async syncLocalPendingInteractions(userId: string) {
+    if (!this.localPendingInteractionStates.has(userId)) {
+      this.localPendingInteractionStates.set(userId, {
+        isSyncing: false,
+        scheduledSync: false,
+      });
+    }
+
+    const syncState = this.localPendingInteractionStates.get(userId)!;
+    if (syncState.isSyncing) {
+      syncState.scheduledSync = true;
+      return;
+    }
+
+    syncState.isSyncing = true;
+    try {
+      await this.sendLocalInteractions(userId);
+    } catch (error) {
+      this.logger.error(
+        error,
+        `Error syncing local interactions for user ${userId}`
+      );
+    } finally {
+      syncState.isSyncing = false;
+
+      if (syncState.scheduledSync) {
+        syncState.scheduledSync = false;
+        this.syncLocalPendingInteractions(userId);
       }
     }
   }
@@ -224,6 +275,38 @@ class SyncService {
     } finally {
       this.syncingRevocations.delete(message.userId);
       this.requireCollaborationRevocations(message.userId);
+    }
+  }
+
+  public async syncServerInteractions(message: InteractionsBatchMessage) {
+    if (this.syncingInteractions.has(message.userId)) {
+      return;
+    }
+
+    this.syncingInteractions.add(message.userId);
+    let cursor: bigint | null = null;
+    try {
+      for (const interaction of message.interactions) {
+        console.log('applying server interaction', interaction);
+        await interactionService.applyServerInteraction(
+          message.userId,
+          interaction
+        );
+        cursor = BigInt(interaction.version);
+      }
+
+      if (cursor) {
+        this.updateInteractionCursor(message.userId, cursor);
+      }
+    } catch (error) {
+      console.log('error syncing server interactions', error);
+      this.logger.error(
+        error,
+        `Error syncing server interactions for user ${message.userId}`
+      );
+    } finally {
+      this.syncingInteractions.delete(message.userId);
+      this.requireInteractions(message.userId);
     }
   }
 
@@ -532,6 +615,85 @@ class SyncService {
     }
   }
 
+  private async sendLocalInteractions(userId: string) {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    const workspace = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .select(['user_id', 'workspace_id', 'account_id'])
+      .where('user_id', '=', userId)
+      .executeTakeFirst();
+
+    if (!workspace) {
+      return;
+    }
+
+    const cutoff = new Date(Date.now() - 1000 * 60 * 5).toISOString();
+    let hasMore = true;
+
+    while (hasMore) {
+      const interactionEvents = await workspaceDatabase
+        .selectFrom('interaction_events')
+        .selectAll()
+        .where((eb) =>
+          eb.or([eb('sent_at', 'is', null), eb('sent_at', '<', cutoff)])
+        )
+        .limit(50)
+        .execute();
+
+      if (interactionEvents.length === 0) {
+        hasMore = false;
+        break;
+      }
+
+      const groupedByNodeId: Record<string, SelectInteractionEvent[]> = {};
+      for (const event of interactionEvents) {
+        groupedByNodeId[event.node_id] = [
+          ...(groupedByNodeId[event.node_id] ?? []),
+          event,
+        ];
+      }
+
+      const sentEventIds: string[] = [];
+      for (const [nodeId, events] of Object.entries(groupedByNodeId)) {
+        if (events.length === 0) {
+          continue;
+        }
+
+        const firstEvent = events[0];
+        if (!firstEvent) {
+          continue;
+        }
+
+        const message: SyncInteractionsMessage = {
+          type: 'sync_interactions',
+          nodeId,
+          nodeType: firstEvent.node_type,
+          userId: workspace.user_id,
+          events: events.map((e) => ({
+            attribute: e.attribute,
+            value: e.value,
+            createdAt: e.created_at,
+          })),
+        };
+
+        const sent = socketService.sendMessage(workspace.account_id, message);
+        if (sent) {
+          sentEventIds.push(...events.map((e) => e.event_id));
+        }
+      }
+
+      if (sentEventIds.length > 0) {
+        await workspaceDatabase
+          .updateTable('interaction_events')
+          .set({ sent_at: new Date().toISOString() })
+          .where('event_id', 'in', sentEventIds)
+          .execute();
+      }
+    }
+  }
+
   private async requireNodeTransactions(userId: string) {
     const workspaceWithCursor = await databaseService.appDatabase
       .selectFrom('workspaces as w')
@@ -608,14 +770,39 @@ class SyncService {
     socketService.sendMessage(workspaceWithCursor.account_id, message);
   }
 
+  private async requireInteractions(userId: string) {
+    const workspaceWithCursor = await databaseService.appDatabase
+      .selectFrom('workspaces as w')
+      .leftJoin('workspace_cursors as wc', 'w.user_id', 'wc.user_id')
+      .select([
+        'w.user_id',
+        'w.workspace_id',
+        'w.account_id',
+        'wc.interactions',
+      ])
+      .where('w.user_id', '=', userId)
+      .executeTakeFirst();
+
+    if (!workspaceWithCursor) {
+      return;
+    }
+
+    const message: FetchInteractionsMessage = {
+      type: 'fetch_interactions',
+      userId: workspaceWithCursor.user_id,
+      workspaceId: workspaceWithCursor.workspace_id,
+      cursor: workspaceWithCursor.interactions?.toString() ?? '0',
+    };
+
+    socketService.sendMessage(workspaceWithCursor.account_id, message);
+  }
+
   private async updateNodeTransactionCursor(userId: string, cursor: bigint) {
     await databaseService.appDatabase
       .insertInto('workspace_cursors')
       .values({
         user_id: userId,
         transactions: cursor,
-        collaborations: 0n,
-        revocations: 0n,
         created_at: new Date().toISOString(),
       })
       .onConflict((eb) =>
@@ -633,8 +820,6 @@ class SyncService {
       .values({
         user_id: userId,
         collaborations: cursor,
-        revocations: 0n,
-        transactions: 0n,
         created_at: new Date().toISOString(),
       })
       .onConflict((eb) =>
@@ -655,13 +840,28 @@ class SyncService {
       .values({
         user_id: userId,
         revocations: cursor,
-        transactions: 0n,
-        collaborations: 0n,
         created_at: new Date().toISOString(),
       })
       .onConflict((eb) =>
         eb.column('user_id').doUpdateSet({
           revocations: cursor,
+          updated_at: new Date().toISOString(),
+        })
+      )
+      .execute();
+  }
+
+  private async updateInteractionCursor(userId: string, cursor: bigint) {
+    await databaseService.appDatabase
+      .insertInto('workspace_cursors')
+      .values({
+        user_id: userId,
+        interactions: cursor,
+        created_at: new Date().toISOString(),
+      })
+      .onConflict((eb) =>
+        eb.column('user_id').doUpdateSet({
+          interactions: cursor,
           updated_at: new Date().toISOString(),
         })
       )

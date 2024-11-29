@@ -1,5 +1,4 @@
-import { UrlFieldAttributes } from '@colanode/core';
-import { cn, isValidUrl } from '@/shared/lib/utils';
+import { UrlFieldAttributes, isValidUrl } from '@colanode/core';
 import {
   HoverCard,
   HoverCardContent,
@@ -8,6 +7,7 @@ import {
 import { SmartTextInput } from '@/renderer/components/ui/smart-text-input';
 import { ExternalLink } from 'lucide-react';
 import { useRecord } from '@/renderer/contexts/record';
+import { cn } from '@/shared/lib/utils';
 
 interface RecordUrlValueProps {
   field: UrlFieldAttributes;

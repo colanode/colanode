@@ -1,5 +1,5 @@
 import React from 'react';
-import { SpaceNode } from '@colanode/core';
+import { SpaceNode, compareString } from '@colanode/core';
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import {
   DropdownMenu,
@@ -40,7 +40,6 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { compareString } from '@/shared/lib/utils';
 
 interface SettingsState {
   open: boolean;

@@ -5,7 +5,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
-import { cn, toUTCDate } from '@/shared/lib/utils';
+import { cn } from '@/shared/lib/utils';
+import { toUTCDate } from '@colanode/core';
 
 interface DatePickerProps {
   value: Date | null;

@@ -114,6 +114,49 @@ const createUploadsTable: Migration = {
   },
 };
 
+const createInteractionsTable: Migration = {
+  up: async (db) => {
+    await db.schema
+      .createTable('interactions')
+      .addColumn('user_id', 'text', (col) => col.notNull())
+      .addColumn('node_id', 'text', (col) => col.notNull())
+      .addColumn('node_type', 'text', (col) => col.notNull())
+      .addColumn('attributes', 'text')
+      .addColumn('created_at', 'text', (col) => col.notNull())
+      .addColumn('updated_at', 'text')
+      .addColumn('server_created_at', 'text')
+      .addColumn('server_updated_at', 'text')
+      .addColumn('version', 'integer', (col) => col.notNull())
+      .addPrimaryKeyConstraint('interactions_pkey', ['user_id', 'node_id'])
+      .execute();
+  },
+  down: async (db) => {
+    await db.schema.dropTable('interactions').execute();
+  },
+};
+
+const createInteractionEventsTable: Migration = {
+  up: async (db) => {
+    await db.schema
+      .createTable('interaction_events')
+      .addColumn('node_id', 'text', (col) => col.notNull())
+      .addColumn('node_type', 'text', (col) => col.notNull())
+      .addColumn('attribute', 'text', (col) => col.notNull())
+      .addColumn('value', 'text', (col) => col.notNull())
+      .addColumn('created_at', 'text', (col) => col.notNull())
+      .addColumn('sent_at', 'text')
+      .addColumn('event_id', 'text', (col) => col.notNull())
+      .addPrimaryKeyConstraint('interaction_events_pkey', [
+        'node_id',
+        'attribute',
+      ])
+      .execute();
+  },
+  down: async (db) => {
+    await db.schema.dropTable('interaction_events').execute();
+  },
+};
+
 const createNodePathsTable: Migration = {
   up: async (db) => {
     await db.schema
@@ -258,9 +301,11 @@ export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00003_create_collaborations_table': createCollaborationsTable,
   '00004_create_uploads_table': createUploadsTable,
   '00005_create_downloads_table': createDownloadsTable,
-  '00006_create_node_paths_table': createNodePathsTable,
-  '00007_create_node_names_table': createNodeNamesTable,
-  '00008_create_node_insert_name_trigger': createNodeInsertNameTrigger,
-  '00009_create_node_update_name_trigger': createNodeUpdateNameTrigger,
-  '00010_create_node_delete_name_trigger': createNodeDeleteNameTrigger,
+  '00006_create_interactions_table': createInteractionsTable,
+  '00007_create_interaction_events_table': createInteractionEventsTable,
+  '00008_create_node_paths_table': createNodePathsTable,
+  '00009_create_node_names_table': createNodeNamesTable,
+  '00010_create_node_insert_name_trigger': createNodeInsertNameTrigger,
+  '00011_create_node_update_name_trigger': createNodeUpdateNameTrigger,
+  '00012_create_node_delete_name_trigger': createNodeDeleteNameTrigger,
 };

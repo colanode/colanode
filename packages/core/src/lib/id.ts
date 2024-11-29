@@ -46,6 +46,7 @@ export enum IdType {
   Device = 'dv',
   Upload = 'up',
   Transaction = 'tx',
+  Event = 'ev',
 }
 
 export const generateId = (type: IdType): string => {

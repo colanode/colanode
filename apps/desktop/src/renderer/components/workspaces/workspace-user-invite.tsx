@@ -1,5 +1,5 @@
 import React from 'react';
-import { isValidEmail } from '@/shared/lib/utils';
+import { isValidEmail } from '@colanode/core';
 import { Button } from '@/renderer/components/ui/button';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { Spinner } from '@/renderer/components/ui/spinner';

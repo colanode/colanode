@@ -53,6 +53,8 @@ export class SocketConnection {
         syncService.syncServerRevocations(message);
       } else if (message.type === 'collaborations_batch') {
         syncService.syncServerCollaborations(message);
+      } else if (message.type === 'interactions_batch') {
+        syncService.syncServerInteractions(message);
       }
     };
 
@@ -77,10 +79,13 @@ export class SocketConnection {
     return this.socket !== null && this.socket.readyState === WebSocket.OPEN;
   }
 
-  public sendMessage(message: Message): void {
+  public sendMessage(message: Message): boolean {
     if (this.socket && this.isConnected()) {
       this.socket.send(JSON.stringify(message));
+      return true;
     }
+
+    return false;
   }
 
   public close(): void {

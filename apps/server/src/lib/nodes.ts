@@ -2,6 +2,7 @@ import { database } from '@/data/database';
 import {
   SelectCollaboration,
   SelectCollaborationRevocation,
+  SelectInteraction,
   SelectNode,
   SelectNodeTransaction,
 } from '@/data/schema';
@@ -9,6 +10,7 @@ import { NodeCollaborator } from '@/types/nodes';
 import {
   NodeOutput,
   NodeRole,
+  ServerInteraction,
   ServerCollaboration,
   ServerCollaborationRevocation,
   ServerNodeTransaction,
@@ -124,6 +126,23 @@ export const mapCollaboration = (
     createdAt: collaboration.created_at.toISOString(),
     updatedAt: collaboration.updated_at?.toISOString() ?? null,
     version: collaboration.version.toString(),
+  };
+};
+
+export const mapInteraction = (
+  interaction: SelectInteraction
+): ServerInteraction => {
+  return {
+    userId: interaction.user_id,
+    nodeId: interaction.node_id,
+    nodeType: interaction.node_type,
+    workspaceId: interaction.workspace_id,
+    attributes: interaction.attributes,
+    createdAt: interaction.created_at.toISOString(),
+    updatedAt: interaction.updated_at?.toISOString() ?? null,
+    serverCreatedAt: interaction.server_created_at.toISOString(),
+    serverUpdatedAt: interaction.server_updated_at?.toISOString() ?? null,
+    version: interaction.version.toString(),
   };
 };
 

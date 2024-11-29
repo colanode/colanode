@@ -2,7 +2,8 @@ import { LocalNodeTransaction, Node } from '@colanode/core';
 import { Account } from '@/shared/types/accounts';
 import { Workspace } from '@/shared/types/workspaces';
 import { Server } from '@/shared/types/servers';
-import { Download, Upload, UserNode } from '@/shared/types/nodes';
+import { Download, Upload } from '@/shared/types/nodes';
+import { Interaction } from '@/shared/types/interactions';
 
 export type NodeCreatedEvent = {
   type: 'node_created';
@@ -138,6 +139,12 @@ export type SocketConnectionOpenedEvent = {
   accountId: string;
 };
 
+export type InteractionEventCreatedEvent = {
+  type: 'interaction_event_created';
+  userId: string;
+  nodeId: string;
+};
+
 export type Event =
   | NodeCreatedEvent
   | NodeUpdatedEvent
@@ -162,4 +169,5 @@ export type Event =
   | NodeTransactionIncompleteEvent
   | ServerAvailabilityChangedEvent
   | SocketConnectionOpenedEvent
-  | CollaborationCreatedEvent;
+  | CollaborationCreatedEvent
+  | InteractionEventCreatedEvent;

@@ -99,7 +99,6 @@ const createNodesTable: Migration = {
     await db.schema
       .createTable('nodes')
       .addColumn('id', 'varchar(30)', (col) => col.notNull().primaryKey())
-      .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
       .addColumn('type', 'varchar(30)', (col) =>
         col.generatedAlwaysAs(sql`(attributes->>'type')::VARCHAR(30)`).stored()
       )
@@ -109,6 +108,7 @@ const createNodesTable: Migration = {
           .stored()
           .notNull()
       )
+      .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
       .addColumn('attributes', 'jsonb', (col) => col.notNull())
       .addColumn('created_at', 'timestamptz', (col) => col.notNull())
       .addColumn('updated_at', 'timestamptz')
@@ -136,9 +136,9 @@ const createNodeTransactionsTable: Migration = {
     await db.schema
       .createTable('node_transactions')
       .addColumn('id', 'varchar(30)', (col) => col.notNull().primaryKey())
-      .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
       .addColumn('node_id', 'varchar(30)', (col) => col.notNull())
       .addColumn('node_type', 'varchar(30)', (col) => col.notNull())
+      .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
       .addColumn('operation', 'varchar(30)', (col) => col.notNull())
       .addColumn('data', 'bytea')
       .addColumn('created_at', 'timestamptz', (col) => col.notNull())
@@ -362,6 +362,59 @@ const createUploadsTable: Migration = {
   },
 };
 
+const createInteractionsTable: Migration = {
+  up: async (db) => {
+    await sql`
+      CREATE SEQUENCE IF NOT EXISTS interactions_version_seq
+      START WITH 1000000000
+      INCREMENT BY 1
+      NO MINVALUE
+      NO MAXVALUE
+      CACHE 1;
+    `.execute(db);
+
+    await db.schema
+      .createTable('interactions')
+      .addColumn('user_id', 'varchar(30)', (col) => col.notNull())
+      .addColumn('node_id', 'varchar(30)', (col) => col.notNull())
+      .addColumn('node_type', 'varchar(30)', (col) => col.notNull())
+      .addColumn('workspace_id', 'varchar(30)', (col) => col.notNull())
+      .addColumn('attributes', 'jsonb')
+      .addColumn('created_at', 'timestamptz', (col) => col.notNull())
+      .addColumn('updated_at', 'timestamptz')
+      .addColumn('server_created_at', 'timestamptz', (col) => col.notNull())
+      .addColumn('server_updated_at', 'timestamptz')
+      .addColumn('version', 'bigint', (col) =>
+        col.notNull().defaultTo(sql`nextval('interactions_version_seq')`)
+      )
+      .addPrimaryKeyConstraint('interactions_pkey', ['user_id', 'node_id'])
+      .execute();
+
+    await sql`
+      CREATE OR REPLACE FUNCTION update_interaction_version() RETURNS TRIGGER AS $$
+      BEGIN
+        NEW.version = nextval('interactions_version_seq');
+        RETURN NEW;
+      END;
+      $$ LANGUAGE plpgsql;
+
+      CREATE TRIGGER trg_update_interaction_version
+      BEFORE UPDATE ON interactions
+      FOR EACH ROW
+      EXECUTE FUNCTION update_interaction_version();
+    `.execute(db);
+  },
+  down: async (db) => {
+    await sql`
+      DROP TRIGGER IF EXISTS trg_update_interaction_version ON interactions;
+      DROP FUNCTION IF EXISTS update_interaction_version();
+      DROP SEQUENCE IF EXISTS interactions_version_seq;
+    `.execute(db);
+
+    await db.schema.dropTable('interactions').execute();
+  },
+};
+
 export const databaseMigrations: Record<string, Migration> = {
   '00001_create_accounts_table': createAccountsTable,
   '00002_create_devices_table': createDevicesTable,
@@ -374,4 +427,5 @@ export const databaseMigrations: Record<string, Migration> = {
   '00009_create_collaboration_revocations_table':
     createCollaborationRevocationsTable,
   '00010_create_uploads_table': createUploadsTable,
+  '00011_create_interactions_table': createInteractionsTable,
 };

@@ -29,6 +29,7 @@ import {
 import { eventBus } from '@/shared/lib/event-bus';
 import { SelectWorkspace } from '@/main/data/app/schema';
 import { sql } from 'kysely';
+import { interactionService } from '@/main/services/interaction-service';
 
 export type CreateNodeInput = {
   id: string;
@@ -191,6 +192,14 @@ class NodeService {
         userId,
         transaction: mapTransaction(createdTransaction),
       });
+
+      await interactionService.setInteraction(
+        userId,
+        createdTransaction.node_id,
+        createdTransaction.node_type,
+        'lastReceivedTransactionId',
+        createdTransaction.id
+      );
     }
 
     for (const createdUpload of createdUploads) {
@@ -323,7 +332,10 @@ class NodeService {
           return { updatedNode, createdTransaction };
         }
 
-        return { updatedNode: undefined, createdTransaction: undefined };
+        return {
+          updatedNode: undefined,
+          createdTransaction: undefined,
+        };
       });
 
     if (updatedNode) {
@@ -340,6 +352,14 @@ class NodeService {
         userId,
         transaction: mapTransaction(createdTransaction),
       });
+
+      await interactionService.setInteraction(
+        userId,
+        createdTransaction.node_id,
+        createdTransaction.node_type,
+        'lastReceivedTransactionId',
+        createdTransaction.id
+      );
     }
 
     return updatedNode !== undefined;
@@ -569,10 +589,10 @@ class NodeService {
 
     const attributes = ydoc.getAttributes();
 
-    const result = await workspaceDatabase
+    const { createdNode } = await workspaceDatabase
       .transaction()
       .execute(async (trx) => {
-        const nodeRow = await trx
+        const createdNode = await trx
           .insertInto('nodes')
           .returningAll()
           .values({
@@ -595,21 +615,29 @@ class NodeService {
             created_at: transaction.createdAt,
             created_by: transaction.createdBy,
             retry_count: 0,
-            status: nodeRow ? 'synced' : 'incomplete',
+            status: createdNode ? 'synced' : 'incomplete',
             version,
             server_created_at: transaction.serverCreatedAt,
           })
           .execute();
 
-        return nodeRow;
+        return { createdNode };
       });
 
-    if (result) {
+    if (createdNode) {
       eventBus.publish({
         type: 'node_created',
         userId,
-        node: mapNode(result),
+        node: mapNode(createdNode),
       });
+
+      await interactionService.setInteraction(
+        userId,
+        createdNode.id,
+        createdNode.type,
+        'lastReceivedTransactionId',
+        transaction.id
+      );
     } else {
       eventBus.publish({
         type: 'node_transaction_incomplete',
@@ -673,10 +701,10 @@ class NodeService {
     ydoc.applyUpdate(transaction.data);
     const attributes = ydoc.getAttributes();
 
-    const result = await workspaceDatabase
+    const { updatedNode } = await workspaceDatabase
       .transaction()
       .execute(async (trx) => {
-        const nodeRow = await trx
+        const updatedNode = await trx
           .updateTable('nodes')
           .returningAll()
           .set({
@@ -699,21 +727,29 @@ class NodeService {
             created_at: transaction.createdAt,
             created_by: transaction.createdBy,
             retry_count: 0,
-            status: nodeRow ? 'synced' : 'incomplete',
+            status: updatedNode ? 'synced' : 'incomplete',
             version,
             server_created_at: transaction.serverCreatedAt,
           })
           .execute();
 
-        return nodeRow;
+        return { updatedNode };
       });
 
-    if (result) {
+    if (updatedNode) {
       eventBus.publish({
         type: 'node_updated',
         userId,
-        node: mapNode(result),
+        node: mapNode(updatedNode),
       });
+
+      await interactionService.setInteraction(
+        userId,
+        updatedNode.id,
+        updatedNode.type,
+        'lastReceivedTransactionId',
+        transaction.id
+      );
     } else {
       eventBus.publish({
         type: 'node_transaction_incomplete',
@@ -735,6 +771,16 @@ class NodeService {
       .execute(async (trx) => {
         await trx
           .deleteFrom('node_transactions')
+          .where('node_id', '=', transaction.nodeId)
+          .execute();
+
+        await trx
+          .deleteFrom('interactions')
+          .where('node_id', '=', transaction.nodeId)
+          .execute();
+
+        await trx
+          .deleteFrom('interaction_events')
           .where('node_id', '=', transaction.nodeId)
           .execute();
 

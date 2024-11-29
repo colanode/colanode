@@ -1,9 +1,8 @@
 import React from 'react';
 import { formatBytes } from '@/shared/lib/files';
-import { formatDate } from '@/shared/lib/utils';
 import { FileThumbnail } from '@/renderer/components/files/file-thumbnail';
 import { Avatar } from '@/renderer/components/avatars/avatar';
-import { FileNode } from '@colanode/core';
+import { FileNode, formatDate } from '@colanode/core';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
 

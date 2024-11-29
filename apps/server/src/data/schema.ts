@@ -1,4 +1,10 @@
-import { NodeAttributes, NodeRole, WorkspaceRole } from '@colanode/core';
+import {
+  InteractionAttributes,
+  NodeAttributes,
+  NodeRole,
+  NodeType,
+  WorkspaceRole,
+} from '@colanode/core';
 import {
   ColumnType,
   Insertable,
@@ -83,9 +89,9 @@ export type UpdateWorkspaceUser = Updateable<WorkspaceUserTable>;
 
 interface NodeTable {
   id: ColumnType<string, string, never>;
-  workspace_id: ColumnType<string, string, never>;
+  type: ColumnType<NodeType, never, never>;
   parent_id: ColumnType<string, never, never>;
-  type: ColumnType<string, never, never>;
+  workspace_id: ColumnType<string, string, never>;
   attributes: JSONColumnType<NodeAttributes, string | null, string | null>;
   created_at: ColumnType<Date, Date, never>;
   updated_at: ColumnType<Date | null, Date | null, Date>;
@@ -101,9 +107,9 @@ export type UpdateNode = Updateable<NodeTable>;
 interface NodeTransactionTable {
   id: ColumnType<string, string, never>;
   node_id: ColumnType<string, string, never>;
-  node_type: ColumnType<string, string, never>;
-  operation: ColumnType<string, string, never>;
+  node_type: ColumnType<NodeType, NodeType, never>;
   workspace_id: ColumnType<string, string, never>;
+  operation: ColumnType<string, string, never>;
   data: ColumnType<Uint8Array | null, Uint8Array | null, Uint8Array | null>;
   created_at: ColumnType<Date, Date, never>;
   created_by: ColumnType<string, string, never>;
@@ -168,6 +174,27 @@ interface UploadTable {
   completed_at: ColumnType<Date, Date, never>;
 }
 
+interface InteractionTable {
+  user_id: ColumnType<string, string, never>;
+  node_id: ColumnType<string, string, never>;
+  node_type: ColumnType<NodeType, NodeType, never>;
+  workspace_id: ColumnType<string, string, never>;
+  attributes: JSONColumnType<
+    InteractionAttributes,
+    string | null,
+    string | null
+  >;
+  created_at: ColumnType<Date, Date, never>;
+  updated_at: ColumnType<Date | null, Date | null, Date>;
+  server_created_at: ColumnType<Date, Date, never>;
+  server_updated_at: ColumnType<Date | null, Date | null, Date>;
+  version: ColumnType<bigint, never, never>;
+}
+
+export type SelectInteraction = Selectable<InteractionTable>;
+export type CreateInteraction = Insertable<InteractionTable>;
+export type UpdateInteraction = Updateable<InteractionTable>;
+
 export interface DatabaseSchema {
   accounts: AccountTable;
   devices: DeviceTable;
@@ -179,4 +206,5 @@ export interface DatabaseSchema {
   collaboration_revocations: CollaborationRevocationTable;
   node_paths: NodePathTable;
   uploads: UploadTable;
+  interactions: InteractionTable;
 }

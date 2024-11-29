@@ -3,6 +3,7 @@ import { Server } from 'http';
 import { WebSocketServer, WebSocket } from 'ws';
 import { verifyToken } from '@/lib/tokens';
 import {
+  InteractionsBatchMessage,
   CollaborationRevocationsBatchMessage,
   CollaborationsBatchMessage,
   Message,
@@ -10,7 +11,9 @@ import {
   NodeType,
 } from '@colanode/core';
 import { logService } from '@/services/log-service';
+import { interactionService } from '@/services/interaction-service';
 import {
+  mapInteraction,
   mapCollaboration,
   mapCollaborationRevocation,
   mapNodeTransaction,
@@ -18,6 +21,7 @@ import {
 import { eventBus } from '@/lib/event-bus';
 import {
   CollaboratorRemovedEvent,
+  InteractionUpdatedEvent,
   NodeTransactionCreatedEvent,
 } from '@/types/events';
 
@@ -35,6 +39,7 @@ interface SynapseConnection {
   transactions: Map<string, SynapseUserCursor>;
   revocations: Map<string, SynapseUserCursor>;
   collaborations: Map<string, SynapseUserCursor>;
+  interactions: Map<string, SynapseUserCursor>;
 }
 
 const PUBLIC_NODES: NodeType[] = ['workspace', 'user'];
@@ -49,6 +54,8 @@ class SynapseService {
         this.handleNodeTransactionCreatedEvent(event);
       } else if (event.type === 'collaborator_removed') {
         this.handleCollaboratorRemovedEvent(event);
+      } else if (event.type === 'interaction_updated') {
+        this.handleInteractionUpdatedEvent(event);
       }
     });
   }
@@ -123,6 +130,7 @@ class SynapseService {
         transactions: new Map(),
         revocations: new Map(),
         collaborations: new Map(),
+        interactions: new Map(),
       };
 
       this.connections.set(account.deviceId, connection);
@@ -190,6 +198,23 @@ class SynapseService {
         state.cursor = message.cursor;
         this.sendPendingCollaborations(connection, message.userId);
       }
+    } else if (message.type === 'fetch_interactions') {
+      const state = connection.interactions.get(message.userId);
+      if (!state) {
+        connection.interactions.set(message.userId, {
+          userId: message.userId,
+          workspaceId: message.workspaceId,
+          cursor: message.cursor,
+          syncing: false,
+        });
+
+        this.sendPendingInteractions(connection, message.userId);
+      } else if (!state.syncing && state.cursor !== message.cursor) {
+        state.cursor = message.cursor;
+        this.sendPendingInteractions(connection, message.userId);
+      }
+    } else if (message.type === 'sync_interactions') {
+      interactionService.syncLocalInteractions(connection.accountId, message);
     }
   }
 
@@ -218,7 +243,7 @@ class SynapseService {
         eb.or([
           eb.and([
             eb('nt.workspace_id', '=', state.workspaceId),
-            eb('nt.node_type', 'in', ['workspace', 'user']),
+            eb('nt.node_type', 'in', PUBLIC_NODES),
           ]),
           eb('c.node_id', '=', eb.ref('nt.node_id')),
         ])
@@ -324,6 +349,57 @@ class SynapseService {
     this.sendMessage(connection, message);
   }
 
+  private async sendPendingInteractions(
+    connection: SynapseConnection,
+    userId: string
+  ) {
+    const state = connection.interactions.get(userId);
+    if (!state || state.syncing) {
+      return;
+    }
+
+    state.syncing = true;
+    this.logger.trace(
+      state,
+      `Sending pending interactions for ${connection.deviceId} with ${userId}`
+    );
+
+    const unsyncedInteractions = await database
+      .selectFrom('interactions as i')
+      .leftJoin('collaborations as c', (join) =>
+        join.on('c.user_id', '=', userId).onRef('c.node_id', '=', 'i.node_id')
+      )
+      .where((eb) =>
+        eb.or([
+          eb.and([
+            eb('i.workspace_id', '=', state.workspaceId),
+            eb('i.node_type', 'in', PUBLIC_NODES),
+          ]),
+          eb('c.node_id', '=', eb.ref('i.node_id')),
+        ])
+      )
+      .selectAll('i')
+      .where('i.version', '>', BigInt(state.cursor))
+      .orderBy('i.version', 'asc')
+      .limit(20)
+      .execute();
+
+    if (unsyncedInteractions.length === 0) {
+      state.syncing = false;
+      return;
+    }
+
+    const interactions = unsyncedInteractions.map(mapInteraction);
+    const message: InteractionsBatchMessage = {
+      type: 'interactions_batch',
+      userId,
+      interactions,
+    };
+
+    connection.interactions.delete(userId);
+    this.sendMessage(connection, message);
+  }
+
   private async handleNodeTransactionCreatedEvent(
     event: NodeTransactionCreatedEvent
   ) {
@@ -370,6 +446,52 @@ class SynapseService {
     }
   }
 
+  private async handleInteractionUpdatedEvent(event: InteractionUpdatedEvent) {
+    const userDevices = this.getPendingInteractionsCursors(event.workspaceId);
+    const userIds = Array.from(userDevices.keys());
+    if (userIds.length === 0) {
+      return;
+    }
+
+    const collaborations = await database
+      .selectFrom('collaborations')
+      .selectAll()
+      .where((eb) =>
+        eb.and([eb('user_id', 'in', userIds), eb('node_id', '=', event.nodeId)])
+      )
+      .execute();
+
+    let usersToSend: string[] = [];
+    if (PUBLIC_NODES.includes(event.nodeType)) {
+      usersToSend = userIds;
+    } else {
+      const collaborations = await database
+        .selectFrom('collaborations')
+        .selectAll()
+        .where((eb) =>
+          eb.and([
+            eb('user_id', 'in', userIds),
+            eb('node_id', '=', event.nodeId),
+          ])
+        )
+        .execute();
+
+      usersToSend = collaborations.map((c) => c.user_id);
+    }
+
+    for (const userId of usersToSend) {
+      const deviceIds = userDevices.get(userId) ?? [];
+      for (const deviceId of deviceIds) {
+        const socketConnection = this.connections.get(deviceId);
+        if (socketConnection === undefined) {
+          continue;
+        }
+
+        this.sendPendingTransactions(socketConnection, userId);
+      }
+    }
+  }
+
   private handleCollaboratorRemovedEvent(event: CollaboratorRemovedEvent) {
     const deviceIds = this.getPendingRevocationsCursors(event.userId);
     for (const deviceId of deviceIds) {
@@ -388,6 +510,26 @@ class SynapseService {
     const userDevices = new Map<string, string[]>();
     for (const connection of this.connections.values()) {
       const connectionUsers = connection.transactions.values();
+      for (const user of connectionUsers) {
+        if (user.workspaceId !== workspaceId || user.syncing) {
+          continue;
+        }
+
+        const userIds = userDevices.get(user.userId) ?? [];
+        userIds.push(connection.deviceId);
+        userDevices.set(user.userId, userIds);
+      }
+    }
+
+    return userDevices;
+  }
+
+  private getPendingInteractionsCursors(
+    workspaceId: string
+  ): Map<string, string[]> {
+    const userDevices = new Map<string, string[]>();
+    for (const connection of this.connections.values()) {
+      const connectionUsers = connection.interactions.values();
       for (const user of connectionUsers) {
         if (user.workspaceId !== workspaceId || user.syncing) {
           continue;

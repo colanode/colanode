@@ -3,8 +3,8 @@ import {
   generateId,
   getIdTypeFromNode,
   generateNodeIndex,
+  compareString,
 } from '@colanode/core';
-import { compareString } from '@/shared/lib/utils';
 import { JSONContent } from '@tiptap/core';
 import { Block, BlockLeaf } from '@colanode/core';
 

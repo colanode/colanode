@@ -47,9 +47,10 @@ export type UpdateWorkspace = Updateable<WorkspaceTable>;
 
 interface WorkspaceCursorTable {
   user_id: ColumnType<string, string, never>;
-  transactions: ColumnType<bigint, bigint, bigint>;
-  collaborations: ColumnType<bigint, bigint, bigint>;
-  revocations: ColumnType<bigint, bigint, bigint>;
+  transactions: ColumnType<bigint, bigint | null, bigint>;
+  collaborations: ColumnType<bigint, bigint | null, bigint>;
+  interactions: ColumnType<bigint, bigint | null, bigint>;
+  revocations: ColumnType<bigint, bigint | null, bigint>;
   created_at: ColumnType<string, string, string>;
   updated_at: ColumnType<string | null, string | null, string>;
 }

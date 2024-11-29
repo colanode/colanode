@@ -6,6 +6,7 @@ import {
   ViewFieldFilterAttributes,
   ViewFilterAttributes,
   ViewSortAttributes,
+  compareString,
 } from '@colanode/core';
 import { TableView } from '@/renderer/components/databases/tables/table-view';
 import { BoardView } from '@/renderer/components/databases/boards/board-view';
@@ -13,7 +14,6 @@ import { CalendarView } from '@/renderer/components/databases/calendars/calendar
 import { ViewContext } from '@/renderer/contexts/view';
 import { useDatabase } from '@/renderer/contexts/database';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { compareString } from '@/shared/lib/utils';
 import {
   generateFieldValuesFromFilters,
   generateViewFieldIndex,

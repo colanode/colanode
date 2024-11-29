@@ -8,6 +8,7 @@ import {
 } from 'kysely';
 import path from 'path';
 import {
+  SelectInteraction,
   SelectDownload,
   SelectNode,
   SelectNodeTransaction,
@@ -25,6 +26,7 @@ import { Workspace } from '@/shared/types/workspaces';
 import { Server } from '@/shared/types/servers';
 import { Download, Upload } from '@/shared/types/nodes';
 import { encodeState } from '@colanode/crdt';
+import { Interaction } from '@/shared/types/interactions';
 
 export const appPath = app.getPath('userData');
 
@@ -93,7 +95,7 @@ export const fetchNodeAncestors = (
         .select('ancestor_id')
         .where('descendant_id', '=', nodeId)
     )
-    .where('type', '!=', NodeTypes.Workspace)
+    .where('type', '!=', 'workspace')
     .execute();
 };
 
@@ -208,5 +210,22 @@ export const mapDownload = (row: SelectDownload): Download => {
     createdAt: row.created_at,
     updatedAt: row.updated_at,
     retryCount: row.retry_count,
+  };
+};
+
+export const mapInteraction = (row: SelectInteraction): Interaction => {
+  return {
+    nodeId: row.node_id,
+    userId: row.user_id,
+    attributes: row.attributes,
+    createdAt: new Date(row.created_at),
+    updatedAt: row.updated_at ? new Date(row.updated_at) : null,
+    serverCreatedAt: row.server_created_at
+      ? new Date(row.server_created_at)
+      : null,
+    serverUpdatedAt: row.server_updated_at
+      ? new Date(row.server_updated_at)
+      : null,
+    version: row.version ? BigInt(row.version) : null,
   };
 };

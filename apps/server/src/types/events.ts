@@ -14,4 +14,15 @@ export type CollaboratorRemovedEvent = {
   nodeId: string;
 };
 
-export type Event = NodeTransactionCreatedEvent | CollaboratorRemovedEvent;
+export type InteractionUpdatedEvent = {
+  type: 'interaction_updated';
+  userId: string;
+  nodeId: string;
+  nodeType: NodeType;
+  workspaceId: string;
+};
+
+export type Event =
+  | NodeTransactionCreatedEvent
+  | CollaboratorRemovedEvent
+  | InteractionUpdatedEvent;

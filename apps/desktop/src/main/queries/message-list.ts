@@ -2,9 +2,8 @@ import { MessageListQueryInput } from '@/shared/queries/message-list';
 import { databaseService } from '@/main/data/database-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { SelectNode } from '@/main/data/workspace/schema';
-import { MessageNode, NodeTypes } from '@colanode/core';
+import { MessageNode, compareString } from '@colanode/core';
 import { mapNode } from '@/main/utils';
-import { compareString } from '@/shared/lib/utils';
 import { Event } from '@/shared/types/events';
 
 export class MessageListQueryHandler
@@ -104,7 +103,7 @@ export class MessageListQueryHandler
       .where((eb) =>
         eb.and([
           eb('parent_id', '=', input.conversationId),
-          eb('type', '=', NodeTypes.Message),
+          eb('type', '=', 'message'),
         ])
       )
       .orderBy('id', 'desc')

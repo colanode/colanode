@@ -10,8 +10,9 @@ import {
   SelectFieldAttributes,
   ViewType,
   generateNodeIndex,
+  compareString,
+  isStringArray,
 } from '@colanode/core';
-import { compareString, isStringArray } from '@/shared/lib/utils';
 
 export const getDefaultFieldWidth = (type: FieldType): number => {
   if (!type) return 0;

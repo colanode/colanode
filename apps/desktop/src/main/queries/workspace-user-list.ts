@@ -93,7 +93,7 @@ export class WorkspaceUserListQueryHandler
     const rows = await workspaceDatabase
       .selectFrom('nodes')
       .selectAll()
-      .where('type', '=', NodeTypes.User)
+      .where('type', '=', 'user')
       .orderBy('created_at asc')
       .offset(offset)
       .limit(input.count)
