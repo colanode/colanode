@@ -575,7 +575,7 @@ class SynapseService {
           continue;
         }
 
-        this.sendPendingTransactions(socketConnection, userId);
+        this.sendPendingInteractions(socketConnection, userId);
       }
     }
   }

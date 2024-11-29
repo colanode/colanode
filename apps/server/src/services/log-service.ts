@@ -10,7 +10,7 @@ class LogService {
   public createLogger(name: string) {
     return pino({
       name,
-      level: logConfig[name] || 'info',
+      level: logConfig[name] || 'trace',
       transport: isDev
         ? {
             target: 'pino-pretty',
