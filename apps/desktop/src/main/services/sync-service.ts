@@ -287,7 +287,6 @@ class SyncService {
     let cursor: bigint | null = null;
     try {
       for (const interaction of message.interactions) {
-        console.log('applying server interaction', interaction);
         await interactionService.applyServerInteraction(
           message.userId,
           interaction
@@ -299,7 +298,6 @@ class SyncService {
         this.updateInteractionCursor(message.userId, cursor);
       }
     } catch (error) {
-      console.log('error syncing server interactions', error);
       this.logger.error(
         error,
         `Error syncing server interactions for user ${message.userId}`

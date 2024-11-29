@@ -504,7 +504,6 @@ class NodeService {
         },
       };
     } catch (error) {
-      console.log('error', error);
       return { type: 'retry', output: null };
     }
   }

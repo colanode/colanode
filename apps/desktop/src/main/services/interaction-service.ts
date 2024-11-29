@@ -229,7 +229,6 @@ class InteractionService {
     userId: string,
     interaction: ServerInteraction
   ): Promise<boolean> {
-    console.log('trying to apply server interaction', interaction);
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 

@@ -21,7 +21,6 @@ class InteractionService {
       .executeTakeFirst();
 
     if (!workspaceUser || workspaceUser.account_id !== accountId) {
-      console.log('workspace user not found', accountId, message.userId);
       return false;
     }
 
