@@ -450,6 +450,7 @@ class SynapseService {
 
         this.sendPendingTransactions(socketConnection, userId);
         this.sendPendingCollaborations(socketConnection, userId);
+        this.sendPendingInteractions(socketConnection, userId);
       }
     }
   }
@@ -565,6 +566,10 @@ class SynapseService {
         .execute();
 
       usersToSend = collaborations.map((c) => c.user_id);
+    }
+
+    if (userIds.includes(event.userId) && !usersToSend.includes(event.userId)) {
+      usersToSend.push(event.userId);
     }
 
     for (const userId of usersToSend) {
