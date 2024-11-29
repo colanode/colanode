@@ -6,6 +6,7 @@ import { appDatabaseMigrations } from '@/main/data/app/migrations';
 import { workspaceDatabaseMigrations } from '@/main/data/workspace/migrations';
 import { appDatabasePath, getWorkspaceDirectoryPath } from '@/main/utils';
 import SQLite from 'better-sqlite3';
+import { eventBus } from '@/shared/lib/event-bus';
 
 class DatabaseService {
   private initPromise: Promise<void> | null = null;
@@ -22,6 +23,12 @@ class DatabaseService {
     });
 
     this.appDatabase = new Kysely<AppDatabaseSchema>({ dialect });
+
+    eventBus.subscribe((event) => {
+      if (event.type === 'workspace_created') {
+        this.initWorkspaceDatabase(event.workspace.userId);
+      }
+    });
   }
 
   public async init(): Promise<void> {

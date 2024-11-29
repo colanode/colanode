@@ -23,7 +23,7 @@ export class WorkspaceGetQueryHandler
   public async checkForChanges(
     event: Event,
     input: WorkspaceGetQueryInput,
-    output: Workspace | null
+    _: Workspace | null
   ): Promise<ChangeCheckResult<WorkspaceGetQueryInput>> {
     if (
       event.type === 'workspace_created' &&
