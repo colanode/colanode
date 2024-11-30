@@ -60,8 +60,12 @@ class InteractionService {
       .where('node_id', '=', nodeId)
       .executeTakeFirst();
 
+    const existingAttributes = interaction?.attributes
+      ? JSON.parse(interaction.attributes)
+      : null;
+
     const attributes = mergeInteractionAttributes(
-      interaction?.attributes,
+      existingAttributes,
       attribute,
       value
     );

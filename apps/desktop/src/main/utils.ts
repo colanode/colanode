@@ -217,7 +217,7 @@ export const mapInteraction = (row: SelectInteraction): Interaction => {
   return {
     nodeId: row.node_id,
     userId: row.user_id,
-    attributes: row.attributes,
+    attributes: JSON.parse(row.attributes),
     createdAt: new Date(row.created_at),
     updatedAt: row.updated_at ? new Date(row.updated_at) : null,
     serverCreatedAt: row.server_created_at
