@@ -4,7 +4,7 @@ import fs from 'fs';
 import unzipper from 'unzipper';
 import { EmojiData } from '@/shared/types/emojis';
 import { IconData } from '@/shared/types/icons';
-import { logService } from '@/main/services/log-service';
+import { createLogger } from '@/main/logger';
 import { getAssetsSourcePath } from '@/main/utils';
 
 type AssetsVersion = {
@@ -21,7 +21,7 @@ class AssetService {
     app.getPath('userData'),
     'assets'
   );
-  private readonly logger = logService.createLogger('asset-service');
+  private readonly logger = createLogger('asset-service');
 
   public async handleAssetRequest(request: Request): Promise<Response> {
     const url = request.url.replace('asset://', '');

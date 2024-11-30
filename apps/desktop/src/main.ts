@@ -15,10 +15,10 @@ import { CommandInput } from '@/shared/commands';
 import { commandService } from '@/main/services/command-service';
 import { bootstrapper } from '@/main/bootstrapper';
 import started from 'electron-squirrel-startup';
-import { logService } from '@/main/services/log-service';
+import { createLogger } from '@/main/logger';
 import { getAppIconPath } from '@/main/utils';
 
-const logger = logService.createLogger('main');
+const logger = createLogger('main');
 
 app.setName('Colanode');
 app.setAppUserModelId('com.colanode.desktop');

@@ -16,7 +16,7 @@ import {
 } from '@colanode/core';
 import { eventBus } from '@/shared/lib/event-bus';
 import { serverService } from '@/main/services/server-service';
-import { logService } from '@/main/services/log-service';
+import { createLogger } from '@/main/logger';
 
 type WorkspaceFileState = {
   isUploading: boolean;
@@ -26,7 +26,7 @@ type WorkspaceFileState = {
 };
 
 class FileService {
-  private readonly logger = logService.createLogger('file-service');
+  private readonly logger = createLogger('file-service');
   private readonly fileStates: Map<string, WorkspaceFileState> = new Map();
 
   constructor() {

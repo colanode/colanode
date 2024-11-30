@@ -3,10 +3,10 @@ import { MutationInput } from '@/shared/mutations';
 import { MutationMap } from '@/shared/mutations';
 import { mutationHandlerMap } from '@/main/mutations';
 import { MutationHandler } from '@/main/types';
-import { logService } from '@/main/services/log-service';
+import { createLogger } from '@/main/logger';
 
 class MutationService {
-  private readonly logger = logService.createLogger('mutation-service');
+  private readonly logger = createLogger('mutation-service');
 
   public async executeMutation<T extends MutationInput>(
     input: T

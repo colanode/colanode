@@ -17,7 +17,7 @@ import {
   SyncInteractionsMessage,
   SyncNodeTransactionsOutput,
 } from '@colanode/core';
-import { logService } from '@/main/services/log-service';
+import { createLogger } from '@/main/logger';
 import { nodeService } from '@/main/services/node-service';
 import { socketService } from '@/main/services/socket-service';
 import { collaborationService } from '@/main/services/collaboration-service';
@@ -34,7 +34,7 @@ type WorkspaceSyncState = {
 };
 
 class SyncService {
-  private readonly logger = logService.createLogger('sync-service');
+  private readonly logger = createLogger('sync-service');
   private readonly localPendingTransactionStates: Map<
     string,
     WorkspaceSyncState

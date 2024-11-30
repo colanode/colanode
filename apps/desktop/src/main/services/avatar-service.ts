@@ -4,10 +4,10 @@ import fs from 'fs';
 import { databaseService } from '@/main/data/database-service';
 import { httpClient } from '@/shared/lib/http-client';
 import { getAccountAvatarsDirectoryPath } from '@/main/utils';
-import { logService } from '@/main/services/log-service';
+import { createLogger } from '@/main/logger';
 
 class AvatarService {
-  private readonly logger = logService.createLogger('avatar-service');
+  private readonly logger = createLogger('avatar-service');
 
   public async handleAvatarRequest(request: Request): Promise<Response> {
     const url = request.url.replace('avatar://', '');

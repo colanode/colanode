@@ -4,10 +4,10 @@ import { queryHandlerMap } from '@/main/queries';
 import { eventBus } from '@/shared/lib/event-bus';
 import { Event } from '@/shared/types/events';
 import { isEqual } from 'lodash-es';
-import { logService } from '@/main/services/log-service';
+import { createLogger } from '@/main/logger';
 
 class QueryService {
-  private readonly logger = logService.createLogger('query-service');
+  private readonly logger = createLogger('query-service');
   private readonly subscribedQueries: Map<string, SubscribedQuery<QueryInput>> =
     new Map();
 

@@ -11,10 +11,10 @@ import {
 import { getAccountAvatarsDirectoryPath } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
 import { serverService } from '@/main/services/server-service';
-import { logService } from '@/main/services/log-service';
+import { createLogger } from '@/main/logger';
 
 class AccountService {
-  private readonly logger = logService.createLogger('account-service');
+  private readonly logger = createLogger('account-service');
 
   async syncAccounts() {
     this.logger.info('Syncing accounts');

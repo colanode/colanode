@@ -1,11 +1,11 @@
 import { CommandInput } from '@/shared/commands';
-import { logService } from '@/main/services/log-service';
+import { createLogger } from '@/main/logger';
 import { CommandMap } from '@/shared/commands';
 import { commandHandlerMap } from '@/main/commands';
 import { CommandHandler } from '@/main/types';
 
 class CommandService {
-  private readonly logger = logService.createLogger('command-service');
+  private readonly logger = createLogger('command-service');
 
   public async executeCommand<T extends CommandInput>(
     input: T

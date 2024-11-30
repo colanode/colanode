@@ -4,7 +4,7 @@ import { ServerConfig } from '@colanode/core';
 import { databaseService } from '@/main/data/database-service';
 import { mapServer } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
-import { logService } from '@/main/services/log-service';
+import { createLogger } from '@/main/logger';
 
 type ServerState = {
   isAvailable: boolean;
@@ -15,7 +15,7 @@ type ServerState = {
 
 class ServerService {
   private readonly states: Map<string, ServerState> = new Map();
-  private readonly logger = logService.createLogger('server-service');
+  private readonly logger = createLogger('server-service');
 
   public async syncServers() {
     const rows = await databaseService.appDatabase
