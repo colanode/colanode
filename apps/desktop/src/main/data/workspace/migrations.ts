@@ -122,6 +122,11 @@ const createInteractionsTable: Migration = {
       .addColumn('node_id', 'text', (col) => col.notNull())
       .addColumn('node_type', 'text', (col) => col.notNull())
       .addColumn('attributes', 'text')
+      .addColumn('last_seen_at', 'text', (col) =>
+        col
+          .generatedAlwaysAs(sql`json_extract(attributes, '$.lastSeenAt')`)
+          .stored()
+      )
       .addColumn('created_at', 'text', (col) => col.notNull())
       .addColumn('updated_at', 'text')
       .addColumn('server_created_at', 'text')

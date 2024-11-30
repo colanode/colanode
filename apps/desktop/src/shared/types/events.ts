@@ -145,6 +145,12 @@ export type InteractionEventCreatedEvent = {
   nodeId: string;
 };
 
+export type InteractionUpdatedEvent = {
+  type: 'interaction_updated';
+  userId: string;
+  interaction: Interaction;
+};
+
 export type Event =
   | NodeCreatedEvent
   | NodeUpdatedEvent
@@ -170,4 +176,5 @@ export type Event =
   | ServerAvailabilityChangedEvent
   | SocketConnectionOpenedEvent
   | CollaborationCreatedEvent
-  | InteractionEventCreatedEvent;
+  | InteractionEventCreatedEvent
+  | InteractionUpdatedEvent;

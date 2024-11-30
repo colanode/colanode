@@ -2,6 +2,7 @@ import { databaseService } from '@/main/data/database-service';
 import { WorkspaceRadarData } from '@/shared/types/radars';
 import { eventBus } from '@/shared/lib/event-bus';
 import { Event } from '@/shared/types/events';
+import { getIdType, IdType } from '@colanode/core';
 
 class RadarService {
   private readonly workspaceStates: Map<string, WorkspaceRadarData> = new Map();
@@ -69,56 +70,46 @@ class RadarService {
       nodeStates: {},
     };
 
-    // const nodeUnreadMessageCounts = await workspaceDatabase
-    //   .selectFrom('user_nodes as un')
-    //   .innerJoin('nodes as n', 'un.node_id', 'n.id')
-    //   .where('un.user_id', '=', userId)
-    //   .where('n.type', '=', NodeTypes.Message)
-    //   .where('un.last_seen_version_id', 'is', null)
-    //   .select(['n.parent_id as node_id'])
-    //   .select((eb) => [
-    //     eb.fn.count<number>('un.node_id').as('messages_count'),
-    //     eb.fn.sum<number>('un.mentions_count').as('mentions_count'),
-    //   ])
-    //   .groupBy('n.parent_id')
-    //   .execute();
+    const nodeUnreadMessageCounts = await workspaceDatabase
+      .selectFrom('interactions as i')
+      .innerJoin('nodes as n', 'i.node_id', 'n.id')
+      .where('i.user_id', '=', userId)
+      .where('n.type', '=', 'message')
+      .where('i.last_seen_at', 'is', null)
+      .select(['n.parent_id as node_id'])
+      .select((eb) => [eb.fn.count<number>('i.node_id').as('messages_count')])
+      .groupBy('n.parent_id')
+      .execute();
 
-    // for (const nodeUnreadMessageCount of nodeUnreadMessageCounts) {
-    //   const idType = getIdType(nodeUnreadMessageCount.node_id);
-    //   const nodeId = nodeUnreadMessageCount.node_id;
-    //   const messagesCount = nodeUnreadMessageCount.messages_count;
-    //   const mentionsCount = nodeUnreadMessageCount.mentions_count;
+    for (const nodeUnreadMessageCount of nodeUnreadMessageCounts) {
+      const idType = getIdType(nodeUnreadMessageCount.node_id);
+      const nodeId = nodeUnreadMessageCount.node_id;
+      const messagesCount = nodeUnreadMessageCount.messages_count;
 
-    //   if (idType === IdType.Chat) {
-    //     data.nodeStates[nodeId] = {
-    //       type: 'chat',
-    //       nodeId,
-    //       unseenMessagesCount: messagesCount,
-    //       mentionsCount,
-    //     };
+      if (idType === IdType.Chat) {
+        data.nodeStates[nodeId] = {
+          type: 'chat',
+          nodeId,
+          unseenMessagesCount: messagesCount,
+          mentionsCount: 0,
+        };
 
-    //     if (mentionsCount > 0) {
-    //       data.importantCount += mentionsCount;
-    //     }
+        if (messagesCount > 0) {
+          data.importantCount += messagesCount;
+        }
+      } else if (idType === IdType.Channel) {
+        data.nodeStates[nodeId] = {
+          type: 'channel',
+          nodeId,
+          unseenMessagesCount: messagesCount,
+          mentionsCount: 0,
+        };
 
-    //     if (messagesCount > 0) {
-    //       data.importantCount += messagesCount;
-    //     }
-    //   } else if (idType === IdType.Channel) {
-    //     data.nodeStates[nodeId] = {
-    //       type: 'channel',
-    //       nodeId,
-    //       unseenMessagesCount: messagesCount,
-    //       mentionsCount,
-    //     };
-
-    //     if (messagesCount > 0) {
-    //       data.hasUnseenChanges = true;
-    //     } else if (mentionsCount > 0) {
-    //       data.importantCount += messagesCount;
-    //     }
-    //   }
-    // }
+        if (messagesCount > 0) {
+          data.hasUnseenChanges = true;
+        }
+      }
+    }
 
     this.workspaceStates.set(userId, data);
   }
@@ -126,6 +117,14 @@ class RadarService {
   private async handleEvent(event: Event) {
     if (event.type === 'workspace_deleted') {
       this.workspaceStates.delete(event.workspace.userId);
+      eventBus.publish({
+        type: 'radar_data_updated',
+      });
+    } else if (
+      event.type === 'interaction_updated' &&
+      event.userId === event.interaction.userId
+    ) {
+      await this.initWorkspace(event.userId);
       eventBus.publish({
         type: 'radar_data_updated',
       });

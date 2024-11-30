@@ -10,6 +10,7 @@ import {
 import { databaseService } from '@/main/data/database-service';
 import { SelectInteractionEvent } from '@/main/data/workspace/schema';
 import { eventBus } from '@/shared/lib/event-bus';
+import { mapInteraction } from '../utils';
 
 const UPDATE_RETRIES_COUNT = 10;
 
@@ -70,7 +71,7 @@ class InteractionService {
     }
 
     if (interaction) {
-      const result = await workspaceDatabase
+      const { updatedInteraction } = await workspaceDatabase
         .transaction()
         .execute(async (tx) => {
           const updatedInteraction = await tx
@@ -86,7 +87,7 @@ class InteractionService {
             .executeTakeFirst();
 
           if (!updatedInteraction) {
-            return false;
+            return { updatedInteraction: undefined };
           }
 
           await tx
@@ -108,70 +109,88 @@ class InteractionService {
             )
             .execute();
 
-          return true;
+          return { updatedInteraction };
         });
 
-      if (result) {
+      if (updatedInteraction) {
+        eventBus.publish({
+          type: 'interaction_updated',
+          userId,
+          interaction: mapInteraction(updatedInteraction),
+        });
+
         eventBus.publish({
           type: 'interaction_event_created',
           userId,
           nodeId,
         });
+
+        return true;
       }
 
-      return result;
+      return false;
     }
 
-    const result = await workspaceDatabase.transaction().execute(async (tx) => {
-      const createdInteraction = await tx
-        .insertInto('interactions')
-        .returningAll()
-        .values({
-          node_id: nodeId,
-          node_type: nodeType,
-          user_id: userId,
-          attributes: JSON.stringify(attributes),
-          created_at: new Date().toISOString(),
-          version: BigInt(0),
-        })
-        .onConflict((b) => b.columns(['node_id', 'user_id']).doNothing())
-        .executeTakeFirst();
+    const { createdInteraction } = await workspaceDatabase
+      .transaction()
+      .execute(async (tx) => {
+        const createdInteraction = await tx
+          .insertInto('interactions')
+          .returningAll()
+          .values({
+            node_id: nodeId,
+            node_type: nodeType,
+            user_id: userId,
+            attributes: JSON.stringify(attributes),
+            created_at: new Date().toISOString(),
+            version: BigInt(0),
+          })
+          .onConflict((b) => b.columns(['node_id', 'user_id']).doNothing())
+          .executeTakeFirst();
 
-      if (!createdInteraction) {
-        return false;
-      }
+        if (!createdInteraction) {
+          return { createdInteraction: undefined };
+        }
 
-      await tx
-        .insertInto('interaction_events')
-        .values({
-          node_id: nodeId,
-          node_type: nodeType,
-          attribute,
-          value,
-          created_at: new Date().toISOString(),
-          event_id: generateId(IdType.Event),
-        })
-        .onConflict((b) =>
-          b.columns(['node_id', 'attribute']).doUpdateSet({
+        await tx
+          .insertInto('interaction_events')
+          .values({
+            node_id: nodeId,
+            node_type: nodeType,
+            attribute,
             value,
-            sent_at: null,
+            created_at: new Date().toISOString(),
             event_id: generateId(IdType.Event),
           })
-        )
-        .execute();
+          .onConflict((b) =>
+            b.columns(['node_id', 'attribute']).doUpdateSet({
+              value,
+              sent_at: null,
+              event_id: generateId(IdType.Event),
+            })
+          )
+          .execute();
 
-      return true;
-    });
+        return { createdInteraction };
+      });
 
-    if (result) {
+    if (createdInteraction) {
+      eventBus.publish({
+        type: 'interaction_updated',
+        userId,
+        interaction: mapInteraction(createdInteraction),
+      });
+
       eventBus.publish({
         type: 'interaction_event_created',
         userId,
         nodeId,
       });
+
+      return true;
     }
 
-    return result;
+    return false;
   }
 
   public async applyServerInteraction(
@@ -201,8 +220,9 @@ class InteractionService {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
-    await workspaceDatabase
+    const createdInteraction = await workspaceDatabase
       .insertInto('interactions')
+      .returningAll()
       .values({
         user_id: interaction.userId,
         node_id: interaction.nodeId,
@@ -222,7 +242,17 @@ class InteractionService {
           version: BigInt(interaction.version),
         })
       )
-      .execute();
+      .executeTakeFirst();
+
+    if (createdInteraction) {
+      eventBus.publish({
+        type: 'interaction_updated',
+        userId,
+        interaction: mapInteraction(createdInteraction),
+      });
+    }
+
+    return createdInteraction;
   }
 
   private async tryApplyServerInteraction(
@@ -250,7 +280,7 @@ class InteractionService {
     );
 
     if (existingInteraction) {
-      const result = await workspaceDatabase
+      const { updatedInteraction } = await workspaceDatabase
         .transaction()
         .execute(async (tx) => {
           const updatedInteraction = await tx
@@ -268,7 +298,7 @@ class InteractionService {
             .executeTakeFirst();
 
           if (!updatedInteraction) {
-            return false;
+            return { updatedInteraction: undefined };
           }
 
           if (toDeleteEventIds.length > 0) {
@@ -279,46 +309,68 @@ class InteractionService {
               .execute();
           }
 
-          return true;
+          return { updatedInteraction };
         });
 
-      return result;
+      if (updatedInteraction) {
+        eventBus.publish({
+          type: 'interaction_updated',
+          userId,
+          interaction: mapInteraction(updatedInteraction),
+        });
+
+        return true;
+      }
+
+      return false;
     }
 
-    const result = await workspaceDatabase.transaction().execute(async (tx) => {
-      const createdInteraction = await tx
-        .insertInto('interactions')
-        .returningAll()
-        .values({
-          user_id: interaction.userId,
-          node_id: interaction.nodeId,
-          node_type: interaction.nodeType,
-          attributes: JSON.stringify(attributes),
-          created_at: interaction.createdAt,
-          updated_at: interaction.updatedAt,
-          server_created_at: interaction.serverCreatedAt,
-          server_updated_at: interaction.serverUpdatedAt,
-          version: BigInt(interaction.version),
-        })
-        .onConflict((b) => b.columns(['node_id', 'user_id']).doNothing())
-        .executeTakeFirst();
+    const { createdInteraction } = await workspaceDatabase
+      .transaction()
+      .execute(async (tx) => {
+        const createdInteraction = await tx
+          .insertInto('interactions')
+          .returningAll()
+          .values({
+            user_id: interaction.userId,
+            node_id: interaction.nodeId,
+            node_type: interaction.nodeType,
+            attributes: JSON.stringify(attributes),
+            created_at: interaction.createdAt,
+            updated_at: interaction.updatedAt,
+            server_created_at: interaction.serverCreatedAt,
+            server_updated_at: interaction.serverUpdatedAt,
+            version: BigInt(interaction.version),
+          })
+          .onConflict((b) => b.columns(['node_id', 'user_id']).doNothing())
+          .executeTakeFirst();
 
-      if (!createdInteraction) {
-        return false;
-      }
+        if (!createdInteraction) {
+          return { createdInteraction: undefined };
+        }
 
-      if (toDeleteEventIds.length > 0) {
-        await tx
-          .deleteFrom('interaction_events')
-          .where('node_id', '=', interaction.nodeId)
-          .where('event_id', 'in', toDeleteEventIds)
-          .execute();
-      }
+        if (toDeleteEventIds.length > 0) {
+          await tx
+            .deleteFrom('interaction_events')
+            .where('node_id', '=', interaction.nodeId)
+            .where('event_id', 'in', toDeleteEventIds)
+            .execute();
+        }
+
+        return { createdInteraction };
+      });
+
+    if (createdInteraction) {
+      eventBus.publish({
+        type: 'interaction_updated',
+        userId,
+        interaction: mapInteraction(createdInteraction),
+      });
 
       return true;
-    });
+    }
 
-    return result;
+    return false;
   }
 
   private mergeServerAttributes(
