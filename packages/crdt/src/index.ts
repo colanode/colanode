@@ -346,7 +346,6 @@ export class YDoc {
           index += diff.value.length;
         } else if (diff.removed) {
           yText.delete(index, diff.value.length);
-          index -= diff.value.length;
         } else {
           index += diff.value.length;
         }
