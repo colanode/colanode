@@ -746,8 +746,17 @@ class SyncService {
 
     const workspace = await databaseService.appDatabase
       .selectFrom('workspaces')
-      .select(['user_id', 'workspace_id', 'account_id'])
-      .where('user_id', '=', userId)
+      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
+      .innerJoin('servers', 'accounts.server', 'servers.domain')
+      .select([
+        'workspaces.workspace_id',
+        'workspaces.user_id',
+        'workspaces.account_id',
+        'accounts.token',
+        'servers.domain',
+        'servers.attributes',
+      ])
+      .where('workspaces.user_id', '=', userId)
       .executeTakeFirst();
 
     if (!workspace) {
@@ -757,7 +766,15 @@ class SyncService {
       return;
     }
 
+    if (!serverService.isAvailable(workspace.domain)) {
+      this.logger.trace(
+        `Server ${workspace.domain} is not available, skipping sending local pending interactions`
+      );
+      return;
+    }
+
     const cutoff = new Date(Date.now() - 1000 * 60 * 5).toISOString();
+    let cursor = '0';
     let hasMore = true;
 
     while (hasMore) {
@@ -767,6 +784,7 @@ class SyncService {
         .where((eb) =>
           eb.or([eb('sent_at', 'is', null), eb('sent_at', '<', cutoff)])
         )
+        .where('event_id', '>', cursor)
         .limit(50)
         .execute();
 
@@ -788,6 +806,8 @@ class SyncService {
           ...(groupedByNodeId[event.node_id] ?? []),
           event,
         ];
+
+        cursor = event.event_id;
       }
 
       const sentEventIds: string[] = [];
