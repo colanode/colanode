@@ -1,5 +1,4 @@
 import { MutationInput } from '@/shared/mutations';
-
 import { MutationMap } from '@/shared/mutations';
 import { mutationHandlerMap } from '@/main/mutations';
 import { MutationHandler } from '@/main/types';
@@ -15,10 +14,9 @@ class MutationService {
       input.type
     ] as unknown as MutationHandler<T>;
 
-    this.logger.debug(`Executing mutation: ${input.type}`);
+    this.logger.trace(`Executing mutation: ${input.type}`);
 
     if (!handler) {
-      this.logger.warn(`No handler found for mutation type: ${input.type}`);
       throw new Error(`No handler found for mutation type: ${input.type}`);
     }
 

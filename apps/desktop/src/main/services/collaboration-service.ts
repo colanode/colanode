@@ -4,12 +4,19 @@ import {
 } from '@colanode/core';
 import { databaseService } from '@/main/data/database-service';
 import { eventBus } from '@/shared/lib/event-bus';
+import { createLogger } from '@/main/logger';
 
 class CollaborationService {
+  private readonly logger = createLogger('collaboration-service');
+
   public async applyServerCollaboration(
     userId: string,
     collaboration: ServerCollaboration
   ) {
+    this.logger.trace(
+      `Applying server collaboration: ${collaboration.nodeId} for user ${userId}`
+    );
+
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
@@ -47,6 +54,10 @@ class CollaborationService {
     userId: string,
     revocation: ServerCollaborationRevocation
   ) {
+    this.logger.trace(
+      `Applying server collaboration revocation: ${revocation.nodeId} for user ${userId}`
+    );
+
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 

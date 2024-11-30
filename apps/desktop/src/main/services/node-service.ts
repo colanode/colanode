@@ -1,3 +1,4 @@
+import { sql } from 'kysely';
 import {
   Node,
   NodeAttributes,
@@ -28,8 +29,8 @@ import {
 } from '@/main/data/workspace/schema';
 import { eventBus } from '@/shared/lib/event-bus';
 import { SelectWorkspace } from '@/main/data/app/schema';
-import { sql } from 'kysely';
 import { interactionService } from '@/main/services/interaction-service';
+import { createLogger } from '@/main/logger';
 
 export type CreateNodeInput = {
   id: string;
@@ -39,6 +40,8 @@ export type CreateNodeInput = {
 };
 
 class NodeService {
+  private readonly logger = createLogger('node-service');
+
   public async fetchNode(nodeId: string, userId: string): Promise<Node | null> {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
@@ -60,6 +63,7 @@ class NodeService {
     userId: string,
     input: CreateNodeInput | CreateNodeInput[]
   ) {
+    this.logger.trace(`Creating ${Array.isArray(input) ? 'nodes' : 'node'}`);
     const workspace = await this.fetchWorkspace(userId);
 
     const inputs = Array.isArray(input) ? input : [input];
@@ -179,6 +183,10 @@ class NodeService {
     });
 
     for (const createdNode of createdNodes) {
+      this.logger.trace(
+        `Created node ${createdNode.id} with type ${createdNode.type}`
+      );
+
       eventBus.publish({
         type: 'node_created',
         userId,
@@ -187,6 +195,10 @@ class NodeService {
     }
 
     for (const createdTransaction of createdNodeTransactions) {
+      this.logger.trace(
+        `Created transaction ${createdTransaction.id} for node ${createdTransaction.node_id} with operation ${createdTransaction.operation}`
+      );
+
       eventBus.publish({
         type: 'node_transaction_created',
         userId,
@@ -203,6 +215,10 @@ class NodeService {
     }
 
     for (const createdUpload of createdUploads) {
+      this.logger.trace(
+        `Created upload ${createdUpload.upload_id} for node ${createdUpload.node_id}`
+      );
+
       eventBus.publish({
         type: 'upload_created',
         userId,
@@ -211,6 +227,10 @@ class NodeService {
     }
 
     for (const createdDownload of createdDownloads) {
+      this.logger.trace(
+        `Created download ${createdDownload.upload_id} for node ${createdDownload.node_id}`
+      );
+
       eventBus.publish({
         type: 'download_created',
         userId,
@@ -240,6 +260,8 @@ class NodeService {
     userId: string,
     updater: (attributes: NodeAttributes) => NodeAttributes
   ): Promise<boolean> {
+    this.logger.trace(`Updating node ${nodeId}`);
+
     const workspace = await this.fetchWorkspace(userId);
 
     const workspaceDatabase =
@@ -339,14 +361,24 @@ class NodeService {
       });
 
     if (updatedNode) {
+      this.logger.trace(
+        `Updated node ${updatedNode.id} with type ${updatedNode.type}`
+      );
+
       eventBus.publish({
         type: 'node_updated',
         userId,
         node: mapNode(updatedNode),
       });
+    } else {
+      this.logger.trace(`Failed to update node ${nodeId}`);
     }
 
     if (createdTransaction) {
+      this.logger.trace(
+        `Created transaction ${createdTransaction.id} for node ${nodeId}`
+      );
+
       eventBus.publish({
         type: 'node_transaction_created',
         userId,
@@ -360,6 +392,8 @@ class NodeService {
         'lastReceivedTransactionId',
         createdTransaction.id
       );
+    } else {
+      this.logger.trace(`Failed to create transaction for node ${nodeId}`);
     }
 
     return updatedNode !== undefined;
@@ -429,19 +463,31 @@ class NodeService {
       });
 
     if (deletedNode) {
+      this.logger.trace(
+        `Deleted node ${deletedNode.id} with type ${deletedNode.type}`
+      );
+
       eventBus.publish({
         type: 'node_deleted',
         userId,
         node: mapNode(deletedNode),
       });
+    } else {
+      this.logger.trace(`Failed to delete node ${nodeId}`);
     }
 
     if (createdTransaction) {
+      this.logger.trace(
+        `Created transaction ${createdTransaction.id} for node ${nodeId}`
+      );
+
       eventBus.publish({
         type: 'node_transaction_created',
         userId,
         transaction: mapTransaction(createdTransaction),
       });
+    } else {
+      this.logger.trace(`Failed to create transaction for node ${nodeId}`);
     }
   }
 
@@ -552,6 +598,10 @@ class NodeService {
     userId: string,
     transaction: ServerNodeCreateTransaction
   ) {
+    this.logger.trace(
+      `Applying server create transaction ${transaction.id} for node ${transaction.nodeId}`
+    );
+
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
@@ -568,6 +618,9 @@ class NodeService {
         existingTransaction.version === version &&
         existingTransaction.server_created_at === transaction.serverCreatedAt
       ) {
+        this.logger.trace(
+          `Server create transaction ${transaction.id} for node ${transaction.nodeId} is already synced`
+        );
         return;
       }
 
@@ -581,6 +634,9 @@ class NodeService {
         .where('id', '=', transaction.id)
         .execute();
 
+      this.logger.trace(
+        `Server create transaction ${transaction.id} for node ${transaction.nodeId} has been synced`
+      );
       return;
     }
 
@@ -625,6 +681,10 @@ class NodeService {
       });
 
     if (createdNode) {
+      this.logger.trace(
+        `Created node ${createdNode.id} with type ${createdNode.type} with transaction ${transaction.id}`
+      );
+
       eventBus.publish({
         type: 'node_created',
         userId,
@@ -639,6 +699,10 @@ class NodeService {
         transaction.id
       );
     } else {
+      this.logger.trace(
+        `Server create transaction ${transaction.id} for node ${transaction.nodeId} is incomplete`
+      );
+
       eventBus.publish({
         type: 'node_transaction_incomplete',
         userId,
@@ -667,6 +731,9 @@ class NodeService {
         existingTransaction.version === version &&
         existingTransaction.server_created_at === transaction.serverCreatedAt
       ) {
+        this.logger.trace(
+          `Server update transaction ${transaction.id} for node ${transaction.nodeId} is already synced`
+        );
         return;
       }
 
@@ -680,6 +747,9 @@ class NodeService {
         .where('id', '=', transaction.id)
         .execute();
 
+      this.logger.trace(
+        `Server update transaction ${transaction.id} for node ${transaction.nodeId} has been synced`
+      );
       return;
     }
 
@@ -737,6 +807,10 @@ class NodeService {
       });
 
     if (updatedNode) {
+      this.logger.trace(
+        `Updated node ${updatedNode.id} with type ${updatedNode.type} with transaction ${transaction.id}`
+      );
+
       eventBus.publish({
         type: 'node_updated',
         userId,
@@ -751,6 +825,10 @@ class NodeService {
         transaction.id
       );
     } else {
+      this.logger.trace(
+        `Server update transaction ${transaction.id} for node ${transaction.nodeId} is incomplete`
+      );
+
       eventBus.publish({
         type: 'node_transaction_incomplete',
         userId,
@@ -763,6 +841,10 @@ class NodeService {
     userId: string,
     transaction: ServerNodeDeleteTransaction
   ) {
+    this.logger.trace(
+      `Applying server delete transaction ${transaction.id} for node ${transaction.nodeId}`
+    );
+
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
@@ -794,6 +876,10 @@ class NodeService {
       });
 
     if (result) {
+      this.logger.trace(
+        `Deleted node ${result.id} with type ${result.type} with transaction ${transaction.id}`
+      );
+
       eventBus.publish({
         type: 'node_deleted',
         userId,

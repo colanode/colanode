@@ -139,7 +139,7 @@ class FileService {
   }
 
   public async syncFiles() {
-    this.logger.info('Syncing files');
+    this.logger.debug('Syncing files');
 
     const workspaces = await databaseService.appDatabase
       .selectFrom('workspaces')

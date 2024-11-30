@@ -4,8 +4,11 @@ import { Message } from '@colanode/core';
 import { SelectAccount } from '@/main/data/app/schema';
 import { syncService } from '@/main/services/sync-service';
 import { eventBus } from '@/shared/lib/event-bus';
+import { createLogger } from '@/main/logger';
 
 export class SocketConnection {
+  private readonly logger = createLogger('socket-connection');
+
   private readonly synapseUrl: string;
   private readonly account: SelectAccount;
   private socket: WebSocket | null;
@@ -21,6 +24,10 @@ export class SocketConnection {
   }
 
   public init(): void {
+    this.logger.trace(
+      `Initializing socket connection for account ${this.account.id}`
+    );
+
     if (this.isConnected()) {
       return;
     }
@@ -47,6 +54,10 @@ export class SocketConnection {
         return;
       }
       const message: Message = JSON.parse(data);
+      this.logger.trace(
+        `Received message of type ${message.type} for account ${this.account.id}`
+      );
+
       if (message.type === 'node_transactions_batch') {
         syncService.syncServerTransactions(message);
       } else if (message.type === 'collaboration_revocations_batch') {
@@ -59,6 +70,10 @@ export class SocketConnection {
     };
 
     this.socket.onopen = () => {
+      this.logger.trace(
+        `Socket connection for account ${this.account.id} opened`
+      );
+
       this.backoffCalculator.reset();
       eventBus.publish({
         type: 'socket_connection_opened',
@@ -67,10 +82,18 @@ export class SocketConnection {
     };
 
     this.socket.onerror = () => {
+      this.logger.trace(
+        `Socket connection for account ${this.account.id} errored`
+      );
+
       this.backoffCalculator.increaseError();
     };
 
     this.socket.onclose = () => {
+      this.logger.trace(
+        `Socket connection for account ${this.account.id} closed`
+      );
+
       this.backoffCalculator.increaseError();
     };
   }
@@ -81,6 +104,10 @@ export class SocketConnection {
 
   public sendMessage(message: Message): boolean {
     if (this.socket && this.isConnected()) {
+      this.logger.trace(
+        `Sending message of type ${message.type} for account ${this.account.id}`
+      );
+
       this.socket.send(JSON.stringify(message));
       return true;
     }
@@ -90,6 +117,10 @@ export class SocketConnection {
 
   public close(): void {
     if (this.socket) {
+      this.logger.trace(
+        `Closing socket connection for account ${this.account.id}`
+      );
+
       this.socket.close();
     }
   }

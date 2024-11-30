@@ -28,12 +28,11 @@ class QueryService {
   public async executeQuery<T extends QueryInput>(
     input: T
   ): Promise<QueryMap[T['type']]['output']> {
-    this.logger.debug(`Executing query: ${input.type}`);
+    this.logger.trace(`Executing query: ${input.type}`);
 
     const handler = queryHandlerMap[input.type] as unknown as QueryHandler<T>;
 
     if (!handler) {
-      this.logger.warn(`No handler found for query type: ${input.type}`);
       throw new Error(`No handler found for query type: ${input.type}`);
     }
 
@@ -53,7 +52,6 @@ class QueryService {
 
     const handler = queryHandlerMap[input.type] as unknown as QueryHandler<T>;
     if (!handler) {
-      this.logger.warn(`No handler found for query type: ${input.type}`);
       throw new Error(`No handler found for query type: ${input.type}`);
     }
 

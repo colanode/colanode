@@ -17,7 +17,7 @@ class AccountService {
   private readonly logger = createLogger('account-service');
 
   async syncAccounts() {
-    this.logger.info('Syncing accounts');
+    this.logger.debug('Syncing all accounts');
 
     const accounts = await databaseService.appDatabase
       .selectFrom('accounts')
@@ -32,7 +32,7 @@ class AccountService {
   }
 
   private async syncAccount(account: SelectAccount) {
-    this.logger.debug(`Syncing account ${account.email}`);
+    this.logger.trace(`Syncing account ${account.email}`);
 
     const server = await databaseService.appDatabase
       .selectFrom('servers')
@@ -48,7 +48,7 @@ class AccountService {
     }
 
     if (!serverService.isAvailable(server.domain)) {
-      this.logger.debug(
+      this.logger.trace(
         `Server ${server.domain} is not available for syncing account ${account.email}`
       );
       return;
@@ -61,6 +61,8 @@ class AccountService {
         token: account.token,
       }
     );
+
+    this.logger.trace(`Account sync response status code: ${status}`);
 
     if (status >= 400 && status < 500) {
       this.logger.info(`Account ${account.email} is not valid, logging out...`);
@@ -91,6 +93,8 @@ class AccountService {
     if (!updatedAccount) {
       this.logger.warn(`Failed to update account ${account.email} after sync`);
       return;
+    } else {
+      this.logger.trace(`Updated account ${account.email} after sync`);
     }
 
     eventBus.publish({
@@ -125,6 +129,10 @@ class AccountService {
             `Failed to create workspace ${workspace.id} for account ${account.email}`
           );
           return;
+        } else {
+          this.logger.trace(
+            `Created workspace ${workspace.id} for account ${account.email} after sync`
+          );
         }
 
         eventBus.publish({
@@ -151,6 +159,10 @@ class AccountService {
             `Failed to update workspace ${currentWorkspace.user_id} for account ${account.email}`
           );
           return;
+        } else {
+          this.logger.trace(
+            `Updated workspace ${currentWorkspace.user_id} for account ${account.email} after sync`
+          );
         }
 
         eventBus.publish({
@@ -172,6 +184,8 @@ class AccountService {
   }
 
   public async logoutAccount(account: SelectAccount): Promise<boolean> {
+    this.logger.debug(`Logging out account ${account.email}`);
+
     const workspaces = await databaseService.appDatabase
       .selectFrom('workspaces')
       .select(['user_id'])
@@ -194,7 +208,10 @@ class AccountService {
       .executeTakeFirst();
 
     if (!deletedAccount) {
+      this.logger.warn(`Failed to delete account ${account.email}`);
       return false;
+    } else {
+      this.logger.trace(`Deleted account ${account.email}`);
     }
 
     eventBus.publish({
@@ -216,7 +233,7 @@ class AccountService {
   }
 
   public async syncDeletedTokens() {
-    this.logger.info('Syncing deleted tokens');
+    this.logger.debug('Syncing deleted tokens');
 
     const deletedTokens = await databaseService.appDatabase
       .selectFrom('deleted_tokens')
@@ -247,6 +264,10 @@ class AccountService {
           domain: deletedToken.domain,
           token: deletedToken.token,
         });
+
+        this.logger.trace(
+          `Deleted token logout response status code: ${status}`
+        );
 
         if (status !== 200) {
           return;
@@ -281,6 +302,8 @@ class AccountService {
     if (!deletedWorkspace) {
       this.logger.warn(`Failed to delete workspace ${userId}`);
       return false;
+    } else {
+      this.logger.trace(`Deleted workspace ${userId}`);
     }
 
     await databaseService.deleteWorkspaceDatabase(userId);
@@ -288,6 +311,7 @@ class AccountService {
     if (fs.existsSync(workspaceDir)) {
       fs.rmSync(workspaceDir, { recursive: true });
     }
+    this.logger.trace(`Deleted workspace directory ${workspaceDir}`);
 
     eventBus.publish({
       type: 'workspace_deleted',

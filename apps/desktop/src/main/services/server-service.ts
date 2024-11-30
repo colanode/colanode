@@ -18,6 +18,8 @@ class ServerService {
   private readonly logger = createLogger('server-service');
 
   public async syncServers() {
+    this.logger.trace('Syncing servers');
+
     const rows = await databaseService.appDatabase
       .selectFrom('servers')
       .selectAll()
@@ -57,7 +59,7 @@ class ServerService {
       });
     }
 
-    this.logger.info(
+    this.logger.trace(
       `Server ${server.domain} is ${isAvailable ? 'available' : 'unavailable'}`
     );
 
@@ -85,6 +87,8 @@ class ServerService {
   }
 
   public async fetchServerConfig(domain: string) {
+    this.logger.trace(`Fetching server config for ${domain}`);
+
     const baseUrl = this.buildApiBaseUrl(domain);
     const configUrl = `${baseUrl}/v1/config`;
     try {

@@ -10,14 +10,13 @@ class CommandService {
   public async executeCommand<T extends CommandInput>(
     input: T
   ): Promise<CommandMap[T['type']]['output']> {
-    this.logger.debug(`Executing command: ${input.type}`);
+    this.logger.trace(`Executing command: ${input.type}`);
 
     const handler = commandHandlerMap[
       input.type
     ] as unknown as CommandHandler<T>;
 
     if (!handler) {
-      this.logger.warn(`No handler found for command type: ${input.type}`);
       throw new Error(`No handler found for command type: ${input.type}`);
     }
 
