@@ -15,7 +15,7 @@ import { CommandInput } from '@/shared/commands';
 import { commandService } from '@/main/services/command-service';
 import { bootstrapper } from '@/main/bootstrapper';
 import started from 'electron-squirrel-startup';
-import { createLogger } from '@/main/logger';
+import { closeLoggers, createLogger } from '@/main/logger';
 import { getAppIconPath } from '@/main/utils';
 
 const logger = createLogger('main');
@@ -110,6 +110,10 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
+});
+
+app.on('before-quit', () => {
+  closeLoggers();
 });
 
 // In this file you can include the rest of your app's specific main process
