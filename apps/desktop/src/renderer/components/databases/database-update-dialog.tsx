@@ -1,4 +1,6 @@
-import { useWorkspace } from '@/renderer/contexts/workspace';
+import { DatabaseNode, hasEditorAccess, NodeRole } from '@colanode/core';
+
+import { DatabaseForm } from '@/renderer/components/databases/database-form';
 import {
   Dialog,
   DialogContent,
@@ -6,10 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { DatabaseNode, hasEditorAccess, NodeRole } from '@colanode/core';
 import { toast } from '@/renderer/hooks/use-toast';
-import { DatabaseForm } from './database-form';
 
 interface DatabaseUpdateDialogProps {
   database: DatabaseNode;

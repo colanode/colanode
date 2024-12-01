@@ -1,12 +1,13 @@
 import React from 'react';
-import { ViewTabs } from '@/renderer/components/databases/view-tabs';
-import { useDatabase } from '@/renderer/contexts/database';
+
 import { BoardViewColumn } from '@/renderer/components/databases/boards/board-view-column';
+import { BoardViewSettings } from '@/renderer/components/databases/boards/board-view-settings';
+import { ViewFilterButton } from '@/renderer/components/databases/search/view-filter-button';
 import { ViewSearchBar } from '@/renderer/components/databases/search/view-search-bar';
 import { ViewSortButton } from '@/renderer/components/databases/search/view-sort-button';
-import { ViewFilterButton } from '@/renderer/components/databases/search/view-filter-button';
+import { ViewTabs } from '@/renderer/components/databases/view-tabs';
+import { useDatabase } from '@/renderer/contexts/database';
 import { useView } from '@/renderer/contexts/view';
-import { BoardViewSettings } from '@/renderer/components/databases/boards/board-view-settings';
 
 export const BoardView = () => {
   const database = useDatabase();

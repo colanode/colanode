@@ -1,24 +1,25 @@
+import { MessageNode } from '@colanode/core';
+import { JSONContent } from '@tiptap/core';
+import { Plus, Search, Send, Upload } from 'lucide-react';
 import React from 'react';
+
 import {
   MessageEditor,
   MessageEditorRefProps,
 } from '@/renderer/components/messages/message-editor';
-import { useMutation } from '@/renderer/hooks/use-mutation';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { MessageNode } from '@colanode/core';
-import { editorHasContent } from '@/shared/lib/editor';
-import { useConversation } from '@/renderer/contexts/conversation';
 import { MessageReplyBanner } from '@/renderer/components/messages/message-reply-banner';
-import { JSONContent } from '@tiptap/core';
-import { Spinner } from '@/renderer/components/ui/spinner';
-import { Send, Plus, Search, Upload } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
+import { Spinner } from '@/renderer/components/ui/spinner';
+import { useConversation } from '@/renderer/contexts/conversation';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
+import { editorHasContent } from '@/shared/lib/editor';
 
 export interface MessageCreateRefProps {
   setReplyTo: (replyTo: MessageNode) => void;

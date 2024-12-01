@@ -1,4 +1,3 @@
-import { database } from '@/data/database';
 import {
   generateId,
   IdType,
@@ -7,9 +6,11 @@ import {
   WorkspaceStatus,
   WorkspaceUserStatus,
 } from '@colanode/core';
-import { nodeService } from './node-service';
-import { mapNode } from '@/lib/nodes';
+
+import { database } from '@/data/database';
 import { SelectAccount } from '@/data/schema';
+import { mapNode } from '@/lib/nodes';
+import { nodeService } from '@/services/node-service';
 
 class WorkspaceService {
   public async createWorkspace(

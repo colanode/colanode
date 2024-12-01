@@ -1,10 +1,10 @@
 import {
-  ZodType,
-  ZodTypeDef,
-  ParseInput,
-  ParseReturnType,
   INVALID,
   OK,
+  ParseInput,
+  ParseReturnType,
+  ZodType,
+  ZodTypeDef,
 } from 'zod';
 
 export class ZodText extends ZodType<string, ZodTypeDef, string> {

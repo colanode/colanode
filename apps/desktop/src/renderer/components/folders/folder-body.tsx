@@ -1,6 +1,15 @@
-import React from 'react';
 import { FolderNode } from '@colanode/core';
-import { Dropzone } from '@/renderer/components/ui/dropzone';
+import {
+  Check,
+  Filter,
+  GalleryVertical,
+  LayoutGrid,
+  List,
+  Upload,
+} from 'lucide-react';
+import React from 'react';
+
+import { FolderFiles } from '@/renderer/components/folders/folder-files';
 import { Button } from '@/renderer/components/ui/button';
 import {
   DropdownMenu,
@@ -10,19 +19,11 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { FolderLayoutType } from '@/shared/types/folders';
+import { Dropzone } from '@/renderer/components/ui/dropzone';
 import { ScrollArea } from '@/renderer/components/ui/scroll-area';
-import { useMutation } from '@/renderer/hooks/use-mutation';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { FolderFiles } from '@/renderer/components/folders/folder-files';
-import {
-  Check,
-  Filter,
-  GalleryVertical,
-  LayoutGrid,
-  List,
-  Upload,
-} from 'lucide-react';
+import { useMutation } from '@/renderer/hooks/use-mutation';
+import { FolderLayoutType } from '@/shared/types/folders';
 
 export type FolderLayout = {
   value: FolderLayoutType;

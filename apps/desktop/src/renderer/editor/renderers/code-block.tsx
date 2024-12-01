@@ -1,8 +1,9 @@
-import React from 'react';
-import { defaultClasses } from '@/renderer/editor/classes';
-import { highlightCode, languages } from '@/shared/lib/lowlight';
 import { JSONContent } from '@tiptap/core';
 import { Clipboard } from 'lucide-react';
+import React from 'react';
+
+import { defaultClasses } from '@/renderer/editor/classes';
+import { highlightCode, languages } from '@/shared/lib/lowlight';
 
 interface CodeBlockRendererProps {
   node: JSONContent;

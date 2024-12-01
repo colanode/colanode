@@ -1,6 +1,7 @@
-import React from 'react';
-import { ViewCreateDialog } from '@/renderer/components/databases/view-create-dialog';
 import { Plus } from 'lucide-react';
+import React from 'react';
+
+import { ViewCreateDialog } from '@/renderer/components/databases/view-create-dialog';
 
 export const ViewCreateButton = () => {
   const [open, setOpen] = React.useState(false);

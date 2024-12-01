@@ -1,8 +1,8 @@
-import { TableViewRow } from '@/renderer/components/databases/tables/table-view-row';
 import { TableViewEmptyPlaceholder } from '@/renderer/components/databases/tables/table-view-empty-placeholder';
 import { TableViewLoadMoreRow } from '@/renderer/components/databases/tables/table-view-load-more-row';
-import { useRecordsQuery } from '@/renderer/hooks/user-records-query';
+import { TableViewRow } from '@/renderer/components/databases/tables/table-view-row';
 import { useView } from '@/renderer/contexts/view';
+import { useRecordsQuery } from '@/renderer/hooks/user-records-query';
 
 export const TableViewBody = () => {
   const view = useView();

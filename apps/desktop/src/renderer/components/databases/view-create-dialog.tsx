@@ -1,4 +1,12 @@
+import { FieldAttributes, FieldType } from '@colanode/core';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Calendar, Columns, Table } from 'lucide-react';
 import React from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { FieldSelect } from '@/renderer/components/databases/fields/field-select';
+import { Button } from '@/renderer/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -7,7 +15,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
-import { z } from 'zod';
 import {
   Form,
   FormControl,
@@ -17,18 +24,12 @@ import {
   FormMessage,
 } from '@/renderer/components/ui/form';
 import { Input } from '@/renderer/components/ui/input';
-import { Button } from '@/renderer/components/ui/button';
 import { Spinner } from '@/renderer/components/ui/spinner';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { cn } from '@/shared/lib/utils';
 import { useDatabase } from '@/renderer/contexts/database';
-import { FieldSelect } from '@/renderer/components/databases/fields/field-select';
-import { toast } from '@/renderer/hooks/use-toast';
-import { useMutation } from '@/renderer/hooks/use-mutation';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { Calendar, Columns, Table } from 'lucide-react';
-import { FieldAttributes, FieldType } from '@colanode/core';
+import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
+import { cn } from '@/shared/lib/utils';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),

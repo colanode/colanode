@@ -1,9 +1,9 @@
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   PageUpdateMutationInput,
   PageUpdateMutationOutput,
 } from '@/shared/mutations/page-update';
-import { nodeService } from '@/main/services/node-service';
 
 export class PageUpdateMutationHandler
   implements MutationHandler<PageUpdateMutationInput>

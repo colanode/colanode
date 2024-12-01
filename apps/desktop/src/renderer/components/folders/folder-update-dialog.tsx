@@ -1,4 +1,6 @@
-import { useWorkspace } from '@/renderer/contexts/workspace';
+import { FolderNode, hasEditorAccess, NodeRole } from '@colanode/core';
+
+import { FolderForm } from '@/renderer/components/folders/folder-form';
 import {
   Dialog,
   DialogContent,
@@ -6,10 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { FolderNode, hasEditorAccess, NodeRole } from '@colanode/core';
 import { toast } from '@/renderer/hooks/use-toast';
-import { FolderForm } from '@/renderer/components/folders/folder-form';
 
 interface FolderUpdateDialogProps {
   folder: FolderNode;

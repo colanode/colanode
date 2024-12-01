@@ -1,31 +1,32 @@
-import { database } from '@/data/database';
-import { Server } from 'http';
-import { WebSocketServer, WebSocket } from 'ws';
-import { verifyToken } from '@/lib/tokens';
 import {
-  InteractionsBatchMessage,
   CollaborationRevocationsBatchMessage,
   CollaborationsBatchMessage,
+  InteractionsBatchMessage,
   Message,
   NodeTransactionsBatchMessage,
   NodeType,
 } from '@colanode/core';
-import { logService } from '@/services/log-service';
-import { interactionService } from '@/services/interaction-service';
-import {
-  mapInteraction,
-  mapCollaboration,
-  mapCollaborationRevocation,
-  mapNodeTransaction,
-} from '@/lib/nodes';
+import { WebSocket,WebSocketServer } from 'ws';
+import { Server } from 'http';
+
+import { database } from '@/data/database';
 import { eventBus } from '@/lib/event-bus';
 import {
+  mapCollaboration,
+  mapCollaborationRevocation,
+  mapInteraction,
+  mapNodeTransaction,
+} from '@/lib/nodes';
+import { verifyToken } from '@/lib/tokens';
+import { interactionService } from '@/services/interaction-service';
+import { logService } from '@/services/log-service';
+import {
+  CollaboratorAddedEvent,
   CollaboratorRemovedEvent,
   InteractionUpdatedEvent,
   NodeCreatedEvent,
-  NodeUpdatedEvent,
   NodeDeletedEvent,
-  CollaboratorAddedEvent,
+  NodeUpdatedEvent,
 } from '@/types/events';
 
 interface SynapseUserCursor {

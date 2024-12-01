@@ -1,10 +1,11 @@
 import { generateId, IdType, PageAttributes } from '@colanode/core';
+
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   PageCreateMutationInput,
   PageCreateMutationOutput,
 } from '@/shared/mutations/page-create';
-import { nodeService } from '@/main/services/node-service';
 
 export class PageCreateMutationHandler
   implements MutationHandler<PageCreateMutationInput>

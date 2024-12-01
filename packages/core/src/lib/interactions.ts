@@ -1,8 +1,8 @@
+import { compareDate, compareString } from './utils';
 import {
   InteractionAttribute,
   InteractionAttributes,
 } from '../types/interactions';
-import { compareDate, compareString } from './utils';
 
 export const mergeInteractionAttributes = (
   attributes: InteractionAttributes | null | undefined,

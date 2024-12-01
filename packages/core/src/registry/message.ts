@@ -1,7 +1,8 @@
-import { z } from 'zod';
-import { CollaborationModel, NodeModel } from './core';
-import { blockSchema } from './block';
 import { isEqual } from 'lodash-es';
+import { z } from 'zod';
+
+import { blockSchema } from './block';
+import { CollaborationModel, NodeModel } from './core';
 
 const standardMessageAttributesSchema = z.object({
   type: z.literal('message'),

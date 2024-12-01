@@ -1,9 +1,10 @@
 import { FileNode } from '@colanode/core';
-import { Button } from '@/renderer/components/ui/button';
-import { useWorkspace } from '@/renderer/contexts/workspace';
 import { SquareArrowOutUpRight } from 'lucide-react';
+
 import { FilePreview } from '@/renderer/components/files/file-preview';
 import { FileSidebar } from '@/renderer/components/files/file-sidebar';
+import { Button } from '@/renderer/components/ui/button';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 
 interface FileBodyProps {
   file: FileNode;

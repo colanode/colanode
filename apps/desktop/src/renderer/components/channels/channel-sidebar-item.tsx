@@ -1,9 +1,10 @@
-import { cn } from '@/shared/lib/utils';
 import { ChannelNode } from '@colanode/core';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { useRadar } from '@/renderer/contexts/radar';
 import { ReadStateIndicator } from '@/renderer/components/layouts/read-state-indicator';
+import { useRadar } from '@/renderer/contexts/radar';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { cn } from '@/shared/lib/utils';
 
 interface ChannelSidebarItemProps {
   node: ChannelNode;

@@ -1,8 +1,9 @@
+import { extractNodeRole } from '@colanode/core';
+
+import { PageBody } from '@/renderer/components/pages/page-body';
+import { PageHeader } from '@/renderer/components/pages/page-header';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { extractNodeRole } from '@colanode/core';
-import { PageHeader } from '@/renderer/components/pages/page-header';
-import { PageBody } from '@/renderer/components/pages/page-body';
 
 interface PageContainerProps {
   nodeId: string;

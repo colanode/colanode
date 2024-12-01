@@ -1,11 +1,12 @@
+import { WorkspaceUserRoleUpdateOutput } from '@colanode/core';
+
 import { databaseService } from '@/main/data/database-service';
+import { MutationHandler } from '@/main/types';
 import { httpClient } from '@/shared/lib/http-client';
 import {
   WorkspaceUserRoleUpdateMutationInput,
   WorkspaceUserRoleUpdateMutationOutput,
 } from '@/shared/mutations/workspace-user-role-update';
-import { WorkspaceUserRoleUpdateOutput } from '@colanode/core';
-import { MutationHandler } from '@/main/types';
 
 export class WorkspaceUserRoleUpdateMutationHandler
   implements MutationHandler<WorkspaceUserRoleUpdateMutationInput>

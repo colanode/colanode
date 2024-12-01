@@ -1,5 +1,6 @@
-import { EditorCommand } from '@/shared/types/editor';
 import { List } from 'lucide-react';
+
+import { EditorCommand } from '@/shared/types/editor';
 
 export const BulletListCommand: EditorCommand = {
   key: 'bullet-list',

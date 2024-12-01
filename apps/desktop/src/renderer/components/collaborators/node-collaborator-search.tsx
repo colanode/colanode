@@ -1,9 +1,9 @@
+import { UserNode } from '@colanode/core';
+import { X } from 'lucide-react';
 import React from 'react';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/renderer/components/ui/popover';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
+import { Badge } from '@/renderer/components/ui/badge';
 import { Button } from '@/renderer/components/ui/button';
 import {
   Command,
@@ -13,12 +13,13 @@ import {
   CommandItem,
   CommandList,
 } from '@/renderer/components/ui/command';
-import { Badge } from '@/renderer/components/ui/badge';
-import { Avatar } from '@/renderer/components/avatars/avatar';
-import { useQuery } from '@/renderer/hooks/use-query';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/renderer/components/ui/popover';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { X } from 'lucide-react';
-import { UserNode } from '@colanode/core';
+import { useQuery } from '@/renderer/hooks/use-query';
 
 interface NodeCollaboratorSearchProps {
   excluded: string[];

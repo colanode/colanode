@@ -1,5 +1,6 @@
-import { EditorCommand } from '@/shared/types/editor';
 import { ListTodo } from 'lucide-react';
+
+import { EditorCommand } from '@/shared/types/editor';
 
 export const TodoCommand: EditorCommand = {
   key: 'todo',

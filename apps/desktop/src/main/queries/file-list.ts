@@ -1,10 +1,11 @@
-import { FileListQueryInput } from '@/shared/queries/file-list';
+import { compareString,FileNode } from '@colanode/core';
+
 import { databaseService } from '@/main/data/database-service';
-import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { FileNode, compareString } from '@colanode/core';
-import { Event } from '@/shared/types/events';
 import { SelectNode } from '@/main/data/workspace/schema';
+import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { mapNode } from '@/main/utils';
+import { FileListQueryInput } from '@/shared/queries/file-list';
+import { Event } from '@/shared/types/events';
 
 export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {
   public async handleQuery(input: FileListQueryInput): Promise<FileNode[]> {

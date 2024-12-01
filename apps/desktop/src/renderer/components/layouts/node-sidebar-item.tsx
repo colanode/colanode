@@ -1,11 +1,12 @@
-import React from 'react';
 import { Node } from '@colanode/core';
-import { SpaceSidebarItem } from '@/renderer/components/spaces/space-sidebar-item';
+import React from 'react';
+
 import { ChannelSidebarItem } from '@/renderer/components/channels/channel-sidebar-item';
 import { ChatSidebarItem } from '@/renderer/components/chats/chat-sidebar-item';
-import { PageSidebarItem } from '@/renderer/components/pages/page-sidebar-item';
 import { DatabaseSidebarItem } from '@/renderer/components/databases/database-sidiebar-item';
 import { FolderSidebarItem } from '@/renderer/components/folders/folder-sidebar-item';
+import { PageSidebarItem } from '@/renderer/components/pages/page-sidebar-item';
+import { SpaceSidebarItem } from '@/renderer/components/spaces/space-sidebar-item';
 
 interface NodeSidebarItemProps {
   node: Node;

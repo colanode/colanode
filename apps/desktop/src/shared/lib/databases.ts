@@ -1,17 +1,17 @@
 import {
-  FieldType,
+  compareString,
   FieldAttributes,
+  FieldType,
+  FieldValue,
+  generateNodeIndex,
+  isStringArray,
+  MultiSelectFieldAttributes,
+  RecordNode,
+  SelectFieldAttributes,
+  ViewFieldAttributes,
   ViewFieldFilterAttributes,
   ViewFilterAttributes,
-  ViewFieldAttributes,
-  RecordNode,
-  FieldValue,
-  MultiSelectFieldAttributes,
-  SelectFieldAttributes,
   ViewType,
-  generateNodeIndex,
-  compareString,
-  isStringArray,
 } from '@colanode/core';
 
 export const getDefaultFieldWidth = (type: FieldType): number => {

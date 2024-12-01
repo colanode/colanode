@@ -1,14 +1,15 @@
+import { Plus } from 'lucide-react';
+
+import { ViewSortAddPopover } from '@/renderer/components/databases/search/view-sort-add-popover';
+import { ViewSortRow } from '@/renderer/components/databases/search/view-sort-row';
+import { Button } from '@/renderer/components/ui/button';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
-import { Button } from '@/renderer/components/ui/button';
-import { ViewSortRow } from '@/renderer/components/databases/search/view-sort-row';
 import { useDatabase } from '@/renderer/contexts/database';
-import { ViewSortAddPopover } from '@/renderer/components/databases/search/view-sort-add-popover';
 import { useView } from '@/renderer/contexts/view';
-import { Plus } from 'lucide-react';
 
 export const ViewSorts = () => {
   const database = useDatabase();

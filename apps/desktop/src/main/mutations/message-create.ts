@@ -1,21 +1,22 @@
 import {
+  Block,
+  EditorNodeTypes,
+  extractFileType,
+  FileAttributes,
   generateId,
   IdType,
-  EditorNodeTypes,
-  NodeTypes,
-  extractFileType,
-  Block,
-  FileAttributes,
   MessageAttributes,
+  NodeTypes,
 } from '@colanode/core';
+
+import { fileService } from '@/main/services/file-service';
+import { CreateNodeInput, nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
+import { mapContentsToBlocks } from '@/shared/lib/editor';
 import {
   MessageCreateMutationInput,
   MessageCreateMutationOutput,
 } from '@/shared/mutations/message-create';
-import { mapContentsToBlocks } from '@/shared/lib/editor';
-import { fileService } from '@/main/services/file-service';
-import { CreateNodeInput, nodeService } from '@/main/services/node-service';
 
 export class MessageCreateMutationHandler
   implements MutationHandler<MessageCreateMutationInput>

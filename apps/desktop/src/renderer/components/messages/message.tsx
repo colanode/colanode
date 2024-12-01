@@ -1,14 +1,15 @@
-import { InView } from 'react-intersection-observer';
 import { MessageNode } from '@colanode/core';
-import { MessageReactions } from '@/renderer/components/messages/message-reactions';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { useRadar } from '@/renderer/contexts/radar';
+import { InView } from 'react-intersection-observer';
+
 import { MessageActions } from '@/renderer/components/messages/message-actions';
 import { MessageAuthorAvatar } from '@/renderer/components/messages/message-author-avatar';
 import { MessageAuthorName } from '@/renderer/components/messages/message-author-name';
 import { MessageContent } from '@/renderer/components/messages/message-content';
+import { MessageReactions } from '@/renderer/components/messages/message-reactions';
 import { MessageReference } from '@/renderer/components/messages/message-reference';
 import { MessageTime } from '@/renderer/components/messages/message-time';
+import { useRadar } from '@/renderer/contexts/radar';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 
 interface MessageProps {
   message: MessageNode;

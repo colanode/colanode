@@ -1,11 +1,12 @@
 import { type NodeViewProps } from '@tiptap/core';
-import { match } from 'ts-pattern';
 import { NodeViewWrapper } from '@tiptap/react';
-import { getFilePlaceholderUrl } from '@/shared/lib/files';
 import { X } from 'lucide-react';
+import { match } from 'ts-pattern';
+
 import { FilePreviewImage } from '@/renderer/components/files/previews/file-preview-image';
-import { FilePreviewVideo } from '@/renderer/components/files/previews/file-preview-video';
 import { FilePreviewOther } from '@/renderer/components/files/previews/file-preview-other';
+import { FilePreviewVideo } from '@/renderer/components/files/previews/file-preview-video';
+import { getFilePlaceholderUrl } from '@/shared/lib/files';
 
 export const FilePlaceholderNodeView = ({
   node,

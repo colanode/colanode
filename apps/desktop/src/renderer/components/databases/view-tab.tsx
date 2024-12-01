@@ -1,6 +1,7 @@
-import { cn } from '@/shared/lib/utils';
 import { ViewAttributes } from '@colanode/core';
+
 import { ViewIcon } from '@/renderer/components/databases/view-icon';
+import { cn } from '@/shared/lib/utils';
 
 interface ViewTabProps {
   view: ViewAttributes;

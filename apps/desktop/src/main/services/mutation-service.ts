@@ -1,7 +1,7 @@
-import { MutationInput, MutationMap } from '@/shared/mutations';
+import { createLogger } from '@/main/logger';
 import { mutationHandlerMap } from '@/main/mutations';
 import { MutationHandler } from '@/main/types';
-import { createLogger } from '@/main/logger';
+import { MutationInput, MutationMap } from '@/shared/mutations';
 
 class MutationService {
   private readonly logger = createLogger('mutation-service');

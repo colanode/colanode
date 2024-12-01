@@ -1,11 +1,13 @@
-import React from 'react';
 import { Node, NodeTypes } from '@colanode/core';
+import React from 'react';
+
+import { NodeBreadcrumbItem } from '@/renderer/components/layouts/node-breadcrumb-item';
 import {
   Breadcrumb,
+  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbList,
   BreadcrumbSeparator,
-  BreadcrumbEllipsis,
 } from '@/renderer/components/ui/breadcrumb';
 import {
   DropdownMenu,
@@ -14,7 +16,6 @@ import {
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { NodeBreadcrumbItem } from '@/renderer/components/layouts/node-breadcrumb-item';
 
 interface NodeBreadcrumbProps {
   nodes: Node[];

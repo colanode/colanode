@@ -1,7 +1,8 @@
+import { isEqual } from 'lodash-es';
 import { z } from 'zod';
+
 import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
 import { fieldAttributesSchema } from './fields';
-import { isEqual } from 'lodash-es';
 
 export const viewFieldAttributesSchema = z.object({
   id: z.string(),

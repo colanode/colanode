@@ -1,6 +1,7 @@
 import React from 'react';
-import { ViewSorts } from '@/renderer/components/databases/search/view-sorts';
+
 import { ViewFilters } from '@/renderer/components/databases/search/view-filters';
+import { ViewSorts } from '@/renderer/components/databases/search/view-sorts';
 import { Separator } from '@/renderer/components/ui/separator';
 import { useView } from '@/renderer/contexts/view';
 

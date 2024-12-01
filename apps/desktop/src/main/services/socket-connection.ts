@@ -1,10 +1,11 @@
-import { WebSocket } from 'ws';
-import { BackoffCalculator } from '@/shared/lib/backoff-calculator';
 import { Message } from '@colanode/core';
+import { WebSocket } from 'ws';
+
 import { SelectAccount } from '@/main/data/app/schema';
-import { syncService } from '@/main/services/sync-service';
-import { eventBus } from '@/shared/lib/event-bus';
 import { createLogger } from '@/main/logger';
+import { syncService } from '@/main/services/sync-service';
+import { BackoffCalculator } from '@/shared/lib/backoff-calculator';
+import { eventBus } from '@/shared/lib/event-bus';
 
 export class SocketConnection {
   private readonly logger = createLogger('socket-connection');

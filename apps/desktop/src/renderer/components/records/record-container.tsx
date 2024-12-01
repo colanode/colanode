@@ -1,8 +1,9 @@
-import { useQuery } from '@/renderer/hooks/use-query';
-import { useWorkspace } from '@/renderer/contexts/workspace';
 import { extractNodeRole } from '@colanode/core';
-import { RecordHeader } from '@/renderer/components/records/record-header';
+
 import { RecordBody } from '@/renderer/components/records/record-body';
+import { RecordHeader } from '@/renderer/components/records/record-header';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useQuery } from '@/renderer/hooks/use-query';
 
 interface RecordContainerProps {
   nodeId: string;

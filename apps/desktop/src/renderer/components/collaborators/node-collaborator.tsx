@@ -1,10 +1,11 @@
+import { NodeRole } from '@colanode/core';
+import { Trash2 } from 'lucide-react';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { NodeCollaboratorRoleDropdown } from '@/renderer/components/collaborators/node-collaborator-role-dropdown';
-import { useMutation } from '@/renderer/hooks/use-mutation';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { Trash2 } from 'lucide-react';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { NodeRole } from '@colanode/core';
 
 interface NodeCollaboratorProps {
   nodeId: string;

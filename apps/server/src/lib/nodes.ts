@@ -1,3 +1,15 @@
+import {
+  extractNodeCollaborators,
+  extractNodeRole,
+  Node,
+  NodeOutput,
+  NodeRole,
+  NodeType,  ServerCollaboration,
+  ServerCollaborationRevocation,
+  ServerInteraction,
+  ServerNodeTransaction} from '@colanode/core';
+import { encodeState } from '@colanode/crdt';
+
 import { database } from '@/data/database';
 import {
   SelectCollaboration,
@@ -7,21 +19,6 @@ import {
   SelectNodeTransaction,
 } from '@/data/schema';
 import { NodeCollaborator } from '@/types/nodes';
-import {
-  NodeOutput,
-  NodeRole,
-  ServerInteraction,
-  ServerCollaboration,
-  ServerCollaborationRevocation,
-  ServerNodeTransaction,
-} from '@colanode/core';
-import {
-  extractNodeCollaborators,
-  extractNodeRole,
-  Node,
-  NodeType,
-} from '@colanode/core';
-import { encodeState } from '@colanode/crdt';
 
 export const mapNodeOutput = (node: SelectNode): NodeOutput => {
   return {

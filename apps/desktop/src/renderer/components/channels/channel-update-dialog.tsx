@@ -1,4 +1,6 @@
-import { useWorkspace } from '@/renderer/contexts/workspace';
+import { ChannelNode, hasEditorAccess, NodeRole } from '@colanode/core';
+
+import { ChannelForm } from '@/renderer/components/channels/channel-form';
 import {
   Dialog,
   DialogContent,
@@ -6,9 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { ChannelNode, hasEditorAccess, NodeRole } from '@colanode/core';
-import { ChannelForm } from '@/renderer/components/channels/channel-form';
 import { toast } from '@/renderer/hooks/use-toast';
 
 interface ChannelUpdateDialogProps {

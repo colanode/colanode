@@ -1,11 +1,12 @@
+import { Block } from '@colanode/core';
+
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
+import { mapContentsToBlocks } from '@/shared/lib/editor';
 import {
   DocumentSaveMutationInput,
   DocumentSaveMutationOutput,
 } from '@/shared/mutations/document-save';
-import { mapContentsToBlocks } from '@/shared/lib/editor';
-import { Block } from '@colanode/core';
-import { nodeService } from '@/main/services/node-service';
 
 export class DocumentSaveMutationHandler
   implements MutationHandler<DocumentSaveMutationInput>

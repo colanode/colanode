@@ -1,18 +1,19 @@
 import { FieldAttributes } from '@colanode/core';
-import { RecordTextValue } from '@/renderer/components/records/values/record-text-value';
-import { RecordNumberValue } from '@/renderer/components/records/values/record-number-value';
+
 import { RecordBooleanValue } from '@/renderer/components/records/values/record-boolean-value';
+import { RecordCollaboratorValue } from '@/renderer/components/records/values/record-collaborator-value';
 import { RecordCreatedAtValue } from '@/renderer/components/records/values/record-created-at-value';
 import { RecordCreatedByValue } from '@/renderer/components/records/values/record-created-by-value';
-import { RecordSelectValue } from '@/renderer/components/records/values/record-select-value';
-import { RecordPhoneValue } from '@/renderer/components/records/values/record-phone-value';
-import { RecordEmailValue } from '@/renderer/components/records/values/record-email-value';
-import { RecordUrlValue } from '@/renderer/components/records/values/record-url-value';
-import { RecordMultiSelectValue } from '@/renderer/components/records/values/record-multi-select-value';
 import { RecordDateValue } from '@/renderer/components/records/values/record-date-value';
-import { RecordCollaboratorValue } from '@/renderer/components/records/values/record-collaborator-value';
+import { RecordEmailValue } from '@/renderer/components/records/values/record-email-value';
+import { RecordMultiSelectValue } from '@/renderer/components/records/values/record-multi-select-value';
+import { RecordNumberValue } from '@/renderer/components/records/values/record-number-value';
+import { RecordPhoneValue } from '@/renderer/components/records/values/record-phone-value';
+import { RecordSelectValue } from '@/renderer/components/records/values/record-select-value';
+import { RecordTextValue } from '@/renderer/components/records/values/record-text-value';
 import { RecordUpdatedAtValue } from '@/renderer/components/records/values/record-updated-at-value';
 import { RecordUpdatedByValue } from '@/renderer/components/records/values/record-updated-by-value';
+import { RecordUrlValue } from '@/renderer/components/records/values/record-url-value';
 
 interface RecordFieldValueProps {
   field: FieldAttributes;

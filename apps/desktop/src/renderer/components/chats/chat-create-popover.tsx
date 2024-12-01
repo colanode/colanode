@@ -1,13 +1,14 @@
+import { Plus } from 'lucide-react';
 import React from 'react';
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
-import { Plus } from 'lucide-react';
-import { useMutation } from '@/renderer/hooks/use-mutation';
 import { UserSearch } from '@/renderer/components/users/user-search';
 import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 
 export const ChatCreatePopover = () => {
   const workspace = useWorkspace();

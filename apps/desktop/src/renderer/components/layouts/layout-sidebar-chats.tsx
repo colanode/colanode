@@ -1,7 +1,7 @@
-import { ChatCreatePopover } from '@/renderer/components/chats/chat-create-popover';
-import { useQuery } from '@/renderer/hooks/use-query';
-import { useWorkspace } from '@/renderer/contexts/workspace';
+import { ChatNode } from '@colanode/core';
 
+import { ChatCreatePopover } from '@/renderer/components/chats/chat-create-popover';
+import { ChatSidebarItem } from '@/renderer/components/chats/chat-sidebar-item';
 import {
   SidebarGroup,
   SidebarGroupAction,
@@ -10,8 +10,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/renderer/components/ui/sidebar';
-import { ChatNode } from '@colanode/core';
-import { ChatSidebarItem } from '@/renderer/components/chats/chat-sidebar-item';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useQuery } from '@/renderer/hooks/use-query';
 
 export const LayoutSidebarChats = () => {
   const workspace = useWorkspace();

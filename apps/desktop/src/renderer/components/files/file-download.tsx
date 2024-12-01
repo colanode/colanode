@@ -1,7 +1,8 @@
+import { Download } from 'lucide-react';
+
+import { Spinner } from '@/renderer/components/ui/spinner';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { Spinner } from '@/renderer/components/ui/spinner';
-import { Download } from 'lucide-react';
 
 interface FileDownloadProps {
   id: string;

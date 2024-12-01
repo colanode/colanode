@@ -1,23 +1,24 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Upload } from 'lucide-react';
 import React from 'react';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
+import { Button } from '@/renderer/components/ui/button';
 import {
   Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
 } from '@/renderer/components/ui/form';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { z } from 'zod';
+import { Input } from '@/renderer/components/ui/input';
+import { Spinner } from '@/renderer/components/ui/spinner';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
-import { Avatar } from '@/renderer/components/avatars/avatar';
 import { cn } from '@/shared/lib/utils';
-import { Spinner } from '@/renderer/components/ui/spinner';
-import { Upload } from 'lucide-react';
-import { Input } from '@/renderer/components/ui/input';
-import { Button } from '@/renderer/components/ui/button';
 import { Account } from '@/shared/types/accounts';
 
 const formSchema = z.object({

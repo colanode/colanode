@@ -1,5 +1,6 @@
-import { EditorCommand } from '@/shared/types/editor';
 import { Code } from 'lucide-react';
+
+import { EditorCommand } from '@/shared/types/editor';
 
 export const CodeBlockCommand: EditorCommand = {
   key: 'code-block',

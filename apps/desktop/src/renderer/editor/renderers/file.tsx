@@ -1,4 +1,5 @@
 import { JSONContent } from '@tiptap/core';
+
 import { FileBlock } from '@/renderer/components/files/file-block';
 
 interface FileRendererProps {

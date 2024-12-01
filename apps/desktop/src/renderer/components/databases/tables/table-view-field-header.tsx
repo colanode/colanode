@@ -1,21 +1,22 @@
-import React from 'react';
-import { cn } from '@/shared/lib/utils';
-import { useDrag, useDrop } from 'react-dnd';
+import { ArrowDownAz, ArrowDownZa, EyeOff, Filter, Trash2 } from 'lucide-react';
 import { Resizable } from 're-resizable';
+import React from 'react';
+import { useDrag, useDrop } from 'react-dnd';
+
+import { FieldDeleteDialog } from '@/renderer/components/databases/fields/field-delete-dialog';
+import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
+import { FieldRenameInput } from '@/renderer/components/databases/fields/field-rename-input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
 import { Separator } from '@/renderer/components/ui/separator';
-import { FieldDeleteDialog } from '@/renderer/components/databases/fields/field-delete-dialog';
-import { FieldRenameInput } from '@/renderer/components/databases/fields/field-rename-input';
-import { useView } from '@/renderer/contexts/view';
-import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
-import { ArrowDownAz, ArrowDownZa, EyeOff, Filter, Trash2 } from 'lucide-react';
-import { ViewField } from '@/shared/types/databases';
 import { useDatabase } from '@/renderer/contexts/database';
+import { useView } from '@/renderer/contexts/view';
 import { isFilterableField, isSortableField } from '@/shared/lib/databases';
+import { cn } from '@/shared/lib/utils';
+import { ViewField } from '@/shared/types/databases';
 
 interface TableViewFieldHeaderProps {
   viewField: ViewField;

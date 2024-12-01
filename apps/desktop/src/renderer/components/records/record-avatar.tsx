@@ -1,9 +1,9 @@
-import { useRecord } from '@/renderer/contexts/record';
-import { useMutation } from '@/renderer/hooks/use-mutation';
-import { useWorkspace } from '@/renderer/contexts/workspace';
+import { Avatar } from '@/renderer/components/avatars/avatar';
 import { AvatarPopover } from '@/renderer/components/avatars/avatar-popover';
 import { Button } from '@/renderer/components/ui/button';
-import { Avatar } from '@/renderer/components/avatars/avatar';
+import { useRecord } from '@/renderer/contexts/record';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 
 export const RecordAvatar = () => {
   const workspace = useWorkspace();

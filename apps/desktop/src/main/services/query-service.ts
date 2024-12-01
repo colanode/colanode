@@ -1,10 +1,11 @@
-import { QueryInput, QueryMap } from '@/shared/queries';
-import { QueryHandler, SubscribedQuery } from '@/main/types';
-import { queryHandlerMap } from '@/main/queries';
-import { eventBus } from '@/shared/lib/event-bus';
-import { Event } from '@/shared/types/events';
 import { isEqual } from 'lodash-es';
+
 import { createLogger } from '@/main/logger';
+import { queryHandlerMap } from '@/main/queries';
+import { QueryHandler, SubscribedQuery } from '@/main/types';
+import { eventBus } from '@/shared/lib/event-bus';
+import { QueryInput, QueryMap } from '@/shared/queries';
+import { Event } from '@/shared/types/events';
 
 class QueryService {
   private readonly logger = createLogger('query-service');

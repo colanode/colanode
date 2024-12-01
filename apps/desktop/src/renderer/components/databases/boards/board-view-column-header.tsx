@@ -1,5 +1,6 @@
-import { SelectOptionBadge } from '@/renderer/components/databases/fields/select-option-badge';
 import { SelectOptionAttributes } from '@colanode/core';
+
+import { SelectOptionBadge } from '@/renderer/components/databases/fields/select-option-badge';
 
 interface BoardViewColumnHeaderProps {
   option: SelectOptionAttributes;

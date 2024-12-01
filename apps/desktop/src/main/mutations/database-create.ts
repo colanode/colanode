@@ -1,15 +1,16 @@
 import {
-  generateId,
-  IdType,
   DatabaseAttributes,
+  generateId,
   generateNodeIndex,
+  IdType,
 } from '@colanode/core';
+
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   DatabaseCreateMutationInput,
   DatabaseCreateMutationOutput,
 } from '@/shared/mutations/database-create';
-import { nodeService } from '@/main/services/node-service';
 
 export class DatabaseCreateMutationHandler
   implements MutationHandler<DatabaseCreateMutationInput>

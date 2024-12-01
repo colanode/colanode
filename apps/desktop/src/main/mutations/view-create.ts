@@ -1,15 +1,16 @@
 import {
-  generateId,
-  IdType,
-  generateNodeIndex,
   compareString,
+  generateId,
+  generateNodeIndex,
+  IdType,
 } from '@colanode/core';
+
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   ViewCreateMutationInput,
   ViewCreateMutationOutput,
 } from '@/shared/mutations/view-create';
-import { nodeService } from '@/main/services/node-service';
 
 export class ViewCreateMutationHandler
   implements MutationHandler<ViewCreateMutationInput>

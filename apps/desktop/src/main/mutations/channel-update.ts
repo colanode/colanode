@@ -1,9 +1,9 @@
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   ChannelUpdateMutationInput,
   ChannelUpdateMutationOutput,
 } from '@/shared/mutations/channel-update';
-import { nodeService } from '@/main/services/node-service';
 
 export class ChannelUpdateMutationHandler
   implements MutationHandler<ChannelUpdateMutationInput>

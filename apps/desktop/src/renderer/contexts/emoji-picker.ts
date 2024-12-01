@@ -1,5 +1,6 @@
-import { EmojiData, Emoji } from '@/shared/types/emojis';
 import { createContext, useContext } from 'react';
+
+import { Emoji,EmojiData } from '@/shared/types/emojis';
 
 interface EmojiPickerContextProps {
   data: EmojiData;

@@ -1,5 +1,6 @@
 import { mergeAttributes, Node } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
+
 import { FolderNodeView } from '@/renderer/editor/views';
 
 export const FolderNode = Node.create({

@@ -1,6 +1,7 @@
 import { FileNode } from '@colanode/core';
-import { FileThumbnail } from '@/renderer/components/files/file-thumbnail';
+
 import { FileContextMenu } from '@/renderer/components/files/file-context-menu';
+import { FileThumbnail } from '@/renderer/components/files/file-thumbnail';
 import { GridItem } from '@/renderer/components/folders/grids/grid-item';
 
 interface GridFileProps {

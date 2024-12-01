@@ -1,7 +1,8 @@
-import { useDatabase } from '@/renderer/contexts/database';
-import { Plus } from 'lucide-react';
-import { useView } from '@/renderer/contexts/view';
 import { ViewFilterAttributes } from '@colanode/core';
+import { Plus } from 'lucide-react';
+
+import { useDatabase } from '@/renderer/contexts/database';
+import { useView } from '@/renderer/contexts/view';
 
 interface BoardViewRecordCreateCardProps {
   filters: ViewFilterAttributes[];

@@ -1,6 +1,7 @@
-import React from 'react';
-import { SpaceCreateDialog } from '@/renderer/components/spaces/space-create-dialog';
 import { Plus } from 'lucide-react';
+import React from 'react';
+
+import { SpaceCreateDialog } from '@/renderer/components/spaces/space-create-dialog';
 
 export const SpaceCreateButton = () => {
   const [open, setOpen] = React.useState(false);

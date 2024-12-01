@@ -1,7 +1,7 @@
-import { useWorkspace } from '@/renderer/contexts/workspace';
+import { RecordFieldValue } from '@/renderer/components/records/record-field-value';
 import { useRecord } from '@/renderer/contexts/record';
 import { useView } from '@/renderer/contexts/view';
-import { RecordFieldValue } from '@/renderer/components/records/record-field-value';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 
 export const CalendarViewRecordCard = () => {
   const workspace = useWorkspace();

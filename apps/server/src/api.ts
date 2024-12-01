@@ -1,17 +1,17 @@
-import express, { Request, Response } from 'express';
 import cors from 'cors';
+import express, { Request, Response } from 'express';
 import http from 'http';
 
-import { accountsRouter } from '@/routes/accounts';
-import { workspacesRouter } from '@/routes/workspaces';
 import { authMiddleware } from '@/middlewares/auth';
-import { syncRouter } from '@/routes/sync';
-import { configRouter } from '@/routes/config';
+import { accountsRouter } from '@/routes/accounts';
 import { avatarsRouter } from '@/routes/avatars';
+import { configRouter } from '@/routes/config';
 import { filesRouter } from '@/routes/files';
 import { nodesRouter } from '@/routes/nodes';
-import { synapse } from '@/services/synapse-service';
+import { syncRouter } from '@/routes/sync';
+import { workspacesRouter } from '@/routes/workspaces';
 import { logService } from '@/services/log-service';
+import { synapse } from '@/services/synapse-service';
 
 const logger = logService.createLogger('api');
 

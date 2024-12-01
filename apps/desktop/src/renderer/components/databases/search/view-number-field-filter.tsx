@@ -2,23 +2,24 @@ import {
   NumberFieldAttributes,
   ViewFieldFilterAttributes,
 } from '@colanode/core';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/renderer/components/ui/popover';
+import { ChevronDown, Trash2 } from 'lucide-react';
+
+import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
+import { Button } from '@/renderer/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { Button } from '@/renderer/components/ui/button';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/renderer/components/ui/popover';
 import { SmartNumberInput } from '@/renderer/components/ui/smart-number-input';
 import { useView } from '@/renderer/contexts/view';
-import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
 import { numberFieldFilterOperators } from '@/shared/lib/databases';
-import { ChevronDown, Trash2 } from 'lucide-react';
 
 interface ViewNumberFieldFilterProps {
   field: NumberFieldAttributes;

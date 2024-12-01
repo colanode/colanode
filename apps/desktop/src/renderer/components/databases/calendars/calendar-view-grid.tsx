@@ -1,20 +1,21 @@
-import React from 'react';
-import { buttonVariants } from '@/renderer/components/ui/button';
-import { cn, getDisplayedDates } from '@/shared/lib/utils';
-import { DayPicker, DayProps } from 'react-day-picker';
-import { CalendarViewDay } from '@/renderer/components/databases/calendars/calendar-view-day';
 import {
   FieldAttributes,
-  ViewFilterAttributes,
   isSameDay,
   toUTCDate,
+  ViewFilterAttributes,
 } from '@colanode/core';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React from 'react';
+import { DayPicker, DayProps } from 'react-day-picker';
+
+import { CalendarViewDay } from '@/renderer/components/databases/calendars/calendar-view-day';
+import { buttonVariants } from '@/renderer/components/ui/button';
+import { useDatabase } from '@/renderer/contexts/database';
+import { useView } from '@/renderer/contexts/view';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useRecordsQuery } from '@/renderer/hooks/user-records-query';
 import { filterRecords } from '@/shared/lib/databases';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import { useView } from '@/renderer/contexts/view';
-import { useDatabase } from '@/renderer/contexts/database';
+import { cn, getDisplayedDates } from '@/shared/lib/utils';
 
 interface CalendarViewGridProps {
   field: FieldAttributes;

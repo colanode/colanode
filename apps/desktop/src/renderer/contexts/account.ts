@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+
 import { Account } from '@/shared/types/accounts';
 
 interface AccountContext extends Account {

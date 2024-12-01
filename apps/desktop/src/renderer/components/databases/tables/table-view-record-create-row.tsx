@@ -1,5 +1,6 @@
-import { useDatabase } from '@/renderer/contexts/database';
 import { Plus } from 'lucide-react';
+
+import { useDatabase } from '@/renderer/contexts/database';
 import { useView } from '@/renderer/contexts/view';
 
 export const TableViewRecordCreateRow = () => {

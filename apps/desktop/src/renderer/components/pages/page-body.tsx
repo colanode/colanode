@@ -1,6 +1,7 @@
 import { hasEditorAccess, NodeRole, PageNode } from '@colanode/core';
-import { ScrollArea } from '@/renderer/components/ui/scroll-area';
+
 import { Document } from '@/renderer/components/documents/document';
+import { ScrollArea } from '@/renderer/components/ui/scroll-area';
 
 interface PageBodyProps {
   page: PageNode;

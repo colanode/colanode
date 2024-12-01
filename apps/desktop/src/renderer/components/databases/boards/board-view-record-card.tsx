@@ -1,10 +1,11 @@
-import React from 'react';
-import { useWorkspace } from '@/renderer/contexts/workspace';
 import { SelectFieldAttributes, SelectOptionAttributes } from '@colanode/core';
+import React from 'react';
 import { useDrag } from 'react-dnd';
-import { useView } from '@/renderer/contexts/view';
+
 import { RecordFieldValue } from '@/renderer/components/records/record-field-value';
 import { useRecord } from '@/renderer/contexts/record';
+import { useView } from '@/renderer/contexts/view';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 
 interface DragResult {
   option: SelectOptionAttributes;

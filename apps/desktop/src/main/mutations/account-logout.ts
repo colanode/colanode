@@ -1,10 +1,10 @@
 import { databaseService } from '@/main/data/database-service';
+import { accountService } from '@/main/services/account-service';
+import { MutationHandler } from '@/main/types';
 import {
   AccountLogoutMutationInput,
   AccountLogoutMutationOutput,
 } from '@/shared/mutations/account-logout';
-import { MutationHandler } from '@/main/types';
-import { accountService } from '@/main/services/account-service';
 
 export class AccountLogoutMutationHandler
   implements MutationHandler<AccountLogoutMutationInput>

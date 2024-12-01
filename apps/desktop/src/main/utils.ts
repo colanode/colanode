@@ -1,4 +1,5 @@
-import { app } from 'electron';
+import { LocalNodeTransaction, Node } from '@colanode/core';
+import { encodeState } from '@colanode/crdt';
 import {
   DeleteResult,
   InsertResult,
@@ -6,27 +7,27 @@ import {
   Transaction,
   UpdateResult,
 } from 'kysely';
+import { app } from 'electron';
 import path from 'path';
+
 import {
-  SelectInteraction,
+  SelectAccount,
+  SelectServer,
+  SelectWorkspace,
+} from '@/main/data/app/schema';
+import {
   SelectDownload,
+  SelectInteraction,
   SelectNode,
   SelectNodeTransaction,
   SelectUpload,
   WorkspaceDatabaseSchema,
 } from '@/main/data/workspace/schema';
-import { LocalNodeTransaction, Node } from '@colanode/core';
 import { Account } from '@/shared/types/accounts';
-import {
-  SelectAccount,
-  SelectServer,
-  SelectWorkspace,
-} from './data/app/schema';
-import { Workspace } from '@/shared/types/workspaces';
-import { Server } from '@/shared/types/servers';
-import { Download, Upload } from '@/shared/types/nodes';
-import { encodeState } from '@colanode/crdt';
 import { Interaction } from '@/shared/types/interactions';
+import { Download, Upload } from '@/shared/types/nodes';
+import { Server } from '@/shared/types/servers';
+import { Workspace } from '@/shared/types/workspaces';
 
 export const appPath = app.getPath('userData');
 

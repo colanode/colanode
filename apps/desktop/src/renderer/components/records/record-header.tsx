@@ -1,10 +1,11 @@
+import { Node, NodeRole,RecordNode } from '@colanode/core';
+
 import { NodeCollaboratorsPopover } from '@/renderer/components/collaborators/node-collaborators-popover';
-import { RecordNode, Node, NodeRole } from '@colanode/core';
-import { Header } from '@/renderer/components/ui/header';
 import { NodeBreadcrumb } from '@/renderer/components/layouts/node-breadcrumb';
-import { RecordSettings } from '@/renderer/components/records/record-settings';
-import { useContainer } from '@/renderer/contexts/container';
 import { NodeFullscreenButton } from '@/renderer/components/layouts/node-fullscreen-button';
+import { RecordSettings } from '@/renderer/components/records/record-settings';
+import { Header } from '@/renderer/components/ui/header';
+import { useContainer } from '@/renderer/contexts/container';
 
 interface RecordHeaderProps {
   nodes: Node[];

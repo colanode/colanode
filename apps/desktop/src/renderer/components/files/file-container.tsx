@@ -1,8 +1,9 @@
+import { extractNodeRole } from '@colanode/core';
+
+import { FileBody } from '@/renderer/components/files/file-body';
+import { FileHeader } from '@/renderer/components/files/file-header';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { FileHeader } from '@/renderer/components/files/file-header';
-import { extractNodeRole } from '@colanode/core';
-import { FileBody } from '@/renderer/components/files/file-body';
 
 interface FileContainerProps {
   nodeId: string;

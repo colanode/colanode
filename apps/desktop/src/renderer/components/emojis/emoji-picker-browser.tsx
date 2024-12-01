@@ -1,9 +1,10 @@
-import { Emoji, EmojiPickerRowData } from '@/shared/types/emojis';
 import React from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList } from 'react-window';
+
 import { EmojiPickerBrowserRow } from '@/renderer/components/emojis/emoji-picker-browser-row';
 import { useEmojiPicker } from '@/renderer/contexts/emoji-picker';
+import { Emoji, EmojiPickerRowData } from '@/shared/types/emojis';
 
 const emojisPerRow = 10;
 

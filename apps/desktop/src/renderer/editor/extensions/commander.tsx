@@ -1,4 +1,3 @@
-import React from 'react';
 import type { Range } from '@tiptap/core';
 import { Editor, Extension } from '@tiptap/core';
 import { ReactRenderer } from '@tiptap/react';
@@ -7,9 +6,11 @@ import {
   type SuggestionKeyDownProps,
   type SuggestionProps,
 } from '@tiptap/suggestion';
+import React from 'react';
 import tippy from 'tippy.js';
-import { EditorCommandContext, EditorCommand } from '@/shared/types/editor';
+
 import { updateScrollView } from '@/shared/lib/utils';
+import { EditorCommand,EditorCommandContext } from '@/shared/types/editor';
 
 interface CommanderOptions {
   commands: EditorCommand[];

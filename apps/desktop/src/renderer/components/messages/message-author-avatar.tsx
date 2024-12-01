@@ -1,7 +1,8 @@
+import { MessageNode, UserNode } from '@colanode/core';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { MessageNode, UserNode } from '@colanode/core';
-import { Avatar } from '@/renderer/components/avatars/avatar';
 
 interface MessageAuthorAvatarProps {
   message: MessageNode;

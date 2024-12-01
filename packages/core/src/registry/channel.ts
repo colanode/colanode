@@ -1,6 +1,7 @@
-import { z } from 'zod';
-import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
 import { isEqual } from 'lodash-es';
+import { z } from 'zod';
+
+import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
 
 export const channelAttributesSchema = z.object({
   type: z.literal('channel'),

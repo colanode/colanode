@@ -1,4 +1,5 @@
 import { isAxiosError } from 'axios';
+
 import { ApiErrorOutput } from '@/shared/types/errors';
 
 export const parseApiError = (error: unknown): ApiErrorOutput => {

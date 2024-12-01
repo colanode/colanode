@@ -1,4 +1,5 @@
 import { FileNode } from '@colanode/core';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 
 interface FileBreadcrumbItemProps {

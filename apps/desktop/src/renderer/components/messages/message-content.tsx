@@ -1,6 +1,7 @@
+import { MessageNode } from '@colanode/core';
+
 import { NodeRenderer } from '@/renderer/editor/renderers/node';
 import { mapBlocksToContents } from '@/shared/lib/editor';
-import { MessageNode } from '@colanode/core';
 
 interface MessageContentProps {
   message: MessageNode;

@@ -1,9 +1,10 @@
 import { LocalNodeTransaction, Node } from '@colanode/core';
+
 import { Account } from '@/shared/types/accounts';
-import { Workspace } from '@/shared/types/workspaces';
-import { Server } from '@/shared/types/servers';
-import { Download, Upload } from '@/shared/types/nodes';
 import { Interaction } from '@/shared/types/interactions';
+import { Download, Upload } from '@/shared/types/nodes';
+import { Server } from '@/shared/types/servers';
+import { Workspace } from '@/shared/types/workspaces';
 
 export type NodeCreatedEvent = {
   type: 'node_created';

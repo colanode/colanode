@@ -1,5 +1,6 @@
-import { sql } from 'kysely';
 import {
+  generateId,
+  IdType,
   Node,
   NodeAttributes,
   NodeMutationContext,
@@ -8,18 +9,12 @@ import {
   ServerNodeDeleteTransaction,
   ServerNodeTransaction,
   ServerNodeUpdateTransaction,
-  generateId,
-  IdType,
 } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
+import { sql } from 'kysely';
+
+import { SelectWorkspace } from '@/main/data/app/schema';
 import { databaseService } from '@/main/data/database-service';
-import {
-  fetchNodeAncestors,
-  mapDownload,
-  mapNode,
-  mapTransaction,
-  mapUpload,
-} from '@/main/utils';
 import {
   CreateDownload,
   CreateUpload,
@@ -28,10 +23,16 @@ import {
   SelectNodeTransaction,
   SelectUpload,
 } from '@/main/data/workspace/schema';
-import { eventBus } from '@/shared/lib/event-bus';
-import { SelectWorkspace } from '@/main/data/app/schema';
-import { interactionService } from '@/main/services/interaction-service';
 import { createLogger } from '@/main/logger';
+import { interactionService } from '@/main/services/interaction-service';
+import {
+  fetchNodeAncestors,
+  mapDownload,
+  mapNode,
+  mapTransaction,
+  mapUpload,
+} from '@/main/utils';
+import { eventBus } from '@/shared/lib/event-bus';
 
 export type CreateNodeInput = {
   id: string;

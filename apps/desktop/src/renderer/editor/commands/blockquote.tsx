@@ -1,5 +1,6 @@
-import { EditorCommand } from '@/shared/types/editor';
 import { Quote } from 'lucide-react';
+
+import { EditorCommand } from '@/shared/types/editor';
 
 export const BlockquoteCommand: EditorCommand = {
   key: 'blockquote',

@@ -1,6 +1,7 @@
 import { DatabaseNode, NodeRole } from '@colanode/core';
-import { DatabaseViews } from '@/renderer/components/databases/database-views';
+
 import { Database } from '@/renderer/components/databases/database';
+import { DatabaseViews } from '@/renderer/components/databases/database-views';
 
 interface DatabaseBodyProps {
   database: DatabaseNode;

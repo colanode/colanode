@@ -1,12 +1,13 @@
-import fs from 'fs';
 import FormData from 'form-data';
+import fs from 'fs';
+
 import { databaseService } from '@/main/data/database-service';
 import { MutationHandler } from '@/main/types';
+import { httpClient } from '@/shared/lib/http-client';
 import {
   AvatarUploadMutationInput,
   AvatarUploadMutationOutput,
 } from '@/shared/mutations/avatar-upload';
-import { httpClient } from '@/shared/lib/http-client';
 
 interface AvatarUploadResponse {
   id: string;

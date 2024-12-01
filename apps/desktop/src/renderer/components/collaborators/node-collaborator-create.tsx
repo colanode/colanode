@@ -1,12 +1,13 @@
+import { UserNode } from '@colanode/core';
 import React from 'react';
+
+import { NodeCollaboratorRoleDropdown } from '@/renderer/components/collaborators/node-collaborator-role-dropdown';
 import { NodeCollaboratorSearch } from '@/renderer/components/collaborators/node-collaborator-search';
 import { Button } from '@/renderer/components/ui/button';
 import { Spinner } from '@/renderer/components/ui/spinner';
-import { NodeCollaboratorRoleDropdown } from '@/renderer/components/collaborators/node-collaborator-role-dropdown';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { UserNode } from '@colanode/core';
 
 interface NodeCollaboratorCreate {
   nodeId: string;

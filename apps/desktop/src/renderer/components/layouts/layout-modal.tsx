@@ -1,13 +1,14 @@
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import React from 'react';
+
+import { NodeContainer } from '@/renderer/components/layouts/node-container';
 import {
   Dialog,
   DialogContent,
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
 import { ContainerContext } from '@/renderer/contexts/container';
-import { NodeContainer } from '@/renderer/components/layouts/node-container';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 
 interface LayoutModalProps {
   nodeId: string;

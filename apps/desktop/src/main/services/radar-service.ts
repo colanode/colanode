@@ -1,8 +1,9 @@
+import { getIdType, IdType } from '@colanode/core';
+
 import { databaseService } from '@/main/data/database-service';
-import { WorkspaceRadarData } from '@/shared/types/radars';
 import { eventBus } from '@/shared/lib/event-bus';
 import { Event } from '@/shared/types/events';
-import { getIdType, IdType } from '@colanode/core';
+import { WorkspaceRadarData } from '@/shared/types/radars';
 
 class RadarService {
   private readonly workspaceStates: Map<string, WorkspaceRadarData> = new Map();

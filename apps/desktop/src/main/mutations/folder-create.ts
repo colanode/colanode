@@ -1,10 +1,11 @@
-import { generateId, IdType, FolderAttributes } from '@colanode/core';
+import { FolderAttributes,generateId, IdType } from '@colanode/core';
+
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   FolderCreateMutationInput,
   FolderCreateMutationOutput,
 } from '@/shared/mutations/folder-create';
-import { nodeService } from '@/main/services/node-service';
 
 export class FolderCreateMutationHandler
   implements MutationHandler<FolderCreateMutationInput>

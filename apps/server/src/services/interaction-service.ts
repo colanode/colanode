@@ -1,11 +1,12 @@
-import { database } from '@/data/database';
-import { eventBus } from '@/lib/event-bus';
 import {
   InteractionAttributes,
   InteractionEvent,
   mergeInteractionAttributes,
   SyncInteractionsMessage,
 } from '@colanode/core';
+
+import { database } from '@/data/database';
+import { eventBus } from '@/lib/event-bus';
 
 const UPDATE_RETRIES_COUNT = 10;
 

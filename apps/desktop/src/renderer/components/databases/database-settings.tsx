@@ -1,4 +1,10 @@
+import { DatabaseNode, hasEditorAccess, NodeRole } from '@colanode/core';
+import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
+
+import { NodeCollaboratorAudit } from '@/renderer/components/collaborators/node-collaborator-audit';
+import { DatabaseDeleteDialog } from '@/renderer/components/databases/database-delete-dialog';
+import { DatabaseUpdateDialog } from '@/renderer/components/databases/database-update-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,11 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
-import { DatabaseDeleteDialog } from '@/renderer/components/databases/database-delete-dialog';
-import { DatabaseNode, hasEditorAccess, NodeRole } from '@colanode/core';
-import { NodeCollaboratorAudit } from '@/renderer/components/collaborators/node-collaborator-audit';
-import { DatabaseUpdateDialog } from '@/renderer/components/databases/database-update-dialog';
 
 interface DatabaseSettingsProps {
   database: DatabaseNode;

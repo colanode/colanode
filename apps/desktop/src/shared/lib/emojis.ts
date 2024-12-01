@@ -1,4 +1,4 @@
-import { EmojiData, Emoji } from '@/shared/types/emojis';
+import { Emoji,EmojiData } from '@/shared/types/emojis';
 
 export const getEmojiUrl = (id: string | null | undefined): string => {
   if (!id) {

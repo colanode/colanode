@@ -1,8 +1,9 @@
-import { mergeAttributes, Node, CommandProps } from '@tiptap/core';
+import { generateId, IdType } from '@colanode/core';
+import { CommandProps,mergeAttributes, Node } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
+
 import { FilePlaceholderNodeView } from '@/renderer/editor/views';
 import { FileMetadata } from '@/shared/types/files';
-import { generateId, IdType } from '@colanode/core';
 
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {

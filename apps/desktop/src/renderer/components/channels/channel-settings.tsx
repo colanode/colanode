@@ -1,4 +1,10 @@
+import { ChannelNode, hasEditorAccess, NodeRole } from '@colanode/core';
+import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
+
+import { ChannelDeleteDialog } from '@/renderer/components/channels/channel-delete-dialog';
+import { ChannelUpdateDialog } from '@/renderer/components/channels/channel-update-dialog';
+import { NodeCollaboratorAudit } from '@/renderer/components/collaborators/node-collaborator-audit';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,11 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
-import { ChannelDeleteDialog } from '@/renderer/components/channels/channel-delete-dialog';
-import { ChannelNode, hasEditorAccess, NodeRole } from '@colanode/core';
-import { NodeCollaboratorAudit } from '@/renderer/components/collaborators/node-collaborator-audit';
-import { ChannelUpdateDialog } from '@/renderer/components/channels/channel-update-dialog';
 
 interface ChannelSettingsProps {
   channel: ChannelNode;

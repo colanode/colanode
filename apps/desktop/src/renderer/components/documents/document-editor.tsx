@@ -1,59 +1,61 @@
-import React from 'react';
 import '@/renderer/styles/editor.css';
+
+import { EditorContent, JSONContent,useEditor } from '@tiptap/react';
 import { debounce } from 'lodash-es';
-import { useEditor, EditorContent, JSONContent } from '@tiptap/react';
+import React from 'react';
+
+import { useWorkspace } from '@/renderer/contexts/workspace';
 import {
-  ParagraphCommand,
   BlockquoteCommand,
+  BulletListCommand,
+  CodeBlockCommand,
+  DividerCommand,
+  FileCommand,
+  FolderCommand,
   Heading1Command,
   Heading2Command,
   Heading3Command,
-  BulletListCommand,
-  CodeBlockCommand,
   OrderedListCommand,
-  DividerCommand,
-  TodoCommand,
   PageCommand,
-  FolderCommand,
-  FileCommand,
+  ParagraphCommand,
+  TodoCommand,
 } from '@/renderer/editor/commands';
 import {
-  IdExtension,
+  BlockquoteNode,
+  BoldMark,
+  BulletListNode,
+  CodeBlockNode,
+  CodeMark,
+  ColorMark,
+  CommanderExtension,
+  DeleteControlExtension,
+  DividerNode,
   DocumentNode,
-  PageNode,
-  FolderNode,
+  DropcursorExtension,
   FileNode,
-  TextNode,
-  ParagraphNode,
+  FolderNode,
   Heading1Node,
   Heading2Node,
   Heading3Node,
-  BlockquoteNode,
-  BulletListNode,
-  CodeBlockNode,
-  TabKeymapExtension,
+  HighlightMark,
+  IdExtension,
+  ItalicMark,
+  LinkMark,
   ListItemNode,
   ListKeymapExtension,
   OrderedListNode,
+  PageNode,
+  ParagraphNode,
   PlaceholderExtension,
-  TaskListNode,
-  TaskItemNode,
-  CommanderExtension,
-  DividerNode,
-  TrailingNode,
-  BoldMark,
-  ItalicMark,
-  UnderlineMark,
   StrikethroughMark,
-  CodeMark,
-  ColorMark,
-  HighlightMark,
-  LinkMark,
-  DeleteControlExtension,
-  DropcursorExtension,
+  TabKeymapExtension,
+  TaskItemNode,
+  TaskListNode,
+  TextNode,
+  TrailingNode,
+  UnderlineMark,
 } from '@/renderer/editor/extensions';
 import { EditorBubbleMenu } from '@/renderer/editor/menu/bubble-menu';
-import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 
 interface DocumentEditorProps {

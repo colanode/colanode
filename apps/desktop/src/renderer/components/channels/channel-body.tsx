@@ -1,4 +1,5 @@
 import { ChannelNode, NodeRole } from '@colanode/core';
+
 import { Conversation } from '@/renderer/components/messages/conversation';
 
 interface ChannelBodyProps {

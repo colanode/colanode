@@ -1,21 +1,20 @@
 import {
-  WorkspaceUsersInviteInput,
-  WorkspaceUserRoleUpdateInput,
-  WorkspaceCreateInput,
+ AccountStatus,generateId, IdType,  WorkspaceCreateInput,
   WorkspaceOutput,
   WorkspaceRole,
-  WorkspaceUserStatus,
   WorkspaceUpdateInput,
   WorkspaceUserInviteResult,
-} from '@colanode/core';
-import { ApiError, ColanodeRequest, ColanodeResponse } from '@/types/api';
-import { generateId, IdType, AccountStatus } from '@colanode/core';
-import { database } from '@/data/database';
+  WorkspaceUserRoleUpdateInput,
+  WorkspaceUsersInviteInput,
+  WorkspaceUserStatus } from '@colanode/core';
 import { Router } from 'express';
-import { getNameFromEmail } from '@/lib/utils';
+
+import { database } from '@/data/database';
 import { fetchNode, mapNode, mapNodeTransaction } from '@/lib/nodes';
+import { getNameFromEmail } from '@/lib/utils';
 import { nodeService } from '@/services/node-service';
 import { workspaceService } from '@/services/workspace-service';
+import { ApiError, ColanodeRequest, ColanodeResponse } from '@/types/api';
 
 export const workspacesRouter = Router();
 

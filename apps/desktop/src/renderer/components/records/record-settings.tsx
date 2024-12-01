@@ -1,4 +1,9 @@
+import { hasEditorAccess, NodeRole, RecordNode } from '@colanode/core';
+import { Copy, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
+
+import { NodeCollaboratorAudit } from '@/renderer/components/collaborators/node-collaborator-audit';
+import { RecordDeleteDialog } from '@/renderer/components/records/record-delete-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,11 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { Copy, Settings, Trash2 } from 'lucide-react';
-import { hasEditorAccess, NodeRole, RecordNode } from '@colanode/core';
-import { NodeCollaboratorAudit } from '@/renderer/components/collaborators/node-collaborator-audit';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { RecordDeleteDialog } from '@/renderer/components/records/record-delete-dialog';
 
 interface RecordSettingsProps {
   record: RecordNode;

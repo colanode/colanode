@@ -1,4 +1,4 @@
-import { IconData, Icon } from '@/shared/types/icons';
+import { Icon,IconData } from '@/shared/types/icons';
 
 export const getIconUrl = (id: string): string => {
   return `asset://icons/${id}.svg`;

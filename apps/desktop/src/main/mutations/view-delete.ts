@@ -1,5 +1,5 @@
-import { MutationHandler } from '@/main/types';
 import { nodeService } from '@/main/services/node-service';
+import { MutationHandler } from '@/main/types';
 import {
   ViewDeleteMutationInput,
   ViewDeleteMutationOutput,

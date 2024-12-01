@@ -1,11 +1,12 @@
-import { avatarStorage, BUCKET_NAMES } from '@/data/storage';
+import { GetObjectCommand,PutObjectCommand } from '@aws-sdk/client-s3';
 import { generateId, IdType } from '@colanode/core';
-import { PutObjectCommand, GetObjectCommand } from '@aws-sdk/client-s3';
 import { Router } from 'express';
 import multer from 'multer';
-import path from 'path';
 import sharp from 'sharp';
+import path from 'path';
 import { Readable } from 'stream';
+
+import { avatarStorage, BUCKET_NAMES } from '@/data/storage';
 
 export const avatarsRouter = Router();
 

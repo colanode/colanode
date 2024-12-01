@@ -1,7 +1,7 @@
-import { CommandMap, CommandInput } from '@/shared/commands';
-import { QueryInput, QueryMap } from '@/shared/queries';
-import { MutationInput, MutationMap } from '@/shared/mutations';
+import { CommandInput,CommandMap } from '@/shared/commands';
 import { EventBus } from '@/shared/lib/event-bus';
+import { MutationInput, MutationMap } from '@/shared/mutations';
+import { QueryInput, QueryMap } from '@/shared/queries';
 
 export interface ColanodeApi {
   init: () => Promise<void>;

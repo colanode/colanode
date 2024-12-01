@@ -1,6 +1,7 @@
-import React from 'react';
-import { defaultClasses } from '@/renderer/editor/classes';
 import { JSONContent } from '@tiptap/core';
+import React from 'react';
+
+import { defaultClasses } from '@/renderer/editor/classes';
 
 interface MarkRendererProps {
   node: JSONContent;

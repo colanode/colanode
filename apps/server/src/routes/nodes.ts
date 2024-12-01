@@ -1,8 +1,9 @@
+import { GetNodeTransactionsOutput, hasViewerAccess } from '@colanode/core';
+import { Router } from 'express';
+
 import { database } from '@/data/database';
 import { fetchNodeRole, mapNodeTransaction } from '@/lib/nodes';
 import { ApiError, ColanodeRequest, ColanodeResponse } from '@/types/api';
-import { Router } from 'express';
-import { GetNodeTransactionsOutput, hasViewerAccess } from '@colanode/core';
 
 export const nodesRouter = Router();
 

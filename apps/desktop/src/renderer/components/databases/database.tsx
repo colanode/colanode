@@ -1,13 +1,14 @@
-import React from 'react';
-import { DatabaseContext } from '@/renderer/contexts/database';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { useMutation } from '@/renderer/hooks/use-mutation';
 import {
   DatabaseNode,
   hasCollaboratorAccess,
   hasEditorAccess,
   NodeRole,
 } from '@colanode/core';
+import React from 'react';
+
+import { DatabaseContext } from '@/renderer/contexts/database';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 
 interface DatabaseProps {
   database: DatabaseNode;

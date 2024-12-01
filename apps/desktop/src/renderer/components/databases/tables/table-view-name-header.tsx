@@ -1,17 +1,18 @@
-import React from 'react';
+import { ArrowDownAz, ArrowDownZa, Filter, Type } from 'lucide-react';
 import { Resizable } from 're-resizable';
+import React from 'react';
+import { useDrop } from 'react-dnd';
+
+import { Input } from '@/renderer/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
 import { Separator } from '@/renderer/components/ui/separator';
-import { Input } from '@/renderer/components/ui/input';
-import { useView } from '@/renderer/contexts/view';
-import { useDrop } from 'react-dnd';
-import { cn } from '@/shared/lib/utils';
-import { ArrowDownAz, ArrowDownZa, Filter, Type } from 'lucide-react';
 import { useDatabase } from '@/renderer/contexts/database';
+import { useView } from '@/renderer/contexts/view';
+import { cn } from '@/shared/lib/utils';
 
 export const TableViewNameHeader = () => {
   const database = useDatabase();

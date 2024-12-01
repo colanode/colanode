@@ -1,4 +1,5 @@
 import { extractNodeCollaborators, Node, NodeTypes } from '@colanode/core';
+
 import { NodeCollaborator } from '@/shared/types/nodes';
 
 export const getDefaultNodeIcon = (type: string) => {

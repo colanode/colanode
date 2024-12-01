@@ -1,8 +1,9 @@
+import type { ConfigEnv, Plugin, UserConfig } from 'vite';
 import { builtinModules } from 'node:module';
 import type { AddressInfo } from 'node:net';
-import type { ConfigEnv, Plugin, UserConfig } from 'vite';
-import pkg from './package.json';
 import path from 'path';
+
+import pkg from './package.json';
 
 export const builtins = [
   'electron',

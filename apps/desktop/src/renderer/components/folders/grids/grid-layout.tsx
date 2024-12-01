@@ -1,5 +1,5 @@
-import { useFolder } from '@/renderer/contexts/folder';
 import { GridFile } from '@/renderer/components/folders/grids/grid-file';
+import { useFolder } from '@/renderer/contexts/folder';
 
 export const GridLayout = () => {
   const folder = useFolder();

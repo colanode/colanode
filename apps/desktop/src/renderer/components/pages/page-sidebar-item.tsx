@@ -1,7 +1,8 @@
-import { cn } from '@/shared/lib/utils';
 import { PageNode } from '@colanode/core';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useWorkspace } from '@/renderer/contexts/workspace';
+import { cn } from '@/shared/lib/utils';
 
 interface PageSidebarItemProps {
   node: PageNode;

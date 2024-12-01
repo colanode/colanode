@@ -1,7 +1,7 @@
+import { JSONContent } from '@tiptap/core';
 import React from 'react';
 
 import { NodeRenderer } from '@/renderer/editor/renderers/node';
-import { JSONContent } from '@tiptap/core';
 
 interface NodeChildrenRendererProps {
   node: JSONContent;

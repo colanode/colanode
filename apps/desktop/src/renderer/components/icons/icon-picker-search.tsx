@@ -1,7 +1,8 @@
 import React from 'react';
+
 import { IconPickerItem } from '@/renderer/components/icons/icon-picker-item';
-import { searchIcons } from '@/shared/lib/icons';
 import { useIconPicker } from '@/renderer/contexts/icon-picker';
+import { searchIcons } from '@/shared/lib/icons';
 
 interface IconPickerSearchProps {
   query: string;

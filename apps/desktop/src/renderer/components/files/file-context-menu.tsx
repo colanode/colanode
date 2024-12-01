@@ -1,4 +1,6 @@
+import { Folder, Trash2 } from 'lucide-react';
 import React from 'react';
+
 import { FileDeleteDialog } from '@/renderer/components/files/file-delete-dialog';
 import {
   ContextMenu,
@@ -8,7 +10,6 @@ import {
   ContextMenuTrigger,
 } from '@/renderer/components/ui/context-menu';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { Folder, Trash2 } from 'lucide-react';
 
 interface FileContextMenuProps {
   id: string;

@@ -1,5 +1,5 @@
-import React from 'react';
 import { JSONContent } from '@tiptap/core';
+import React from 'react';
 
 interface TextRendererProps {
   node: JSONContent;

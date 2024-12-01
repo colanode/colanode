@@ -1,12 +1,13 @@
-import React from 'react';
 import { MultiSelectFieldAttributes } from '@colanode/core';
-import {
-  Popover,
-  PopoverTrigger,
-  PopoverContent,
-} from '@/renderer/components/ui/popover';
+import React from 'react';
+
 import { SelectFieldOptions } from '@/renderer/components/databases/fields/select-field-options';
 import { SelectOptionBadge } from '@/renderer/components/databases/fields/select-option-badge';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/renderer/components/ui/popover';
 import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordMultiSelectValueProps {

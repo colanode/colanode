@@ -1,4 +1,5 @@
 import { FolderNode } from '@colanode/core';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 
 interface FolderBreadcrumbItemProps {

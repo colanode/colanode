@@ -1,10 +1,11 @@
 import React from 'react';
+
+import { AvatarPicker } from '@/renderer/components/avatars/avatar-picker';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
-import { AvatarPicker } from './avatar-picker';
 
 interface AvatarPopoverProps {
   onPick: (avatar: string) => void;

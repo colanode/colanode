@@ -1,12 +1,12 @@
+import { AvatarUpload } from '@/renderer/components/avatars/avatar-upload';
+import { EmojiPicker } from '@/renderer/components/emojis/emoji-picker';
+import { IconPicker } from '@/renderer/components/icons/icon-picker';
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/renderer/components/ui/tabs';
-import { EmojiPicker } from '@/renderer/components/emojis/emoji-picker';
-import { IconPicker } from '@/renderer/components/icons/icon-picker';
-import { AvatarUpload } from '@/renderer/components/avatars/avatar-upload';
 
 interface AvatarPickerProps {
   onPick: (avatar: string) => void;

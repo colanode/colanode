@@ -1,6 +1,7 @@
-import React from 'react';
-import { Checkbox } from '@/renderer/components/ui/checkbox';
 import { BooleanFieldAttributes } from '@colanode/core';
+import React from 'react';
+
+import { Checkbox } from '@/renderer/components/ui/checkbox';
 import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordBooleanValueProps {

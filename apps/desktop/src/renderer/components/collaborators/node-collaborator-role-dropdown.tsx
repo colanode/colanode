@@ -1,10 +1,11 @@
+import { Check, ChevronDown } from 'lucide-react';
+
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { Check, ChevronDown } from 'lucide-react';
 
 interface NodeCollaboratorRole {
   name: string;

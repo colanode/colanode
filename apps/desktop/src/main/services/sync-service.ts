@@ -1,32 +1,33 @@
-import { databaseService } from '@/main/data/database-service';
-import { mapTransaction } from '@/main/utils';
-import { eventBus } from '@/shared/lib/event-bus';
-import { httpClient } from '@/shared/lib/http-client';
-import { serverService } from '@/main/services/server-service';
 import {
-  InteractionsBatchMessage,
   CollaborationRevocationsBatchMessage,
   CollaborationsBatchMessage,
-  FetchInteractionsMessage,
   FetchCollaborationRevocationsMessage,
   FetchCollaborationsMessage,
+  FetchInteractionsMessage,
   FetchNodeTransactionsMessage,
   GetNodeTransactionsOutput,
+  InteractionsBatchMessage,
   LocalNodeTransaction,
   NodeTransactionsBatchMessage,
   SyncInteractionsMessage,
   SyncNodeTransactionsOutput,
 } from '@colanode/core';
-import { createLogger } from '@/main/logger';
-import { nodeService } from '@/main/services/node-service';
-import { socketService } from '@/main/services/socket-service';
-import { collaborationService } from '@/main/services/collaboration-service';
-import { interactionService } from '@/main/services/interaction-service';
+import { sql } from 'kysely';
+
+import { databaseService } from '@/main/data/database-service';
 import {
   SelectInteractionEvent,
   SelectNodeTransaction,
 } from '@/main/data/workspace/schema';
-import { sql } from 'kysely';
+import { createLogger } from '@/main/logger';
+import { collaborationService } from '@/main/services/collaboration-service';
+import { interactionService } from '@/main/services/interaction-service';
+import { nodeService } from '@/main/services/node-service';
+import { serverService } from '@/main/services/server-service';
+import { socketService } from '@/main/services/socket-service';
+import { mapTransaction } from '@/main/utils';
+import { eventBus } from '@/shared/lib/event-bus';
+import { httpClient } from '@/shared/lib/http-client';
 
 type WorkspaceSyncState = {
   isSyncing: boolean;

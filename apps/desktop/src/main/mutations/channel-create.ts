@@ -1,11 +1,12 @@
+import { ChannelAttributes,generateId, IdType } from '@colanode/core';
+
 import { databaseService } from '@/main/data/database-service';
-import { generateId, IdType, ChannelAttributes } from '@colanode/core';
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   ChannelCreateMutationInput,
   ChannelCreateMutationOutput,
 } from '@/shared/mutations/channel-create';
-import { nodeService } from '@/main/services/node-service';
 
 export class ChannelCreateMutationHandler
   implements MutationHandler<ChannelCreateMutationInput>

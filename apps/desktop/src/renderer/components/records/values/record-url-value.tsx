@@ -1,11 +1,12 @@
-import { UrlFieldAttributes, isValidUrl } from '@colanode/core';
+import { isValidUrl,UrlFieldAttributes } from '@colanode/core';
+import { ExternalLink } from 'lucide-react';
+
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from '@/renderer/components/ui/hover-card';
 import { SmartTextInput } from '@/renderer/components/ui/smart-text-input';
-import { ExternalLink } from 'lucide-react';
 import { useRecord } from '@/renderer/contexts/record';
 import { cn } from '@/shared/lib/utils';
 

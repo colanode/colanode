@@ -1,10 +1,11 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
-import { CommandMap, CommandInput } from '@/shared/commands';
-import { MutationMap, MutationInput } from '@/shared/mutations';
-import { QueryInput, QueryMap } from '@/shared/queries';
 import { contextBridge, ipcRenderer } from 'electron';
+
+import { CommandInput,CommandMap } from '@/shared/commands';
 import { eventBus } from '@/shared/lib/event-bus';
+import { MutationInput,MutationMap } from '@/shared/mutations';
+import { QueryInput, QueryMap } from '@/shared/queries';
 import { Event } from '@/shared/types/events';
 
 contextBridge.exposeInMainWorld('colanode', {

@@ -1,11 +1,11 @@
-import { NodeType } from '../registry';
+import { InteractionEvent } from './interactions';
 import {
-  ServerInteraction,
   ServerCollaboration,
   ServerCollaborationRevocation,
+  ServerInteraction,
   ServerNodeTransaction,
 } from './sync';
-import { InteractionEvent } from './interactions';
+import { NodeType } from '../registry';
 
 export type FetchNodeTransactionsMessage = {
   type: 'fetch_node_transactions';

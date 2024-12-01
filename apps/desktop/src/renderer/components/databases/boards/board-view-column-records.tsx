@@ -4,13 +4,14 @@ import {
   SelectOptionAttributes,
   ViewFilterAttributes,
 } from '@colanode/core';
+
 import { BoardViewRecordCard } from '@/renderer/components/databases/boards/board-view-record-card';
-import { useView } from '@/renderer/contexts/view';
-import { useRecordsQuery } from '@/renderer/hooks/user-records-query';
-import { RecordProvider } from '@/renderer/components/records/record-provider';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { useDatabase } from '@/renderer/contexts/database';
 import { BoardViewRecordCreateCard } from '@/renderer/components/databases/boards/board-view-record-create-card';
+import { RecordProvider } from '@/renderer/components/records/record-provider';
+import { useDatabase } from '@/renderer/contexts/database';
+import { useView } from '@/renderer/contexts/view';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useRecordsQuery } from '@/renderer/hooks/user-records-query';
 
 interface BoardViewColumnRecordsProps {
   field: SelectFieldAttributes;

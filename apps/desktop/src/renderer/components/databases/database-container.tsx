@@ -1,8 +1,9 @@
+import { extractNodeRole } from '@colanode/core';
+
+import { DatabaseBody } from '@/renderer/components/databases/database-body';
+import { DatabaseHeader } from '@/renderer/components/databases/database-header';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { DatabaseHeader } from '@/renderer/components/databases/database-header';
-import { extractNodeRole } from '@colanode/core';
-import { DatabaseBody } from '@/renderer/components/databases/database-body';
 
 interface DatabaseContainerProps {
   nodeId: string;

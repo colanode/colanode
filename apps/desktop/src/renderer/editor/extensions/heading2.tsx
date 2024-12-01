@@ -1,4 +1,5 @@
 import { mergeAttributes, Node, textblockTypeInputRule } from '@tiptap/core';
+
 import { defaultClasses } from '@/renderer/editor/classes';
 
 export interface Heading2Options {

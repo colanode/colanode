@@ -1,11 +1,12 @@
 import React from 'react';
-import { getEmojiUrl } from '@/shared/lib/emojis';
+
 import { EmojiElement } from '@/renderer/components/emojis/emoji-element';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
+import { getEmojiUrl } from '@/shared/lib/emojis';
 
 const skins: string[] = [
   '01jc5vxx32ez8g5394y7mzt2vnem',

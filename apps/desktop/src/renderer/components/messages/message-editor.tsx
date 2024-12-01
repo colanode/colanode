@@ -1,28 +1,29 @@
-import React from 'react';
 import type { JSONContent } from '@tiptap/core';
 import { EditorContent, useEditor } from '@tiptap/react';
 import isHotkey from 'is-hotkey';
+import React from 'react';
+
 import {
-  MessageNode,
-  TextNode,
-  ParagraphNode,
-  CodeBlockNode,
-  TabKeymapExtension,
-  PlaceholderExtension,
-  DividerNode,
-  TrailingNode,
   BoldMark,
-  ItalicMark,
-  UnderlineMark,
-  StrikethroughMark,
+  CodeBlockNode,
   CodeMark,
   ColorMark,
-  HighlightMark,
-  LinkMark,
-  IdExtension,
+  DividerNode,
   DropcursorExtension,
-  FilePlaceholderNode,
   FileNode,
+  FilePlaceholderNode,
+  HighlightMark,
+  IdExtension,
+  ItalicMark,
+  LinkMark,
+  MessageNode,
+  ParagraphNode,
+  PlaceholderExtension,
+  StrikethroughMark,
+  TabKeymapExtension,
+  TextNode,
+  TrailingNode,
+  UnderlineMark,
 } from '@/renderer/editor/extensions';
 import { EditorBubbleMenu } from '@/renderer/editor/menu/bubble-menu';
 import { FileMetadata } from '@/shared/types/files';

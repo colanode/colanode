@@ -1,18 +1,19 @@
-import React from 'react';
 import { CollaboratorFieldAttributes, UserNode } from '@colanode/core';
-import { useRecord } from '@/renderer/contexts/record';
-import { useQueries } from '@/renderer/hooks/use-queries';
-import { useWorkspace } from '@/renderer/contexts/workspace';
+import { X } from 'lucide-react';
+import React from 'react';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
+import { Badge } from '@/renderer/components/ui/badge';
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
+  PopoverTrigger,
 } from '@/renderer/components/ui/popover';
-import { UserSearch } from '@/renderer/components/users/user-search';
-import { Badge } from '@/renderer/components/ui/badge';
 import { Separator } from '@/renderer/components/ui/separator';
-import { X } from 'lucide-react';
+import { UserSearch } from '@/renderer/components/users/user-search';
+import { useRecord } from '@/renderer/contexts/record';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useQueries } from '@/renderer/hooks/use-queries';
 
 interface RecordCollaboratorValueProps {
   field: CollaboratorFieldAttributes;

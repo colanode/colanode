@@ -1,5 +1,6 @@
-import { IconData, Icon } from '@/shared/types/icons';
 import { createContext, useContext } from 'react';
+
+import { Icon,IconData } from '@/shared/types/icons';
 
 interface IconPickerContextProps {
   data: IconData;

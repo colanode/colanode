@@ -1,9 +1,9 @@
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   DatabaseUpdateMutationInput,
   DatabaseUpdateMutationOutput,
 } from '@/shared/mutations/database-update';
-import { nodeService } from '@/main/services/node-service';
 
 export class DatabaseUpdateMutationHandler
   implements MutationHandler<DatabaseUpdateMutationInput>

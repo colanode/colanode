@@ -1,29 +1,30 @@
-import { Request, Response, Router } from 'express';
 import {
   AccountStatus,
+  AccountSyncOutput,
   AccountUpdateInput,
   AccountUpdateOutput,
   EmailLoginInput,
   EmailRegisterInput,
+  generateId,
   GoogleLoginInput,
   GoogleUserInfo,
+  IdType,
   LoginOutput,
   WorkspaceOutput,
   WorkspaceRole,
-  generateId,
-  IdType,
-  AccountSyncOutput,
 } from '@colanode/core';
 import axios from 'axios';
-import { ApiError, ColanodeRequest, ColanodeResponse } from '@/types/api';
-import { database } from '@/data/database';
 import bcrypt from 'bcrypt';
-import { authMiddleware } from '@/middlewares/auth';
-import { generateToken } from '@/lib/tokens';
-import { SelectAccount } from '@/data/schema';
-import { workspaceService } from '@/services/workspace-service';
+import { Request, Response, Router } from 'express';
 import { sha256 } from 'js-sha256';
+
+import { database } from '@/data/database';
+import { SelectAccount } from '@/data/schema';
+import { generateToken } from '@/lib/tokens';
+import { authMiddleware } from '@/middlewares/auth';
 import { nodeService } from '@/services/node-service';
+import { workspaceService } from '@/services/workspace-service';
+import { ApiError, ColanodeRequest, ColanodeResponse } from '@/types/api';
 
 const GoogleUserInfoUrl = 'https://www.googleapis.com/oauth2/v1/userinfo';
 const SaltRounds = 10;
@@ -34,7 +35,7 @@ accountsRouter.post('/register/email', async (req: Request, res: Response) => {
   const input: EmailRegisterInput = req.body;
   const email = input.email.toLowerCase();
 
-  let existingAccount = await database
+  const existingAccount = await database
     .selectFrom('accounts')
     .selectAll()
     .where('email', '=', email)
@@ -94,7 +95,7 @@ accountsRouter.post('/login/email', async (req: Request, res: Response) => {
   const input: EmailLoginInput = req.body;
   const email = input.email.toLowerCase();
 
-  let account = await database
+  const account = await database
     .selectFrom('accounts')
     .where('email', '=', email)
     .selectAll()
@@ -159,7 +160,7 @@ accountsRouter.post('/login/google', async (req: Request, res: Response) => {
     });
   }
 
-  let existingAccount = await database
+  const existingAccount = await database
     .selectFrom('accounts')
     .where('email', '=', googleUser.email)
     .selectAll()

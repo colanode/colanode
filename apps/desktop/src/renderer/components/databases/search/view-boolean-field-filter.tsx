@@ -2,22 +2,23 @@ import {
   BooleanFieldAttributes,
   ViewFieldFilterAttributes,
 } from '@colanode/core';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/renderer/components/ui/popover';
+import { ChevronDown, Trash2 } from 'lucide-react';
+
+import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
+import { Button } from '@/renderer/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { Button } from '@/renderer/components/ui/button';
-import { booleanFieldFilterOperators } from '@/shared/lib/databases';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/renderer/components/ui/popover';
 import { useView } from '@/renderer/contexts/view';
-import { FieldIcon } from '../fields/field-icon';
-import { ChevronDown, Trash2 } from 'lucide-react';
+import { booleanFieldFilterOperators } from '@/shared/lib/databases';
 
 interface ViewBooleanFieldFilterProps {
   field: BooleanFieldAttributes;

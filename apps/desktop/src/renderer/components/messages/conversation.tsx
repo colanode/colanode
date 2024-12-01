@@ -1,16 +1,17 @@
-import React from 'react';
-import { MessageList } from '@/renderer/components/messages/message-list';
-import {
-  MessageCreate,
-  MessageCreateRefProps,
-} from '@/renderer/components/messages/message-create';
-import { ScrollArea } from '@/renderer/components/ui/scroll-area';
-import { InView } from 'react-intersection-observer';
 import {
   hasAdminAccess,
   hasCollaboratorAccess,
   NodeRole,
 } from '@colanode/core';
+import React from 'react';
+import { InView } from 'react-intersection-observer';
+
+import {
+  MessageCreate,
+  MessageCreateRefProps,
+} from '@/renderer/components/messages/message-create';
+import { MessageList } from '@/renderer/components/messages/message-list';
+import { ScrollArea } from '@/renderer/components/ui/scroll-area';
 import { ConversationContext } from '@/renderer/contexts/conversation';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 

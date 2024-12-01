@@ -1,9 +1,10 @@
-import { SocketConnection } from '@/main/services/socket-connection';
-import { databaseService } from '@/main/data/database-service';
 import { Message } from '@colanode/core';
-import { serverService } from '@/main/services/server-service';
-import { eventBus } from '@/shared/lib/event-bus';
+
+import { databaseService } from '@/main/data/database-service';
 import { createLogger } from '@/main/logger';
+import { serverService } from '@/main/services/server-service';
+import { SocketConnection } from '@/main/services/socket-connection';
+import { eventBus } from '@/shared/lib/event-bus';
 
 class SocketService {
   private readonly logger = createLogger('socket-service');

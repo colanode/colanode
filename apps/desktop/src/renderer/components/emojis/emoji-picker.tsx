@@ -1,10 +1,11 @@
 import React from 'react';
-import { EmojiSkinToneSelector } from '@/renderer/components/emojis/emoji-skin-tone-selector';
-import { Emoji } from '@/shared/types/emojis';
-import { EmojiPickerContext } from '@/renderer/contexts/emoji-picker';
+
 import { EmojiPickerBrowser } from '@/renderer/components/emojis/emoji-picker-browser';
 import { EmojiPickerSearch } from '@/renderer/components/emojis/emoji-picker-search';
+import { EmojiSkinToneSelector } from '@/renderer/components/emojis/emoji-skin-tone-selector';
+import { EmojiPickerContext } from '@/renderer/contexts/emoji-picker';
 import { useQuery } from '@/renderer/hooks/use-query';
+import { Emoji } from '@/shared/types/emojis';
 
 interface EmojiPickerProps {
   onPick: (emoji: Emoji, skinTone: number) => void;

@@ -1,29 +1,30 @@
-import { RecordListQueryInput } from '@/shared/queries/record-list';
-import { databaseService } from '@/main/data/database-service';
-import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { SelectNode } from '@/main/data/workspace/schema';
-import { sql } from 'kysely';
 import {
   BooleanFieldAttributes,
   CreatedAtFieldAttributes,
+  DatabaseNode,
   DateFieldAttributes,
   EmailFieldAttributes,
   FieldAttributes,
+  isStringArray,
   MultiSelectFieldAttributes,
+  NodeTypes,
   NumberFieldAttributes,
   PhoneFieldAttributes,
+  RecordNode,
   SelectFieldAttributes,
   TextFieldAttributes,
   UrlFieldAttributes,
   ViewFieldFilterAttributes,
   ViewFilterAttributes,
   ViewSortAttributes,
-  DatabaseNode,
-  RecordNode,
-  isStringArray,
-  NodeTypes,
 } from '@colanode/core';
+import { sql } from 'kysely';
+
+import { databaseService } from '@/main/data/database-service';
+import { SelectNode } from '@/main/data/workspace/schema';
+import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { mapNode } from '@/main/utils';
+import { RecordListQueryInput } from '@/shared/queries/record-list';
 import { Event } from '@/shared/types/events';
 
 export class RecordListQueryHandler

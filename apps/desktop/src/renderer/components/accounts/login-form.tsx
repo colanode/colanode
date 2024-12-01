@@ -1,8 +1,9 @@
 import React from 'react';
-import { EmailRegister } from '@/renderer/components/accounts/email-register';
-import { EmailLogin } from '@/renderer/components/accounts/email-login';
-import { ServerDropdown } from '@/renderer/components/servers/server-dropdown';
 import { useNavigate } from 'react-router-dom';
+
+import { EmailLogin } from '@/renderer/components/accounts/email-login';
+import { EmailRegister } from '@/renderer/components/accounts/email-register';
+import { ServerDropdown } from '@/renderer/components/servers/server-dropdown';
 import { Separator } from '@/renderer/components/ui/separator';
 import { Account } from '@/shared/types/accounts';
 import { Server } from '@/shared/types/servers';

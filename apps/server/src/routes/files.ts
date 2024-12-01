@@ -1,15 +1,9 @@
-import { database } from '@/data/database';
-import { BUCKET_NAMES, filesStorage } from '@/data/storage';
-import { hasCollaboratorAccess } from '@/lib/constants';
-import { fetchNodeRole } from '@/lib/nodes';
-import { ApiError, ColanodeRequest, ColanodeResponse } from '@/types/api';
 import {
   GetObjectCommand,
   HeadObjectCommand,
   PutObjectCommand,
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import { Router } from 'express';
 import {
   CreateDownloadOutput,
   CreateUploadInput,
@@ -17,8 +11,15 @@ import {
   extractFileType,
   UploadMetadata,
 } from '@colanode/core';
+import { Router } from 'express';
+
+import { database } from '@/data/database';
 import { redis } from '@/data/redis';
+import { BUCKET_NAMES, filesStorage } from '@/data/storage';
+import { hasCollaboratorAccess } from '@/lib/constants';
+import { fetchNodeRole } from '@/lib/nodes';
 import { nodeService } from '@/services/node-service';
+import { ApiError, ColanodeRequest, ColanodeResponse } from '@/types/api';
 
 export const filesRouter = Router();
 
@@ -326,7 +327,7 @@ filesRouter.put(
           message: 'Uploaded file type does not match expected type',
         });
       }
-    } catch (error) {
+    } catch {
       return res.status(400).json({
         code: ApiError.BadRequest,
         message: 'File upload verification failed',

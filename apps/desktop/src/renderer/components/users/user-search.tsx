@@ -1,4 +1,7 @@
+import { UserNode } from '@colanode/core';
 import React from 'react';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
 import {
   Command,
   CommandEmpty,
@@ -9,8 +12,6 @@ import {
 } from '@/renderer/components/ui/command';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { Avatar } from '@/renderer/components/avatars/avatar';
-import { UserNode } from '@colanode/core';
 
 interface UserSearchProps {
   exclude?: string[];

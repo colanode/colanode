@@ -1,6 +1,7 @@
-import { QueryInput } from '@/shared/queries';
-import { sha256 } from 'js-sha256';
 import { useQueries as useTanstackQueries } from '@tanstack/react-query';
+import { sha256 } from 'js-sha256';
+
+import { QueryInput } from '@/shared/queries';
 
 export const useQueries = <T extends QueryInput>(inputs: T[]) => {
   const result = useTanstackQueries({

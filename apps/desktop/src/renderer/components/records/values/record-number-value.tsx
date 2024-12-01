@@ -1,4 +1,5 @@
 import { type NumberFieldAttributes } from '@colanode/core';
+
 import { SmartNumberInput } from '@/renderer/components/ui/smart-number-input';
 import { useRecord } from '@/renderer/contexts/record';
 

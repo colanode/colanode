@@ -1,11 +1,12 @@
+import { WorkspaceUsersInviteOutput } from '@colanode/core';
+
 import { databaseService } from '@/main/data/database-service';
+import { MutationHandler } from '@/main/types';
 import { httpClient } from '@/shared/lib/http-client';
 import {
   WorkspaceUsersInviteMutationInput,
   WorkspaceUsersInviteMutationOutput,
 } from '@/shared/mutations/workspace-users-invite';
-import { MutationHandler } from '@/main/types';
-import { WorkspaceUsersInviteOutput } from '@colanode/core';
 
 export class WorkspaceUsersInviteMutationHandler
   implements MutationHandler<WorkspaceUsersInviteMutationInput>

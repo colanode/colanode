@@ -1,4 +1,6 @@
+import { Trash2 } from 'lucide-react';
 import React from 'react';
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -9,9 +11,8 @@ import {
   AlertDialogTitle,
 } from '@/renderer/components/ui/alert-dialog';
 import { Button } from '@/renderer/components/ui/button';
-import { useMutation } from '@/renderer/hooks/use-mutation';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { Trash2 } from 'lucide-react';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 
 interface MessageDeleteButtonProps {
   id: string;

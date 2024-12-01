@@ -1,10 +1,11 @@
-import axios from 'axios';
-import { Server } from '@/shared/types/servers';
 import { ServerConfig } from '@colanode/core';
+import axios from 'axios';
+
 import { databaseService } from '@/main/data/database-service';
+import { createLogger } from '@/main/logger';
 import { mapServer } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
-import { createLogger } from '@/main/logger';
+import { Server } from '@/shared/types/servers';
 
 type ServerState = {
   isAvailable: boolean;

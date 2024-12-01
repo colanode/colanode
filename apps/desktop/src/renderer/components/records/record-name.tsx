@@ -1,7 +1,7 @@
-import { useMutation } from '@/renderer/hooks/use-mutation';
 import { SmartTextInput } from '@/renderer/components/ui/smart-text-input';
-import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useRecord } from '@/renderer/contexts/record';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 
 export const RecordName = () => {
   const workspace = useWorkspace();

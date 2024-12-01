@@ -1,10 +1,11 @@
+import { unset } from 'lodash-es';
+
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   NodeAttributeDeleteMutationInput,
   NodeAttributeDeleteMutationOutput,
 } from '@/shared/mutations/node-attribute-delete';
-import { nodeService } from '@/main/services/node-service';
-import { unset } from 'lodash-es';
 
 export class NodeAttributeDeleteMutationHandler
   implements MutationHandler<NodeAttributeDeleteMutationInput>

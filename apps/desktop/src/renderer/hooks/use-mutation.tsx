@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { MutationInput, MutationMap } from '@/shared/mutations';
 
 interface MutationOptions<T extends MutationInput> {

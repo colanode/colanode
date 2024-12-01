@@ -1,5 +1,6 @@
-import { useWorkspace } from '@/renderer/contexts/workspace';
 import { Fullscreen } from 'lucide-react';
+
+import { useWorkspace } from '@/renderer/contexts/workspace';
 
 interface NodeFullscreenButtonProps {
   nodeId: string;

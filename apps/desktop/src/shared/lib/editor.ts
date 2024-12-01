@@ -1,11 +1,11 @@
 import {
-  EditorNodeTypes,
-  generateId,
-  getIdTypeFromNode,
-  generateNodeIndex,
-  compareString,
   Block,
   BlockLeaf,
+  compareString,
+  EditorNodeTypes,
+  generateId,
+  generateNodeIndex,
+  getIdTypeFromNode,
 } from '@colanode/core';
 import { JSONContent } from '@tiptap/core';
 

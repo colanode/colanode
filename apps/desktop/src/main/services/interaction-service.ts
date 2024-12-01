@@ -7,10 +7,11 @@ import {
   NodeType,
   ServerInteraction,
 } from '@colanode/core';
+
 import { databaseService } from '@/main/data/database-service';
 import { SelectInteractionEvent } from '@/main/data/workspace/schema';
+import { mapInteraction } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
-import { mapInteraction } from '../utils';
 
 const UPDATE_RETRIES_COUNT = 10;
 

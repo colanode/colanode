@@ -1,8 +1,9 @@
-import { initApi } from '@/api';
-import { initRedis } from '@/data/redis';
-import { migrate } from '@/data/database';
-import { jobService } from '@/services/job-service';
 import dotenv from 'dotenv';
+
+import { initApi } from '@/api';
+import { migrate } from '@/data/database';
+import { initRedis } from '@/data/redis';
+import { jobService } from '@/services/job-service';
 
 dotenv.config();
 

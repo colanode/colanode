@@ -8,8 +8,9 @@ import {
   UpdateResult,
 } from 'kysely';
 import pg from 'pg';
-import { DatabaseSchema } from '@/data/schema';
+
 import { databaseMigrations } from '@/data/migrations';
+import { DatabaseSchema } from '@/data/schema';
 
 const dialect = new PostgresDialect({
   pool: new pg.Pool({

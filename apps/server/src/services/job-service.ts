@@ -1,7 +1,8 @@
+import { Job, JobsOptions,Queue, Worker } from 'bullmq';
+
 import { redisConfig } from '@/data/redis';
 import { jobHandlerMap } from '@/jobs';
 import { JobHandler, JobInput } from '@/types/jobs';
-import { Job, Queue, Worker, JobsOptions } from 'bullmq';
 
 class JobService {
   private jobQueue: Queue | undefined;

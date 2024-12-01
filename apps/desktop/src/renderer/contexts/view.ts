@@ -4,8 +4,9 @@ import {
   ViewSortAttributes,
   ViewType,
 } from '@colanode/core';
-import { ViewField } from '@/shared/types/databases';
 import { createContext, useContext } from 'react';
+
+import { ViewField } from '@/shared/types/databases';
 
 interface ViewContext {
   id: string;

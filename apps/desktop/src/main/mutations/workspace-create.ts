@@ -1,12 +1,13 @@
+import { WorkspaceOutput } from '@colanode/core';
+
 import { databaseService } from '@/main/data/database-service';
+import { MutationHandler } from '@/main/types';
+import { eventBus } from '@/shared/lib/event-bus';
 import { httpClient } from '@/shared/lib/http-client';
 import {
   WorkspaceCreateMutationInput,
   WorkspaceCreateMutationOutput,
 } from '@/shared/mutations/workspace-create';
-import { MutationHandler } from '@/main/types';
-import { WorkspaceOutput } from '@colanode/core';
-import { eventBus } from '@/shared/lib/event-bus';
 
 export class WorkspaceCreateMutationHandler
   implements MutationHandler<WorkspaceCreateMutationInput>

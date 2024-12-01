@@ -1,19 +1,20 @@
+import started from 'electron-squirrel-startup';
 import { app, BrowserWindow, ipcMain, protocol } from 'electron';
 import path from 'path';
-import { eventBus } from '@/shared/lib/event-bus';
-import { avatarService } from '@/main/services/avatar-service';
-import { fileService } from '@/main/services/file-service';
+
+import { bootstrapper } from '@/main/bootstrapper';
+import { closeLoggers, createLogger } from '@/main/logger';
 import { assetService } from '@/main/services/asset-service';
-import { MutationMap, MutationInput } from '@/shared/mutations';
-import { QueryMap, QueryInput } from '@/shared/queries';
+import { avatarService } from '@/main/services/avatar-service';
+import { commandService } from '@/main/services/command-service';
+import { fileService } from '@/main/services/file-service';
 import { mutationService } from '@/main/services/mutation-service';
 import { queryService } from '@/main/services/query-service';
-import { CommandMap, CommandInput } from '@/shared/commands';
-import { commandService } from '@/main/services/command-service';
-import { bootstrapper } from '@/main/bootstrapper';
-import started from 'electron-squirrel-startup';
-import { closeLoggers, createLogger } from '@/main/logger';
 import { getAppIconPath } from '@/main/utils';
+import { CommandInput,CommandMap } from '@/shared/commands';
+import { eventBus } from '@/shared/lib/event-bus';
+import { MutationInput,MutationMap } from '@/shared/mutations';
+import { QueryInput,QueryMap } from '@/shared/queries';
 
 const logger = createLogger('main');
 

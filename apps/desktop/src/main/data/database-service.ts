@@ -1,13 +1,14 @@
-import fs from 'fs';
 import SQLite from 'better-sqlite3';
 import { Kysely, Migration, Migrator, SqliteDialect } from 'kysely';
-import { AppDatabaseSchema } from '@/main/data/app/schema';
-import { WorkspaceDatabaseSchema } from '@/main/data/workspace/schema';
+import fs from 'fs';
+
 import { appDatabaseMigrations } from '@/main/data/app/migrations';
+import { AppDatabaseSchema } from '@/main/data/app/schema';
 import { workspaceDatabaseMigrations } from '@/main/data/workspace/migrations';
+import { WorkspaceDatabaseSchema } from '@/main/data/workspace/schema';
+import { createLogger } from '@/main/logger';
 import { appDatabasePath, getWorkspaceDirectoryPath } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
-import { createLogger } from '@/main/logger';
 
 class DatabaseService {
   private initPromise: Promise<void> | null = null;

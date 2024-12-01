@@ -1,6 +1,7 @@
 import { app } from 'electron';
-import { eventBus } from '@/shared/lib/event-bus';
+
 import { radarService } from '@/main/services/radar-service';
+import { eventBus } from '@/shared/lib/event-bus';
 
 class NotificationService {
   constructor() {

@@ -1,10 +1,11 @@
+import { ImagePlay } from 'lucide-react';
 import React from 'react';
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
-import { ImagePlay } from 'lucide-react';
 
 export const MessageGifPicker = () => {
   const [open, setOpen] = React.useState(false);

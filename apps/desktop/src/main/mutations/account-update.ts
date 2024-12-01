@@ -1,12 +1,13 @@
-import { databaseService } from '@/main/data/database-service';
-import { httpClient } from '@/shared/lib/http-client';
-import { MutationHandler } from '@/main/types';
 import { AccountUpdateOutput } from '@colanode/core';
+
+import { databaseService } from '@/main/data/database-service';
+import { MutationHandler } from '@/main/types';
+import { eventBus } from '@/shared/lib/event-bus';
+import { httpClient } from '@/shared/lib/http-client';
 import {
   AccountUpdateMutationInput,
   AccountUpdateMutationOutput,
 } from '@/shared/mutations/account-update';
-import { eventBus } from '@/shared/lib/event-bus';
 
 export class AccountUpdateMutationHandler
   implements MutationHandler<AccountUpdateMutationInput>

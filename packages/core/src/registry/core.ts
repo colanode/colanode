@@ -1,5 +1,5 @@
 import { z, ZodSchema } from 'zod';
-import { Node, NodeAttributes } from './';
+
 import {
   extractNodeRole,
   hasAdminAccess,
@@ -8,6 +8,7 @@ import {
   hasViewerAccess,
 } from '../lib/nodes';
 import { WorkspaceRole } from '../types/workspaces';
+import { Node, NodeAttributes } from './';
 
 export type NodeRole = 'admin' | 'editor' | 'collaborator' | 'viewer';
 export const nodeRoleEnum = z.enum([

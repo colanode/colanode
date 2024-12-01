@@ -1,10 +1,11 @@
+import { set } from 'lodash-es';
+
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   NodeCollaboratorCreateMutationInput,
   NodeCollaboratorCreateMutationOutput,
 } from '@/shared/mutations/node-collaborator-create';
-import { nodeService } from '@/main/services/node-service';
-import { set } from 'lodash-es';
 
 export class NodeCollaboratorCreateMutationHandler
   implements MutationHandler<NodeCollaboratorCreateMutationInput>

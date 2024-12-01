@@ -1,4 +1,5 @@
 import { monotonicFactory } from 'ulid';
+
 import { NodeTypes } from './constants';
 
 const ulid = monotonicFactory();

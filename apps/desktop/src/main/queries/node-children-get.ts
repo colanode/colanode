@@ -1,9 +1,10 @@
-import { NodeChildrenGetQueryInput } from '@/shared/queries/node-children-get';
+import { Node } from '@colanode/core';
+
 import { databaseService } from '@/main/data/database-service';
-import { mapNode } from '@/main/utils';
 import { SelectNode } from '@/main/data/workspace/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { Node } from '@colanode/core';
+import { mapNode } from '@/main/utils';
+import { NodeChildrenGetQueryInput } from '@/shared/queries/node-children-get';
 import { Event } from '@/shared/types/events';
 
 export class NodeChildrenGetQueryHandler

@@ -1,17 +1,18 @@
 import {
+  ChannelAttributes,
   generateId,
   IdType,
-  ChannelAttributes,
   PageAttributes,
   SpaceAttributes,
 } from '@colanode/core';
+
+import { databaseService } from '@/main/data/database-service';
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   SpaceCreateMutationInput,
   SpaceCreateMutationOutput,
 } from '@/shared/mutations/space-create';
-import { nodeService } from '@/main/services/node-service';
-import { databaseService } from '@/main/data/database-service';
 
 export class SpaceCreateMutationHandler
   implements MutationHandler<SpaceCreateMutationInput>

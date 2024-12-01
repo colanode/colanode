@@ -1,12 +1,3 @@
-import { net, shell } from 'electron';
-import path from 'path';
-import fs from 'fs';
-import axios from 'axios';
-import mime from 'mime-types';
-import { FileMetadata } from '@/shared/types/files';
-import { databaseService } from '@/main/data/database-service';
-import { httpClient } from '@/shared/lib/http-client';
-import { getWorkspaceFilesDirectoryPath } from '@/main/utils';
 import {
   CompleteUploadOutput,
   CreateDownloadOutput,
@@ -14,9 +5,19 @@ import {
   extractFileType,
   FileAttributes,
 } from '@colanode/core';
-import { eventBus } from '@/shared/lib/event-bus';
-import { serverService } from '@/main/services/server-service';
+import axios from 'axios';
+import mime from 'mime-types';
+import { net, shell } from 'electron';
+import fs from 'fs';
+import path from 'path';
+
+import { databaseService } from '@/main/data/database-service';
 import { createLogger } from '@/main/logger';
+import { serverService } from '@/main/services/server-service';
+import { getWorkspaceFilesDirectoryPath } from '@/main/utils';
+import { eventBus } from '@/shared/lib/event-bus';
+import { httpClient } from '@/shared/lib/http-client';
+import { FileMetadata } from '@/shared/types/files';
 
 type WorkspaceFileState = {
   isUploading: boolean;

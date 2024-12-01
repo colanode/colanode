@@ -1,6 +1,7 @@
-import { EditorCommand } from '@/shared/types/editor';
 import { NodeTypes } from '@colanode/core';
 import { FileText } from 'lucide-react';
+
+import { EditorCommand } from '@/shared/types/editor';
 
 export const PageCommand: EditorCommand = {
   key: 'page',

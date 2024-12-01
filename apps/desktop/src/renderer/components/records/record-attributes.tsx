@@ -1,9 +1,10 @@
 import React from 'react';
-import { RecordName } from '@/renderer/components/records/record-name';
-import { useDatabase } from '@/renderer/contexts/database';
+
+import { RecordAvatar } from '@/renderer/components/records/record-avatar';
 import { RecordField } from '@/renderer/components/records/record-field';
 import { RecordFieldValue } from '@/renderer/components/records/record-field-value';
-import { RecordAvatar } from '@/renderer/components/records/record-avatar';
+import { RecordName } from '@/renderer/components/records/record-name';
+import { useDatabase } from '@/renderer/contexts/database';
 
 export const RecordAttributes = () => {
   const database = useDatabase();

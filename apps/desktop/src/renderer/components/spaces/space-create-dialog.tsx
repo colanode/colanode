@@ -1,3 +1,8 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
+import { z } from 'zod';
+
+import { Button } from '@/renderer/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -6,7 +11,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
-import { z } from 'zod';
 import {
   Form,
   FormControl,
@@ -16,13 +20,10 @@ import {
   FormMessage,
 } from '@/renderer/components/ui/form';
 import { Input } from '@/renderer/components/ui/input';
-import { Textarea } from '@/renderer/components/ui/textarea';
-import { Button } from '@/renderer/components/ui/button';
 import { Spinner } from '@/renderer/components/ui/spinner';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useMutation } from '@/renderer/hooks/use-mutation';
+import { Textarea } from '@/renderer/components/ui/textarea';
 import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),

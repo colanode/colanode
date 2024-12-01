@@ -1,5 +1,6 @@
-import { EditorCommand } from '@/shared/types/editor';
 import { Pilcrow } from 'lucide-react';
+
+import { EditorCommand } from '@/shared/types/editor';
 
 export const ParagraphCommand: EditorCommand = {
   key: 'paragraph',

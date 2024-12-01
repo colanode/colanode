@@ -1,4 +1,9 @@
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { Info, Trash2, Users } from 'lucide-react';
 import React from 'react';
+import { match } from 'ts-pattern';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
 import {
   Dialog,
   DialogContent,
@@ -9,18 +14,14 @@ import {
   SidebarContent,
   SidebarGroup,
   SidebarGroupContent,
+  SidebarHeader,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarProvider,
-  SidebarHeader,
 } from '@/renderer/components/ui/sidebar';
-import { Avatar } from '@/renderer/components/avatars/avatar';
 import { WorkspaceUpdate } from '@/renderer/components/workspaces/workspace-update';
 import { WorkspaceUsers } from '@/renderer/components/workspaces/workspace-users';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { Info, Trash2, Users } from 'lucide-react';
-import { match } from 'ts-pattern';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 
 interface WorkspaceSettingsDialogProps {

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { ZodText } from './zod';
 
 export const selectOptionAttributesSchema = z.object({

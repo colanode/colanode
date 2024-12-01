@@ -1,10 +1,11 @@
-import React from 'react';
 import { isValidEmail } from '@colanode/core';
-import { Button } from '@/renderer/components/ui/button';
-import { useMutation } from '@/renderer/hooks/use-mutation';
-import { Spinner } from '@/renderer/components/ui/spinner';
-import { toast } from '@/renderer/hooks/use-toast';
 import { X } from 'lucide-react';
+import React from 'react';
+
+import { Button } from '@/renderer/components/ui/button';
+import { Spinner } from '@/renderer/components/ui/spinner';
+import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 import { Workspace } from '@/shared/types/workspaces';
 
 interface WorkspaceUserInviteProps {

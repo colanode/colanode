@@ -2,23 +2,24 @@ import {
   CreatedAtFieldAttributes,
   ViewFieldFilterAttributes,
 } from '@colanode/core';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/renderer/components/ui/popover';
+import { ChevronDown, Trash2 } from 'lucide-react';
+
+import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
+import { Button } from '@/renderer/components/ui/button';
+import { DatePicker } from '@/renderer/components/ui/date-picker';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { Button } from '@/renderer/components/ui/button';
-import { dateFieldFilterOperators } from '@/shared/lib/databases';
-import { DatePicker } from '@/renderer/components/ui/date-picker';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/renderer/components/ui/popover';
 import { useView } from '@/renderer/contexts/view';
-import { FieldIcon } from '../fields/field-icon';
-import { ChevronDown, Trash2 } from 'lucide-react';
+import { dateFieldFilterOperators } from '@/shared/lib/databases';
 
 interface ViewCreatedAtFieldFilterProps {
   field: CreatedAtFieldAttributes;

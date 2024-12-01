@@ -1,6 +1,7 @@
+import { JSONContent } from '@tiptap/core';
+
 import { defaultClasses } from '@/renderer/editor/classes';
 import { NodeChildrenRenderer } from '@/renderer/editor/renderers/node-children';
-import { JSONContent } from '@tiptap/core';
 
 interface TaskListRendererProps {
   node: JSONContent;

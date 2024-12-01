@@ -1,7 +1,7 @@
-import { ViewTab } from '@/renderer/components/databases/view-tab';
 import { ViewCreateButton } from '@/renderer/components/databases/view-create-button';
-import { useDatabaseViews } from '@/renderer/contexts/database-views';
+import { ViewTab } from '@/renderer/components/databases/view-tab';
 import { useDatabase } from '@/renderer/contexts/database';
+import { useDatabaseViews } from '@/renderer/contexts/database-views';
 
 export const ViewTabs = () => {
   const database = useDatabase();

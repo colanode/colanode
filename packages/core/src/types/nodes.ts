@@ -1,5 +1,5 @@
-import { NodeAttributes } from '../registry';
 import { ServerNodeTransaction } from './sync';
+import { NodeAttributes } from '../registry';
 
 export type NodeOutput = {
   id: string;

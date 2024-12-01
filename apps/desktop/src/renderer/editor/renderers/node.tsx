@@ -1,22 +1,23 @@
+import { JSONContent } from '@tiptap/core';
 import { ReactElement } from 'react';
+import { match } from 'ts-pattern';
+
 import { BlockquoteRenderer } from '@/renderer/editor/renderers/blockquote';
 import { BulletListRenderer } from '@/renderer/editor/renderers/bullet-list';
 import { CodeBlockRenderer } from '@/renderer/editor/renderers/code-block';
 import { DocumentRenderer } from '@/renderer/editor/renderers/document';
+import { FileRenderer } from '@/renderer/editor/renderers/file';
 import { Heading1Renderer } from '@/renderer/editor/renderers/heading1';
 import { Heading2Renderer } from '@/renderer/editor/renderers/heading2';
 import { Heading3Renderer } from '@/renderer/editor/renderers/heading3';
 import { ListItemRenderer } from '@/renderer/editor/renderers/list-item';
+import { MarkRenderer } from '@/renderer/editor/renderers/mark';
 import { MessageRenderer } from '@/renderer/editor/renderers/message';
 import { OrderedListRenderer } from '@/renderer/editor/renderers/ordered-list';
 import { ParagraphRenderer } from '@/renderer/editor/renderers/paragraph';
 import { TaskItemRenderer } from '@/renderer/editor/renderers/task-item';
 import { TaskListRenderer } from '@/renderer/editor/renderers/task-list';
 import { TextRenderer } from '@/renderer/editor/renderers/text';
-import { MarkRenderer } from '@/renderer/editor/renderers/mark';
-import { FileRenderer } from '@/renderer/editor/renderers/file';
-import { match } from 'ts-pattern';
-import { JSONContent } from '@tiptap/core';
 
 interface NodeRendererProps {
   node: JSONContent;

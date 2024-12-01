@@ -1,23 +1,25 @@
 import '@/renderer/styles/index.css';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
-import { createRoot } from 'react-dom/client';
-import { App } from '@/renderer/app';
-import { TooltipProvider } from '@/renderer/components/ui/tooltip';
-import { Toaster } from '@/renderer/components/ui/toaster';
-import { WorkspaceCreate } from '@/renderer/components/workspaces/workspace-create';
-import { Workspace } from '@/renderer/components/workspaces/workspace';
-import { WorkspaceRedirect } from '@/renderer/components/workspaces/workspace-redirect';
-import { createHashRouter, RouterProvider } from 'react-router-dom';
 import { DndProvider } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
-import { Login } from '@/renderer/components/accounts/login';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useEventBus } from '@/renderer/hooks/use-event-bus';
-import { Event } from '@/shared/types/events';
-import { AccountRedirect } from '@/renderer/components/accounts/account-redirect';
+import { createRoot } from 'react-dom/client';
+import { createHashRouter, RouterProvider } from 'react-router-dom';
+
+import { App } from '@/renderer/app';
 import { Account } from '@/renderer/components/accounts/account';
+import { AccountRedirect } from '@/renderer/components/accounts/account-redirect';
+import { Login } from '@/renderer/components/accounts/login';
 import { DelayedComponent } from '@/renderer/components/ui/delayed-component';
+import { Toaster } from '@/renderer/components/ui/toaster';
+import { TooltipProvider } from '@/renderer/components/ui/tooltip';
+import { Workspace } from '@/renderer/components/workspaces/workspace';
+import { WorkspaceCreate } from '@/renderer/components/workspaces/workspace-create';
+import { WorkspaceRedirect } from '@/renderer/components/workspaces/workspace-redirect';
+import { useEventBus } from '@/renderer/hooks/use-event-bus';
 import { RootLoader } from '@/renderer/root-loader';
+import { Event } from '@/shared/types/events';
 
 const router = createHashRouter([
   {

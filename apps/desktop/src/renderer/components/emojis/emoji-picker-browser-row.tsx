@@ -1,6 +1,7 @@
 import React from 'react';
-import { EmojiPickerRowData } from '@/shared/types/emojis';
+
 import { EmojiPickerItem } from '@/renderer/components/emojis/emoji-picker-item';
+import { EmojiPickerRowData } from '@/shared/types/emojis';
 
 interface EmojiPickerBrowserRowProps {
   index: number;

@@ -1,10 +1,10 @@
+import { verifyToken } from '@/lib/tokens';
 import {
   ApiError,
   ColanodeNextFunction,
   ColanodeRequest,
   ColanodeResponse,
 } from '@/types/api';
-import { verifyToken } from '@/lib/tokens';
 
 export const authMiddleware = async (
   req: ColanodeRequest,

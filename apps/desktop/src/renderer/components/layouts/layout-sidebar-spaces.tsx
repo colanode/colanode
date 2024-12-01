@@ -1,14 +1,15 @@
-import { useQuery } from '@/renderer/hooks/use-query';
-import { useWorkspace } from '@/renderer/contexts/workspace';
+import { SpaceNode } from '@colanode/core';
+
+import { SpaceCreateButton } from '@/renderer/components/spaces/space-create-button';
+import { SpaceSidebarItem } from '@/renderer/components/spaces/space-sidebar-item';
 import {
   SidebarGroup,
   SidebarGroupAction,
   SidebarGroupLabel,
   SidebarMenu,
 } from '@/renderer/components/ui/sidebar';
-import { SpaceCreateButton } from '@/renderer/components/spaces/space-create-button';
-import { SpaceNode } from '@colanode/core';
-import { SpaceSidebarItem } from '@/renderer/components/spaces/space-sidebar-item';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useQuery } from '@/renderer/hooks/use-query';
 
 export const LayoutSidebarSpaces = () => {
   const workspace = useWorkspace();

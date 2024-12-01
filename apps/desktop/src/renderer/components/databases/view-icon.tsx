@@ -1,5 +1,6 @@
-import { Avatar } from '@/renderer/components/avatars/avatar';
 import { Calendar, Database, SquareKanban, Table } from 'lucide-react';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
 
 interface ViewIconProps {
   id: string;

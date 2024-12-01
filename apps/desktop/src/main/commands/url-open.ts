@@ -1,6 +1,7 @@
+import { shell } from 'electron';
+
 import { CommandHandler } from '@/main/types';
 import { UrlOpenCommandInput } from '@/shared/commands/url-open';
-import { shell } from 'electron';
 
 export class UrlOpenCommandHandler
   implements CommandHandler<UrlOpenCommandInput>

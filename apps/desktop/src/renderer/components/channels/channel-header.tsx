@@ -1,10 +1,11 @@
-import { NodeCollaboratorsPopover } from '@/renderer/components/collaborators/node-collaborators-popover';
 import { ChannelNode, Node, NodeRole } from '@colanode/core';
-import { Header } from '@/renderer/components/ui/header';
-import { NodeBreadcrumb } from '@/renderer/components/layouts/node-breadcrumb';
+
 import { ChannelSettings } from '@/renderer/components/channels/channel-settings';
-import { useContainer } from '@/renderer/contexts/container';
+import { NodeCollaboratorsPopover } from '@/renderer/components/collaborators/node-collaborators-popover';
+import { NodeBreadcrumb } from '@/renderer/components/layouts/node-breadcrumb';
 import { NodeFullscreenButton } from '@/renderer/components/layouts/node-fullscreen-button';
+import { Header } from '@/renderer/components/ui/header';
+import { useContainer } from '@/renderer/contexts/container';
 
 interface ChannelHeaderProps {
   nodes: Node[];

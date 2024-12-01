@@ -1,11 +1,12 @@
-import { PageContainer } from '@/renderer/components/pages/page-container';
-import { ChannelContainer } from '@/renderer/components/channels/channel-container';
-import { DatabaseContainer } from '@/renderer/components/databases/database-container';
-import { RecordContainer } from '@/renderer/components/records/record-container';
-import { ChatContainer } from '@/renderer/components/chats/chat-container';
-import { FolderContainer } from '@/renderer/components/folders/folder-container';
-import { FileContainer } from '@/renderer/components/files/file-container';
 import { getIdType, IdType } from '@colanode/core';
+
+import { ChannelContainer } from '@/renderer/components/channels/channel-container';
+import { ChatContainer } from '@/renderer/components/chats/chat-container';
+import { DatabaseContainer } from '@/renderer/components/databases/database-container';
+import { FileContainer } from '@/renderer/components/files/file-container';
+import { FolderContainer } from '@/renderer/components/folders/folder-container';
+import { PageContainer } from '@/renderer/components/pages/page-container';
+import { RecordContainer } from '@/renderer/components/records/record-container';
 
 interface NodeContainerProps {
   nodeId: string;

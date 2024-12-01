@@ -1,8 +1,9 @@
+import { extractNodeRole } from '@colanode/core';
+
+import { ChatBody } from '@/renderer/components/chats/chat-body';
+import { ChatHeader } from '@/renderer/components/chats/chat-header';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { ChatHeader } from '@/renderer/components/chats/chat-header';
-import { ChatBody } from '@/renderer/components/chats/chat-body';
-import { extractNodeRole } from '@colanode/core';
 
 interface ChatContainerProps {
   nodeId: string;

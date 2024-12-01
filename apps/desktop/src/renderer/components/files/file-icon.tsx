@@ -1,4 +1,4 @@
-import { FileImage, File, FileVideo, FileAudio, FileText } from 'lucide-react';
+import { File, FileAudio, FileImage, FileText,FileVideo } from 'lucide-react';
 
 interface FileIconProps {
   mimeType: string;

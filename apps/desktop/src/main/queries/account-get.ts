@@ -1,10 +1,10 @@
-import { databaseService } from '@/main/data/database-service';
-import { Account } from '@/shared/types/accounts';
 import { SelectAccount } from '@/main/data/app/schema';
+import { databaseService } from '@/main/data/database-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { Event } from '@/shared/types/events';
 import { mapAccount } from '@/main/utils';
 import { AccountGetQueryInput } from '@/shared/queries/account-get';
+import { Account } from '@/shared/types/accounts';
+import { Event } from '@/shared/types/events';
 
 export class AccountGetQueryHandler
   implements QueryHandler<AccountGetQueryInput>

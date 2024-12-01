@@ -1,7 +1,8 @@
-import { cn } from '@/shared/lib/utils';
 import { FolderNode } from '@colanode/core';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useWorkspace } from '@/renderer/contexts/workspace';
+import { cn } from '@/shared/lib/utils';
 
 interface FolderSidebarItemProps {
   node: FolderNode;

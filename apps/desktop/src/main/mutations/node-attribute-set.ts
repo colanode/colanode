@@ -1,10 +1,11 @@
+import { set } from 'lodash-es';
+
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   NodeAttributeSetMutationInput,
   NodeAttributeSetMutationOutput,
 } from '@/shared/mutations/node-attribute-set';
-import { nodeService } from '@/main/services/node-service';
-import { set } from 'lodash-es';
 
 export class NodeAttributeSetMutationHandler
   implements MutationHandler<NodeAttributeSetMutationInput>

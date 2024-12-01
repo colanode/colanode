@@ -1,4 +1,5 @@
 import { ChannelNode } from '@colanode/core';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 
 interface ChannelBreadcrumbItemProps {

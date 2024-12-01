@@ -1,8 +1,9 @@
-import { Avatar } from '@/renderer/components/avatars/avatar';
 import { CreatedByFieldAttributes } from '@colanode/core';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
+import { useRecord } from '@/renderer/contexts/record';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordCreatedByValueProps {
   field: CreatedByFieldAttributes;

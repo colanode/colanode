@@ -1,4 +1,6 @@
 import React from 'react';
+
+import { Button } from '@/renderer/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -7,12 +9,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
-import { Button } from '@/renderer/components/ui/button';
-import { Label } from '@/renderer/components/ui/label';
 import { Input } from '@/renderer/components/ui/input';
+import { Label } from '@/renderer/components/ui/label';
 import { Spinner } from '@/renderer/components/ui/spinner';
-import { toast } from '@/renderer/hooks/use-toast';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface ServerCreateDialogProps {
   open: boolean;

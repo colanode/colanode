@@ -1,4 +1,6 @@
-import { useWorkspace } from '@/renderer/contexts/workspace';
+import { generateId,IdType } from '@colanode/core';
+
+import { PageForm } from '@/renderer/components/pages/page-form';
 import {
   Dialog,
   DialogContent,
@@ -6,9 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { IdType, generateId } from '@colanode/core';
-import { PageForm } from '@/renderer/components/pages/page-form';
 
 interface PageCreateDialogProps {
   spaceId: string;

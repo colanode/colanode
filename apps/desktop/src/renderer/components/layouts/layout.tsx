@@ -1,10 +1,10 @@
+import { LayoutMain } from '@/renderer/components/layouts/layout-main';
+import { LayoutModal } from '@/renderer/components/layouts/layout-modal';
 import { LayoutSidebar } from '@/renderer/components/layouts/layout-sidebar';
 import {
   SidebarInset,
   SidebarProvider,
 } from '@/renderer/components/ui/sidebar';
-import { LayoutMain } from '@/renderer/components/layouts/layout-main';
-import { LayoutModal } from '@/renderer/components/layouts/layout-modal';
 
 interface LayoutProps {
   main?: string | null;

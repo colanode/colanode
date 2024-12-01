@@ -1,12 +1,13 @@
-import React from 'react';
 import { SelectFieldAttributes } from '@colanode/core';
+import React from 'react';
+
+import { SelectFieldOptions } from '@/renderer/components/databases/fields/select-field-options';
 import { SelectOptionBadge } from '@/renderer/components/databases/fields/select-option-badge';
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
+  PopoverTrigger,
 } from '@/renderer/components/ui/popover';
-import { SelectFieldOptions } from '@/renderer/components/databases/fields/select-field-options';
 import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordSelectValueProps {

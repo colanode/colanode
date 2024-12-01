@@ -1,10 +1,10 @@
-import { DownloadGetQueryInput } from '@/shared/queries/download-get';
 import { databaseService } from '@/main/data/database-service';
-import { Download } from '@/shared/types/nodes';
+import { SelectDownload } from '@/main/data/workspace/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { mapDownload } from '@/main/utils';
+import { DownloadGetQueryInput } from '@/shared/queries/download-get';
 import { Event } from '@/shared/types/events';
-import { SelectDownload } from '@/main/data/workspace/schema';
+import { Download } from '@/shared/types/nodes';
 
 export class DownloadGetQueryHandler
   implements QueryHandler<DownloadGetQueryInput>

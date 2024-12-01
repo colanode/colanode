@@ -1,7 +1,8 @@
 import { z } from 'zod';
+
+import { blockSchema } from './block';
 import { CollaborationModel, NodeModel } from './core';
 import { fieldValueSchema } from './fields';
-import { blockSchema } from './block';
 
 export const recordAttributesSchema = z.object({
   type: z.literal('record'),

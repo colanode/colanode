@@ -1,4 +1,12 @@
+import {
+  MultiSelectFieldAttributes,
+  SelectFieldAttributes,
+} from '@colanode/core';
+import { Check, Plus, X } from 'lucide-react';
 import React from 'react';
+
+import { SelectOptionBadge } from '@/renderer/components/databases/fields/select-option-badge';
+import { SelectOptionSettingsPopover } from '@/renderer/components/databases/fields/select-option-settings-popover';
 import {
   Command,
   CommandEmpty,
@@ -7,17 +15,10 @@ import {
   CommandItem,
   CommandList,
 } from '@/renderer/components/ui/command';
-import { SelectOptionBadge } from '@/renderer/components/databases/fields/select-option-badge';
-import {
-  MultiSelectFieldAttributes,
-  SelectFieldAttributes,
-} from '@colanode/core';
-import { getRandomSelectOptionColor } from '@/shared/lib/databases';
-import { SelectOptionSettingsPopover } from '@/renderer/components/databases/fields/select-option-settings-popover';
+import { useDatabase } from '@/renderer/contexts/database';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { Check, Plus, X } from 'lucide-react';
-import { useDatabase } from '@/renderer/contexts/database';
+import { getRandomSelectOptionColor } from '@/shared/lib/databases';
 
 interface SelectFieldOptionsProps {
   field: SelectFieldAttributes | MultiSelectFieldAttributes;

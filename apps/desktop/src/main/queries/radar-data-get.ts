@@ -1,8 +1,8 @@
 import { radarService } from '@/main/services/radar-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { RadarDataGetQueryInput } from '@/shared/queries/radar-data-get';
-import { WorkspaceRadarData } from '@/shared/types/radars';
 import { Event } from '@/shared/types/events';
+import { WorkspaceRadarData } from '@/shared/types/radars';
 
 export class RadarDataGetQueryHandler
   implements QueryHandler<RadarDataGetQueryInput>

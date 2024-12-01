@@ -1,6 +1,10 @@
-import { Input } from '@/renderer/components/ui/input';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { Mail } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
+import { z } from 'zod';
+
 import { Button } from '@/renderer/components/ui/button';
-import { Spinner } from '@/renderer/components/ui/spinner';
 import {
   Form,
   FormControl,
@@ -8,14 +12,11 @@ import {
   FormItem,
   FormMessage,
 } from '@/renderer/components/ui/form';
-import { z } from 'zod';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Input } from '@/renderer/components/ui/input';
+import { Spinner } from '@/renderer/components/ui/spinner';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
 import { Server } from '@/shared/types/servers';
-import { useMutation } from '@/renderer/hooks/use-mutation';
-import { Mail } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 
 const formSchema = z.object({
   email: z.string().min(2).email(),

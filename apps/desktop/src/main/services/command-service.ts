@@ -1,7 +1,7 @@
-import { CommandInput, CommandMap } from '@/shared/commands';
-import { createLogger } from '@/main/logger';
 import { commandHandlerMap } from '@/main/commands';
+import { createLogger } from '@/main/logger';
 import { CommandHandler } from '@/main/types';
+import { CommandInput, CommandMap } from '@/shared/commands';
 
 class CommandService {
   private readonly logger = createLogger('command-service');

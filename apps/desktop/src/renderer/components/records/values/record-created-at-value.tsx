@@ -1,4 +1,5 @@
 import { CreatedAtFieldAttributes } from '@colanode/core';
+
 import { useRecord } from '@/renderer/contexts/record';
 
 interface RecordCreatedAtValueProps {

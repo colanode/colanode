@@ -1,11 +1,12 @@
 import { Editor } from '@tiptap/core';
+import { Baseline } from 'lucide-react';
+
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
+  PopoverTrigger,
 } from '@/renderer/components/ui/popover';
 import { cn } from '@/shared/lib/utils';
-import { Baseline } from 'lucide-react';
 
 interface ColorItem {
   color: string;

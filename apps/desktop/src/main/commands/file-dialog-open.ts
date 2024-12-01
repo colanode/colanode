@@ -1,6 +1,7 @@
+import { BrowserWindow, dialog } from 'electron';
+
 import { CommandHandler } from '@/main/types';
 import { FileDialogOpenCommandInput } from '@/shared/commands/file-dialog-open';
-import { BrowserWindow, dialog } from 'electron';
 
 export class FileDialogOpenCommandHandler
   implements CommandHandler<FileDialogOpenCommandInput>

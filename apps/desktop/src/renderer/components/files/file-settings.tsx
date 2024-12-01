@@ -1,12 +1,13 @@
+import { Copy, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
+
+import { FileDeleteDialog } from '@/renderer/components/files/file-delete-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { Copy, Settings, Trash2 } from 'lucide-react';
-import { FileDeleteDialog } from '@/renderer/components/files/file-delete-dialog';
 
 interface FileSettingsProps {
   nodeId: string;

@@ -1,6 +1,6 @@
-import { Icon } from '@/shared/types/icons';
-import { useIconPicker } from '@/renderer/contexts/icon-picker';
 import { IconElement } from '@/renderer/components/icons/icon-element';
+import { useIconPicker } from '@/renderer/contexts/icon-picker';
+import { Icon } from '@/shared/types/icons';
 
 interface IconPickerItemProps {
   icon: Icon;

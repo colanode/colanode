@@ -1,10 +1,10 @@
-import { WorkspaceListQueryInput } from '@/shared/queries/workspace-list';
-import { databaseService } from '@/main/data/database-service';
-import { Workspace } from '@/shared/types/workspaces';
 import { SelectWorkspace } from '@/main/data/app/schema';
+import { databaseService } from '@/main/data/database-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { Event } from '@/shared/types/events';
 import { mapWorkspace } from '@/main/utils';
+import { WorkspaceListQueryInput } from '@/shared/queries/workspace-list';
+import { Event } from '@/shared/types/events';
+import { Workspace } from '@/shared/types/workspaces';
 
 export class WorkspaceListQueryHandler
   implements QueryHandler<WorkspaceListQueryInput>

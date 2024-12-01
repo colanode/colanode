@@ -1,4 +1,6 @@
+import { toUTCDate } from '@colanode/core';
 import React from 'react';
+
 import { Calendar } from '@/renderer/components/ui/calendar';
 import {
   Popover,
@@ -6,7 +8,6 @@ import {
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
 import { cn } from '@/shared/lib/utils';
-import { toUTCDate } from '@colanode/core';
 
 interface DatePickerProps {
   value: Date | null;

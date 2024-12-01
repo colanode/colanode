@@ -1,6 +1,7 @@
 import React from 'react';
-import { IconPickerRowData } from '@/shared/types/icons';
+
 import { IconPickerItem } from '@/renderer/components/icons/icon-picker-item';
+import { IconPickerRowData } from '@/shared/types/icons';
 
 interface IconPickerBrowserRowProps {
   index: number;

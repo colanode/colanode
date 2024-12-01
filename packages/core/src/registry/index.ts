@@ -4,37 +4,13 @@ import {
   channelCollaborationModel,
   channelModel,
 } from './channel';
-import { CollaborationModel, NodeModel } from './core';
-import {
-  PageAttributes,
-  PageCollaborationAttributes,
-  pageCollaborationModel,
-  pageModel,
-} from './page';
 import {
   ChatAttributes,
   ChatCollaborationAttributes,
   chatCollaborationModel,
   chatModel,
 } from './chat';
-import {
-  SpaceAttributes,
-  SpaceCollaborationAttributes,
-  spaceCollaborationModel,
-  spaceModel,
-} from './space';
-import {
-  UserAttributes,
-  UserCollaborationAttributes,
-  userCollaborationModel,
-  userModel,
-} from './user';
-import {
-  MessageAttributes,
-  MessageCollaborationAttributes,
-  messageCollaborationModel,
-  messageModel,
-} from './message';
+import { CollaborationModel, NodeModel } from './core';
 import {
   DatabaseAttributes,
   DatabaseCollaborationAttributes,
@@ -54,11 +30,35 @@ import {
   folderModel,
 } from './folder';
 import {
-  recordCollaborationModel,
+  MessageAttributes,
+  MessageCollaborationAttributes,
+  messageCollaborationModel,
+  messageModel,
+} from './message';
+import {
+  PageAttributes,
+  PageCollaborationAttributes,
+  pageCollaborationModel,
+  pageModel,
+} from './page';
+import {
   RecordAttributes,
   RecordCollaborationAttributes,
+  recordCollaborationModel,
   recordModel,
 } from './record';
+import {
+  SpaceAttributes,
+  SpaceCollaborationAttributes,
+  spaceCollaborationModel,
+  spaceModel,
+} from './space';
+import {
+  UserAttributes,
+  UserCollaborationAttributes,
+  userCollaborationModel,
+  userModel,
+} from './user';
 import {
   WorkspaceAttributes,
   WorkspaceCollaborationAttributes,

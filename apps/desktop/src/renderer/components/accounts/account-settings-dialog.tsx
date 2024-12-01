@@ -1,3 +1,8 @@
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { Info, Trash2 } from 'lucide-react';
+
+import { AccountUpdate } from '@/renderer/components/accounts/account-update';
+import { Avatar } from '@/renderer/components/avatars/avatar';
 import {
   Dialog,
   DialogContent,
@@ -9,10 +14,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/renderer/components/ui/tabs';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { Avatar } from '@/renderer/components/avatars/avatar';
-import { Info, Trash2 } from 'lucide-react';
-import { AccountUpdate } from '@/renderer/components/accounts/account-update';
 import { useAccount } from '@/renderer/contexts/account';
 
 interface AccountSettingsDialogProps {

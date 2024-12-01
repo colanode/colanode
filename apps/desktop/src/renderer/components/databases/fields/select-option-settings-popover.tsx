@@ -1,4 +1,8 @@
+import { SelectOptionAttributes } from '@colanode/core';
+import { Ellipsis, Trash2 } from 'lucide-react';
 import React from 'react';
+
+import { SelectOptionDeleteDialog } from '@/renderer/components/databases/fields/select-option-delete-dialog';
 import { Label } from '@/renderer/components/ui/label';
 import {
   Popover,
@@ -6,13 +10,10 @@ import {
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
 import { Separator } from '@/renderer/components/ui/separator';
+import { SmartTextInput } from '@/renderer/components/ui/smart-text-input';
+import { useDatabase } from '@/renderer/contexts/database';
 import { selectOptionColors } from '@/shared/lib/databases';
 import { cn } from '@/shared/lib/utils';
-import { SelectOptionAttributes } from '@colanode/core';
-import { SelectOptionDeleteDialog } from '@/renderer/components/databases/fields/select-option-delete-dialog';
-import { SmartTextInput } from '@/renderer/components/ui/smart-text-input';
-import { Ellipsis, Trash2 } from 'lucide-react';
-import { useDatabase } from '@/renderer/contexts/database';
 
 interface SelectOptionSettingsPopoverProps {
   fieldId: string;

@@ -1,9 +1,8 @@
+import { FieldType } from '@colanode/core';
+import { Check, ChevronsUpDown } from 'lucide-react';
 import React from 'react';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/renderer/components/ui/popover';
+
+import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
 import { Button } from '@/renderer/components/ui/button';
 import {
   Command,
@@ -13,10 +12,12 @@ import {
   CommandItem,
   CommandList,
 } from '@/renderer/components/ui/command';
-import { FieldType } from '@colanode/core';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/renderer/components/ui/popover';
 import { cn } from '@/shared/lib/utils';
-import { FieldIcon } from './field-icon';
-import { Check, ChevronsUpDown } from 'lucide-react';
 
 interface FieldTypeOption {
   name: string;

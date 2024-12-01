@@ -1,13 +1,13 @@
 import { databaseService } from '@/main/data/database-service';
-import { assetService } from '@/main/services/asset-service';
-import { radarService } from '@/main/services/radar-service';
-import { socketService } from '@/main/services/socket-service';
-import { serverService } from '@/main/services/server-service';
-import { accountService } from '@/main/services/account-service';
-import { syncService } from '@/main/services/sync-service';
-import { notificationService } from '@/main/services/notification-service';
-import { fileService } from '@/main/services/file-service';
 import { createLogger } from '@/main/logger';
+import { accountService } from '@/main/services/account-service';
+import { assetService } from '@/main/services/asset-service';
+import { fileService } from '@/main/services/file-service';
+import { notificationService } from '@/main/services/notification-service';
+import { radarService } from '@/main/services/radar-service';
+import { serverService } from '@/main/services/server-service';
+import { socketService } from '@/main/services/socket-service';
+import { syncService } from '@/main/services/sync-service';
 
 // one minute
 const EVENT_LOOP_INTERVAL = 1000 * 60;

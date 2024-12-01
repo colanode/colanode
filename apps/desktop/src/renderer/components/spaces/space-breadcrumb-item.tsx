@@ -1,4 +1,5 @@
 import { SpaceNode } from '@colanode/core';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 
 interface SpaceBreadcrumbItemProps {

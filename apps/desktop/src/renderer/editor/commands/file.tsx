@@ -1,6 +1,7 @@
-import { EditorCommand } from '@/shared/types/editor';
 import { NodeTypes } from '@colanode/core';
 import { FilePlus } from 'lucide-react';
+
+import { EditorCommand } from '@/shared/types/editor';
 
 export const FileCommand: EditorCommand = {
   key: 'file',

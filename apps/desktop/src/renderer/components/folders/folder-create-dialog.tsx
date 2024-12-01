@@ -1,4 +1,6 @@
-import { useWorkspace } from '@/renderer/contexts/workspace';
+import { generateId,IdType } from '@colanode/core';
+
+import { FolderForm } from '@/renderer/components/folders/folder-form';
 import {
   Dialog,
   DialogContent,
@@ -6,9 +8,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { IdType, generateId } from '@colanode/core';
-import { FolderForm } from '@/renderer/components/folders/folder-form';
 
 interface FolderCreateDialogProps {
   spaceId: string;

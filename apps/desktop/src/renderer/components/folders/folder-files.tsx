@@ -1,14 +1,15 @@
+import { getIdType, IdType } from '@colanode/core';
 import React from 'react';
 import { match } from 'ts-pattern';
-import { FolderContext } from '@/renderer/contexts/folder';
-import { FolderLayoutType } from '@/shared/types/folders';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { useQueries } from '@/renderer/hooks/use-queries';
+
+import { GalleryLayout } from '@/renderer/components/folders/galleries/gallery-layout';
 import { GridLayout } from '@/renderer/components/folders/grids/grid-layout';
 import { ListLayout } from '@/renderer/components/folders/lists/list-layout';
-import { GalleryLayout } from '@/renderer/components/folders/galleries/gallery-layout';
-import { getIdType, IdType } from '@colanode/core';
+import { FolderContext } from '@/renderer/contexts/folder';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useQueries } from '@/renderer/hooks/use-queries';
 import { FileListQueryInput } from '@/shared/queries/file-list';
+import { FolderLayoutType } from '@/shared/types/folders';
 
 const FILES_PER_PAGE = 100;
 

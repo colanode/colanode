@@ -1,11 +1,12 @@
+import { compareString } from '@colanode/core';
 import React from 'react';
 import { InView } from 'react-intersection-observer';
+
 import { Message } from '@/renderer/components/messages/message';
+import { useConversation } from '@/renderer/contexts/conversation';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { compareString } from '@colanode/core';
 import { useQueries } from '@/renderer/hooks/use-queries';
 import { MessageListQueryInput } from '@/shared/queries/message-list';
-import { useConversation } from '@/renderer/contexts/conversation';
 
 const MESSAGES_PER_PAGE = 50;
 

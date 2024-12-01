@@ -1,9 +1,10 @@
-import { getFileUrl } from '@/shared/lib/files';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { FileIcon } from '@/renderer/components/files/file-icon';
-import { cn } from '@/shared/lib/utils';
 import { FileNode } from '@colanode/core';
+
+import { FileIcon } from '@/renderer/components/files/file-icon';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
+import { getFileUrl } from '@/shared/lib/files';
+import { cn } from '@/shared/lib/utils';
 
 interface FileThumbnailProps {
   file: FileNode;

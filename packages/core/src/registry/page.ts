@@ -1,7 +1,8 @@
-import { z } from 'zod';
-import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
-import { blockSchema } from './block';
 import { isEqual } from 'lodash-es';
+import { z } from 'zod';
+
+import { blockSchema } from './block';
+import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
 
 export const pageAttributesSchema = z.object({
   type: z.literal('page'),

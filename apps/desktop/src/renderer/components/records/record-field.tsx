@@ -1,15 +1,16 @@
-import React from 'react';
 import { FieldAttributes } from '@colanode/core';
+import { Trash2 } from 'lucide-react';
+import React from 'react';
+
+import { FieldDeleteDialog } from '@/renderer/components/databases/fields/field-delete-dialog';
+import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
+import { FieldRenameInput } from '@/renderer/components/databases/fields/field-rename-input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
-import { FieldRenameInput } from '@/renderer/components/databases/fields/field-rename-input';
 import { Separator } from '@/renderer/components/ui/separator';
-import { FieldDeleteDialog } from '@/renderer/components/databases/fields/field-delete-dialog';
-import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
-import { Trash2 } from 'lucide-react';
 import { useDatabase } from '@/renderer/contexts/database';
 
 interface RecordFieldProps {

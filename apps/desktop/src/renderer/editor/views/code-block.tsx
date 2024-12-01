@@ -1,7 +1,10 @@
 import '@/renderer/styles/highlight.css';
-import React from 'react';
+
 import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react';
+import { Check, ChevronDown, Clipboard } from 'lucide-react';
+import React from 'react';
+
 import {
   Command,
   CommandEmpty,
@@ -18,7 +21,6 @@ import {
 import { defaultClasses } from '@/renderer/editor/classes';
 import { languages } from '@/shared/lib/lowlight';
 import { cn } from '@/shared/lib/utils';
-import { ChevronDown, Check, Clipboard } from 'lucide-react';
 
 export const CodeBlockNodeView = ({
   node,

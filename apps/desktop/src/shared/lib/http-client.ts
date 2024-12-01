@@ -1,12 +1,13 @@
-import { serverService } from '@/main/services/server-service';
-import { BackoffCalculator } from '@/shared/lib/backoff-calculator';
 import axios, {
-  isAxiosError,
+  AxiosError,
   AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
-  AxiosError,
+  isAxiosError,
 } from 'axios';
+
+import { serverService } from '@/main/services/server-service';
+import { BackoffCalculator } from '@/shared/lib/backoff-calculator';
 
 interface HttpClientRequestConfig extends AxiosRequestConfig {
   domain: string;

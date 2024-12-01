@@ -1,12 +1,13 @@
 import React from 'react';
-import { TableViewHeader } from '@/renderer/components/databases/tables/table-view-header';
-import { TableViewBody } from '@/renderer/components/databases/tables/table-view-body';
-import { TableViewRecordCreateRow } from '@/renderer/components/databases/tables/table-view-record-create-row';
-import { ViewTabs } from '@/renderer/components/databases/view-tabs';
-import { TableViewSettings } from '@/renderer/components/databases/tables/table-view-settings';
-import { ViewSearchBar } from '@/renderer/components/databases/search/view-search-bar';
+
 import { ViewFilterButton } from '@/renderer/components/databases/search/view-filter-button';
+import { ViewSearchBar } from '@/renderer/components/databases/search/view-search-bar';
 import { ViewSortButton } from '@/renderer/components/databases/search/view-sort-button';
+import { TableViewBody } from '@/renderer/components/databases/tables/table-view-body';
+import { TableViewHeader } from '@/renderer/components/databases/tables/table-view-header';
+import { TableViewRecordCreateRow } from '@/renderer/components/databases/tables/table-view-record-create-row';
+import { TableViewSettings } from '@/renderer/components/databases/tables/table-view-settings';
+import { ViewTabs } from '@/renderer/components/databases/view-tabs';
 
 export const TableView = () => {
   return (

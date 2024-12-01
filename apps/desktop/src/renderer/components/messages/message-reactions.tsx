@@ -1,8 +1,9 @@
 import { MessageNode } from '@colanode/core';
+
 import { EmojiElement } from '@/renderer/components/emojis/emoji-element';
-import { cn } from '@/shared/lib/utils';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { cn } from '@/shared/lib/utils';
 
 interface MessageReactionsProps {
   message: MessageNode;

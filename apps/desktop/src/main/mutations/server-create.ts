@@ -1,11 +1,11 @@
 import { databaseService } from '@/main/data/database-service';
+import { serverService } from '@/main/services/server-service';
 import { MutationHandler } from '@/main/types';
+import { eventBus } from '@/shared/lib/event-bus';
 import {
   ServerCreateMutationInput,
   ServerCreateMutationOutput,
 } from '@/shared/mutations/server-create';
-import { eventBus } from '@/shared/lib/event-bus';
-import { serverService } from '../services/server-service';
 
 export class ServerCreateMutationHandler
   implements MutationHandler<ServerCreateMutationInput>

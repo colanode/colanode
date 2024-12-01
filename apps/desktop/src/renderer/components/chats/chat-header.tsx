@@ -1,9 +1,10 @@
-import { NodeCollaboratorsPopover } from '@/renderer/components/collaborators/node-collaborators-popover';
 import { ChatNode, NodeRole } from '@colanode/core';
-import { Header } from '@/renderer/components/ui/header';
+
+import { NodeCollaboratorsPopover } from '@/renderer/components/collaborators/node-collaborators-popover';
 import { NodeBreadcrumb } from '@/renderer/components/layouts/node-breadcrumb';
-import { useContainer } from '@/renderer/contexts/container';
 import { NodeFullscreenButton } from '@/renderer/components/layouts/node-fullscreen-button';
+import { Header } from '@/renderer/components/ui/header';
+import { useContainer } from '@/renderer/contexts/container';
 
 interface ChatHeaderProps {
   chat: ChatNode;

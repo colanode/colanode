@@ -1,10 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { z, ZodSchema } from 'zod';
-import * as Y from 'yjs';
 import { ZodText } from '@colanode/core';
-import { isEqual } from 'lodash-es';
 import { diffChars } from 'diff';
 import { fromUint8Array, toUint8Array } from 'js-base64';
+import { isEqual } from 'lodash-es';
+import * as Y from 'yjs';
+import { z, ZodSchema } from 'zod';
 
 export const encodeState = (state: Uint8Array) => {
   return fromUint8Array(state);

@@ -1,11 +1,12 @@
+import { SmilePlus } from 'lucide-react';
 import React from 'react';
+
+import { EmojiPicker } from '@/renderer/components/emojis/emoji-picker';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
-import { EmojiPicker } from '@/renderer/components/emojis/emoji-picker';
-import { SmilePlus } from 'lucide-react';
 
 interface MessageReactionProps {
   onReactionClick: (reaction: string) => void;

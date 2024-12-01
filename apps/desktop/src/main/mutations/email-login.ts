@@ -1,12 +1,13 @@
 import { LoginOutput } from '@colanode/core';
+
 import { databaseService } from '@/main/data/database-service';
+import { MutationHandler } from '@/main/types';
+import { eventBus } from '@/shared/lib/event-bus';
+import { httpClient } from '@/shared/lib/http-client';
 import {
   EmailLoginMutationInput,
   EmailLoginMutationOutput,
 } from '@/shared/mutations/email-login';
-import { MutationHandler } from '@/main/types';
-import { httpClient } from '@/shared/lib/http-client';
-import { eventBus } from '@/shared/lib/event-bus';
 import { Account } from '@/shared/types/accounts';
 
 export class EmailLoginMutationHandler

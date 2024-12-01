@@ -1,9 +1,10 @@
-import { NodeCollaboratorsPopover } from '@/renderer/components/collaborators/node-collaborators-popover';
 import { FolderNode, Node, NodeRole } from '@colanode/core';
-import { Header } from '@/renderer/components/ui/header';
-import { NodeBreadcrumb } from '@/renderer/components/layouts/node-breadcrumb';
+
+import { NodeCollaboratorsPopover } from '@/renderer/components/collaborators/node-collaborators-popover';
 import { FolderSettings } from '@/renderer/components/folders/folder-settings';
+import { NodeBreadcrumb } from '@/renderer/components/layouts/node-breadcrumb';
 import { NodeFullscreenButton } from '@/renderer/components/layouts/node-fullscreen-button';
+import { Header } from '@/renderer/components/ui/header';
 import { useContainer } from '@/renderer/contexts/container';
 
 interface FolderHeaderProps {

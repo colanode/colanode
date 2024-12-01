@@ -1,4 +1,9 @@
+import { Check, ChevronsUpDown, LogOut, Plus, Settings } from 'lucide-react';
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
+import { ReadStateIndicator } from '@/renderer/components/layouts/read-state-indicator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,12 +17,8 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/renderer/components/ui/sidebar';
-import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useAccount } from '@/renderer/contexts/account';
-import { Check, ChevronsUpDown, LogOut, Plus, Settings } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
 import { useRadar } from '@/renderer/contexts/radar';
-import { ReadStateIndicator } from '@/renderer/components/layouts/read-state-indicator';
 import { useQuery } from '@/renderer/hooks/use-query';
 import { AccountReadState } from '@/shared/types/radars';
 

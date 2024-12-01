@@ -1,6 +1,6 @@
+import { FilePreview } from '@/renderer/components/files/file-preview';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { FilePreview } from '@/renderer/components/files/file-preview';
 
 interface FileBlockProps {
   id: string;

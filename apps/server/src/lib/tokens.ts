@@ -1,7 +1,8 @@
+import { sha256 } from 'js-sha256';
+
 import { database } from '@/data/database';
 import { uuid } from '@/lib/utils';
 import { ColanodeRequestAccount } from '@/types/api';
-import { sha256 } from 'js-sha256';
 
 interface GenerateTokenResult {
   token: string;

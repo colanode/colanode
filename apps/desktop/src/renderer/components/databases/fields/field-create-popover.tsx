@@ -1,8 +1,11 @@
-import React from 'react';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { Plus } from 'lucide-react';
+import React from 'react';
 import { useForm } from 'react-hook-form';
 import * as z from 'zod';
 
+import { FieldAttrs } from '@/renderer/components/databases/fields/field-attrs';
+import { FieldTypeSelect } from '@/renderer/components/databases/fields/field-type-select';
 import { Button } from '@/renderer/components/ui/button';
 import {
   Form,
@@ -18,13 +21,10 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
-import { useDatabase } from '@/renderer/contexts/database';
-import { FieldTypeSelect } from '@/renderer/components/databases/fields/field-type-select';
-import { FieldAttrs } from '@/renderer/components/databases/fields/field-attrs';
 import { Spinner } from '@/renderer/components/ui/spinner';
-import { useMutation } from '@/renderer/hooks/use-mutation';
+import { useDatabase } from '@/renderer/contexts/database';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { Plus } from 'lucide-react';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 
 const formSchema = z.object({
   name: z.string(),

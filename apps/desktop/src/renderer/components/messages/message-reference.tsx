@@ -1,9 +1,10 @@
+import { MessageNode } from '@colanode/core';
+
+import { MessageAuthorAvatar } from '@/renderer/components/messages/message-author-avatar';
+import { MessageAuthorName } from '@/renderer/components/messages/message-author-name';
+import { MessageContent } from '@/renderer/components/messages/message-content';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { MessageNode } from '@colanode/core';
-import { MessageAuthorAvatar } from '@/renderer/components/messages/message-author-avatar';
-import { MessageContent } from '@/renderer/components/messages/message-content';
-import { MessageAuthorName } from '@/renderer/components/messages/message-author-name';
 
 interface MessageReferenceProps {
   messageId: string;

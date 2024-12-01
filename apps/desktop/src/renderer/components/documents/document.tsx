@@ -1,4 +1,5 @@
 import { Block } from '@colanode/core';
+
 import { DocumentEditor } from '@/renderer/components/documents/document-editor';
 import { mapBlocksToContents } from '@/shared/lib/editor';
 

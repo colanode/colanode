@@ -2,9 +2,10 @@ import {
   ServerCollaboration,
   ServerCollaborationRevocation,
 } from '@colanode/core';
+
 import { databaseService } from '@/main/data/database-service';
-import { eventBus } from '@/shared/lib/event-bus';
 import { createLogger } from '@/main/logger';
+import { eventBus } from '@/shared/lib/event-bus';
 
 class CollaborationService {
   private readonly logger = createLogger('collaboration-service');

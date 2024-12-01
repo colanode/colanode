@@ -1,10 +1,11 @@
-import React from 'react';
-import { formatBytes } from '@/shared/lib/files';
-import { FileThumbnail } from '@/renderer/components/files/file-thumbnail';
-import { Avatar } from '@/renderer/components/avatars/avatar';
 import { FileNode, formatDate } from '@colanode/core';
+import React from 'react';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
+import { FileThumbnail } from '@/renderer/components/files/file-thumbnail';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
+import { formatBytes } from '@/shared/lib/files';
 
 interface FileSidebarProps {
   file: FileNode;

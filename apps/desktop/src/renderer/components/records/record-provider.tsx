@@ -1,6 +1,7 @@
-import React from 'react';
-import { RecordContext } from '@/renderer/contexts/record';
 import { hasEditorAccess, NodeRole, RecordNode } from '@colanode/core';
+import React from 'react';
+
+import { RecordContext } from '@/renderer/contexts/record';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 

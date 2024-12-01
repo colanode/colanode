@@ -2,24 +2,25 @@ import {
   SelectFieldAttributes,
   ViewFieldFilterAttributes,
 } from '@colanode/core';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/renderer/components/ui/popover';
+import { ChevronDown, Trash2 } from 'lucide-react';
+
+import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
+import { SelectFieldOptions } from '@/renderer/components/databases/fields/select-field-options';
+import { SelectOptionBadge } from '@/renderer/components/databases/fields/select-option-badge';
+import { Button } from '@/renderer/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { Button } from '@/renderer/components/ui/button';
-import { selectFieldFilterOperators } from '@/shared/lib/databases';
-import { SelectFieldOptions } from '@/renderer/components/databases/fields/select-field-options';
-import { SelectOptionBadge } from '@/renderer/components/databases/fields/select-option-badge';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/renderer/components/ui/popover';
 import { useView } from '@/renderer/contexts/view';
-import { FieldIcon } from '../fields/field-icon';
-import { ChevronDown, Trash2 } from 'lucide-react';
+import { selectFieldFilterOperators } from '@/shared/lib/databases';
 
 interface ViewSelectFieldFilterProps {
   field: SelectFieldAttributes;

@@ -1,8 +1,9 @@
+import { extractNodeRole } from '@colanode/core';
+
+import { FolderBody } from '@/renderer/components/folders/folder-body';
+import { FolderHeader } from '@/renderer/components/folders/folder-header';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { extractNodeRole } from '@colanode/core';
-import { FolderHeader } from '@/renderer/components/folders/folder-header';
-import { FolderBody } from './folder-body';
 
 interface FolderContainerProps {
   nodeId: string;

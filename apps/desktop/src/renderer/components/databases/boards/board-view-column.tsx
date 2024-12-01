@@ -1,10 +1,11 @@
-import React from 'react';
-import { getSelectOptionLightColorClass } from '@/shared/lib/databases';
-import { cn } from '@/shared/lib/utils';
-import { useDrop } from 'react-dnd';
 import { SelectFieldAttributes, SelectOptionAttributes } from '@colanode/core';
+import React from 'react';
+import { useDrop } from 'react-dnd';
+
 import { BoardViewColumnHeader } from '@/renderer/components/databases/boards/board-view-column-header';
 import { BoardViewColumnRecords } from '@/renderer/components/databases/boards/board-view-column-records';
+import { getSelectOptionLightColorClass } from '@/shared/lib/databases';
+import { cn } from '@/shared/lib/utils';
 
 interface BoardViewColumnProps {
   field: SelectFieldAttributes;

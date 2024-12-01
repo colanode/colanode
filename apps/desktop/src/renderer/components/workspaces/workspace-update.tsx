@@ -1,7 +1,7 @@
-import { toast } from '@/renderer/hooks/use-toast';
-import { useMutation } from '@/renderer/hooks/use-mutation';
-import { WorkspaceForm } from './workspace-form';
+import { WorkspaceForm } from '@/renderer/components/workspaces/workspace-form';
 import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 export const WorkspaceUpdate = () => {
   const workspace = useWorkspace();

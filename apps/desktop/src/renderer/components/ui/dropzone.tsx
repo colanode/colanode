@@ -1,7 +1,7 @@
+import { Upload } from 'lucide-react';
 import React from 'react';
 import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
-import { Upload } from 'lucide-react';
 
 interface DropzoneProps {
   text: string;

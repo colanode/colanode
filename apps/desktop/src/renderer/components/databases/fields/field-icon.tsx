@@ -1,17 +1,17 @@
 import { FieldType } from '@colanode/core';
 import {
-  SquareCheck,
-  User,
   Calendar,
-  Mail,
   File,
-  ListChecks,
   Hash,
-  Smartphone,
-  ListCheck,
-  Text,
   Link,
+  ListCheck,
+  ListChecks,
+  Mail,
   ShieldQuestion,
+  Smartphone,
+  SquareCheck,
+  Text,
+  User,
 } from 'lucide-react';
 
 interface FieldIconProps {

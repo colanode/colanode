@@ -1,5 +1,6 @@
-import { Node, NodeAttributes, NodeRole } from '../index';
 import { generateKeyBetween } from 'fractional-indexing-jittered';
+
+import { Node, NodeAttributes, NodeRole } from '../index';
 
 export const extractNodeCollaborators = (
   attributes: NodeAttributes | NodeAttributes[]

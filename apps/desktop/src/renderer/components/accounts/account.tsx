@@ -1,8 +1,9 @@
 import React from 'react';
-import { AccountContext } from '@/renderer/contexts/account';
 import { Outlet, useNavigate, useParams } from 'react-router-dom';
+
 import { AccountLogout } from '@/renderer/components/accounts/account-logout';
 import { AccountSettingsDialog } from '@/renderer/components/accounts/account-settings-dialog';
+import { AccountContext } from '@/renderer/contexts/account';
 import { useQuery } from '@/renderer/hooks/use-query';
 
 export const Account = () => {

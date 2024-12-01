@@ -1,14 +1,15 @@
-import { cn } from '@/shared/lib/utils';
+import { getIdType, IdType } from '@colanode/core';
+
+import { useAccount } from '@/renderer/contexts/account';
 import {
   getAvatarSizeClasses,
   getAvatarUrl,
   getColorForId,
   getDefaultNodeAvatar,
 } from '@/shared/lib/avatars';
-import { getIdType, IdType } from '@colanode/core';
 import { getEmojiUrl } from '@/shared/lib/emojis';
 import { getIconUrl } from '@/shared/lib/icons';
-import { useAccount } from '@/renderer/contexts/account';
+import { cn } from '@/shared/lib/utils';
 
 interface AvatarProps {
   id: string;

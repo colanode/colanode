@@ -1,10 +1,11 @@
 import { net } from 'electron';
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
+
 import { databaseService } from '@/main/data/database-service';
-import { httpClient } from '@/shared/lib/http-client';
-import { getAccountAvatarsDirectoryPath } from '@/main/utils';
 import { createLogger } from '@/main/logger';
+import { getAccountAvatarsDirectoryPath } from '@/main/utils';
+import { httpClient } from '@/shared/lib/http-client';
 
 class AvatarService {
   private readonly logger = createLogger('avatar-service');

@@ -1,10 +1,11 @@
-import { cn } from '@/shared/lib/utils';
 import { ChatNode } from '@colanode/core';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
+import { ReadStateIndicator } from '@/renderer/components/layouts/read-state-indicator';
+import { useRadar } from '@/renderer/contexts/radar';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { useRadar } from '@/renderer/contexts/radar';
-import { ReadStateIndicator } from '@/renderer/components/layouts/read-state-indicator';
+import { cn } from '@/shared/lib/utils';
 
 interface ChatSidebarItemProps {
   node: ChatNode;

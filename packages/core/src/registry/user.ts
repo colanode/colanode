@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { CollaborationModel, NodeModel } from './core';
 
 export const userAttributesSchema = z.object({

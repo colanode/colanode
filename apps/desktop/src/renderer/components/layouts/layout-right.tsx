@@ -1,5 +1,5 @@
-import { ContainerContext } from '@/renderer/contexts/container';
 import { NodeContainer } from '@/renderer/components/layouts/node-container';
+import { ContainerContext } from '@/renderer/contexts/container';
 
 interface LayoutRightProps {
   nodeId: string;

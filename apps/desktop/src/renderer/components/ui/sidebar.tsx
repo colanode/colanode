@@ -1,8 +1,8 @@
-import * as React from 'react';
 import { Slot } from '@radix-ui/react-slot';
-import { VariantProps, cva } from 'class-variance-authority';
+import { cva,VariantProps } from 'class-variance-authority';
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import * as React from 'react';
 
-import { cn } from '@/shared/lib/utils';
 import { Button } from '@/renderer/components/ui/button';
 import { Input } from '@/renderer/components/ui/input';
 import { Separator } from '@/renderer/components/ui/separator';
@@ -13,7 +13,7 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/renderer/components/ui/tooltip';
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
+import { cn } from '@/shared/lib/utils';
 
 const SIDEBAR_WIDTH = '16rem';
 const SIDEBAR_WIDTH_ICON = '3rem';

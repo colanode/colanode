@@ -1,17 +1,18 @@
-import fs from 'fs';
-import { databaseService } from '@/main/data/database-service';
-import { SelectAccount } from '@/main/data/app/schema';
 import { AccountSyncOutput } from '@colanode/core';
-import { httpClient } from '@/shared/lib/http-client';
+import fs from 'fs';
+
+import { SelectAccount } from '@/main/data/app/schema';
+import { databaseService } from '@/main/data/database-service';
+import { createLogger } from '@/main/logger';
+import { serverService } from '@/main/services/server-service';
 import {
+  getAccountAvatarsDirectoryPath,
   getWorkspaceDirectoryPath,
   mapAccount,
   mapWorkspace,
-  getAccountAvatarsDirectoryPath,
 } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
-import { serverService } from '@/main/services/server-service';
-import { createLogger } from '@/main/logger';
+import { httpClient } from '@/shared/lib/http-client';
 
 class AccountService {
   private readonly logger = createLogger('account-service');

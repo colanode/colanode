@@ -1,6 +1,6 @@
-import { NodeRole } from '../registry/core';
 import { InteractionAttributes } from './interactions';
 import { NodeType } from '../registry';
+import { NodeRole } from '../registry/core';
 
 export type SyncNodeTransactionsInput = {
   transactions: LocalNodeTransaction[];

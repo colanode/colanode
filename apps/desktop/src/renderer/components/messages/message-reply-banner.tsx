@@ -1,7 +1,8 @@
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { useQuery } from '@/renderer/hooks/use-query';
 import { MessageNode } from '@colanode/core';
 import { CircleX } from 'lucide-react';
+
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useQuery } from '@/renderer/hooks/use-query';
 
 interface MessageReplyBannerProps {
   message: MessageNode;

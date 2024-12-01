@@ -1,5 +1,5 @@
-import { getFriendlyNameFromMimeType } from '@/shared/lib/files';
 import { FileIcon } from '@/renderer/components/files/file-icon';
+import { getFriendlyNameFromMimeType } from '@/shared/lib/files';
 
 interface FilePreviewOtherProps {
   mimeType: string;

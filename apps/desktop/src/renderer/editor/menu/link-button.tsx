@@ -1,13 +1,13 @@
 import { Editor } from '@tiptap/core';
+import { Check, Link, Trash2 } from 'lucide-react';
 
 import { Input } from '@/renderer/components/ui/input';
 import {
   Popover,
-  PopoverTrigger,
   PopoverContent,
+  PopoverTrigger,
 } from '@/renderer/components/ui/popover';
 import { cn } from '@/shared/lib/utils';
-import { Check, Link, Trash2 } from 'lucide-react';
 
 const isValidUrl = (url: string) => {
   try {

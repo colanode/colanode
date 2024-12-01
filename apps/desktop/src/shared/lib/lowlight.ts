@@ -1,4 +1,4 @@
-import { createLowlight, all } from 'lowlight';
+import { all,createLowlight } from 'lowlight';
 export const lowlight = createLowlight(all);
 const lowlightLanguages = lowlight.listLanguages();
 

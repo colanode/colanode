@@ -1,8 +1,9 @@
 import React from 'react';
-import { DatabaseViewsContext } from '@/renderer/contexts/database-views';
+
 import { View } from '@/renderer/components/databases/view';
 import { ScrollArea } from '@/renderer/components/ui/scroll-area';
 import { useDatabase } from '@/renderer/contexts/database';
+import { DatabaseViewsContext } from '@/renderer/contexts/database-views';
 
 export const DatabaseViews = () => {
   const database = useDatabase();

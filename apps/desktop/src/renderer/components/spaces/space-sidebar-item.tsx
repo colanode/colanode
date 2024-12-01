@@ -1,6 +1,28 @@
+import { compareString,SpaceNode } from '@colanode/core';
+import {
+  ChevronRight,
+  Database,
+  Ellipsis,
+  Folder,
+  MessageCircle,
+  Plus,
+  Settings,
+  StickyNote,
+} from 'lucide-react';
 import React from 'react';
-import { SpaceNode, compareString } from '@colanode/core';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
+import { ChannelCreateDialog } from '@/renderer/components/channels/channel-create-dialog';
+import { DatabaseCreateDialog } from '@/renderer/components/databases/database-create-dialog';
+import { FolderCreateDialog } from '@/renderer/components/folders/folder-create-dialog';
+import { NodeSidebarItem } from '@/renderer/components/layouts/node-sidebar-item';
+import { PageCreateDialog } from '@/renderer/components/pages/page-create-dialog';
+import { SpaceSettingsDialog } from '@/renderer/components/spaces/space-settings-dialog';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@/renderer/components/ui/collapsible';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,15 +31,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { ChannelCreateDialog } from '@/renderer/components/channels/channel-create-dialog';
-import { PageCreateDialog } from '@/renderer/components/pages/page-create-dialog';
-import { DatabaseCreateDialog } from '@/renderer/components/databases/database-create-dialog';
-import { NodeSidebarItem } from '@/renderer/components/layouts/node-sidebar-item';
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from '@/renderer/components/ui/collapsible';
 import {
   SidebarMenuAction,
   SidebarMenuButton,
@@ -27,18 +40,6 @@ import {
   SidebarMenuSubItem,
 } from '@/renderer/components/ui/sidebar';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { FolderCreateDialog } from '@/renderer/components/folders/folder-create-dialog';
-import { SpaceSettingsDialog } from '@/renderer/components/spaces/space-settings-dialog';
-import {
-  Ellipsis,
-  MessageCircle,
-  StickyNote,
-  Database,
-  Folder,
-  Settings,
-  Plus,
-  ChevronRight,
-} from 'lucide-react';
 import { useQuery } from '@/renderer/hooks/use-query';
 
 interface SettingsState {

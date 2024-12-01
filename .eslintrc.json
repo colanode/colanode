@@ -5,8 +5,10 @@
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
     "plugin:import/recommended",
-    "plugin:import/typescript"
+    "plugin:import/typescript",
+    "prettier"
   ],
+  "plugins": ["import"],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2020
@@ -22,7 +24,20 @@
       "error",
       { "vars": "all", "varsIgnorePattern": "^_", "argsIgnorePattern": "^_" }
     ],
-    "no-console": "off"
+    "no-console": "off",
+    "import/order": [
+      "error",
+      {
+        "groups": [
+          "external",
+          "builtin",
+          "internal",
+          "sibling",
+          "parent",
+          "index"
+        ]
+      }
+    ]
   },
   "ignorePatterns": ["dist", "node_modules"]
 }

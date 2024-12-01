@@ -1,15 +1,16 @@
+import { DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu';
+import { ChevronDown } from 'lucide-react';
 import React from 'react';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
+import { ServerCreateDialog } from '@/renderer/components/servers/server-create-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { Avatar } from '@/renderer/components/avatars/avatar';
 import { Server } from '@/shared/types/servers';
-import { ServerCreateDialog } from '@/renderer/components/servers/server-create-dialog';
-import { DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu';
-import { ChevronDown } from 'lucide-react';
 
 interface ServerDropdownProps {
   value: Server;

@@ -1,10 +1,11 @@
+import { Node } from '@colanode/core';
+
 import { databaseService } from '@/main/data/database-service';
-import { mapNode, fetchNodeAncestors } from '@/main/utils';
 import { SelectNode } from '@/main/data/workspace/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
+import { fetchNodeAncestors,mapNode } from '@/main/utils';
 import { NodeTreeGetQueryInput } from '@/shared/queries/node-tree-get';
 import { Event } from '@/shared/types/events';
-import { Node } from '@colanode/core';
 
 export class NodeTreeGetQueryHandler
   implements QueryHandler<NodeTreeGetQueryInput>

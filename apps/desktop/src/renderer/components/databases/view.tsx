@@ -1,19 +1,21 @@
-import React from 'react';
-import { match } from 'ts-pattern';
 import {
+  compareString,
   SortDirection,
   ViewAttributes,
   ViewFieldFilterAttributes,
   ViewFilterAttributes,
   ViewSortAttributes,
-  compareString,
 } from '@colanode/core';
-import { TableView } from '@/renderer/components/databases/tables/table-view';
+import React from 'react';
+import { match } from 'ts-pattern';
+
 import { BoardView } from '@/renderer/components/databases/boards/board-view';
 import { CalendarView } from '@/renderer/components/databases/calendars/calendar-view';
-import { ViewContext } from '@/renderer/contexts/view';
+import { TableView } from '@/renderer/components/databases/tables/table-view';
 import { useDatabase } from '@/renderer/contexts/database';
+import { ViewContext } from '@/renderer/contexts/view';
 import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 import {
   generateFieldValuesFromFilters,
   generateViewFieldIndex,
@@ -23,7 +25,6 @@ import {
   getFieldFilterOperators,
 } from '@/shared/lib/databases';
 import { ViewField } from '@/shared/types/databases';
-import { useMutation } from '@/renderer/hooks/use-mutation';
 
 interface ViewProps {
   view: ViewAttributes;

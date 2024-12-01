@@ -1,9 +1,10 @@
 import React from 'react';
-import { Icon } from '@/shared/types/icons';
-import { IconPickerContext } from '@/renderer/contexts/icon-picker';
-import { IconPickerSearch } from '@/renderer/components/icons/icon-picker-search';
+
 import { IconPickerBrowser } from '@/renderer/components/icons/icon-picker-browser';
+import { IconPickerSearch } from '@/renderer/components/icons/icon-picker-search';
+import { IconPickerContext } from '@/renderer/contexts/icon-picker';
 import { useQuery } from '@/renderer/hooks/use-query';
+import { Icon } from '@/shared/types/icons';
 
 interface IconPickerProps {
   onPick: (icon: Icon) => void;

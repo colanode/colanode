@@ -1,15 +1,16 @@
-import { Database } from '@/renderer/components/databases/database';
-import { RecordAttributes } from '@/renderer/components/records/record-attributes';
-import { ScrollArea } from '@/renderer/components/ui/scroll-area';
-import { Document } from '@/renderer/components/documents/document';
-import { Separator } from '@/renderer/components/ui/separator';
-import { RecordProvider } from '@/renderer/components/records/record-provider';
 import {
   DatabaseNode,
   hasEditorAccess,
   NodeRole,
   RecordNode,
 } from '@colanode/core';
+
+import { Database } from '@/renderer/components/databases/database';
+import { Document } from '@/renderer/components/documents/document';
+import { RecordAttributes } from '@/renderer/components/records/record-attributes';
+import { RecordProvider } from '@/renderer/components/records/record-provider';
+import { ScrollArea } from '@/renderer/components/ui/scroll-area';
+import { Separator } from '@/renderer/components/ui/separator';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 
 interface RecordBodyProps {

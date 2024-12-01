@@ -1,5 +1,6 @@
-import { Spinner } from '@/renderer/components/ui/spinner';
 import { ArrowDown } from 'lucide-react';
+
+import { Spinner } from '@/renderer/components/ui/spinner';
 
 interface TableViewLoadMoreRowProps {
   isPending: boolean;

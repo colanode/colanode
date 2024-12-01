@@ -1,4 +1,10 @@
+import { hasEditorAccess, NodeRole, PageNode } from '@colanode/core';
+import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
+
+import { NodeCollaboratorAudit } from '@/renderer/components/collaborators/node-collaborator-audit';
+import { PageDeleteDialog } from '@/renderer/components/pages/page-delete-dialog';
+import { PageUpdateDialog } from '@/renderer/components/pages/page-update-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -7,11 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
-import { hasEditorAccess, NodeRole, PageNode } from '@colanode/core';
-import { NodeCollaboratorAudit } from '@/renderer/components/collaborators/node-collaborator-audit';
-import { PageUpdateDialog } from '@/renderer/components/pages/page-update-dialog';
-import { PageDeleteDialog } from '@/renderer/components/pages/page-delete-dialog';
 
 interface PageSettingsProps {
   page: PageNode;

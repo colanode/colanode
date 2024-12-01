@@ -1,11 +1,12 @@
-import { app, net } from 'electron';
-import path from 'path';
-import fs from 'fs';
 import unzipper from 'unzipper';
-import { EmojiData } from '@/shared/types/emojis';
-import { IconData } from '@/shared/types/icons';
+import { app, net } from 'electron';
+import fs from 'fs';
+import path from 'path';
+
 import { createLogger } from '@/main/logger';
 import { getAssetsSourcePath } from '@/main/utils';
+import { EmojiData } from '@/shared/types/emojis';
+import { IconData } from '@/shared/types/icons';
 
 type AssetsVersion = {
   date: string;

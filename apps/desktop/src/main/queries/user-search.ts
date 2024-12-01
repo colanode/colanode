@@ -1,10 +1,11 @@
-import { UserSearchQueryInput } from '@/shared/queries/user-search';
-import { databaseService } from '@/main/data/database-service';
-import { sql } from 'kysely';
-import { SelectNode } from '@/main/data/workspace/schema';
 import { NodeTypes, UserNode } from '@colanode/core';
+import { sql } from 'kysely';
+
+import { databaseService } from '@/main/data/database-service';
+import { SelectNode } from '@/main/data/workspace/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { mapNode } from '@/main/utils';
+import { UserSearchQueryInput } from '@/shared/queries/user-search';
 import { Event } from '@/shared/types/events';
 
 export class UserSearchQueryHandler

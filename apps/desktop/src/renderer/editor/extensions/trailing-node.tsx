@@ -1,5 +1,5 @@
 import { Extension } from '@tiptap/core';
-import { NodeType, Node } from '@tiptap/pm/model';
+import { Node,NodeType } from '@tiptap/pm/model';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 
 const nodeEqualsType = ({

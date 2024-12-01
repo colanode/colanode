@@ -1,13 +1,14 @@
-import React from 'react';
-import { useConversation } from '@/renderer/contexts/conversation';
 import { MessageNode } from '@colanode/core';
 import { MessagesSquare, Reply } from 'lucide-react';
-import { MessageReactionCreatePopover } from '@/renderer/components/messages/message-reaction-create-popover';
-import { useMutation } from '@/renderer/hooks/use-mutation';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { MessageDeleteButton } from '@/renderer/components/messages/message-delete-button';
+import React from 'react';
+
 import { EmojiElement } from '@/renderer/components/emojis/emoji-element';
+import { MessageDeleteButton } from '@/renderer/components/messages/message-delete-button';
+import { MessageReactionCreatePopover } from '@/renderer/components/messages/message-reaction-create-popover';
 import { Separator } from '@/renderer/components/ui/separator';
+import { useConversation } from '@/renderer/contexts/conversation';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 
 const MessageAction = ({ children }: { children: React.ReactNode }) => {
   return (

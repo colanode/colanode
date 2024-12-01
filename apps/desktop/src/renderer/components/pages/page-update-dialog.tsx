@@ -1,4 +1,6 @@
-import { useWorkspace } from '@/renderer/contexts/workspace';
+import { hasEditorAccess, NodeRole, PageNode } from '@colanode/core';
+
+import { PageForm } from '@/renderer/components/pages/page-form';
 import {
   Dialog,
   DialogContent,
@@ -6,10 +8,9 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { hasEditorAccess, NodeRole, PageNode } from '@colanode/core';
 import { toast } from '@/renderer/hooks/use-toast';
-import { PageForm } from '@/renderer/components/pages/page-form';
 
 interface PageUpdateDialogProps {
   page: PageNode;

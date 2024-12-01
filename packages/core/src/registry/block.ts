@@ -1,5 +1,6 @@
-import { ZodText } from './zod';
 import { z } from 'zod';
+
+import { ZodText } from './zod';
 
 export const blockLeafSchema = z.object({
   type: z.string(),

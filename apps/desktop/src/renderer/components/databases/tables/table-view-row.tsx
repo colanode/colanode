@@ -1,9 +1,10 @@
+import { extractNodeRole, RecordNode } from '@colanode/core';
+
 import { TableViewNameCell } from '@/renderer/components/databases/tables/table-view-name-cell';
 import { RecordFieldValue } from '@/renderer/components/records/record-field-value';
-import { extractNodeRole, RecordNode } from '@colanode/core';
-import { useView } from '@/renderer/contexts/view';
 import { RecordProvider } from '@/renderer/components/records/record-provider';
 import { useDatabase } from '@/renderer/contexts/database';
+import { useView } from '@/renderer/contexts/view';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 
 interface TableViewRowProps {

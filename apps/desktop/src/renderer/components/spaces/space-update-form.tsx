@@ -1,4 +1,11 @@
+import { SpaceNode } from '@colanode/core';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import * as z from 'zod';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
+import { AvatarPopover } from '@/renderer/components/avatars/avatar-popover';
+import { Button } from '@/renderer/components/ui/button';
 import {
   Form,
   FormControl,
@@ -9,16 +16,10 @@ import {
 } from '@/renderer/components/ui/form';
 import { Input } from '@/renderer/components/ui/input';
 import { Spinner } from '@/renderer/components/ui/spinner';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { Textarea } from '@/renderer/components/ui/textarea';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
-import { AvatarPopover } from '@/renderer/components/avatars/avatar-popover';
-import { Avatar } from '@/renderer/components/avatars/avatar';
-import { Textarea } from '@/renderer/components/ui/textarea';
-import { Button } from '@/renderer/components/ui/button';
-import { SpaceNode } from '@colanode/core';
 
 interface SpaceUpdateFormProps {
   space: SpaceNode;

@@ -1,3 +1,11 @@
+import { extractNodeRole, hasAdminAccess, SpaceNode } from '@colanode/core';
+import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+import { Info, Trash2, Users } from 'lucide-react';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
+import { NodeCollaborators } from '@/renderer/components/collaborators/node-collaborators';
+import { SpaceDeleteForm } from '@/renderer/components/spaces/space-delete-form';
+import { SpaceUpdateForm } from '@/renderer/components/spaces/space-update-form';
 import {
   Dialog,
   DialogContent,
@@ -9,13 +17,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@/renderer/components/ui/tabs';
-import { Avatar } from '@/renderer/components/avatars/avatar';
-import { SpaceUpdateForm } from '@/renderer/components/spaces/space-update-form';
-import { SpaceDeleteForm } from '@/renderer/components/spaces/space-delete-form';
-import { Info, Trash2, Users } from 'lucide-react';
-import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { NodeCollaborators } from '@/renderer/components/collaborators/node-collaborators';
-import { extractNodeRole, hasAdminAccess, SpaceNode } from '@colanode/core';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 
 interface SpaceSettingsDialogProps {

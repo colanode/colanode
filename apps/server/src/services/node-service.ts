@@ -8,6 +8,10 @@ import {
   registry,
 } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
+import { sql, Transaction } from 'kysely';
+import { cloneDeep } from 'lodash-es';
+
+import { database } from '@/data/database';
 import {
   CreateCollaboration,
   CreateNode,
@@ -15,10 +19,9 @@ import {
   DatabaseSchema,
   SelectWorkspaceUser,
 } from '@/data/schema';
-import { cloneDeep } from 'lodash-es';
-import { mapNode } from '@/lib/nodes';
-import { database } from '@/data/database';
-import { fetchNodeAncestors } from '@/lib/nodes';
+import { eventBus } from '@/lib/event-bus';
+import { fetchNodeAncestors, mapNode } from '@/lib/nodes';
+import { logService } from '@/services/log-service';
 import {
   ApplyNodeCreateTransactionInput,
   ApplyNodeCreateTransactionOutput,
@@ -31,9 +34,6 @@ import {
   UpdateNodeInput,
   UpdateNodeOutput,
 } from '@/types/nodes';
-import { eventBus } from '@/lib/event-bus';
-import { logService } from '@/services/log-service';
-import { sql, Transaction } from 'kysely';
 
 const UPDATE_RETRIES_LIMIT = 10;
 
@@ -244,7 +244,7 @@ class NodeService {
           transaction: createdTransaction,
         },
       };
-    } catch (error) {
+    } catch {
       return { type: 'retry', output: null };
     }
   }
@@ -503,7 +503,7 @@ class NodeService {
           transaction: createdTransaction,
         },
       };
-    } catch (error) {
+    } catch {
       return { type: 'retry', output: null };
     }
   }

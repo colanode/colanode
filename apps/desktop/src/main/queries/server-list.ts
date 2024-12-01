@@ -1,9 +1,9 @@
-import { ServerListQueryInput } from '@/shared/queries/server-list';
-import { databaseService } from '@/main/data/database-service';
 import { SelectServer } from '@/main/data/app/schema';
+import { databaseService } from '@/main/data/database-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { Server } from '@/shared/types/servers';
+import { ServerListQueryInput } from '@/shared/queries/server-list';
 import { Event } from '@/shared/types/events';
+import { Server } from '@/shared/types/servers';
 
 export class ServerListQueryHandler
   implements QueryHandler<ServerListQueryInput>

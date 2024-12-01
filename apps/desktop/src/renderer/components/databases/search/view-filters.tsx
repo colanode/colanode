@@ -1,17 +1,18 @@
-import { useDatabase } from '@/renderer/contexts/database';
-import { ViewTextFieldFilter } from '@/renderer/components/databases/search/view-text-field-filter';
-import { ViewNumberFieldFilter } from '@/renderer/components/databases/search/view-number-field-filter';
-import { ViewEmailFieldFilter } from '@/renderer/components/databases/search/view-email-field-filter';
-import { ViewUrlFieldFilter } from '@/renderer/components/databases/search/view-url-field-filter';
-import { ViewPhoneFieldFilter } from '@/renderer/components/databases/search/view-phone-field-filter';
-import { ViewBooleanFieldFilter } from '@/renderer/components/databases/search/view-boolean-field-filter';
-import { ViewSelectFieldFilter } from '@/renderer/components/databases/search/view-select-field-filter';
-import { ViewMultiSelectFieldFilter } from '@/renderer/components/databases/search/view-multi-select-field-filter';
-import { ViewDateFieldFilter } from '@/renderer/components/databases/search/view-date-field-filter';
-import { ViewCreatedAtFieldFilter } from '@/renderer/components/databases/search/view-created-at-field-fitler';
-import { ViewFilterAddPopover } from '@/renderer/components/databases/search/view-filter-add-popover';
-import { useView } from '@/renderer/contexts/view';
 import { Plus } from 'lucide-react';
+
+import { ViewBooleanFieldFilter } from '@/renderer/components/databases/search/view-boolean-field-filter';
+import { ViewCreatedAtFieldFilter } from '@/renderer/components/databases/search/view-created-at-field-fitler';
+import { ViewDateFieldFilter } from '@/renderer/components/databases/search/view-date-field-filter';
+import { ViewEmailFieldFilter } from '@/renderer/components/databases/search/view-email-field-filter';
+import { ViewFilterAddPopover } from '@/renderer/components/databases/search/view-filter-add-popover';
+import { ViewMultiSelectFieldFilter } from '@/renderer/components/databases/search/view-multi-select-field-filter';
+import { ViewNumberFieldFilter } from '@/renderer/components/databases/search/view-number-field-filter';
+import { ViewPhoneFieldFilter } from '@/renderer/components/databases/search/view-phone-field-filter';
+import { ViewSelectFieldFilter } from '@/renderer/components/databases/search/view-select-field-filter';
+import { ViewTextFieldFilter } from '@/renderer/components/databases/search/view-text-field-filter';
+import { ViewUrlFieldFilter } from '@/renderer/components/databases/search/view-url-field-filter';
+import { useDatabase } from '@/renderer/contexts/database';
+import { useView } from '@/renderer/contexts/view';
 
 export const ViewFilters = () => {
   const database = useDatabase();

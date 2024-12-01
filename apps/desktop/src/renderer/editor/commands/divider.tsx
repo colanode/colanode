@@ -1,5 +1,6 @@
-import { EditorCommand } from '@/shared/types/editor';
 import { SeparatorHorizontal } from 'lucide-react';
+
+import { EditorCommand } from '@/shared/types/editor';
 
 export const DividerCommand: EditorCommand = {
   key: 'divider',

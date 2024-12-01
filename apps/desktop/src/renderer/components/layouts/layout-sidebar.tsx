@@ -1,3 +1,7 @@
+import { LayoutSidebarChats } from '@/renderer/components/layouts/layout-sidebar-chats';
+import { LayoutSidebarFooter } from '@/renderer/components/layouts/layout-sidebar-footer';
+import { LayoutSidebarHeader } from '@/renderer/components/layouts/layout-sidebar-header';
+import { LayoutSidebarSpaces } from '@/renderer/components/layouts/layout-sidebar-spaces';
 import {
   Sidebar,
   SidebarContent,
@@ -5,11 +9,6 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '@/renderer/components/ui/sidebar';
-
-import { LayoutSidebarHeader } from '@/renderer/components/layouts/layout-sidebar-header';
-import { LayoutSidebarSpaces } from '@/renderer/components/layouts/layout-sidebar-spaces';
-import { LayoutSidebarChats } from '@/renderer/components/layouts/layout-sidebar-chats';
-import { LayoutSidebarFooter } from '@/renderer/components/layouts/layout-sidebar-footer';
 
 export const LayoutSidebar = () => {
   return (

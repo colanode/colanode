@@ -1,11 +1,11 @@
-import { eventBus } from '@/shared/lib/event-bus';
 import { databaseService } from '@/main/data/database-service';
 import { MutationHandler } from '@/main/types';
+import { mapNode } from '@/main/utils';
+import { eventBus } from '@/shared/lib/event-bus';
 import {
   FileDownloadMutationInput,
   FileDownloadMutationOutput,
 } from '@/shared/mutations/file-download';
-import { mapNode } from '@/main/utils';
 
 export class FileDownloadMutationHandler
   implements MutationHandler<FileDownloadMutationInput>

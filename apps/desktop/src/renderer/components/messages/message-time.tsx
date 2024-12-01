@@ -1,4 +1,5 @@
-import { MessageNode, formatDate, timeAgo } from '@colanode/core';
+import { formatDate, MessageNode, timeAgo } from '@colanode/core';
+
 import {
   Tooltip,
   TooltipContent,

@@ -1,12 +1,12 @@
 import { databaseService } from '@/main/data/database-service';
+import { MutationHandler } from '@/main/types';
+import { eventBus } from '@/shared/lib/event-bus';
 import { httpClient } from '@/shared/lib/http-client';
 import {
   WorkspaceUpdateMutationInput,
   WorkspaceUpdateMutationOutput,
 } from '@/shared/mutations/workspace-update';
-import { MutationHandler } from '@/main/types';
 import { Workspace } from '@/shared/types/workspaces';
-import { eventBus } from '@/shared/lib/event-bus';
 
 export class WorkspaceUpdateMutationHandler
   implements MutationHandler<WorkspaceUpdateMutationInput>

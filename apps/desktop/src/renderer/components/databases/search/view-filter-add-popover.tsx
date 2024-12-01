@@ -1,9 +1,6 @@
 import React from 'react';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '@/renderer/components/ui/popover';
+
+import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
 import {
   Command,
   CommandEmpty,
@@ -12,9 +9,13 @@ import {
   CommandItem,
   CommandList,
 } from '@/renderer/components/ui/command';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/renderer/components/ui/popover';
 import { useDatabase } from '@/renderer/contexts/database';
 import { useView } from '@/renderer/contexts/view';
-import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
 
 interface ViewFilterAddPopoverProps {
   children: React.ReactNode;

@@ -1,9 +1,9 @@
-import { databaseService } from '@/main/data/database-service';
 import { SelectWorkspace } from '@/main/data/app/schema';
+import { databaseService } from '@/main/data/database-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { Event } from '@/shared/types/events';
 import { mapWorkspace } from '@/main/utils';
 import { WorkspaceGetQueryInput } from '@/shared/queries/workspace-get';
+import { Event } from '@/shared/types/events';
 import { Workspace } from '@/shared/types/workspaces';
 
 export class WorkspaceGetQueryHandler

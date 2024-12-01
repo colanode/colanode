@@ -1,27 +1,28 @@
+import { Eye, EyeOff, Trash2 } from 'lucide-react';
 import React from 'react';
+
+import { AvatarPopover } from '@/renderer/components/avatars/avatar-popover';
+import { FieldDeleteDialog } from '@/renderer/components/databases/fields/field-delete-dialog';
+import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
+import { ViewDeleteDialog } from '@/renderer/components/databases/view-delete-dialog';
+import { ViewIcon } from '@/renderer/components/databases/view-icon';
+import { ViewSettingsButton } from '@/renderer/components/databases/view-settings-button';
+import { Button } from '@/renderer/components/ui/button';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@/renderer/components/ui/popover';
-import { useView } from '@/renderer/contexts/view';
 import { Separator } from '@/renderer/components/ui/separator';
-import { useDatabase } from '@/renderer/contexts/database';
-import { cn } from '@/shared/lib/utils';
+import { SmartTextInput } from '@/renderer/components/ui/smart-text-input';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/renderer/components/ui/tooltip';
-import { FieldDeleteDialog } from '@/renderer/components/databases/fields/field-delete-dialog';
-import { ViewDeleteDialog } from '@/renderer/components/databases/view-delete-dialog';
-import { SmartTextInput } from '@/renderer/components/ui/smart-text-input';
-import { AvatarPopover } from '@/renderer/components/avatars/avatar-popover';
-import { Button } from '@/renderer/components/ui/button';
-import { Eye, EyeOff, Trash2 } from 'lucide-react';
-import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
-import { ViewIcon } from '@/renderer/components/databases/view-icon';
-import { ViewSettingsButton } from '@/renderer/components/databases/view-settings-button';
+import { useDatabase } from '@/renderer/contexts/database';
+import { useView } from '@/renderer/contexts/view';
+import { cn } from '@/shared/lib/utils';
 
 export const TableViewSettings = () => {
   const database = useDatabase();

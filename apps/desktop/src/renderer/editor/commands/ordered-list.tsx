@@ -1,5 +1,6 @@
-import { EditorCommand } from '@/shared/types/editor';
 import { ListOrdered } from 'lucide-react';
+
+import { EditorCommand } from '@/shared/types/editor';
 
 export const OrderedListCommand: EditorCommand = {
   key: 'ordered-list',

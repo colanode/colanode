@@ -1,4 +1,5 @@
 import { TextFieldAttributes } from '@colanode/core';
+
 import { SmartTextInput } from '@/renderer/components/ui/smart-text-input';
 import { useRecord } from '@/renderer/contexts/record';
 

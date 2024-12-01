@@ -1,4 +1,5 @@
 import { PageNode } from '@colanode/core';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 
 interface PageBreadcrumbItemProps {

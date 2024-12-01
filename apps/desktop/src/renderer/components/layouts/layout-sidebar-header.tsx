@@ -1,8 +1,9 @@
+import { Bell, Check,ChevronsUpDown, Plus, Settings } from 'lucide-react';
 import React from 'react';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { Avatar } from '@/renderer/components/avatars/avatar';
-import { useAccount } from '@/renderer/contexts/account';
 import { useNavigate } from 'react-router-dom';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
+import { ReadStateIndicator } from '@/renderer/components/layouts/read-state-indicator';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,9 +17,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from '@/renderer/components/ui/sidebar';
-import { ChevronsUpDown, Settings, Plus, Bell, Check } from 'lucide-react';
+import { useAccount } from '@/renderer/contexts/account';
 import { useRadar } from '@/renderer/contexts/radar';
-import { ReadStateIndicator } from '@/renderer/components/layouts/read-state-indicator';
+import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
 
 export const LayoutSidebarHeader = () => {

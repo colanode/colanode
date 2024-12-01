@@ -1,5 +1,5 @@
-import { cn } from '@/shared/lib/utils';
 import { getSelectOptionColorClass } from '@/shared/lib/databases';
+import { cn } from '@/shared/lib/utils';
 
 interface SelectOptionBadgeProps {
   name: string;

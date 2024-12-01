@@ -1,6 +1,7 @@
 import React from 'react';
-import { cn } from '@/shared/lib/utils';
+
 import { useFolder } from '@/renderer/contexts/folder';
+import { cn } from '@/shared/lib/utils';
 
 interface GridItemProps {
   id: string;

@@ -1,4 +1,5 @@
 import { z } from 'zod';
+
 import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
 
 export const chatAttributesSchema = z.object({

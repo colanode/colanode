@@ -1,15 +1,16 @@
 import {
-  generateId,
-  IdType,
-  generateNodeIndex,
   compareString,
+  generateId,
+  generateNodeIndex,
+  IdType,
 } from '@colanode/core';
+
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   SelectOptionCreateMutationInput,
   SelectOptionCreateMutationOutput,
 } from '@/shared/mutations/select-option-create';
-import { nodeService } from '@/main/services/node-service';
 
 export class SelectOptionCreateMutationHandler
   implements MutationHandler<SelectOptionCreateMutationInput>

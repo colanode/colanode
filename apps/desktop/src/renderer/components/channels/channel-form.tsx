@@ -1,4 +1,10 @@
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
+import { AvatarPopover } from '@/renderer/components/avatars/avatar-popover';
+import { Button } from '@/renderer/components/ui/button';
 import {
   Form,
   FormControl,
@@ -6,13 +12,8 @@ import {
   FormItem,
   FormMessage,
 } from '@/renderer/components/ui/form';
-import { Button } from '@/renderer/components/ui/button';
-import { Spinner } from '@/renderer/components/ui/spinner';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
 import { Input } from '@/renderer/components/ui/input';
-import { Avatar } from '@/renderer/components/avatars/avatar';
-import { AvatarPopover } from '@/renderer/components/avatars/avatar-popover';
+import { Spinner } from '@/renderer/components/ui/spinner';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),

@@ -1,10 +1,11 @@
-import React from 'react';
-import isHotkey from 'is-hotkey';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { Spinner } from '@/renderer/components/ui/spinner';
 import { RecordNode } from '@colanode/core';
-import { useMutation } from '@/renderer/hooks/use-mutation';
+import isHotkey from 'is-hotkey';
 import { Maximize2 } from 'lucide-react';
+import React from 'react';
+
+import { Spinner } from '@/renderer/components/ui/spinner';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 
 interface NameEditorProps {
   initialValue: string;

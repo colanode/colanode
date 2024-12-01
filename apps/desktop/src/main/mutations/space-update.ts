@@ -1,9 +1,9 @@
+import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
 import {
   SpaceUpdateMutationInput,
   SpaceUpdateMutationOutput,
 } from '@/shared/mutations/space-update';
-import { nodeService } from '@/main/services/node-service';
 
 export class SpaceUpdateMutationHandler
   implements MutationHandler<SpaceUpdateMutationInput>

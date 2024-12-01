@@ -1,14 +1,15 @@
-import React from 'react';
-import { useQueries } from '@/renderer/hooks/use-queries';
-import { Separator } from '@/renderer/components/ui/separator';
-import { WorkspaceUserInvite } from '@/renderer/components/workspaces/workspace-user-invite';
-import { Avatar } from '@/renderer/components/avatars/avatar';
-import { Spinner } from '@/renderer/components/ui/spinner';
-import { InView } from 'react-intersection-observer';
-import { WorkspaceUserRoleDropdown } from '@/renderer/components/workspaces/workspace-user-role-dropdown';
 import { WorkspaceRole } from '@colanode/core';
-import { WorkspaceUserListQueryInput } from '@/shared/queries/workspace-user-list';
+import React from 'react';
+import { InView } from 'react-intersection-observer';
+
+import { Avatar } from '@/renderer/components/avatars/avatar';
+import { Separator } from '@/renderer/components/ui/separator';
+import { Spinner } from '@/renderer/components/ui/spinner';
+import { WorkspaceUserInvite } from '@/renderer/components/workspaces/workspace-user-invite';
+import { WorkspaceUserRoleDropdown } from '@/renderer/components/workspaces/workspace-user-role-dropdown';
 import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useQueries } from '@/renderer/hooks/use-queries';
+import { WorkspaceUserListQueryInput } from '@/shared/queries/workspace-user-list';
 
 const USERS_PER_PAGE = 50;
 

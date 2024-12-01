@@ -1,13 +1,14 @@
-import React from 'react';
-import { Separator } from '@/renderer/components/ui/separator';
-import { NodeCollaborator } from '@/renderer/components/collaborators/node-collaborator';
-import { NodeCollaboratorCreate } from '@/renderer/components/collaborators/node-collaborator-create';
 import {
   extractNodeName,
   hasAdminAccess,
   Node,
   NodeRole,
 } from '@colanode/core';
+import React from 'react';
+
+import { NodeCollaborator } from '@/renderer/components/collaborators/node-collaborator';
+import { NodeCollaboratorCreate } from '@/renderer/components/collaborators/node-collaborator-create';
+import { Separator } from '@/renderer/components/ui/separator';
 import { buildNodeCollaborators } from '@/shared/lib/nodes';
 
 interface NodeCollaboratorsProps {
