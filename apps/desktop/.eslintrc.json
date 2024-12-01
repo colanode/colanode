@@ -4,5 +4,18 @@
     "es6": true,
     "node": true
   },
-  "extends": ["../../.eslintrc.json", "plugin:import/electron"]
+  "extends": [
+    "../../.eslintrc.json",
+    "plugin:import/electron",
+    "plugin:react/recommended",
+    "plugin:react/jsx-runtime"
+  ],
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
+  },
+  "rules": {
+    "react/prop-types": "off"
+  }
 }

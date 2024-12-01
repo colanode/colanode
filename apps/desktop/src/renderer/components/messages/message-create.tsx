@@ -174,7 +174,7 @@ export const MessageCreate = React.forwardRef<MessageCreateRefProps>(
                 />
               ) : (
                 <p className="m-0 px-0 py-1 text-muted-foreground">
-                  You don't have permission to create messages in this
+                  You don&apos;t have permission to create messages in this
                   conversation
                 </p>
               )}
@@ -203,3 +203,5 @@ export const MessageCreate = React.forwardRef<MessageCreateRefProps>(
     );
   }
 );
+
+MessageCreate.displayName = 'MessageCreate';

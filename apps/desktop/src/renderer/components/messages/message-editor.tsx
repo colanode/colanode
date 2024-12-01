@@ -142,3 +142,5 @@ export const MessageEditor = React.forwardRef<
     </React.Fragment>
   );
 });
+
+MessageEditor.displayName = 'MessageEditor';

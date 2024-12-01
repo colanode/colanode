@@ -17,7 +17,7 @@ export const IconPickerSearch = ({ query }: IconPickerSearchProps) => {
   return (
     <div className="grid w-full min-w-full grid-cols-10 gap-1">
       <div className="col-span-full flex items-center py-1 pl-1 text-sm text-muted-foreground">
-        <p>Search results for "{query}"</p>
+        <p>Search results for &quot;{query}&quot;</p>
       </div>
       {filteredIcons.map((icon) => (
         <IconPickerItem key={icon.id} icon={icon} />

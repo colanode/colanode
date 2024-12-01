@@ -36,6 +36,7 @@ export const MarkRenderer = ({ node, children }: MarkRendererProps) => {
             href={mark.attrs.href}
             target="_blank"
             className={defaultClasses.link}
+            rel="noreferrer"
           >
             {result}
           </a>
