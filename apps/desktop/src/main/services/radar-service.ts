@@ -75,6 +75,7 @@ class RadarService {
       .innerJoin('nodes as n', 'i.node_id', 'n.id')
       .where('i.user_id', '=', userId)
       .where('n.type', '=', 'message')
+      .where('n.created_by', '!=', userId)
       .where('i.last_seen_at', 'is', null)
       .select(['n.parent_id as node_id'])
       .select((eb) => [eb.fn.count<number>('i.node_id').as('messages_count')])
