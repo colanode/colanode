@@ -33,7 +33,7 @@ export enum IdType {
   Record = 'rc',
   Folder = 'fl',
   View = 'vw',
-  Field = 'fi',
+  Field = 'fd',
   SelectOption = 'so',
   ViewFilter = 'vf',
   ViewSort = 'vs',

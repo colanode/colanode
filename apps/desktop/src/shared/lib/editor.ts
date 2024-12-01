@@ -4,9 +4,10 @@ import {
   getIdTypeFromNode,
   generateNodeIndex,
   compareString,
+  Block,
+  BlockLeaf,
 } from '@colanode/core';
 import { JSONContent } from '@tiptap/core';
-import { Block, BlockLeaf } from '@colanode/core';
 
 const leafBlockTypes = new Set([
   EditorNodeTypes.Paragraph,

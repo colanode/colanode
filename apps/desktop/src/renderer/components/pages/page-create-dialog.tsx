@@ -7,9 +7,8 @@ import {
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { IdType } from '@colanode/core';
+import { IdType, generateId } from '@colanode/core';
 import { PageForm } from '@/renderer/components/pages/page-form';
-import { generateId } from '@colanode/core';
 
 interface PageCreateDialogProps {
   spaceId: string;

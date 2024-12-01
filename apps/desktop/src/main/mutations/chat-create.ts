@@ -1,12 +1,11 @@
 import { databaseService } from '@/main/data/database-service';
-import { generateId, IdType, NodeTypes, NodeRoles } from '@colanode/core';
+import { generateId, IdType, NodeTypes, ChatAttributes } from '@colanode/core';
 import { MutationHandler } from '@/main/types';
 import {
   ChatCreateMutationInput,
   ChatCreateMutationOutput,
 } from '@/shared/mutations/chat-create';
 import { sql } from 'kysely';
-import { ChatAttributes } from '@colanode/core';
 import { nodeService } from '@/main/services/node-service';
 
 interface ChatRow {

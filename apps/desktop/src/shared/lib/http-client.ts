@@ -1,6 +1,12 @@
 import { serverService } from '@/main/services/server-service';
 import { BackoffCalculator } from '@/shared/lib/backoff-calculator';
-import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios';
+import axios, {
+  isAxiosError,
+  AxiosInstance,
+  AxiosRequestConfig,
+  AxiosResponse,
+  AxiosError,
+} from 'axios';
 
 interface HttpClientRequestConfig extends AxiosRequestConfig {
   domain: string;
@@ -38,9 +44,9 @@ class HttpClient {
       }
 
       return response;
-    } catch (error: any) {
+    } catch (error) {
       // If error is related to server availability, increase backoff
-      if (this.isServerError(error)) {
+      if (isAxiosError(error) && this.isServerError(error)) {
         if (!this.backoffs.has(config.domain)) {
           this.backoffs.set(config.domain, new BackoffCalculator());
         }
@@ -53,11 +59,11 @@ class HttpClient {
     }
   }
 
-  private isServerError(error: any): boolean {
+  private isServerError(error: AxiosError): boolean {
     if (error.code === 'ECONNABORTED' || error.code === 'ETIMEDOUT') {
       return true;
     }
-    const status = error.response?.status;
+    const status = error.response?.status ?? 0;
     return (status >= 500 && status < 600) || status === 429;
   }
 
@@ -76,15 +82,15 @@ class HttpClient {
   public async get<T>(
     path: string,
     config: HttpClientRequestConfig
-  ): Promise<AxiosResponse<T, any>> {
+  ): Promise<AxiosResponse<T>> {
     return this.request<T>('get', path, config);
   }
 
   public async post<T>(
     path: string,
-    data: any,
+    data: unknown,
     config: HttpClientRequestConfig
-  ): Promise<AxiosResponse<T, any>> {
+  ): Promise<AxiosResponse<T>> {
     return this.request<T>('post', path, {
       ...config,
       data,
@@ -93,9 +99,9 @@ class HttpClient {
 
   public async put<T>(
     path: string,
-    data: any,
+    data: unknown,
     config: HttpClientRequestConfig
-  ): Promise<AxiosResponse<T, any>> {
+  ): Promise<AxiosResponse<T>> {
     return this.request<T>('put', path, {
       ...config,
       data,
@@ -105,7 +111,7 @@ class HttpClient {
   public async delete<T>(
     path: string,
     config: HttpClientRequestConfig
-  ): Promise<AxiosResponse<T, any>> {
+  ): Promise<AxiosResponse<T>> {
     return this.request<T>('delete', path, config);
   }
 }

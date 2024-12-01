@@ -1,8 +1,4 @@
-import {
-  InteractionAttribute,
-  InteractionAttributes,
-  NodeType,
-} from '@colanode/core';
+import { InteractionAttribute, NodeType } from '@colanode/core';
 import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
 
 interface NodeTable {

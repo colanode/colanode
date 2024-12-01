@@ -94,7 +94,7 @@ class ServerService {
     try {
       const { status, data } = await axios.get<ServerConfig>(configUrl);
       return status === 200 ? data : null;
-    } catch (error) {
+    } catch {
       return null;
     }
   }

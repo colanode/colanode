@@ -85,7 +85,8 @@ class QueryService {
         typeof query.input
       >;
 
-      let result: any = query.result;
+      type QueryOutput = QueryMap[(typeof query.input)['type']]['output'];
+      let result: QueryOutput = query.result;
       let hasChanges = false;
       for (const event of events) {
         const changeCheckResult = await handler.checkForChanges(
@@ -95,7 +96,7 @@ class QueryService {
         );
 
         if (changeCheckResult.hasChanges) {
-          result = changeCheckResult.result;
+          result = changeCheckResult.result as QueryOutput;
           hasChanges = true;
         }
       }

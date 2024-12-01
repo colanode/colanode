@@ -1,4 +1,4 @@
-import Link from '@tiptap/extension-link';
+import { Link } from '@tiptap/extension-link';
 
 import { defaultClasses } from '@/renderer/editor/classes';
 

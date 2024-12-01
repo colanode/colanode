@@ -1,8 +1,6 @@
 import { Extension } from '@tiptap/core';
 
-interface TabKeymapExtensionOptions {}
-
-export const TabKeymapExtension = Extension.create<TabKeymapExtensionOptions>({
+export const TabKeymapExtension = Extension.create({
   name: 'tabKeymap',
   addKeyboardShortcuts() {
     return {

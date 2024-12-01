@@ -2,7 +2,7 @@ import { mergeAttributes, Node, textblockTypeInputRule } from '@tiptap/core';
 import { defaultClasses } from '@/renderer/editor/classes';
 
 export interface Heading2Options {
-  HTMLAttributes: Record<string, any>;
+  HTMLAttributes: Record<string, unknown>;
 }
 
 declare module '@tiptap/core' {

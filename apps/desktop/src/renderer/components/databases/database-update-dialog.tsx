@@ -8,7 +8,6 @@ import {
 } from '@/renderer/components/ui/dialog';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { DatabaseNode, hasEditorAccess, NodeRole } from '@colanode/core';
-import { ChannelForm } from '@/renderer/components/channels/channel-form';
 import { toast } from '@/renderer/hooks/use-toast';
 import { DatabaseForm } from './database-form';
 

@@ -7,8 +7,7 @@ import {
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { IdType } from '@colanode/core';
-import { generateId } from '@colanode/core';
+import { IdType, generateId } from '@colanode/core';
 import { DatabaseForm } from '@/renderer/components/databases/database-form';
 
 interface DatabaseCreateDialogProps {

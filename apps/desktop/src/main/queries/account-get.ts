@@ -22,8 +22,7 @@ export class AccountGetQueryHandler
 
   public async checkForChanges(
     event: Event,
-    input: AccountGetQueryInput,
-    output: Account | null
+    input: AccountGetQueryInput
   ): Promise<ChangeCheckResult<AccountGetQueryInput>> {
     if (
       event.type === 'account_created' &&

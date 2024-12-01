@@ -1,4 +1,4 @@
-import OrderedList from '@tiptap/extension-ordered-list';
+import { OrderedList } from '@tiptap/extension-ordered-list';
 
 import { defaultClasses } from '@/renderer/editor/classes';
 

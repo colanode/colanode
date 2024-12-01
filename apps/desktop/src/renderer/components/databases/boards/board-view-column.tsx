@@ -29,7 +29,7 @@ export const BoardViewColumn = ({ field, option }: BoardViewColumnProps) => {
   const lightClass = getSelectOptionLightColorClass(option.color ?? 'gray');
   return (
     <div
-      ref={dropRef as any}
+      ref={dropRef as React.LegacyRef<HTMLDivElement>}
       className={cn('min-h-[400px] border-r p-1', isDragging && lightClass)}
       style={{
         minWidth: '250px',

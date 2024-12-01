@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { z, ZodSchema } from 'zod';
 import * as Y from 'yjs';
 import { ZodText } from '@colanode/core';
@@ -170,7 +171,7 @@ export class YDoc {
     }
 
     const deletedKeys = Array.from(yMap.keys()).filter(
-      (key) => !attributes.hasOwnProperty(key)
+      (key) => !Object.prototype.hasOwnProperty.call(attributes, key)
     );
 
     for (const key of deletedKeys) {
@@ -324,7 +325,7 @@ export class YDoc {
     }
 
     const deletedKeys = Array.from(yMap.keys()).filter(
-      (key) => !record.hasOwnProperty(key)
+      (key) => !Object.prototype.hasOwnProperty.call(record, key)
     );
 
     for (const key of deletedKeys) {

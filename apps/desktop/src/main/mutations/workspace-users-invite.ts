@@ -49,7 +49,7 @@ export class WorkspaceUsersInviteMutationHandler
       };
     }
 
-    const { data } = await httpClient.post<WorkspaceUsersInviteOutput>(
+    await httpClient.post<WorkspaceUsersInviteOutput>(
       `/v1/workspaces/${workspace.workspace_id}/users`,
       {
         emails: input.emails,

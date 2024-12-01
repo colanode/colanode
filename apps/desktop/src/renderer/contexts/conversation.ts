@@ -1,6 +1,5 @@
-import { NodeRole } from '@colanode/core';
+import { NodeRole, MessageNode } from '@colanode/core';
 import { createContext, useContext } from 'react';
-import { MessageNode } from '@colanode/core';
 
 interface ConversationContext {
   id: string;

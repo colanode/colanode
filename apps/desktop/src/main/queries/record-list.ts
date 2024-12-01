@@ -21,9 +21,9 @@ import {
   DatabaseNode,
   RecordNode,
   isStringArray,
+  NodeTypes,
 } from '@colanode/core';
 import { mapNode } from '@/main/utils';
-import { NodeTypes } from '@colanode/core';
 import { Event } from '@/shared/types/events';
 
 export class RecordListQueryHandler

@@ -13,7 +13,7 @@
   "scripts": {
     "compile": "tsc --noEmit",
     "test": "vitest",
-    "lint": "eslint . --max-warnings 0",
+    "lint": "eslint src --ext .ts --max-warnings 0",
     "build": "tsc",
     "coverage": "vitest run --coverage "
   },

@@ -1,10 +1,9 @@
-import { generateId, IdType } from '@colanode/core';
+import { generateId, IdType, RecordAttributes } from '@colanode/core';
 import { MutationHandler } from '@/main/types';
 import {
   RecordCreateMutationInput,
   RecordCreateMutationOutput,
 } from '@/shared/mutations/record-create';
-import { RecordAttributes } from '@colanode/core';
 import { nodeService } from '@/main/services/node-service';
 
 export class RecordCreateMutationHandler

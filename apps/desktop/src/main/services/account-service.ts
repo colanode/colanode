@@ -7,8 +7,8 @@ import {
   getWorkspaceDirectoryPath,
   mapAccount,
   mapWorkspace,
+  getAccountAvatarsDirectoryPath,
 } from '@/main/utils';
-import { getAccountAvatarsDirectoryPath } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
 import { serverService } from '@/main/services/server-service';
 import { createLogger } from '@/main/logger';
@@ -282,7 +282,7 @@ class AccountService {
         this.logger.debug(
           `Logged out account ${deletedToken.account_id} from server ${deletedToken.domain}`
         );
-      } catch (error) {
+      } catch {
         this.logger.warn(
           `Failed to logout account ${deletedToken.account_id} from server ${deletedToken.domain}`
         );

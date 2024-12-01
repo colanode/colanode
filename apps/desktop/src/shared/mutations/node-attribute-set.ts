@@ -3,7 +3,7 @@ export type NodeAttributeSetMutationInput = {
   userId: string;
   nodeId: string;
   path: string;
-  value: any;
+  value: unknown;
 };
 
 export type NodeAttributeSetMutationOutput = {

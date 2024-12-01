@@ -1,9 +1,7 @@
 // See the Electron documentation for details on how to use preload scripts:
 // https://www.electronjs.org/docs/latest/tutorial/process-model#preload-scripts
-import { CommandMap } from '@/shared/commands';
-import { CommandInput } from '@/shared/commands';
-import { MutationMap } from '@/shared/mutations';
-import { MutationInput } from '@/shared/mutations';
+import { CommandMap, CommandInput } from '@/shared/commands';
+import { MutationMap, MutationInput } from '@/shared/mutations';
 import { QueryInput, QueryMap } from '@/shared/queries';
 import { contextBridge, ipcRenderer } from 'electron';
 import { eventBus } from '@/shared/lib/event-bus';

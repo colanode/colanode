@@ -4,7 +4,7 @@ import { JSONContent } from '@tiptap/core';
 
 interface MarkRendererProps {
   node: JSONContent;
-  children: any | any[];
+  children: React.ReactNode | React.ReactNode[];
 }
 
 export const MarkRenderer = ({ node, children }: MarkRendererProps) => {

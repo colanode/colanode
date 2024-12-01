@@ -994,7 +994,7 @@ const recordMatchesUrlFilter = (
   return false;
 };
 
-export const isFilterableField = (field: FieldAttributes) => {
+export const isFilterableField = (_: FieldAttributes) => {
   // TODO: Implement this
   return true;
 };

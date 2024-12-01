@@ -1,11 +1,15 @@
 import { Extension } from '@tiptap/core';
-import { NodeType } from '@tiptap/pm/model';
+import { NodeType, Node } from '@tiptap/pm/model';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 
-const nodeEqualsType = ({ types, node }: { types: NodeType[]; node: any }) => {
-  return (
-    (Array.isArray(types) && types.includes(node?.type)) || node?.type === types
-  );
+const nodeEqualsType = ({
+  types,
+  node,
+}: {
+  types: NodeType[];
+  node: Node | null;
+}) => {
+  return Array.isArray(types) && node?.type && types.includes(node.type);
 };
 
 export interface TrailingNodeOptions {

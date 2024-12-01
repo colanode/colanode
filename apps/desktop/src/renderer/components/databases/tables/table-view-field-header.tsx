@@ -108,7 +108,7 @@ export const TableViewFieldHeader = ({
                   ? 'border-r-2 border-blue-300'
                   : 'border-r'
               )}
-              ref={dragDropRef as any}
+              ref={dragDropRef as React.LegacyRef<HTMLDivElement>}
             >
               <FieldIcon type={viewField.field.type} className="size-4" />
               <p>{viewField.field.name}</p>

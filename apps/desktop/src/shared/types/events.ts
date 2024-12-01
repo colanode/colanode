@@ -102,7 +102,7 @@ export type UploadDeletedEvent = {
 export type QueryResultUpdatedEvent = {
   type: 'query_result_updated';
   id: string;
-  result: any;
+  result: unknown;
 };
 
 export type RadarDataUpdatedEvent = {

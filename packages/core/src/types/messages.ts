@@ -1,4 +1,4 @@
-import { NodeType } from '~/registry';
+import { NodeType } from '../registry';
 import {
   ServerInteraction,
   ServerCollaboration,

@@ -1,6 +1,5 @@
-import { CommandInput } from '@/shared/commands';
+import { CommandInput, CommandMap } from '@/shared/commands';
 import { createLogger } from '@/main/logger';
-import { CommandMap } from '@/shared/commands';
 import { commandHandlerMap } from '@/main/commands';
 import { CommandHandler } from '@/main/types';
 

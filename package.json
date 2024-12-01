@@ -13,6 +13,7 @@
     "type": "git",
     "url": "https://github.com/colanode/colanode"
   },
+  "packageManager": "npm@10.9.0",
   "scripts": {
     "compile": "turbo run compile",
     "build": "turbo run build",
@@ -25,7 +26,9 @@
   },
   "devDependencies": {
     "@types/lodash-es": "^4.17.12",
-    "eslint": "^9.16.0",
+    "@typescript-eslint/eslint-plugin": "^8.16.0",
+    "eslint": "^8.57.1",
+    "eslint-plugin-import": "^2.31.0",
     "prettier": "^3.4.1",
     "turbo": "^2.3.3",
     "typescript": "^5.7.2",

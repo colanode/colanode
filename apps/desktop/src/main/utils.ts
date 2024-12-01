@@ -15,7 +15,7 @@ import {
   SelectUpload,
   WorkspaceDatabaseSchema,
 } from '@/main/data/workspace/schema';
-import { LocalNodeTransaction, Node, NodeTypes } from '@colanode/core';
+import { LocalNodeTransaction, Node } from '@colanode/core';
 import { Account } from '@/shared/types/accounts';
 import {
   SelectAccount,
@@ -102,7 +102,7 @@ export const fetchNodeAncestors = (
 export const mapNode = (row: SelectNode): Node => {
   return {
     id: row.id,
-    type: row.type as any,
+    type: row.type,
     parentId: row.parent_id,
     attributes: JSON.parse(row.attributes),
     createdAt: row.created_at,

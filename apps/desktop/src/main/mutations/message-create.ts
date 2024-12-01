@@ -4,6 +4,9 @@ import {
   EditorNodeTypes,
   NodeTypes,
   extractFileType,
+  Block,
+  FileAttributes,
+  MessageAttributes,
 } from '@colanode/core';
 import { MutationHandler } from '@/main/types';
 import {
@@ -12,7 +15,6 @@ import {
 } from '@/shared/mutations/message-create';
 import { mapContentsToBlocks } from '@/shared/lib/editor';
 import { fileService } from '@/main/services/file-service';
-import { Block, FileAttributes, MessageAttributes } from '@colanode/core';
 import { CreateNodeInput, nodeService } from '@/main/services/node-service';
 
 export class MessageCreateMutationHandler

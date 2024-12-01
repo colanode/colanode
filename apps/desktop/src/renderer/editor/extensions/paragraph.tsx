@@ -1,4 +1,4 @@
-import Paragraph from '@tiptap/extension-paragraph';
+import { Paragraph } from '@tiptap/extension-paragraph';
 
 import { defaultClasses } from '@/renderer/editor/classes';
 

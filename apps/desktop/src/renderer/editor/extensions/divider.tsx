@@ -1,5 +1,5 @@
 import { InputRule } from '@tiptap/core';
-import HorizontalRule from '@tiptap/extension-horizontal-rule';
+import { HorizontalRule } from '@tiptap/extension-horizontal-rule';
 
 export const DividerNode = HorizontalRule.extend({
   addInputRules() {

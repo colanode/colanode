@@ -1,14 +1,15 @@
-import { generateId, IdType, NodeRoles } from '@colanode/core';
+import {
+  generateId,
+  IdType,
+  ChannelAttributes,
+  PageAttributes,
+  SpaceAttributes,
+} from '@colanode/core';
 import { MutationHandler } from '@/main/types';
 import {
   SpaceCreateMutationInput,
   SpaceCreateMutationOutput,
 } from '@/shared/mutations/space-create';
-import {
-  ChannelAttributes,
-  PageAttributes,
-  SpaceAttributes,
-} from '@colanode/core';
 import { nodeService } from '@/main/services/node-service';
 import { databaseService } from '@/main/data/database-service';
 

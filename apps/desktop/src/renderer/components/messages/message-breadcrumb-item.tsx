@@ -1,5 +1,4 @@
-import { MessageNode, SpaceNode } from '@colanode/core';
-import { Avatar } from '@/renderer/components/avatars/avatar';
+import { MessageNode } from '@colanode/core';
 import { MessageCircleMore } from 'lucide-react';
 
 interface MessageBreadcrumbItemProps {
@@ -8,7 +7,7 @@ interface MessageBreadcrumbItemProps {
 
 export const MessageBreadcrumbItem = ({ node }: MessageBreadcrumbItemProps) => {
   return (
-    <div className="flex items-center space-x-2">
+    <div key={node.id} className="flex items-center space-x-2">
       <MessageCircleMore className="size-5" />
       <span>Message</span>
     </div>

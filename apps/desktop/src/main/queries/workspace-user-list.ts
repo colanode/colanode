@@ -1,9 +1,8 @@
 import { WorkspaceUserListQueryInput } from '@/shared/queries/workspace-user-list';
 import { databaseService } from '@/main/data/database-service';
-import { NodeTypes } from '@colanode/core';
+import { NodeTypes, UserNode } from '@colanode/core';
 import { mapNode } from '@/main/utils';
 import { SelectNode } from '@/main/data/workspace/schema';
-import { UserNode } from '@colanode/core';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { Event } from '@/shared/types/events';
 

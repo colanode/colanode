@@ -1,4 +1,4 @@
-import ListKeymap from '@tiptap/extension-list-keymap';
+import { ListKeymap } from '@tiptap/extension-list-keymap';
 
 export const ListKeymapExtension = ListKeymap.configure({
   listTypes: [

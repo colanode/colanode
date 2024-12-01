@@ -42,11 +42,14 @@ class AvatarService {
       return new Response(null, { status: 404 });
     }
 
-    const response = await httpClient.get<any>(`/v1/avatars/${avatarId}`, {
-      domain: credentials.domain,
-      token: credentials.token,
-      responseType: 'stream',
-    });
+    const response = await httpClient.get<NodeJS.ReadableStream>(
+      `/v1/avatars/${avatarId}`,
+      {
+        domain: credentials.domain,
+        token: credentials.token,
+        responseType: 'stream',
+      }
+    );
 
     if (response.status !== 200 || !response.data) {
       this.logger.warn(

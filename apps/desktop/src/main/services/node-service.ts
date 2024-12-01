@@ -8,9 +8,10 @@ import {
   ServerNodeDeleteTransaction,
   ServerNodeTransaction,
   ServerNodeUpdateTransaction,
+  generateId,
+  IdType,
 } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
-import { generateId, IdType } from '@colanode/core';
 import { databaseService } from '@/main/data/database-service';
 import {
   fetchNodeAncestors,
@@ -274,7 +275,7 @@ class NodeService {
     }
 
     const ancestors = ancestorRows.map(mapNode);
-    let node = mapNode(nodeRow);
+    const node = mapNode(nodeRow);
 
     if (!node) {
       throw new Error('Node not found');

@@ -7,15 +7,9 @@ import {
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import {
-  ChannelNode,
-  hasEditorAccess,
-  NodeRole,
-  PageNode,
-} from '@colanode/core';
-import { ChannelForm } from '@/renderer/components/channels/channel-form';
+import { hasEditorAccess, NodeRole, PageNode } from '@colanode/core';
 import { toast } from '@/renderer/hooks/use-toast';
-import { PageForm } from './page-form';
+import { PageForm } from '@/renderer/components/pages/page-form';
 
 interface PageUpdateDialogProps {
   page: PageNode;

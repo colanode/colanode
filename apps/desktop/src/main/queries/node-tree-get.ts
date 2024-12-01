@@ -1,9 +1,8 @@
 import { databaseService } from '@/main/data/database-service';
-import { mapNode } from '@/main/utils';
+import { mapNode, fetchNodeAncestors } from '@/main/utils';
 import { SelectNode } from '@/main/data/workspace/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { NodeTreeGetQueryInput } from '@/shared/queries/node-tree-get';
-import { fetchNodeAncestors } from '@/main/utils';
 import { Event } from '@/shared/types/events';
 import { Node } from '@colanode/core';
 

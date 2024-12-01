@@ -1,5 +1,4 @@
-import { MutationInput } from '@/shared/mutations';
-import { MutationMap } from '@/shared/mutations';
+import { MutationInput, MutationMap } from '@/shared/mutations';
 import { mutationHandlerMap } from '@/main/mutations';
 import { MutationHandler } from '@/main/types';
 import { createLogger } from '@/main/logger';

@@ -2,7 +2,8 @@ import React from 'react';
 import type { Range } from '@tiptap/core';
 import { Editor, Extension } from '@tiptap/core';
 import { ReactRenderer } from '@tiptap/react';
-import Suggestion, {
+import {
+  Suggestion,
   type SuggestionKeyDownProps,
   type SuggestionProps,
 } from '@tiptap/suggestion';
@@ -43,8 +44,8 @@ const CommandList = ({
   range,
 }: {
   items: EditorCommand[];
-  command: any;
-  range: any;
+  command: (item: EditorCommand, range: Range) => void;
+  range: Range;
 }) => {
   const [selectedIndex, setSelectedIndex] = React.useState(0);
 
@@ -129,6 +130,8 @@ const CommandList = ({
 
 const renderItems = () => {
   let component: ReactRenderer | null = null;
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   let popup: any | null = null;
 
   return {
@@ -138,7 +141,7 @@ const renderItems = () => {
         editor: props.editor,
       });
 
-      // @ts-ignore
+      // @ts-expect-error Tippy instance type is complex, ignoring for simplicity
       popup = tippy('body', {
         getReferenceClientRect: props.clientRect,
         appendTo: () => document.body,
@@ -152,10 +155,11 @@ const renderItems = () => {
     onUpdate: (props: SuggestionProps<EditorCommand>) => {
       component?.updateProps(props);
 
-      popup &&
+      if (popup) {
         popup[0].setProps({
           getReferenceClientRect: props.clientRect,
         });
+      }
     },
     onKeyDown: (props: SuggestionKeyDownProps) => {
       if (props.event.key === 'Escape') {
@@ -168,7 +172,7 @@ const renderItems = () => {
         return true;
       }
 
-      // @ts-ignore
+      // @ts-expect-error Tippy instance type is complex, ignoring for simplicity
       return component?.ref?.onKeyDown(props);
     },
     onExit: () => {

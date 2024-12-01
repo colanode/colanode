@@ -47,7 +47,7 @@ export const BoardViewRecordCard = () => {
 
   return (
     <div
-      ref={dragRef as any}
+      ref={dragRef as React.LegacyRef<HTMLDivElement>}
       role="presentation"
       key={record.id}
       className="animate-fade-in flex cursor-pointer flex-col gap-1 rounded-md border p-2 text-left hover:bg-gray-50"

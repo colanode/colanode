@@ -1,11 +1,10 @@
 import { databaseService } from '@/main/data/database-service';
-import { generateId, IdType } from '@colanode/core';
+import { generateId, IdType, ChannelAttributes } from '@colanode/core';
 import { MutationHandler } from '@/main/types';
 import {
   ChannelCreateMutationInput,
   ChannelCreateMutationOutput,
 } from '@/shared/mutations/channel-create';
-import { ChannelAttributes } from '@colanode/core';
 import { nodeService } from '@/main/services/node-service';
 
 export class ChannelCreateMutationHandler

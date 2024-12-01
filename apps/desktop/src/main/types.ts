@@ -1,5 +1,4 @@
-import { CommandMap } from '@/shared/commands';
-import { CommandInput } from '@/shared/commands';
+import { CommandMap, CommandInput } from '@/shared/commands';
 import { MutationInput, MutationMap } from '@/shared/mutations';
 import { QueryInput, QueryMap } from '@/shared/queries';
 import { Event } from '@/shared/types/events';

@@ -1,11 +1,15 @@
 import { MutationHandler } from '@/main/types';
-import { extractFileType, generateId, IdType } from '@colanode/core';
+import {
+  extractFileType,
+  generateId,
+  IdType,
+  FileAttributes,
+} from '@colanode/core';
 import {
   FileCreateMutationInput,
   FileCreateMutationOutput,
 } from '@/shared/mutations/file-create';
 import { fileService } from '@/main/services/file-service';
-import { FileAttributes } from '@colanode/core';
 import { nodeService } from '@/main/services/node-service';
 
 export class FileCreateMutationHandler

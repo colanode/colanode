@@ -5,4 +5,4 @@ export type ServerConfig = {
   attributes: ServerAttributes;
 };
 
-export type ServerAttributes = {};
+export type ServerAttributes = Record<string, unknown>;

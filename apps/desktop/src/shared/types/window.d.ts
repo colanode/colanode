@@ -1,8 +1,6 @@
-import { CommandMap } from '@/shared/commands';
-import { QueryInput } from '@/shared/queries';
+import { CommandMap, CommandInput } from '@/shared/commands';
+import { QueryInput, QueryMap } from '@/shared/queries';
 import { MutationInput, MutationMap } from '@/shared/mutations';
-import { QueryMap } from '@/shared/queries';
-import { CommandInput } from '@/shared/commands';
 import { EventBus } from '@/shared/lib/event-bus';
 
 export interface ColanodeApi {

@@ -155,7 +155,7 @@ const Sidebar = React.forwardRef<
     },
     ref
   ) => {
-    const { state, open, setOpen, toggleSidebar } = useSidebar();
+    const { state } = useSidebar();
 
     if (collapsible === 'none') {
       return (

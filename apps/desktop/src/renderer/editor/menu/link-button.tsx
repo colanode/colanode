@@ -13,7 +13,7 @@ const isValidUrl = (url: string) => {
   try {
     new URL(url);
     return true;
-  } catch (e) {
+  } catch {
     return false;
   }
 };
@@ -24,7 +24,7 @@ const getUrlFromString = (str: string): string | null => {
     if (str.includes('.') && !str.includes(' ')) {
       return new URL(`https://${str}`).toString();
     }
-  } catch (e) {
+  } catch {
     return null;
   }
 

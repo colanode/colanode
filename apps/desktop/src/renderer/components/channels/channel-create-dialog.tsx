@@ -7,9 +7,8 @@ import {
   DialogTitle,
 } from '@/renderer/components/ui/dialog';
 import { useMutation } from '@/renderer/hooks/use-mutation';
-import { IdType } from '@colanode/core';
+import { IdType, generateId } from '@colanode/core';
 import { ChannelForm } from '@/renderer/components/channels/channel-form';
-import { generateId } from '@colanode/core';
 
 interface ChannelCreateDialogProps {
   spaceId: string;

@@ -213,6 +213,7 @@ export const languages: CodeLanguage[] = [
 ];
 
 const parseNodes = (
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   nodes: any[],
   className: string[] = []
 ): CodeHighlightNode[] => {
