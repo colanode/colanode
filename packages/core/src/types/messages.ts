@@ -5,6 +5,7 @@ import {
   ServerInteraction,
   ServerNodeTransaction,
 } from './sync';
+
 import { NodeType } from '../registry';
 
 export type FetchNodeTransactionsMessage = {

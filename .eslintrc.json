@@ -35,7 +35,8 @@
           "sibling",
           "parent",
           "index"
-        ]
+        ],
+        "newlines-between": "always"
       }
     ]
   },

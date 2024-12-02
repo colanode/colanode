@@ -1,4 +1,5 @@
 import pino, { Level, Logger } from 'pino';
+
 import { app } from 'electron';
 import path from 'path';
 

@@ -1,5 +1,6 @@
 import cors from 'cors';
 import express, { Request, Response } from 'express';
+
 import http from 'http';
 
 import { authMiddleware } from '@/middlewares/auth';

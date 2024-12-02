@@ -7,6 +7,7 @@ import {
   Transaction,
   UpdateResult,
 } from 'kysely';
+
 import { app } from 'electron';
 import path from 'path';
 

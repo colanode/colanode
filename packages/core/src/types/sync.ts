@@ -1,4 +1,5 @@
 import { InteractionAttributes } from './interactions';
+
 import { NodeType } from '../registry';
 import { NodeRole } from '../registry/core';
 

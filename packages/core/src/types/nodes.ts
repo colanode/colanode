@@ -1,4 +1,5 @@
 import { ServerNodeTransaction } from './sync';
+
 import { NodeAttributes } from '../registry';
 
 export type NodeOutput = {

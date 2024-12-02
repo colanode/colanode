@@ -1,4 +1,5 @@
 import started from 'electron-squirrel-startup';
+
 import { app, BrowserWindow, ipcMain, protocol } from 'electron';
 import path from 'path';
 

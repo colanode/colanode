@@ -1,4 +1,5 @@
 import { AccountSyncOutput } from '@colanode/core';
+
 import fs from 'fs';
 
 import { SelectAccount } from '@/main/data/app/schema';

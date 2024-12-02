@@ -1,4 +1,5 @@
 import { compareDate, compareString } from './utils';
+
 import {
   InteractionAttribute,
   InteractionAttributes,

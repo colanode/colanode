@@ -1,5 +1,6 @@
 import SQLite from 'better-sqlite3';
 import { Kysely, Migration, Migrator, SqliteDialect } from 'kysely';
+
 import fs from 'fs';
 
 import { appDatabaseMigrations } from '@/main/data/app/migrations';

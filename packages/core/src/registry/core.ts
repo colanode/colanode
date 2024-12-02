@@ -8,6 +8,7 @@ import {
   hasViewerAccess,
 } from '../lib/nodes';
 import { WorkspaceRole } from '../types/workspaces';
+
 import { Node, NodeAttributes } from './';
 
 export type NodeRole = 'admin' | 'editor' | 'collaborator' | 'viewer';
