@@ -17,6 +17,7 @@ import {
   MessageCreateMutationInput,
   MessageCreateMutationOutput,
 } from '@/shared/mutations/messages/message-create';
+import { MutationError } from '@/shared/mutations';
 
 export class MessageCreateMutationHandler
   implements MutationHandler<MessageCreateMutationInput>
@@ -37,7 +38,10 @@ export class MessageCreateMutationHandler
         const path = block.attrs?.path;
         const metadata = fileService.getFileMetadata(path);
         if (!metadata) {
-          throw new Error('Invalid file');
+          throw new MutationError(
+            'invalid_file',
+            'File attachment is invalid or could not be read.'
+          );
         }
 
         const fileId = generateId(IdType.File);
@@ -105,7 +109,10 @@ export class MessageCreateMutationHandler
       );
 
       if (!reference || reference.type !== 'message') {
-        throw new Error('Reference node not found');
+        throw new MutationError(
+          'node_not_found',
+          'Referenced message not found or has been deleted.'
+        );
       }
 
       const messageAttributes: MessageAttributes = {

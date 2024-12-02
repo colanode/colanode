@@ -58,11 +58,10 @@ export const NodeCollaboratorCreate = ({
               onSuccess() {
                 setUsers([]);
               },
-              onError() {
+              onError(error) {
                 toast({
                   title: 'Failed to add collaborators',
-                  description:
-                    'Something went wrong trying to add collaborators. Please try again.',
+                  description: error.message,
                   variant: 'destructive',
                 });
               },

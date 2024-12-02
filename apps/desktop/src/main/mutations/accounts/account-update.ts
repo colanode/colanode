@@ -8,6 +8,7 @@ import {
   AccountUpdateMutationInput,
   AccountUpdateMutationOutput,
 } from '@/shared/mutations/accounts/account-update';
+import { MutationError } from '@/shared/mutations';
 
 export class AccountUpdateMutationHandler
   implements MutationHandler<AccountUpdateMutationInput>
@@ -22,7 +23,10 @@ export class AccountUpdateMutationHandler
       .executeTakeFirst();
 
     if (!account) {
-      throw new Error('Account not found!');
+      throw new MutationError(
+        'account_not_found',
+        'Account not found or has been logged out already. Try closing the app and opening it again.'
+      );
     }
 
     const server = await databaseService.appDatabase
@@ -32,7 +36,10 @@ export class AccountUpdateMutationHandler
       .executeTakeFirst();
 
     if (!server) {
-      throw new Error('Account not found');
+      throw new MutationError(
+        'server_not_found',
+        `The server ${account.server} associated with this account was not found. Try closing the app and opening it again.`
+      );
     }
 
     const { data } = await httpClient.put<AccountUpdateOutput>(
@@ -58,7 +65,10 @@ export class AccountUpdateMutationHandler
       .executeTakeFirst();
 
     if (!updatedAccount) {
-      throw new Error('Account not found');
+      throw new MutationError(
+        'account_not_found',
+        'Account not found or has been logged out already. Try closing the app and opening it again.'
+      );
     }
 
     eventBus.publish({

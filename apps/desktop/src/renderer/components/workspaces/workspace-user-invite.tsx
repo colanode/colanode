@@ -91,11 +91,10 @@ export const WorkspaceUserInvite = ({
                 setEmails([]);
                 setInput('');
               },
-              onError() {
+              onError(error) {
                 toast({
                   title: 'Failed to invite users',
-                  description:
-                    'Something went wrong inviting userts to workspace. Please try again!',
+                  description: error.message,
                   variant: 'destructive',
                 });
               },

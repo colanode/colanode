@@ -2,6 +2,7 @@ import { databaseService } from '@/main/data/database-service';
 import { MutationHandler } from '@/main/types';
 import { mapNode } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
+import { MutationError } from '@/shared/mutations';
 import {
   FileDownloadMutationInput,
   FileDownloadMutationOutput,
@@ -24,16 +25,18 @@ export class FileDownloadMutationHandler
       .executeTakeFirst();
 
     if (!node) {
-      return {
-        success: false,
-      };
+      throw new MutationError(
+        'node_not_found',
+        'The file you are trying to download does not exist.'
+      );
     }
 
     const file = mapNode(node);
     if (file.attributes.type !== 'file') {
-      return {
-        success: false,
-      };
+      throw new MutationError(
+        'invalid_attributes',
+        'The node you are trying to download is not a file.'
+      );
     }
 
     const download = await workspaceDatabase

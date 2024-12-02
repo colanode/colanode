@@ -10,6 +10,7 @@ import {
 import { Button } from '@/renderer/components/ui/button';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface FileDeleteDialogProps {
   nodeId: string;
@@ -51,6 +52,13 @@ export const FileDeleteDialog = ({
                 },
                 onSuccess() {
                   onOpenChange(false);
+                },
+                onError(error) {
+                  toast({
+                    title: 'Failed to delete file',
+                    description: error.message,
+                    variant: 'destructive',
+                  });
                 },
               });
             }}

@@ -1,5 +1,6 @@
 import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
+import { MutationError } from '@/shared/mutations';
 import {
   MessageReactionDeleteMutationInput,
   MessageReactionDeleteMutationOutput,
@@ -11,12 +12,15 @@ export class MessageReactionDeleteMutationHandler
   async handleMutation(
     input: MessageReactionDeleteMutationInput
   ): Promise<MessageReactionDeleteMutationOutput> {
-    await nodeService.updateNode(
+    const result = await nodeService.updateNode(
       input.messageId,
       input.userId,
       (attributes) => {
         if (attributes.type !== 'message') {
-          throw new Error('Node is not a message');
+          throw new MutationError(
+            'invalid_attributes',
+            'Node is not a message'
+          );
         }
 
         const reactionUsers = attributes.reactions[input.reaction] ?? [];
@@ -34,6 +38,20 @@ export class MessageReactionDeleteMutationHandler
         return attributes;
       }
     );
+
+    if (result === 'unauthorized') {
+      throw new MutationError(
+        'unauthorized',
+        "You don't have permission to react to this message."
+      );
+    }
+
+    if (result !== 'success') {
+      throw new MutationError(
+        'unknown',
+        'Something went wrong while deleting the reaction.'
+      );
+    }
 
     return {
       success: true,

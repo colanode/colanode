@@ -24,7 +24,7 @@ export const PageCommand: EditorCommand = {
       generateIndex: false,
     });
 
-    if (!output.id) {
+    if (!output.success) {
       return;
     }
 
@@ -35,7 +35,7 @@ export const PageCommand: EditorCommand = {
       .insertContent({
         type: NodeTypes.Page,
         attrs: {
-          id: output.id,
+          id: output.output.id,
         },
       })
       .run();

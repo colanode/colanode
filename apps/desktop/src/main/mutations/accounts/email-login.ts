@@ -9,6 +9,7 @@ import {
   EmailLoginMutationOutput,
 } from '@/shared/mutations/accounts/email-login';
 import { Account } from '@/shared/types/accounts';
+import { MutationError } from '@/shared/mutations';
 
 export class EmailLoginMutationHandler
   implements MutationHandler<EmailLoginMutationInput>
@@ -23,9 +24,10 @@ export class EmailLoginMutationHandler
       .executeTakeFirst();
 
     if (!server) {
-      return {
-        success: false,
-      };
+      throw new MutationError(
+        'server_not_found',
+        `Server ${input.server} was not found! Try using a different server.`
+      );
     }
 
     const { data } = await httpClient.post<LoginOutput>(
@@ -57,7 +59,10 @@ export class EmailLoginMutationHandler
         .executeTakeFirst();
 
       if (!createdAccount) {
-        throw new Error('Failed to create account!');
+        throw new MutationError(
+          'account_login_failed',
+          'Failed to login with email and password! Please try again.'
+        );
       }
 
       account = {
@@ -93,7 +98,10 @@ export class EmailLoginMutationHandler
     });
 
     if (!account) {
-      throw new Error('Failed to create account!');
+      throw new MutationError(
+        'account_login_failed',
+        'Failed to login with email and password! Please try again.'
+      );
     }
 
     eventBus.publish({
@@ -118,7 +126,6 @@ export class EmailLoginMutationHandler
     }
 
     return {
-      success: true,
       account,
       workspaces: data.workspaces,
     };

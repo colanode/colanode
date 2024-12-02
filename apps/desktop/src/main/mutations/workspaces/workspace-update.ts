@@ -2,6 +2,7 @@ import { databaseService } from '@/main/data/database-service';
 import { MutationHandler } from '@/main/types';
 import { eventBus } from '@/shared/lib/event-bus';
 import { httpClient } from '@/shared/lib/http-client';
+import { MutationError } from '@/shared/mutations';
 import {
   WorkspaceUpdateMutationInput,
   WorkspaceUpdateMutationOutput,
@@ -21,7 +22,7 @@ export class WorkspaceUpdateMutationHandler
       .executeTakeFirst();
 
     if (!account) {
-      throw new Error('Account not found!');
+      throw new MutationError('account_not_found', 'Account not found!');
     }
 
     const server = await databaseService.appDatabase
@@ -31,7 +32,10 @@ export class WorkspaceUpdateMutationHandler
       .executeTakeFirst();
 
     if (!server) {
-      throw new Error('Account not found');
+      throw new MutationError(
+        'server_not_found',
+        'The server associated with this account was not found.'
+      );
     }
 
     const { data } = await httpClient.put<Workspace>(
@@ -66,7 +70,7 @@ export class WorkspaceUpdateMutationHandler
       .executeTakeFirst();
 
     if (!updatedWorkspace) {
-      throw new Error('Failed to update workspace!');
+      throw new MutationError('unknown', 'Failed to update workspace!');
     }
 
     eventBus.publish({

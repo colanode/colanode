@@ -9,18 +9,9 @@ export type EmailLoginMutationInput = {
   password: string;
 };
 
-export type EmailLoginMutationOutput =
-  | EmailLoginMutationSuccessOutput
-  | EmailLoginMutationErrorOutput;
-
-export type EmailLoginMutationSuccessOutput = {
-  success: true;
+export type EmailLoginMutationOutput = {
   account: Account;
   workspaces: WorkspaceOutput[];
-};
-
-export type EmailLoginMutationErrorOutput = {
-  success: false;
 };
 
 declare module '@/shared/mutations' {

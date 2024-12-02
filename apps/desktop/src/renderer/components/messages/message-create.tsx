@@ -79,6 +79,13 @@ export const MessageCreate = React.forwardRef<MessageCreateRefProps>(
             messageEditorRef.current.focus();
           }
         },
+        onError(error) {
+          toast({
+            title: 'Failed to create message',
+            description: error.message,
+            variant: 'destructive',
+          });
+        },
       });
     }, [
       conversation.id,

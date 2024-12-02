@@ -8,6 +8,7 @@ import {
   WorkspaceCreateMutationInput,
   WorkspaceCreateMutationOutput,
 } from '@/shared/mutations/workspaces/workspace-create';
+import { MutationError } from '@/shared/mutations';
 
 export class WorkspaceCreateMutationHandler
   implements MutationHandler<WorkspaceCreateMutationInput>
@@ -22,7 +23,7 @@ export class WorkspaceCreateMutationHandler
       .executeTakeFirst();
 
     if (!account) {
-      throw new Error('Account not found!');
+      throw new MutationError('account_not_found', 'Account not found!');
     }
 
     const server = await databaseService.appDatabase
@@ -32,7 +33,10 @@ export class WorkspaceCreateMutationHandler
       .executeTakeFirst();
 
     if (!server) {
-      throw new Error('Account not found');
+      throw new MutationError(
+        'server_not_found',
+        'The server associated with this account was not found.'
+      );
     }
 
     const { data } = await httpClient.post<WorkspaceOutput>(
@@ -65,7 +69,7 @@ export class WorkspaceCreateMutationHandler
       .executeTakeFirst();
 
     if (!createdWorkspace) {
-      throw new Error('Failed to create workspace!');
+      throw new MutationError('unknown', 'Failed to create workspace!');
     }
 
     eventBus.publish({

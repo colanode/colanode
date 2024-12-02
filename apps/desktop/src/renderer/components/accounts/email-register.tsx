@@ -50,22 +50,13 @@ export const EmailRegister = ({ server }: EmailRegisterProps) => {
         server: server.domain,
       },
       onSuccess(output) {
-        if (output.success) {
-          const userId = output.workspaces[0]?.id ?? '';
-          navigate(`/${output.account.id}/${userId}`);
-        } else {
-          toast({
-            title: 'Failed to register',
-            description: 'Email already in use.',
-            variant: 'destructive',
-          });
-        }
+        const userId = output.workspaces[0]?.id ?? '';
+        navigate(`/${output.account.id}/${userId}`);
       },
-      onError() {
+      onError(error) {
         toast({
           title: 'Failed to register',
-          description:
-            'Something went wrong trying to register. Please try again.',
+          description: error.message,
           variant: 'destructive',
         });
       },

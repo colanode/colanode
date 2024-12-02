@@ -1,6 +1,7 @@
 import { databaseService } from '@/main/data/database-service';
 import { accountService } from '@/main/services/account-service';
 import { MutationHandler } from '@/main/types';
+import { MutationError } from '@/shared/mutations';
 import {
   AccountLogoutMutationInput,
   AccountLogoutMutationOutput,
@@ -19,9 +20,10 @@ export class AccountLogoutMutationHandler
       .executeTakeFirst();
 
     if (!account) {
-      return {
-        success: false,
-      };
+      throw new MutationError(
+        'account_not_found',
+        'Account was not found or has been logged out already. Try closing the app and opening it again.'
+      );
     }
 
     await accountService.logoutAccount(account);

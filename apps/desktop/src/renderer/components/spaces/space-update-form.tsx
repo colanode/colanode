@@ -63,10 +63,10 @@ export const SpaceUpdateForm = ({ space }: SpaceUpdateFormProps) => {
           variant: 'default',
         });
       },
-      onError() {
+      onError(error) {
         toast({
           title: 'Failed to update space',
-          description: 'Something went wrong updating space. Please try again!',
+          description: error.message,
           variant: 'destructive',
         });
       },

@@ -24,6 +24,7 @@ import { Spinner } from '@/renderer/components/ui/spinner';
 import { Textarea } from '@/renderer/components/ui/textarea';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),
@@ -75,6 +76,13 @@ export const SpaceCreateDialog = ({
       onSuccess() {
         onOpenChange(false);
         form.reset();
+      },
+      onError(error) {
+        toast({
+          title: 'Failed to create space',
+          description: error.message,
+          variant: 'destructive',
+        });
       },
     });
   };

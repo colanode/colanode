@@ -1,4 +1,4 @@
-import { generateId,IdType } from '@colanode/core';
+import { generateId, IdType } from '@colanode/core';
 
 import { ChannelForm } from '@/renderer/components/channels/channel-form';
 import {
@@ -10,6 +10,7 @@ import {
 } from '@/renderer/components/ui/dialog';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface ChannelCreateDialogProps {
   spaceId: string;
@@ -62,6 +63,13 @@ export const ChannelCreateDialog = ({
               onSuccess(output) {
                 onOpenChange(false);
                 workspace.openInMain(output.id);
+              },
+              onError(error) {
+                toast({
+                  title: 'Failed to create channel',
+                  description: error.message,
+                  variant: 'destructive',
+                });
               },
             });
           }}

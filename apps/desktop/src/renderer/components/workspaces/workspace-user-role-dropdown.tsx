@@ -107,11 +107,10 @@ export const WorkspaceUserRoleDropdown = ({
                     role: role.value,
                     userId: workspace.userId,
                   },
-                  onError() {
+                  onError(error) {
                     toast({
                       title: 'Failed to update role',
-                      description:
-                        'Something went wrong updating user role. Please try again!',
+                      description: error.message,
                       variant: 'destructive',
                     });
                   },

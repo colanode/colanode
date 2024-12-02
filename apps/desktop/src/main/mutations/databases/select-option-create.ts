@@ -11,6 +11,7 @@ import {
   SelectOptionCreateMutationInput,
   SelectOptionCreateMutationOutput,
 } from '@/shared/mutations/databases/select-option-create';
+import { MutationError } from '@/shared/mutations';
 
 export class SelectOptionCreateMutationHandler
   implements MutationHandler<SelectOptionCreateMutationInput>
@@ -19,21 +20,30 @@ export class SelectOptionCreateMutationHandler
     input: SelectOptionCreateMutationInput
   ): Promise<SelectOptionCreateMutationOutput> {
     const id = generateId(IdType.SelectOption);
-    await nodeService.updateNode(
+    const result = await nodeService.updateNode(
       input.databaseId,
       input.userId,
       (attributes) => {
         if (attributes.type !== 'database') {
-          throw new Error('Node is not a database');
+          throw new MutationError(
+            'invalid_attributes',
+            'Node is not a database'
+          );
         }
 
         const field = attributes.fields[input.fieldId];
         if (!field) {
-          throw new Error('Field not found');
+          throw new MutationError(
+            'field_not_found',
+            'The field you are trying to create a select option in does not exist.'
+          );
         }
 
         if (field.type !== 'select' && field.type !== 'multiSelect') {
-          throw new Error('Field is not a select');
+          throw new MutationError(
+            'invalid_field_type',
+            'The field you are trying to create a select option in is not a "Select" or "Multi-Select" field.'
+          );
         }
 
         if (!field.options) {
@@ -56,6 +66,20 @@ export class SelectOptionCreateMutationHandler
         return attributes;
       }
     );
+
+    if (result === 'unauthorized') {
+      throw new MutationError(
+        'unauthorized',
+        "You don't have permission to create a select option in this field."
+      );
+    }
+
+    if (result !== 'success') {
+      throw new MutationError(
+        'unknown',
+        'Something went wrong while creating the select option.'
+      );
+    }
 
     return {
       id: id,

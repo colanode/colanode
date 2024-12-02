@@ -12,6 +12,7 @@ import {
   FileCreateMutationInput,
   FileCreateMutationOutput,
 } from '@/shared/mutations/files/file-create';
+import { MutationError } from '@/shared/mutations';
 
 export class FileCreateMutationHandler
   implements MutationHandler<FileCreateMutationInput>
@@ -21,7 +22,10 @@ export class FileCreateMutationHandler
   ): Promise<FileCreateMutationOutput> {
     const metadata = fileService.getFileMetadata(input.filePath);
     if (!metadata) {
-      throw new Error('Invalid file');
+      throw new MutationError(
+        'invalid_file',
+        'File is invalid or could not be read.'
+      );
     }
 
     const fileId = generateId(IdType.File);

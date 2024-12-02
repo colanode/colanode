@@ -9,6 +9,7 @@ import { Separator } from '@/renderer/components/ui/separator';
 import { useConversation } from '@/renderer/contexts/conversation';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 const MessageAction = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -49,6 +50,13 @@ export const MessageActions = ({ message }: MessageActionsProps) => {
           userId: workspace.userId,
           reaction,
         },
+        onError(error) {
+          toast({
+            title: 'Failed to add reaction',
+            description: error.message,
+            variant: 'destructive',
+          });
+        },
       });
     },
     [isPending, mutate, workspace.userId, message.id]
@@ -84,6 +92,13 @@ export const MessageActions = ({ message }: MessageActionsProps) => {
                 messageId: message.id,
                 userId: workspace.userId,
                 reaction,
+              },
+              onError(error) {
+                toast({
+                  title: 'Failed to add reaction',
+                  description: error.message,
+                  variant: 'destructive',
+                });
               },
             });
           }}

@@ -15,6 +15,7 @@ import { ScrollArea } from '@/renderer/components/ui/scroll-area';
 import { Separator } from '@/renderer/components/ui/separator';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface RecordBodyProps {
   record: RecordNode;
@@ -43,6 +44,13 @@ export const RecordBody = ({
           userId: workspace.userId,
           recordId: record.id,
           content,
+        },
+        onError(error) {
+          toast({
+            title: 'Failed to update record',
+            description: error.message,
+            variant: 'destructive',
+          });
         },
       });
     },

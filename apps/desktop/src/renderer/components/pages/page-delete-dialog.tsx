@@ -10,6 +10,7 @@ import {
 import { Button } from '@/renderer/components/ui/button';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface PageDeleteDialogProps {
   open: boolean;
@@ -52,6 +53,13 @@ export const PageDeleteDialog = ({
                 onSuccess() {
                   onOpenChange(false);
                   workspace.closeNode(nodeId);
+                },
+                onError(error) {
+                  toast({
+                    title: 'Failed to delete page',
+                    description: error.message,
+                    variant: 'destructive',
+                  });
                 },
               });
             }}

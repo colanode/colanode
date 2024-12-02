@@ -1,5 +1,6 @@
 import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
+import { MutationError } from '@/shared/mutations';
 import {
   ViewNameUpdateMutationInput,
   ViewNameUpdateMutationOutput,
@@ -11,23 +12,43 @@ export class ViewNameUpdateMutationHandler
   async handleMutation(
     input: ViewNameUpdateMutationInput
   ): Promise<ViewNameUpdateMutationOutput> {
-    await nodeService.updateNode(
+    const result = await nodeService.updateNode(
       input.databaseId,
       input.userId,
       (attributes) => {
         if (attributes.type !== 'database') {
-          throw new Error('Invalid node type');
+          throw new MutationError(
+            'invalid_attributes',
+            'Node is not a database'
+          );
         }
 
         const view = attributes.views[input.viewId];
         if (!view) {
-          throw new Error('View not found');
+          throw new MutationError(
+            'view_not_found',
+            'The view you are trying to update the name of does not exist.'
+          );
         }
 
         view.name = input.name;
         return attributes;
       }
     );
+
+    if (result === 'unauthorized') {
+      throw new MutationError(
+        'unauthorized',
+        "You don't have permission to update this view."
+      );
+    }
+
+    if (result !== 'success') {
+      throw new MutationError(
+        'unknown',
+        'Something went wrong while updating the view.'
+      );
+    }
 
     return {
       id: input.viewId,

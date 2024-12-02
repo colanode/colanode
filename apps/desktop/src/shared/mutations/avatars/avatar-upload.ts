@@ -5,8 +5,7 @@ export type AvatarUploadMutationInput = {
 };
 
 export type AvatarUploadMutationOutput = {
-  status: 'success' | 'error' | 'canceled';
-  id: string | null;
+  id: string;
 };
 
 declare module '@/shared/mutations' {

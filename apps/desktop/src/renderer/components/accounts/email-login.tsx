@@ -47,22 +47,13 @@ export const EmailLogin = ({ server }: EmailLoginProps) => {
         server: server.domain,
       },
       onSuccess(output) {
-        if (output.success) {
-          const userId = output.workspaces[0]?.id ?? '';
-          navigate(`/${output.account.id}/${userId}`);
-        } else {
-          toast({
-            title: 'Failed to login',
-            description: 'Invalid email or password.',
-            variant: 'destructive',
-          });
-        }
+        const userId = output.workspaces[0]?.id ?? '';
+        navigate(`/${output.account.id}/${userId}`);
       },
-      onError() {
+      onError(error) {
         toast({
           title: 'Failed to login',
-          description:
-            'Something went wrong trying to login. Please try again.',
+          description: error.message,
           variant: 'destructive',
         });
       },

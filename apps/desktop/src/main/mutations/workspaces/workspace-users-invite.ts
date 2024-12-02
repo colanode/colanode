@@ -7,6 +7,7 @@ import {
   WorkspaceUsersInviteMutationInput,
   WorkspaceUsersInviteMutationOutput,
 } from '@/shared/mutations/workspaces/workspace-users-invite';
+import { MutationError } from '@/shared/mutations';
 
 export class WorkspaceUsersInviteMutationHandler
   implements MutationHandler<WorkspaceUsersInviteMutationInput>
@@ -21,9 +22,7 @@ export class WorkspaceUsersInviteMutationHandler
       .executeTakeFirst();
 
     if (!workspace) {
-      return {
-        success: false,
-      };
+      throw new MutationError('workspace_not_found', 'Workspace not found');
     }
 
     const account = await databaseService.appDatabase
@@ -33,9 +32,10 @@ export class WorkspaceUsersInviteMutationHandler
       .executeTakeFirst();
 
     if (!account) {
-      return {
-        success: false,
-      };
+      throw new MutationError(
+        'account_not_found',
+        'The account associated with this workspace was not found.'
+      );
     }
 
     const server = await databaseService.appDatabase
@@ -45,9 +45,10 @@ export class WorkspaceUsersInviteMutationHandler
       .executeTakeFirst();
 
     if (!server) {
-      return {
-        success: false,
-      };
+      throw new MutationError(
+        'server_not_found',
+        'The server associated with this account was not found.'
+      );
     }
 
     await httpClient.post<WorkspaceUsersInviteOutput>(

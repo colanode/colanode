@@ -4,6 +4,7 @@ import React from 'react';
 import { RecordContext } from '@/renderer/contexts/record';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 export const RecordProvider = ({
   record,
@@ -41,6 +42,13 @@ export const RecordProvider = ({
               value,
               userId: workspace.userId,
             },
+            onError(error) {
+              toast({
+                title: 'Failed to update record field value',
+                description: error.message,
+                variant: 'destructive',
+              });
+            },
           });
         },
         removeFieldValue: (field) => {
@@ -50,6 +58,13 @@ export const RecordProvider = ({
               recordId: record.id,
               fieldId: field.id,
               userId: workspace.userId,
+            },
+            onError(error) {
+              toast({
+                title: 'Failed to delete record field value',
+                description: error.message,
+                variant: 'destructive',
+              });
             },
           });
         },

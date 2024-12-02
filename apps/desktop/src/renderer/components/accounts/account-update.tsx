@@ -66,11 +66,10 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
           variant: 'default',
         });
       },
-      onError() {
+      onError(error) {
         toast({
           title: 'Failed to update account',
-          description:
-            'Something went wrong updating account. Please try again!',
+          description: error.message,
           variant: 'destructive',
         });
       },
@@ -122,16 +121,15 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
                     filePath: filePath,
                   },
                   onSuccess(output) {
-                    if (output.status === 'success' && output.id) {
+                    if (output.id) {
                       form.setValue('avatar', output.id);
                     }
                     setIsFileDialogOpen(false);
                   },
-                  onError() {
+                  onError(error) {
                     toast({
                       title: 'Failed to upload avatar',
-                      description:
-                        'Something went wrong trying to upload avatar. Please try again.',
+                      description: error.message,
                       variant: 'destructive',
                     });
                     setIsFileDialogOpen(false);

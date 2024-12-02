@@ -142,6 +142,13 @@ export const ViewCreateDialog = ({
         form.reset();
         onOpenChange(false);
       },
+      onError(error) {
+        toast({
+          title: 'Failed to create view',
+          description: error.message,
+          variant: 'destructive',
+        });
+      },
     });
   };
 

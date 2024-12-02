@@ -9,6 +9,7 @@ import React from 'react';
 import { DatabaseContext } from '@/renderer/contexts/database';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface DatabaseProps {
   database: DatabaseNode;
@@ -46,6 +47,13 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
               fieldType: type,
               userId: workspace.userId,
             },
+            onError(error) {
+              toast({
+                title: 'Failed to create field',
+                description: error.message,
+                variant: 'destructive',
+              });
+            },
           });
         },
         renameField: (id, name) => {
@@ -61,6 +69,13 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
               name,
               userId: workspace.userId,
             },
+            onError(error) {
+              toast({
+                title: 'Failed to update field',
+                description: error.message,
+                variant: 'destructive',
+              });
+            },
           });
         },
         deleteField: (id) => {
@@ -74,6 +89,13 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
               databaseId: database.id,
               fieldId: id,
               userId: workspace.userId,
+            },
+            onError(error) {
+              toast({
+                title: 'Failed to delete field',
+                description: error.message,
+                variant: 'destructive',
+              });
             },
           });
         },
@@ -90,6 +112,13 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
               name,
               color,
               userId: workspace.userId,
+            },
+            onError(error) {
+              toast({
+                title: 'Failed to create select option',
+                description: error.message,
+                variant: 'destructive',
+              });
             },
           });
         },
@@ -108,6 +137,13 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
               color: attributes.color,
               userId: workspace.userId,
             },
+            onError(error) {
+              toast({
+                title: 'Failed to update select option',
+                description: error.message,
+                variant: 'destructive',
+              });
+            },
           });
         },
         deleteSelectOption: (fieldId, optionId) => {
@@ -122,6 +158,13 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
               fieldId,
               optionId,
               userId: workspace.userId,
+            },
+            onError(error) {
+              toast({
+                title: 'Failed to delete select option',
+                description: error.message,
+                variant: 'destructive',
+              });
             },
           });
         },

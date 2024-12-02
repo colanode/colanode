@@ -6,6 +6,7 @@ import { Document } from '@/renderer/components/documents/document';
 import { ScrollArea } from '@/renderer/components/ui/scroll-area';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface PageBodyProps {
   page: PageNode;
@@ -25,6 +26,13 @@ export const PageBody = ({ page, role }: PageBodyProps) => {
           userId: workspace.userId,
           pageId: page.id,
           content,
+        },
+        onError(error) {
+          toast({
+            title: 'Failed to update page',
+            description: error.message,
+            variant: 'destructive',
+          });
         },
       });
     },

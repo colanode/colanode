@@ -6,6 +6,7 @@ import { NodeCollaboratorRoleDropdown } from '@/renderer/components/collaborator
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { useQuery } from '@/renderer/hooks/use-query';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface NodeCollaboratorProps {
   nodeId: string;
@@ -64,6 +65,13 @@ export const NodeCollaborator = ({
                 collaboratorId: collaboratorId,
                 role: newRole,
                 userId: workspace.userId,
+              },
+              onError(error) {
+                toast({
+                  title: 'Failed to update collaborator',
+                  description: error.message,
+                  variant: 'destructive',
+                });
               },
             });
           }}

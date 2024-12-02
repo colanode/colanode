@@ -6,6 +6,7 @@ import React from 'react';
 import { Spinner } from '@/renderer/components/ui/spinner';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface NameEditorProps {
   initialValue: string;
@@ -70,6 +71,13 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
       },
       onSuccess() {
         setIsEditing(false);
+      },
+      onError(error) {
+        toast({
+          title: 'Failed to update view',
+          description: error.message,
+          variant: 'destructive',
+        });
       },
     });
   };

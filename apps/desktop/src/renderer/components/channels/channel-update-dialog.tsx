@@ -71,6 +71,13 @@ export const ChannelUpdateDialog = ({
                   variant: 'default',
                 });
               },
+              onError(error) {
+                toast({
+                  title: 'Failed to update channel',
+                  description: error.message,
+                  variant: 'destructive',
+                });
+              },
             });
           }}
         />

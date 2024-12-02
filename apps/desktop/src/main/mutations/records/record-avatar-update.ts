@@ -1,5 +1,6 @@
 import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
+import { MutationError } from '@/shared/mutations';
 import {
   RecordAvatarUpdateMutationInput,
   RecordAvatarUpdateMutationOutput,
@@ -11,14 +12,25 @@ export class RecordAvatarUpdateMutationHandler
   async handleMutation(
     input: RecordAvatarUpdateMutationInput
   ): Promise<RecordAvatarUpdateMutationOutput> {
-    await nodeService.updateNode(input.recordId, input.userId, (attributes) => {
-      if (attributes.type !== 'record') {
-        throw new Error('Invalid node type');
-      }
+    const result = await nodeService.updateNode(
+      input.recordId,
+      input.userId,
+      (attributes) => {
+        if (attributes.type !== 'record') {
+          throw new MutationError('invalid_attributes', 'Invalid node type');
+        }
 
-      attributes.avatar = input.avatar;
-      return attributes;
-    });
+        attributes.avatar = input.avatar;
+        return attributes;
+      }
+    );
+
+    if (result === 'unauthorized') {
+      throw new MutationError(
+        'unauthorized',
+        "You don't have permission to update this record."
+      );
+    }
 
     return {
       success: true,

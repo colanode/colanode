@@ -4,6 +4,7 @@ import { EmojiElement } from '@/renderer/components/emojis/emoji-element';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { cn } from '@/shared/lib/utils';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface MessageReactionsProps {
   message: MessageNode;
@@ -60,6 +61,13 @@ export const MessageReactions = ({ message }: MessageReactionsProps) => {
                     userId: workspace.userId,
                     reaction: reaction.reaction,
                   },
+                  onError(error) {
+                    toast({
+                      title: 'Failed to remove reaction',
+                      description: error.message,
+                      variant: 'destructive',
+                    });
+                  },
                 });
               } else {
                 mutate({
@@ -68,6 +76,13 @@ export const MessageReactions = ({ message }: MessageReactionsProps) => {
                     messageId: message.id,
                     userId: workspace.userId,
                     reaction: reaction.reaction,
+                  },
+                  onError(error) {
+                    toast({
+                      title: 'Failed to add reaction',
+                      description: error.message,
+                      variant: 'destructive',
+                    });
                   },
                 });
               }

@@ -41,6 +41,13 @@ export type CreateNodeInput = {
   download?: CreateDownload;
 };
 
+export type UpdateNodeResult =
+  | 'success'
+  | 'not_found'
+  | 'unauthorized'
+  | 'failed'
+  | 'invalid_attributes';
+
 class NodeService {
   private readonly logger = createLogger('node-service');
 
@@ -245,23 +252,23 @@ class NodeService {
     nodeId: string,
     userId: string,
     updater: (attributes: NodeAttributes) => NodeAttributes
-  ) {
+  ): Promise<UpdateNodeResult> {
     let count = 0;
     while (count++ < 20) {
-      const updated = await this.tryUpdateNode(nodeId, userId, updater);
-      if (updated) {
-        return;
+      const result = await this.tryUpdateNode(nodeId, userId, updater);
+      if (result) {
+        return result;
       }
     }
 
-    throw new Error('Failed to update node');
+    return 'failed';
   }
 
   private async tryUpdateNode(
     nodeId: string,
     userId: string,
     updater: (attributes: NodeAttributes) => NodeAttributes
-  ): Promise<boolean> {
+  ): Promise<UpdateNodeResult | null> {
     this.logger.trace(`Updating node ${nodeId}`);
 
     const workspace = await this.fetchWorkspace(userId);
@@ -272,14 +279,14 @@ class NodeService {
     const ancestorRows = await fetchNodeAncestors(workspaceDatabase, nodeId);
     const nodeRow = ancestorRows.find((ancestor) => ancestor.id === nodeId);
     if (!nodeRow) {
-      throw new Error('Node not found');
+      return 'not_found';
     }
 
     const ancestors = ancestorRows.map(mapNode);
     const node = mapNode(nodeRow);
 
     if (!node) {
-      throw new Error('Node not found');
+      return 'not_found';
     }
 
     const context = new NodeMutationContext(
@@ -296,11 +303,11 @@ class NodeService {
 
     const model = registry.getNodeModel(node.type);
     if (!model.schema.safeParse(updatedAttributes).success) {
-      throw new Error('Invalid attributes');
+      return 'invalid_attributes';
     }
 
     if (!model.canUpdate(context, node, updatedAttributes)) {
-      throw new Error('Insufficient permissions');
+      return 'unauthorized';
     }
 
     const ydoc = new YDoc();
@@ -312,7 +319,7 @@ class NodeService {
 
     for (const previousTransaction of previousTransactions) {
       if (previousTransaction.data === null) {
-        throw new Error('Node has been deleted');
+        return 'not_found';
       }
 
       ydoc.applyUpdate(previousTransaction.data);
@@ -398,7 +405,11 @@ class NodeService {
       this.logger.trace(`Failed to create transaction for node ${nodeId}`);
     }
 
-    return updatedNode !== undefined;
+    if (updatedNode) {
+      return 'success';
+    }
+
+    return null;
   }
 
   public async deleteNode(nodeId: string, userId: string) {

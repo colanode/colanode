@@ -4,6 +4,7 @@ import { Button } from '@/renderer/components/ui/button';
 import { useRecord } from '@/renderer/contexts/record';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 export const RecordAvatar = () => {
   const workspace = useWorkspace();
@@ -36,6 +37,13 @@ export const RecordAvatar = () => {
             recordId: record.id,
             avatar,
             userId: workspace.userId,
+          },
+          onError(error) {
+            toast({
+              title: 'Failed to update record avatar',
+              description: error.message,
+              variant: 'destructive',
+            });
           },
         });
       }}

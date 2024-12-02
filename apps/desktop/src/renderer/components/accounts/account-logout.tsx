@@ -51,11 +51,10 @@ export const AccountLogout = ({ onCancel, onLogout }: AccountLogoutProps) => {
                 onSuccess() {
                   onLogout();
                 },
-                onError() {
+                onError(error) {
                   toast({
                     title: 'Failed to logout',
-                    description:
-                      'Something went wrong trying to logout. Please try again.',
+                    description: error.message,
                     variant: 'destructive',
                   });
                 },

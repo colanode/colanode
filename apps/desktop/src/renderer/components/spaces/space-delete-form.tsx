@@ -40,11 +40,10 @@ export const SpaceDeleteForm = ({ id }: SpaceDeleteFormProps) => {
                   variant: 'default',
                 });
               },
-              onError() {
+              onError(error) {
                 toast({
                   title: 'Failed to delete space',
-                  description:
-                    'Something went wrong deleting space. Please try again!',
+                  description: error.message,
                   variant: 'destructive',
                 });
               },

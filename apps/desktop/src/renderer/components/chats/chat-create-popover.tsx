@@ -9,6 +9,7 @@ import {
 import { UserSearch } from '@/renderer/components/users/user-search';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 export const ChatCreatePopover = () => {
   const workspace = useWorkspace();
@@ -36,6 +37,13 @@ export const ChatCreatePopover = () => {
               onSuccess(output) {
                 workspace.openInMain(output.id);
                 setOpen(false);
+              },
+              onError(error) {
+                toast({
+                  title: 'Failed to create chat',
+                  description: error.message,
+                  variant: 'destructive',
+                });
               },
             });
           }}

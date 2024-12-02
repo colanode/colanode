@@ -25,6 +25,7 @@ import {
   getFieldFilterOperators,
 } from '@/shared/lib/databases';
 import { ViewField } from '@/shared/types/databases';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface ViewProps {
   view: ViewAttributes;
@@ -86,6 +87,13 @@ export const View = ({ view }: ViewProps) => {
               databaseId: database.id,
               view: viewCopy,
             },
+            onError(error) {
+              toast({
+                title: 'Failed to update view',
+                description: error.message,
+                variant: 'destructive',
+              });
+            },
           });
         },
         updateAvatar: (avatar: string) => {
@@ -102,6 +110,13 @@ export const View = ({ view }: ViewProps) => {
               userId: workspace.userId,
               databaseId: database.id,
               view: viewCopy,
+            },
+            onError(error) {
+              toast({
+                title: 'Failed to update view',
+                description: error.message,
+                variant: 'destructive',
+              });
             },
           });
         },
@@ -132,6 +147,13 @@ export const View = ({ view }: ViewProps) => {
               databaseId: database.id,
               view: viewCopy,
             },
+            onError(error) {
+              toast({
+                title: 'Failed to update view',
+                description: error.message,
+                variant: 'destructive',
+              });
+            },
           });
         },
         resizeField: (id: string, width: number) => {
@@ -161,6 +183,13 @@ export const View = ({ view }: ViewProps) => {
               databaseId: database.id,
               view: viewCopy,
             },
+            onError(error) {
+              toast({
+                title: 'Failed to update view',
+                description: error.message,
+                variant: 'destructive',
+              });
+            },
           });
         },
         resizeName: (width: number) => {
@@ -181,6 +210,13 @@ export const View = ({ view }: ViewProps) => {
               userId: workspace.userId,
               databaseId: database.id,
               view: viewCopy,
+            },
+            onError(error) {
+              toast({
+                title: 'Failed to update view',
+                description: error.message,
+                variant: 'destructive',
+              });
             },
           });
         },
@@ -215,6 +251,13 @@ export const View = ({ view }: ViewProps) => {
               userId: workspace.userId,
               databaseId: database.id,
               view: viewCopy,
+            },
+            onError(error) {
+              toast({
+                title: 'Failed to update view',
+                description: error.message,
+                variant: 'destructive',
+              });
             },
           });
         },
@@ -258,6 +301,13 @@ export const View = ({ view }: ViewProps) => {
               setOpenedFieldFilters((prev) => [...prev, fieldId]);
               setIsSearchBarOpened(true);
             },
+            onError(error) {
+              toast({
+                title: 'Failed to update view',
+                description: error.message,
+                variant: 'destructive',
+              });
+            },
           });
         },
         updateFilter: (id: string, filter: ViewFilterAttributes) => {
@@ -282,6 +332,13 @@ export const View = ({ view }: ViewProps) => {
             onSuccess() {
               setIsSearchBarOpened(true);
             },
+            onError(error) {
+              toast({
+                title: 'Failed to update view',
+                description: error.message,
+                variant: 'destructive',
+              });
+            },
           });
         },
         removeFilter: (id: string) => {
@@ -305,6 +362,13 @@ export const View = ({ view }: ViewProps) => {
             },
             onSuccess() {
               setIsSearchBarOpened(true);
+            },
+            onError(error) {
+              toast({
+                title: 'Failed to update view',
+                description: error.message,
+                variant: 'destructive',
+              });
             },
           });
         },
@@ -343,6 +407,13 @@ export const View = ({ view }: ViewProps) => {
               setIsSearchBarOpened(true);
               setIsSortsOpened(true);
             },
+            onError(error) {
+              toast({
+                title: 'Failed to update view',
+                description: error.message,
+                variant: 'destructive',
+              });
+            },
           });
         },
         updateSort: (id: string, sort: ViewSortAttributes) => {
@@ -368,6 +439,13 @@ export const View = ({ view }: ViewProps) => {
               setIsSearchBarOpened(true);
               setIsSortsOpened(true);
             },
+            onError(error) {
+              toast({
+                title: 'Failed to update view',
+                description: error.message,
+                variant: 'destructive',
+              });
+            },
           });
         },
         removeSort: (id: string) => {
@@ -391,6 +469,13 @@ export const View = ({ view }: ViewProps) => {
             },
             onSuccess() {
               setIsSearchBarOpened(true);
+            },
+            onError(error) {
+              toast({
+                title: 'Failed to update view',
+                description: error.message,
+                variant: 'destructive',
+              });
             },
           });
         },
@@ -432,6 +517,13 @@ export const View = ({ view }: ViewProps) => {
             },
             onSuccess: (output) => {
               workspace.openInModal(output.id);
+            },
+            onError(error) {
+              toast({
+                title: 'Failed to create record',
+                description: error.message,
+                variant: 'destructive',
+              });
             },
           });
         },

@@ -25,7 +25,7 @@ export const FolderCommand: EditorCommand = {
       generateIndex: false,
     });
 
-    if (!output.id) {
+    if (!output.success) {
       return;
     }
 
@@ -36,7 +36,7 @@ export const FolderCommand: EditorCommand = {
       .insertContent({
         type: NodeTypes.Folder,
         attrs: {
-          id: output.id,
+          id: output.output.id,
         },
       })
       .run();

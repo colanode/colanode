@@ -13,6 +13,7 @@ import {
   SpaceCreateMutationInput,
   SpaceCreateMutationOutput,
 } from '@/shared/mutations/spaces/space-create';
+import { MutationError } from '@/shared/mutations';
 
 export class SpaceCreateMutationHandler
   implements MutationHandler<SpaceCreateMutationInput>
@@ -27,11 +28,14 @@ export class SpaceCreateMutationHandler
       .executeTakeFirst();
 
     if (!workspace) {
-      throw new Error('Workspace not found');
+      throw new MutationError('workspace_not_found', 'Workspace not found');
     }
 
     if (workspace.role === 'guest' || workspace.role === 'none') {
-      throw new Error('You are not allowed to create spaces in this workspace');
+      throw new MutationError(
+        'unauthorized',
+        "You don't have permission to create spaces in this workspace."
+      );
     }
 
     const spaceId = generateId(IdType.Space);

@@ -69,6 +69,13 @@ export const FolderUpdateDialog = ({
                   variant: 'default',
                 });
               },
+              onError(error) {
+                toast({
+                  title: 'Failed to update folder',
+                  description: error.message,
+                  variant: 'destructive',
+                });
+              },
             });
           }}
         />

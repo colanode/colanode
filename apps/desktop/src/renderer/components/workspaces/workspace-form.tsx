@@ -107,16 +107,13 @@ export const WorkspaceForm = ({
                     filePath: filePath,
                   },
                   onSuccess(output) {
-                    if (output.status === 'success' && output.id) {
-                      form.setValue('avatar', output.id);
-                    }
+                    form.setValue('avatar', output.id);
                     setIsFileDialogOpen(false);
                   },
-                  onError() {
+                  onError(error) {
                     toast({
                       title: 'Failed to upload avatar',
-                      description:
-                        'Something went wrong trying to upload avatar. Please try again.',
+                      description: error.message,
                       variant: 'destructive',
                     });
                     setIsFileDialogOpen(false);

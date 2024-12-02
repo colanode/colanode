@@ -1,5 +1,6 @@
 import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
+import { MutationError } from '@/shared/mutations';
 import {
   FolderUpdateMutationInput,
   FolderUpdateMutationOutput,
@@ -11,16 +12,34 @@ export class FolderUpdateMutationHandler
   async handleMutation(
     input: FolderUpdateMutationInput
   ): Promise<FolderUpdateMutationOutput> {
-    await nodeService.updateNode(input.folderId, input.userId, (attributes) => {
-      if (attributes.type !== 'folder') {
-        throw new Error('Node is not a folder');
+    const result = await nodeService.updateNode(
+      input.folderId,
+      input.userId,
+      (attributes) => {
+        if (attributes.type !== 'folder') {
+          throw new MutationError('invalid_attributes', 'Node is not a folder');
+        }
+
+        attributes.name = input.name;
+        attributes.avatar = input.avatar;
+
+        return attributes;
       }
+    );
 
-      attributes.name = input.name;
-      attributes.avatar = input.avatar;
+    if (result === 'unauthorized') {
+      throw new MutationError(
+        'unauthorized',
+        "You don't have permission to update this folder."
+      );
+    }
 
-      return attributes;
-    });
+    if (result !== 'success') {
+      throw new MutationError(
+        'unknown',
+        'Something went wrong while updating the folder.'
+      );
+    }
 
     return {
       success: true,

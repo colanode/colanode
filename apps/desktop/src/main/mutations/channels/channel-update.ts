@@ -1,5 +1,6 @@
 import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
+import { MutationError } from '@/shared/mutations';
 import {
   ChannelUpdateMutationInput,
   ChannelUpdateMutationOutput,
@@ -11,12 +12,15 @@ export class ChannelUpdateMutationHandler
   async handleMutation(
     input: ChannelUpdateMutationInput
   ): Promise<ChannelUpdateMutationOutput> {
-    await nodeService.updateNode(
+    const result = await nodeService.updateNode(
       input.channelId,
       input.userId,
       (attributes) => {
         if (attributes.type !== 'channel') {
-          throw new Error('Node is not a channel');
+          throw new MutationError(
+            'invalid_attributes',
+            'Something went wrong while updating the channel.'
+          );
         }
 
         attributes.name = input.name;
@@ -26,8 +30,36 @@ export class ChannelUpdateMutationHandler
       }
     );
 
-    return {
-      success: true,
-    };
+    if (result === 'not_found') {
+      throw new MutationError(
+        'channel_not_found',
+        'Channel not found or has been deleted.'
+      );
+    }
+
+    if (result === 'invalid_attributes') {
+      throw new MutationError(
+        'invalid_attributes',
+        'Something went wrong while updating the channel.'
+      );
+    }
+
+    if (result === 'unauthorized') {
+      throw new MutationError(
+        'unauthorized',
+        "You don't have permission to update this channel."
+      );
+    }
+
+    if (result === 'success') {
+      return {
+        success: true,
+      };
+    }
+
+    throw new MutationError(
+      'unknown',
+      'Something went wrong while updating the channel.'
+    );
   }
 }

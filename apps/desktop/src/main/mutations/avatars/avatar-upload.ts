@@ -9,6 +9,7 @@ import {
   AvatarUploadMutationInput,
   AvatarUploadMutationOutput,
 } from '@/shared/mutations/avatars/avatar-upload';
+import { MutationError } from '@/shared/mutations';
 
 interface AvatarUploadResponse {
   id: string;
@@ -28,10 +29,10 @@ export class AvatarUploadMutationHandler
       .executeTakeFirst();
 
     if (!credentials) {
-      return {
-        status: 'error',
-        id: null,
-      };
+      throw new MutationError(
+        'account_not_found',
+        'Account not found or has been logged out already. Try closing the app and opening it again.'
+      );
     }
 
     const filePath = input.filePath;
@@ -51,7 +52,6 @@ export class AvatarUploadMutationHandler
     );
 
     return {
-      status: 'success',
       id: data.id,
     };
   }

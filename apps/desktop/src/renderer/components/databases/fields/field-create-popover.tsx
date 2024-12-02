@@ -25,6 +25,7 @@ import { Spinner } from '@/renderer/components/ui/spinner';
 import { useDatabase } from '@/renderer/contexts/database';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 const formSchema = z.object({
   name: z.string(),
@@ -79,6 +80,13 @@ export const FieldCreatePopover = () => {
       onSuccess: () => {
         setOpen(false);
         form.reset();
+      },
+      onError(error) {
+        toast({
+          title: 'Failed to create field',
+          description: error.message,
+          variant: 'destructive',
+        });
       },
     });
   };

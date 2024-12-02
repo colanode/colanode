@@ -87,16 +87,13 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
               filePath: filePath,
             },
             onSuccess(output) {
-              if (output.status === 'success' && output.id) {
-                onUpload(output.id);
-              }
+              onUpload(output.id);
               setIsFileDialogOpen(false);
             },
-            onError() {
+            onError(error) {
               toast({
                 title: 'Failed to upload avatar',
-                description:
-                  'Something went wrong trying to upload avatar. Please try again.',
+                description: error.message,
                 variant: 'destructive',
               });
               setIsFileDialogOpen(false);

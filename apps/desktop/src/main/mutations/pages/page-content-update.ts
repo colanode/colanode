@@ -7,6 +7,7 @@ import {
   PageContentUpdateMutationInput,
   PageContentUpdateMutationOutput,
 } from '@/shared/mutations/pages/page-content-update';
+import { MutationError } from '@/shared/mutations';
 
 export class PageContentUpdateMutationHandler
   implements MutationHandler<PageContentUpdateMutationInput>
@@ -14,34 +15,52 @@ export class PageContentUpdateMutationHandler
   async handleMutation(
     input: PageContentUpdateMutationInput
   ): Promise<PageContentUpdateMutationOutput> {
-    await nodeService.updateNode(input.pageId, input.userId, (attributes) => {
-      if (attributes.type !== 'page') {
-        throw new Error('Invalid node type');
-      }
-
-      const blocksMap = new Map<string, Block>();
-      if (attributes.content) {
-        for (const [key, value] of Object.entries(attributes.content)) {
-          blocksMap.set(key, value);
+    const result = await nodeService.updateNode(
+      input.pageId,
+      input.userId,
+      (attributes) => {
+        if (attributes.type !== 'page') {
+          throw new MutationError('invalid_attributes', 'Invalid node type');
         }
+
+        const blocksMap = new Map<string, Block>();
+        if (attributes.content) {
+          for (const [key, value] of Object.entries(attributes.content)) {
+            blocksMap.set(key, value);
+          }
+        }
+
+        const blocks = mapContentsToBlocks(
+          input.pageId,
+          input.content.content ?? [],
+          blocksMap
+        );
+
+        attributes.content = blocks.reduce(
+          (acc, block) => {
+            acc[block.id] = block;
+            return acc;
+          },
+          {} as Record<string, Block>
+        );
+
+        return attributes;
       }
+    );
 
-      const blocks = mapContentsToBlocks(
-        input.pageId,
-        input.content.content ?? [],
-        blocksMap
+    if (result === 'unauthorized') {
+      throw new MutationError(
+        'unauthorized',
+        "You don't have permission to update this page."
       );
+    }
 
-      attributes.content = blocks.reduce(
-        (acc, block) => {
-          acc[block.id] = block;
-          return acc;
-        },
-        {} as Record<string, Block>
+    if (result !== 'success') {
+      throw new MutationError(
+        'unknown',
+        'Something went wrong while updating the page content.'
       );
-
-      return attributes;
-    });
+    }
 
     return {
       success: true,

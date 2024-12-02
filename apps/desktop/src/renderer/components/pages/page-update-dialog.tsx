@@ -69,6 +69,13 @@ export const PageUpdateDialog = ({
                   variant: 'default',
                 });
               },
+              onError(error) {
+                toast({
+                  title: 'Failed to update page',
+                  description: error.message,
+                  variant: 'destructive',
+                });
+              },
             });
           }}
         />

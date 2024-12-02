@@ -1,4 +1,4 @@
-import { generateId,IdType } from '@colanode/core';
+import { generateId, IdType } from '@colanode/core';
 
 import { PageForm } from '@/renderer/components/pages/page-form';
 import {
@@ -10,6 +10,7 @@ import {
 } from '@/renderer/components/ui/dialog';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface PageCreateDialogProps {
   spaceId: string;
@@ -63,6 +64,13 @@ export const PageCreateDialog = ({
               onSuccess(output) {
                 onOpenChange(false);
                 workspace.openInMain(output.id);
+              },
+              onError(error) {
+                toast({
+                  title: 'Failed to create page',
+                  description: error.message,
+                  variant: 'destructive',
+                });
               },
             });
           }}

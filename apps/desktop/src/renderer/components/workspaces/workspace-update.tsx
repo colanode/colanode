@@ -33,11 +33,10 @@ export const WorkspaceUpdate = () => {
               variant: 'default',
             });
           },
-          onError() {
+          onError(error) {
             toast({
               title: 'Failed to update workspace',
-              description:
-                'Something went wrong updating workspace. Please try again!',
+              description: error.message,
               variant: 'destructive',
             });
           },

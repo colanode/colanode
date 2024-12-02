@@ -19,6 +19,7 @@ import { useDatabase } from '@/renderer/contexts/database';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { getRandomSelectOptionColor } from '@/shared/lib/databases';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface SelectFieldOptionsProps {
   field: SelectFieldAttributes | MultiSelectFieldAttributes;
@@ -124,6 +125,13 @@ export const SelectFieldOptions = ({
                     setInputValue('');
                     setColor(getRandomSelectOptionColor());
                     onSelect(output.id);
+                  },
+                  onError(error) {
+                    toast({
+                      title: 'Failed to create select option',
+                      description: error.message,
+                      variant: 'destructive',
+                    });
                   },
                 });
               }}

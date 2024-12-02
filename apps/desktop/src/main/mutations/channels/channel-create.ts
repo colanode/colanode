@@ -7,6 +7,7 @@ import {
   ChannelCreateMutationInput,
   ChannelCreateMutationOutput,
 } from '@/shared/mutations/channels/channel-create';
+import { MutationError } from '@/shared/mutations';
 
 export class ChannelCreateMutationHandler
   implements MutationHandler<ChannelCreateMutationInput>
@@ -25,7 +26,10 @@ export class ChannelCreateMutationHandler
       .executeTakeFirst();
 
     if (!space) {
-      throw new Error('Space not found');
+      throw new MutationError(
+        'space_not_found',
+        'Space not found or has been deleted.'
+      );
     }
 
     const id = generateId(IdType.Channel);

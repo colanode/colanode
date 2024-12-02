@@ -2,6 +2,7 @@ import { SmartTextInput } from '@/renderer/components/ui/smart-text-input';
 import { useRecord } from '@/renderer/contexts/record';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 export const RecordName = () => {
   const workspace = useWorkspace();
@@ -27,6 +28,13 @@ export const RecordName = () => {
             recordId: record.id,
             name: value,
             userId: workspace.userId,
+          },
+          onError(error) {
+            toast({
+              title: 'Failed to update record name',
+              description: error.message,
+              variant: 'destructive',
+            });
           },
         });
       }}

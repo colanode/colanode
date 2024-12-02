@@ -1,5 +1,6 @@
 import { nodeService } from '@/main/services/node-service';
 import { MutationHandler } from '@/main/types';
+import { MutationError } from '@/shared/mutations';
 import {
   RecordFieldValueDeleteMutationInput,
   RecordFieldValueDeleteMutationOutput,
@@ -11,14 +12,32 @@ export class RecordFieldValueDeleteMutationHandler
   async handleMutation(
     input: RecordFieldValueDeleteMutationInput
   ): Promise<RecordFieldValueDeleteMutationOutput> {
-    await nodeService.updateNode(input.recordId, input.userId, (attributes) => {
-      if (attributes.type !== 'record') {
-        throw new Error('Invalid node type');
-      }
+    const result = await nodeService.updateNode(
+      input.recordId,
+      input.userId,
+      (attributes) => {
+        if (attributes.type !== 'record') {
+          throw new MutationError('invalid_attributes', 'Invalid node type');
+        }
 
-      delete attributes.fields[input.fieldId];
-      return attributes;
-    });
+        delete attributes.fields[input.fieldId];
+        return attributes;
+      }
+    );
+
+    if (result === 'unauthorized') {
+      throw new MutationError(
+        'unauthorized',
+        "You don't have permission to delete this field value."
+      );
+    }
+
+    if (result !== 'success') {
+      throw new MutationError(
+        'unknown',
+        'Something went wrong while deleting the field value.'
+      );
+    }
 
     return {
       success: true,

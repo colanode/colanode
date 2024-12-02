@@ -42,7 +42,7 @@ export const FileCommand: EditorCommand = {
       generateIndex: false,
     });
 
-    if (!output.id) {
+    if (!output.success) {
       return;
     }
 
@@ -53,7 +53,7 @@ export const FileCommand: EditorCommand = {
       .insertContent({
         type: NodeTypes.File,
         attrs: {
-          id: output.id,
+          id: output.output.id,
         },
       })
       .run();

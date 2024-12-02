@@ -24,6 +24,7 @@ import { ScrollArea } from '@/renderer/components/ui/scroll-area';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { FolderLayoutType } from '@/shared/types/folders';
+import { toast } from '@/renderer/hooks/use-toast';
 
 export type FolderLayout = {
   value: FolderLayoutType;
@@ -102,6 +103,13 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
         userId: workspace.userId,
         filePath,
         parentId: folder.id,
+      },
+      onError(error) {
+        toast({
+          title: 'Failed to upload file',
+          description: error.message,
+          variant: 'destructive',
+        });
       },
     });
 

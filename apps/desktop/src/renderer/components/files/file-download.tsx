@@ -3,6 +3,7 @@ import { Download } from 'lucide-react';
 import { Spinner } from '@/renderer/components/ui/spinner';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
+import { toast } from '@/renderer/hooks/use-toast';
 
 interface FileDownloadProps {
   id: string;
@@ -33,6 +34,13 @@ export const FileDownload = ({ id, downloadProgress }: FileDownloadProps) => {
                 type: 'file_download',
                 userId: workspace.userId,
                 fileId: id,
+              },
+              onError(error) {
+                toast({
+                  title: 'Failed to download file',
+                  description: error.message,
+                  variant: 'destructive',
+                });
               },
             });
           }}

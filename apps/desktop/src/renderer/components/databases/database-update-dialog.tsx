@@ -71,6 +71,13 @@ export const DatabaseUpdateDialog = ({
                   variant: 'default',
                 });
               },
+              onError(error) {
+                toast({
+                  title: 'Failed to update database',
+                  description: error.message,
+                  variant: 'destructive',
+                });
+              },
             });
           }}
         />

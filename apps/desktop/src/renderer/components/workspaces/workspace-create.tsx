@@ -41,11 +41,10 @@ export const WorkspaceCreate = () => {
               onSuccess(output) {
                 navigate(`/${account.id}/${output.id}`);
               },
-              onError() {
+              onError(error) {
                 toast({
                   title: 'Failed to create workspace',
-                  description:
-                    'Somewthing went wrong creating the workspace. Please try again!',
+                  description: error.message,
                   variant: 'destructive',
                 });
               },

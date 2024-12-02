@@ -62,11 +62,10 @@ export const ServerCreateDialog = ({
                 onSuccess() {
                   onOpenChange(false);
                 },
-                onError() {
+                onError(error) {
                   toast({
-                    title: 'Failed to login',
-                    description:
-                      'Something went wrong adding the server. Please make sure the domain is correct.',
+                    title: 'Failed to add server',
+                    description: error.message,
                     variant: 'destructive',
                   });
                 },
