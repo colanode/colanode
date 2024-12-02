@@ -11,10 +11,10 @@ import { filesRouter } from '@/routes/files';
 import { nodesRouter } from '@/routes/nodes';
 import { syncRouter } from '@/routes/sync';
 import { workspacesRouter } from '@/routes/workspaces';
-import { logService } from '@/services/log-service';
 import { synapse } from '@/services/synapse-service';
+import { createLogger } from '@/lib/logger';
 
-const logger = logService.createLogger('api');
+const logger = createLogger('api');
 
 export const initApi = async () => {
   const app = express();

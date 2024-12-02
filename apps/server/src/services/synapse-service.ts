@@ -6,7 +6,7 @@ import {
   NodeTransactionsBatchMessage,
   NodeType,
 } from '@colanode/core';
-import { WebSocket,WebSocketServer } from 'ws';
+import { WebSocket, WebSocketServer } from 'ws';
 
 import { Server } from 'http';
 
@@ -20,7 +20,6 @@ import {
 } from '@/lib/nodes';
 import { verifyToken } from '@/lib/tokens';
 import { interactionService } from '@/services/interaction-service';
-import { logService } from '@/services/log-service';
 import {
   CollaboratorAddedEvent,
   CollaboratorRemovedEvent,
@@ -29,6 +28,7 @@ import {
   NodeDeletedEvent,
   NodeUpdatedEvent,
 } from '@/types/events';
+import { createLogger } from '@/lib/logger';
 
 interface SynapseUserCursor {
   workspaceId: string;
@@ -50,7 +50,7 @@ interface SynapseConnection {
 const PUBLIC_NODES: NodeType[] = ['workspace', 'user'];
 
 class SynapseService {
-  private readonly logger = logService.createLogger('synapse-service');
+  private readonly logger = createLogger('synapse-service');
   private readonly connections: Map<string, SynapseConnection> = new Map();
 
   constructor() {

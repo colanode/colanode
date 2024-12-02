@@ -21,7 +21,7 @@ import {
 } from '@/data/schema';
 import { eventBus } from '@/lib/event-bus';
 import { fetchNodeAncestors, mapNode } from '@/lib/nodes';
-import { logService } from '@/services/log-service';
+import { createLogger } from '@/lib/logger';
 import {
   ApplyNodeCreateTransactionInput,
   ApplyNodeCreateTransactionOutput,
@@ -49,7 +49,7 @@ type CollaboratorChangeResult = {
 };
 
 class NodeService {
-  private readonly logger = logService.createLogger('node-service');
+  private readonly logger = createLogger('node-service');
 
   public async createNode(
     input: CreateNodeInput
