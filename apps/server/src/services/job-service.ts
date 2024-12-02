@@ -1,8 +1,10 @@
-import { Job, JobsOptions,Queue, Worker } from 'bullmq';
+import { Job, JobsOptions, Queue, Worker } from 'bullmq';
 
 import { redisConfig } from '@/data/redis';
 import { jobHandlerMap } from '@/jobs';
 import { JobHandler, JobInput } from '@/types/jobs';
+
+const JOBS_QUEUE_NAME = process.env.REDIS_JOBS_QUEUE_NAME ?? 'jobs';
 
 class JobService {
   private jobQueue: Queue | undefined;
@@ -13,7 +15,7 @@ class JobService {
       return;
     }
 
-    this.jobQueue = new Queue('jobs', {
+    this.jobQueue = new Queue(JOBS_QUEUE_NAME, {
       connection: {
         host: redisConfig.host,
         password: redisConfig.password,
@@ -31,7 +33,7 @@ class JobService {
       return;
     }
 
-    this.jobWorker = new Worker('jobs', this.handleJobJob, {
+    this.jobWorker = new Worker(JOBS_QUEUE_NAME, this.handleJobJob, {
       connection: {
         host: redisConfig.host,
         password: redisConfig.password,

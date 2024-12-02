@@ -72,6 +72,21 @@ class CollaborationService {
         .deleteFrom('node_transactions')
         .where('node_id', '=', revocation.nodeId)
         .execute();
+
+      await tx
+        .deleteFrom('collaborations')
+        .where('node_id', '=', revocation.nodeId)
+        .execute();
+
+      await tx
+        .deleteFrom('interaction_events')
+        .where('node_id', '=', revocation.nodeId)
+        .execute();
+
+      await tx
+        .deleteFrom('interactions')
+        .where('node_id', '=', revocation.nodeId)
+        .execute();
     });
   }
 }

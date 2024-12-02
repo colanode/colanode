@@ -11,6 +11,7 @@ import { decodeState, YDoc } from '@colanode/crdt';
 import { sql, Transaction } from 'kysely';
 import { cloneDeep } from 'lodash-es';
 
+import { jobService } from '@/services/job-service';
 import { database } from '@/data/database';
 import {
   CreateCollaboration,
@@ -569,6 +570,15 @@ class NodeService {
           throw new Error('Failed to create transaction');
         }
 
+        await trx
+          .updateTable('collaborations')
+          .set({
+            roles: '{}',
+            updated_at: new Date(),
+          })
+          .where('node_id', '=', input.nodeId)
+          .execute();
+
         return {
           deletedNode,
           createdTransaction,
@@ -579,6 +589,12 @@ class NodeService {
       type: 'node_deleted',
       nodeId: input.nodeId,
       nodeType: node.type,
+      workspaceId: workspaceUser.workspace_id,
+    });
+
+    await jobService.addJob({
+      type: 'clean_node_data',
+      nodeId: input.nodeId,
       workspaceId: workspaceUser.workspace_id,
     });
 

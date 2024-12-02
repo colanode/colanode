@@ -456,6 +456,21 @@ class NodeService {
           .where('node_id', '=', nodeId)
           .execute();
 
+        await trx
+          .deleteFrom('collaborations')
+          .where('node_id', '=', nodeId)
+          .execute();
+
+        await trx
+          .deleteFrom('interaction_events')
+          .where('node_id', '=', nodeId)
+          .execute();
+
+        await trx
+          .deleteFrom('interactions')
+          .where('node_id', '=', nodeId)
+          .execute();
+
         const createdTransaction = await trx
           .insertInto('node_transactions')
           .returningAll()
@@ -876,6 +891,11 @@ class NodeService {
 
         await trx
           .deleteFrom('interaction_events')
+          .where('node_id', '=', transaction.nodeId)
+          .execute();
+
+        await trx
+          .deleteFrom('collaborations')
           .where('node_id', '=', transaction.nodeId)
           .execute();
 

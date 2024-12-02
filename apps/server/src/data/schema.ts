@@ -174,6 +174,10 @@ interface UploadTable {
   completed_at: ColumnType<Date, Date, never>;
 }
 
+export type SelectUpload = Selectable<UploadTable>;
+export type CreateUpload = Insertable<UploadTable>;
+export type UpdateUpload = Updateable<UploadTable>;
+
 interface InteractionTable {
   user_id: ColumnType<string, string, never>;
   node_id: ColumnType<string, string, never>;

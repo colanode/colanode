@@ -29,7 +29,3 @@ export const initRedis = async () => {
     console.error('Redis client error:', err);
   });
 };
-
-export const CHANNEL_NAMES = {
-  SYNAPSE: process.env.REDIS_SYNAPSE_CHANNEL_NAME || 'colanode_synapse',
-};

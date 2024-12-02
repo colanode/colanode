@@ -514,8 +514,8 @@ class SynapseService {
     if (PUBLIC_NODES.includes(event.nodeType)) {
       usersToSend = userIds;
     } else {
-      const collaborations = await database
-        .selectFrom('collaborations')
+      const revocations = await database
+        .selectFrom('collaboration_revocations')
         .selectAll()
         .where((eb) =>
           eb.and([
@@ -525,7 +525,7 @@ class SynapseService {
         )
         .execute();
 
-      usersToSend = collaborations.map((c) => c.user_id);
+      usersToSend = revocations.map((r) => r.user_id);
     }
 
     if (usersToSend.length === 0) {
@@ -541,6 +541,7 @@ class SynapseService {
         }
 
         this.sendPendingTransactions(socketConnection, userId);
+        this.sendPendingRevocations(socketConnection, userId);
       }
     }
   }
