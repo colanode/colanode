@@ -1,5 +1,6 @@
 import pino, { Level } from 'pino';
-const isDev = true; //process.env.NODE_ENV === 'development';
+
+import { host } from '@/host';
 
 const logConfig: Record<string, Level> = {
   api: 'trace',
@@ -11,14 +12,15 @@ class LogService {
     return pino({
       name,
       level: logConfig[name] || 'trace',
-      transport: isDev
-        ? {
-            target: 'pino-pretty',
-            options: {
-              colorize: true,
-            },
-          }
-        : undefined,
+      transport:
+        host.environment === 'development'
+          ? {
+              target: 'pino-pretty',
+              options: {
+                colorize: true,
+              },
+            }
+          : undefined,
     });
   }
 }

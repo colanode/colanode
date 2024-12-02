@@ -1,4 +1,8 @@
 import { Event } from '@/types/events';
+import { redis } from '@/data/redis';
+import { host } from '@/host';
+
+const CHANNEL_NAME = process.env.REDIS_EVENTS_CHANNEL ?? 'events';
 
 export interface Subscription {
   id: string;
@@ -11,12 +15,40 @@ export interface EventBus {
   publish(event: Event): void;
 }
 
+export type DistributedEventEnvelope = {
+  event: Event;
+  hostId: string;
+};
+
 export class EventBusService {
   private subscriptions: Map<string, Subscription>;
   private id = 0;
+  private initialized = false;
 
   public constructor() {
     this.subscriptions = new Map<string, Subscription>();
+  }
+
+  public async init() {
+    if (this.initialized) {
+      return;
+    }
+
+    this.initialized = true;
+
+    if (host.environment === 'development') {
+      return;
+    }
+
+    const client = redis.duplicate();
+    client.subscribe(CHANNEL_NAME, (message) => {
+      const envelope = JSON.parse(message) as DistributedEventEnvelope;
+      if (envelope.hostId === host.id) {
+        return;
+      }
+
+      this.publish(envelope.event);
+    });
   }
 
   public subscribe(callback: (event: Event) => void): string {
@@ -38,6 +70,10 @@ export class EventBusService {
     this.subscriptions.forEach((subscription) => {
       subscription.callback(event);
     });
+
+    if (host.environment === 'production') {
+      redis.publish(CHANNEL_NAME, JSON.stringify({ event, hostId: host.id }));
+    }
   }
 }
 

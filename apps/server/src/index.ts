@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
 
+import { eventBus } from '@/lib/event-bus';
 import { initApi } from '@/api';
 import { migrate } from '@/data/database';
 import { initRedis } from '@/data/redis';
@@ -14,6 +15,8 @@ const init = async () => {
 
   jobService.initQueue();
   await jobService.initWorker();
+
+  await eventBus.init();
 };
 
 init();
