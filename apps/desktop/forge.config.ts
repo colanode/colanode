@@ -47,7 +47,12 @@ const config: ForgeConfig = {
   },
   rebuildConfig: {},
   makers: [
-    new MakerSquirrel({}),
+    new MakerSquirrel({
+      name: 'Colanode',
+      authors: 'Colanode',
+      description: 'Colanode Desktop Application',
+      setupExe: 'ColanodeSetup.exe',
+    }),
     new MakerZIP({}, ['darwin']),
     new MakerRpm({
       options: {
