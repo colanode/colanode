@@ -49,12 +49,12 @@ jobs:
 
       - name: Build Electron App
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: apps/desktop
         run: npm run make
 
       - name: Publish Release to GitHub
         env:
-          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: apps/desktop
         run: npm run publish
