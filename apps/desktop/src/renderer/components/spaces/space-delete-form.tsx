@@ -29,9 +29,9 @@ export const SpaceDeleteForm = ({ id }: SpaceDeleteFormProps) => {
           onClick={() => {
             mutate({
               input: {
-                type: 'node_delete',
+                type: 'space_delete',
                 userId: workspace.userId,
-                nodeId: id,
+                spaceId: id,
               },
               onSuccess() {
                 toast({

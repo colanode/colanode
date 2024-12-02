@@ -45,8 +45,8 @@ export const FileDeleteDialog = ({
             onClick={() => {
               mutate({
                 input: {
-                  type: 'node_delete',
-                  nodeId,
+                  type: 'file_delete',
+                  fileId: nodeId,
                   userId: workspace.userId,
                 },
                 onSuccess() {

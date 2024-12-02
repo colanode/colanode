@@ -55,8 +55,8 @@ export const MessageReactions = ({ message }: MessageReactionsProps) => {
               ) {
                 mutate({
                   input: {
-                    type: 'node_reaction_delete',
-                    nodeId: message.id,
+                    type: 'message_reaction_delete',
+                    messageId: message.id,
                     userId: workspace.userId,
                     reaction: reaction.reaction,
                   },
@@ -64,8 +64,8 @@ export const MessageReactions = ({ message }: MessageReactionsProps) => {
               } else {
                 mutate({
                   input: {
-                    type: 'node_reaction_create',
-                    nodeId: message.id,
+                    type: 'message_reaction_create',
+                    messageId: message.id,
                     userId: workspace.userId,
                     reaction: reaction.reaction,
                   },

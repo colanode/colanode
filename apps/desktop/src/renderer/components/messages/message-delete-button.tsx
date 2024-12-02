@@ -48,8 +48,8 @@ export const MessageDeleteButton = ({ id }: MessageDeleteButtonProps) => {
               onClick={() => {
                 mutate({
                   input: {
-                    type: 'node_delete',
-                    nodeId: id,
+                    type: 'message_delete',
+                    messageId: id,
                     userId: workspace.userId,
                   },
                   onSuccess() {

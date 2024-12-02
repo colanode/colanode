@@ -88,7 +88,8 @@ export const SelectOptionSettingsPopover = ({
       <SelectOptionDeleteDialog
         open={openDeleteDialog}
         onOpenChange={setOpenDeleteDialog}
-        id={option.id}
+        fieldId={fieldId}
+        optionId={option.id}
       />
     </React.Fragment>
   );

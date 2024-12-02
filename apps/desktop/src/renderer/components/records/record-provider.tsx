@@ -35,9 +35,9 @@ export const RecordProvider = ({
         updateFieldValue: (field, value) => {
           mutate({
             input: {
-              type: 'node_attribute_set',
-              nodeId: record.id,
-              path: `fields.${field.id}`,
+              type: 'record_field_value_set',
+              recordId: record.id,
+              fieldId: field.id,
               value,
               userId: workspace.userId,
             },
@@ -46,9 +46,9 @@ export const RecordProvider = ({
         removeFieldValue: (field) => {
           mutate({
             input: {
-              type: 'node_attribute_delete',
-              nodeId: record.id,
-              path: `fields.${field.id}`,
+              type: 'record_field_value_delete',
+              recordId: record.id,
+              fieldId: field.id,
               userId: workspace.userId,
             },
           });

@@ -23,10 +23,9 @@ export const RecordName = () => {
 
         mutate({
           input: {
-            type: 'node_attribute_set',
-            nodeId: record.id,
-            path: 'name',
-            value: value,
+            type: 'record_name_update',
+            recordId: record.id,
+            name: value,
             userId: workspace.userId,
           },
         });

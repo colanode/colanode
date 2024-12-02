@@ -32,10 +32,9 @@ export const RecordAvatar = () => {
 
         mutate({
           input: {
-            type: 'node_attribute_set',
-            nodeId: record.id,
-            path: 'avatar',
-            value: avatar,
+            type: 'record_avatar_update',
+            recordId: record.id,
+            avatar,
             userId: workspace.userId,
           },
         });

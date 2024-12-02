@@ -1,6 +1,6 @@
 import '@/renderer/styles/editor.css';
 
-import { EditorContent, JSONContent,useEditor } from '@tiptap/react';
+import { EditorContent, JSONContent, useEditor } from '@tiptap/react';
 import { debounce } from 'lodash-es';
 import React from 'react';
 
@@ -56,13 +56,13 @@ import {
   UnderlineMark,
 } from '@/renderer/editor/extensions';
 import { EditorBubbleMenu } from '@/renderer/editor/menu/bubble-menu';
-import { useMutation } from '@/renderer/hooks/use-mutation';
 
 interface DocumentEditorProps {
   documentId: string;
   content: JSONContent;
   transactionId: string;
   canEdit: boolean;
+  onUpdate: (content: JSONContent) => void;
 }
 
 export const DocumentEditor = ({
@@ -70,9 +70,9 @@ export const DocumentEditor = ({
   content,
   transactionId,
   canEdit,
+  onUpdate,
 }: DocumentEditorProps) => {
   const workspace = useWorkspace();
-  const { mutate } = useMutation();
 
   const hasPendingChanges = React.useRef(false);
   const transactionIdRef = React.useRef(transactionId);
@@ -80,16 +80,9 @@ export const DocumentEditor = ({
     () =>
       debounce((content: JSONContent) => {
         hasPendingChanges.current = false;
-        mutate({
-          input: {
-            type: 'document_save',
-            documentId: documentId,
-            userId: workspace.userId,
-            content,
-          },
-        });
+        onUpdate(content);
       }, 500),
-    [mutate, documentId, workspace.userId]
+    [onUpdate]
   );
 
   const editor = useEditor(

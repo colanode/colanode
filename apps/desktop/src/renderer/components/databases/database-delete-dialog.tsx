@@ -45,8 +45,8 @@ export const DatabaseDeleteDialog = ({
             onClick={() => {
               mutate({
                 input: {
-                  type: 'node_delete',
-                  nodeId,
+                  type: 'database_delete',
+                  databaseId: nodeId,
                   userId: workspace.userId,
                 },
                 onSuccess() {

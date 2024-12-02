@@ -1,7 +1,11 @@
+import { useCallback } from 'react';
 import { hasEditorAccess, NodeRole, PageNode } from '@colanode/core';
+import { JSONContent } from '@tiptap/core';
 
 import { Document } from '@/renderer/components/documents/document';
 import { ScrollArea } from '@/renderer/components/ui/scroll-area';
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { useMutation } from '@/renderer/hooks/use-mutation';
 
 interface PageBodyProps {
   page: PageNode;
@@ -9,7 +13,23 @@ interface PageBodyProps {
 }
 
 export const PageBody = ({ page, role }: PageBodyProps) => {
+  const workspace = useWorkspace();
+  const { mutate } = useMutation();
   const canEdit = hasEditorAccess(role);
+
+  const handleUpdate = useCallback(
+    (content: JSONContent) => {
+      mutate({
+        input: {
+          type: 'page_content_update',
+          userId: workspace.userId,
+          pageId: page.id,
+          content,
+        },
+      });
+    },
+    [mutate, workspace.userId, page.id]
+  );
 
   return (
     <ScrollArea className="h-full max-h-full w-full overflow-y-auto px-10 pb-12">
@@ -18,6 +38,7 @@ export const PageBody = ({ page, role }: PageBodyProps) => {
         content={page.attributes.content}
         transactionId={page.transactionId}
         canEdit={canEdit}
+        onUpdate={handleUpdate}
       />
     </ScrollArea>
   );

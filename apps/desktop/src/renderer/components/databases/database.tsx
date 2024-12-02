@@ -55,10 +55,10 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
 
           mutate({
             input: {
-              type: 'node_attribute_set',
-              nodeId: database.id,
-              path: `fields.${id}.name`,
-              value: name,
+              type: 'field_name_update',
+              databaseId: database.id,
+              fieldId: id,
+              name,
               userId: workspace.userId,
             },
           });
@@ -70,9 +70,9 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
 
           mutate({
             input: {
-              type: 'node_attribute_delete',
-              nodeId: database.id,
-              path: `fields.${id}`,
+              type: 'field_delete',
+              databaseId: database.id,
+              fieldId: id,
               userId: workspace.userId,
             },
           });
@@ -100,10 +100,12 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
 
           mutate({
             input: {
-              type: 'node_attribute_set',
-              nodeId: database.id,
-              path: `fields.${fieldId}.options.${attributes.id}`,
-              value: attributes,
+              type: 'select_option_update',
+              databaseId: database.id,
+              fieldId,
+              optionId: attributes.id,
+              name: attributes.name,
+              color: attributes.color,
               userId: workspace.userId,
             },
           });
@@ -115,9 +117,10 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
 
           mutate({
             input: {
-              type: 'node_attribute_delete',
-              nodeId: database.id,
-              path: `fields.${fieldId}.options.${optionId}`,
+              type: 'select_option_delete',
+              databaseId: database.id,
+              fieldId,
+              optionId,
               userId: workspace.userId,
             },
           });

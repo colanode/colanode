@@ -45,8 +45,8 @@ export const ChannelDeleteDialog = ({
             onClick={() => {
               mutate({
                 input: {
-                  type: 'node_delete',
-                  nodeId,
+                  type: 'channel_delete',
+                  channelId: nodeId,
                   userId: workspace.userId,
                 },
                 onSuccess() {

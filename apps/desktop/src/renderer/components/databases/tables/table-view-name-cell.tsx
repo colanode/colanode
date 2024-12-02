@@ -62,10 +62,10 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
   const handleSave = (newName: string) => {
     mutate({
       input: {
-        type: 'node_attribute_set',
-        nodeId: record.id,
-        path: 'name',
-        value: newName,
+        type: 'view_name_update',
+        databaseId: record.attributes.databaseId,
+        viewId: record.id,
+        name: newName,
         userId: workspace.userId,
       },
       onSuccess() {

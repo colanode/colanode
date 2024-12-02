@@ -45,8 +45,8 @@ export const PageDeleteDialog = ({
             onClick={() => {
               mutate({
                 input: {
-                  type: 'node_delete',
-                  nodeId,
+                  type: 'page_delete',
+                  pageId: nodeId,
                   userId: workspace.userId,
                 },
                 onSuccess() {

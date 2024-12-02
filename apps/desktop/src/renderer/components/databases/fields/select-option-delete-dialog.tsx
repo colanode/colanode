@@ -8,22 +8,22 @@ import {
   AlertDialogTitle,
 } from '@/renderer/components/ui/alert-dialog';
 import { Button } from '@/renderer/components/ui/button';
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { useMutation } from '@/renderer/hooks/use-mutation';
+import { useDatabase } from '@/renderer/contexts/database';
 
 interface SelectOptionDeleteDialogProps {
-  id: string;
+  fieldId: string;
+  optionId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export const SelectOptionDeleteDialog = ({
-  id,
+  fieldId,
+  optionId,
   open,
   onOpenChange,
 }: SelectOptionDeleteDialogProps) => {
-  const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
+  const database = useDatabase();
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -41,15 +41,8 @@ export const SelectOptionDeleteDialog = ({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <Button
             variant="destructive"
-            disabled={isPending}
             onClick={() => {
-              mutate({
-                input: {
-                  type: 'node_delete',
-                  nodeId: id,
-                  userId: workspace.userId,
-                },
-              });
+              database.deleteSelectOption(fieldId, optionId);
             }}
           >
             Delete
