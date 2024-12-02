@@ -1,6 +1,6 @@
 import { assetService } from '@/main/services/asset-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { EmojisGetQueryInput } from '@/shared/queries/emojis-get';
+import { EmojisGetQueryInput } from '@/shared/queries/emojis/emojis-get';
 import { EmojiData } from '@/shared/types/emojis';
 import { Event } from '@/shared/types/events';
 

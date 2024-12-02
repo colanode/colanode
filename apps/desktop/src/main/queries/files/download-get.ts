@@ -2,7 +2,7 @@ import { databaseService } from '@/main/data/database-service';
 import { SelectDownload } from '@/main/data/workspace/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { mapDownload } from '@/main/utils';
-import { DownloadGetQueryInput } from '@/shared/queries/download-get';
+import { DownloadGetQueryInput } from '@/shared/queries/files/download-get';
 import { Event } from '@/shared/types/events';
 import { Download } from '@/shared/types/nodes';
 

@@ -3,8 +3,8 @@ import { Node } from '@colanode/core';
 import { databaseService } from '@/main/data/database-service';
 import { SelectNode } from '@/main/data/workspace/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { fetchNodeAncestors,mapNode } from '@/main/utils';
-import { NodeTreeGetQueryInput } from '@/shared/queries/node-tree-get';
+import { fetchNodeAncestors, mapNode } from '@/main/utils';
+import { NodeTreeGetQueryInput } from '@/shared/queries/nodes/node-tree-get';
 import { Event } from '@/shared/types/events';
 
 export class NodeTreeGetQueryHandler

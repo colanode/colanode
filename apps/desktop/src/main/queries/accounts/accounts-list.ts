@@ -2,7 +2,7 @@ import { SelectAccount } from '@/main/data/app/schema';
 import { databaseService } from '@/main/data/database-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { mapAccount } from '@/main/utils';
-import { AccountListQueryInput } from '@/shared/queries/account-list';
+import { AccountListQueryInput } from '@/shared/queries/accounts/account-list';
 import { Account } from '@/shared/types/accounts';
 import { Event } from '@/shared/types/events';
 

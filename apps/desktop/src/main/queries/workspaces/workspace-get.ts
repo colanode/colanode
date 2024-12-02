@@ -2,7 +2,7 @@ import { SelectWorkspace } from '@/main/data/app/schema';
 import { databaseService } from '@/main/data/database-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { mapWorkspace } from '@/main/utils';
-import { WorkspaceGetQueryInput } from '@/shared/queries/workspace-get';
+import { WorkspaceGetQueryInput } from '@/shared/queries/workspaces/workspace-get';
 import { Event } from '@/shared/types/events';
 import { Workspace } from '@/shared/types/workspaces';
 

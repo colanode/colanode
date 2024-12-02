@@ -9,7 +9,7 @@ import { WorkspaceUserInvite } from '@/renderer/components/workspaces/workspace-
 import { WorkspaceUserRoleDropdown } from '@/renderer/components/workspaces/workspace-user-role-dropdown';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQueries } from '@/renderer/hooks/use-queries';
-import { WorkspaceUserListQueryInput } from '@/shared/queries/workspace-user-list';
+import { WorkspaceUserListQueryInput } from '@/shared/queries/workspaces/workspace-user-list';
 
 const USERS_PER_PAGE = 50;
 

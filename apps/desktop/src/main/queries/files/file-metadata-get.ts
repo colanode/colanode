@@ -1,6 +1,6 @@
 import { fileService } from '@/main/services/file-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { FileMetadataGetQueryInput } from '@/shared/queries/file-metadata-get';
+import { FileMetadataGetQueryInput } from '@/shared/queries/files/file-metadata-get';
 import { Event } from '@/shared/types/events';
 import { FileMetadata } from '@/shared/types/files';
 

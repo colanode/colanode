@@ -4,7 +4,7 @@ import { databaseService } from '@/main/data/database-service';
 import { SelectNode } from '@/main/data/workspace/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { mapNode } from '@/main/utils';
-import { WorkspaceUserListQueryInput } from '@/shared/queries/workspace-user-list';
+import { WorkspaceUserListQueryInput } from '@/shared/queries/workspaces/workspace-user-list';
 import { Event } from '@/shared/types/events';
 
 export class WorkspaceUserListQueryHandler

@@ -1,7 +1,7 @@
 import { SelectServer } from '@/main/data/app/schema';
 import { databaseService } from '@/main/data/database-service';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
-import { ServerListQueryInput } from '@/shared/queries/server-list';
+import { ServerListQueryInput } from '@/shared/queries/servers/server-list';
 import { Event } from '@/shared/types/events';
 import { Server } from '@/shared/types/servers';
 

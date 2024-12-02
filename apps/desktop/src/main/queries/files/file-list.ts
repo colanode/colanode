@@ -1,10 +1,10 @@
-import { compareString,FileNode } from '@colanode/core';
+import { compareString, FileNode } from '@colanode/core';
 
 import { databaseService } from '@/main/data/database-service';
 import { SelectNode } from '@/main/data/workspace/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { mapNode } from '@/main/utils';
-import { FileListQueryInput } from '@/shared/queries/file-list';
+import { FileListQueryInput } from '@/shared/queries/files/file-list';
 import { Event } from '@/shared/types/events';
 
 export class FileListQueryHandler implements QueryHandler<FileListQueryInput> {

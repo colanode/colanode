@@ -4,7 +4,7 @@ import { databaseService } from '@/main/data/database-service';
 import { SelectNode } from '@/main/data/workspace/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { mapNode } from '@/main/utils';
-import { NodeGetQueryInput } from '@/shared/queries/node-get';
+import { NodeGetQueryInput } from '@/shared/queries/nodes/node-get';
 import { Event } from '@/shared/types/events';
 
 export class NodeGetQueryHandler implements QueryHandler<NodeGetQueryInput> {

@@ -5,7 +5,7 @@ import { databaseService } from '@/main/data/database-service';
 import { SelectNode } from '@/main/data/workspace/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { mapNode } from '@/main/utils';
-import { UserSearchQueryInput } from '@/shared/queries/user-search';
+import { UserSearchQueryInput } from '@/shared/queries/users/user-search';
 import { Event } from '@/shared/types/events';
 
 export class UserSearchQueryHandler

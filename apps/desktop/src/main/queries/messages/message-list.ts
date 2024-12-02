@@ -1,10 +1,10 @@
-import { compareString,MessageNode } from '@colanode/core';
+import { compareString, MessageNode } from '@colanode/core';
 
 import { databaseService } from '@/main/data/database-service';
 import { SelectNode } from '@/main/data/workspace/schema';
 import { ChangeCheckResult, QueryHandler } from '@/main/types';
 import { mapNode } from '@/main/utils';
-import { MessageListQueryInput } from '@/shared/queries/message-list';
+import { MessageListQueryInput } from '@/shared/queries/messages/message-list';
 import { Event } from '@/shared/types/events';
 
 export class MessageListQueryHandler

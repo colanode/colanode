@@ -1,6 +1,6 @@
 import { assetService } from '@/main/services/asset-service';
-import { ChangeCheckResult,QueryHandler } from '@/main/types';
-import { IconsGetQueryInput } from '@/shared/queries/icons-get';
+import { ChangeCheckResult, QueryHandler } from '@/main/types';
+import { IconsGetQueryInput } from '@/shared/queries/icons/icons-get';
 import { Event } from '@/shared/types/events';
 import { IconData } from '@/shared/types/icons';
 

@@ -8,7 +8,7 @@ import { ListLayout } from '@/renderer/components/folders/lists/list-layout';
 import { FolderContext } from '@/renderer/contexts/folder';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQueries } from '@/renderer/hooks/use-queries';
-import { FileListQueryInput } from '@/shared/queries/file-list';
+import { FileListQueryInput } from '@/shared/queries/files/file-list';
 import { FolderLayoutType } from '@/shared/types/folders';
 
 const FILES_PER_PAGE = 100;
