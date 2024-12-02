@@ -12,7 +12,7 @@ import fs from 'fs/promises';
 const config: ForgeConfig = {
   packagerConfig: {
     name: 'Colanode',
-    executableName: 'Colanode',
+    executableName: process.platform === 'linux' ? 'colanode' : 'Colanode',
     icon: 'assets/colanode_logo_black',
     appBundleId: 'com.colanode.desktop',
     asar: true,
@@ -49,8 +49,18 @@ const config: ForgeConfig = {
   makers: [
     new MakerSquirrel({}),
     new MakerZIP({}, ['darwin']),
-    new MakerRpm({}),
-    new MakerDeb({}),
+    new MakerRpm({
+      options: {
+        bin: 'colanode',
+        name: 'colanode'
+      }
+    }),
+    new MakerDeb({
+      options: {
+        bin: 'colanode',
+        name: 'colanode'
+      }
+    }),
   ],
   publishers: [
     {
