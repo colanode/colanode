@@ -15,7 +15,10 @@ import path from 'path';
 import { createDebugger } from '@/main/debugger';
 import { databaseService } from '@/main/data/database-service';
 import { serverService } from '@/main/services/server-service';
-import { getWorkspaceFilesDirectoryPath } from '@/main/utils';
+import {
+  fetchWorkspaceCredentials,
+  getWorkspaceFilesDirectoryPath,
+} from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
 import { httpClient } from '@/shared/lib/http-client';
 import { FileMetadata } from '@/shared/types/files';
@@ -237,23 +240,9 @@ class FileService {
       return;
     }
 
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
-      .innerJoin('servers', 'accounts.server', 'servers.domain')
-      .select([
-        'workspaces.workspace_id',
-        'workspaces.user_id',
-        'workspaces.account_id',
-        'accounts.token',
-        'servers.domain',
-        'servers.attributes',
-      ])
-      .where('workspaces.user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
-      this.debug(`Workspace not found for user ${userId}`);
+    const credentials = await fetchWorkspaceCredentials(userId);
+    if (!credentials) {
+      this.debug(`Workspace credentials not found for user ${userId}`);
       return;
     }
 
@@ -283,6 +272,20 @@ class FileService {
         continue;
       }
 
+      const nodeTransactions = await workspaceDatabase
+        .selectFrom('node_transactions')
+        .selectAll()
+        .where('node_id', '=', upload.node_id)
+        .where('status', '=', 'pending')
+        .execute();
+
+      if (nodeTransactions.length > 0) {
+        this.debug(
+          `Node transactions found for node ${upload.node_id}, skipping upload until transactions are completed`
+        );
+        continue;
+      }
+
       const attributes: FileAttributes = JSON.parse(file.attributes);
       const filePath = path.join(
         filesDir,
@@ -298,20 +301,20 @@ class FileService {
         continue;
       }
 
-      if (!serverService.isAvailable(workspace.domain)) {
+      if (!serverService.isAvailable(credentials.serverDomain)) {
         continue;
       }
 
       try {
         const { data } = await httpClient.post<CreateUploadOutput>(
-          `/v1/files/${workspace.workspace_id}`,
+          `/v1/files/${credentials.workspaceId}`,
           {
             fileId: file.id,
             uploadId: upload.upload_id,
           },
           {
-            domain: workspace.domain,
-            token: workspace.token,
+            domain: credentials.serverDomain,
+            token: credentials.token,
           }
         );
 
@@ -325,11 +328,11 @@ class FileService {
         });
 
         const { status } = await httpClient.put<CompleteUploadOutput>(
-          `/v1/files/${workspace.workspace_id}/${data.uploadId}`,
+          `/v1/files/${credentials.workspaceId}/${data.uploadId}`,
           {},
           {
-            domain: workspace.domain,
-            token: workspace.token,
+            domain: credentials.serverDomain,
+            token: credentials.token,
           }
         );
 
@@ -366,16 +369,9 @@ class FileService {
       return;
     }
 
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
-      .innerJoin('servers', 'accounts.server', 'servers.domain')
-      .select(['workspaces.workspace_id', 'accounts.token', 'servers.domain'])
-      .where('workspaces.user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
-      this.debug(`Workspace not found for user ${userId}`);
+    const credentials = await fetchWorkspaceCredentials(userId);
+    if (!credentials) {
+      this.debug(`Workspace credentials not found for user ${userId}`);
       return;
     }
 
@@ -445,16 +441,16 @@ class FileService {
         continue;
       }
 
-      if (!serverService.isAvailable(workspace.domain)) {
+      if (!serverService.isAvailable(credentials.serverDomain)) {
         continue;
       }
 
       try {
         const { data } = await httpClient.get<CreateDownloadOutput>(
-          `/v1/files/${workspace.workspace_id}/${download.node_id}`,
+          `/v1/files/${credentials.workspaceId}/${download.node_id}`,
           {
-            domain: workspace.domain,
-            token: workspace.token,
+            domain: credentials.serverDomain,
+            token: credentials.token,
           }
         );
 
