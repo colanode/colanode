@@ -11,6 +11,8 @@ import {
 import { app } from 'electron';
 import path from 'path';
 
+import { databaseService } from './data/database-service';
+
 import {
   SelectAccount,
   SelectServer,
@@ -28,7 +30,7 @@ import { Account } from '@/shared/types/accounts';
 import { Interaction } from '@/shared/types/interactions';
 import { Download, Upload } from '@/shared/types/nodes';
 import { Server } from '@/shared/types/servers';
-import { Workspace } from '@/shared/types/workspaces';
+import { Workspace, WorkspaceCredentials } from '@/shared/types/workspaces';
 
 export const appPath = app.getPath('userData');
 
@@ -99,6 +101,38 @@ export const fetchNodeAncestors = (
     )
     .where('type', '!=', 'workspace')
     .execute();
+};
+
+export const fetchWorkspaceCredentials = async (
+  userId: string
+): Promise<WorkspaceCredentials | null> => {
+  const workspace = await databaseService.appDatabase
+    .selectFrom('workspaces')
+    .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
+    .innerJoin('servers', 'accounts.server', 'servers.domain')
+    .select([
+      'workspaces.workspace_id',
+      'workspaces.user_id',
+      'workspaces.account_id',
+      'accounts.token',
+      'servers.domain',
+      'servers.attributes',
+    ])
+    .where('workspaces.user_id', '=', userId)
+    .executeTakeFirst();
+
+  if (!workspace) {
+    return null;
+  }
+
+  return {
+    workspaceId: workspace.workspace_id,
+    accountId: workspace.account_id,
+    userId: workspace.user_id,
+    token: workspace.token,
+    serverDomain: workspace.domain,
+    serverAttributes: workspace.attributes,
+  };
 };
 
 export const mapNode = (row: SelectNode): Node => {

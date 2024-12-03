@@ -25,7 +25,7 @@ import { interactionService } from '@/main/services/interaction-service';
 import { nodeService } from '@/main/services/node-service';
 import { serverService } from '@/main/services/server-service';
 import { socketService } from '@/main/services/socket-service';
-import { mapTransaction } from '@/main/utils';
+import { fetchWorkspaceCredentials, mapTransaction } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
 import { httpClient } from '@/shared/lib/http-client';
 
@@ -63,7 +63,7 @@ class SyncService {
       } else if (event.type === 'node_transaction_incomplete') {
         this.syncLocalIncompleteTransactions(event.userId);
       } else if (event.type === 'workspace_created') {
-        this.requireNodeTransactions(event.workspace.userId);
+        this.syncWorkspace(event.workspace.userId);
       } else if (event.type === 'socket_connection_opened') {
         this.syncAllWorkspaces();
       } else if (event.type === 'collaboration_synced') {
@@ -83,17 +83,21 @@ class SyncService {
       .execute();
 
     for (const workspace of workspaces) {
-      this.syncLocalPendingTransactions(workspace.user_id);
-      this.syncLocalIncompleteTransactions(workspace.user_id);
-      this.syncLocalPendingInteractions(workspace.user_id);
-
-      this.requireNodeTransactions(workspace.user_id);
-      this.requireCollaborations(workspace.user_id);
-      this.requireCollaborationRevocations(workspace.user_id);
-      this.requireInteractions(workspace.user_id);
-
-      this.syncMissingNodes(workspace.user_id);
+      await this.syncWorkspace(workspace.user_id);
     }
+  }
+
+  private async syncWorkspace(userId: string) {
+    this.syncLocalPendingTransactions(userId);
+    this.syncLocalIncompleteTransactions(userId);
+    this.syncLocalPendingInteractions(userId);
+
+    this.requireNodeTransactions(userId);
+    this.requireCollaborations(userId);
+    this.requireCollaborationRevocations(userId);
+    this.requireInteractions(userId);
+
+    this.syncMissingNodes(userId);
   }
 
   public async syncLocalPendingTransactions(userId: string) {
@@ -380,28 +384,16 @@ class SyncService {
       return;
     }
 
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
-      .innerJoin('servers', 'accounts.server', 'servers.domain')
-      .select([
-        'workspaces.workspace_id',
-        'workspaces.user_id',
-        'workspaces.account_id',
-        'accounts.token',
-        'servers.domain',
-        'servers.attributes',
-      ])
-      .where('workspaces.user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
-      this.debug(`No workspace found for user ${userId}, skipping`);
+    const credentials = await fetchWorkspaceCredentials(userId);
+    if (!credentials) {
+      this.debug(`No workspace credentials found for user ${userId}, skipping`);
       return;
     }
 
-    if (!serverService.isAvailable(workspace.domain)) {
-      this.debug(`Server ${workspace.domain} is not available, skipping`);
+    if (!serverService.isAvailable(credentials.serverDomain)) {
+      this.debug(
+        `Server ${credentials.serverDomain} is not available, skipping`
+      );
       return;
     }
 
@@ -422,10 +414,10 @@ class SyncService {
         );
 
         const { data } = await httpClient.get<GetNodeTransactionsOutput>(
-          `/v1/nodes/${workspace.workspace_id}/transactions/${nodeId}`,
+          `/v1/nodes/${credentials.workspaceId}/transactions/${nodeId}`,
           {
-            domain: workspace.domain,
-            token: workspace.token,
+            domain: credentials.serverDomain,
+            token: credentials.token,
           }
         );
 
@@ -508,28 +500,16 @@ class SyncService {
       return;
     }
 
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
-      .innerJoin('servers', 'accounts.server', 'servers.domain')
-      .select([
-        'workspaces.workspace_id',
-        'workspaces.user_id',
-        'workspaces.account_id',
-        'accounts.token',
-        'servers.domain',
-        'servers.attributes',
-      ])
-      .where('workspaces.user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
-      this.debug(`No workspace found for user ${userId}, skipping`);
+    const credentials = await fetchWorkspaceCredentials(userId);
+    if (!credentials) {
+      this.debug(`No workspace credentials found for user ${userId}, skipping`);
       return;
     }
 
-    if (!serverService.isAvailable(workspace.domain)) {
-      this.debug(`Server ${workspace.domain} is not available, skipping`);
+    if (!serverService.isAvailable(credentials.serverDomain)) {
+      this.debug(
+        `Server ${credentials.serverDomain} is not available, skipping`
+      );
       return;
     }
 
@@ -538,10 +518,10 @@ class SyncService {
         this.debug(`Syncing missing node ${node.node_id} for user ${userId}`);
 
         const { data } = await httpClient.get<GetNodeTransactionsOutput>(
-          `/v1/nodes/${workspace.workspace_id}/transactions/${node.node_id}`,
+          `/v1/nodes/${credentials.workspaceId}/transactions/${node.node_id}`,
           {
-            domain: workspace.domain,
-            token: workspace.token,
+            domain: credentials.serverDomain,
+            token: credentials.token,
           }
         );
 
@@ -576,37 +556,25 @@ class SyncService {
       return;
     }
 
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
-      .innerJoin('servers', 'accounts.server', 'servers.domain')
-      .select([
-        'workspaces.workspace_id',
-        'workspaces.user_id',
-        'workspaces.account_id',
-        'accounts.token',
-        'servers.domain',
-        'servers.attributes',
-      ])
-      .where('workspaces.user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
-      this.debug(`No workspace found for user ${userId}, skipping`);
+    const credentials = await fetchWorkspaceCredentials(userId);
+    if (!credentials) {
+      this.debug(`No workspace credentials found for user ${userId}, skipping`);
       return;
     }
 
-    if (!serverService.isAvailable(workspace.domain)) {
-      this.debug(`Server ${workspace.domain} is not available, skipping`);
+    if (!serverService.isAvailable(credentials.serverDomain)) {
+      this.debug(
+        `Server ${credentials.serverDomain} is not available, skipping`
+      );
       return;
     }
 
     try {
       const { data } = await httpClient.get<GetNodeTransactionsOutput>(
-        `/v1/nodes/${workspace.workspace_id}/transactions/${nodeId}`,
+        `/v1/nodes/${credentials.workspaceId}/transactions/${nodeId}`,
         {
-          domain: workspace.domain,
-          token: workspace.token,
+          domain: credentials.serverDomain,
+          token: credentials.token,
         }
       );
 
@@ -641,31 +609,17 @@ class SyncService {
       `Sending ${unsyncedTransactions.length} local pending transactions for user ${userId}`
     );
 
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
-      .innerJoin('servers', 'accounts.server', 'servers.domain')
-      .select([
-        'workspaces.workspace_id',
-        'workspaces.user_id',
-        'workspaces.account_id',
-        'accounts.token',
-        'servers.domain',
-        'servers.attributes',
-      ])
-      .where('workspaces.user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
+    const credentials = await fetchWorkspaceCredentials(userId);
+    if (!credentials) {
       this.debug(
-        `No workspace found for user ${userId}, skipping sending local pending transactions`
+        `No workspace credentials found for user ${userId}, skipping sending local pending transactions`
       );
       return;
     }
 
-    if (!serverService.isAvailable(workspace.domain)) {
+    if (!serverService.isAvailable(credentials.serverDomain)) {
       this.debug(
-        `Server ${workspace.domain} is not available, skipping sending local pending transactions`
+        `Server ${credentials.serverDomain} is not available, skipping sending local pending transactions`
       );
       return;
     }
@@ -673,13 +627,13 @@ class SyncService {
     const transactions: LocalNodeTransaction[] =
       unsyncedTransactions.map(mapTransaction);
     const { data } = await httpClient.post<SyncNodeTransactionsOutput>(
-      `/v1/sync/${workspace.workspace_id}`,
+      `/v1/sync/${credentials.workspaceId}`,
       {
         transactions,
       },
       {
-        domain: workspace.domain,
-        token: workspace.token,
+        domain: credentials.serverDomain,
+        token: credentials.token,
       }
     );
 
@@ -727,31 +681,17 @@ class SyncService {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .innerJoin('accounts', 'workspaces.account_id', 'accounts.id')
-      .innerJoin('servers', 'accounts.server', 'servers.domain')
-      .select([
-        'workspaces.workspace_id',
-        'workspaces.user_id',
-        'workspaces.account_id',
-        'accounts.token',
-        'servers.domain',
-        'servers.attributes',
-      ])
-      .where('workspaces.user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
+    const credentials = await fetchWorkspaceCredentials(userId);
+    if (!credentials) {
       this.debug(
-        `No workspace found for user ${userId}, skipping sending local pending interactions`
+        `No workspace credentials found for user ${userId}, skipping sending local pending interactions`
       );
       return;
     }
 
-    if (!serverService.isAvailable(workspace.domain)) {
+    if (!serverService.isAvailable(credentials.serverDomain)) {
       this.debug(
-        `Server ${workspace.domain} is not available, skipping sending local pending interactions`
+        `Server ${credentials.serverDomain} is not available, skipping sending local pending interactions`
       );
       return;
     }
@@ -808,7 +748,7 @@ class SyncService {
           type: 'sync_interactions',
           nodeId,
           nodeType: firstEvent.node_type,
-          userId: workspace.user_id,
+          userId: credentials.userId,
           events: events.map((e) => ({
             attribute: e.attribute,
             value: e.value,
@@ -816,7 +756,7 @@ class SyncService {
           })),
         };
 
-        const sent = socketService.sendMessage(workspace.account_id, message);
+        const sent = socketService.sendMessage(credentials.accountId, message);
         if (sent) {
           sentEventIds.push(...events.map((e) => e.event_id));
         }
