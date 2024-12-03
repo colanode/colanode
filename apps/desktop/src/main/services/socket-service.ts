@@ -1,13 +1,13 @@
 import { Message } from '@colanode/core';
 
+import { createDebugger } from '@/main/debugger';
 import { databaseService } from '@/main/data/database-service';
-import { createLogger } from '@/main/logger';
 import { serverService } from '@/main/services/server-service';
 import { SocketConnection } from '@/main/services/socket-connection';
 import { eventBus } from '@/shared/lib/event-bus';
 
 class SocketService {
-  private readonly logger = createLogger('socket-service');
+  private readonly debug = createDebugger('service:socket');
   private readonly sockets: Map<string, SocketConnection> = new Map();
 
   constructor() {
@@ -34,7 +34,7 @@ class SocketService {
   }
 
   public async checkConnections() {
-    this.logger.trace('Checking socket connections');
+    this.debug('Checking socket connections');
 
     const accounts = await databaseService.appDatabase
       .selectFrom('accounts')
@@ -45,7 +45,7 @@ class SocketService {
     // Update accounts map
     for (const account of accounts) {
       if (!serverService.isAvailable(account.server)) {
-        this.logger.trace(
+        this.debug(
           `Server ${account.server} is not available, skipping socket connection`
         );
 

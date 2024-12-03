@@ -1,4 +1,4 @@
-import { createLogger } from '@/main/logger';
+import { createDebugger } from '@/main/debugger';
 import { mutationHandlerMap } from '@/main/mutations';
 import { MutationHandler } from '@/main/types';
 import {
@@ -8,7 +8,7 @@ import {
 } from '@/shared/mutations';
 
 class MutationService {
-  private readonly logger = createLogger('mutation-service');
+  private readonly debug = createDebugger('service:mutation');
 
   public async executeMutation<T extends MutationInput>(
     input: T
@@ -17,7 +17,7 @@ class MutationService {
       input.type
     ] as unknown as MutationHandler<T>;
 
-    this.logger.trace(`Executing mutation: ${input.type}`);
+    this.debug(`Executing mutation: ${input.type}`);
 
     try {
       if (!handler) {

@@ -1,15 +1,15 @@
+import { createDebugger } from '@/main/debugger';
 import { commandHandlerMap } from '@/main/commands';
-import { createLogger } from '@/main/logger';
 import { CommandHandler } from '@/main/types';
 import { CommandInput, CommandMap } from '@/shared/commands';
 
 class CommandService {
-  private readonly logger = createLogger('command-service');
+  private readonly debug = createDebugger('service:command');
 
   public async executeCommand<T extends CommandInput>(
     input: T
   ): Promise<CommandMap[T['type']]['output']> {
-    this.logger.trace(`Executing command: ${input.type}`);
+    this.debug(`Executing command: ${input.type}`);
 
     const handler = commandHandlerMap[
       input.type

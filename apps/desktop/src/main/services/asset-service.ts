@@ -4,7 +4,7 @@ import { app, net } from 'electron';
 import fs from 'fs';
 import path from 'path';
 
-import { createLogger } from '@/main/logger';
+import { createDebugger } from '@/main/debugger';
 import { getAssetsSourcePath } from '@/main/utils';
 import { EmojiData } from '@/shared/types/emojis';
 import { IconData } from '@/shared/types/icons';
@@ -23,7 +23,7 @@ class AssetService {
     app.getPath('userData'),
     'assets'
   );
-  private readonly logger = createLogger('asset-service');
+  private readonly debug = createDebugger('service:asset');
 
   public async handleAssetRequest(request: Request): Promise<Response> {
     const url = request.url.replace('asset://', '');
@@ -54,7 +54,7 @@ class AssetService {
 
   public async checkAssets(): Promise<void> {
     if (!this.shouldUpdateAssets()) {
-      this.logger.debug('Assets are up to date');
+      this.debug('Assets are up to date');
       return;
     }
 
@@ -62,7 +62,7 @@ class AssetService {
   }
 
   private async updateAssets(): Promise<void> {
-    this.logger.debug('Updating assets');
+    this.debug('Updating assets');
 
     await this.updateEmojis();
     await this.updateIcons();
@@ -71,7 +71,7 @@ class AssetService {
   }
 
   private async updateEmojis(): Promise<void> {
-    this.logger.debug('Updating emojis');
+    this.debug('Updating emojis');
 
     const emojisZipPath = path.join(getAssetsSourcePath(), 'emojis.zip');
     const emojisDir = path.join(this.assetsDir, 'emojis');
@@ -87,7 +87,7 @@ class AssetService {
   }
 
   private async updateIcons(): Promise<void> {
-    this.logger.debug('Updating icons');
+    this.debug('Updating icons');
 
     const iconsZipPath = path.join(getAssetsSourcePath(), 'icons.zip');
     const iconsDir = path.join(this.assetsDir, 'icons');
@@ -105,7 +105,7 @@ class AssetService {
   private shouldUpdateAssets(): boolean {
     const assetsVersion = this.readAssetsVersion();
     if (!assetsVersion) {
-      this.logger.debug('No assets version found, updating assets');
+      this.debug('No assets version found, updating assets');
       return true;
     }
 
@@ -118,7 +118,7 @@ class AssetService {
   private readAssetsVersion(): AssetsVersion | null {
     const assetsVersionPath = path.join(this.assetsDir, 'version.json');
     if (!fs.existsSync(assetsVersionPath)) {
-      this.logger.debug('No assets version found');
+      this.debug('No assets version found');
       return null;
     }
 

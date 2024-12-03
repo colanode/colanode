@@ -3,8 +3,8 @@ import started from 'electron-squirrel-startup';
 import { app, BrowserWindow, ipcMain, protocol } from 'electron';
 import path from 'path';
 
+import { createDebugger } from '@/main/debugger';
 import { bootstrapper } from '@/main/bootstrapper';
-import { closeLoggers, createLogger } from '@/main/logger';
 import { assetService } from '@/main/services/asset-service';
 import { avatarService } from '@/main/services/avatar-service';
 import { commandService } from '@/main/services/command-service';
@@ -12,12 +12,12 @@ import { fileService } from '@/main/services/file-service';
 import { mutationService } from '@/main/services/mutation-service';
 import { queryService } from '@/main/services/query-service';
 import { getAppIconPath } from '@/main/utils';
-import { CommandInput,CommandMap } from '@/shared/commands';
+import { CommandInput, CommandMap } from '@/shared/commands';
 import { eventBus } from '@/shared/lib/event-bus';
-import { MutationInput,MutationMap } from '@/shared/mutations';
-import { QueryInput,QueryMap } from '@/shared/queries';
+import { MutationInput, MutationMap } from '@/shared/mutations';
+import { QueryInput, QueryMap } from '@/shared/queries';
 
-const logger = createLogger('main');
+const debug = createDebugger('main');
 
 app.setName('Colanode');
 app.setAppUserModelId('com.colanode.desktop');
@@ -84,7 +84,7 @@ const createWindow = () => {
     });
   }
 
-  logger.info('Window created');
+  debug('Window created');
 };
 
 // This method will be called when Electron has finished
@@ -109,10 +109,6 @@ app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
-});
-
-app.on('before-quit', () => {
-  closeLoggers();
 });
 
 // In this file you can include the rest of your app's specific main process

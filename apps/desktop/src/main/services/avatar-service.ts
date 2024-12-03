@@ -3,18 +3,18 @@ import fs from 'fs';
 import path from 'path';
 
 import { databaseService } from '@/main/data/database-service';
-import { createLogger } from '@/main/logger';
 import { getAccountAvatarsDirectoryPath } from '@/main/utils';
 import { httpClient } from '@/shared/lib/http-client';
+import { createDebugger } from '@/main/debugger';
 
 class AvatarService {
-  private readonly logger = createLogger('avatar-service');
+  private readonly debug = createDebugger('service:avatar');
 
   public async handleAvatarRequest(request: Request): Promise<Response> {
     const url = request.url.replace('avatar://', '');
     const [accountId, avatarId] = url.split('/');
     if (!accountId || !avatarId) {
-      this.logger.warn(`Invalid avatar request url: ${url}`);
+      this.debug(`Invalid avatar request url: ${url}`);
       return new Response(null, { status: 400 });
     }
 
@@ -27,9 +27,7 @@ class AvatarService {
       return net.fetch(avatarLocalUrl);
     }
 
-    this.logger.debug(
-      `Downloading avatar ${avatarId} for account ${accountId}`
-    );
+    this.debug(`Downloading avatar ${avatarId} for account ${accountId}`);
     // Download the avatar file if it doesn't exist
     const credentials = await databaseService.appDatabase
       .selectFrom('accounts')
@@ -39,7 +37,7 @@ class AvatarService {
       .executeTakeFirst();
 
     if (!credentials) {
-      this.logger.warn(`Account ${accountId} not found`);
+      this.debug(`Account ${accountId} not found`);
       return new Response(null, { status: 404 });
     }
 
@@ -53,7 +51,7 @@ class AvatarService {
     );
 
     if (response.status !== 200 || !response.data) {
-      this.logger.warn(
+      this.debug(
         `Failed to download avatar ${avatarId} for account ${accountId}`
       );
       return new Response(null, { status: 404 });
@@ -70,14 +68,12 @@ class AvatarService {
 
       fileStream.on('finish', async () => {
         // Ensure the file is written before trying to fetch it
-        this.logger.debug(
-          `Avatar ${avatarId} for account ${accountId} downloaded`
-        );
+        this.debug(`Avatar ${avatarId} for account ${accountId} downloaded`);
         resolve(net.fetch(avatarLocalUrl));
       });
 
       fileStream.on('error', (err) => {
-        this.logger.warn(
+        this.debug(
           `Failed to download avatar ${avatarId} for account ${accountId}`
         );
         reject(new Response(null, { status: 500, statusText: err.message }));

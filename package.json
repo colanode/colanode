@@ -25,6 +25,7 @@
     "format": "prettier --write ."
   },
   "devDependencies": {
+    "@types/debug": "^4.1.12",
     "@types/lodash-es": "^4.17.12",
     "@typescript-eslint/eslint-plugin": "^8.16.0",
     "eslint": "^8.57.1",
@@ -37,6 +38,7 @@
     "vitest": "^2.1.6"
   },
   "dependencies": {
+    "debug": "^4.3.7",
     "lodash-es": "^4.17.21"
   }
 }

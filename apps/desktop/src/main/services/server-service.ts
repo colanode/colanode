@@ -2,10 +2,10 @@ import { ServerConfig } from '@colanode/core';
 import axios from 'axios';
 
 import { databaseService } from '@/main/data/database-service';
-import { createLogger } from '@/main/logger';
 import { mapServer } from '@/main/utils';
 import { eventBus } from '@/shared/lib/event-bus';
 import { Server } from '@/shared/types/servers';
+import { createDebugger } from '@/main/debugger';
 
 type ServerState = {
   isAvailable: boolean;
@@ -16,10 +16,10 @@ type ServerState = {
 
 class ServerService {
   private readonly states: Map<string, ServerState> = new Map();
-  private readonly logger = createLogger('server-service');
+  private readonly debug = createDebugger('service:server');
 
   public async syncServers() {
-    this.logger.trace('Syncing servers');
+    this.debug('Syncing servers');
 
     const rows = await databaseService.appDatabase
       .selectFrom('servers')
@@ -60,7 +60,7 @@ class ServerService {
       });
     }
 
-    this.logger.trace(
+    this.debug(
       `Server ${server.domain} is ${isAvailable ? 'available' : 'unavailable'}`
     );
 
@@ -88,7 +88,7 @@ class ServerService {
   }
 
   public async fetchServerConfig(domain: string) {
-    this.logger.trace(`Fetching server config for ${domain}`);
+    this.debug(`Fetching server config for ${domain}`);
 
     const baseUrl = this.buildApiBaseUrl(domain);
     const configUrl = `${baseUrl}/v1/config`;

@@ -14,12 +14,12 @@ import {
 } from '@colanode/core';
 import { sql } from 'kysely';
 
+import { createDebugger } from '@/main/debugger';
 import { databaseService } from '@/main/data/database-service';
 import {
   SelectInteractionEvent,
   SelectNodeTransaction,
 } from '@/main/data/workspace/schema';
-import { createLogger } from '@/main/logger';
 import { collaborationService } from '@/main/services/collaboration-service';
 import { interactionService } from '@/main/services/interaction-service';
 import { nodeService } from '@/main/services/node-service';
@@ -35,7 +35,7 @@ type WorkspaceSyncState = {
 };
 
 class SyncService {
-  private readonly logger = createLogger('sync-service');
+  private readonly debug = createDebugger('service:sync');
   private readonly localPendingTransactionStates: Map<
     string,
     WorkspaceSyncState
@@ -75,7 +75,7 @@ class SyncService {
   }
 
   public async syncAllWorkspaces() {
-    this.logger.trace('Syncing all workspaces');
+    this.debug('Syncing all workspaces');
 
     const workspaces = await databaseService.appDatabase
       .selectFrom('workspaces')
@@ -97,7 +97,7 @@ class SyncService {
   }
 
   public async syncLocalPendingTransactions(userId: string) {
-    this.logger.trace(`Syncing local pending transactions for user ${userId}`);
+    this.debug(`Syncing local pending transactions for user ${userId}`);
 
     if (!this.localPendingTransactionStates.has(userId)) {
       this.localPendingTransactionStates.set(userId, {
@@ -108,7 +108,7 @@ class SyncService {
 
     const syncState = this.localPendingTransactionStates.get(userId)!;
     if (syncState.isSyncing) {
-      this.logger.trace(
+      this.debug(
         `Syncing of local pending transactions already in progress for user ${userId}, scheduling sync`
       );
       syncState.scheduledSync = true;
@@ -119,13 +119,10 @@ class SyncService {
     try {
       await this.sendLocalTransactions(userId);
     } catch (error) {
-      this.logger.error(
-        error,
-        `Error syncing local transactions for user ${userId}`
-      );
+      this.debug(error, `Error syncing local transactions for user ${userId}`);
     } finally {
       syncState.isSyncing = false;
-      this.logger.trace(
+      this.debug(
         `Syncing of local pending transactions completed for user ${userId}`
       );
 
@@ -137,7 +134,7 @@ class SyncService {
   }
 
   public async syncLocalPendingInteractions(userId: string) {
-    this.logger.trace(`Syncing local pending interactions for user ${userId}`);
+    this.debug(`Syncing local pending interactions for user ${userId}`);
 
     if (!this.localPendingInteractionStates.has(userId)) {
       this.localPendingInteractionStates.set(userId, {
@@ -148,7 +145,7 @@ class SyncService {
 
     const syncState = this.localPendingInteractionStates.get(userId)!;
     if (syncState.isSyncing) {
-      this.logger.trace(
+      this.debug(
         `Syncing of local pending interactions already in progress for user ${userId}, scheduling sync`
       );
       syncState.scheduledSync = true;
@@ -159,13 +156,10 @@ class SyncService {
     try {
       await this.sendLocalInteractions(userId);
     } catch (error) {
-      this.logger.error(
-        error,
-        `Error syncing local interactions for user ${userId}`
-      );
+      this.debug(error, `Error syncing local interactions for user ${userId}`);
     } finally {
       syncState.isSyncing = false;
-      this.logger.trace(
+      this.debug(
         `Syncing of local pending interactions completed for user ${userId}`
       );
 
@@ -177,9 +171,7 @@ class SyncService {
   }
 
   public async syncLocalIncompleteTransactions(userId: string) {
-    this.logger.trace(
-      `Syncing local incomplete transactions for user ${userId}`
-    );
+    this.debug(`Syncing local incomplete transactions for user ${userId}`);
 
     if (!this.localIncompleteTransactionStates.has(userId)) {
       this.localIncompleteTransactionStates.set(userId, {
@@ -190,7 +182,7 @@ class SyncService {
 
     const syncState = this.localIncompleteTransactionStates.get(userId)!;
     if (syncState.isSyncing) {
-      this.logger.trace(
+      this.debug(
         `Syncing of local incomplete transactions already in progress for user ${userId}, scheduling sync`
       );
       syncState.scheduledSync = true;
@@ -201,13 +193,13 @@ class SyncService {
     try {
       await this.syncIncompleteTransactions(userId);
     } catch (error) {
-      this.logger.error(
+      this.debug(
         error,
         `Error syncing incomplete transactions for user ${userId}`
       );
     } finally {
       syncState.isSyncing = false;
-      this.logger.trace(
+      this.debug(
         `Syncing of local incomplete transactions completed for user ${userId}`
       );
 
@@ -219,10 +211,10 @@ class SyncService {
   }
 
   public async syncServerTransactions(message: NodeTransactionsBatchMessage) {
-    this.logger.trace(`Syncing server transactions for user ${message.userId}`);
+    this.debug(`Syncing server transactions for user ${message.userId}`);
 
     if (this.syncingTransactions.has(message.userId)) {
-      this.logger.trace(
+      this.debug(
         `Syncing of server transactions already in progress for user ${message.userId}, skipping`
       );
       return;
@@ -240,12 +232,12 @@ class SyncService {
         this.updateNodeTransactionCursor(message.userId, cursor);
       }
     } catch (error) {
-      this.logger.error(
+      this.debug(
         error,
         `Error syncing server transactions for user ${message.userId}`
       );
     } finally {
-      this.logger.trace(
+      this.debug(
         `Syncing of server transactions completed for user ${message.userId}`
       );
 
@@ -255,12 +247,10 @@ class SyncService {
   }
 
   public async syncServerCollaborations(message: CollaborationsBatchMessage) {
-    this.logger.trace(
-      `Syncing server collaborations for user ${message.userId}`
-    );
+    this.debug(`Syncing server collaborations for user ${message.userId}`);
 
     if (this.syncingCollaborations.has(message.userId)) {
-      this.logger.trace(
+      this.debug(
         `Syncing of server collaborations already in progress for user ${message.userId}, skipping`
       );
       return;
@@ -281,7 +271,7 @@ class SyncService {
         this.updateCollaborationCursor(message.userId, cursor);
       }
     } catch (error) {
-      this.logger.error(
+      this.debug(
         error,
         `Error syncing server collaborations for user ${message.userId}`
       );
@@ -294,10 +284,10 @@ class SyncService {
   public async syncServerRevocations(
     message: CollaborationRevocationsBatchMessage
   ) {
-    this.logger.trace(`Syncing server revocations for user ${message.userId}`);
+    this.debug(`Syncing server revocations for user ${message.userId}`);
 
     if (this.syncingRevocations.has(message.userId)) {
-      this.logger.trace(
+      this.debug(
         `Syncing of server revocations already in progress for user ${message.userId}, skipping`
       );
       return;
@@ -318,12 +308,12 @@ class SyncService {
         this.updateCollaborationRevocationCursor(message.userId, cursor);
       }
     } catch (error) {
-      this.logger.error(
+      this.debug(
         error,
         `Error syncing server revocations for user ${message.userId}`
       );
     } finally {
-      this.logger.trace(
+      this.debug(
         `Syncing of server revocations completed for user ${message.userId}`
       );
 
@@ -333,10 +323,10 @@ class SyncService {
   }
 
   public async syncServerInteractions(message: InteractionsBatchMessage) {
-    this.logger.trace(`Syncing server interactions for user ${message.userId}`);
+    this.debug(`Syncing server interactions for user ${message.userId}`);
 
     if (this.syncingInteractions.has(message.userId)) {
-      this.logger.trace(
+      this.debug(
         `Syncing of server interactions already in progress for user ${message.userId}, skipping`
       );
       return;
@@ -357,12 +347,12 @@ class SyncService {
         this.updateInteractionCursor(message.userId, cursor);
       }
     } catch (error) {
-      this.logger.error(
+      this.debug(
         error,
         `Error syncing server interactions for user ${message.userId}`
       );
     } finally {
-      this.logger.trace(
+      this.debug(
         `Syncing of server interactions completed for user ${message.userId}`
       );
 
@@ -372,7 +362,7 @@ class SyncService {
   }
 
   private async syncIncompleteTransactions(userId: string) {
-    this.logger.trace(`Syncing incomplete transactions for user ${userId}`);
+    this.debug(`Syncing incomplete transactions for user ${userId}`);
 
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
@@ -384,7 +374,7 @@ class SyncService {
       .execute();
 
     if (incompleteTransactions.length === 0) {
-      this.logger.trace(
+      this.debug(
         `No incomplete transactions found for user ${userId}, skipping`
       );
       return;
@@ -406,14 +396,12 @@ class SyncService {
       .executeTakeFirst();
 
     if (!workspace) {
-      this.logger.trace(`No workspace found for user ${userId}, skipping`);
+      this.debug(`No workspace found for user ${userId}, skipping`);
       return;
     }
 
     if (!serverService.isAvailable(workspace.domain)) {
-      this.logger.trace(
-        `Server ${workspace.domain} is not available, skipping`
-      );
+      this.debug(`Server ${workspace.domain} is not available, skipping`);
       return;
     }
 
@@ -429,7 +417,7 @@ class SyncService {
 
     for (const [nodeId, transactions] of Object.entries(groupedByNodeId)) {
       try {
-        this.logger.trace(
+        this.debug(
           `Syncing incomplete transactions for node ${nodeId} for user ${userId}`
         );
 
@@ -442,7 +430,7 @@ class SyncService {
         );
 
         if (data.transactions.length === 0) {
-          this.logger.trace(
+          this.debug(
             `No transactions found for node ${nodeId} for user ${userId}, deleting`
           );
 
@@ -464,7 +452,7 @@ class SyncService {
         );
 
         if (!synced) {
-          this.logger.trace(
+          this.debug(
             `Failed to sync transactions for node ${nodeId} for user ${userId}, incrementing retry count`
           );
 
@@ -478,7 +466,7 @@ class SyncService {
             )
             .execute();
         } else {
-          this.logger.trace(
+          this.debug(
             `Successfully synced transactions for node ${nodeId} for user ${userId}, resetting retry count`
           );
 
@@ -494,7 +482,7 @@ class SyncService {
             .execute();
         }
       } catch (error) {
-        this.logger.error(
+        this.debug(
           error,
           `Error syncing incomplete transactions for node ${nodeId} for user ${userId}`
         );
@@ -503,7 +491,7 @@ class SyncService {
   }
 
   private async syncMissingNodes(userId: string) {
-    this.logger.trace(`Syncing missing nodes for user ${userId}`);
+    this.debug(`Syncing missing nodes for user ${userId}`);
 
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
@@ -516,7 +504,7 @@ class SyncService {
       .execute();
 
     if (missingNodes.length === 0) {
-      this.logger.trace(`No missing nodes found for user ${userId}, skipping`);
+      this.debug(`No missing nodes found for user ${userId}, skipping`);
       return;
     }
 
@@ -536,22 +524,18 @@ class SyncService {
       .executeTakeFirst();
 
     if (!workspace) {
-      this.logger.trace(`No workspace found for user ${userId}, skipping`);
+      this.debug(`No workspace found for user ${userId}, skipping`);
       return;
     }
 
     if (!serverService.isAvailable(workspace.domain)) {
-      this.logger.trace(
-        `Server ${workspace.domain} is not available, skipping`
-      );
+      this.debug(`Server ${workspace.domain} is not available, skipping`);
       return;
     }
 
     for (const node of missingNodes) {
       try {
-        this.logger.trace(
-          `Syncing missing node ${node.node_id} for user ${userId}`
-        );
+        this.debug(`Syncing missing node ${node.node_id} for user ${userId}`);
 
         const { data } = await httpClient.get<GetNodeTransactionsOutput>(
           `/v1/nodes/${workspace.workspace_id}/transactions/${node.node_id}`,
@@ -567,7 +551,7 @@ class SyncService {
           data.transactions
         );
       } catch (error) {
-        this.logger.error(
+        this.debug(
           error,
           `Error syncing missing node ${node.node_id} for user ${userId}`
         );
@@ -576,7 +560,7 @@ class SyncService {
   }
 
   private async checkForMissingNode(userId: string, nodeId: string) {
-    this.logger.trace(`Checking for missing node ${nodeId} for user ${userId}`);
+    this.debug(`Checking for missing node ${nodeId} for user ${userId}`);
 
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
@@ -588,7 +572,7 @@ class SyncService {
       .executeTakeFirst();
 
     if (node) {
-      this.logger.trace(`Node ${nodeId} for user ${userId} found, skipping`);
+      this.debug(`Node ${nodeId} for user ${userId} found, skipping`);
       return;
     }
 
@@ -608,14 +592,12 @@ class SyncService {
       .executeTakeFirst();
 
     if (!workspace) {
-      this.logger.trace(`No workspace found for user ${userId}, skipping`);
+      this.debug(`No workspace found for user ${userId}, skipping`);
       return;
     }
 
     if (!serverService.isAvailable(workspace.domain)) {
-      this.logger.trace(
-        `Server ${workspace.domain} is not available, skipping`
-      );
+      this.debug(`Server ${workspace.domain} is not available, skipping`);
       return;
     }
 
@@ -630,7 +612,7 @@ class SyncService {
 
       await nodeService.replaceTransactions(userId, nodeId, data.transactions);
     } catch (error) {
-      this.logger.error(
+      this.debug(
         error,
         `Error checking for missing node ${nodeId} for user ${userId}`
       );
@@ -638,7 +620,7 @@ class SyncService {
   }
 
   private async sendLocalTransactions(userId: string) {
-    this.logger.trace(`Sending local pending transactions for user ${userId}`);
+    this.debug(`Sending local pending transactions for user ${userId}`);
 
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
@@ -655,7 +637,7 @@ class SyncService {
       return;
     }
 
-    this.logger.trace(
+    this.debug(
       `Sending ${unsyncedTransactions.length} local pending transactions for user ${userId}`
     );
 
@@ -675,14 +657,14 @@ class SyncService {
       .executeTakeFirst();
 
     if (!workspace) {
-      this.logger.trace(
+      this.debug(
         `No workspace found for user ${userId}, skipping sending local pending transactions`
       );
       return;
     }
 
     if (!serverService.isAvailable(workspace.domain)) {
-      this.logger.trace(
+      this.debug(
         `Server ${workspace.domain} is not available, skipping sending local pending transactions`
       );
       return;
@@ -713,7 +695,7 @@ class SyncService {
     }
 
     if (syncedTransactionIds.length > 0) {
-      this.logger.trace(
+      this.debug(
         `Marking ${syncedTransactionIds.length} local pending transactions as sent for user ${userId}`
       );
 
@@ -726,7 +708,7 @@ class SyncService {
     }
 
     if (unsyncedTransactionIds.length > 0) {
-      this.logger.trace(
+      this.debug(
         `Marking ${unsyncedTransactionIds.length} local pending transactions as failed for user ${userId}`
       );
 
@@ -740,7 +722,7 @@ class SyncService {
   }
 
   private async sendLocalInteractions(userId: string) {
-    this.logger.trace(`Sending local pending interactions for user ${userId}`);
+    this.debug(`Sending local pending interactions for user ${userId}`);
 
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
@@ -761,14 +743,14 @@ class SyncService {
       .executeTakeFirst();
 
     if (!workspace) {
-      this.logger.trace(
+      this.debug(
         `No workspace found for user ${userId}, skipping sending local pending interactions`
       );
       return;
     }
 
     if (!serverService.isAvailable(workspace.domain)) {
-      this.logger.trace(
+      this.debug(
         `Server ${workspace.domain} is not available, skipping sending local pending interactions`
       );
       return;
@@ -790,14 +772,14 @@ class SyncService {
         .execute();
 
       if (interactionEvents.length === 0) {
-        this.logger.trace(
+        this.debug(
           `No local pending interactions found for user ${userId}, stopping sync`
         );
         hasMore = false;
         break;
       }
 
-      this.logger.trace(
+      this.debug(
         `Sending ${interactionEvents.length} local pending interactions for user ${userId}`
       );
 
@@ -841,7 +823,7 @@ class SyncService {
       }
 
       if (sentEventIds.length > 0) {
-        this.logger.trace(
+        this.debug(
           `Marking ${sentEventIds.length} local pending interactions as sent for user ${userId}`
         );
 
@@ -855,7 +837,7 @@ class SyncService {
   }
 
   private async requireNodeTransactions(userId: string) {
-    this.logger.trace(`Requiring node transactions for user ${userId}`);
+    this.debug(`Requiring node transactions for user ${userId}`);
 
     const workspaceWithCursor = await databaseService.appDatabase
       .selectFrom('workspaces as w')
@@ -870,7 +852,7 @@ class SyncService {
       .executeTakeFirst();
 
     if (!workspaceWithCursor) {
-      this.logger.trace(
+      this.debug(
         `No workspace found for user ${userId}, skipping requiring node transactions`
       );
       return;
@@ -887,7 +869,7 @@ class SyncService {
   }
 
   private async requireCollaborations(userId: string) {
-    this.logger.trace(`Requiring collaborations for user ${userId}`);
+    this.debug(`Requiring collaborations for user ${userId}`);
 
     const workspaceWithCursor = await databaseService.appDatabase
       .selectFrom('workspaces as w')
@@ -902,7 +884,7 @@ class SyncService {
       .executeTakeFirst();
 
     if (!workspaceWithCursor) {
-      this.logger.trace(
+      this.debug(
         `No workspace found for user ${userId}, skipping requiring collaborations`
       );
       return;
@@ -919,7 +901,7 @@ class SyncService {
   }
 
   private async requireCollaborationRevocations(userId: string) {
-    this.logger.trace(`Requiring collaboration revocations for user ${userId}`);
+    this.debug(`Requiring collaboration revocations for user ${userId}`);
 
     const workspaceWithCursor = await databaseService.appDatabase
       .selectFrom('workspaces as w')
@@ -929,7 +911,7 @@ class SyncService {
       .executeTakeFirst();
 
     if (!workspaceWithCursor) {
-      this.logger.trace(
+      this.debug(
         `No workspace found for user ${userId}, skipping requiring collaboration revocations`
       );
       return;
@@ -946,7 +928,7 @@ class SyncService {
   }
 
   private async requireInteractions(userId: string) {
-    this.logger.trace(`Requiring interactions for user ${userId}`);
+    this.debug(`Requiring interactions for user ${userId}`);
 
     const workspaceWithCursor = await databaseService.appDatabase
       .selectFrom('workspaces as w')
@@ -961,7 +943,7 @@ class SyncService {
       .executeTakeFirst();
 
     if (!workspaceWithCursor) {
-      this.logger.trace(
+      this.debug(
         `No workspace found for user ${userId}, skipping requiring interactions`
       );
       return;
@@ -978,7 +960,7 @@ class SyncService {
   }
 
   private async updateNodeTransactionCursor(userId: string, cursor: bigint) {
-    this.logger.trace(
+    this.debug(
       `Updating node transaction cursor for user ${userId} to ${cursor}`
     );
 
@@ -999,9 +981,7 @@ class SyncService {
   }
 
   private async updateCollaborationCursor(userId: string, cursor: bigint) {
-    this.logger.trace(
-      `Updating collaboration cursor for user ${userId} to ${cursor}`
-    );
+    this.debug(`Updating collaboration cursor for user ${userId} to ${cursor}`);
 
     await databaseService.appDatabase
       .insertInto('workspace_cursors')
@@ -1023,7 +1003,7 @@ class SyncService {
     userId: string,
     cursor: bigint
   ) {
-    this.logger.trace(
+    this.debug(
       `Updating collaboration revocation cursor for user ${userId} to ${cursor}`
     );
 
@@ -1044,9 +1024,7 @@ class SyncService {
   }
 
   private async updateInteractionCursor(userId: string, cursor: bigint) {
-    this.logger.trace(
-      `Updating interaction cursor for user ${userId} to ${cursor}`
-    );
+    this.debug(`Updating interaction cursor for user ${userId} to ${cursor}`);
 
     await databaseService.appDatabase
       .insertInto('workspace_cursors')

@@ -1,5 +1,5 @@
+import { createDebugger } from '@/main/debugger';
 import { databaseService } from '@/main/data/database-service';
-import { createLogger } from '@/main/logger';
 import { accountService } from '@/main/services/account-service';
 import { assetService } from '@/main/services/asset-service';
 import { fileService } from '@/main/services/file-service';
@@ -13,7 +13,7 @@ import { syncService } from '@/main/services/sync-service';
 const EVENT_LOOP_INTERVAL = 1000 * 60;
 
 class Bootstrapper {
-  private readonly logger = createLogger('bootstrapper');
+  private readonly debug = createDebugger('bootstrapper');
   private initPromise: Promise<void> | null = null;
   private eventLoop: NodeJS.Timeout | null = null;
 
@@ -30,7 +30,7 @@ class Bootstrapper {
   }
 
   private async executeInit() {
-    this.logger.info('Initializing');
+    this.debug('Initializing');
 
     await databaseService.init();
     await assetService.checkAssets();
@@ -45,7 +45,7 @@ class Bootstrapper {
   }
 
   private async executeEventLoop() {
-    this.logger.info('Executing event loop');
+    this.debug('Executing event loop');
 
     try {
       await serverService.syncServers();
@@ -56,7 +56,7 @@ class Bootstrapper {
 
       notificationService.checkBadge();
     } catch (error) {
-      this.logger.error(error, 'Error executing event loop');
+      this.debug(error, 'Error executing event loop');
     }
 
     this.eventLoop = setTimeout(this.executeEventLoop, EVENT_LOOP_INTERVAL);

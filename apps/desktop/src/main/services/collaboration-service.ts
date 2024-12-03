@@ -3,18 +3,18 @@ import {
   ServerCollaborationRevocation,
 } from '@colanode/core';
 
+import { createDebugger } from '@/main/debugger';
 import { databaseService } from '@/main/data/database-service';
-import { createLogger } from '@/main/logger';
 import { eventBus } from '@/shared/lib/event-bus';
 
 class CollaborationService {
-  private readonly logger = createLogger('collaboration-service');
+  private readonly debug = createDebugger('service:collaboration');
 
   public async applyServerCollaboration(
     userId: string,
     collaboration: ServerCollaboration
   ) {
-    this.logger.trace(
+    this.debug(
       `Applying server collaboration: ${collaboration.nodeId} for user ${userId}`
     );
 
@@ -55,7 +55,7 @@ class CollaborationService {
     userId: string,
     revocation: ServerCollaborationRevocation
   ) {
-    this.logger.trace(
+    this.debug(
       `Applying server collaboration revocation: ${revocation.nodeId} for user ${userId}`
     );
 

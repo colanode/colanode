@@ -2,9 +2,9 @@ import { AccountSyncOutput } from '@colanode/core';
 
 import fs from 'fs';
 
+import { createDebugger } from '@/main/debugger';
 import { SelectAccount } from '@/main/data/app/schema';
 import { databaseService } from '@/main/data/database-service';
-import { createLogger } from '@/main/logger';
 import { serverService } from '@/main/services/server-service';
 import {
   getAccountAvatarsDirectoryPath,
@@ -16,10 +16,10 @@ import { eventBus } from '@/shared/lib/event-bus';
 import { httpClient } from '@/shared/lib/http-client';
 
 class AccountService {
-  private readonly logger = createLogger('account-service');
+  private readonly debug = createDebugger('service:account');
 
   async syncAccounts() {
-    this.logger.debug('Syncing all accounts');
+    this.debug('Syncing all accounts');
 
     const accounts = await databaseService.appDatabase
       .selectFrom('accounts')
@@ -34,7 +34,7 @@ class AccountService {
   }
 
   private async syncAccount(account: SelectAccount) {
-    this.logger.trace(`Syncing account ${account.email}`);
+    this.debug(`Syncing account ${account.email}`);
 
     const server = await databaseService.appDatabase
       .selectFrom('servers')
@@ -43,14 +43,14 @@ class AccountService {
       .executeTakeFirst();
 
     if (!server) {
-      this.logger.warn(
+      this.debug(
         `Server ${account.server} not found for syncing account ${account.email}`
       );
       return;
     }
 
     if (!serverService.isAvailable(server.domain)) {
-      this.logger.trace(
+      this.debug(
         `Server ${server.domain} is not available for syncing account ${account.email}`
       );
       return;
@@ -64,10 +64,10 @@ class AccountService {
       }
     );
 
-    this.logger.trace(`Account sync response status code: ${status}`);
+    this.debug(`Account sync response status code: ${status}`);
 
     if (status >= 400 && status < 500) {
-      this.logger.info(`Account ${account.email} is not valid, logging out...`);
+      this.debug(`Account ${account.email} is not valid, logging out...`);
       await this.logoutAccount(account);
       return;
     }
@@ -93,10 +93,10 @@ class AccountService {
       .executeTakeFirst();
 
     if (!updatedAccount) {
-      this.logger.warn(`Failed to update account ${account.email} after sync`);
+      this.debug(`Failed to update account ${account.email} after sync`);
       return;
     } else {
-      this.logger.trace(`Updated account ${account.email} after sync`);
+      this.debug(`Updated account ${account.email} after sync`);
     }
 
     eventBus.publish({
@@ -127,12 +127,12 @@ class AccountService {
           .executeTakeFirst();
 
         if (!createdWorkspace) {
-          this.logger.warn(
+          this.debug(
             `Failed to create workspace ${workspace.id} for account ${account.email}`
           );
           return;
         } else {
-          this.logger.trace(
+          this.debug(
             `Created workspace ${workspace.id} for account ${account.email} after sync`
           );
         }
@@ -157,12 +157,12 @@ class AccountService {
           .executeTakeFirst();
 
         if (!updatedWorkspace) {
-          this.logger.warn(
+          this.debug(
             `Failed to update workspace ${currentWorkspace.user_id} for account ${account.email}`
           );
           return;
         } else {
-          this.logger.trace(
+          this.debug(
             `Updated workspace ${currentWorkspace.user_id} for account ${account.email} after sync`
           );
         }
@@ -186,7 +186,7 @@ class AccountService {
   }
 
   public async logoutAccount(account: SelectAccount): Promise<boolean> {
-    this.logger.debug(`Logging out account ${account.email}`);
+    this.debug(`Logging out account ${account.email}`);
 
     const workspaces = await databaseService.appDatabase
       .selectFrom('workspaces')
@@ -210,10 +210,10 @@ class AccountService {
       .executeTakeFirst();
 
     if (!deletedAccount) {
-      this.logger.warn(`Failed to delete account ${account.email}`);
+      this.debug(`Failed to delete account ${account.email}`);
       return false;
     } else {
-      this.logger.trace(`Deleted account ${account.email}`);
+      this.debug(`Deleted account ${account.email}`);
     }
 
     eventBus.publish({
@@ -235,7 +235,7 @@ class AccountService {
   }
 
   public async syncDeletedTokens() {
-    this.logger.debug('Syncing deleted tokens');
+    this.debug('Syncing deleted tokens');
 
     const deletedTokens = await databaseService.appDatabase
       .selectFrom('deleted_tokens')
@@ -249,13 +249,13 @@ class AccountService {
       .execute();
 
     if (deletedTokens.length === 0) {
-      this.logger.debug('No deleted tokens found');
+      this.debug('No deleted tokens found');
       return;
     }
 
     for (const deletedToken of deletedTokens) {
       if (!serverService.isAvailable(deletedToken.domain)) {
-        this.logger.debug(
+        this.debug(
           `Server ${deletedToken.domain} is not available for logging out account ${deletedToken.account_id}`
         );
         continue;
@@ -267,9 +267,7 @@ class AccountService {
           token: deletedToken.token,
         });
 
-        this.logger.trace(
-          `Deleted token logout response status code: ${status}`
-        );
+        this.debug(`Deleted token logout response status code: ${status}`);
 
         if (status !== 200) {
           return;
@@ -281,11 +279,11 @@ class AccountService {
           .where('account_id', '=', deletedToken.account_id)
           .execute();
 
-        this.logger.debug(
+        this.debug(
           `Logged out account ${deletedToken.account_id} from server ${deletedToken.domain}`
         );
       } catch {
-        this.logger.warn(
+        this.debug(
           `Failed to logout account ${deletedToken.account_id} from server ${deletedToken.domain}`
         );
       }
@@ -293,7 +291,7 @@ class AccountService {
   }
 
   private async deleteWorkspace(userId: string): Promise<boolean> {
-    this.logger.debug(`Deleting workspace ${userId}`);
+    this.debug(`Deleting workspace ${userId}`);
 
     const deletedWorkspace = await databaseService.appDatabase
       .deleteFrom('workspaces')
@@ -302,10 +300,10 @@ class AccountService {
       .executeTakeFirst();
 
     if (!deletedWorkspace) {
-      this.logger.warn(`Failed to delete workspace ${userId}`);
+      this.debug(`Failed to delete workspace ${userId}`);
       return false;
     } else {
-      this.logger.trace(`Deleted workspace ${userId}`);
+      this.debug(`Deleted workspace ${userId}`);
     }
 
     await databaseService.deleteWorkspaceDatabase(userId);
@@ -313,7 +311,7 @@ class AccountService {
     if (fs.existsSync(workspaceDir)) {
       fs.rmSync(workspaceDir, { recursive: true });
     }
-    this.logger.trace(`Deleted workspace directory ${workspaceDir}`);
+    this.debug(`Deleted workspace directory ${workspaceDir}`);
 
     eventBus.publish({
       type: 'workspace_deleted',

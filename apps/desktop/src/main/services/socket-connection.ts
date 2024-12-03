@@ -1,14 +1,14 @@
 import { Message } from '@colanode/core';
 import { WebSocket } from 'ws';
 
+import { createDebugger } from '@/main/debugger';
 import { SelectAccount } from '@/main/data/app/schema';
-import { createLogger } from '@/main/logger';
 import { syncService } from '@/main/services/sync-service';
 import { BackoffCalculator } from '@/shared/lib/backoff-calculator';
 import { eventBus } from '@/shared/lib/event-bus';
 
 export class SocketConnection {
-  private readonly logger = createLogger('socket-connection');
+  private readonly debug = createDebugger('service:socket-connection');
 
   private readonly synapseUrl: string;
   private readonly account: SelectAccount;
@@ -25,9 +25,7 @@ export class SocketConnection {
   }
 
   public init(): void {
-    this.logger.trace(
-      `Initializing socket connection for account ${this.account.id}`
-    );
+    this.debug(`Initializing socket connection for account ${this.account.id}`);
 
     if (this.isConnected()) {
       return;
@@ -55,7 +53,7 @@ export class SocketConnection {
         return;
       }
       const message: Message = JSON.parse(data);
-      this.logger.trace(
+      this.debug(
         `Received message of type ${message.type} for account ${this.account.id}`
       );
 
@@ -71,9 +69,7 @@ export class SocketConnection {
     };
 
     this.socket.onopen = () => {
-      this.logger.trace(
-        `Socket connection for account ${this.account.id} opened`
-      );
+      this.debug(`Socket connection for account ${this.account.id} opened`);
 
       this.backoffCalculator.reset();
       eventBus.publish({
@@ -83,18 +79,12 @@ export class SocketConnection {
     };
 
     this.socket.onerror = () => {
-      this.logger.trace(
-        `Socket connection for account ${this.account.id} errored`
-      );
-
+      this.debug(`Socket connection for account ${this.account.id} errored`);
       this.backoffCalculator.increaseError();
     };
 
     this.socket.onclose = () => {
-      this.logger.trace(
-        `Socket connection for account ${this.account.id} closed`
-      );
-
+      this.debug(`Socket connection for account ${this.account.id} closed`);
       this.backoffCalculator.increaseError();
     };
   }
@@ -105,7 +95,7 @@ export class SocketConnection {
 
   public sendMessage(message: Message): boolean {
     if (this.socket && this.isConnected()) {
-      this.logger.trace(
+      this.debug(
         `Sending message of type ${message.type} for account ${this.account.id}`
       );
 
@@ -118,10 +108,7 @@ export class SocketConnection {
 
   public close(): void {
     if (this.socket) {
-      this.logger.trace(
-        `Closing socket connection for account ${this.account.id}`
-      );
-
+      this.debug(`Closing socket connection for account ${this.account.id}`);
       this.socket.close();
     }
   }

@@ -1,6 +1,6 @@
 import { isEqual } from 'lodash-es';
 
-import { createLogger } from '@/main/logger';
+import { createDebugger } from '@/main/debugger';
 import { queryHandlerMap } from '@/main/queries';
 import { QueryHandler, SubscribedQuery } from '@/main/types';
 import { eventBus } from '@/shared/lib/event-bus';
@@ -8,7 +8,7 @@ import { QueryInput, QueryMap } from '@/shared/queries';
 import { Event } from '@/shared/types/events';
 
 class QueryService {
-  private readonly logger = createLogger('query-service');
+  private readonly debug = createDebugger('service:query');
   private readonly subscribedQueries: Map<string, SubscribedQuery<QueryInput>> =
     new Map();
 
@@ -29,7 +29,7 @@ class QueryService {
   public async executeQuery<T extends QueryInput>(
     input: T
   ): Promise<QueryMap[T['type']]['output']> {
-    this.logger.trace(`Executing query: ${input.type}`);
+    this.debug(`Executing query: ${input.type}`);
 
     const handler = queryHandlerMap[input.type] as unknown as QueryHandler<T>;
 
@@ -45,7 +45,7 @@ class QueryService {
     id: string,
     input: T
   ): Promise<QueryMap[T['type']]['output']> {
-    this.logger.debug(`Executing query and subscribing: ${input.type}`);
+    this.debug(`Executing query and subscribing: ${input.type}`);
 
     if (this.subscribedQueries.has(id)) {
       return this.subscribedQueries.get(id)!.result;
@@ -65,7 +65,7 @@ class QueryService {
   }
 
   public unsubscribeQuery(id: string) {
-    this.logger.debug(`Unsubscribing query: ${id}`);
+    this.debug(`Unsubscribing query: ${id}`);
     this.subscribedQueries.delete(id);
   }
 
