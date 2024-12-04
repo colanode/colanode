@@ -1,16 +1,14 @@
 import {
   CollaborationRevocationsBatchMessage,
   CollaborationsBatchMessage,
-  FetchCollaborationRevocationsMessage,
-  FetchCollaborationsMessage,
-  FetchInteractionsMessage,
-  FetchNodeTransactionsMessage,
+  InitSyncConsumerMessage,
   GetNodeTransactionsOutput,
   InteractionsBatchMessage,
   LocalNodeTransaction,
   NodeTransactionsBatchMessage,
   SyncInteractionsMessage,
   SyncNodeTransactionsOutput,
+  SyncConsumerType,
 } from '@colanode/core';
 import { sql } from 'kysely';
 
@@ -92,10 +90,10 @@ class SyncService {
     this.syncLocalIncompleteTransactions(userId);
     this.syncLocalPendingInteractions(userId);
 
-    this.requireNodeTransactions(userId);
-    this.requireCollaborations(userId);
-    this.requireCollaborationRevocations(userId);
-    this.requireInteractions(userId);
+    this.initSyncConsumer(userId, 'transactions');
+    this.initSyncConsumer(userId, 'collaborations');
+    this.initSyncConsumer(userId, 'revocations');
+    this.initSyncConsumer(userId, 'interactions');
 
     this.syncMissingNodes(userId);
   }
@@ -246,7 +244,7 @@ class SyncService {
       );
 
       this.syncingTransactions.delete(message.userId);
-      this.requireNodeTransactions(message.userId);
+      this.initSyncConsumer(message.userId, 'transactions');
     }
   }
 
@@ -281,7 +279,7 @@ class SyncService {
       );
     } finally {
       this.syncingCollaborations.delete(message.userId);
-      this.requireCollaborations(message.userId);
+      this.initSyncConsumer(message.userId, 'collaborations');
     }
   }
 
@@ -322,7 +320,7 @@ class SyncService {
       );
 
       this.syncingRevocations.delete(message.userId);
-      this.requireCollaborationRevocations(message.userId);
+      this.initSyncConsumer(message.userId, 'revocations');
     }
   }
 
@@ -361,7 +359,7 @@ class SyncService {
       );
 
       this.syncingInteractions.delete(message.userId);
-      this.requireInteractions(message.userId);
+      this.initSyncConsumer(message.userId, 'interactions');
     }
   }
 
@@ -776,89 +774,10 @@ class SyncService {
     }
   }
 
-  private async requireNodeTransactions(userId: string) {
-    this.debug(`Requiring node transactions for user ${userId}`);
-
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .select(['user_id', 'workspace_id', 'account_id'])
-      .where('user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
-      this.debug(
-        `No workspace found for user ${userId}, skipping requiring node transactions`
-      );
-      return;
-    }
-
-    const cursor = await this.fetchCursor(userId, 'transactions');
-    const message: FetchNodeTransactionsMessage = {
-      type: 'fetch_node_transactions',
-      userId,
-      workspaceId: workspace.workspace_id,
-      cursor: cursor.toString(),
-    };
-
-    socketService.sendMessage(workspace.account_id, message);
-  }
-
-  private async requireCollaborations(userId: string) {
-    this.debug(`Requiring collaborations for user ${userId}`);
-
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .select(['user_id', 'workspace_id', 'account_id'])
-      .where('user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
-      this.debug(
-        `No workspace found for user ${userId}, skipping requiring collaborations`
-      );
-      return;
-    }
-
-    const cursor = await this.fetchCursor(userId, 'collaborations');
-    const message: FetchCollaborationsMessage = {
-      type: 'fetch_collaborations',
-      userId: workspace.user_id,
-      workspaceId: workspace.workspace_id,
-      cursor: cursor.toString(),
-    };
-
-    socketService.sendMessage(workspace.account_id, message);
-  }
-
-  private async requireCollaborationRevocations(userId: string) {
-    this.debug(`Requiring collaboration revocations for user ${userId}`);
-
-    const workspace = await databaseService.appDatabase
-      .selectFrom('workspaces')
-      .select(['user_id', 'workspace_id', 'account_id'])
-      .where('user_id', '=', userId)
-      .executeTakeFirst();
-
-    if (!workspace) {
-      this.debug(
-        `No workspace found for user ${userId}, skipping requiring collaboration revocations`
-      );
-      return;
-    }
-
-    const cursor = await this.fetchCursor(userId, 'revocations');
-    const message: FetchCollaborationRevocationsMessage = {
-      type: 'fetch_collaboration_revocations',
-      userId: workspace.user_id,
-      workspaceId: workspace.workspace_id,
-      cursor: cursor.toString(),
-    };
-
-    socketService.sendMessage(workspace.account_id, message);
-  }
-
-  private async requireInteractions(userId: string) {
-    this.debug(`Requiring interactions for user ${userId}`);
+  private async initSyncConsumer(userId: string, type: SyncConsumerType) {
+    this.debug(
+      `Initializing sync consumer for user ${userId} with type ${type}`
+    );
 
     const workspace = await databaseService.appDatabase
       .selectFrom('workspaces')
@@ -873,19 +792,23 @@ class SyncService {
       return;
     }
 
-    const cursor = await this.fetchCursor(userId, 'interactions');
-    const message: FetchInteractionsMessage = {
-      type: 'fetch_interactions',
-      userId: workspace.user_id,
-      workspaceId: workspace.workspace_id,
+    const cursor = await this.fetchCursor(userId, type);
+    const message: InitSyncConsumerMessage = {
+      type: 'init_sync_consumer',
+      userId,
+      consumerType: type,
       cursor: cursor.toString(),
     };
 
     socketService.sendMessage(workspace.account_id, message);
   }
 
-  private async updateCursor(userId: string, name: string, cursor: bigint) {
-    this.debug(`Updating cursor ${name} for user ${userId} to ${cursor}`);
+  private async updateCursor(
+    userId: string,
+    type: SyncConsumerType,
+    cursor: bigint
+  ) {
+    this.debug(`Updating cursor ${type} for user ${userId} to ${cursor}`);
 
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
@@ -893,12 +816,12 @@ class SyncService {
     await workspaceDatabase
       .insertInto('cursors')
       .values({
-        name,
+        type,
         value: cursor,
         created_at: new Date().toISOString(),
       })
       .onConflict((eb) =>
-        eb.column('name').doUpdateSet({
+        eb.column('type').doUpdateSet({
           value: cursor,
           updated_at: new Date().toISOString(),
         })
@@ -906,14 +829,17 @@ class SyncService {
       .execute();
   }
 
-  private async fetchCursor(userId: string, name: string): Promise<bigint> {
+  private async fetchCursor(
+    userId: string,
+    type: SyncConsumerType
+  ): Promise<bigint> {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
     const cursor = await workspaceDatabase
       .selectFrom('cursors')
       .select('value')
-      .where('name', '=', name)
+      .where('type', '=', type)
       .executeTakeFirst();
 
     return cursor?.value ?? 0n;

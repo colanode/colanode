@@ -11,7 +11,7 @@ export enum ApiError {
   BadRequest = 'BadRequest',
 }
 
-export type ColanodeRequestAccount = {
+export type RequestAccount = {
   id: string;
   deviceId: string;
 };

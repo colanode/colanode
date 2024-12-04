@@ -11,7 +11,7 @@ import { filesRouter } from '@/routes/files';
 import { nodesRouter } from '@/routes/nodes';
 import { syncRouter } from '@/routes/sync';
 import { workspacesRouter } from '@/routes/workspaces';
-import { synapse } from '@/services/synapse-service';
+import { socketService } from '@/services/socket-service';
 import { createLogger } from '@/lib/logger';
 
 const logger = createLogger('api');
@@ -40,7 +40,7 @@ export const initApi = async () => {
   app.use('/v1/nodes', authMiddleware, nodesRouter);
 
   const server = http.createServer(app);
-  await synapse.init(server);
+  await socketService.init(server);
 
   server.listen(port, () => {
     logger.info(`Server is running at http://localhost:${port}`);

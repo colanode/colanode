@@ -4,37 +4,10 @@ import {
   ServerCollaborationRevocation,
   ServerInteraction,
   ServerNodeTransaction,
+  SyncConsumerType,
 } from './sync';
 
 import { NodeType } from '../registry';
-
-export type FetchNodeTransactionsMessage = {
-  type: 'fetch_node_transactions';
-  userId: string;
-  workspaceId: string;
-  cursor: string;
-};
-
-export type FetchCollaborationRevocationsMessage = {
-  type: 'fetch_collaboration_revocations';
-  userId: string;
-  workspaceId: string;
-  cursor: string;
-};
-
-export type FetchCollaborationsMessage = {
-  type: 'fetch_collaborations';
-  userId: string;
-  workspaceId: string;
-  cursor: string;
-};
-
-export type FetchInteractionsMessage = {
-  type: 'fetch_interactions';
-  userId: string;
-  workspaceId: string;
-  cursor: string;
-};
 
 export type NodeTransactionsBatchMessage = {
   type: 'node_transactions_batch';
@@ -68,13 +41,17 @@ export type SyncInteractionsMessage = {
   events: InteractionEvent[];
 };
 
+export type InitSyncConsumerMessage = {
+  type: 'init_sync_consumer';
+  userId: string;
+  consumerType: SyncConsumerType;
+  cursor: string;
+};
+
 export type Message =
-  | FetchNodeTransactionsMessage
   | NodeTransactionsBatchMessage
-  | FetchCollaborationRevocationsMessage
   | CollaborationRevocationsBatchMessage
-  | FetchCollaborationsMessage
   | CollaborationsBatchMessage
-  | FetchInteractionsMessage
   | InteractionsBatchMessage
-  | SyncInteractionsMessage;
+  | SyncInteractionsMessage
+  | InitSyncConsumerMessage;

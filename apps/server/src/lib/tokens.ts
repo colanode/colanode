@@ -2,7 +2,7 @@ import { sha256 } from 'js-sha256';
 
 import { database } from '@/data/database';
 import { uuid } from '@/lib/utils';
-import { ColanodeRequestAccount } from '@/types/api';
+import { RequestAccount } from '@/types/api';
 
 interface GenerateTokenResult {
   token: string;
@@ -16,7 +16,7 @@ type VerifyTokenResult =
     }
   | {
       authenticated: true;
-      account: ColanodeRequestAccount;
+      account: RequestAccount;
     };
 
 export const generateToken = (id: string): GenerateTokenResult => {

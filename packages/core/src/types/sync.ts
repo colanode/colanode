@@ -125,3 +125,9 @@ export type ServerInteraction = {
   serverUpdatedAt: string | null;
   version: string;
 };
+
+export type SyncConsumerType =
+  | 'transactions'
+  | 'collaborations'
+  | 'revocations'
+  | 'interactions';
