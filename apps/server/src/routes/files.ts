@@ -11,7 +11,7 @@ import {
   extractFileType,
   UploadMetadata,
 } from '@colanode/core';
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
 
 import { database } from '@/data/database';
 import { redis } from '@/data/redis';
@@ -19,21 +19,22 @@ import { BUCKET_NAMES, filesStorage } from '@/data/storage';
 import { hasCollaboratorAccess } from '@/lib/constants';
 import { fetchNodeRole } from '@/lib/nodes';
 import { nodeService } from '@/services/node-service';
-import { ApiError, ColanodeRequest, ColanodeResponse } from '@/types/api';
+import { ApiError } from '@/types/api';
 
 export const filesRouter = Router();
 
 filesRouter.get(
   '/:workspaceId/:fileId',
-  async (req: ColanodeRequest, res: ColanodeResponse) => {
+  async (req: Request, res: Response) => {
     const workspaceId = req.params.workspaceId as string;
     const fileId = req.params.fileId as string;
 
-    if (!req.account) {
-      return res.status(401).json({
+    if (!res.locals.account) {
+      res.status(401).json({
         code: ApiError.Unauthorized,
         message: 'Unauthorized.',
       });
+      return;
     }
 
     const workspace = await database
@@ -43,32 +44,35 @@ filesRouter.get(
       .executeTakeFirst();
 
     if (!workspace) {
-      return res.status(404).json({
+      res.status(404).json({
         code: ApiError.ResourceNotFound,
         message: 'Workspace not found.',
       });
+      return;
     }
 
     const workspaceUser = await database
       .selectFrom('workspace_users')
       .selectAll()
       .where('workspace_id', '=', workspace.id)
-      .where('account_id', '=', req.account.id)
+      .where('account_id', '=', res.locals.account.id)
       .executeTakeFirst();
 
     if (!workspaceUser) {
-      return res.status(403).json({
+      res.status(403).json({
         code: ApiError.Forbidden,
         message: 'Forbidden.',
       });
+      return;
     }
 
     const role = await fetchNodeRole(fileId, workspaceUser.id);
     if (role === null || !hasCollaboratorAccess(role)) {
-      return res.status(403).json({
+      res.status(403).json({
         code: ApiError.Forbidden,
         message: 'Forbidden.',
       });
+      return;
     }
 
     const node = await database
@@ -78,17 +82,19 @@ filesRouter.get(
       .executeTakeFirst();
 
     if (!node) {
-      return res.status(404).json({
+      res.status(404).json({
         code: ApiError.ResourceNotFound,
         message: 'File not found.',
       });
+      return;
     }
 
     if (node.attributes.type !== 'file') {
-      return res.status(400).json({
+      res.status(400).json({
         code: ApiError.BadRequest,
         message: 'File not found.',
       });
+      return;
     }
 
     // check if the upload is completed
@@ -99,10 +105,11 @@ filesRouter.get(
       .executeTakeFirst();
 
     if (!upload) {
-      return res.status(400).json({
+      res.status(400).json({
         code: ApiError.BadRequest,
         message: 'Upload not completed.',
       });
+      return;
     }
 
     //generate presigned url for download
@@ -123,120 +130,124 @@ filesRouter.get(
   }
 );
 
-filesRouter.post(
-  '/:workspaceId',
-  async (req: ColanodeRequest, res: ColanodeResponse) => {
-    const workspaceId = req.params.workspaceId as string;
-    const input = req.body as CreateUploadInput;
+filesRouter.post('/:workspaceId', async (req: Request, res: Response) => {
+  const workspaceId = req.params.workspaceId as string;
+  const input = req.body as CreateUploadInput;
 
-    if (!req.account) {
-      return res.status(401).json({
-        code: ApiError.Unauthorized,
-        message: 'Unauthorized.',
-      });
-    }
-
-    const workspace = await database
-      .selectFrom('workspaces')
-      .selectAll()
-      .where('id', '=', workspaceId)
-      .executeTakeFirst();
-
-    if (!workspace) {
-      return res.status(404).json({
-        code: ApiError.ResourceNotFound,
-        message: 'Workspace not found.',
-      });
-    }
-
-    const workspaceUser = await database
-      .selectFrom('workspace_users')
-      .selectAll()
-      .where('workspace_id', '=', workspace.id)
-      .where('account_id', '=', req.account.id)
-      .executeTakeFirst();
-
-    if (!workspaceUser) {
-      return res.status(403).json({
-        code: ApiError.Forbidden,
-        message: 'Forbidden.',
-      });
-    }
-
-    const node = await database
-      .selectFrom('nodes')
-      .selectAll()
-      .where('id', '=', input.fileId)
-      .executeTakeFirst();
-
-    if (!node) {
-      return res.status(404).json({
-        code: ApiError.ResourceNotFound,
-        message: 'File not found.',
-      });
-    }
-
-    if (node.attributes.type !== 'file') {
-      return res.status(400).json({
-        code: ApiError.BadRequest,
-        message: 'File not found.',
-      });
-    }
-
-    if (node.created_by !== workspaceUser.id) {
-      return res.status(403).json({
-        code: ApiError.Forbidden,
-        message: 'Forbidden.',
-      });
-    }
-
-    //generate presigned url for upload
-    const path = `files/${workspaceId}/${input.fileId}_${input.uploadId}${node.attributes.extension}`;
-    const command = new PutObjectCommand({
-      Bucket: BUCKET_NAMES.FILES,
-      Key: path,
-      ContentLength: node.attributes.size,
-      ContentType: node.attributes.mimeType,
+  if (!res.locals.account) {
+    res.status(401).json({
+      code: ApiError.Unauthorized,
+      message: 'Unauthorized.',
     });
-
-    const expiresIn = 60 * 60 * 4; // 4 hours
-    const presignedUrl = await getSignedUrl(filesStorage, command, {
-      expiresIn,
-    });
-
-    const data: UploadMetadata = {
-      fileId: input.fileId,
-      path,
-      mimeType: node.attributes.mimeType,
-      size: node.attributes.size,
-      uploadId: input.uploadId,
-      createdAt: new Date().toISOString(),
-    };
-
-    await redis.set(input.uploadId, JSON.stringify(data), {
-      EX: expiresIn,
-    });
-
-    const output: CreateUploadOutput = {
-      uploadId: input.uploadId,
-      url: presignedUrl,
-    };
-
-    res.status(200).json(output);
+    return;
   }
-);
+
+  const workspace = await database
+    .selectFrom('workspaces')
+    .selectAll()
+    .where('id', '=', workspaceId)
+    .executeTakeFirst();
+
+  if (!workspace) {
+    res.status(404).json({
+      code: ApiError.ResourceNotFound,
+      message: 'Workspace not found.',
+    });
+    return;
+  }
+
+  const workspaceUser = await database
+    .selectFrom('workspace_users')
+    .selectAll()
+    .where('workspace_id', '=', workspace.id)
+    .where('account_id', '=', res.locals.account.id)
+    .executeTakeFirst();
+
+  if (!workspaceUser) {
+    res.status(403).json({
+      code: ApiError.Forbidden,
+      message: 'Forbidden.',
+    });
+    return;
+  }
+
+  const node = await database
+    .selectFrom('nodes')
+    .selectAll()
+    .where('id', '=', input.fileId)
+    .executeTakeFirst();
+
+  if (!node) {
+    res.status(404).json({
+      code: ApiError.ResourceNotFound,
+      message: 'File not found.',
+    });
+    return;
+  }
+
+  if (node.attributes.type !== 'file') {
+    res.status(400).json({
+      code: ApiError.BadRequest,
+      message: 'File not found.',
+    });
+    return;
+  }
+
+  if (node.created_by !== workspaceUser.id) {
+    res.status(403).json({
+      code: ApiError.Forbidden,
+      message: 'Forbidden.',
+    });
+    return;
+  }
+
+  //generate presigned url for upload
+  const path = `files/${workspaceId}/${input.fileId}_${input.uploadId}${node.attributes.extension}`;
+  const command = new PutObjectCommand({
+    Bucket: BUCKET_NAMES.FILES,
+    Key: path,
+    ContentLength: node.attributes.size,
+    ContentType: node.attributes.mimeType,
+  });
+
+  const expiresIn = 60 * 60 * 4; // 4 hours
+  const presignedUrl = await getSignedUrl(filesStorage, command, {
+    expiresIn,
+  });
+
+  const data: UploadMetadata = {
+    fileId: input.fileId,
+    path,
+    mimeType: node.attributes.mimeType,
+    size: node.attributes.size,
+    uploadId: input.uploadId,
+    createdAt: new Date().toISOString(),
+  };
+
+  await redis.set(input.uploadId, JSON.stringify(data), {
+    EX: expiresIn,
+  });
+
+  const output: CreateUploadOutput = {
+    uploadId: input.uploadId,
+    url: presignedUrl,
+  };
+
+  res.status(200).json(output);
+});
 
 filesRouter.put(
   '/:workspaceId/:uploadId',
-  async (req: ColanodeRequest, res: ColanodeResponse) => {
+  async (req: Request, res: Response) => {
     const workspaceId = req.params.workspaceId as string;
     const uploadId = req.params.uploadId as string;
 
-    if (!req.account) {
-      return res.status(401).json({
+    if (!res.locals.account) {
+      res.status(401).json({
         code: ApiError.Unauthorized,
         message: 'Unauthorized.',
       });
+      return;
     }
 
     const workspace = await database
@@ -246,32 +257,35 @@ filesRouter.put(
       .executeTakeFirst();
 
     if (!workspace) {
-      return res.status(404).json({
+      res.status(404).json({
         code: ApiError.ResourceNotFound,
         message: 'Workspace not found.',
       });
+      return;
     }
 
     const workspaceUser = await database
       .selectFrom('workspace_users')
       .selectAll()
       .where('workspace_id', '=', workspace.id)
-      .where('account_id', '=', req.account.id)
+      .where('account_id', '=', res.locals.account.id)
       .executeTakeFirst();
 
     if (!workspaceUser) {
-      return res.status(403).json({
+      res.status(403).json({
         code: ApiError.Forbidden,
         message: 'Forbidden.',
       });
+      return;
     }
 
     const metadataJson = await redis.get(uploadId);
     if (!metadataJson) {
-      return res.status(404).json({
+      res.status(404).json({
         code: ApiError.ResourceNotFound,
         message: 'Upload not found.',
       });
+      return;
     }
 
     const metadata: UploadMetadata = JSON.parse(metadataJson);
@@ -282,24 +296,27 @@ filesRouter.put(
       .executeTakeFirst();
 
     if (!file) {
-      return res.status(404).json({
+      res.status(404).json({
         code: ApiError.ResourceNotFound,
         message: 'File not found.',
       });
+      return;
     }
 
     if (file.attributes.type !== 'file') {
-      return res.status(400).json({
+      res.status(400).json({
         code: ApiError.BadRequest,
         message: 'File not found.',
       });
+      return;
     }
 
     if (file.attributes.size !== metadata.size) {
-      return res.status(400).json({
+      res.status(400).json({
         code: ApiError.BadRequest,
         message: 'Size mismatch.',
       });
+      return;
     }
 
     const path = metadata.path;
@@ -314,24 +331,27 @@ filesRouter.put(
 
       // Verify file size matches expected size
       if (headObject.ContentLength !== metadata.size) {
-        return res.status(400).json({
+        res.status(400).json({
           code: ApiError.BadRequest,
           message: 'Uploaded file size does not match expected size',
         });
+        return;
       }
 
       // Verify mime type matches expected type
       if (headObject.ContentType !== metadata.mimeType) {
-        return res.status(400).json({
+        res.status(400).json({
           code: ApiError.BadRequest,
           message: 'Uploaded file type does not match expected type',
         });
+        return;
       }
     } catch {
-      return res.status(400).json({
+      res.status(400).json({
         code: ApiError.BadRequest,
         message: 'File upload verification failed',
       });
+      return;
     }
 
     await database

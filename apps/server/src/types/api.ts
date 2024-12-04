@@ -1,5 +1,3 @@
-import { NextFunction,Request, Response } from 'express';
-
 export enum ApiError {
   GoogleAuthFailed = 'GoogleAuthFailed',
   UserPendingActivation = 'UserPendingActivation',
@@ -17,11 +15,3 @@ export type ColanodeRequestAccount = {
   id: string;
   deviceId: string;
 };
-
-export type ColanodeRequest = Request & {
-  account?: ColanodeRequestAccount;
-};
-
-export type ColanodeResponse = Response;
-
-export type ColanodeNextFunction = NextFunction;

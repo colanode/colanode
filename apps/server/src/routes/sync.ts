@@ -7,66 +7,65 @@ import {
   SyncNodeTransactionsInput,
   SyncNodeTransactionStatus,
 } from '@colanode/core';
-import { Router } from 'express';
+import { Request, Response, Router } from 'express';
 
 import { database } from '@/data/database';
 import { SelectWorkspaceUser } from '@/data/schema';
 import { nodeService } from '@/services/node-service';
-import { ApiError, ColanodeRequest, ColanodeResponse } from '@/types/api';
+import { ApiError } from '@/types/api';
 
 export const syncRouter = Router();
 
-syncRouter.post(
-  '/:workspaceId',
-  async (req: ColanodeRequest, res: ColanodeResponse) => {
-    if (!req.account) {
-      return res.status(401).json({
-        code: ApiError.Unauthorized,
-        message: 'Unauthorized.',
-      });
-    }
-
-    const workspaceId = req.params.workspaceId as string;
-    const input = req.body as SyncNodeTransactionsInput;
-
-    const workspaceUser = await database
-      .selectFrom('workspace_users')
-      .selectAll()
-      .where('workspace_id', '=', workspaceId)
-      .where('account_id', '=', req.account.id)
-      .executeTakeFirst();
-
-    if (!workspaceUser) {
-      return res.status(403).json({
-        code: ApiError.Forbidden,
-        message: 'Forbidden.',
-      });
-    }
-
-    const results: SyncNodeTransactionResult[] = [];
-    for (const transaction of input.transactions) {
-      try {
-        const status = await handleLocalNodeTransaction(
-          workspaceUser,
-          transaction
-        );
-        results.push({
-          id: transaction.id,
-          status: status,
-        });
-      } catch (error) {
-        console.error('Error handling local transaction', error);
-        results.push({
-          id: transaction.id,
-          status: 'error',
-        });
-      }
-    }
-
-    console.log('executed mutations', results);
-    res.status(200).json({ results });
+syncRouter.post('/:workspaceId', async (req: Request, res: Response) => {
+  if (!res.locals.account) {
+    res.status(401).json({
+      code: ApiError.Unauthorized,
+      message: 'Unauthorized.',
+    });
+    return;
   }
-);
+
+  const workspaceId = req.params.workspaceId as string;
+  const input = req.body as SyncNodeTransactionsInput;
+
+  const workspaceUser = await database
+    .selectFrom('workspace_users')
+    .selectAll()
+    .where('workspace_id', '=', workspaceId)
+    .where('account_id', '=', res.locals.account.id)
+    .executeTakeFirst();
+
+  if (!workspaceUser) {
+    res.status(403).json({
+      code: ApiError.Forbidden,
+      message: 'Forbidden.',
+    });
+    return;
+  }
+
+  const results: SyncNodeTransactionResult[] = [];
+  for (const transaction of input.transactions) {
+    try {
+      const status = await handleLocalNodeTransaction(
+        workspaceUser,
+        transaction
+      );
+      results.push({
+        id: transaction.id,
+        status: status,
+      });
+    } catch (error) {
+      console.error('Error handling local transaction', error);
+      results.push({
+        id: transaction.id,
+        status: 'error',
+      });
+    }
+  }
+
+  console.log('executed mutations', results);
+  res.status(200).json({ results });
+});
 
 const handleLocalNodeTransaction = async (
   workspaceUser: SelectWorkspaceUser,

@@ -1,4 +1,4 @@
-import { GetObjectCommand,PutObjectCommand } from '@aws-sdk/client-s3';
+import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
 import { generateId, IdType } from '@colanode/core';
 import { Router } from 'express';
 import multer from 'multer';
@@ -33,7 +33,8 @@ const upload = multer({
 avatarsRouter.post('/', upload.single('avatar'), async (req, res) => {
   try {
     if (!req.file) {
-      return res.status(400).json({ error: 'No file uploaded' });
+      res.status(400).json({ error: 'No file uploaded' });
+      return;
     }
 
     // Resize image to a maximum of 500x500 pixels while keeping aspect ratio, and convert to JPEG using Sharp
@@ -55,10 +56,10 @@ avatarsRouter.post('/', upload.single('avatar'), async (req, res) => {
     });
 
     await avatarStorage.send(command);
-    return res.json({ success: true, id: avatarId });
+    res.json({ success: true, id: avatarId });
   } catch (error) {
     console.error('Error uploading file:', error);
-    return res.status(500).json({ error: 'Failed to upload avatar' });
+    res.status(500).json({ error: 'Failed to upload avatar' });
   }
 });
 
@@ -72,16 +73,17 @@ avatarsRouter.get('/:id', async (req, res) => {
 
     const avatarResponse = await avatarStorage.send(command);
     if (!avatarResponse.Body) {
-      return res.status(404).json({ error: 'Avatar not found' });
+      res.status(404).json({ error: 'Avatar not found' });
+      return;
     }
 
     if (avatarResponse.Body instanceof Readable) {
       avatarResponse.Body.pipe(res);
     } else {
-      return res.status(404).json({ error: 'Avatar not found' });
+      res.status(404).json({ error: 'Avatar not found' });
     }
   } catch (error) {
     console.error('Error downloading avatar:', error);
-    return res.status(500).json({ error: 'Failed to download avatar' });
+    res.status(500).json({ error: 'Failed to download avatar' });
   }
 });

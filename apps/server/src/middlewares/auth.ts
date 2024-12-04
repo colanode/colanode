@@ -1,33 +1,32 @@
-import { verifyToken } from '@/lib/tokens';
-import {
-  ApiError,
-  ColanodeNextFunction,
-  ColanodeRequest,
-  ColanodeResponse,
-} from '@/types/api';
+import { NextFunction, Request, Response, RequestHandler } from 'express';
 
-export const authMiddleware = async (
-  req: ColanodeRequest,
-  res: ColanodeResponse,
-  next: ColanodeNextFunction
+import { verifyToken } from '@/lib/tokens';
+import { ApiError } from '@/types/api';
+
+export const authMiddleware: RequestHandler = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
 ) => {
-  const token = req.header('Authorization')?.split(' ')[1];
+  const token = req.headers.authorization?.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({
+    res.status(401).json({
       code: ApiError.Unauthorized,
       message: 'Access Denied: No Token Provided!',
     });
+    return;
   }
 
   const result = await verifyToken(token);
   if (!result.authenticated) {
-    return res.status(400).json({
+    res.status(400).json({
       code: ApiError.Unauthorized,
       message: 'Invalid Token',
     });
+    return;
   }
 
-  req.account = result.account;
+  res.locals.account = result.account;
   next();
 };

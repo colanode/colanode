@@ -24,7 +24,7 @@ import { generateToken } from '@/lib/tokens';
 import { authMiddleware } from '@/middlewares/auth';
 import { nodeService } from '@/services/node-service';
 import { workspaceService } from '@/services/workspace-service';
-import { ApiError, ColanodeRequest, ColanodeResponse } from '@/types/api';
+import { ApiError } from '@/types/api';
 
 const GoogleUserInfoUrl = 'https://www.googleapis.com/oauth2/v1/userinfo';
 const SaltRounds = 10;
@@ -48,10 +48,11 @@ accountsRouter.post('/register/email', async (req: Request, res: Response) => {
   let account: SelectAccount | null | undefined = null;
   if (existingAccount) {
     if (existingAccount.status !== AccountStatus.Pending) {
-      return res.status(400).json({
+      res.status(400).json({
         code: ApiError.EmailAlreadyExists,
         message: 'Email already exists.',
       });
+      return;
     }
 
     account = await database
@@ -81,14 +82,15 @@ accountsRouter.post('/register/email', async (req: Request, res: Response) => {
   }
 
   if (!account) {
-    return res.status(500).json({
+    res.status(500).json({
       code: ApiError.InternalServerError,
       message: 'Failed to create account.',
     });
+    return;
   }
 
   const output = await buildLoginOutput(account);
-  return res.status(200).json(output);
+  res.status(200).json(output);
 });
 
 accountsRouter.post('/login/email', async (req: Request, res: Response) => {
@@ -102,24 +104,27 @@ accountsRouter.post('/login/email', async (req: Request, res: Response) => {
     .executeTakeFirst();
 
   if (!account) {
-    return res.status(400).json({
+    res.status(400).json({
       code: ApiError.EmailOrPasswordIncorrect,
       message: 'Invalid credentials.',
     });
+    return;
   }
 
   if (account.status === AccountStatus.Pending) {
-    return res.status(400).json({
+    res.status(400).json({
       code: ApiError.UserPendingActivation,
       message: 'User is pending activation.',
     });
+    return;
   }
 
   if (!account.password) {
-    return res.status(400).json({
+    res.status(400).json({
       code: ApiError.EmailOrPasswordIncorrect,
       message: 'Invalid credentials.',
     });
+    return;
   }
 
   const preHashedPassword = sha256(input.password);
@@ -129,14 +134,15 @@ accountsRouter.post('/login/email', async (req: Request, res: Response) => {
   );
 
   if (!passwordMatch) {
-    return res.status(400).json({
+    res.status(400).json({
       code: ApiError.EmailOrPasswordIncorrect,
       message: 'Invalid credentials.',
     });
+    return;
   }
 
   const output = await buildLoginOutput(account);
-  return res.status(200).json(output);
+  res.status(200).json(output);
 });
 
 accountsRouter.post('/login/google', async (req: Request, res: Response) => {
@@ -145,19 +151,21 @@ accountsRouter.post('/login/google', async (req: Request, res: Response) => {
   const userInfoResponse = await axios.get(url);
 
   if (userInfoResponse.status !== 200) {
-    return res.status(400).json({
+    res.status(400).json({
       code: ApiError.GoogleAuthFailed,
       message: 'Failed to authenticate with Google.',
     });
+    return;
   }
 
   const googleUser: GoogleUserInfo = userInfoResponse.data;
 
   if (!googleUser) {
-    return res.status(400).json({
+    res.status(400).json({
       code: ApiError.GoogleAuthFailed,
       message: 'Failed to authenticate with Google.',
     });
+    return;
   }
 
   const existingAccount = await database
@@ -184,7 +192,7 @@ accountsRouter.post('/login/google', async (req: Request, res: Response) => {
     }
 
     const output = await buildLoginOutput(existingAccount);
-    return res.status(200).json(output);
+    res.status(200).json(output);
   }
 
   const newAccount = await database
@@ -201,78 +209,85 @@ accountsRouter.post('/login/google', async (req: Request, res: Response) => {
     .executeTakeFirst();
 
   if (!newAccount) {
-    return res.status(500).json({
+    res.status(500).json({
       code: ApiError.InternalServerError,
       message: 'Failed to create account.',
     });
+    return;
   }
 
   const output = await buildLoginOutput(newAccount);
-  return res.status(200).json(output);
+  res.status(200).json(output);
 });
 
 accountsRouter.delete(
   '/logout',
   authMiddleware,
-  async (req: ColanodeRequest, res: ColanodeResponse) => {
-    if (!req.account) {
-      return res.status(401).json({
+  async (req: Request, res: Response) => {
+    const account = res.locals.account;
+    if (!account) {
+      res.status(401).json({
         code: ApiError.Unauthorized,
         message: 'Unauthorized.',
       });
+      return;
     }
 
     await database
       .deleteFrom('devices')
-      .where('id', '=', req.account.deviceId)
+      .where('id', '=', account.deviceId)
       .execute();
 
-    return res.status(200).end();
+    res.status(200).end();
   }
 );
 
 accountsRouter.put(
   '/:id',
   authMiddleware,
-  async (req: ColanodeRequest, res: ColanodeResponse) => {
+  async (req: Request, res: Response) => {
     const id = req.params.id;
     const input: AccountUpdateInput = req.body;
 
-    if (!req.account) {
-      return res.status(401).json({
+    if (!res.locals.account) {
+      res.status(401).json({
         code: ApiError.Unauthorized,
         message: 'Unauthorized.',
       });
+      return;
     }
 
-    if (id !== req.account.id) {
-      return res.status(400).json({
+    if (id !== res.locals.account.id) {
+      res.status(400).json({
         code: ApiError.BadRequest,
         message: 'Invalid account id.',
       });
+      return;
     }
 
     const account = await database
       .selectFrom('accounts')
-      .where('id', '=', req.account.id)
+      .where('id', '=', res.locals.account.id)
       .selectAll()
       .executeTakeFirst();
 
     if (!account) {
-      return res.status(404).json({
+      res.status(404).json({
         code: ApiError.ResourceNotFound,
         message: 'Account not found.',
       });
+      return;
     }
 
     const nameChanged = account.name !== input.name;
     const avatarChanged = account.avatar !== input.avatar;
 
     if (!nameChanged && !avatarChanged) {
-      return res.status(400).json({
+      res.status(400).json({
         code: ApiError.BadRequest,
         message: 'Nothing to update.',
       });
+      return;
     }
 
     await database
@@ -282,7 +297,7 @@ accountsRouter.put(
         avatar: input.avatar,
         updated_at: new Date(),
       })
-      .where('id', '=', req.account.id)
+      .where('id', '=', account.id)
       .execute();
 
     const users = await database
@@ -294,7 +309,7 @@ accountsRouter.put(
         database
           .selectFrom('workspace_users')
           .select('id')
-          .where('account_id', '=', req.account.id)
+          .where('account_id', '=', account.id)
       )
       .execute();
 
@@ -334,32 +349,34 @@ accountsRouter.put(
       avatar: input.avatar,
     };
 
-    return res.status(200).json(output);
+    res.status(200).json(output);
   }
 );
 
 accountsRouter.get(
   '/sync',
   authMiddleware,
-  async (req: ColanodeRequest, res: ColanodeResponse) => {
-    if (!req.account) {
-      return res.status(401).json({
+  async (req: Request, res: Response) => {
+    if (!res.locals.account) {
+      res.status(401).json({
         code: ApiError.Unauthorized,
         message: 'Unauthorized.',
       });
+      return;
     }
 
     const account = await database
       .selectFrom('accounts')
-      .where('id', '=', req.account.id)
+      .where('id', '=', res.locals.account.id)
       .selectAll()
       .executeTakeFirst();
 
     if (!account) {
-      return res.status(404).json({
+      res.status(404).json({
         code: ApiError.ResourceNotFound,
         message: 'Account not found.',
       });
+      return;
     }
 
     const workspaceOutputs: WorkspaceOutput[] = [];
@@ -411,7 +428,7 @@ accountsRouter.get(
       workspaces: workspaceOutputs,
     };
 
-    return res.status(200).json(output);
+    res.status(200).json(output);
   }
 );
 
