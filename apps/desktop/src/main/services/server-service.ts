@@ -37,6 +37,50 @@ class ServerService {
     return state?.isAvailable ?? false;
   }
 
+  public async createServer(domain: string): Promise<Server | null> {
+    if (this.states.has(domain)) {
+      return null;
+    }
+
+    const config = await this.fetchServerConfig(domain);
+    if (config === null) {
+      return null;
+    }
+
+    const createdServer = await databaseService.appDatabase
+      .insertInto('servers')
+      .returningAll()
+      .values({
+        domain,
+        name: config.name,
+        avatar: config.avatar,
+        attributes: JSON.stringify(config.attributes),
+        version: config.version,
+        created_at: new Date().toISOString(),
+      })
+      .executeTakeFirst();
+
+    if (!createdServer) {
+      return null;
+    }
+
+    const server = mapServer(createdServer);
+    eventBus.publish({
+      type: 'server_created',
+      server,
+    });
+
+    const state: ServerState = {
+      isAvailable: true,
+      lastCheckedAt: new Date(),
+      lastCheckedSuccessfullyAt: new Date(),
+      count: 1,
+    };
+
+    this.states.set(domain, state);
+    return server;
+  }
+
   private async syncServer(server: Server) {
     const config = await this.fetchServerConfig(server.domain);
     const existingState = this.states.get(server.domain);
