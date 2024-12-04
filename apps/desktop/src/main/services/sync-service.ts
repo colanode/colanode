@@ -233,7 +233,7 @@ class SyncService {
       }
 
       if (cursor) {
-        this.updateNodeTransactionCursor(message.userId, cursor);
+        this.updateCursor(message.userId, 'transactions', cursor);
       }
     } catch (error) {
       this.debug(
@@ -272,7 +272,7 @@ class SyncService {
       }
 
       if (cursor) {
-        this.updateCollaborationCursor(message.userId, cursor);
+        this.updateCursor(message.userId, 'collaborations', cursor);
       }
     } catch (error) {
       this.debug(
@@ -309,7 +309,7 @@ class SyncService {
       }
 
       if (cursor) {
-        this.updateCollaborationRevocationCursor(message.userId, cursor);
+        this.updateCursor(message.userId, 'revocations', cursor);
       }
     } catch (error) {
       this.debug(
@@ -348,7 +348,7 @@ class SyncService {
       }
 
       if (cursor) {
-        this.updateInteractionCursor(message.userId, cursor);
+        this.updateCursor(message.userId, 'interactions', cursor);
       }
     } catch (error) {
       this.debug(
@@ -779,207 +779,144 @@ class SyncService {
   private async requireNodeTransactions(userId: string) {
     this.debug(`Requiring node transactions for user ${userId}`);
 
-    const workspaceWithCursor = await databaseService.appDatabase
-      .selectFrom('workspaces as w')
-      .leftJoin('workspace_cursors as wc', 'w.user_id', 'wc.user_id')
-      .select([
-        'w.user_id',
-        'w.workspace_id',
-        'w.account_id',
-        'wc.transactions',
-      ])
-      .where('w.user_id', '=', userId)
+    const workspace = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .select(['user_id', 'workspace_id', 'account_id'])
+      .where('user_id', '=', userId)
       .executeTakeFirst();
 
-    if (!workspaceWithCursor) {
+    if (!workspace) {
       this.debug(
         `No workspace found for user ${userId}, skipping requiring node transactions`
       );
       return;
     }
 
+    const cursor = await this.fetchCursor(userId, 'transactions');
     const message: FetchNodeTransactionsMessage = {
       type: 'fetch_node_transactions',
-      userId: workspaceWithCursor.user_id,
-      workspaceId: workspaceWithCursor.workspace_id,
-      cursor: workspaceWithCursor.transactions?.toString() ?? '0',
+      userId,
+      workspaceId: workspace.workspace_id,
+      cursor: cursor.toString(),
     };
 
-    socketService.sendMessage(workspaceWithCursor.account_id, message);
+    socketService.sendMessage(workspace.account_id, message);
   }
 
   private async requireCollaborations(userId: string) {
     this.debug(`Requiring collaborations for user ${userId}`);
 
-    const workspaceWithCursor = await databaseService.appDatabase
-      .selectFrom('workspaces as w')
-      .leftJoin('workspace_cursors as wc', 'w.user_id', 'wc.user_id')
-      .select([
-        'w.user_id',
-        'w.workspace_id',
-        'w.account_id',
-        'wc.collaborations',
-      ])
-      .where('w.user_id', '=', userId)
+    const workspace = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .select(['user_id', 'workspace_id', 'account_id'])
+      .where('user_id', '=', userId)
       .executeTakeFirst();
 
-    if (!workspaceWithCursor) {
+    if (!workspace) {
       this.debug(
         `No workspace found for user ${userId}, skipping requiring collaborations`
       );
       return;
     }
 
+    const cursor = await this.fetchCursor(userId, 'collaborations');
     const message: FetchCollaborationsMessage = {
       type: 'fetch_collaborations',
-      userId: workspaceWithCursor.user_id,
-      workspaceId: workspaceWithCursor.workspace_id,
-      cursor: workspaceWithCursor.collaborations?.toString() ?? '0',
+      userId: workspace.user_id,
+      workspaceId: workspace.workspace_id,
+      cursor: cursor.toString(),
     };
 
-    socketService.sendMessage(workspaceWithCursor.account_id, message);
+    socketService.sendMessage(workspace.account_id, message);
   }
 
   private async requireCollaborationRevocations(userId: string) {
     this.debug(`Requiring collaboration revocations for user ${userId}`);
 
-    const workspaceWithCursor = await databaseService.appDatabase
-      .selectFrom('workspaces as w')
-      .leftJoin('workspace_cursors as wc', 'w.user_id', 'wc.user_id')
-      .select(['w.user_id', 'w.workspace_id', 'w.account_id', 'wc.revocations'])
-      .where('w.user_id', '=', userId)
+    const workspace = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .select(['user_id', 'workspace_id', 'account_id'])
+      .where('user_id', '=', userId)
       .executeTakeFirst();
 
-    if (!workspaceWithCursor) {
+    if (!workspace) {
       this.debug(
         `No workspace found for user ${userId}, skipping requiring collaboration revocations`
       );
       return;
     }
 
+    const cursor = await this.fetchCursor(userId, 'revocations');
     const message: FetchCollaborationRevocationsMessage = {
       type: 'fetch_collaboration_revocations',
-      userId: workspaceWithCursor.user_id,
-      workspaceId: workspaceWithCursor.workspace_id,
-      cursor: workspaceWithCursor.revocations?.toString() ?? '0',
+      userId: workspace.user_id,
+      workspaceId: workspace.workspace_id,
+      cursor: cursor.toString(),
     };
 
-    socketService.sendMessage(workspaceWithCursor.account_id, message);
+    socketService.sendMessage(workspace.account_id, message);
   }
 
   private async requireInteractions(userId: string) {
     this.debug(`Requiring interactions for user ${userId}`);
 
-    const workspaceWithCursor = await databaseService.appDatabase
-      .selectFrom('workspaces as w')
-      .leftJoin('workspace_cursors as wc', 'w.user_id', 'wc.user_id')
-      .select([
-        'w.user_id',
-        'w.workspace_id',
-        'w.account_id',
-        'wc.interactions',
-      ])
-      .where('w.user_id', '=', userId)
+    const workspace = await databaseService.appDatabase
+      .selectFrom('workspaces')
+      .select(['user_id', 'workspace_id', 'account_id'])
+      .where('user_id', '=', userId)
       .executeTakeFirst();
 
-    if (!workspaceWithCursor) {
+    if (!workspace) {
       this.debug(
         `No workspace found for user ${userId}, skipping requiring interactions`
       );
       return;
     }
 
+    const cursor = await this.fetchCursor(userId, 'interactions');
     const message: FetchInteractionsMessage = {
       type: 'fetch_interactions',
-      userId: workspaceWithCursor.user_id,
-      workspaceId: workspaceWithCursor.workspace_id,
-      cursor: workspaceWithCursor.interactions?.toString() ?? '0',
+      userId: workspace.user_id,
+      workspaceId: workspace.workspace_id,
+      cursor: cursor.toString(),
     };
 
-    socketService.sendMessage(workspaceWithCursor.account_id, message);
+    socketService.sendMessage(workspace.account_id, message);
   }
 
-  private async updateNodeTransactionCursor(userId: string, cursor: bigint) {
-    this.debug(
-      `Updating node transaction cursor for user ${userId} to ${cursor}`
-    );
+  private async updateCursor(userId: string, name: string, cursor: bigint) {
+    this.debug(`Updating cursor ${name} for user ${userId} to ${cursor}`);
 
-    await databaseService.appDatabase
-      .insertInto('workspace_cursors')
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
+
+    await workspaceDatabase
+      .insertInto('cursors')
       .values({
-        user_id: userId,
-        transactions: cursor,
+        name,
+        value: cursor,
         created_at: new Date().toISOString(),
       })
       .onConflict((eb) =>
-        eb.column('user_id').doUpdateSet({
-          transactions: cursor,
+        eb.column('name').doUpdateSet({
+          value: cursor,
           updated_at: new Date().toISOString(),
         })
       )
       .execute();
   }
 
-  private async updateCollaborationCursor(userId: string, cursor: bigint) {
-    this.debug(`Updating collaboration cursor for user ${userId} to ${cursor}`);
+  private async fetchCursor(userId: string, name: string): Promise<bigint> {
+    const workspaceDatabase =
+      await databaseService.getWorkspaceDatabase(userId);
 
-    await databaseService.appDatabase
-      .insertInto('workspace_cursors')
-      .values({
-        user_id: userId,
-        collaborations: cursor,
-        created_at: new Date().toISOString(),
-      })
-      .onConflict((eb) =>
-        eb.column('user_id').doUpdateSet({
-          collaborations: cursor,
-          updated_at: new Date().toISOString(),
-        })
-      )
-      .execute();
-  }
+    const cursor = await workspaceDatabase
+      .selectFrom('cursors')
+      .select('value')
+      .where('name', '=', name)
+      .executeTakeFirst();
 
-  private async updateCollaborationRevocationCursor(
-    userId: string,
-    cursor: bigint
-  ) {
-    this.debug(
-      `Updating collaboration revocation cursor for user ${userId} to ${cursor}`
-    );
-
-    await databaseService.appDatabase
-      .insertInto('workspace_cursors')
-      .values({
-        user_id: userId,
-        revocations: cursor,
-        created_at: new Date().toISOString(),
-      })
-      .onConflict((eb) =>
-        eb.column('user_id').doUpdateSet({
-          revocations: cursor,
-          updated_at: new Date().toISOString(),
-        })
-      )
-      .execute();
-  }
-
-  private async updateInteractionCursor(userId: string, cursor: bigint) {
-    this.debug(`Updating interaction cursor for user ${userId} to ${cursor}`);
-
-    await databaseService.appDatabase
-      .insertInto('workspace_cursors')
-      .values({
-        user_id: userId,
-        interactions: cursor,
-        created_at: new Date().toISOString(),
-      })
-      .onConflict((eb) =>
-        eb.column('user_id').doUpdateSet({
-          interactions: cursor,
-          updated_at: new Date().toISOString(),
-        })
-      )
-      .execute();
+    return cursor?.value ?? 0n;
   }
 }
 

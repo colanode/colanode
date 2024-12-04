@@ -115,6 +115,13 @@ export type SelectInteractionEvent = Selectable<InteractionEventTable>;
 export type CreateInteractionEvent = Insertable<InteractionEventTable>;
 export type UpdateInteractionEvent = Updateable<InteractionEventTable>;
 
+interface CursorTable {
+  name: ColumnType<string, string, never>;
+  value: ColumnType<bigint, bigint, bigint>;
+  created_at: ColumnType<string, string, never>;
+  updated_at: ColumnType<string | null, string | null, string | null>;
+}
+
 export interface WorkspaceDatabaseSchema {
   nodes: NodeTable;
   node_transactions: NodeTransactionTable;
@@ -124,4 +131,5 @@ export interface WorkspaceDatabaseSchema {
   downloads: DownloadTable;
   interactions: InteractionTable;
   interaction_events: InteractionEventTable;
+  cursors: CursorTable;
 }

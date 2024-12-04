@@ -300,6 +300,21 @@ const createNodeDeleteNameTrigger: Migration = {
   },
 };
 
+const createCursorsTable: Migration = {
+  up: async (db) => {
+    await db.schema
+      .createTable('cursors')
+      .addColumn('name', 'text', (col) => col.notNull().primaryKey())
+      .addColumn('value', 'integer', (col) => col.notNull().defaultTo(0))
+      .addColumn('created_at', 'text', (col) => col.notNull())
+      .addColumn('updated_at', 'text')
+      .execute();
+  },
+  down: async (db) => {
+    await db.schema.dropTable('cursors').execute();
+  },
+};
+
 export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00001_create_nodes_table': createNodesTable,
   '00002_create_node_transactions_table': createNodeTransactionsTable,
@@ -313,4 +328,5 @@ export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00010_create_node_insert_name_trigger': createNodeInsertNameTrigger,
   '00011_create_node_update_name_trigger': createNodeUpdateNameTrigger,
   '00012_create_node_delete_name_trigger': createNodeDeleteNameTrigger,
+  '00013_create_cursors_table': createCursorsTable,
 };

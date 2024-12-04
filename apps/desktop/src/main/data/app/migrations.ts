@@ -80,32 +80,6 @@ const createWorkspacesTable: Migration = {
   },
 };
 
-const createWorkspaceCursorsTable: Migration = {
-  up: async (db) => {
-    await db.schema
-      .createTable('workspace_cursors')
-      .addColumn('user_id', 'text', (col) =>
-        col
-          .notNull()
-          .primaryKey()
-          .references('workspaces.user_id')
-          .onDelete('cascade')
-      )
-      .addColumn('transactions', 'integer', (col) => col.notNull().defaultTo(0))
-      .addColumn('collaborations', 'integer', (col) =>
-        col.notNull().defaultTo(0)
-      )
-      .addColumn('interactions', 'integer', (col) => col.notNull().defaultTo(0))
-      .addColumn('revocations', 'integer', (col) => col.notNull().defaultTo(0))
-      .addColumn('created_at', 'text', (col) => col.notNull())
-      .addColumn('updated_at', 'text')
-      .execute();
-  },
-  down: async (db) => {
-    await db.schema.dropTable('workspace_cursors').execute();
-  },
-};
-
 const createDeletedTokensTable: Migration = {
   up: async (db) => {
     await db.schema
@@ -125,6 +99,5 @@ export const appDatabaseMigrations: Record<string, Migration> = {
   '00001_create_servers_table': createServersTable,
   '00002_create_accounts_table': createAccountsTable,
   '00003_create_workspaces_table': createWorkspacesTable,
-  '00004_create_workspace_cursors_table': createWorkspaceCursorsTable,
   '00005_create_deleted_tokens_table': createDeletedTokensTable,
 };
