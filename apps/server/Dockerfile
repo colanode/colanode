@@ -5,6 +5,9 @@ WORKDIR /app
 # Copy root workspace files
 COPY ../../package.json ../../package-lock.json ./
 
+# Copy scripts
+COPY ../../scripts scripts
+
 # Copy all package.json files first
 COPY ../../packages/core/package.json packages/core/package.json
 COPY ../../packages/crdt/package.json packages/crdt/package.json
@@ -16,7 +19,6 @@ RUN npm ci
 # Copy source files
 COPY ../../packages/core packages/core
 COPY ../../packages/crdt packages/crdt
-COPY ../../scripts scripts
 COPY ../../apps/server apps/server
 COPY ../../tsconfig.base.json ./
 
