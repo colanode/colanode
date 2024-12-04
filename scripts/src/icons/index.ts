@@ -1,7 +1,6 @@
-import archiver from 'archiver';
+import AdmZip from 'adm-zip';
 import fetch from 'node-fetch';
 import { monotonicFactory } from 'ulid';
-import unzipper from 'unzipper';
 
 import fs from 'fs';
 
@@ -52,7 +51,7 @@ const simpleIconTitleToSlug = (title: string) =>
 
 const WORK_DIR_PATH = 'src/icons/temp';
 const ICONS_DIR_PATH = `${WORK_DIR_PATH}/icons`;
-const ICONS_METADATA_FILE_PATH = `${ICONS_DIR_PATH}/icons.json`;
+const ICONS_METADATA_FILE_PATH = `src/icons/icons.json`;
 const ICONS_ZIP_FILE_PATH = 'src/icons/icons.zip';
 
 const GITHUB_DOMAIN = 'https://github.com';
@@ -103,17 +102,9 @@ const downloadRemixIconRepo = async () => {
     fs.rmSync(REMIX_ICON_DIR_PATH, { recursive: true });
   }
 
-  await new Promise((resolve, reject) => {
-    if (response.body == null) {
-      reject(new Error(`Failed to download ${url}`));
-      return;
-    }
-
-    response.body
-      .pipe(unzipper.Extract({ path: WORK_DIR_PATH }))
-      .on('close', resolve)
-      .on('error', reject);
-  });
+  const buffer = await response.buffer();
+  const zip = new AdmZip(buffer);
+  zip.extractAllTo(WORK_DIR_PATH, true);
   console.log(`Downloaded remix icon repo`);
 };
 
@@ -129,17 +120,9 @@ const downloadSimpleIconsRepo = async () => {
     fs.rmSync(SIMPLE_ICONS_DIR_PATH, { recursive: true });
   }
 
-  await new Promise((resolve, reject) => {
-    if (response.body == null) {
-      reject(new Error(`Failed to download ${url}`));
-      return;
-    }
-
-    response.body
-      .pipe(unzipper.Extract({ path: WORK_DIR_PATH }))
-      .on('close', resolve)
-      .on('error', reject);
-  });
+  const buffer = await response.buffer();
+  const zip = new AdmZip(buffer);
+  zip.extractAllTo(WORK_DIR_PATH, true);
   console.log(`Downloaded simple icons repo`);
 };
 
@@ -279,21 +262,9 @@ const generateIconsDir = async () => {
 };
 
 const zipIcons = async () => {
-  await new Promise((resolve, reject) => {
-    const output = fs.createWriteStream(ICONS_ZIP_FILE_PATH);
-    const archive = archiver('zip', { zlib: { level: 9 } });
-
-    output.on('close', () => {
-      console.log(`Zipped ${archive.pointer()} total bytes`);
-      resolve(void 0);
-    });
-
-    archive.on('error', (err) => reject(err));
-
-    archive.pipe(output);
-    archive.directory(ICONS_DIR_PATH, false);
-    archive.finalize();
-  });
+  const zip = new AdmZip();
+  zip.addLocalFolder(ICONS_DIR_PATH);
+  zip.writeZip(ICONS_ZIP_FILE_PATH);
   console.log(`Zipped icons`);
 };
 

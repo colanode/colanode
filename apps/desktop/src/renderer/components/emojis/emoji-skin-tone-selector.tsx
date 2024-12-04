@@ -9,12 +9,12 @@ import {
 import { getEmojiUrl } from '@/shared/lib/emojis';
 
 const skins: string[] = [
-  '01jc5vxx32ez8g5394y7mzt2vnem',
-  '01jc5vxx32ez8g5394y7mzt2vpem',
-  '01jc5vxx32ez8g5394y7mzt2vqem',
-  '01jc5vxx32ez8g5394y7mzt2vrem',
-  '01jc5vxx32ez8g5394y7mzt2vsem',
-  '01jc5vxx32ez8g5394y7mzt2vtem',
+  '01je8kh1j8qdp2tbc4b8b8rgj7em',
+  '01je8kh1j8qdp2tbc4b8b8rgj8em',
+  '01je8kh1j8qdp2tbc4b8b8rgj9em',
+  '01je8kh1j8qdp2tbc4b8b8rgjaem',
+  '01je8kh1j8qdp2tbc4b8b8rgjbem',
+  '01je8kh1j9q3pjaxx25w2ysct2em',
 ];
 
 interface EmojiSkinToneSelectorProps {

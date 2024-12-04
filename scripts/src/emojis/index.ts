@@ -1,7 +1,6 @@
-import archiver from 'archiver';
+import AdmZip from 'adm-zip';
 import fetch from 'node-fetch';
 import { monotonicFactory } from 'ulid';
-import unzipper from 'unzipper';
 
 import fs from 'fs';
 
@@ -37,7 +36,7 @@ type EmojiMartData = {
 
 const WORK_DIR_PATH = 'src/emojis/temp';
 const EMOJIS_DIR_PATH = `${WORK_DIR_PATH}/emojis`;
-const EMOJIS_METADATA_FILE_PATH = `${EMOJIS_DIR_PATH}/emojis.json`;
+const EMOJIS_METADATA_FILE_PATH = 'src/emojis/emojis.json';
 const EMOJIS_ZIP_FILE_PATH = 'src/emojis/emojis.zip';
 
 const GITHUB_DOMAIN = 'https://github.com';
@@ -94,17 +93,9 @@ const downloadEmojiMartRepo = async () => {
     fs.rmSync(EMOJI_MART_DIR_PATH, { recursive: true });
   }
 
-  await new Promise((resolve, reject) => {
-    if (response.body == null) {
-      reject(new Error(`Failed to download ${url}`));
-      return;
-    }
-
-    response.body
-      .pipe(unzipper.Extract({ path: WORK_DIR_PATH }))
-      .on('close', resolve)
-      .on('error', reject);
-  });
+  const buffer = await response.buffer();
+  const zip = new AdmZip(buffer);
+  zip.extractAllTo(WORK_DIR_PATH, true);
   console.log(`Downloaded emoji-mart repo`);
 };
 
@@ -120,17 +111,9 @@ const downloadTweemojiRepo = async () => {
     fs.rmSync(TWEEMOJI_DIR_PATH, { recursive: true });
   }
 
-  await new Promise((resolve, reject) => {
-    if (response.body == null) {
-      reject(new Error(`Failed to download ${url}`));
-      return;
-    }
-
-    response.body
-      .pipe(unzipper.Extract({ path: WORK_DIR_PATH }))
-      .on('close', resolve)
-      .on('error', reject);
-  });
+  const buffer = await response.buffer();
+  const zip = new AdmZip(buffer);
+  zip.extractAllTo(WORK_DIR_PATH, true);
   console.log(`Downloaded twemoji repo`);
 };
 
@@ -218,7 +201,7 @@ const generateEmojisDir = () => {
 
       const fileName = getEmojiSkinFileName(skin.unified);
       const sourceFilePath = `${TWEEMOJI_SVG_DIR_PATH}/${fileName}`;
-      const targetFilePath = `${EMOJIS_DIR_PATH}/${fileName}`;
+      const targetFilePath = `${EMOJIS_DIR_PATH}/${skinId}.svg`;
       if (!fs.existsSync(targetFilePath)) {
         fs.copyFileSync(sourceFilePath, targetFilePath);
       }
@@ -266,21 +249,9 @@ const zipEmojis = async () => {
     fs.rmSync(EMOJIS_ZIP_FILE_PATH);
   }
 
-  await new Promise((resolve, reject) => {
-    const output = fs.createWriteStream(EMOJIS_ZIP_FILE_PATH);
-    const archive = archiver('zip', { zlib: { level: 9 } });
-
-    output.on('close', () => {
-      console.log(`Zipped ${archive.pointer()} total bytes`);
-      resolve(void 0);
-    });
-
-    archive.on('error', (err) => reject(err));
-
-    archive.pipe(output);
-    archive.directory(EMOJIS_DIR_PATH, false);
-    archive.finalize();
-  });
+  const zip = new AdmZip();
+  zip.addLocalFolder(EMOJIS_DIR_PATH);
+  zip.writeZip(EMOJIS_ZIP_FILE_PATH);
   console.log(`Zipped emojis`);
 };
 

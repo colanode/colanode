@@ -146,3 +146,15 @@ dist/
 .DS_Store
 .turbo
 .tsbuildinfo
+
+# Ignore temporary emoji and icon directories
+src/scripts/emojis/temp/
+src/scripts/icons/temp/
+
+# Ignore desktop assets directories
+apps/desktop/assets/emojis/
+apps/desktop/assets/icons/
+
+# Ignore specific JSON files in desktop assets
+apps/desktop/assets/emojis.json
+apps/desktop/assets/icons.json

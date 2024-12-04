@@ -1,4 +1,4 @@
-import { hashCode,IdType } from '@colanode/core';
+import { hashCode, IdType } from '@colanode/core';
 
 export const getAvatarSizeClasses = (size?: string) => {
   if (size === 'small') {
@@ -41,27 +41,27 @@ export const getAvatarUrl = (accountId: string, avatar: string): string => {
 
 export const getDefaultNodeAvatar = (type: IdType): string | null => {
   if (type === IdType.Channel) {
-    return '01jc86rkg8cp6mgmrra20ed31aic';
+    return '01je8md2pbpk5rdesmb1d54s1tic';
   }
 
   if (type === IdType.Page) {
-    return '01jc86rkh54xdkrqrwvpzab63kic';
+    return '01je8md2q765zkjskwmqm17jrtic';
   }
 
   if (type === IdType.Database) {
-    return '01jc86rkgy4710n5wpatc0jnh0ic';
+    return '01je8md2q0qm5h2dgwhv6sk6kaic';
   }
 
   if (type === IdType.Record) {
-    return '01jc86rkh6j2b38w8rranjd14ric';
+    return '01je8md2q8d8p8yaq4rpybhktqic';
   }
 
   if (type === IdType.Folder) {
-    return '01jc86rkhdwdf47de5j64p7ktkic';
+    return '01je8md2qfbtd5hxzsvkhbmbpfic';
   }
 
   if (type === IdType.Space) {
-    return '01jc86rkm2gfd3nkn0yahxtg26ic';
+    return '01je8md2tezbkwrjm9eht228j6ic';
   }
 
   return null;

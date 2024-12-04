@@ -23,7 +23,8 @@
     "watch": "turbo watch build --filter=@colanode/{core,crdt,server}",
     "lint": "turbo run lint --parallel",
     "test": "turbo run test -- --watch false",
-    "format": "prettier --write ."
+    "format": "prettier --write .",
+    "postinstall": "node --no-warnings --loader ts-node/esm scripts/src/postinstall/index.ts"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
@@ -34,6 +35,7 @@
     "eslint-plugin-import": "^2.31.0",
     "eslint-plugin-react": "^7.37.2",
     "prettier": "^3.4.1",
+    "ts-node": "^10.9.2",
     "turbo": "^2.3.3",
     "typescript": "^5.7.2",
     "vitest": "^2.1.6"

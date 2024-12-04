@@ -24,9 +24,9 @@ interface MessageActionsProps {
 }
 
 const quickReactions = [
-  '01jc5vxx33b9nmy1a6yd71pee6em',
-  '01jc5vxx32ez8g5394y7mzt2smem',
-  '01jc5vxx374h4gxvgjsjf3kbn7em',
+  '01je8kh1jw8hm4s8pgb1j7ha3jem',
+  '01je8kh1j23gc6jt9cbjfsam7dem',
+  '01je8kh228xbs1hv5gn6ff0y90em',
 ];
 
 export const MessageActions = ({ message }: MessageActionsProps) => {

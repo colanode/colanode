@@ -1,7 +1,6 @@
 import { createDebugger } from '@/main/debugger';
 import { databaseService } from '@/main/data/database-service';
 import { accountService } from '@/main/services/account-service';
-import { assetService } from '@/main/services/asset-service';
 import { fileService } from '@/main/services/file-service';
 import { notificationService } from '@/main/services/notification-service';
 import { radarService } from '@/main/services/radar-service';
@@ -33,7 +32,6 @@ class Bootstrapper {
     this.debug('Initializing');
 
     await databaseService.init();
-    await assetService.checkAssets();
     await serverService.syncServers();
     await radarService.init();
     await socketService.checkConnections();
