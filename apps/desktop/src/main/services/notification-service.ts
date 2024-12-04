@@ -16,10 +16,6 @@ class NotificationService {
     });
   }
 
-  public init() {
-    this.checkBadge();
-  }
-
   public checkBadge() {
     if (process.platform !== 'darwin') {
       return;

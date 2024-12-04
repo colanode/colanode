@@ -32,13 +32,10 @@ class Bootstrapper {
     this.debug('Initializing');
 
     await databaseService.init();
-    await serverService.syncServers();
-    await radarService.init();
-    await socketService.checkConnections();
-    notificationService.init();
+    radarService.init();
 
     if (!this.eventLoop) {
-      this.eventLoop = setTimeout(this.executeEventLoop, 50);
+      this.eventLoop = setTimeout(this.executeEventLoop, 20);
     }
   }
 
