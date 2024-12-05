@@ -35,7 +35,7 @@ class Bootstrapper {
     radarService.init();
 
     if (!this.eventLoop) {
-      this.eventLoop = setTimeout(this.executeEventLoop, 20);
+      this.eventLoop = setTimeout(this.executeEventLoop, 50);
     }
   }
 

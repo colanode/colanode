@@ -52,9 +52,21 @@ interface DeletedTokenTable {
   created_at: ColumnType<string, string, string>;
 }
 
+interface MetadataTable {
+  key: ColumnType<string, string, never>;
+  value: ColumnType<string, string, string>;
+  created_at: ColumnType<string, string, never>;
+  updated_at: ColumnType<string | null, string | null, string | null>;
+}
+
+export type SelectMetadata = Selectable<MetadataTable>;
+export type CreateMetadata = Insertable<MetadataTable>;
+export type UpdateMetadata = Updateable<MetadataTable>;
+
 export interface AppDatabaseSchema {
   servers: ServerTable;
   accounts: AccountTable;
   workspaces: WorkspaceTable;
   deleted_tokens: DeletedTokenTable;
+  metadata: MetadataTable;
 }

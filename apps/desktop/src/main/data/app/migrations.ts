@@ -95,9 +95,25 @@ const createDeletedTokensTable: Migration = {
   },
 };
 
+const createMetadataTable: Migration = {
+  up: async (db) => {
+    await db.schema
+      .createTable('metadata')
+      .addColumn('key', 'text', (col) => col.notNull().primaryKey())
+      .addColumn('value', 'text', (col) => col.notNull())
+      .addColumn('created_at', 'text', (col) => col.notNull())
+      .addColumn('updated_at', 'text')
+      .execute();
+  },
+  down: async (db) => {
+    await db.schema.dropTable('metadata').execute();
+  },
+};
+
 export const appDatabaseMigrations: Record<string, Migration> = {
   '00001_create_servers_table': createServersTable,
   '00002_create_accounts_table': createAccountsTable,
   '00003_create_workspaces_table': createWorkspacesTable,
-  '00005_create_deleted_tokens_table': createDeletedTokensTable,
+  '00004_create_deleted_tokens_table': createDeletedTokensTable,
+  '00005_create_metadata_table': createMetadataTable,
 };

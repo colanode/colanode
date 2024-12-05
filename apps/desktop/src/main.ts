@@ -3,6 +3,8 @@ import started from 'electron-squirrel-startup';
 import { app, BrowserWindow, ipcMain, protocol } from 'electron';
 import path from 'path';
 
+import { metadataService } from '@/main/services/metadata-service';
+import { WindowSize } from '@/shared/types/metadata';
 import { createDebugger } from '@/main/debugger';
 import { bootstrapper } from '@/main/bootstrapper';
 import { assetService } from '@/main/services/asset-service';
@@ -27,16 +29,52 @@ if (started) {
   app.quit();
 }
 
-const createWindow = () => {
-  bootstrapper.init();
+const createWindow = async () => {
+  await bootstrapper.init();
 
   // Create the browser window.
+  let windowSize = await metadataService.get<WindowSize>('window_size');
   const mainWindow = new BrowserWindow({
-    fullscreen: true,
+    width: windowSize?.width ?? 1200,
+    height: windowSize?.height ?? 800,
+    fullscreen: windowSize?.fullscreen ?? false,
+    fullscreenable: true,
+    minWidth: 800,
+    minHeight: 600,
     icon: getAppIconPath(),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
+  });
+
+  mainWindow.on('resized', () => {
+    windowSize = {
+      width: mainWindow.getBounds().width,
+      height: mainWindow.getBounds().height,
+      fullscreen: false,
+    };
+
+    metadataService.set('window_size', windowSize);
+  });
+
+  mainWindow.on('enter-full-screen', () => {
+    windowSize = {
+      width: windowSize?.width ?? mainWindow.getBounds().width,
+      height: windowSize?.height ?? mainWindow.getBounds().height,
+      fullscreen: true,
+    };
+
+    metadataService.set('window_size', windowSize);
+  });
+
+  mainWindow.on('leave-full-screen', () => {
+    windowSize = {
+      width: windowSize?.width ?? mainWindow.getBounds().width,
+      height: windowSize?.height ?? mainWindow.getBounds().height,
+      fullscreen: false,
+    };
+
+    metadataService.set('window_size', windowSize);
   });
 
   // and load the index.html of the app.
