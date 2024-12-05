@@ -29,7 +29,7 @@ interface NodePathTable {
 
 export type SelectNodePath = Selectable<NodePathTable>;
 
-interface NodeTransactionTable {
+interface TransactionTable {
   id: ColumnType<string, string, never>;
   node_id: ColumnType<string, string, never>;
   node_type: ColumnType<NodeType, NodeType, never>;
@@ -43,9 +43,9 @@ interface NodeTransactionTable {
   version: ColumnType<bigint | null, bigint | null, bigint | null>;
 }
 
-export type SelectNodeTransaction = Selectable<NodeTransactionTable>;
-export type CreateNodeTransaction = Insertable<NodeTransactionTable>;
-export type UpdateNodeTransaction = Updateable<NodeTransactionTable>;
+export type SelectTransaction = Selectable<TransactionTable>;
+export type CreateTransaction = Insertable<TransactionTable>;
+export type UpdateTransaction = Updateable<TransactionTable>;
 
 interface CollaborationTable {
   user_id: ColumnType<string, string, never>;
@@ -128,7 +128,7 @@ interface CursorTable {
 
 export interface WorkspaceDatabaseSchema {
   nodes: NodeTable;
-  node_transactions: NodeTransactionTable;
+  transactions: TransactionTable;
   node_paths: NodePathTable;
   collaborations: CollaborationTable;
   uploads: UploadTable;

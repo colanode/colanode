@@ -14,7 +14,7 @@ import {
 import { Request, Response, Router } from 'express';
 
 import { database } from '@/data/database';
-import { fetchNode, mapNode, mapNodeTransaction } from '@/lib/nodes';
+import { fetchNode, mapNode, mapTransaction } from '@/lib/nodes';
 import { getNameFromEmail } from '@/lib/utils';
 import { nodeService } from '@/services/node-service';
 import { workspaceService } from '@/services/workspace-service';
@@ -606,7 +606,7 @@ workspacesRouter.put(
     }
 
     res.status(200).json({
-      transaction: mapNodeTransaction(updateUserOutput.transaction),
+      transaction: mapTransaction(updateUserOutput.transaction),
     });
   }
 );

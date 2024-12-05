@@ -3,27 +3,27 @@ import { InteractionAttributes } from './interactions';
 import { NodeType } from '../registry';
 import { NodeRole } from '../registry/core';
 
-export type SyncNodeTransactionsInput = {
-  transactions: LocalNodeTransaction[];
+export type SyncTransactionsInput = {
+  transactions: LocalTransaction[];
 };
 
-export type SyncNodeTransactionsOutput = {
-  results: SyncNodeTransactionResult[];
+export type SyncTransactionsOutput = {
+  results: SyncTransactionResult[];
 };
 
-export type SyncNodeTransactionStatus = 'success' | 'error';
+export type SyncTransactionStatus = 'success' | 'error';
 
-export type SyncNodeTransactionResult = {
+export type SyncTransactionResult = {
   id: string;
-  status: SyncNodeTransactionStatus;
+  status: SyncTransactionStatus;
 };
 
-export type LocalNodeTransaction =
-  | LocalCreateNodeTransaction
-  | LocalUpdateNodeTransaction
-  | LocalDeleteNodeTransaction;
+export type LocalTransaction =
+  | LocalCreateTransaction
+  | LocalUpdateTransaction
+  | LocalDeleteTransaction;
 
-export type LocalCreateNodeTransaction = {
+export type LocalCreateTransaction = {
   id: string;
   nodeId: string;
   nodeType: string;
@@ -33,7 +33,7 @@ export type LocalCreateNodeTransaction = {
   createdBy: string;
 };
 
-export type LocalUpdateNodeTransaction = {
+export type LocalUpdateTransaction = {
   id: string;
   nodeId: string;
   nodeType: string;
@@ -43,7 +43,7 @@ export type LocalUpdateNodeTransaction = {
   createdBy: string;
 };
 
-export type LocalDeleteNodeTransaction = {
+export type LocalDeleteTransaction = {
   id: string;
   nodeId: string;
   nodeType: string;
@@ -52,7 +52,7 @@ export type LocalDeleteNodeTransaction = {
   createdBy: string;
 };
 
-export type ServerNodeCreateTransaction = {
+export type ServerCreateTransaction = {
   id: string;
   operation: 'create';
   nodeId: string;
@@ -65,7 +65,7 @@ export type ServerNodeCreateTransaction = {
   version: string;
 };
 
-export type ServerNodeUpdateTransaction = {
+export type ServerUpdateTransaction = {
   id: string;
   operation: 'update';
   nodeId: string;
@@ -78,7 +78,7 @@ export type ServerNodeUpdateTransaction = {
   version: string;
 };
 
-export type ServerNodeDeleteTransaction = {
+export type ServerDeleteTransaction = {
   id: string;
   operation: 'delete';
   nodeId: string;
@@ -90,12 +90,12 @@ export type ServerNodeDeleteTransaction = {
   version: string;
 };
 
-export type ServerNodeTransaction =
-  | ServerNodeCreateTransaction
-  | ServerNodeUpdateTransaction
-  | ServerNodeDeleteTransaction;
+export type ServerTransaction =
+  | ServerCreateTransaction
+  | ServerUpdateTransaction
+  | ServerDeleteTransaction;
 
-export type ServerCollaborationRevocation = {
+export type ServerDeletedCollaboration = {
   userId: string;
   nodeId: string;
   workspaceId: string;
@@ -129,5 +129,5 @@ export type ServerInteraction = {
 export type SyncConsumerType =
   | 'transactions'
   | 'collaborations'
-  | 'revocations'
+  | 'deleted_collaborations'
   | 'interactions';

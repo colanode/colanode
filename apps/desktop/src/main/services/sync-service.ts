@@ -1,13 +1,13 @@
 import {
-  CollaborationRevocationsBatchMessage,
   CollaborationsBatchMessage,
+  DeletedCollaborationsBatchMessage,
   InitSyncConsumerMessage,
-  GetNodeTransactionsOutput,
+  GetTransactionsOutput,
   InteractionsBatchMessage,
-  LocalNodeTransaction,
-  NodeTransactionsBatchMessage,
+  LocalTransaction,
+  TransactionsBatchMessage,
   SyncInteractionsMessage,
-  SyncNodeTransactionsOutput,
+  SyncTransactionsOutput,
   SyncConsumerType,
 } from '@colanode/core';
 import { sql } from 'kysely';
@@ -16,7 +16,7 @@ import { createDebugger } from '@/main/debugger';
 import { databaseService } from '@/main/data/database-service';
 import {
   SelectInteractionEvent,
-  SelectNodeTransaction,
+  SelectTransaction,
 } from '@/main/data/workspace/schema';
 import { collaborationService } from '@/main/services/collaboration-service';
 import { interactionService } from '@/main/services/interaction-service';
@@ -51,14 +51,14 @@ class SyncService {
 
   private readonly syncingTransactions: Set<string> = new Set();
   private readonly syncingCollaborations: Set<string> = new Set();
-  private readonly syncingRevocations: Set<string> = new Set();
+  private readonly syncingDeletedCollaborations: Set<string> = new Set();
   private readonly syncingInteractions: Set<string> = new Set();
 
   constructor() {
     eventBus.subscribe((event) => {
-      if (event.type === 'node_transaction_created') {
+      if (event.type === 'transaction_created') {
         this.syncLocalPendingTransactions(event.userId);
-      } else if (event.type === 'node_transaction_incomplete') {
+      } else if (event.type === 'transaction_incomplete') {
         this.syncLocalIncompleteTransactions(event.userId);
       } else if (event.type === 'workspace_created') {
         this.syncWorkspace(event.workspace.userId);
@@ -92,7 +92,7 @@ class SyncService {
 
     this.initSyncConsumer(userId, 'transactions');
     this.initSyncConsumer(userId, 'collaborations');
-    this.initSyncConsumer(userId, 'revocations');
+    this.initSyncConsumer(userId, 'deleted_collaborations');
     this.initSyncConsumer(userId, 'interactions');
 
     this.syncMissingNodes(userId);
@@ -212,7 +212,7 @@ class SyncService {
     }
   }
 
-  public async syncServerTransactions(message: NodeTransactionsBatchMessage) {
+  public async syncServerTransactions(message: TransactionsBatchMessage) {
     this.debug(`Syncing server transactions for user ${message.userId}`);
 
     if (this.syncingTransactions.has(message.userId)) {
@@ -283,44 +283,46 @@ class SyncService {
     }
   }
 
-  public async syncServerRevocations(
-    message: CollaborationRevocationsBatchMessage
+  public async syncServerDeletedCollaborations(
+    message: DeletedCollaborationsBatchMessage
   ) {
-    this.debug(`Syncing server revocations for user ${message.userId}`);
+    this.debug(
+      `Syncing server deleted collaborations for user ${message.userId}`
+    );
 
-    if (this.syncingRevocations.has(message.userId)) {
+    if (this.syncingDeletedCollaborations.has(message.userId)) {
       this.debug(
-        `Syncing of server revocations already in progress for user ${message.userId}, skipping`
+        `Syncing of server deleted collaborations already in progress for user ${message.userId}, skipping`
       );
       return;
     }
 
-    this.syncingRevocations.add(message.userId);
+    this.syncingDeletedCollaborations.add(message.userId);
     let cursor: bigint | null = null;
     try {
-      for (const revocation of message.revocations) {
-        await collaborationService.applyServerCollaborationRevocation(
+      for (const deletedCollaboration of message.deletedCollaborations) {
+        await collaborationService.applyServerDeletedCollaboration(
           message.userId,
-          revocation
+          deletedCollaboration
         );
-        cursor = BigInt(revocation.version);
+        cursor = BigInt(deletedCollaboration.version);
       }
 
       if (cursor) {
-        this.updateCursor(message.userId, 'revocations', cursor);
+        this.updateCursor(message.userId, 'deleted_collaborations', cursor);
       }
     } catch (error) {
       this.debug(
         error,
-        `Error syncing server revocations for user ${message.userId}`
+        `Error syncing server deleted collaborations for user ${message.userId}`
       );
     } finally {
       this.debug(
-        `Syncing of server revocations completed for user ${message.userId}`
+        `Syncing of server deleted collaborations completed for user ${message.userId}`
       );
 
-      this.syncingRevocations.delete(message.userId);
-      this.initSyncConsumer(message.userId, 'revocations');
+      this.syncingDeletedCollaborations.delete(message.userId);
+      this.initSyncConsumer(message.userId, 'deleted_collaborations');
     }
   }
 
@@ -370,7 +372,7 @@ class SyncService {
       await databaseService.getWorkspaceDatabase(userId);
 
     const incompleteTransactions = await workspaceDatabase
-      .selectFrom('node_transactions')
+      .selectFrom('transactions')
       .selectAll()
       .where('status', '=', 'incomplete')
       .execute();
@@ -396,7 +398,7 @@ class SyncService {
     }
 
     const groupedByNodeId = incompleteTransactions.reduce<
-      Record<string, SelectNodeTransaction[]>
+      Record<string, SelectTransaction[]>
     >((acc, transaction) => {
       acc[transaction.node_id] = [
         ...(acc[transaction.node_id] ?? []),
@@ -411,7 +413,7 @@ class SyncService {
           `Syncing incomplete transactions for node ${nodeId} for user ${userId}`
         );
 
-        const { data } = await httpClient.get<GetNodeTransactionsOutput>(
+        const { data } = await httpClient.get<GetTransactionsOutput>(
           `/v1/nodes/${credentials.workspaceId}/transactions/${nodeId}`,
           {
             domain: credentials.serverDomain,
@@ -425,7 +427,7 @@ class SyncService {
           );
 
           await workspaceDatabase
-            .deleteFrom('node_transactions')
+            .deleteFrom('transactions')
             .where(
               'id',
               'in',
@@ -447,7 +449,7 @@ class SyncService {
           );
 
           await workspaceDatabase
-            .updateTable('node_transactions')
+            .updateTable('transactions')
             .set({ retry_count: sql`retry_count + 1` })
             .where(
               'id',
@@ -461,7 +463,7 @@ class SyncService {
           );
 
           await workspaceDatabase
-            .updateTable('node_transactions')
+            .updateTable('transactions')
             .set({ retry_count: sql`retry_count + 1` })
             .where(
               'id',
@@ -515,7 +517,7 @@ class SyncService {
       try {
         this.debug(`Syncing missing node ${node.node_id} for user ${userId}`);
 
-        const { data } = await httpClient.get<GetNodeTransactionsOutput>(
+        const { data } = await httpClient.get<GetTransactionsOutput>(
           `/v1/nodes/${credentials.workspaceId}/transactions/${node.node_id}`,
           {
             domain: credentials.serverDomain,
@@ -568,7 +570,7 @@ class SyncService {
     }
 
     try {
-      const { data } = await httpClient.get<GetNodeTransactionsOutput>(
+      const { data } = await httpClient.get<GetTransactionsOutput>(
         `/v1/nodes/${credentials.workspaceId}/transactions/${nodeId}`,
         {
           domain: credentials.serverDomain,
@@ -592,7 +594,7 @@ class SyncService {
       await databaseService.getWorkspaceDatabase(userId);
 
     const unsyncedTransactions = await workspaceDatabase
-      .selectFrom('node_transactions')
+      .selectFrom('transactions')
       .selectAll()
       .where('status', '=', 'pending')
       .orderBy('id', 'asc')
@@ -622,9 +624,9 @@ class SyncService {
       return;
     }
 
-    const transactions: LocalNodeTransaction[] =
+    const transactions: LocalTransaction[] =
       unsyncedTransactions.map(mapTransaction);
-    const { data } = await httpClient.post<SyncNodeTransactionsOutput>(
+    const { data } = await httpClient.post<SyncTransactionsOutput>(
       `/v1/sync/${credentials.workspaceId}`,
       {
         transactions,
@@ -652,7 +654,7 @@ class SyncService {
       );
 
       await workspaceDatabase
-        .updateTable('node_transactions')
+        .updateTable('transactions')
         .set({ status: 'sent' })
         .where('id', 'in', syncedTransactionIds)
         .where('status', '=', 'pending')
@@ -665,7 +667,7 @@ class SyncService {
       );
 
       await workspaceDatabase
-        .updateTable('node_transactions')
+        .updateTable('transactions')
         .set((eb) => ({ retry_count: eb('retry_count', '+', 1) }))
         .where('id', 'in', unsyncedTransactionIds)
         .where('status', '=', 'pending')

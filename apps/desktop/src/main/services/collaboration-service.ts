@@ -1,6 +1,6 @@
 import {
   ServerCollaboration,
-  ServerCollaborationRevocation,
+  ServerDeletedCollaboration,
 } from '@colanode/core';
 
 import { createDebugger } from '@/main/debugger';
@@ -51,12 +51,12 @@ class CollaborationService {
     });
   }
 
-  public async applyServerCollaborationRevocation(
+  public async applyServerDeletedCollaboration(
     userId: string,
-    revocation: ServerCollaborationRevocation
+    deletedCollaboration: ServerDeletedCollaboration
   ) {
     this.debug(
-      `Applying server collaboration revocation: ${revocation.nodeId} for user ${userId}`
+      `Applying server deleted collaboration: ${deletedCollaboration.nodeId} for user ${userId}`
     );
 
     const workspaceDatabase =
@@ -65,27 +65,27 @@ class CollaborationService {
     await workspaceDatabase.transaction().execute(async (tx) => {
       await tx
         .deleteFrom('nodes')
-        .where('id', '=', revocation.nodeId)
+        .where('id', '=', deletedCollaboration.nodeId)
         .execute();
 
       await tx
-        .deleteFrom('node_transactions')
-        .where('node_id', '=', revocation.nodeId)
+        .deleteFrom('transactions')
+        .where('node_id', '=', deletedCollaboration.nodeId)
         .execute();
 
       await tx
         .deleteFrom('collaborations')
-        .where('node_id', '=', revocation.nodeId)
+        .where('node_id', '=', deletedCollaboration.nodeId)
         .execute();
 
       await tx
         .deleteFrom('interaction_events')
-        .where('node_id', '=', revocation.nodeId)
+        .where('node_id', '=', deletedCollaboration.nodeId)
         .execute();
 
       await tx
         .deleteFrom('interactions')
-        .where('node_id', '=', revocation.nodeId)
+        .where('node_id', '=', deletedCollaboration.nodeId)
         .execute();
     });
   }

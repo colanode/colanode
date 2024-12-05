@@ -16,7 +16,7 @@ import { database } from '@/data/database';
 import {
   CreateCollaboration,
   CreateNode,
-  CreateNodeTransaction,
+  CreateTransaction,
   DatabaseSchema,
   SelectWorkspaceUser,
 } from '@/data/schema';
@@ -24,12 +24,12 @@ import { eventBus } from '@/lib/event-bus';
 import { fetchNodeAncestors, mapNode } from '@/lib/nodes';
 import { createLogger } from '@/lib/logger';
 import {
-  ApplyNodeCreateTransactionInput,
-  ApplyNodeCreateTransactionOutput,
-  ApplyNodeDeleteTransactionInput,
-  ApplyNodeDeleteTransactionOutput,
-  ApplyNodeUpdateTransactionInput,
-  ApplyNodeUpdateTransactionOutput,
+  ApplyCreateTransactionInput,
+  ApplyCreateTransactionOutput,
+  ApplyDeleteTransactionInput,
+  ApplyDeleteTransactionOutput,
+  ApplyUpdateTransactionInput,
+  ApplyUpdateTransactionOutput,
   CreateNodeInput,
   CreateNodeOutput,
   UpdateNodeInput,
@@ -73,7 +73,7 @@ class NodeService {
       transaction_id: transactionId,
     };
 
-    const createTransaction: CreateNodeTransaction = {
+    const createTransaction: CreateTransaction = {
       id: transactionId,
       node_id: input.nodeId,
       node_type: input.attributes.type,
@@ -143,7 +143,7 @@ class NodeService {
     }
 
     const previousTransactions = await database
-      .selectFrom('node_transactions')
+      .selectFrom('transactions')
       .selectAll()
       .where('node_id', '=', input.nodeId)
       .orderBy('id', 'asc')
@@ -200,7 +200,7 @@ class NodeService {
           }
 
           const createdTransaction = await trx
-            .insertInto('node_transactions')
+            .insertInto('transactions')
             .returningAll()
             .values({
               id: transactionId,
@@ -250,10 +250,10 @@ class NodeService {
     }
   }
 
-  public async applyNodeCreateTransaction(
+  public async applyCreateTransaction(
     workspaceUser: SelectWorkspaceUser,
-    input: ApplyNodeCreateTransactionInput
-  ): Promise<ApplyNodeCreateTransactionOutput | null> {
+    input: ApplyCreateTransactionInput
+  ): Promise<ApplyCreateTransactionOutput | null> {
     const ydoc = new YDoc();
     ydoc.applyUpdate(input.data);
     const attributes = ydoc.getAttributes<NodeAttributes>();
@@ -289,7 +289,7 @@ class NodeService {
       transaction_id: input.id,
     };
 
-    const createTransaction: CreateNodeTransaction = {
+    const createTransaction: CreateTransaction = {
       id: input.id,
       node_id: input.nodeId,
       node_type: attributes.type,
@@ -327,16 +327,13 @@ class NodeService {
     }
   }
 
-  public async applyNodeUpdateTransaction(
+  public async applyUpdateTransaction(
     workspaceUser: SelectWorkspaceUser,
-    input: ApplyNodeUpdateTransactionInput
-  ): Promise<ApplyNodeUpdateTransactionOutput | null> {
+    input: ApplyUpdateTransactionInput
+  ): Promise<ApplyUpdateTransactionOutput | null> {
     let count = 0;
     while (count < UPDATE_RETRIES_LIMIT) {
-      const result = await this.tryApplyNodeUpdateTransaction(
-        workspaceUser,
-        input
-      );
+      const result = await this.tryApplyUpdateTransaction(workspaceUser, input);
 
       if (result.type === 'success') {
         return result.output;
@@ -352,10 +349,10 @@ class NodeService {
     return null;
   }
 
-  private async tryApplyNodeUpdateTransaction(
+  private async tryApplyUpdateTransaction(
     workspaceUser: SelectWorkspaceUser,
-    input: ApplyNodeUpdateTransactionInput
-  ): Promise<UpdateResult<ApplyNodeUpdateTransactionOutput>> {
+    input: ApplyUpdateTransactionInput
+  ): Promise<UpdateResult<ApplyUpdateTransactionOutput>> {
     const ancestorRows = await fetchNodeAncestors(input.nodeId);
     const ancestors = ancestorRows.map(mapNode);
 
@@ -365,7 +362,7 @@ class NodeService {
     }
 
     const previousTransactions = await database
-      .selectFrom('node_transactions')
+      .selectFrom('transactions')
       .selectAll()
       .where('node_id', '=', input.nodeId)
       .orderBy('version', 'asc')
@@ -428,7 +425,7 @@ class NodeService {
           }
 
           const createdTransaction = await trx
-            .insertInto('node_transactions')
+            .insertInto('transactions')
             .returningAll()
             .values({
               id: input.id,
@@ -509,10 +506,10 @@ class NodeService {
     }
   }
 
-  public async applyNodeDeleteTransaction(
+  public async applyDeleteTransaction(
     workspaceUser: SelectWorkspaceUser,
-    input: ApplyNodeDeleteTransactionInput
-  ): Promise<ApplyNodeDeleteTransactionOutput | null> {
+    input: ApplyDeleteTransactionInput
+  ): Promise<ApplyDeleteTransactionOutput | null> {
     const ancestorRows = await fetchNodeAncestors(input.nodeId);
     const ancestors = ancestorRows.map(mapNode);
     const node = ancestors.find((ancestor) => ancestor.id === input.nodeId);
@@ -547,12 +544,12 @@ class NodeService {
         }
 
         await trx
-          .deleteFrom('node_transactions')
+          .deleteFrom('transactions')
           .where('node_id', '=', input.nodeId)
           .execute();
 
         const createdTransaction = await trx
-          .insertInto('node_transactions')
+          .insertInto('transactions')
           .returningAll()
           .values({
             id: input.id,
@@ -607,7 +604,7 @@ class NodeService {
   private async applyDatabaseCreateTransaction(
     attributes: NodeAttributes,
     node: CreateNode,
-    transaction: CreateNodeTransaction
+    transaction: CreateTransaction
   ) {
     const collaborationsToCreate: CreateCollaboration[] = Object.entries(
       extractNodeCollaborators(attributes)
@@ -631,7 +628,7 @@ class NodeService {
       }
 
       const createdTransaction = await trx
-        .insertInto('node_transactions')
+        .insertInto('transactions')
         .returningAll()
         .values(transaction)
         .executeTakeFirst();

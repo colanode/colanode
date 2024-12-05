@@ -1,4 +1,4 @@
-import { LocalNodeTransaction, Node } from '@colanode/core';
+import { LocalTransaction, Node } from '@colanode/core';
 import { encodeState } from '@colanode/crdt';
 import {
   DeleteResult,
@@ -22,7 +22,7 @@ import {
   SelectDownload,
   SelectInteraction,
   SelectNode,
-  SelectNodeTransaction,
+  SelectTransaction,
   SelectUpload,
   WorkspaceDatabaseSchema,
 } from '@/main/data/workspace/schema';
@@ -175,9 +175,7 @@ export const mapWorkspace = (row: SelectWorkspace): Workspace => {
   };
 };
 
-export const mapTransaction = (
-  row: SelectNodeTransaction
-): LocalNodeTransaction => {
+export const mapTransaction = (row: SelectTransaction): LocalTransaction => {
   if (row.operation === 'create' && row.data) {
     return {
       id: row.id,

@@ -1,6 +1,6 @@
 import { Node, NodeAttributes } from '@colanode/core';
 
-import { SelectNode, SelectNodeTransaction } from '@/data/schema';
+import { SelectNode, SelectTransaction } from '@/data/schema';
 
 export type NodeCollaborator = {
   nodeId: string;
@@ -18,7 +18,7 @@ export type CreateNodeInput = {
 
 export type CreateNodeOutput = {
   node: SelectNode;
-  transaction: SelectNodeTransaction;
+  transaction: SelectTransaction;
 };
 
 export type UpdateNodeInput = {
@@ -30,22 +30,22 @@ export type UpdateNodeInput = {
 
 export type UpdateNodeOutput = {
   node: SelectNode;
-  transaction: SelectNodeTransaction;
+  transaction: SelectTransaction;
 };
 
-export type ApplyNodeCreateTransactionInput = {
+export type ApplyCreateTransactionInput = {
   id: string;
   nodeId: string;
   data: string | Uint8Array;
   createdAt: Date;
 };
 
-export type ApplyNodeCreateTransactionOutput = {
+export type ApplyCreateTransactionOutput = {
   node: SelectNode;
-  transaction: SelectNodeTransaction;
+  transaction: SelectTransaction;
 };
 
-export type ApplyNodeUpdateTransactionInput = {
+export type ApplyUpdateTransactionInput = {
   id: string;
   nodeId: string;
   userId: string;
@@ -53,18 +53,18 @@ export type ApplyNodeUpdateTransactionInput = {
   createdAt: Date;
 };
 
-export type ApplyNodeUpdateTransactionOutput = {
+export type ApplyUpdateTransactionOutput = {
   node: SelectNode;
-  transaction: SelectNodeTransaction;
+  transaction: SelectTransaction;
 };
 
-export type ApplyNodeDeleteTransactionInput = {
+export type ApplyDeleteTransactionInput = {
   id: string;
   nodeId: string;
   createdAt: Date;
 };
 
-export type ApplyNodeDeleteTransactionOutput = {
+export type ApplyDeleteTransactionOutput = {
   node: SelectNode;
-  transaction: SelectNodeTransaction;
+  transaction: SelectTransaction;
 };

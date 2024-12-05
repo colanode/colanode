@@ -1,4 +1,4 @@
-import { LocalNodeTransaction, Node } from '@colanode/core';
+import { LocalTransaction, Node } from '@colanode/core';
 
 import { Account } from '@/shared/types/accounts';
 import { Interaction } from '@/shared/types/interactions';
@@ -110,14 +110,14 @@ export type RadarDataUpdatedEvent = {
   type: 'radar_data_updated';
 };
 
-export type NodeTransactionCreatedEvent = {
-  type: 'node_transaction_created';
+export type TransactionCreatedEvent = {
+  type: 'transaction_created';
   userId: string;
-  transaction: LocalNodeTransaction;
+  transaction: LocalTransaction;
 };
 
-export type NodeTransactionIncompleteEvent = {
-  type: 'node_transaction_incomplete';
+export type TransactionIncompleteEvent = {
+  type: 'transaction_incomplete';
   userId: string;
   transactionId: string;
 };
@@ -172,8 +172,8 @@ export type Event =
   | UploadDeletedEvent
   | QueryResultUpdatedEvent
   | RadarDataUpdatedEvent
-  | NodeTransactionCreatedEvent
-  | NodeTransactionIncompleteEvent
+  | TransactionCreatedEvent
+  | TransactionIncompleteEvent
   | ServerAvailabilityChangedEvent
   | SocketConnectionOpenedEvent
   | CollaborationCreatedEvent

@@ -1,11 +1,11 @@
 import {
-  LocalCreateNodeTransaction,
-  LocalDeleteNodeTransaction,
-  LocalNodeTransaction,
-  LocalUpdateNodeTransaction,
-  SyncNodeTransactionResult,
-  SyncNodeTransactionsInput,
-  SyncNodeTransactionStatus,
+  LocalCreateTransaction,
+  LocalDeleteTransaction,
+  LocalTransaction,
+  LocalUpdateTransaction,
+  SyncTransactionResult,
+  SyncTransactionsInput,
+  SyncTransactionStatus,
 } from '@colanode/core';
 import { Request, Response, Router } from 'express';
 
@@ -26,7 +26,7 @@ syncRouter.post('/:workspaceId', async (req: Request, res: Response) => {
   }
 
   const workspaceId = req.params.workspaceId as string;
-  const input = req.body as SyncNodeTransactionsInput;
+  const input = req.body as SyncTransactionsInput;
 
   const workspaceUser = await database
     .selectFrom('workspace_users')
@@ -43,13 +43,10 @@ syncRouter.post('/:workspaceId', async (req: Request, res: Response) => {
     return;
   }
 
-  const results: SyncNodeTransactionResult[] = [];
+  const results: SyncTransactionResult[] = [];
   for (const transaction of input.transactions) {
     try {
-      const status = await handleLocalNodeTransaction(
-        workspaceUser,
-        transaction
-      );
+      const status = await handleLocalTransaction(workspaceUser, transaction);
       results.push({
         id: transaction.id,
         status: status,
@@ -67,26 +64,26 @@ syncRouter.post('/:workspaceId', async (req: Request, res: Response) => {
   res.status(200).json({ results });
 });
 
-const handleLocalNodeTransaction = async (
+const handleLocalTransaction = async (
   workspaceUser: SelectWorkspaceUser,
-  transaction: LocalNodeTransaction
-): Promise<SyncNodeTransactionStatus> => {
+  transaction: LocalTransaction
+): Promise<SyncTransactionStatus> => {
   if (transaction.operation === 'create') {
-    return await handleCreateNodeTransaction(workspaceUser, transaction);
+    return await handleCreateTransaction(workspaceUser, transaction);
   } else if (transaction.operation === 'update') {
-    return await handleUpdateNodeTransaction(workspaceUser, transaction);
+    return await handleUpdateTransaction(workspaceUser, transaction);
   } else if (transaction.operation === 'delete') {
-    return await handleDeleteNodeTransaction(workspaceUser, transaction);
+    return await handleDeleteTransaction(workspaceUser, transaction);
   } else {
     return 'error';
   }
 };
 
-const handleCreateNodeTransaction = async (
+const handleCreateTransaction = async (
   workspaceUser: SelectWorkspaceUser,
-  transaction: LocalCreateNodeTransaction
-): Promise<SyncNodeTransactionStatus> => {
-  const output = await nodeService.applyNodeCreateTransaction(workspaceUser, {
+  transaction: LocalCreateTransaction
+): Promise<SyncTransactionStatus> => {
+  const output = await nodeService.applyCreateTransaction(workspaceUser, {
     id: transaction.id,
     nodeId: transaction.nodeId,
     data: transaction.data,
@@ -100,11 +97,11 @@ const handleCreateNodeTransaction = async (
   return 'success';
 };
 
-const handleUpdateNodeTransaction = async (
+const handleUpdateTransaction = async (
   workspaceUser: SelectWorkspaceUser,
-  transaction: LocalUpdateNodeTransaction
-): Promise<SyncNodeTransactionStatus> => {
-  const output = await nodeService.applyNodeUpdateTransaction(workspaceUser, {
+  transaction: LocalUpdateTransaction
+): Promise<SyncTransactionStatus> => {
+  const output = await nodeService.applyUpdateTransaction(workspaceUser, {
     id: transaction.id,
     nodeId: transaction.nodeId,
     userId: transaction.createdBy,
@@ -119,11 +116,11 @@ const handleUpdateNodeTransaction = async (
   return 'success';
 };
 
-const handleDeleteNodeTransaction = async (
+const handleDeleteTransaction = async (
   workspaceUser: SelectWorkspaceUser,
-  transaction: LocalDeleteNodeTransaction
-): Promise<SyncNodeTransactionStatus> => {
-  const output = await nodeService.applyNodeDeleteTransaction(workspaceUser, {
+  transaction: LocalDeleteTransaction
+): Promise<SyncTransactionStatus> => {
+  const output = await nodeService.applyDeleteTransaction(workspaceUser, {
     id: transaction.id,
     nodeId: transaction.nodeId,
     createdAt: new Date(transaction.createdAt),

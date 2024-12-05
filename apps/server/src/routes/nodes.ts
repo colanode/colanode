@@ -1,8 +1,8 @@
-import { GetNodeTransactionsOutput, hasViewerAccess } from '@colanode/core';
+import { GetTransactionsOutput, hasViewerAccess } from '@colanode/core';
 import { Request, Response, Router } from 'express';
 
 import { database } from '@/data/database';
-import { fetchNodeRole, mapNodeTransaction } from '@/lib/nodes';
+import { fetchNodeRole, mapTransaction } from '@/lib/nodes';
 import { ApiError } from '@/types/api';
 
 export const nodesRouter = Router();
@@ -60,14 +60,14 @@ nodesRouter.get(
     }
 
     const transactions = await database
-      .selectFrom('node_transactions')
+      .selectFrom('transactions')
       .selectAll()
       .where('node_id', '=', nodeId)
       .orderBy('version', 'desc')
       .execute();
 
-    const output: GetNodeTransactionsOutput = {
-      transactions: transactions.map(mapNodeTransaction),
+    const output: GetTransactionsOutput = {
+      transactions: transactions.map(mapTransaction),
     };
 
     res.status(200).json(output);

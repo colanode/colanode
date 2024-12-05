@@ -5,10 +5,10 @@ import {
   NodeAttributes,
   NodeMutationContext,
   registry,
-  ServerNodeCreateTransaction,
-  ServerNodeDeleteTransaction,
-  ServerNodeTransaction,
-  ServerNodeUpdateTransaction,
+  ServerCreateTransaction,
+  ServerDeleteTransaction,
+  ServerTransaction,
+  ServerUpdateTransaction,
 } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
 import { sql } from 'kysely';
@@ -21,7 +21,7 @@ import {
   CreateUpload,
   SelectDownload,
   SelectNode,
-  SelectNodeTransaction,
+  SelectTransaction,
   SelectUpload,
 } from '@/main/data/workspace/schema';
 import { interactionService } from '@/main/services/interaction-service';
@@ -77,7 +77,7 @@ class NodeService {
 
     const inputs = Array.isArray(input) ? input : [input];
     const createdNodes: SelectNode[] = [];
-    const createdNodeTransactions: SelectNodeTransaction[] = [];
+    const createdTransactions: SelectTransaction[] = [];
     const createdUploads: SelectUpload[] = [];
     const createdDownloads: SelectDownload[] = [];
 
@@ -140,7 +140,7 @@ class NodeService {
         createdNodes.push(createdNode);
 
         const createdTransaction = await transaction
-          .insertInto('node_transactions')
+          .insertInto('transactions')
           .returningAll()
           .values({
             id: transactionId,
@@ -159,7 +159,7 @@ class NodeService {
           throw new Error('Failed to create transaction');
         }
 
-        createdNodeTransactions.push(createdTransaction);
+        createdTransactions.push(createdTransaction);
 
         if (inputItem.upload) {
           const createdUpload = await transaction
@@ -203,13 +203,13 @@ class NodeService {
       });
     }
 
-    for (const createdTransaction of createdNodeTransactions) {
+    for (const createdTransaction of createdTransactions) {
       this.debug(
         `Created transaction ${createdTransaction.id} for node ${createdTransaction.node_id} with operation ${createdTransaction.operation}`
       );
 
       eventBus.publish({
-        type: 'node_transaction_created',
+        type: 'transaction_created',
         userId,
         transaction: mapTransaction(createdTransaction),
       });
@@ -312,7 +312,7 @@ class NodeService {
 
     const ydoc = new YDoc();
     const previousTransactions = await workspaceDatabase
-      .selectFrom('node_transactions')
+      .selectFrom('transactions')
       .where('node_id', '=', nodeId)
       .selectAll()
       .execute();
@@ -345,7 +345,7 @@ class NodeService {
 
         if (updatedNode) {
           const createdTransaction = await trx
-            .insertInto('node_transactions')
+            .insertInto('transactions')
             .returningAll()
             .values({
               id: transactionId,
@@ -389,7 +389,7 @@ class NodeService {
       );
 
       eventBus.publish({
-        type: 'node_transaction_created',
+        type: 'transaction_created',
         userId,
         transaction: mapTransaction(createdTransaction),
       });
@@ -452,7 +452,7 @@ class NodeService {
         }
 
         await trx
-          .deleteFrom('node_transactions')
+          .deleteFrom('transactions')
           .where('node_id', '=', nodeId)
           .execute();
 
@@ -472,7 +472,7 @@ class NodeService {
           .execute();
 
         const createdTransaction = await trx
-          .insertInto('node_transactions')
+          .insertInto('transactions')
           .returningAll()
           .values({
             id: generateId(IdType.Transaction),
@@ -510,7 +510,7 @@ class NodeService {
       );
 
       eventBus.publish({
-        type: 'node_transaction_created',
+        type: 'transaction_created',
         userId,
         transaction: mapTransaction(createdTransaction),
       });
@@ -521,7 +521,7 @@ class NodeService {
 
   public async applyServerTransaction(
     userId: string,
-    transaction: ServerNodeTransaction
+    transaction: ServerTransaction
   ) {
     if (transaction.operation === 'create') {
       await this.applyServerCreateTransaction(userId, transaction);
@@ -535,7 +535,7 @@ class NodeService {
   public async replaceTransactions(
     userId: string,
     nodeId: string,
-    transactions: ServerNodeTransaction[]
+    transactions: ServerTransaction[]
   ): Promise<boolean> {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
@@ -592,7 +592,7 @@ class NodeService {
         .execute();
 
       await trx
-        .insertInto('node_transactions')
+        .insertInto('transactions')
         .values(
           transactions.map((t) => ({
             id: t.id,
@@ -624,7 +624,7 @@ class NodeService {
 
   private async applyServerCreateTransaction(
     userId: string,
-    transaction: ServerNodeCreateTransaction
+    transaction: ServerCreateTransaction
   ) {
     this.debug(
       `Applying server create transaction ${transaction.id} for node ${transaction.nodeId}`
@@ -635,7 +635,7 @@ class NodeService {
 
     const version = BigInt(transaction.version);
     const existingTransaction = await workspaceDatabase
-      .selectFrom('node_transactions')
+      .selectFrom('transactions')
       .select(['id', 'status', 'version', 'server_created_at'])
       .where('id', '=', transaction.id)
       .executeTakeFirst();
@@ -653,7 +653,7 @@ class NodeService {
       }
 
       await workspaceDatabase
-        .updateTable('node_transactions')
+        .updateTable('transactions')
         .set({
           status: 'synced',
           version,
@@ -689,7 +689,7 @@ class NodeService {
           .executeTakeFirst();
 
         await trx
-          .insertInto('node_transactions')
+          .insertInto('transactions')
           .values({
             id: transaction.id,
             node_id: transaction.nodeId,
@@ -732,7 +732,7 @@ class NodeService {
       );
 
       eventBus.publish({
-        type: 'node_transaction_incomplete',
+        type: 'transaction_incomplete',
         userId,
         transactionId: transaction.id,
       });
@@ -741,14 +741,14 @@ class NodeService {
 
   private async applyServerUpdateTransaction(
     userId: string,
-    transaction: ServerNodeUpdateTransaction
+    transaction: ServerUpdateTransaction
   ) {
     const workspaceDatabase =
       await databaseService.getWorkspaceDatabase(userId);
 
     const version = BigInt(transaction.version);
     const existingTransaction = await workspaceDatabase
-      .selectFrom('node_transactions')
+      .selectFrom('transactions')
       .select(['id', 'status', 'version', 'server_created_at'])
       .where('id', '=', transaction.id)
       .executeTakeFirst();
@@ -766,7 +766,7 @@ class NodeService {
       }
 
       await workspaceDatabase
-        .updateTable('node_transactions')
+        .updateTable('transactions')
         .set({
           status: 'synced',
           version,
@@ -782,7 +782,7 @@ class NodeService {
     }
 
     const previousTransactions = await workspaceDatabase
-      .selectFrom('node_transactions')
+      .selectFrom('transactions')
       .selectAll()
       .where('node_id', '=', transaction.nodeId)
       .orderBy('id', 'asc')
@@ -815,7 +815,7 @@ class NodeService {
           .executeTakeFirst();
 
         await trx
-          .insertInto('node_transactions')
+          .insertInto('transactions')
           .values({
             id: transaction.id,
             node_id: transaction.nodeId,
@@ -858,7 +858,7 @@ class NodeService {
       );
 
       eventBus.publish({
-        type: 'node_transaction_incomplete',
+        type: 'transaction_incomplete',
         userId,
         transactionId: transaction.id,
       });
@@ -867,7 +867,7 @@ class NodeService {
 
   private async applyServerDeleteTransaction(
     userId: string,
-    transaction: ServerNodeDeleteTransaction
+    transaction: ServerDeleteTransaction
   ) {
     this.debug(
       `Applying server delete transaction ${transaction.id} for node ${transaction.nodeId}`
@@ -880,7 +880,7 @@ class NodeService {
       .transaction()
       .execute(async (trx) => {
         await trx
-          .deleteFrom('node_transactions')
+          .deleteFrom('transactions')
           .where('node_id', '=', transaction.nodeId)
           .execute();
 

@@ -4,19 +4,21 @@ import {
   Node,
   NodeOutput,
   NodeRole,
-  NodeType,  ServerCollaboration,
-  ServerCollaborationRevocation,
+  NodeType,
+  ServerCollaboration,
+  ServerDeletedCollaboration,
   ServerInteraction,
-  ServerNodeTransaction} from '@colanode/core';
+  ServerTransaction,
+} from '@colanode/core';
 import { encodeState } from '@colanode/crdt';
 
 import { database } from '@/data/database';
 import {
   SelectCollaboration,
-  SelectCollaborationRevocation,
+  SelectDeletedCollaboration,
   SelectInteraction,
   SelectNode,
-  SelectNodeTransaction,
+  SelectTransaction,
 } from '@/data/schema';
 import { NodeCollaborator } from '@/types/nodes';
 
@@ -50,9 +52,9 @@ export const mapNode = (node: SelectNode): Node => {
   } as Node;
 };
 
-export const mapNodeTransaction = (
-  transaction: SelectNodeTransaction
-): ServerNodeTransaction => {
+export const mapTransaction = (
+  transaction: SelectTransaction
+): ServerTransaction => {
   if (transaction.operation === 'create' && transaction.data) {
     return {
       id: transaction.id,
@@ -100,15 +102,15 @@ export const mapNodeTransaction = (
   throw new Error('Unknown transaction type');
 };
 
-export const mapCollaborationRevocation = (
-  revocation: SelectCollaborationRevocation
-): ServerCollaborationRevocation => {
+export const mapDeletedCollaboration = (
+  deletedCollaboration: SelectDeletedCollaboration
+): ServerDeletedCollaboration => {
   return {
-    userId: revocation.user_id,
-    nodeId: revocation.node_id,
-    workspaceId: revocation.workspace_id,
-    createdAt: revocation.created_at.toISOString(),
-    version: revocation.version.toString(),
+    userId: deletedCollaboration.user_id,
+    nodeId: deletedCollaboration.node_id,
+    workspaceId: deletedCollaboration.workspace_id,
+    createdAt: deletedCollaboration.created_at.toISOString(),
+    version: deletedCollaboration.version.toString(),
   };
 };
 

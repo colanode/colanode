@@ -34,10 +34,10 @@ const createNodesTable: Migration = {
   },
 };
 
-const createNodeTransactionsTable: Migration = {
+const createTransactionsTable: Migration = {
   up: async (db) => {
     await db.schema
-      .createTable('node_transactions')
+      .createTable('transactions')
       .addColumn('id', 'text', (col) => col.notNull().primaryKey())
       .addColumn('node_id', 'text', (col) => col.notNull())
       .addColumn('node_type', 'text', (col) => col.notNull())
@@ -52,7 +52,7 @@ const createNodeTransactionsTable: Migration = {
       .execute();
   },
   down: async (db) => {
-    await db.schema.dropTable('node_transactions').execute();
+    await db.schema.dropTable('transactions').execute();
   },
 };
 
@@ -317,7 +317,7 @@ const createCursorsTable: Migration = {
 
 export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00001_create_nodes_table': createNodesTable,
-  '00002_create_node_transactions_table': createNodeTransactionsTable,
+  '00002_create_transactions_table': createTransactionsTable,
   '00003_create_collaborations_table': createCollaborationsTable,
   '00004_create_uploads_table': createUploadsTable,
   '00005_create_downloads_table': createDownloadsTable,

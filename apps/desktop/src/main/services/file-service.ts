@@ -272,16 +272,16 @@ class FileService {
         continue;
       }
 
-      const nodeTransactions = await workspaceDatabase
-        .selectFrom('node_transactions')
+      const transactions = await workspaceDatabase
+        .selectFrom('transactions')
         .selectAll()
         .where('node_id', '=', upload.node_id)
         .where('status', '=', 'pending')
         .execute();
 
-      if (nodeTransactions.length > 0) {
+      if (transactions.length > 0) {
         this.debug(
-          `Node transactions found for node ${upload.node_id}, skipping upload until transactions are completed`
+          `Transactions found for node ${upload.node_id}, skipping upload until transactions are completed`
         );
         continue;
       }

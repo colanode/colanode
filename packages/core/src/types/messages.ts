@@ -1,24 +1,24 @@
 import { InteractionEvent } from './interactions';
 import {
   ServerCollaboration,
-  ServerCollaborationRevocation,
+  ServerDeletedCollaboration,
   ServerInteraction,
-  ServerNodeTransaction,
+  ServerTransaction,
   SyncConsumerType,
 } from './sync';
 
 import { NodeType } from '../registry';
 
-export type NodeTransactionsBatchMessage = {
-  type: 'node_transactions_batch';
+export type TransactionsBatchMessage = {
+  type: 'transactions_batch';
   userId: string;
-  transactions: ServerNodeTransaction[];
+  transactions: ServerTransaction[];
 };
 
-export type CollaborationRevocationsBatchMessage = {
-  type: 'collaboration_revocations_batch';
+export type DeletedCollaborationsBatchMessage = {
+  type: 'deleted_collaborations_batch';
   userId: string;
-  revocations: ServerCollaborationRevocation[];
+  deletedCollaborations: ServerDeletedCollaboration[];
 };
 
 export type CollaborationsBatchMessage = {
@@ -49,9 +49,9 @@ export type InitSyncConsumerMessage = {
 };
 
 export type Message =
-  | NodeTransactionsBatchMessage
-  | CollaborationRevocationsBatchMessage
+  | TransactionsBatchMessage
   | CollaborationsBatchMessage
+  | DeletedCollaborationsBatchMessage
   | InteractionsBatchMessage
   | SyncInteractionsMessage
   | InitSyncConsumerMessage;

@@ -104,7 +104,7 @@ export type SelectNode = Selectable<NodeTable>;
 export type CreateNode = Insertable<NodeTable>;
 export type UpdateNode = Updateable<NodeTable>;
 
-interface NodeTransactionTable {
+interface TransactionTable {
   id: ColumnType<string, string, never>;
   node_id: ColumnType<string, string, never>;
   node_type: ColumnType<NodeType, NodeType, never>;
@@ -117,9 +117,9 @@ interface NodeTransactionTable {
   version: ColumnType<bigint, never, never>;
 }
 
-export type SelectNodeTransaction = Selectable<NodeTransactionTable>;
-export type CreateNodeTransaction = Insertable<NodeTransactionTable>;
-export type UpdateNodeTransaction = Updateable<NodeTransactionTable>;
+export type SelectTransaction = Selectable<TransactionTable>;
+export type CreateTransaction = Insertable<TransactionTable>;
+export type UpdateTransaction = Updateable<TransactionTable>;
 
 interface CollaborationTable {
   user_id: ColumnType<string, string, never>;
@@ -135,7 +135,7 @@ export type SelectCollaboration = Selectable<CollaborationTable>;
 export type CreateCollaboration = Insertable<CollaborationTable>;
 export type UpdateCollaboration = Updateable<CollaborationTable>;
 
-interface CollaborationRevocationTable {
+interface DeletedCollaborationTable {
   user_id: ColumnType<string, never, never>;
   node_id: ColumnType<string, never, never>;
   workspace_id: ColumnType<string, string, never>;
@@ -143,12 +143,9 @@ interface CollaborationRevocationTable {
   version: ColumnType<bigint, never, never>;
 }
 
-export type SelectCollaborationRevocation =
-  Selectable<CollaborationRevocationTable>;
-export type CreateCollaborationRevocation =
-  Insertable<CollaborationRevocationTable>;
-export type UpdateCollaborationRevocation =
-  Updateable<CollaborationRevocationTable>;
+export type SelectDeletedCollaboration = Selectable<DeletedCollaborationTable>;
+export type CreateDeletedCollaboration = Insertable<DeletedCollaborationTable>;
+export type UpdateDeletedCollaboration = Updateable<DeletedCollaborationTable>;
 
 interface NodePathTable {
   ancestor_id: ColumnType<string, string, never>;
@@ -205,9 +202,9 @@ export interface DatabaseSchema {
   workspaces: WorkspaceTable;
   workspace_users: WorkspaceUserTable;
   nodes: NodeTable;
-  node_transactions: NodeTransactionTable;
+  transactions: TransactionTable;
   collaborations: CollaborationTable;
-  collaboration_revocations: CollaborationRevocationTable;
+  deleted_collaborations: DeletedCollaborationTable;
   node_paths: NodePathTable;
   uploads: UploadTable;
   interactions: InteractionTable;

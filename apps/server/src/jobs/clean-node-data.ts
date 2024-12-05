@@ -2,7 +2,7 @@ import { generateId, IdType } from '@colanode/core';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 
 import { database } from '@/data/database';
-import { CreateNodeTransaction, SelectUpload } from '@/data/schema';
+import { CreateTransaction, SelectUpload } from '@/data/schema';
 import { JobHandler } from '@/types/jobs';
 import { filesStorage, BUCKET_NAMES } from '@/data/storage';
 import { eventBus } from '@/lib/event-bus';
@@ -32,7 +32,7 @@ export const cleanNodeDataHandler: JobHandler<CleanNodeDataInput> = async (
   logger.trace(`Cleaning node data for ${input.nodeId}`);
 
   const deleteTransactions = await database
-    .selectFrom('node_transactions')
+    .selectFrom('transactions')
     .selectAll()
     .where('node_id', '=', input.nodeId)
     .execute();
@@ -101,7 +101,7 @@ const deleteChildren = async (
           : [];
 
       const nodeIds: string[] = descendants.map((d) => d.id);
-      const transactionsToCreate: CreateNodeTransaction[] = descendants.map(
+      const transactionsToCreate: CreateTransaction[] = descendants.map(
         (descendant) => ({
           id: generateId(IdType.Transaction),
           node_id: descendant.id,
@@ -117,12 +117,12 @@ const deleteChildren = async (
 
       await database.transaction().execute(async (trx) => {
         await trx
-          .deleteFrom('node_transactions')
+          .deleteFrom('transactions')
           .where('node_id', 'in', nodeIds)
           .execute();
 
         const createdTransactions = await trx
-          .insertInto('node_transactions')
+          .insertInto('transactions')
           .returningAll()
           .values(transactionsToCreate)
           .execute();

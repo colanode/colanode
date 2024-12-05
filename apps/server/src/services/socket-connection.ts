@@ -1,14 +1,14 @@
 import { WebSocket } from 'ws';
 import {
-  CollaborationRevocationsBatchMessage,
   CollaborationsBatchMessage,
   InitSyncConsumerMessage,
   InteractionsBatchMessage,
   Message,
-  NodeTransactionsBatchMessage,
+  TransactionsBatchMessage,
   NodeType,
   SyncConsumerType,
   WorkspaceStatus,
+  DeletedCollaborationsBatchMessage,
 } from '@colanode/core';
 
 import { interactionService } from '@/services/interaction-service';
@@ -17,9 +17,9 @@ import { RequestAccount } from '@/types/api';
 import { database } from '@/data/database';
 import {
   mapCollaboration,
-  mapCollaborationRevocation,
+  mapDeletedCollaboration,
   mapInteraction,
-  mapNodeTransaction,
+  mapTransaction,
 } from '@/lib/nodes';
 import {
   CollaboratorAddedEvent,
@@ -131,8 +131,8 @@ export class SocketConnection {
   ) {
     if (consumer.type === 'transactions') {
       this.consumeTransactions(user, consumer);
-    } else if (consumer.type === 'revocations') {
-      this.consumeRevocations(user, consumer);
+    } else if (consumer.type === 'deleted_collaborations') {
+      this.consumeDeletedCollaborations(user, consumer);
     } else if (consumer.type === 'collaborations') {
       this.consumeCollaborations(user, consumer);
     } else if (consumer.type === 'interactions') {
@@ -154,24 +154,24 @@ export class SocketConnection {
     );
 
     const unsyncedTransactions = await database
-      .selectFrom('node_transactions as nt')
+      .selectFrom('transactions as t')
       .leftJoin('collaborations as c', (join) =>
         join
           .on('c.user_id', '=', user.userId)
-          .onRef('c.node_id', '=', 'nt.node_id')
+          .onRef('c.node_id', '=', 't.node_id')
       )
-      .selectAll('nt')
+      .selectAll('t')
       .where((eb) =>
         eb.or([
           eb.and([
-            eb('nt.workspace_id', '=', user.workspaceId),
-            eb('nt.node_type', 'in', PUBLIC_NODES),
+            eb('t.workspace_id', '=', user.workspaceId),
+            eb('t.node_type', 'in', PUBLIC_NODES),
           ]),
-          eb('c.node_id', '=', eb.ref('nt.node_id')),
+          eb('c.node_id', '=', eb.ref('t.node_id')),
         ])
       )
-      .where('nt.version', '>', BigInt(consumer.cursor))
-      .orderBy('nt.version', 'asc')
+      .where('t.version', '>', BigInt(consumer.cursor))
+      .orderBy('t.version', 'asc')
       .limit(20)
       .execute();
 
@@ -180,9 +180,9 @@ export class SocketConnection {
       return;
     }
 
-    const transactions = unsyncedTransactions.map(mapNodeTransaction);
-    const message: NodeTransactionsBatchMessage = {
-      type: 'node_transactions_batch',
+    const transactions = unsyncedTransactions.map(mapTransaction);
+    const message: TransactionsBatchMessage = {
+      type: 'transactions_batch',
       userId: user.userId,
       transactions,
     };
@@ -191,7 +191,7 @@ export class SocketConnection {
     this.sendMessage(message);
   }
 
-  private async consumeRevocations(
+  private async consumeDeletedCollaborations(
     user: SocketUser,
     consumer: SocketSyncConsumer
   ) {
@@ -202,28 +202,30 @@ export class SocketConnection {
     consumer.fetching = true;
     this.logger.trace(
       consumer,
-      `Sending pending collaboration revocations for ${this.account.id} with ${consumer.type}`
+      `Sending pending deleted collaborations for ${this.account.id} with ${consumer.type}`
     );
 
-    const unsyncedRevocations = await database
-      .selectFrom('collaboration_revocations as cr')
+    const unsyncedDeletedCollaborations = await database
+      .selectFrom('deleted_collaborations as dc')
       .selectAll()
-      .where('cr.user_id', '=', user.userId)
-      .where('cr.version', '>', BigInt(consumer.cursor))
-      .orderBy('cr.version', 'asc')
+      .where('dc.user_id', '=', user.userId)
+      .where('dc.version', '>', BigInt(consumer.cursor))
+      .orderBy('dc.version', 'asc')
       .limit(50)
       .execute();
 
-    if (unsyncedRevocations.length === 0) {
+    if (unsyncedDeletedCollaborations.length === 0) {
       consumer.fetching = false;
       return;
     }
 
-    const revocations = unsyncedRevocations.map(mapCollaborationRevocation);
-    const message: CollaborationRevocationsBatchMessage = {
-      type: 'collaboration_revocations_batch',
+    const deletedCollaborations = unsyncedDeletedCollaborations.map(
+      mapDeletedCollaboration
+    );
+    const message: DeletedCollaborationsBatchMessage = {
+      type: 'deleted_collaborations_batch',
       userId: user.userId,
-      revocations,
+      deletedCollaborations,
     };
 
     user.consumers.delete(consumer.type);
@@ -368,9 +370,11 @@ export class SocketConnection {
         this.consumePendingSync(user, transactionsConsumer);
       }
 
-      const revocationsConsumer = user.consumers.get('revocations');
-      if (revocationsConsumer) {
-        this.consumePendingSync(user, revocationsConsumer);
+      const deletedCollaborationsConsumer = user.consumers.get(
+        'deleted_collaborations'
+      );
+      if (deletedCollaborationsConsumer) {
+        this.consumePendingSync(user, deletedCollaborationsConsumer);
       }
     }
   }
@@ -396,9 +400,11 @@ export class SocketConnection {
         continue;
       }
 
-      const revocationsConsumer = user.consumers.get('revocations');
-      if (revocationsConsumer) {
-        this.consumePendingSync(user, revocationsConsumer);
+      const deletedCollaborationsConsumer = user.consumers.get(
+        'deleted_collaborations'
+      );
+      if (deletedCollaborationsConsumer) {
+        this.consumePendingSync(user, deletedCollaborationsConsumer);
       }
     }
   }

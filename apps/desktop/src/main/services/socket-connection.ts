@@ -57,10 +57,10 @@ export class SocketConnection {
         `Received message of type ${message.type} for account ${this.account.id}`
       );
 
-      if (message.type === 'node_transactions_batch') {
+      if (message.type === 'transactions_batch') {
         syncService.syncServerTransactions(message);
-      } else if (message.type === 'collaboration_revocations_batch') {
-        syncService.syncServerRevocations(message);
+      } else if (message.type === 'deleted_collaborations_batch') {
+        syncService.syncServerDeletedCollaborations(message);
       } else if (message.type === 'collaborations_batch') {
         syncService.syncServerCollaborations(message);
       } else if (message.type === 'interactions_batch') {
