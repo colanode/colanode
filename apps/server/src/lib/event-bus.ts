@@ -47,7 +47,7 @@ export class EventBusService {
         return;
       }
 
-      this.publish(envelope.event);
+      this.processEvent(envelope.event);
     });
   }
 
@@ -67,13 +67,17 @@ export class EventBusService {
   }
 
   public publish(event: Event) {
-    this.subscriptions.forEach((subscription) => {
-      subscription.callback(event);
-    });
+    this.processEvent(event);
 
     if (host.environment === 'production') {
       redis.publish(CHANNEL_NAME, JSON.stringify({ event, hostId: host.id }));
     }
+  }
+
+  private processEvent(event: Event) {
+    this.subscriptions.forEach((subscription) => {
+      subscription.callback(event);
+    });
   }
 }
 
