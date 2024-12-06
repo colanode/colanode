@@ -414,7 +414,7 @@ class SyncService {
         );
 
         const { data } = await httpClient.get<GetTransactionsOutput>(
-          `/v1/nodes/${credentials.workspaceId}/transactions/${nodeId}`,
+          `/v1/workspaces/${credentials.workspaceId}/transactions/${nodeId}`,
           {
             domain: credentials.serverDomain,
             token: credentials.token,
@@ -518,7 +518,7 @@ class SyncService {
         this.debug(`Syncing missing node ${node.node_id} for user ${userId}`);
 
         const { data } = await httpClient.get<GetTransactionsOutput>(
-          `/v1/nodes/${credentials.workspaceId}/transactions/${node.node_id}`,
+          `/v1/workspaces/${credentials.workspaceId}/transactions/${node.node_id}`,
           {
             domain: credentials.serverDomain,
             token: credentials.token,
@@ -571,7 +571,7 @@ class SyncService {
 
     try {
       const { data } = await httpClient.get<GetTransactionsOutput>(
-        `/v1/nodes/${credentials.workspaceId}/transactions/${nodeId}`,
+        `/v1/workspaces/${credentials.workspaceId}/transactions/${nodeId}`,
         {
           domain: credentials.serverDomain,
           token: credentials.token,
@@ -627,7 +627,7 @@ class SyncService {
     const transactions: LocalTransaction[] =
       unsyncedTransactions.map(mapTransaction);
     const { data } = await httpClient.post<SyncTransactionsOutput>(
-      `/v1/sync/${credentials.workspaceId}`,
+      `/v1/workspaces/${credentials.workspaceId}/transactions`,
       {
         transactions,
       },

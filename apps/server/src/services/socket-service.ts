@@ -28,7 +28,7 @@ class SocketService {
     });
 
     server.on('upgrade', async (request, socket, head) => {
-      if (request.url !== '/v1/synapse') {
+      if (request.url !== '/client/v1/synapse') {
         socket.destroy();
         return;
       }

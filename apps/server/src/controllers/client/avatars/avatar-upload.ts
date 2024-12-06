@@ -1,18 +1,15 @@
-import { GetObjectCommand, PutObjectCommand } from '@aws-sdk/client-s3';
-import { generateId, IdType } from '@colanode/core';
-import { Router } from 'express';
-import multer from 'multer';
+import { Request, Response } from 'express';
 import sharp from 'sharp';
+import { PutObjectCommand } from '@aws-sdk/client-s3';
+import { generateId, IdType } from '@colanode/core';
+import multer from 'multer';
 
 import path from 'path';
-import { Readable } from 'stream';
 
 import { avatarStorage, BUCKET_NAMES } from '@/data/storage';
 
-export const avatarsRouter = Router();
-
 const storage = multer.memoryStorage();
-const upload = multer({
+const uploadMulter = multer({
   storage,
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, cb) => {
@@ -30,7 +27,12 @@ const upload = multer({
   },
 });
 
-avatarsRouter.post('/', upload.single('avatar'), async (req, res) => {
+export const avatarUploadParameter = uploadMulter.single('avatar');
+
+export const avatarUploadHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     if (!req.file) {
       res.status(400).json({ error: 'No file uploaded' });
@@ -61,29 +63,4 @@ avatarsRouter.post('/', upload.single('avatar'), async (req, res) => {
     console.error('Error uploading file:', error);
     res.status(500).json({ error: 'Failed to upload avatar' });
   }
-});
-
-avatarsRouter.get('/:id', async (req, res) => {
-  try {
-    const { id } = req.params;
-    const command = new GetObjectCommand({
-      Bucket: BUCKET_NAMES.AVATARS,
-      Key: `avatars/${id}.jpeg`,
-    });
-
-    const avatarResponse = await avatarStorage.send(command);
-    if (!avatarResponse.Body) {
-      res.status(404).json({ error: 'Avatar not found' });
-      return;
-    }
-
-    if (avatarResponse.Body instanceof Readable) {
-      avatarResponse.Body.pipe(res);
-    } else {
-      res.status(404).json({ error: 'Avatar not found' });
-    }
-  } catch (error) {
-    console.error('Error downloading avatar:', error);
-    res.status(500).json({ error: 'Failed to download avatar' });
-  }
-});
+};

@@ -146,12 +146,12 @@ class ServerService {
 
   public buildApiBaseUrl(domain: string) {
     const protocol = domain.startsWith('localhost:') ? 'http' : 'https';
-    return `${protocol}://${domain}`;
+    return `${protocol}://${domain}/client`;
   }
 
   public buildSynapseUrl(domain: string) {
     const protocol = domain.startsWith('localhost:') ? 'ws' : 'wss';
-    return `${protocol}://${domain}/v1/synapse`;
+    return `${protocol}://${domain}/client/v1/synapse`;
   }
 }
 

@@ -1,9 +1,10 @@
 import { ServerConfig } from '@colanode/core';
-import { Request, Response,Router } from 'express';
+import { Request, Response } from 'express';
 
-export const configRouter = Router();
-
-configRouter.get('/', async (_: Request, res: Response) => {
+export const configGetHandler = async (
+  _: Request,
+  res: Response
+): Promise<void> => {
   const config: ServerConfig = {
     name: 'Colanode Cloud',
     avatar: '',
@@ -12,4 +13,4 @@ configRouter.get('/', async (_: Request, res: Response) => {
   };
 
   res.status(200).json(config);
-});
+};

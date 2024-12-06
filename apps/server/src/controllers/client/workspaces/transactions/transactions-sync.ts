@@ -1,3 +1,4 @@
+import { Request, Response } from 'express';
 import {
   LocalCreateTransaction,
   LocalDeleteTransaction,
@@ -7,46 +8,23 @@ import {
   SyncTransactionsInput,
   SyncTransactionStatus,
 } from '@colanode/core';
-import { Request, Response, Router } from 'express';
 
-import { database } from '@/data/database';
 import { SelectWorkspaceUser } from '@/data/schema';
 import { nodeService } from '@/services/node-service';
-import { ApiError } from '@/types/api';
 
-export const syncRouter = Router();
-
-syncRouter.post('/:workspaceId', async (req: Request, res: Response) => {
-  if (!res.locals.account) {
-    res.status(401).json({
-      code: ApiError.Unauthorized,
-      message: 'Unauthorized.',
-    });
-    return;
-  }
-
-  const workspaceId = req.params.workspaceId as string;
+export const transactionsSyncHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   const input = req.body as SyncTransactionsInput;
-
-  const workspaceUser = await database
-    .selectFrom('workspace_users')
-    .selectAll()
-    .where('workspace_id', '=', workspaceId)
-    .where('account_id', '=', res.locals.account.id)
-    .executeTakeFirst();
-
-  if (!workspaceUser) {
-    res.status(403).json({
-      code: ApiError.Forbidden,
-      message: 'Forbidden.',
-    });
-    return;
-  }
 
   const results: SyncTransactionResult[] = [];
   for (const transaction of input.transactions) {
     try {
-      const status = await handleLocalTransaction(workspaceUser, transaction);
+      const status = await handleLocalTransaction(
+        res.locals.workspaceUser,
+        transaction
+      );
       results.push({
         id: transaction.id,
         status: status,
@@ -62,7 +40,7 @@ syncRouter.post('/:workspaceId', async (req: Request, res: Response) => {
 
   console.log('executed mutations', results);
   res.status(200).json({ results });
-});
+};
 
 const handleLocalTransaction = async (
   workspaceUser: SelectWorkspaceUser,

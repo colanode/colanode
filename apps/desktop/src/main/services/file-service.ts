@@ -307,7 +307,7 @@ class FileService {
 
       try {
         const { data } = await httpClient.post<CreateUploadOutput>(
-          `/v1/files/${credentials.workspaceId}`,
+          `/v1/workspaces/${credentials.workspaceId}/uploads`,
           {
             fileId: file.id,
             uploadId: upload.upload_id,
@@ -328,7 +328,7 @@ class FileService {
         });
 
         const { status } = await httpClient.put<CompleteUploadOutput>(
-          `/v1/files/${credentials.workspaceId}/${data.uploadId}`,
+          `/v1/workspaces/${credentials.workspaceId}/uploads/${data.uploadId}`,
           {},
           {
             domain: credentials.serverDomain,
@@ -447,7 +447,7 @@ class FileService {
 
       try {
         const { data } = await httpClient.get<CreateDownloadOutput>(
-          `/v1/files/${credentials.workspaceId}/${download.node_id}`,
+          `/v1/workspaces/${credentials.workspaceId}/downloads/${download.node_id}`,
           {
             domain: credentials.serverDomain,
             token: credentials.token,
