@@ -34,6 +34,18 @@ jobs:
           $version = $env:GITHUB_REF -replace '^refs/tags/v',''
           echo "VERSION=$version" >> $env:GITHUB_ENV
 
+      # Decode certificate for Windows
+      - name: Decode certificate (Windows)
+        if: matrix.os == 'windows-latest'
+        run: |
+          $certPath = Join-Path -Path $env:RUNNER_TEMP -ChildPath "build_cert.pfx"
+          $certContent = [System.Convert]::FromBase64String($env:WINDOWS_CERT_BASE64)
+          [IO.File]::WriteAllBytes($certPath, $certContent)
+          echo "CERTIFICATE_PATH=$certPath" >> $env:GITHUB_ENV
+        shell: pwsh
+        env:
+          WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
+
       - name: Update package.json version
         shell: bash
         working-directory: apps/desktop
@@ -50,8 +62,19 @@ jobs:
       - name: Build Electron App
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CERTIFICATE_PATH: ${{ env.CERTIFICATE_PATH }}
+          CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
         working-directory: apps/desktop
         run: npm run make
+
+      # Clean up certificate
+      - name: Clean up certificate
+        if: matrix.os == 'windows-latest'
+        run: |
+          if (Test-Path $env:CERTIFICATE_PATH) {
+            Remove-Item -Path $env:CERTIFICATE_PATH
+          }
+        shell: pwsh
 
       - name: Publish Release to GitHub
         env:

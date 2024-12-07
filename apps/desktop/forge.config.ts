@@ -15,6 +15,10 @@ const config: ForgeConfig = {
     executableName: process.platform === 'linux' ? 'colanode' : 'Colanode',
     icon: 'assets/colanode_logo_black',
     appBundleId: 'com.colanode.desktop',
+    ...(process.platform === 'win32' && {
+      certificateFile: process.env.CERTIFICATE_PATH,
+      certificatePassword: process.env.CERTIFICATE_PASSWORD
+    }),
     asar: true,
     ignore: [
       /^\/src/,
@@ -49,9 +53,10 @@ const config: ForgeConfig = {
   makers: [
     new MakerSquirrel({
       name: 'Colanode',
-      authors: 'Colanode',
-      description: 'Colanode Desktop Application',
-      setupExe: 'ColanodeSetup.exe',
+      ...(process.platform === 'win32' && {
+        certificateFile: process.env.CERTIFICATE_PATH,
+        certificatePassword: process.env.CERTIFICATE_PASSWORD
+      })
     }),
     new MakerZIP({}, ['darwin']),
     new MakerRpm({
