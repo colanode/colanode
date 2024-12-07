@@ -21,6 +21,7 @@ import {
   fileUploadCompleteHandler,
   transactionsGetHandler,
   transactionsSyncHandler,
+  avatarUploadParameter,
 } from '@/controllers/client';
 import { workspaceMiddleware } from '@/middlewares/workspace';
 import { authMiddleware } from '@/middlewares/auth';
@@ -45,7 +46,12 @@ clientRouter.put(
 
 clientRouter.get('/v1/accounts/sync', authMiddleware, accountSyncHandler);
 
-clientRouter.post('/v1/avatars', authMiddleware, avatarUploadHandler);
+clientRouter.post(
+  '/v1/avatars',
+  authMiddleware,
+  avatarUploadParameter,
+  avatarUploadHandler
+);
 
 clientRouter.get(
   '/v1/avatars/:avatarId',
