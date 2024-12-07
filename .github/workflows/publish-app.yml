@@ -1,4 +1,4 @@
-name: Publish App
+name: Publish Desktop
 
 on:
   push:
@@ -6,37 +6,38 @@ on:
       - 'v*'
 
 jobs:
-  release:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
-
+  build-windows:
+    runs-on: windows-latest
+    
     steps:
       - name: Check out Git repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
-      - name: Install Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v3
         with:
           node-version: 22
+          cache: 'npm'
 
-      # Set VERSION for Unix-like systems
-      - name: Set VERSION (Unix)
-        if: matrix.os != 'windows-latest'
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+      - name: Cache Electron (Windows)
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~\AppData\Local\electron\Cache
+            ~\AppData\Local\electron-builder\Cache
+          key: ${{ runner.os }}-electron-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-cache-
 
-      # Set VERSION for Windows
-      - name: Set VERSION (Windows)
-        if: matrix.os == 'windows-latest'
+      - name: Set VERSION
         shell: pwsh
         run: |
           $version = $env:GITHUB_REF -replace '^refs/tags/v',''
           echo "VERSION=$version" >> $env:GITHUB_ENV
 
-      # Decode certificate for Windows
-      - name: Decode certificate (Windows)
-        if: matrix.os == 'windows-latest'
+      - name: Decode certificate
         run: |
           $certPath = Join-Path -Path $env:RUNNER_TEMP -ChildPath "build_cert.pfx"
           $certContent = [System.Convert]::FromBase64String($env:WINDOWS_CERT_BASE64)
@@ -49,34 +50,84 @@ jobs:
       - name: Update package.json version
         shell: bash
         working-directory: apps/desktop
-        run: |
-          if [ "$RUNNER_OS" == "Windows" ]; then
-            npm version ${VERSION} --no-git-tag-version
-          else
-            npm version $VERSION --no-git-tag-version
-          fi
+        run: npm version ${VERSION} --no-git-tag-version
 
       - name: Install Dependencies
-        run: npm ci
+        run: |
+          npm ci --production
+        working-directory: apps/desktop
 
       - name: Build Electron App
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CERTIFICATE_PATH: ${{ env.CERTIFICATE_PATH }}
           CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+          NODE_ENV: production
         working-directory: apps/desktop
-        run: npm run make
+        run: npm run make -- --win
 
-      # Clean up certificate
       - name: Clean up certificate
-        if: matrix.os == 'windows-latest'
         run: |
           if (Test-Path $env:CERTIFICATE_PATH) {
             Remove-Item -Path $env:CERTIFICATE_PATH
           }
         shell: pwsh
 
-      - name: Publish Release to GitHub
+      - name: Publish Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        working-directory: apps/desktop
+        run: npm run publish
+
+  build-macos:
+    runs-on: macos-latest
+    
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Cache Electron (macOS)
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+          key: ${{ runner.os }}-electron-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-cache-
+
+      - name: Set VERSION
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Update package.json version
+        working-directory: apps/desktop
+        run: npm version $VERSION --no-git-tag-version
+
+      - name: Install Dependencies
+        run: |
+          npm ci --production
+        working-directory: apps/desktop
+
+      - name: Build Electron App
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ENV: production
+          CSC_LINK: ${{ secrets.MACOS_CERTIFICATE }}
+          CSC_KEY_PASSWORD: ${{ secrets.MACOS_CERTIFICATE_PWD }}
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+        working-directory: apps/desktop
+        run: npm run make -- --mac
+
+      - name: Publish Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         working-directory: apps/desktop
