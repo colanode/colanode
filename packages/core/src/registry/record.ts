@@ -1,8 +1,10 @@
 import { z } from 'zod';
 
 import { blockSchema } from './block';
-import { CollaborationModel, NodeModel } from './core';
+import { NodeModel } from './core';
 import { fieldValueSchema } from './fields';
+
+import { extractText } from '../lib/blocks';
 
 export const recordAttributesSchema = z.object({
   type: z.literal('record'),
@@ -19,6 +21,20 @@ export type RecordAttributes = z.infer<typeof recordAttributesSchema>;
 export const recordModel: NodeModel = {
   type: 'record',
   schema: recordAttributesSchema,
+  getName: (_, attributes) => {
+    if (attributes.type !== 'record') {
+      return undefined;
+    }
+
+    return attributes.name;
+  },
+  getText: (id, attributes) => {
+    if (attributes.type !== 'record') {
+      return undefined;
+    }
+
+    return extractText(id, attributes.content);
+  },
   canCreate: async (context, attributes) => {
     if (attributes.type !== 'record') {
       return false;
@@ -48,17 +64,4 @@ export const recordModel: NodeModel = {
 
     return context.hasEditorAccess();
   },
-};
-
-export const recordCollaborationAttributesSchema = z.object({
-  type: z.literal('record'),
-});
-
-export type RecordCollaborationAttributes = z.infer<
-  typeof recordCollaborationAttributesSchema
->;
-
-export const recordCollaborationModel: CollaborationModel = {
-  type: 'record',
-  schema: recordCollaborationAttributesSchema,
 };

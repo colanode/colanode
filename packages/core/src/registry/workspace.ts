@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { CollaborationModel, NodeModel } from './core';
+import { NodeModel } from './core';
 
 export const workspaceAttributesSchema = z.object({
   type: z.literal('workspace'),
@@ -15,26 +15,19 @@ export type WorkspaceAttributes = z.infer<typeof workspaceAttributesSchema>;
 export const workspaceModel: NodeModel = {
   type: 'workspace',
   schema: workspaceAttributesSchema,
+  getName: () => {
+    return undefined;
+  },
+  getText: () => {
+    return undefined;
+  },
   canCreate: async (_, __) => {
-    return true;
+    return false;
   },
   canUpdate: async (_, __, ___) => {
-    return true;
+    return false;
   },
   canDelete: async (_, __) => {
-    return true;
+    return false;
   },
-};
-
-export const workspaceCollaborationAttributesSchema = z.object({
-  type: z.literal('workspace'),
-});
-
-export type WorkspaceCollaborationAttributes = z.infer<
-  typeof workspaceCollaborationAttributesSchema
->;
-
-export const workspaceCollaborationModel: CollaborationModel = {
-  type: 'workspace',
-  schema: workspaceCollaborationAttributesSchema,
 };

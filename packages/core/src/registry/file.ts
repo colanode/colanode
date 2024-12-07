@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { CollaborationModel, NodeModel } from './core';
+import { NodeModel } from './core';
 
 export const fileAttributesSchema = z.object({
   type: z.literal('file'),
@@ -22,6 +22,16 @@ export type FileAttributes = z.infer<typeof fileAttributesSchema>;
 export const fileModel: NodeModel = {
   type: 'file',
   schema: fileAttributesSchema,
+  getName: (_, attributes) => {
+    if (attributes.type !== 'file') {
+      return undefined;
+    }
+
+    return attributes.name;
+  },
+  getText: () => {
+    return undefined;
+  },
   canCreate: async (_, __) => {
     return true;
   },
@@ -31,17 +41,4 @@ export const fileModel: NodeModel = {
   canDelete: async (_, __) => {
     return true;
   },
-};
-
-export const fileCollaborationAttributesSchema = z.object({
-  type: z.literal('file'),
-});
-
-export type FileCollaborationAttributes = z.infer<
-  typeof fileCollaborationAttributesSchema
->;
-
-export const fileCollaborationModel: CollaborationModel = {
-  type: 'file',
-  schema: fileCollaborationAttributesSchema,
 };

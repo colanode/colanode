@@ -55,7 +55,7 @@ class NodeService {
   public async createNode(
     input: CreateNodeInput
   ): Promise<CreateNodeOutput | null> {
-    const model = registry.getNodeModel(input.attributes.type);
+    const model = registry.getModel(input.attributes.type);
     const ydoc = new YDoc();
     const update = ydoc.updateAttributes(model.schema, input.attributes);
     const attributes = ydoc.getAttributes<NodeAttributes>();
@@ -164,7 +164,7 @@ class NodeService {
       return { type: 'error', output: null };
     }
 
-    const model = registry.getNodeModel(updatedAttributes.type);
+    const model = registry.getModel(updatedAttributes.type);
     const update = ydoc.updateAttributes(model.schema, updatedAttributes);
 
     const attributes = ydoc.getAttributes<NodeAttributes>();
@@ -271,7 +271,7 @@ class NodeService {
       ancestors
     );
 
-    const model = registry.getNodeModel(attributes.type);
+    const model = registry.getModel(attributes.type);
     if (!model.schema.safeParse(attributes).success) {
       return null;
     }
@@ -381,7 +381,7 @@ class NodeService {
 
     const attributes = ydoc.getAttributes<NodeAttributes>();
     const attributesJson = JSON.stringify(attributes);
-    const model = registry.getNodeModel(attributes.type);
+    const model = registry.getModel(attributes.type);
     if (!model.schema.safeParse(attributes).success) {
       return { type: 'error', output: null };
     }
@@ -517,7 +517,7 @@ class NodeService {
       return null;
     }
 
-    const model = registry.getNodeModel(node.attributes.type);
+    const model = registry.getModel(node.attributes.type);
     const context = new NodeMutationContext(
       workspaceUser.account_id,
       workspaceUser.workspace_id,

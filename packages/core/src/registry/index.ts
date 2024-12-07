@@ -1,70 +1,15 @@
-import {
-  ChannelAttributes,
-  ChannelCollaborationAttributes,
-  channelCollaborationModel,
-  channelModel,
-} from './channel';
-import {
-  ChatAttributes,
-  ChatCollaborationAttributes,
-  chatCollaborationModel,
-  chatModel,
-} from './chat';
-import { CollaborationModel, NodeModel } from './core';
-import {
-  DatabaseAttributes,
-  DatabaseCollaborationAttributes,
-  databaseCollaborationModel,
-  databaseModel,
-} from './database';
-import {
-  FileAttributes,
-  FileCollaborationAttributes,
-  fileCollaborationModel,
-  fileModel,
-} from './file';
-import {
-  FolderAttributes,
-  FolderCollaborationAttributes,
-  folderCollaborationModel,
-  folderModel,
-} from './folder';
-import {
-  MessageAttributes,
-  MessageCollaborationAttributes,
-  messageCollaborationModel,
-  messageModel,
-} from './message';
-import {
-  PageAttributes,
-  PageCollaborationAttributes,
-  pageCollaborationModel,
-  pageModel,
-} from './page';
-import {
-  RecordAttributes,
-  RecordCollaborationAttributes,
-  recordCollaborationModel,
-  recordModel,
-} from './record';
-import {
-  SpaceAttributes,
-  SpaceCollaborationAttributes,
-  spaceCollaborationModel,
-  spaceModel,
-} from './space';
-import {
-  UserAttributes,
-  UserCollaborationAttributes,
-  userCollaborationModel,
-  userModel,
-} from './user';
-import {
-  WorkspaceAttributes,
-  WorkspaceCollaborationAttributes,
-  workspaceCollaborationModel,
-  workspaceModel,
-} from './workspace';
+import { ChannelAttributes, channelModel } from './channel';
+import { ChatAttributes, chatModel } from './chat';
+import { NodeModel } from './core';
+import { DatabaseAttributes, databaseModel } from './database';
+import { FileAttributes, fileModel } from './file';
+import { FolderAttributes, folderModel } from './folder';
+import { MessageAttributes, messageModel } from './message';
+import { PageAttributes, pageModel } from './page';
+import { RecordAttributes, recordModel } from './record';
+import { SpaceAttributes, spaceModel } from './space';
+import { UserAttributes, userModel } from './user';
+import { WorkspaceAttributes, workspaceModel } from './workspace';
 
 type NodeBase = {
   id: string;
@@ -90,19 +35,9 @@ export type ChannelNode = NodeBase & {
   attributes: ChannelAttributes;
 };
 
-export type ChannelCollaboration = CollaborationBase & {
-  type: 'channel';
-  attributes: ChannelCollaborationAttributes;
-};
-
 export type ChatNode = NodeBase & {
   type: 'chat';
   attributes: ChatAttributes;
-};
-
-export type ChatCollaboration = CollaborationBase & {
-  type: 'chat';
-  attributes: ChatCollaborationAttributes;
 };
 
 export type DatabaseNode = NodeBase & {
@@ -110,19 +45,9 @@ export type DatabaseNode = NodeBase & {
   attributes: DatabaseAttributes;
 };
 
-export type DatabaseCollaboration = CollaborationBase & {
-  type: 'database';
-  attributes: DatabaseCollaborationAttributes;
-};
-
 export type FileNode = NodeBase & {
   type: 'file';
   attributes: FileAttributes;
-};
-
-export type FileCollaboration = CollaborationBase & {
-  type: 'file';
-  attributes: FileCollaborationAttributes;
 };
 
 export type FolderNode = NodeBase & {
@@ -130,19 +55,9 @@ export type FolderNode = NodeBase & {
   attributes: FolderAttributes;
 };
 
-export type FolderCollaboration = CollaborationBase & {
-  type: 'folder';
-  attributes: FolderCollaborationAttributes;
-};
-
 export type MessageNode = NodeBase & {
   type: 'message';
   attributes: MessageAttributes;
-};
-
-export type MessageCollaboration = CollaborationBase & {
-  type: 'message';
-  attributes: MessageCollaborationAttributes;
 };
 
 export type PageNode = NodeBase & {
@@ -150,19 +65,9 @@ export type PageNode = NodeBase & {
   attributes: PageAttributes;
 };
 
-export type PageCollaboration = CollaborationBase & {
-  type: 'page';
-  attributes: PageCollaborationAttributes;
-};
-
 export type RecordNode = NodeBase & {
   type: 'record';
   attributes: RecordAttributes;
-};
-
-export type RecordCollaboration = CollaborationBase & {
-  type: 'record';
-  attributes: RecordCollaborationAttributes;
 };
 
 export type SpaceNode = NodeBase & {
@@ -170,29 +75,14 @@ export type SpaceNode = NodeBase & {
   attributes: SpaceAttributes;
 };
 
-export type SpaceCollaboration = CollaborationBase & {
-  type: 'space';
-  attributes: SpaceCollaborationAttributes;
-};
-
 export type UserNode = NodeBase & {
   type: 'user';
   attributes: UserAttributes;
 };
 
-export type UserCollaboration = CollaborationBase & {
-  type: 'user';
-  attributes: UserCollaborationAttributes;
-};
-
 export type WorkspaceNode = NodeBase & {
   type: 'workspace';
   attributes: WorkspaceAttributes;
-};
-
-export type WorkspaceCollaboration = CollaborationBase & {
-  type: 'workspace';
-  attributes: WorkspaceCollaborationAttributes;
 };
 
 export type NodeType =
@@ -234,82 +124,25 @@ export type Node =
   | UserNode
   | WorkspaceNode;
 
-export type CollaborationAttributes =
-  | UserCollaborationAttributes
-  | SpaceCollaborationAttributes
-  | DatabaseCollaborationAttributes
-  | ChannelCollaborationAttributes
-  | ChatCollaborationAttributes
-  | FileCollaborationAttributes
-  | FolderCollaborationAttributes
-  | MessageCollaborationAttributes
-  | PageCollaborationAttributes
-  | RecordCollaborationAttributes
-  | WorkspaceCollaborationAttributes;
-
-export type Collaboration =
-  | UserCollaboration
-  | SpaceCollaboration
-  | DatabaseCollaboration
-  | ChannelCollaboration
-  | ChatCollaboration
-  | FileCollaboration
-  | FolderCollaboration
-  | MessageCollaboration
-  | PageCollaboration
-  | RecordCollaboration
-  | WorkspaceCollaboration;
-
 class Registry {
-  private nodeModels: Map<string, NodeModel> = new Map();
-  private collaborationModels: Map<string, CollaborationModel> = new Map();
+  private models: Map<string, NodeModel> = new Map();
 
   constructor() {
-    this.nodeModels.set('channel', channelModel);
-    this.collaborationModels.set('channel', channelCollaborationModel);
-
-    this.nodeModels.set('chat', chatModel);
-    this.collaborationModels.set('chat', chatCollaborationModel);
-
-    this.nodeModels.set('database', databaseModel);
-    this.collaborationModels.set('database', databaseCollaborationModel);
-
-    this.nodeModels.set('file', fileModel);
-    this.collaborationModels.set('file', fileCollaborationModel);
-
-    this.nodeModels.set('folder', folderModel);
-    this.collaborationModels.set('folder', folderCollaborationModel);
-
-    this.nodeModels.set('message', messageModel);
-    this.collaborationModels.set('message', messageCollaborationModel);
-
-    this.nodeModels.set('page', pageModel);
-    this.collaborationModels.set('page', pageCollaborationModel);
-
-    this.nodeModels.set('record', recordModel);
-    this.collaborationModels.set('record', recordCollaborationModel);
-
-    this.nodeModels.set('space', spaceModel);
-    this.collaborationModels.set('space', spaceCollaborationModel);
-
-    this.nodeModels.set('user', userModel);
-    this.collaborationModels.set('user', userCollaborationModel);
-
-    this.nodeModels.set('workspace', workspaceModel);
-    this.collaborationModels.set('workspace', workspaceCollaborationModel);
+    this.models.set('channel', channelModel);
+    this.models.set('chat', chatModel);
+    this.models.set('database', databaseModel);
+    this.models.set('file', fileModel);
+    this.models.set('folder', folderModel);
+    this.models.set('message', messageModel);
+    this.models.set('page', pageModel);
+    this.models.set('record', recordModel);
+    this.models.set('space', spaceModel);
+    this.models.set('user', userModel);
+    this.models.set('workspace', workspaceModel);
   }
 
-  getNodeModel(type: string): NodeModel {
-    const model = this.nodeModels.get(type);
-    if (!model) {
-      throw new Error(`Model for type ${type} not found`);
-    }
-
-    return model;
-  }
-
-  getCollaborationModel(type: string): CollaborationModel {
-    const model = this.collaborationModels.get(type);
+  getModel(type: string): NodeModel {
+    const model = this.models.get(type);
     if (!model) {
       throw new Error(`Model for type ${type} not found`);
     }

@@ -11,7 +11,6 @@ import {
   ServerUpdateTransaction,
 } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
-import { sql } from 'kysely';
 
 import { createDebugger } from '@/main/debugger';
 import { SelectWorkspace } from '@/main/data/app/schema';
@@ -86,7 +85,7 @@ class NodeService {
 
     await workspaceDatabase.transaction().execute(async (transaction) => {
       for (const inputItem of inputs) {
-        const model = registry.getNodeModel(inputItem.attributes.type);
+        const model = registry.getModel(inputItem.attributes.type);
         if (!model.schema.safeParse(inputItem.attributes).success) {
           throw new Error('Invalid attributes');
         }
@@ -120,6 +119,9 @@ class NodeService {
 
         const createdAt = new Date().toISOString();
         const transactionId = generateId(IdType.Transaction);
+
+        const name = model.getName(inputItem.id, inputItem.attributes);
+        const text = model.getText(inputItem.id, inputItem.attributes);
 
         const createdNode = await transaction
           .insertInto('nodes')
@@ -187,6 +189,20 @@ class NodeService {
           }
 
           createdDownloads.push(createdDownload);
+        }
+
+        if (name) {
+          await transaction
+            .insertInto('node_names')
+            .values({ id: inputItem.id, name })
+            .execute();
+        }
+
+        if (text) {
+          await transaction
+            .insertInto('node_texts')
+            .values({ id: inputItem.id, text })
+            .execute();
         }
       }
     });
@@ -301,7 +317,7 @@ class NodeService {
     const updatedAt = new Date().toISOString();
     const updatedAttributes = updater(node.attributes);
 
-    const model = registry.getNodeModel(node.type);
+    const model = registry.getModel(node.type);
     if (!model.schema.safeParse(updatedAttributes).success) {
       return 'invalid_attributes';
     }
@@ -326,6 +342,8 @@ class NodeService {
     }
 
     const update = ydoc.updateAttributes(model.schema, updatedAttributes);
+    const name = model.getName(nodeId, updatedAttributes);
+    const text = model.getText(nodeId, updatedAttributes);
 
     const { updatedNode, createdTransaction } = await workspaceDatabase
       .transaction()
@@ -361,6 +379,28 @@ class NodeService {
             .executeTakeFirst();
 
           return { updatedNode, createdTransaction };
+        }
+
+        if (name !== undefined) {
+          await trx.deleteFrom('node_names').where('id', '=', nodeId).execute();
+        }
+
+        if (name) {
+          await trx
+            .insertInto('node_names')
+            .values({ id: nodeId, name })
+            .execute();
+        }
+
+        if (text !== undefined) {
+          await trx.deleteFrom('node_texts').where('id', '=', nodeId).execute();
+        }
+
+        if (text) {
+          await trx
+            .insertInto('node_texts')
+            .values({ id: nodeId, text })
+            .execute();
         }
 
         return {
@@ -425,7 +465,7 @@ class NodeService {
       throw new Error('Node not found');
     }
 
-    const model = registry.getNodeModel(node.type);
+    const model = registry.getModel(node.type);
     const context = new NodeMutationContext(
       workspace.account_id,
       workspace.workspace_id,
@@ -470,6 +510,9 @@ class NodeService {
           .deleteFrom('interactions')
           .where('node_id', '=', nodeId)
           .execute();
+
+        await trx.deleteFrom('node_names').where('id', '=', nodeId).execute();
+        await trx.deleteFrom('node_texts').where('id', '=', nodeId).execute();
 
         const createdTransaction = await trx
           .insertInto('transactions')
@@ -560,10 +603,23 @@ class NodeService {
       ydoc.applyUpdate(transaction.data);
     }
 
+    const model = registry.getModel(firstTransaction.nodeType);
+    if (!model) {
+      return false;
+    }
+
     const attributes = ydoc.getAttributes<NodeAttributes>();
     const attributesJson = JSON.stringify(attributes);
+    const name = model.getName(nodeId, attributes);
+    const text = model.getText(nodeId, attributes);
 
     await workspaceDatabase.transaction().execute(async (trx) => {
+      await trx.deleteFrom('nodes').where('id', '=', nodeId).execute();
+      await trx
+        .deleteFrom('transactions')
+        .where('node_id', '=', nodeId)
+        .execute();
+
       await trx
         .insertInto('nodes')
         .values({
@@ -581,14 +637,6 @@ class NodeService {
               : null,
           transaction_id: lastTransaction.id,
         })
-        .onConflict((oc) =>
-          oc.columns(['id']).doUpdateSet({
-            attributes: attributesJson,
-            updated_at: lastTransaction.createdAt,
-            updated_by: lastTransaction.createdBy,
-            transaction_id: lastTransaction.id,
-          })
-        )
         .execute();
 
       await trx
@@ -609,14 +657,24 @@ class NodeService {
             server_created_at: t.serverCreatedAt,
           }))
         )
-        .onConflict((oc) =>
-          oc.columns(['id']).doUpdateSet({
-            status: 'synced',
-            version: sql`excluded.version`,
-            server_created_at: sql`excluded.server_created_at`,
-          })
-        )
         .execute();
+
+      await trx.deleteFrom('node_names').where('id', '=', nodeId).execute();
+      await trx.deleteFrom('node_texts').where('id', '=', nodeId).execute();
+
+      if (name) {
+        await trx
+          .insertInto('node_names')
+          .values({ id: nodeId, name })
+          .execute();
+      }
+
+      if (text) {
+        await trx
+          .insertInto('node_texts')
+          .values({ id: nodeId, text })
+          .execute();
+      }
     });
 
     return true;
@@ -668,10 +726,17 @@ class NodeService {
       return;
     }
 
+    const model = registry.getModel(transaction.nodeType);
+    if (!model) {
+      return;
+    }
+
     const ydoc = new YDoc();
     ydoc.applyUpdate(transaction.data);
 
-    const attributes = ydoc.getAttributes();
+    const attributes = ydoc.getAttributes<NodeAttributes>();
+    const name = model.getName(transaction.nodeId, attributes);
+    const text = model.getText(transaction.nodeId, attributes);
 
     const { createdNode } = await workspaceDatabase
       .transaction()
@@ -704,6 +769,20 @@ class NodeService {
             server_created_at: transaction.serverCreatedAt,
           })
           .execute();
+
+        if (name) {
+          await trx
+            .insertInto('node_names')
+            .values({ id: transaction.nodeId, name })
+            .execute();
+        }
+
+        if (text) {
+          await trx
+            .insertInto('node_texts')
+            .values({ id: transaction.nodeId, text })
+            .execute();
+        }
 
         return { createdNode };
       });
@@ -781,6 +860,11 @@ class NodeService {
       return;
     }
 
+    const model = registry.getModel(transaction.nodeType);
+    if (!model) {
+      return;
+    }
+
     const previousTransactions = await workspaceDatabase
       .selectFrom('transactions')
       .selectAll()
@@ -797,7 +881,10 @@ class NodeService {
     }
 
     ydoc.applyUpdate(transaction.data);
-    const attributes = ydoc.getAttributes();
+    const attributes = ydoc.getAttributes<NodeAttributes>();
+
+    const name = model.getName(transaction.nodeId, attributes);
+    const text = model.getText(transaction.nodeId, attributes);
 
     const { updatedNode } = await workspaceDatabase
       .transaction()
@@ -830,6 +917,34 @@ class NodeService {
             server_created_at: transaction.serverCreatedAt,
           })
           .execute();
+
+        if (name !== undefined) {
+          await trx
+            .deleteFrom('node_names')
+            .where('id', '=', transaction.nodeId)
+            .execute();
+        }
+
+        if (name) {
+          await trx
+            .insertInto('node_names')
+            .values({ id: transaction.nodeId, name })
+            .execute();
+        }
+
+        if (text !== undefined) {
+          await trx
+            .deleteFrom('node_texts')
+            .where('id', '=', transaction.nodeId)
+            .execute();
+        }
+
+        if (text) {
+          await trx
+            .insertInto('node_texts')
+            .values({ id: transaction.nodeId, text })
+            .execute();
+        }
 
         return { updatedNode };
       });
@@ -897,6 +1012,16 @@ class NodeService {
         await trx
           .deleteFrom('collaborations')
           .where('node_id', '=', transaction.nodeId)
+          .execute();
+
+        await trx
+          .deleteFrom('node_names')
+          .where('id', '=', transaction.nodeId)
+          .execute();
+
+        await trx
+          .deleteFrom('node_texts')
+          .where('id', '=', transaction.nodeId)
           .execute();
 
         const nodeRow = await trx

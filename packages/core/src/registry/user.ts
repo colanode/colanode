@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { CollaborationModel, NodeModel } from './core';
+import { NodeModel } from './core';
 
 export const userAttributesSchema = z.object({
   type: z.literal('user'),
@@ -17,26 +17,23 @@ export type UserAttributes = z.infer<typeof userAttributesSchema>;
 export const userModel: NodeModel = {
   type: 'user',
   schema: userAttributesSchema,
+  getName: (_, attributes) => {
+    if (attributes.type !== 'user') {
+      return undefined;
+    }
+
+    return attributes.name;
+  },
+  getText: () => {
+    return undefined;
+  },
   canCreate: async (_, __) => {
-    return true;
+    return false;
   },
   canUpdate: async (_, __, ___) => {
-    return true;
+    return false;
   },
   canDelete: async (_, __) => {
-    return true;
+    return false;
   },
-};
-
-export const userCollaborationAttributesSchema = z.object({
-  type: z.literal('user'),
-});
-
-export type UserCollaborationAttributes = z.infer<
-  typeof userCollaborationAttributesSchema
->;
-
-export const userCollaborationModel: CollaborationModel = {
-  type: 'user',
-  schema: userCollaborationAttributesSchema,
 };

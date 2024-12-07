@@ -72,9 +72,12 @@ export interface NodeModel {
     attributes: NodeAttributes
   ) => Promise<boolean>;
   canDelete: (context: NodeMutationContext, node: Node) => Promise<boolean>;
+  getName: (
+    id: string,
+    attributes: NodeAttributes
+  ) => string | null | undefined;
+  getText: (
+    id: string,
+    attributes: NodeAttributes
+  ) => string | null | undefined;
 }
-
-export type CollaborationModel = {
-  type: string;
-  schema: ZodSchema;
-};

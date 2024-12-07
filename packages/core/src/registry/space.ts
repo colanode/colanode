@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
+import { NodeModel, nodeRoleEnum } from './core';
 
 export const spaceAttributesSchema = z.object({
   type: z.literal('space'),
@@ -16,6 +16,16 @@ export type SpaceAttributes = z.infer<typeof spaceAttributesSchema>;
 export const spaceModel: NodeModel = {
   type: 'space',
   schema: spaceAttributesSchema,
+  getName: (_, attributes) => {
+    if (attributes.type !== 'space') {
+      return undefined;
+    }
+
+    return attributes.name;
+  },
+  getText: () => {
+    return undefined;
+  },
   canCreate: async (context, __) => {
     if (context.workspaceRole === 'guest' || context.workspaceRole === 'none') {
       return false;
@@ -29,17 +39,4 @@ export const spaceModel: NodeModel = {
   canDelete: async (context, _) => {
     return context.hasAdminAccess();
   },
-};
-
-export const spaceCollaborationAttributesSchema = z.object({
-  type: z.literal('space'),
-});
-
-export type SpaceCollaborationAttributes = z.infer<
-  typeof spaceCollaborationAttributesSchema
->;
-
-export const spaceCollaborationModel: CollaborationModel = {
-  type: 'space',
-  schema: spaceCollaborationAttributesSchema,
 };

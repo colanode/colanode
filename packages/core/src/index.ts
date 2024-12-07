@@ -28,3 +28,4 @@ export * from './types/nodes';
 export * from './types/servers';
 export * from './types/sync';
 export * from './types/workspaces';
+export * from './lib/blocks';

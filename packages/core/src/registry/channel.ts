@@ -1,7 +1,7 @@
 import { isEqual } from 'lodash-es';
 import { z } from 'zod';
 
-import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
+import { NodeModel, nodeRoleEnum } from './core';
 
 export const channelAttributesSchema = z.object({
   type: z.literal('channel'),
@@ -16,6 +16,16 @@ export type ChannelAttributes = z.infer<typeof channelAttributesSchema>;
 export const channelModel: NodeModel = {
   type: 'channel',
   schema: channelAttributesSchema,
+  getName: (_, attributes) => {
+    if (attributes.type !== 'channel') {
+      return undefined;
+    }
+
+    return attributes.name;
+  },
+  getText: () => {
+    return undefined;
+  },
   canCreate: async (context, attributes) => {
     if (attributes.type !== 'channel') {
       return false;
@@ -51,17 +61,4 @@ export const channelModel: NodeModel = {
   canDelete: async (context, _) => {
     return context.hasEditorAccess();
   },
-};
-
-export const channelCollaborationAttributesSchema = z.object({
-  type: z.literal('channel'),
-});
-
-export type ChannelCollaborationAttributes = z.infer<
-  typeof channelCollaborationAttributesSchema
->;
-
-export const channelCollaborationModel: CollaborationModel = {
-  type: 'channel',
-  schema: channelCollaborationAttributesSchema,
 };

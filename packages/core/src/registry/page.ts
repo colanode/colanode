@@ -2,7 +2,9 @@ import { isEqual } from 'lodash-es';
 import { z } from 'zod';
 
 import { blockSchema } from './block';
-import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
+import { NodeModel, nodeRoleEnum } from './core';
+
+import { extractText } from '../lib/blocks';
 
 export const pageAttributesSchema = z.object({
   type: z.literal('page'),
@@ -18,6 +20,20 @@ export type PageAttributes = z.infer<typeof pageAttributesSchema>;
 export const pageModel: NodeModel = {
   type: 'page',
   schema: pageAttributesSchema,
+  getName: (_, attributes) => {
+    if (attributes.type !== 'page') {
+      return undefined;
+    }
+
+    return attributes.name;
+  },
+  getText: (id, attributes) => {
+    if (attributes.type !== 'page') {
+      return undefined;
+    }
+
+    return extractText(id, attributes.content);
+  },
   canCreate: async (context, attributes) => {
     if (attributes.type !== 'page') {
       return false;
@@ -44,16 +60,4 @@ export const pageModel: NodeModel = {
   canDelete: async (context, _) => {
     return context.hasEditorAccess();
   },
-};
-export const pageCollaborationAttributesSchema = z.object({
-  type: z.literal('page'),
-});
-
-export type PageCollaborationAttributes = z.infer<
-  typeof pageCollaborationAttributesSchema
->;
-
-export const pageCollaborationModel: CollaborationModel = {
-  type: 'page',
-  schema: pageCollaborationAttributesSchema,
 };

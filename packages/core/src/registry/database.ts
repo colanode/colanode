@@ -1,7 +1,7 @@
 import { isEqual } from 'lodash-es';
 import { z } from 'zod';
 
-import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
+import { NodeModel, nodeRoleEnum } from './core';
 import { fieldAttributesSchema } from './fields';
 
 export const viewFieldAttributesSchema = z.object({
@@ -84,6 +84,16 @@ export type ViewType = 'table' | 'board' | 'calendar';
 export const databaseModel: NodeModel = {
   type: 'database',
   schema: databaseAttributesSchema,
+  getName: (_, attributes) => {
+    if (attributes.type !== 'database') {
+      return undefined;
+    }
+
+    return attributes.name;
+  },
+  getText: () => {
+    return undefined;
+  },
   canCreate: async (context, attributes) => {
     if (attributes.type !== 'database') {
       return false;
@@ -110,17 +120,4 @@ export const databaseModel: NodeModel = {
   canDelete: async (context, _) => {
     return context.hasEditorAccess();
   },
-};
-
-export const databaseCollaborationAttributesSchema = z.object({
-  type: z.literal('database'),
-});
-
-export type DatabaseCollaborationAttributes = z.infer<
-  typeof databaseCollaborationAttributesSchema
->;
-
-export const databaseCollaborationModel: CollaborationModel = {
-  type: 'database',
-  schema: databaseCollaborationAttributesSchema,
 };

@@ -2,7 +2,9 @@ import { isEqual } from 'lodash-es';
 import { z } from 'zod';
 
 import { blockSchema } from './block';
-import { CollaborationModel, NodeModel } from './core';
+import { NodeModel } from './core';
+
+import { extractText } from '../lib/blocks';
 
 const standardMessageAttributesSchema = z.object({
   type: z.literal('message'),
@@ -31,6 +33,16 @@ export type MessageAttributes = z.infer<typeof messageAttributesSchema>;
 export const messageModel: NodeModel = {
   type: 'message',
   schema: messageAttributesSchema,
+  getName: () => {
+    return undefined;
+  },
+  getText: (id, attributes) => {
+    if (attributes.type !== 'message') {
+      return undefined;
+    }
+
+    return extractText(id, attributes.content);
+  },
   canCreate: async (context, attributes) => {
     if (attributes.type !== 'message') {
       return false;
@@ -60,17 +72,4 @@ export const messageModel: NodeModel = {
 
     return context.hasAdminAccess();
   },
-};
-
-export const messageCollaborationAttributesSchema = z.object({
-  type: z.literal('message'),
-});
-
-export type MessageCollaborationAttributes = z.infer<
-  typeof messageCollaborationAttributesSchema
->;
-
-export const messageCollaborationModel: CollaborationModel = {
-  type: 'message',
-  schema: messageCollaborationAttributesSchema,
 };

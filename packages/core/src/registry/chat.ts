@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
+import { NodeModel, nodeRoleEnum } from './core';
 
 export const chatAttributesSchema = z.object({
   type: z.literal('chat'),
@@ -13,6 +13,12 @@ export type ChatAttributes = z.infer<typeof chatAttributesSchema>;
 export const chatModel: NodeModel = {
   type: 'chat',
   schema: chatAttributesSchema,
+  getName: () => {
+    return undefined;
+  },
+  getText: () => {
+    return undefined;
+  },
   canCreate: async (context, attributes) => {
     if (attributes.type !== 'chat') {
       return false;
@@ -35,17 +41,4 @@ export const chatModel: NodeModel = {
   canDelete: async () => {
     return false;
   },
-};
-
-export const chatCollaborationAttributesSchema = z.object({
-  type: z.literal('chat'),
-});
-
-export type ChatCollaborationAttributes = z.infer<
-  typeof chatCollaborationAttributesSchema
->;
-
-export const chatCollaborationModel: CollaborationModel = {
-  type: 'chat',
-  schema: chatCollaborationAttributesSchema,
 };

@@ -1,7 +1,7 @@
 import { isEqual } from 'lodash-es';
 import { z } from 'zod';
 
-import { CollaborationModel, NodeModel, nodeRoleEnum } from './core';
+import { NodeModel, nodeRoleEnum } from './core';
 
 export const folderAttributesSchema = z.object({
   type: z.literal('folder'),
@@ -16,6 +16,16 @@ export type FolderAttributes = z.infer<typeof folderAttributesSchema>;
 export const folderModel: NodeModel = {
   type: 'folder',
   schema: folderAttributesSchema,
+  getName: (_, attributes) => {
+    if (attributes.type !== 'folder') {
+      return undefined;
+    }
+
+    return attributes.name;
+  },
+  getText: () => {
+    return undefined;
+  },
   canCreate: async (context, attributes) => {
     if (attributes.type !== 'folder') {
       return false;
@@ -42,17 +52,4 @@ export const folderModel: NodeModel = {
   canDelete: async (context, _) => {
     return context.hasEditorAccess();
   },
-};
-
-export const folderCollaborationAttributesSchema = z.object({
-  type: z.literal('folder'),
-});
-
-export type FolderCollaborationAttributes = z.infer<
-  typeof folderCollaborationAttributesSchema
->;
-
-export const folderCollaborationModel: CollaborationModel = {
-  type: 'folder',
-  schema: folderCollaborationAttributesSchema,
 };

@@ -119,6 +119,24 @@ export type SelectInteractionEvent = Selectable<InteractionEventTable>;
 export type CreateInteractionEvent = Insertable<InteractionEventTable>;
 export type UpdateInteractionEvent = Updateable<InteractionEventTable>;
 
+interface NodeNameTable {
+  id: ColumnType<string, string, never>;
+  name: ColumnType<string, string, string>;
+}
+
+export type SelectNodeName = Selectable<NodeNameTable>;
+export type CreateNodeName = Insertable<NodeNameTable>;
+export type UpdateNodeName = Updateable<NodeNameTable>;
+
+interface NodeTextTable {
+  id: ColumnType<string, string, never>;
+  text: ColumnType<string, string, string>;
+}
+
+export type SelectNodeText = Selectable<NodeTextTable>;
+export type CreateNodeText = Insertable<NodeTextTable>;
+export type UpdateNodeText = Updateable<NodeTextTable>;
+
 interface CursorTable {
   type: ColumnType<SyncConsumerType, SyncConsumerType, never>;
   value: ColumnType<bigint, bigint, bigint>;
@@ -135,5 +153,7 @@ export interface WorkspaceDatabaseSchema {
   downloads: DownloadTable;
   interactions: InteractionTable;
   interaction_events: InteractionEventTable;
+  node_names: NodeNameTable;
+  node_texts: NodeTextTable;
   cursors: CursorTable;
 }

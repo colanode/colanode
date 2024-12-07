@@ -237,65 +237,15 @@ const createNodeNamesTable: Migration = {
   },
 };
 
-const createNodeInsertNameTrigger: Migration = {
+const createNodeTextsTable: Migration = {
   up: async (db) => {
     await sql`
-      CREATE TRIGGER node_insert_name
-      AFTER INSERT ON nodes
-      WHEN json_type(NEW.attributes, '$.name') = 'text'
-      BEGIN
-        INSERT INTO node_names (id, name)
-        VALUES (
-          NEW.id,
-          json_extract(NEW.attributes, '$.name')
-        );
-      END;
+      CREATE VIRTUAL TABLE node_texts USING fts5(id UNINDEXED, text);
     `.execute(db);
   },
   down: async (db) => {
     await sql`
-      DROP TRIGGER node_insert_name;
-    `.execute(db);
-  },
-};
-
-const createNodeUpdateNameTrigger: Migration = {
-  up: async (db) => {
-    await sql`
-      CREATE TRIGGER node_update_name
-      AFTER UPDATE ON nodes
-      WHEN json_extract(OLD.attributes, '$.name') IS NOT json_extract(NEW.attributes, '$.name')
-      BEGIN
-        DELETE FROM node_names WHERE id = OLD.id;
-
-        INSERT INTO node_names (id, name)
-        SELECT
-          NEW.id,
-          json_extract(NEW.attributes, '$.name')
-        WHERE json_type(NEW.attributes, '$.name') = 'text';
-      END;
-    `.execute(db);
-  },
-  down: async (db) => {
-    await sql`
-      DROP TRIGGER node_update_name;
-    `.execute(db);
-  },
-};
-
-const createNodeDeleteNameTrigger: Migration = {
-  up: async (db) => {
-    await sql`
-      CREATE TRIGGER node_delete_name
-      AFTER DELETE ON nodes
-      BEGIN
-        DELETE FROM node_names WHERE id = OLD.id;
-      END;
-    `.execute(db);
-  },
-  down: async (db) => {
-    await sql`
-      DROP TRIGGER node_delete_name;
+      DROP TABLE IF EXISTS node_texts;
     `.execute(db);
   },
 };
@@ -325,8 +275,6 @@ export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00007_create_interaction_events_table': createInteractionEventsTable,
   '00008_create_node_paths_table': createNodePathsTable,
   '00009_create_node_names_table': createNodeNamesTable,
-  '00010_create_node_insert_name_trigger': createNodeInsertNameTrigger,
-  '00011_create_node_update_name_trigger': createNodeUpdateNameTrigger,
-  '00012_create_node_delete_name_trigger': createNodeDeleteNameTrigger,
-  '00013_create_cursors_table': createCursorsTable,
+  '00010_create_node_texts_table': createNodeTextsTable,
+  '00011_create_cursors_table': createCursorsTable,
 };
