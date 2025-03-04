@@ -15,6 +15,7 @@ import { ConcurrentUpdateResult, UpdateDocumentOutput } from '@/types/nodes';
 import { eventBus } from '@/lib/event-bus';
 import { fetchNode, fetchNodeTree, mapNode } from '@/lib/nodes';
 import { CreateDocumentInput, CreateDocumentOutput } from '@/types/documents';
+import { scheduleDocumentEmbedding } from '@/lib/embeddings';
 
 const debug = createDebugger('server:lib:documents');
 
@@ -283,6 +284,8 @@ const tryUpdateDocumentFromMutation = async (
       rootId: node.root_id,
       workspaceId: user.workspace_id,
     });
+
+    await scheduleDocumentEmbedding(mutation.documentId);
 
     return {
       type: 'success',

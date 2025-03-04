@@ -258,6 +258,40 @@ export type SelectUpload = Selectable<UploadTable>;
 export type CreateUpload = Insertable<UploadTable>;
 export type UpdateUpload = Updateable<UploadTable>;
 
+interface NodeEmbeddingTable {
+  node_id: ColumnType<string, string, never>;
+  chunk: ColumnType<number, number, number>;
+  revision: ColumnType<bigint, bigint, bigint>;
+  workspace_id: ColumnType<string, string, never>;
+  text: ColumnType<string, string, string>;
+  summary: ColumnType<string | null, string | null, string | null>;
+  embedding_vector: ColumnType<number[], number[], number[]>;
+  search_vector: ColumnType<never, never, never>;
+  created_at: ColumnType<Date, Date, never>;
+  updated_at: ColumnType<Date | null, Date | null, Date | null>;
+}
+
+export type SelectNodeEmbedding = Selectable<NodeEmbeddingTable>;
+export type CreateNodeEmbedding = Insertable<NodeEmbeddingTable>;
+export type UpdateNodeEmbedding = Updateable<NodeEmbeddingTable>;
+
+interface DocumentEmbeddingTable {
+  document_id: ColumnType<string, string, never>;
+  chunk: ColumnType<number, number, number>;
+  revision: ColumnType<bigint, bigint, bigint>;
+  workspace_id: ColumnType<string, string, never>;
+  text: ColumnType<string, string, string>;
+  summary: ColumnType<string | null, string | null, string | null>;
+  embedding_vector: ColumnType<number[], number[], number[]>;
+  search_vector: ColumnType<never, never, never>;
+  created_at: ColumnType<Date, Date, never>;
+  updated_at: ColumnType<Date | null, Date | null, Date | null>;
+}
+
+export type SelectDocumentEmbedding = Selectable<DocumentEmbeddingTable>;
+export type CreateDocumentEmbedding = Insertable<DocumentEmbeddingTable>;
+export type UpdateDocumentEmbedding = Updateable<DocumentEmbeddingTable>;
+
 export interface DatabaseSchema {
   accounts: AccountTable;
   devices: DeviceTable;
@@ -273,4 +307,6 @@ export interface DatabaseSchema {
   documents: DocumentTable;
   document_updates: DocumentUpdateTable;
   uploads: UploadTable;
+  node_embeddings: NodeEmbeddingTable;
+  document_embeddings: DocumentEmbeddingTable;
 }

@@ -39,6 +39,34 @@ class JobService {
     this.jobQueue.on('error', (error) => {
       debug(`Job queue error: ${error}`);
     });
+
+    this.jobQueue.upsertJobScheduler(
+      'check_node_embeddings',
+      { pattern: '0 */30 * * * *' },
+      {
+        name: 'check_node_embeddings',
+        data: { type: 'check_node_embeddings' } as JobInput,
+        opts: {
+          backoff: 3,
+          attempts: 5,
+          removeOnFail: 1000,
+        },
+      }
+    );
+
+    this.jobQueue.upsertJobScheduler(
+      'check_document_embeddings',
+      { pattern: '0 */30 * * * *' },
+      {
+        name: 'check_document_embeddings',
+        data: { type: 'check_document_embeddings' } as JobInput,
+        opts: {
+          backoff: 3,
+          attempts: 5,
+          removeOnFail: 1000,
+        },
+      }
+    );
   }
 
   public async initWorker() {
@@ -67,6 +95,8 @@ class JobService {
     const input = job.data as JobInput;
     const handler = jobHandlerMap[input.type] as JobHandler<typeof input>;
     await handler(input);
+
+    debug(`Job ${job.id} with type ${input.type} completed.`);
   };
 }
 

@@ -16,6 +16,9 @@ import { createDocumentUpdatesTable } from './00013-create-document-updates-tabl
 import { createUploadsTable } from './00014-create-uploads-table';
 import { createNodePathsIndexes } from './00015-create-node-paths-indexes';
 import { createUserAccountIdIndex } from './00016-create-user-account-id-index';
+import { createVectorExtension } from './00017-create-vector-extension';
+import { createNodeEmbeddingsTable } from './00018-create-node-embeddings-table';
+import { createDocumentEmbeddingsTable } from './00019-create-document-embeddings-table';
 
 export const databaseMigrations: Record<string, Migration> = {
   '00001_create_accounts_table': createAccountsTable,
@@ -34,4 +37,7 @@ export const databaseMigrations: Record<string, Migration> = {
   '00014_create_uploads_table': createUploadsTable,
   '00015_create_node_paths_indexes': createNodePathsIndexes,
   '00016_create_user_account_id_index': createUserAccountIdIndex,
+  '00017_create_vector_extension': createVectorExtension,
+  '00018_create_node_embeddings_table': createNodeEmbeddingsTable,
+  '00019_create_document_embeddings_table': createDocumentEmbeddingsTable,
 };

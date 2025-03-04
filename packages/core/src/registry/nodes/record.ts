@@ -90,9 +90,18 @@ export const recordModel: NodeModel = {
       throw new Error('Invalid node type');
     }
 
+    const texts: string[] = [];
+    for (const field of Object.values(attributes.fields)) {
+      if (field.type === 'text') {
+        texts.push(field.value);
+      } else if (field.type === 'string') {
+        texts.push(field.value);
+      }
+    }
+
     return {
       name: attributes.name,
-      attributes: null,
+      attributes: texts.join('\n'),
     };
   },
 };

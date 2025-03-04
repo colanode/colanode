@@ -11,6 +11,7 @@ import {
   Node,
   NodeAttributes,
   UpdateNodeMutationData,
+  MessageAttributes,
 } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
 import { cloneDeep } from 'lodash-es';
@@ -38,6 +39,7 @@ import {
 } from '@/lib/collaborations';
 import { jobService } from '@/services/job-service';
 import { deleteFile } from '@/lib/files';
+import { scheduleNodeEmbedding } from '@/lib/embeddings';
 
 const debug = createDebugger('server:lib:nodes');
 
@@ -202,6 +204,21 @@ export const createNode = async (
       });
     }
 
+    await scheduleNodeEmbedding(createdNode);
+
+    if (
+      attributes.type === 'message' &&
+      (attributes as MessageAttributes).subtype === 'question'
+    ) {
+      await jobService.addJob({
+        type: 'assistant_response',
+        messageId: input.nodeId,
+        workspaceId: input.workspaceId,
+        selectedContextNodeIds:
+          (attributes as MessageAttributes).selectedContextNodeIds || [],
+      });
+    }
+
     return {
       node: createdNode,
     };
@@ -345,6 +362,8 @@ export const tryUpdateNode = async (
       });
     }
 
+    await scheduleNodeEmbedding(updatedNode);
+
     return {
       type: 'success',
       output: {
@@ -464,6 +483,21 @@ export const createNodeFromMutation = async (
         collaboratorId: createdCollaboration.collaborator_id,
         nodeId: mutation.nodeId,
         workspaceId: user.workspace_id,
+      });
+    }
+
+    await scheduleNodeEmbedding(createdNode);
+
+    if (
+      attributes.type === 'message' &&
+      (attributes as MessageAttributes).subtype === 'question'
+    ) {
+      await jobService.addJob({
+        type: 'assistant_response',
+        messageId: mutation.nodeId,
+        workspaceId: user.workspace_id,
+        selectedContextNodeIds:
+          (attributes as MessageAttributes).selectedContextNodeIds || [],
       });
     }
 
@@ -621,6 +655,8 @@ const tryUpdateNodeFromMutation = async (
         workspaceId: user.workspace_id,
       });
     }
+
+    await scheduleNodeEmbedding(updatedNode);
 
     return {
       type: 'success',

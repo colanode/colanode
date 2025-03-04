@@ -2,12 +2,12 @@ version: '3.8'
 
 services:
   postgres:
-    image: postgres:15
+    image: pgvector/pgvector:pg17
     container_name: colanode_postgres
     restart: always
     environment:
       POSTGRES_USER: colanode_user
-      POSTGRES_PASSWORD: strongpassword
+      POSTGRES_PASSWORD: your_postgres_password
       POSTGRES_DB: colanode_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -20,7 +20,7 @@ services:
     image: redis:7
     container_name: colanode_redis
     restart: always
-    command: ['redis-server', '--requirepass', 'strongredispassword']
+    command: ['redis-server', '--requirepass', 'your_redis_password']
     volumes:
       - redis_data:/data
     ports:
@@ -34,12 +34,18 @@ services:
     restart: always
     environment:
       MINIO_ROOT_USER: minioadmin
-      MINIO_ROOT_PASSWORD: minioadminpassword
+      MINIO_ROOT_PASSWORD: your_minio_password
+      MINIO_BROWSER: 'on'
+      MINIO_DOMAIN: minio
+      MINIO_ADDRESS: ':9000'
+      MINIO_CONSOLE_ADDRESS: ':9001'
     volumes:
       - minio_data:/data
     ports:
       - '9000:9000'
-    command: server /data
+      - '9001:9001'
+    entrypoint: sh
+    command: -c 'mkdir -p /data/colanode-avatars /data/colanode-files && minio server /data --address ":9000" --console-address ":9001"'
     networks:
       - colanode_network
 
@@ -62,7 +68,7 @@ services:
       PORT: 3000
 
       # The server requires a name and avatar URL which will be displayed in the desktop app login screen.
-      SERVER_NAME: 'Colanode'
+      SERVER_NAME: 'Colanode Local'
       SERVER_AVATAR: ''
       # Possible values for SERVER_MODE: 'standalone', 'cluster'
       SERVER_MODE: 'standalone'
@@ -71,7 +77,7 @@ services:
       # Account Configuration
       # ───────────────────────────────────────────────────────────────
       # Possible values for ACCOUNT_VERIFICATION_TYPE: 'automatic', 'manual', 'email'
-      ACCOUNT_VERIFICATION_TYPE: 'manual'
+      ACCOUNT_VERIFICATION_TYPE: 'automatic'
       ACCOUNT_OTP_TIMEOUT: '600' # in seconds
       ACCOUNT_ALLOW_GOOGLE_LOGIN: 'false'
 
@@ -85,7 +91,7 @@ services:
       # PostgreSQL Configuration
       # ───────────────────────────────────────────────────────────────
       # The server expects a PostgreSQL database with the pgvector extension installed.
-      POSTGRES_URL: 'postgres://colanode_user:strongpassword@postgres:5432/colanode_db'
+      POSTGRES_URL: 'postgres://colanode_user:your_postgres_password@postgres:5432/colanode_db'
 
       # Optional variables for SSL connection to the database
       POSTGRES_SSL_REJECT_UNAUTHORIZED: 'false'
@@ -96,7 +102,7 @@ services:
       # ───────────────────────────────────────────────────────────────
       # Redis Configuration
       # ───────────────────────────────────────────────────────────────
-      REDIS_URL: 'redis://:strongredispassword@redis:6379/0'
+      REDIS_URL: 'redis://:your_redis_password@redis:6379/0'
       REDIS_DB: '0'
       # Optional variables:
       REDIS_JOBS_QUEUE_NAME: 'jobs'
@@ -108,46 +114,109 @@ services:
       # ───────────────────────────────────────────────────────────────
       S3_AVATARS_ENDPOINT: 'http://minio:9000'
       S3_AVATARS_ACCESS_KEY: 'minioadmin'
-      S3_AVATARS_SECRET_KEY: 'minioadminpassword'
+      S3_AVATARS_SECRET_KEY: 'your_minio_password'
       S3_AVATARS_BUCKET_NAME: 'colanode-avatars'
       S3_AVATARS_REGION: 'us-east-1'
+      S3_AVATARS_FORCE_PATH_STYLE: 'true'
 
       # ───────────────────────────────────────────────────────────────
       # S3 Configuration for Files
       # ───────────────────────────────────────────────────────────────
       S3_FILES_ENDPOINT: 'http://minio:9000'
       S3_FILES_ACCESS_KEY: 'minioadmin'
-      S3_FILES_SECRET_KEY: 'minioadminpassword'
+      S3_FILES_SECRET_KEY: 'your_minio_password'
       S3_FILES_BUCKET_NAME: 'colanode-files'
       S3_FILES_REGION: 'us-east-1'
+      S3_FILES_FORCE_PATH_STYLE: 'true'
 
       # ───────────────────────────────────────────────────────────────
       # SMTP Configuration
       # ───────────────────────────────────────────────────────────────
-      SMTP_HOST: 'smtp.example.com'
+      SMTP_HOST: 'your_smtp_host'
       SMTP_PORT: '587'
-      SMTP_USER: 'user@example.com'
-      SMTP_PASSWORD: 'passsword'
+      SMTP_USER: 'your_smtp_user'
+      SMTP_PASSWORD: 'your_smtp_password'
       # configuration.ts requires SMTP_EMAIL_FROM and SMTP_EMAIL_FROM_NAME
-      SMTP_EMAIL_FROM: 'no-reply@example.com'
+      SMTP_EMAIL_FROM: 'your_email@example.com'
       SMTP_EMAIL_FROM_NAME: 'ColaNode'
 
       # ───────────────────────────────────────────────────────────────
       # AI Configuration
       # ───────────────────────────────────────────────────────────────
-      AI_ENABLED: 'false'
-      AI_ENTRY_EMBED_DELAY: '60000'
+      AI_ENABLED: 'true'
+      AI_NODE_EMBEDDING_DELAY: '5000'
+      AI_DOCUMENT_EMBEDDING_DELAY: '10000'
 
-      OPENAI_API_KEY: ''
-      OPENAI_EMBEDDING_MODEL: 'text-embedding-ada-002'
-      OPENAI_EMBEDDING_DIMENSIONS: '2000'
-      OPENAI_EMBEDDING_BATCH_SIZE: '50'
+      # OpenAI Provider
+      OPENAI_API_KEY: 'your_openai_api_key'
+      OPENAI_ENABLED: 'true'
 
+      # Google Provider
+      GOOGLE_API_KEY: 'your_google_api_key'
+      GOOGLE_ENABLED: 'true'
+
+      # Langfuse Configuration
+      LANGFUSE_ENABLED: 'false'
+      LANGFUSE_PUBLIC_KEY: 'your_langfuse_public_key'
+      LANGFUSE_SECRET_KEY: 'your_langfuse_secret_key'
+      LANGFUSE_BASE_URL: 'http://localhost:3005'
+
+      # Intent Recognition Model
+      INTENT_RECOGNITION_PROVIDER: 'google'
+      INTENT_RECOGNITION_MODEL: 'gemini-2.0-flash-lite'
+      INTENT_RECOGNITION_TEMPERATURE: '0.5'
+
+      # Query Rewrite Model
+      QUERY_REWRITE_PROVIDER: 'openai'
+      QUERY_REWRITE_MODEL: 'gpt-4o-mini'
+      QUERY_REWRITE_TEMPERATURE: '0.3'
+
+      # Response Model
+      RESPONSE_PROVIDER: 'google'
+      RESPONSE_MODEL: 'gemini-2.0-flash'
+      RESPONSE_TEMPERATURE: '0.6'
+
+      # Rerank Model
+      RERANK_PROVIDER: 'google'
+      RERANK_MODEL: 'gemini-2.0-flash-lite'
+      RERANK_TEMPERATURE: '0.5'
+
+      # Summarization Model
+      SUMMARIZATION_PROVIDER: 'openai'
+      SUMMARIZATION_MODEL: 'gpt-4o-mini'
+      SUMMARIZATION_TEMPERATURE: '0.3'
+
+      # Chunk Context Enhancer Model
+      CHUNK_CONTEXT_PROVIDER: 'google'
+      CHUNK_CONTEXT_MODEL: 'gemini-2.0-flash-lite'
+      CHUNK_CONTEXT_TEMPERATURE: '0.5'
+
+      # No Context Model
+      NO_CONTEXT_PROVIDER: 'openai'
+      NO_CONTEXT_MODEL: 'gpt-4o-mini'
+      NO_CONTEXT_TEMPERATURE: '0.3'
+
+      # Database Filter Model
+      DATABASE_FILTER_PROVIDER: 'google'
+      DATABASE_FILTER_MODEL: 'gemini-2.0-flash-lite'
+      DATABASE_FILTER_TEMPERATURE: '0.5'
+
+      # Embedding Model
+      EMBEDDING_PROVIDER: 'openai'
+      EMBEDDING_MODEL: 'text-embedding-3-large'
+      EMBEDDING_DIMENSIONS: '2000'
+      EMBEDDING_BATCH_SIZE: '50'
+      EMBEDDING_API_KEY: 'your_embedding_api_key'
+
+      # Chunking Configuration
       CHUNK_DEFAULT_CHUNK_SIZE: '1000'
       CHUNK_DEFAULT_OVERLAP: '200'
-      CHUNK_ENHANCE_WITH_CONTEXT: 'false'
-      CHUNK_CONTEXT_ENHANCER_MODEL: 'gpt-4o-mini'
-      CHUNK_CONTEXT_ENHANCER_TEMPERATURE: '0.3'
+      CHUNK_ENHANCE_WITH_CONTEXT: 'true'
+
+      # Retrieval Configuration
+      RETRIEVAL_HYBRID_SEARCH_SEMANTIC_WEIGHT: '0.7'
+      RETRIEVAL_HYBRID_SEARCH_KEYWORD_WEIGHT: '0.3'
+      RETRIEVAL_HYBRID_SEARCH_MAX_RESULTS: '20'
       # ───────────────────────────────────────────────────────────────
 
     ports:

@@ -81,6 +81,16 @@ const deleteChildren = async (parentIds: string[], userId: string) => {
           .execute();
 
         await trx
+          .deleteFrom('node_embeddings')
+          .where('node_id', 'in', nodeIds)
+          .execute();
+
+        await trx
+          .deleteFrom('document_embeddings')
+          .where('document_id', 'in', nodeIds)
+          .execute();
+
+        await trx
           .updateTable('collaborations')
           .set({
             deleted_at: new Date(),

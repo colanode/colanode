@@ -40,6 +40,7 @@
     "vitest": "^3.0.6"
   },
   "dependencies": {
+    "@langchain/langgraph": "^0.2.46",
     "debug": "^4.3.7",
     "lodash-es": "^4.17.21"
   }
