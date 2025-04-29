@@ -1,39 +1,40 @@
-import cors from 'cors';
-import express, { Request, Response } from 'express';
 import { createDebugger } from '@colanode/core';
+import { fastify } from 'fastify';
+import fastifyMultipart from '@fastify/multipart';
+import fastifyWebsocket from '@fastify/websocket';
 
-import http from 'http';
-
-import { clientRouter } from '@/api/client/routes';
-import { ipMiddleware } from '@/api/client/middlewares/ip';
-import { socketService } from '@/services/socket-service';
+import { clientRoutes } from '@/api/client/routes';
+import { ipDecorator } from '@/api/client/plugins/ip';
 
 const debug = createDebugger('server:app');
 
 export const initApp = async () => {
-  const app = express();
-  const port = 3000;
+  const app = fastify({
+    bodyLimit: 10 * 1024 * 1024, // 10MB
+  });
 
-  app.use(
-    express.json({
-      limit: '50mb',
-    })
-  );
-  app.use(cors());
-  app.use(ipMiddleware);
+  await app.register(fastifyMultipart, {
+    limits: {
+      fileSize: 10 * 1024 * 1024, // 10MB
+    },
+  });
 
-  app.get('/', (_: Request, res: Response) => {
-    res.send(
+  await app.register(fastifyWebsocket);
+  await app.register(ipDecorator);
+  await app.register(clientRoutes, { prefix: '/client/v1' });
+
+  app.get('/', (_, reply) => {
+    reply.send(
       'This is a Colanode server. For more information, visit https://colanode.com'
     );
   });
 
-  app.use('/client', clientRouter);
+  app.listen({ port: 3000 }, (err, address) => {
+    if (err) {
+      debug(`Failed to start server: ${err}`);
+      process.exit(1);
+    }
 
-  const server = http.createServer(app);
-  await socketService.init(server);
-
-  server.listen(port, () => {
-    debug(`Server is running at http://localhost:${port}`);
+    debug(`Server is running at ${address}`);
   });
 };

@@ -39,6 +39,13 @@ export const generatePasswordHash = async (
   });
 };
 
+export const verifyPassword = async (
+  password: string,
+  hash: string
+): Promise<boolean> => {
+  return await argon2.verify(hash, password);
+};
+
 export const buildLoginSuccessOutput = async (
   account: SelectAccount,
   metadata: DeviceMetadata
