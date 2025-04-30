@@ -50,7 +50,7 @@ export const fileUploadCompleteRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      if (node.created_by !== request.account.id) {
+      if (node.created_by !== request.user.id) {
         return reply.code(403).send({
           code: ApiErrorCode.FileOwnerMismatch,
           message: 'You cannot complete this file upload.',

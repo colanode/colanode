@@ -77,7 +77,7 @@ export const fileUploadInitRoute: FastifyPluginCallbackZod = (
       const storageUsedRow = await database
         .selectFrom('uploads')
         .select(({ fn }) => [fn.sum('size').as('storage_used')])
-        .where('created_by', '=', request.account.id)
+        .where('created_by', '=', request.user.id)
         .executeTakeFirst();
 
       const storageUsed = BigInt(storageUsedRow?.storage_used ?? 0);
@@ -103,13 +103,13 @@ export const fileUploadInitRoute: FastifyPluginCallbackZod = (
           file_id: input.fileId,
           upload_id: uploadId,
           workspace_id: node.workspace_id,
-          root_id: node.id,
+          root_id: node.root_id,
           mime_type: file.attributes.mimeType,
           size: file.attributes.size,
           path: path,
           version_id: file.attributes.version,
           created_at: new Date(),
-          created_by: request.account.id,
+          created_by: request.user.id,
         })
         .onConflict((b) =>
           b.columns(['file_id']).doUpdateSet({
@@ -119,7 +119,7 @@ export const fileUploadInitRoute: FastifyPluginCallbackZod = (
             path: path,
             version_id: file.attributes.version,
             created_at: new Date(),
-            created_by: request.account.id,
+            created_by: request.user.id,
           })
         )
         .executeTakeFirst();
