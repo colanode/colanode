@@ -135,7 +135,7 @@ export class SocketConnection {
     message: SynchronizerInputMessage,
     user: SocketUser
   ): BaseSynchronizer<SynchronizerInput> | null {
-    const cursor = BigInt(message.cursor);
+    const cursor = message.cursor;
     if (message.input.type === 'users') {
       return new UserSynchronizer(message.id, user.user, message.input, cursor);
     } else if (message.input.type === 'collaborations') {

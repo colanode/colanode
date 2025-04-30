@@ -9,8 +9,8 @@ interface WorkspaceTable {
   description: ColumnType<string | null, string | null, string | null>;
   avatar: ColumnType<string | null, string | null, string | null>;
   role: ColumnType<WorkspaceRole, WorkspaceRole, WorkspaceRole>;
-  storage_limit: ColumnType<bigint, bigint, bigint>;
-  max_file_size: ColumnType<bigint, bigint, bigint>;
+  storage_limit: ColumnType<string, string, string>;
+  max_file_size: ColumnType<string, string, string>;
   created_at: ColumnType<string, string, never>;
 }
 

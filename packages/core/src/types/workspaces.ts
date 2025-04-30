@@ -32,8 +32,8 @@ export const workspaceUserOutputSchema = z.object({
   id: z.string(),
   accountId: z.string(),
   role: workspaceRoleSchema,
-  storageLimit: z.bigint(),
-  maxFileSize: z.bigint(),
+  storageLimit: z.string(),
+  maxFileSize: z.string(),
 });
 
 export type WorkspaceUserOutput = z.infer<typeof workspaceUserOutputSchema>;

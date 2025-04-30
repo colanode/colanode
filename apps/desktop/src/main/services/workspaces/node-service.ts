@@ -110,8 +110,8 @@ export class NodeService {
             attributes: JSON.stringify(input.attributes),
             created_at: createdAt,
             created_by: this.workspace.userId,
-            local_revision: BigInt(0),
-            server_revision: BigInt(0),
+            local_revision: '0',
+            server_revision: '0',
           })
           .executeTakeFirst();
 
@@ -305,7 +305,7 @@ export class NodeService {
           attributes: JSON.stringify(attributes),
           updated_at: updatedAt,
           updated_by: this.workspace.userId,
-          local_revision: localRevision,
+          local_revision: localRevision.toString(),
         })
         .where('id', '=', nodeId)
         .where('local_revision', '=', node.localRevision)
@@ -536,8 +536,6 @@ export class NodeService {
   private async tryCreateServerNode(
     update: SyncNodeUpdateData
   ): Promise<boolean> {
-    const serverRevision = BigInt(update.revision);
-
     const ydoc = new YDoc(update.data);
     const attributes = ydoc.getObject<NodeAttributes>();
 
@@ -565,8 +563,8 @@ export class NodeService {
             attributes: JSON.stringify(attributes),
             created_at: update.createdAt,
             created_by: update.createdBy,
-            local_revision: 0n,
-            server_revision: serverRevision,
+            local_revision: '0',
+            server_revision: update.revision,
           })
           .executeTakeFirst();
 
@@ -579,7 +577,7 @@ export class NodeService {
           .returningAll()
           .values({
             id: update.nodeId,
-            revision: serverRevision,
+            revision: update.revision,
             state: decodeState(update.data),
           })
           .executeTakeFirst();
@@ -658,7 +656,6 @@ export class NodeService {
     const ydoc = new YDoc(nodeState?.state);
     ydoc.applyUpdate(update.data);
 
-    const serverRevision = BigInt(update.revision);
     const serverState = ydoc.getState();
 
     for (const nodeUpdate of nodeUpdates) {
@@ -695,8 +692,8 @@ export class NodeService {
             attributes: JSON.stringify(attributes),
             updated_at: update.createdAt,
             updated_by: update.createdBy,
-            local_revision: localRevision,
-            server_revision: serverRevision,
+            local_revision: localRevision.toString(),
+            server_revision: update.revision,
           })
           .where('id', '=', existingNode.id)
           .where('local_revision', '=', existingNode.local_revision)
@@ -711,16 +708,16 @@ export class NodeService {
           .returningAll()
           .values({
             id: existingNode.id,
-            revision: serverRevision,
+            revision: update.revision,
             state: serverState,
           })
           .onConflict((cb) =>
             cb
               .doUpdateSet({
-                revision: serverRevision,
+                revision: update.revision,
                 state: serverState,
               })
-              .where('revision', '=', BigInt(nodeState?.revision ?? 0))
+              .where('revision', '=', nodeState?.revision ?? '0')
           )
           .executeTakeFirst();
 
@@ -1041,7 +1038,7 @@ export class NodeService {
           .returningAll()
           .set({
             attributes: JSON.stringify(attributes),
-            local_revision: localRevision,
+            local_revision: localRevision.toString(),
           })
           .where('id', '=', mutation.nodeId)
           .where('local_revision', '=', node.local_revision)

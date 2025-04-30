@@ -23,9 +23,8 @@ export class NodeInteractionService {
       .where('collaborator_id', '=', nodeInteraction.collaboratorId)
       .executeTakeFirst();
 
-    const revision = BigInt(nodeInteraction.revision);
     if (existingNodeInteraction) {
-      if (existingNodeInteraction.revision === revision) {
+      if (existingNodeInteraction.revision === nodeInteraction.revision) {
         debug(
           `Server node interaction for node ${nodeInteraction.nodeId} is already synced`
         );
@@ -44,7 +43,7 @@ export class NodeInteractionService {
         last_seen_at: nodeInteraction.lastSeenAt,
         last_opened_at: nodeInteraction.lastOpenedAt,
         first_opened_at: nodeInteraction.firstOpenedAt,
-        revision,
+        revision: nodeInteraction.revision,
       })
       .onConflict((b) =>
         b.columns(['node_id', 'collaborator_id']).doUpdateSet({
@@ -52,7 +51,7 @@ export class NodeInteractionService {
           first_seen_at: nodeInteraction.firstSeenAt,
           last_opened_at: nodeInteraction.lastOpenedAt,
           first_opened_at: nodeInteraction.firstOpenedAt,
-          revision,
+          revision: nodeInteraction.revision,
         })
       )
       .executeTakeFirst();

@@ -9,11 +9,11 @@ export abstract class BaseSynchronizer<T extends SynchronizerInput> {
   public readonly id: string;
   public readonly user: ConnectedUser;
   public readonly input: T;
-  public readonly cursor: bigint;
+  public readonly cursor: string;
 
   protected status: SynchronizerStatus = 'pending';
 
-  constructor(id: string, user: ConnectedUser, input: T, cursor: bigint) {
+  constructor(id: string, user: ConnectedUser, input: T, cursor: string) {
     this.id = id;
     this.user = user;
     this.input = input;

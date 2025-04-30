@@ -25,7 +25,7 @@ export class UserService {
         name: user.name,
         avatar: user.avatar,
         role: user.role,
-        revision: BigInt(user.revision),
+        revision: user.revision,
         created_at: user.createdAt,
         updated_at: user.updatedAt,
         status: user.status,
@@ -42,10 +42,10 @@ export class UserService {
             custom_avatar: user.customAvatar,
             role: user.role,
             status: user.status,
-            revision: BigInt(user.revision),
+            revision: user.revision,
             updated_at: user.updatedAt,
           })
-          .where('revision', '<', BigInt(user.revision))
+          .where('revision', '<', user.revision)
       )
       .executeTakeFirst();
 

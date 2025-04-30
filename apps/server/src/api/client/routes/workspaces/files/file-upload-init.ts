@@ -81,7 +81,7 @@ export const fileUploadInitRoute: FastifyPluginCallbackZod = (
         .executeTakeFirst();
 
       const storageUsed = BigInt(storageUsedRow?.storage_used ?? 0);
-      const storageLimit = user.storage_limit;
+      const storageLimit = BigInt(user.storage_limit);
 
       if (storageUsed >= storageLimit) {
         return reply.code(400).send({

@@ -32,7 +32,7 @@ export class Synchronizer<TInput extends SynchronizerInput> {
   ) => Promise<void>;
 
   private status: SynchronizerStatus = 'idle';
-  private cursor: bigint = 0n;
+  private cursor: string = '0';
   private initialized: boolean = false;
 
   constructor(
@@ -105,12 +105,12 @@ export class Synchronizer<TInput extends SynchronizerInput> {
     }
 
     this.status = 'processing';
-    let lastCursor: bigint | null = null;
+    let lastCursor: string | null = null;
 
     try {
       for (const item of message.items) {
         await this.processor(item.data);
-        lastCursor = BigInt(item.cursor);
+        lastCursor = item.cursor;
       }
     } catch (error) {
       debug(`Error consuming items: ${error}`);
@@ -157,10 +157,10 @@ export class Synchronizer<TInput extends SynchronizerInput> {
       .where('key', '=', this.cursorKey)
       .executeTakeFirst();
 
-    return cursor?.value ?? 0n;
+    return cursor?.value ?? '0';
   }
 
-  private async saveCursor(cursor: bigint) {
+  private async saveCursor(cursor: string) {
     await this.workspace.database
       .insertInto('cursors')
       .values({

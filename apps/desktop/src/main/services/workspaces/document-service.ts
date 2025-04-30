@@ -145,8 +145,8 @@ export class DocumentService {
           .values({
             id: id,
             content: JSON.stringify(content),
-            local_revision: 0n,
-            server_revision: 0n,
+            local_revision: '0',
+            server_revision: '0',
             created_at: updatedAt,
             created_by: this.workspace.userId,
           })
@@ -251,7 +251,7 @@ export class DocumentService {
     }
 
     const localRevision = BigInt(document.local_revision) + 1n;
-    const serverRevision = BigInt(document.server_revision) + 1n;
+    const serverRevision = document.server_revision;
     const updateId = generateId(IdType.Update);
     const updatedAt = new Date().toISOString();
     const text = extractDocumentText(document.id, afterContent);
@@ -274,7 +274,7 @@ export class DocumentService {
         .returningAll()
         .set({
           content: JSON.stringify(afterContent),
-          local_revision: localRevision,
+          local_revision: localRevision.toString(),
           server_revision: serverRevision,
           updated_at: updatedAt,
           updated_by: this.workspace.userId,
@@ -510,7 +510,7 @@ export class DocumentService {
         .returningAll()
         .set({
           content: JSON.stringify(content),
-          local_revision: localRevision,
+          local_revision: localRevision.toString(),
         })
         .where('id', '=', data.documentId)
         .where('local_revision', '=', node.local_revision)
@@ -637,7 +637,7 @@ export class DocumentService {
     ydoc.applyUpdate(data.data);
 
     const serverState = ydoc.getState();
-    const serverRevision = BigInt(data.revision);
+    const serverRevision = data.revision;
 
     for (const update of documentUpdates) {
       if (update.id === data.id || mergedUpdateIds.includes(update.id)) {
@@ -679,7 +679,7 @@ export class DocumentService {
           .set({
             content: JSON.stringify(content),
             server_revision: serverRevision,
-            local_revision: localRevision,
+            local_revision: localRevision.toString(),
             updated_at: data.createdAt,
             updated_by: data.createdBy,
           })
@@ -706,7 +706,7 @@ export class DocumentService {
                 state: serverState,
                 revision: serverRevision,
               })
-              .where('revision', '=', BigInt(documentState?.revision ?? 0))
+              .where('revision', '=', documentState?.revision ?? '0')
           )
           .executeTakeFirst();
 
@@ -805,7 +805,7 @@ export class DocumentService {
               id: data.documentId,
               content: JSON.stringify(content),
               server_revision: serverRevision,
-              local_revision: localRevision,
+              local_revision: localRevision.toString(),
               created_at: data.createdAt,
               created_by: data.createdBy,
             })

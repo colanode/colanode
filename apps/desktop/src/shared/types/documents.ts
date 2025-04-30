@@ -2,8 +2,8 @@ import { DocumentContent } from '@colanode/core';
 
 export type Document = {
   id: string;
-  localRevision: bigint;
-  serverRevision: bigint;
+  localRevision: string;
+  serverRevision: string;
   content: DocumentContent;
   createdAt: string;
   createdBy: string;
@@ -13,7 +13,7 @@ export type Document = {
 
 export type DocumentState = {
   id: string;
-  revision: bigint;
+  revision: string;
   state: Uint8Array;
 };
 

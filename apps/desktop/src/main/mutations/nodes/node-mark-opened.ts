@@ -61,7 +61,7 @@ export class NodeMarkOpenedMutationHandler
             collaborator_id: workspace.userId,
             last_opened_at: lastOpenedAt,
             first_opened_at: firstOpenedAt,
-            revision: 0n,
+            revision: '0',
             root_id: node.rootId,
           })
           .onConflict((b) =>

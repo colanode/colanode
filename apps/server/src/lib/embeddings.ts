@@ -7,20 +7,20 @@ import { jobService } from '@/services/job-service';
 
 export const fetchEmbeddingCursor = async (
   cursorId: string
-): Promise<bigint> => {
+): Promise<string> => {
   const cursorStringValue = await redis.get(`embedding_cursor:${cursorId}`);
   if (!cursorStringValue) {
-    return 0n;
+    return '0';
   }
 
-  return BigInt(cursorStringValue);
+  return cursorStringValue;
 };
 
 export const updateEmbeddingCursor = async (
   cursorId: string,
-  value: bigint
+  value: string
 ) => {
-  await redis.set(`embedding_cursor:${cursorId}`, value.toString());
+  await redis.set(`embedding_cursor:${cursorId}`, value);
 };
 
 export const deleteEmbeddingCursor = async (cursorId: string) => {

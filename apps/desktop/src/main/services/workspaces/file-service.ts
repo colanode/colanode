@@ -111,11 +111,13 @@ export class FileService {
       );
     }
 
-    if (metadata.size > this.workspace.maxFileSize) {
+    const fileSize = BigInt(metadata.size);
+    const maxFileSize = BigInt(this.workspace.maxFileSize);
+    if (fileSize > maxFileSize) {
       throw new MutationError(
         MutationErrorCode.FileTooLarge,
         'The file you are trying to upload is too large. The maximum file size is ' +
-          formatBytes(this.workspace.maxFileSize)
+          formatBytes(maxFileSize)
       );
     }
 
@@ -124,15 +126,16 @@ export class FileService {
       this.workspace.userId
     );
 
-    if (storageUsed + BigInt(metadata.size) > this.workspace.storageLimit) {
+    const storageLimit = BigInt(this.workspace.storageLimit);
+    if (storageUsed + fileSize > storageLimit) {
       throw new MutationError(
         MutationErrorCode.StorageLimitExceeded,
         'You have reached your storage limit. You have used ' +
           formatBytes(storageUsed) +
           ' and you are trying to upload a file of size ' +
-          formatBytes(metadata.size) +
+          formatBytes(fileSize) +
           '. Your storage limit is ' +
-          formatBytes(this.workspace.storageLimit)
+          formatBytes(storageLimit)
       );
     }
 
@@ -305,7 +308,7 @@ export class FileService {
     }
 
     const file = mapNode(node) as LocalFileNode;
-    if (node.server_revision === BigInt(0)) {
+    if (node.server_revision === '0') {
       // file is not synced with the server, we need to wait for the sync to complete
       return;
     }
@@ -508,7 +511,7 @@ export class FileService {
 
     const file = mapNode(node) as LocalFileNode;
 
-    if (node.server_revision === BigInt(0)) {
+    if (node.server_revision === '0') {
       // file is not synced with the server, we need to wait for the sync to complete
       return;
     }

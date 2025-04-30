@@ -98,11 +98,11 @@ export class WorkspaceService {
     return this.workspace.role;
   }
 
-  public get maxFileSize(): bigint {
+  public get maxFileSize(): string {
     return this.workspace.maxFileSize;
   }
 
-  public get storageLimit(): bigint {
+  public get storageLimit(): string {
     return this.workspace.storageLimit;
   }
 

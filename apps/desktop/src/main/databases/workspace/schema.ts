@@ -20,7 +20,7 @@ interface UserTable {
   status: ColumnType<UserStatus, UserStatus, UserStatus>;
   created_at: ColumnType<string, string, never>;
   updated_at: ColumnType<string | null, string | null, string | null>;
-  revision: ColumnType<bigint, bigint, bigint>;
+  revision: ColumnType<string, string, string>;
 }
 
 export type SelectUser = Selectable<UserTable>;
@@ -33,8 +33,8 @@ interface NodeTable {
   parent_id: ColumnType<string | null, never, never>;
   root_id: ColumnType<string, string, never>;
   attributes: ColumnType<string, string, string>;
-  local_revision: ColumnType<bigint, bigint, bigint>;
-  server_revision: ColumnType<bigint, bigint, bigint>;
+  local_revision: ColumnType<string, string, string>;
+  server_revision: ColumnType<string, string, string>;
   created_at: ColumnType<string, string, never>;
   updated_at: ColumnType<string | null, string | null, string | null>;
   created_by: ColumnType<string, string, never>;
@@ -48,7 +48,7 @@ export type UpdateNode = Updateable<NodeTable>;
 interface NodeStateTable {
   id: ColumnType<string, string, never>;
   state: ColumnType<Uint8Array, Uint8Array, Uint8Array>;
-  revision: ColumnType<bigint, bigint, bigint>;
+  revision: ColumnType<string, string, string>;
 }
 
 export type SelectNodeState = Selectable<NodeStateTable>;
@@ -70,7 +70,7 @@ interface NodeInteractionTable {
   node_id: ColumnType<string, string, never>;
   collaborator_id: ColumnType<string, string, never>;
   root_id: ColumnType<string, string, never>;
-  revision: ColumnType<bigint, bigint, bigint>;
+  revision: ColumnType<string, string, string>;
   first_seen_at: ColumnType<string | null, string | null, string | null>;
   last_seen_at: ColumnType<string | null, string | null, string | null>;
   first_opened_at: ColumnType<string | null, string | null, string | null>;
@@ -86,7 +86,7 @@ interface NodeReactionTable {
   collaborator_id: ColumnType<string, string, never>;
   reaction: ColumnType<string, string, string>;
   root_id: ColumnType<string, string, string>;
-  revision: ColumnType<bigint, bigint, bigint>;
+  revision: ColumnType<string, string, string>;
   created_at: ColumnType<string, string, never>;
 }
 
@@ -132,7 +132,7 @@ export type UpdateNodeText = Updateable<NodeTextTable>;
 interface CollaborationTable {
   node_id: ColumnType<string, string, never>;
   role: ColumnType<string, string, string>;
-  revision: ColumnType<bigint, bigint, bigint>;
+  revision: ColumnType<string, string, string>;
   created_at: ColumnType<string, string, never>;
   updated_at: ColumnType<string | null, string | null, string | null>;
   deleted_at: ColumnType<string | null, string | null, string | null>;
@@ -145,8 +145,8 @@ export type UpdateCollaboration = Updateable<CollaborationTable>;
 interface DocumentTable {
   id: ColumnType<string, string, never>;
   type: ColumnType<DocumentType, never, never>;
-  local_revision: ColumnType<bigint, bigint, bigint>;
-  server_revision: ColumnType<bigint, bigint, bigint>;
+  local_revision: ColumnType<string, string, string>;
+  server_revision: ColumnType<string, string, string>;
   content: ColumnType<string, string, string>;
   created_at: ColumnType<string, string, never>;
   created_by: ColumnType<string, string, never>;
@@ -161,7 +161,7 @@ export type UpdateDocument = Updateable<DocumentTable>;
 interface DocumentStateTable {
   id: ColumnType<string, string, never>;
   state: ColumnType<Uint8Array, Uint8Array, Uint8Array>;
-  revision: ColumnType<bigint, bigint, bigint>;
+  revision: ColumnType<string, string, string>;
 }
 
 export type SelectDocumentState = Selectable<DocumentStateTable>;
@@ -243,7 +243,7 @@ export type UpdateTombstone = Updateable<TombstoneTable>;
 
 interface CursorTable {
   key: ColumnType<string, string, never>;
-  value: ColumnType<bigint, bigint, bigint>;
+  value: ColumnType<string, string, string>;
   created_at: ColumnType<string, string, never>;
   updated_at: ColumnType<string | null, string | null, string | null>;
 }

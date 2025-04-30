@@ -62,7 +62,7 @@ export class NodeMarkSeenMutationHandler
             collaborator_id: workspace.userId,
             last_seen_at: lastSeenAt,
             first_seen_at: firstSeenAt,
-            revision: 0n,
+            revision: '0',
             root_id: node.rootId,
           })
           .onConflict((b) =>

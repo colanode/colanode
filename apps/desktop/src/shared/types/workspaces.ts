@@ -8,8 +8,8 @@ export type Workspace = {
   accountId: string;
   role: WorkspaceRole;
   userId: string;
-  maxFileSize: bigint;
-  storageLimit: bigint;
+  maxFileSize: string;
+  storageLimit: string;
 };
 
 export type ContainerTab = {

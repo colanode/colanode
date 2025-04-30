@@ -73,15 +73,15 @@ interface UserTable {
   id: ColumnType<string, string, never>;
   workspace_id: ColumnType<string, string, never>;
   account_id: ColumnType<string, string, never>;
-  revision: ColumnType<bigint, never, never>;
+  revision: ColumnType<string, never, never>;
   email: ColumnType<string, string, string>;
   role: ColumnType<WorkspaceRole, WorkspaceRole, WorkspaceRole>;
   name: ColumnType<string, string, string>;
   avatar: ColumnType<string | null, string | null, string | null>;
   custom_name: ColumnType<string | null, string | null, string | null>;
   custom_avatar: ColumnType<string | null, string | null, string | null>;
-  storage_limit: ColumnType<bigint, bigint, bigint>;
-  max_file_size: ColumnType<bigint, bigint, bigint>;
+  storage_limit: ColumnType<string, string, string>;
+  max_file_size: ColumnType<string, string, string>;
   created_at: ColumnType<Date, Date, never>;
   created_by: ColumnType<string, string, never>;
   updated_at: ColumnType<Date | null, Date | null, Date>;
@@ -99,7 +99,7 @@ interface NodeTable {
   parent_id: ColumnType<string | null, never, never>;
   root_id: ColumnType<string, string, never>;
   workspace_id: ColumnType<string, string, never>;
-  revision: ColumnType<bigint, bigint, bigint>;
+  revision: ColumnType<string, string, string>;
   attributes: JSONColumnType<NodeAttributes, string | null, string | null>;
   created_at: ColumnType<Date, Date, never>;
   created_by: ColumnType<string, string, never>;
@@ -116,7 +116,7 @@ interface NodeUpdateTable {
   node_id: ColumnType<string, string, never>;
   root_id: ColumnType<string, string, never>;
   workspace_id: ColumnType<string, string, never>;
-  revision: ColumnType<bigint, never, never>;
+  revision: ColumnType<string, never, never>;
   data: ColumnType<Uint8Array, Uint8Array, Uint8Array>;
   created_at: ColumnType<Date, Date, never>;
   created_by: ColumnType<string, string, never>;
@@ -136,7 +136,7 @@ interface NodeInteractionTable {
   collaborator_id: ColumnType<string, string, never>;
   root_id: ColumnType<string, string, never>;
   workspace_id: ColumnType<string, string, never>;
-  revision: ColumnType<bigint, never, never>;
+  revision: ColumnType<string, never, never>;
   first_seen_at: ColumnType<Date | null, Date | null, Date | null>;
   last_seen_at: ColumnType<Date | null, Date | null, Date | null>;
   first_opened_at: ColumnType<Date | null, Date | null, Date | null>;
@@ -152,7 +152,7 @@ interface NodeReactionTable {
   collaborator_id: ColumnType<string, string, never>;
   root_id: ColumnType<string, string, never>;
   workspace_id: ColumnType<string, string, never>;
-  revision: ColumnType<bigint, never, never>;
+  revision: ColumnType<string, never, never>;
   reaction: ColumnType<string, string, string>;
   created_at: ColumnType<Date, Date, Date>;
   deleted_at: ColumnType<Date | null, Date | null, Date | null>;
@@ -166,7 +166,7 @@ interface NodeTombstoneTable {
   id: ColumnType<string, string, never>;
   root_id: ColumnType<string, string, never>;
   workspace_id: ColumnType<string, string, never>;
-  revision: ColumnType<bigint, never, never>;
+  revision: ColumnType<string, never, never>;
   deleted_at: ColumnType<Date, Date, Date>;
   deleted_by: ColumnType<string, string, never>;
 }
@@ -190,7 +190,7 @@ interface CollaborationTable {
   node_id: ColumnType<string, string, never>;
   collaborator_id: ColumnType<string, string, never>;
   workspace_id: ColumnType<string, string, never>;
-  revision: ColumnType<bigint, never, never>;
+  revision: ColumnType<string, never, never>;
   role: ColumnType<NodeRole, NodeRole, NodeRole>;
   created_at: ColumnType<Date, Date, never>;
   created_by: ColumnType<string, string, never>;
@@ -208,7 +208,7 @@ interface DocumentTable {
   id: ColumnType<string, string, never>;
   type: ColumnType<DocumentType, never, never>;
   workspace_id: ColumnType<string, string, never>;
-  revision: ColumnType<bigint, bigint, bigint>;
+  revision: ColumnType<string, string, string>;
   content: JSONColumnType<DocumentContent, string, string>;
   created_at: ColumnType<Date, Date, never>;
   created_by: ColumnType<string, string, never>;
@@ -225,7 +225,7 @@ interface DocumentUpdateTable {
   document_id: ColumnType<string, string, never>;
   root_id: ColumnType<string, string, never>;
   workspace_id: ColumnType<string, string, never>;
-  revision: ColumnType<bigint, never, never>;
+  revision: ColumnType<string, never, never>;
   data: ColumnType<Uint8Array, Uint8Array, Uint8Array>;
   created_at: ColumnType<Date, Date, never>;
   created_by: ColumnType<string, string, never>;
@@ -261,7 +261,7 @@ export type UpdateUpload = Updateable<UploadTable>;
 interface NodeEmbeddingTable {
   node_id: ColumnType<string, string, never>;
   chunk: ColumnType<number, number, number>;
-  revision: ColumnType<bigint, bigint, bigint>;
+  revision: ColumnType<string, string, string>;
   workspace_id: ColumnType<string, string, never>;
   text: ColumnType<string, string, string>;
   summary: ColumnType<string | null, string | null, string | null>;
@@ -278,7 +278,7 @@ export type UpdateNodeEmbedding = Updateable<NodeEmbeddingTable>;
 interface DocumentEmbeddingTable {
   document_id: ColumnType<string, string, never>;
   chunk: ColumnType<number, number, number>;
-  revision: ColumnType<bigint, bigint, bigint>;
+  revision: ColumnType<string, string, string>;
   workspace_id: ColumnType<string, string, never>;
   text: ColumnType<string, string, string>;
   summary: ColumnType<string | null, string | null, string | null>;

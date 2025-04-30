@@ -88,7 +88,7 @@ export class NodeReactionService {
             collaborator_id: this.workspace.userId,
             reaction,
             root_id: node.rootId,
-            revision: 0n,
+            revision: '0',
             created_at: new Date().toISOString(),
           })
           .onConflict((cb) => cb.doNothing())
@@ -267,9 +267,8 @@ export class NodeReactionService {
       .where('reaction', '=', nodeReaction.reaction)
       .executeTakeFirst();
 
-    const revision = BigInt(nodeReaction.revision);
     if (existingNodeReaction) {
-      if (existingNodeReaction.revision === revision) {
+      if (existingNodeReaction.revision === nodeReaction.revision) {
         debug(
           `Server node reaction for node ${nodeReaction.nodeId} is already synced`
         );
@@ -280,7 +279,7 @@ export class NodeReactionService {
         .updateTable('node_reactions')
         .returningAll()
         .set({
-          revision,
+          revision: nodeReaction.revision,
         })
         .where('node_id', '=', nodeReaction.nodeId)
         .where('collaborator_id', '=', nodeReaction.collaboratorId)
@@ -306,11 +305,11 @@ export class NodeReactionService {
         reaction: nodeReaction.reaction,
         root_id: nodeReaction.rootId,
         created_at: nodeReaction.createdAt,
-        revision,
+        revision: nodeReaction.revision,
       })
       .onConflict((b) =>
         b.columns(['node_id', 'collaborator_id', 'reaction']).doUpdateSet({
-          revision,
+          revision: nodeReaction.revision,
         })
       )
       .executeTakeFirst();

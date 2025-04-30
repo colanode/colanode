@@ -130,6 +130,7 @@ export const emailRegisterRoute: FastifyPluginCallbackZod = (
         platform: input.platform,
         version: input.version,
       });
+
       return output;
     },
   });

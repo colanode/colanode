@@ -16,6 +16,14 @@ import { configuration } from '@/lib/configuration';
 
 const debug = createDebugger('server:database');
 
+pg.types.setTypeParser(pg.types.builtins.NUMERIC, (val) => {
+  return parseFloat(val);
+});
+
+pg.types.setTypeParser(pg.types.builtins.INT4, (val) => {
+  return parseInt(val);
+});
+
 const dialect = new PostgresDialect({
   pool: new pg.Pool({
     connectionString: configuration.postgres.url,

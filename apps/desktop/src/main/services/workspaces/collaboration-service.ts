@@ -49,18 +49,18 @@ export class CollaborationService {
         created_at: collaboration.createdAt,
         updated_at: collaboration.updatedAt,
         deleted_at: collaboration.deletedAt,
-        revision: BigInt(collaboration.revision),
+        revision: collaboration.revision,
       })
       .onConflict((oc) =>
         oc
           .columns(['node_id'])
           .doUpdateSet({
             role: collaboration.role,
-            revision: BigInt(collaboration.revision),
+            revision: collaboration.revision,
             updated_at: collaboration.updatedAt,
             deleted_at: collaboration.deletedAt,
           })
-          .where('revision', '<', BigInt(collaboration.revision))
+          .where('revision', '<', collaboration.revision)
       )
       .executeTakeFirst();
 

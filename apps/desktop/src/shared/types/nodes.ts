@@ -22,7 +22,7 @@ export type NodeInteraction = {
   nodeId: string;
   collaboratorId: string;
   rootId: string;
-  revision: bigint;
+  revision: string;
   lastSeenAt: string | null;
   firstSeenAt: string | null;
   lastOpenedAt: string | null;
@@ -62,8 +62,8 @@ export type NodeCounter = {
 };
 
 export type LocalNodeBase = {
-  localRevision: bigint;
-  serverRevision: bigint;
+  localRevision: string;
+  serverRevision: string;
 };
 
 export type LocalChannelNode = ChannelNode & LocalNodeBase;

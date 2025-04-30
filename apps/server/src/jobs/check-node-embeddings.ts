@@ -76,7 +76,7 @@ export const checkNodeEmbeddingsHandler = async () => {
         .orderBy('created_at', 'asc')
         .executeTakeFirst();
 
-      const revision = firstEmbedding?.revision ?? 0n;
+      const revision = firstEmbedding?.revision ?? '0';
       if (revision >= node.revision) {
         continue;
       }
@@ -85,7 +85,7 @@ export const checkNodeEmbeddingsHandler = async () => {
     }
 
     if (nodes.length > 0) {
-      lastRevision = nodes[nodes.length - 1]?.revision ?? 0n;
+      lastRevision = nodes[nodes.length - 1]?.revision ?? '0';
     }
 
     if (nodes.length < BATCH_SIZE) {

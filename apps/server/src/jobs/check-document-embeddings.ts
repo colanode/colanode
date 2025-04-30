@@ -63,7 +63,7 @@ export const checkDocumentEmbeddingsHandler = async () => {
         .orderBy('created_at', 'asc')
         .executeTakeFirst();
 
-      const revision = firstEmbedding?.revision ?? 0n;
+      const revision = firstEmbedding?.revision ?? '0';
       if (revision >= document.revision) {
         continue;
       }
@@ -72,7 +72,7 @@ export const checkDocumentEmbeddingsHandler = async () => {
     }
 
     if (documents.length > 0) {
-      lastRevision = documents[documents.length - 1]?.revision ?? 0n;
+      lastRevision = documents[documents.length - 1]?.revision ?? '0';
     }
 
     if (documents.length < BATCH_SIZE) {
