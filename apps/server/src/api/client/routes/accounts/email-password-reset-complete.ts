@@ -19,7 +19,7 @@ export const emailPasswordResetCompleteRoute: FastifyPluginCallbackZod = (
 ) => {
   instance.route({
     method: 'POST',
-    url: '/emails/password/reset/complete',
+    url: '/emails/passwords/reset/complete',
     schema: {
       response: {
         200: emailPasswordResetCompleteOutputSchema,
