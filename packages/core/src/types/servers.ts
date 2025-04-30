@@ -1,9 +1,15 @@
-export type ServerConfig = {
-  name: string;
-  avatar: string;
-  version: string;
-  attributes: ServerAttributes;
-  ip: string | null | undefined;
-};
+import { z } from 'zod';
 
-export type ServerAttributes = Record<string, unknown>;
+export const serverAttributesSchema = z.record(z.string(), z.unknown());
+
+export type ServerAttributes = z.infer<typeof serverAttributesSchema>;
+
+export const serverConfigSchema = z.object({
+  name: z.string(),
+  avatar: z.string(),
+  version: z.string(),
+  ip: z.string().nullable().optional(),
+  attributes: serverAttributesSchema,
+});
+
+export type ServerConfig = z.infer<typeof serverConfigSchema>;

@@ -1,3 +1,5 @@
+import { WorkspaceUpdateInput } from '@colanode/core';
+
 import { appService } from '@/main/services/app-service';
 import { MutationHandler } from '@/main/lib/types';
 import { mapWorkspace } from '@/main/lib/mappers';
@@ -34,13 +36,15 @@ export class WorkspaceUpdateMutationHandler
     }
 
     try {
+      const body: WorkspaceUpdateInput = {
+        name: input.name,
+        description: input.description,
+        avatar: input.avatar,
+      };
+
       const { data } = await accountService.client.put<Workspace>(
         `/v1/workspaces/${input.id}`,
-        {
-          name: input.name,
-          description: input.description,
-          avatar: input.avatar,
-        }
+        body
       );
 
       const updatedWorkspace = await accountService.database

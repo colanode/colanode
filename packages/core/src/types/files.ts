@@ -1,21 +1,45 @@
-export type CreateUploadInput = {
-  fileId: string;
-};
+import { z } from 'zod';
 
-export type CreateUploadOutput = {
-  url: string;
-  uploadId: string;
-};
+export const createUploadInputSchema = z.object({
+  fileId: z.string(),
+});
 
-export type CreateDownloadOutput = {
-  url: string;
-};
+export type CreateUploadInput = z.infer<typeof createUploadInputSchema>;
 
-export type CompleteUploadOutput = {
-  success: boolean;
-};
+export const createUploadOutputSchema = z.object({
+  url: z.string(),
+  uploadId: z.string(),
+});
 
-export type FileSubtype = 'image' | 'video' | 'audio' | 'pdf' | 'other';
+export type CreateUploadOutput = z.infer<typeof createUploadOutputSchema>;
+
+export const createDownloadOutputSchema = z.object({
+  url: z.string(),
+});
+
+export type CreateDownloadOutput = z.infer<typeof createDownloadOutputSchema>;
+
+export const completeUploadInputSchema = z.object({
+  uploadId: z.string(),
+});
+
+export type CompleteUploadInput = z.infer<typeof completeUploadInputSchema>;
+
+export const completeUploadOutputSchema = z.object({
+  success: z.boolean(),
+});
+
+export type CompleteUploadOutput = z.infer<typeof completeUploadOutputSchema>;
+
+export const fileSubtypeSchema = z.enum([
+  'image',
+  'video',
+  'audio',
+  'pdf',
+  'other',
+]);
+
+export type FileSubtype = z.infer<typeof fileSubtypeSchema>;
 
 export enum FileStatus {
   Pending = 0,

@@ -1,4 +1,5 @@
 import {
+  AccountSyncInput,
   AccountSyncOutput,
   ApiErrorCode,
   ApiErrorOutput,
@@ -245,12 +246,14 @@ export class AccountService {
     }
 
     try {
+      const body: AccountSyncInput = {
+        platform: process.platform,
+        version: this.app.version,
+      };
+
       const { data } = await this.client.post<AccountSyncOutput>(
         '/v1/accounts/sync',
-        {
-          platform: process.platform,
-          version: this.app.version,
-        }
+        body
       );
 
       const hasChanges =

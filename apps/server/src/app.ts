@@ -2,34 +2,45 @@ import { createDebugger } from '@colanode/core';
 import { fastify } from 'fastify';
 import fastifyMultipart from '@fastify/multipart';
 import fastifyWebsocket from '@fastify/websocket';
+import {
+  serializerCompiler,
+  validatorCompiler,
+} from 'fastify-type-provider-zod';
 
 import { clientRoutes } from '@/api/client/routes';
 import { ipDecorator } from '@/api/client/plugins/ip';
+import { errorHandler } from '@/api/client/plugins/error-handler';
 
 const debug = createDebugger('server:app');
 
 export const initApp = async () => {
-  const app = fastify({
+  const server = fastify({
     bodyLimit: 10 * 1024 * 1024, // 10MB
   });
 
-  await app.register(fastifyMultipart, {
+  // register the global error handler in the beginning of the app
+  server.register(errorHandler);
+
+  server.setSerializerCompiler(serializerCompiler);
+  server.setValidatorCompiler(validatorCompiler);
+
+  await server.register(fastifyMultipart, {
     limits: {
       fileSize: 10 * 1024 * 1024, // 10MB
     },
   });
 
-  await app.register(fastifyWebsocket);
-  await app.register(ipDecorator);
-  await app.register(clientRoutes, { prefix: '/client/v1' });
+  await server.register(fastifyWebsocket);
+  await server.register(ipDecorator);
+  await server.register(clientRoutes, { prefix: '/client/v1' });
 
-  app.get('/', (_, reply) => {
+  server.get('/', (_, reply) => {
     reply.send(
       'This is a Colanode server. For more information, visit https://colanode.com'
     );
   });
 
-  app.listen({ port: 3000 }, (err, address) => {
+  server.listen({ port: 3000 }, (err, address) => {
     if (err) {
       debug(`Failed to start server: ${err}`);
       process.exit(1);

@@ -1,4 +1,4 @@
-import { AccountUpdateOutput } from '@colanode/core';
+import { AccountUpdateInput, AccountUpdateOutput } from '@colanode/core';
 
 import { MutationHandler } from '@/main/lib/types';
 import { eventBus } from '@/shared/lib/event-bus';
@@ -27,12 +27,14 @@ export class AccountUpdateMutationHandler
     }
 
     try {
+      const body: AccountUpdateInput = {
+        name: input.name,
+        avatar: input.avatar,
+      };
+
       const { data } = await accountService.client.put<AccountUpdateOutput>(
         `/v1/accounts/${input.id}`,
-        {
-          name: input.name,
-          avatar: input.avatar,
-        }
+        body
       );
 
       const updatedAccount = await appService.database

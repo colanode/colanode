@@ -1,9 +1,4 @@
-export type WorkspaceRole =
-  | 'owner'
-  | 'admin'
-  | 'collaborator'
-  | 'guest'
-  | 'none';
+import { z } from 'zod';
 
 export enum WorkspaceStatus {
   Active = 1,
@@ -15,48 +10,74 @@ export enum UserStatus {
   Removed = 2,
 }
 
-export type WorkspaceCreateInput = {
-  name: string;
-  description?: string | null;
-  avatar?: string | null;
-};
+export const workspaceRoleSchema = z.enum([
+  'owner',
+  'admin',
+  'collaborator',
+  'guest',
+  'none',
+]);
 
-export type WorkspaceOutput = {
-  id: string;
-  name: string;
-  description?: string | null;
-  avatar?: string | null;
-  user: WorkspaceUserOutput;
-};
+export type WorkspaceRole = z.infer<typeof workspaceRoleSchema>;
 
-export type WorkspaceUserOutput = {
-  id: string;
-  accountId: string;
-  role: WorkspaceRole;
-  storageLimit: bigint;
-  maxFileSize: bigint;
-};
+export const workspaceCreateInputSchema = z.object({
+  name: z.string(),
+  description: z.string().nullable().optional(),
+  avatar: z.string().nullable().optional(),
+});
 
-export type WorkspaceUpdateInput = {
-  name: string;
-  description?: string | null;
-  avatar?: string | null;
-};
+export type WorkspaceCreateInput = z.infer<typeof workspaceCreateInputSchema>;
 
-export type UsersInviteInput = {
-  emails: string[];
-  role: WorkspaceRole;
-};
+export const workspaceUserOutputSchema = z.object({
+  id: z.string(),
+  accountId: z.string(),
+  role: workspaceRoleSchema,
+  storageLimit: z.bigint(),
+  maxFileSize: z.bigint(),
+});
 
-export type UserInviteResult = {
-  email: string;
-  result: 'success' | 'error' | 'exists';
-};
+export type WorkspaceUserOutput = z.infer<typeof workspaceUserOutputSchema>;
 
-export type UsersInviteOutput = {
-  results: UserInviteResult[];
-};
+export const workspaceOutputSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  description: z.string().nullable().optional(),
+  avatar: z.string().nullable().optional(),
+  user: workspaceUserOutputSchema,
+});
 
-export type UserRoleUpdateInput = {
-  role: WorkspaceRole;
-};
+export type WorkspaceOutput = z.infer<typeof workspaceOutputSchema>;
+
+export const workspaceUpdateInputSchema = z.object({
+  name: z.string(),
+  description: z.string().nullable().optional(),
+  avatar: z.string().nullable().optional(),
+});
+
+export type WorkspaceUpdateInput = z.infer<typeof workspaceUpdateInputSchema>;
+
+export const usersInviteInputSchema = z.object({
+  emails: z.array(z.string().email()),
+  role: workspaceRoleSchema,
+});
+
+export type UsersInviteInput = z.infer<typeof usersInviteInputSchema>;
+
+export const userInviteResultSchema = z.object({
+  email: z.string().email(),
+  result: z.enum(['success', 'error', 'exists']),
+});
+
+export type UserInviteResult = z.infer<typeof userInviteResultSchema>;
+
+export const usersInviteOutputSchema = z.object({
+  results: z.array(userInviteResultSchema),
+});
+
+export type UsersInviteOutput = z.infer<typeof usersInviteOutputSchema>;
+
+export const userRoleUpdateInputSchema = z.object({
+  role: workspaceRoleSchema,
+});
+
+export type UserRoleUpdateInput = z.infer<typeof userRoleUpdateInputSchema>;

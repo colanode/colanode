@@ -1,7 +1,4 @@
-export type ApiErrorOutput = {
-  message: string;
-  code: ApiErrorCode;
-};
+import { z } from 'zod';
 
 export enum ApiErrorCode {
   AccountNotFound = 'account_not_found',
@@ -44,6 +41,7 @@ export enum ApiErrorCode {
   TokenInvalid = 'token_invalid',
   RootNotFound = 'root_not_found',
 
+  ValidationError = 'validation_error',
   TooManyRequests = 'too_many_requests',
   Unauthorized = 'unauthorized',
   Forbidden = 'forbidden',
@@ -51,3 +49,10 @@ export enum ApiErrorCode {
   BadRequest = 'bad_request',
   Unknown = 'unknown',
 }
+
+export const apiErrorOutputSchema = z.object({
+  message: z.string(),
+  code: z.nativeEnum(ApiErrorCode),
+});
+
+export type ApiErrorOutput = z.infer<typeof apiErrorOutputSchema>;

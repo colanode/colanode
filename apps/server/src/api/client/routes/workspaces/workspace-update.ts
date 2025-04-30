@@ -1,25 +1,37 @@
+import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+import { z } from 'zod';
 import {
   WorkspaceOutput,
-  WorkspaceUpdateInput,
   ApiErrorCode,
+  apiErrorOutputSchema,
+  workspaceOutputSchema,
+  workspaceUpdateInputSchema,
 } from '@colanode/core';
-import { FastifyPluginCallback } from 'fastify';
 
 import { database } from '@/data/database';
 import { eventBus } from '@/lib/event-bus';
 
-interface WorkspaceParams {
-  workspaceId: string;
-}
-
-export const workspaceUpdateRoute: FastifyPluginCallback = (
+export const workspaceUpdateRoute: FastifyPluginCallbackZod = (
   instance,
   _,
   done
 ) => {
-  instance.put<{ Params: WorkspaceParams; Body: WorkspaceUpdateInput }>(
-    '/',
-    async (request, reply) => {
+  instance.route({
+    method: 'PUT',
+    url: '/',
+    schema: {
+      params: z.object({
+        workspaceId: z.string(),
+      }),
+      body: workspaceUpdateInputSchema,
+      response: {
+        200: workspaceOutputSchema,
+        400: apiErrorOutputSchema,
+        403: apiErrorOutputSchema,
+        404: apiErrorOutputSchema,
+      },
+    },
+    handler: async (request, reply) => {
       const workspaceId = request.params.workspaceId;
       const input = request.body;
 
@@ -71,8 +83,8 @@ export const workspaceUpdateRoute: FastifyPluginCallback = (
       };
 
       return output;
-    }
-  );
+    },
+  });
 
   done();
 };

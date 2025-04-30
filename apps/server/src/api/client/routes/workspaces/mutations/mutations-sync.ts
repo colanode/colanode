@@ -1,6 +1,5 @@
-import { FastifyPluginCallback } from 'fastify';
+import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import {
-  SyncMutationsInput,
   SyncMutationResult,
   SyncMutationStatus,
   Mutation,
@@ -12,6 +11,7 @@ import {
   MarkNodeOpenedMutation,
   UpdateNodeMutation,
   UpdateDocumentMutation,
+  syncMutationsInputSchema,
 } from '@colanode/core';
 
 import { SelectUser } from '@/data/schema';
@@ -24,33 +24,40 @@ import { createNodeReaction, deleteNodeReaction } from '@/lib/node-reactions';
 import { markNodeAsOpened, markNodeAsSeen } from '@/lib/node-interactions';
 import { updateDocumentFromMutation } from '@/lib/documents';
 
-export const mutationsSyncRoute: FastifyPluginCallback = (
+export const mutationsSyncRoute: FastifyPluginCallbackZod = (
   instance,
   _,
   done
 ) => {
-  instance.post<{ Body: SyncMutationsInput }>('/', async (request) => {
-    const input = request.body;
-    const user = request.user;
+  instance.route({
+    method: 'POST',
+    url: '/',
+    schema: {
+      body: syncMutationsInputSchema,
+    },
+    handler: async (request) => {
+      const input = request.body;
+      const user = request.user;
 
-    const results: SyncMutationResult[] = [];
-    for (const mutation of input.mutations) {
-      try {
-        const status = await handleMutation(user, mutation);
-        results.push({
-          id: mutation.id,
-          status: status,
-        });
-      } catch (error) {
-        console.error('Error handling local mutation', error);
-        results.push({
-          id: mutation.id,
-          status: 'error',
-        });
+      const results: SyncMutationResult[] = [];
+      for (const mutation of input.mutations) {
+        try {
+          const status = await handleMutation(user, mutation);
+          results.push({
+            id: mutation.id,
+            status: status,
+          });
+        } catch (error) {
+          console.error('Error handling local mutation', error);
+          results.push({
+            id: mutation.id,
+            status: 'error',
+          });
+        }
       }
-    }
 
-    return { results };
+      return { results };
+    },
   });
 
   done();

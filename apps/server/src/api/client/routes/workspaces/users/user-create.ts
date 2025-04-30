@@ -1,11 +1,14 @@
-import { FastifyPluginCallback } from 'fastify';
+import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+import { z } from 'zod';
 import {
   AccountStatus,
   ApiErrorCode,
+  apiErrorOutputSchema,
   generateId,
   IdType,
   UserInviteResult,
-  UsersInviteInput,
+  usersInviteInputSchema,
+  usersInviteOutputSchema,
   UserStatus,
 } from '@colanode/core';
 
@@ -15,14 +18,27 @@ import { SelectAccount } from '@/data/schema';
 import { eventBus } from '@/lib/event-bus';
 import { configuration } from '@/lib/configuration';
 
-interface UserCreateParams {
-  workspaceId: string;
-}
-
-export const userCreateRoute: FastifyPluginCallback = (instance, _, done) => {
-  instance.post<{ Params: UserCreateParams; Body: UsersInviteInput }>(
-    '/',
-    async (request, reply) => {
+export const userCreateRoute: FastifyPluginCallbackZod = (
+  instance,
+  _,
+  done
+) => {
+  instance.route({
+    method: 'POST',
+    url: '/',
+    schema: {
+      params: z.object({
+        workspaceId: z.string(),
+      }),
+      body: usersInviteInputSchema,
+      response: {
+        200: usersInviteOutputSchema,
+        400: apiErrorOutputSchema,
+        403: apiErrorOutputSchema,
+        404: apiErrorOutputSchema,
+      },
+    },
+    handler: async (request, reply) => {
       const workspaceId = request.params.workspaceId;
       const input = request.body;
       const user = request.user;
@@ -109,8 +125,8 @@ export const userCreateRoute: FastifyPluginCallback = (instance, _, done) => {
       }
 
       return { results };
-    }
-  );
+    },
+  });
 
   done();
 };

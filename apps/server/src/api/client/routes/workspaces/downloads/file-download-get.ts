@@ -1,28 +1,38 @@
-import { FastifyPluginCallback } from 'fastify';
+import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+import { z } from 'zod';
 import {
   CreateDownloadOutput,
   hasNodeRole,
   ApiErrorCode,
   extractNodeRole,
   FileStatus,
+  createDownloadOutputSchema,
+  apiErrorOutputSchema,
 } from '@colanode/core';
 
 import { fetchNodeTree, mapNode } from '@/lib/nodes';
 import { database } from '@/data/database';
 import { buildDownloadUrl } from '@/lib/files';
 
-interface FileDownloadParams {
-  fileId: string;
-}
-
-export const fileDownloadGetRoute: FastifyPluginCallback = (
+export const fileDownloadGetRoute: FastifyPluginCallbackZod = (
   instance,
   _,
   done
 ) => {
-  instance.get<{ Params: FileDownloadParams }>(
-    '/:fileId',
-    async (request, reply) => {
+  instance.route({
+    method: 'GET',
+    url: '/:fileId',
+    schema: {
+      params: z.object({
+        fileId: z.string(),
+      }),
+      response: {
+        200: createDownloadOutputSchema,
+        400: apiErrorOutputSchema,
+        404: apiErrorOutputSchema,
+      },
+    },
+    handler: async (request, reply) => {
       const fileId = request.params.fileId;
 
       const tree = await fetchNodeTree(fileId);
@@ -83,8 +93,8 @@ export const fileDownloadGetRoute: FastifyPluginCallback = (
       };
 
       return output;
-    }
-  );
+    },
+  });
 
   done();
 };

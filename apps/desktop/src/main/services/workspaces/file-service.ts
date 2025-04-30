@@ -1,6 +1,8 @@
 import {
+  CompleteUploadInput,
   CompleteUploadOutput,
   CreateDownloadOutput,
+  CreateUploadInput,
   CreateUploadOutput,
   FileAttributes,
   FileStatus,
@@ -340,12 +342,14 @@ export class FileService {
     }
 
     try {
+      const createUploadInput: CreateUploadInput = {
+        fileId: file.id,
+      };
+
       const { data } =
         await this.workspace.account.client.post<CreateUploadOutput>(
           `/v1/workspaces/${this.workspace.id}/files`,
-          {
-            fileId: file.id,
-          }
+          createUploadInput
         );
 
       const presignedUrl = data.url;
@@ -390,11 +394,13 @@ export class FileService {
         },
       });
 
+      const completeUploadInput: CompleteUploadInput = {
+        uploadId: data.uploadId,
+      };
+
       await this.workspace.account.client.put<CompleteUploadOutput>(
         `/v1/workspaces/${this.workspace.id}/files/${file.id}`,
-        {
-          uploadId: data.uploadId,
-        }
+        completeUploadInput
       );
 
       const finalFileState = await this.workspace.database
@@ -535,8 +541,7 @@ export class FileService {
     try {
       const { data } =
         await this.workspace.account.client.get<CreateDownloadOutput>(
-          `/v1/workspaces/${this.workspace.id}/downloads/${file.id}`,
-          {}
+          `/v1/workspaces/${this.workspace.id}/downloads/${file.id}`
         );
 
       const presignedUrl = data.url;

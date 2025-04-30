@@ -1,124 +1,194 @@
-export type SyncMutationsInput = {
-  mutations: Mutation[];
-};
+import { z } from 'zod';
 
-export type SyncMutationsOutput = {
-  results: SyncMutationResult[];
-};
+export const syncMutationStatusSchema = z.enum(['success', 'error']);
 
-export type SyncMutationStatus = 'success' | 'error';
+export type SyncMutationStatus = z.infer<typeof syncMutationStatusSchema>;
 
-export type SyncMutationResult = {
-  id: string;
-  status: SyncMutationStatus;
-};
+export const syncMutationResultSchema = z.object({
+  id: z.string(),
+  status: syncMutationStatusSchema,
+});
 
-export type MutationBase = {
-  id: string;
-  createdAt: string;
-};
+export type SyncMutationResult = z.infer<typeof syncMutationResultSchema>;
 
-export type CreateNodeMutationData = {
-  nodeId: string;
-  updateId: string;
-  createdAt: string;
-  data: string;
-};
+export const syncMutationsInputSchema = z.object({
+  mutations: z.array(z.lazy(() => mutationSchema)),
+});
 
-export type CreateNodeMutation = MutationBase & {
-  type: 'create_node';
-  data: CreateNodeMutationData;
-};
+export type SyncMutationsInput = z.infer<typeof syncMutationsInputSchema>;
 
-export type UpdateNodeMutationData = {
-  nodeId: string;
-  updateId: string;
-  data: string;
-  createdAt: string;
-};
+export const syncMutationsOutputSchema = z.object({
+  results: z.array(syncMutationResultSchema),
+});
 
-export type UpdateNodeMutation = MutationBase & {
-  type: 'update_node';
-  data: UpdateNodeMutationData;
-};
+export type SyncMutationsOutput = z.infer<typeof syncMutationsOutputSchema>;
 
-export type DeleteNodeMutationData = {
-  nodeId: string;
-  rootId: string;
-  deletedAt: string;
-};
+export const mutationBaseSchema = z.object({
+  id: z.string(),
+  createdAt: z.string(),
+});
 
-export type DeleteNodeMutation = MutationBase & {
-  type: 'delete_node';
-  data: DeleteNodeMutationData;
-};
+export type MutationBase = z.infer<typeof mutationBaseSchema>;
 
-export type CreateNodeReactionMutationData = {
-  nodeId: string;
-  reaction: string;
-  rootId: string;
-  createdAt: string;
-};
+export const createNodeMutationDataSchema = z.object({
+  nodeId: z.string(),
+  updateId: z.string(),
+  createdAt: z.string(),
+  data: z.string(),
+});
 
-export type CreateNodeReactionMutation = MutationBase & {
-  type: 'create_node_reaction';
-  data: CreateNodeReactionMutationData;
-};
+export type CreateNodeMutationData = z.infer<
+  typeof createNodeMutationDataSchema
+>;
 
-export type DeleteNodeReactionMutationData = {
-  nodeId: string;
-  reaction: string;
-  rootId: string;
-  deletedAt: string;
-};
+export const createNodeMutationSchema = mutationBaseSchema.extend({
+  type: z.literal('create_node'),
+  data: createNodeMutationDataSchema,
+});
 
-export type DeleteNodeReactionMutation = MutationBase & {
-  type: 'delete_node_reaction';
-  data: DeleteNodeReactionMutationData;
-};
+export type CreateNodeMutation = z.infer<typeof createNodeMutationSchema>;
 
-export type MarkNodeSeenMutationData = {
-  nodeId: string;
-  collaboratorId: string;
-  seenAt: string;
-};
+export const updateNodeMutationDataSchema = z.object({
+  nodeId: z.string(),
+  updateId: z.string(),
+  data: z.string(),
+  createdAt: z.string(),
+});
 
-export type MarkNodeSeenMutation = MutationBase & {
-  type: 'mark_node_seen';
-  data: MarkNodeSeenMutationData;
-};
+export type UpdateNodeMutationData = z.infer<
+  typeof updateNodeMutationDataSchema
+>;
 
-export type MarkNodeOpenedMutationData = {
-  nodeId: string;
-  collaboratorId: string;
-  openedAt: string;
-};
+export const updateNodeMutationSchema = mutationBaseSchema.extend({
+  type: z.literal('update_node'),
+  data: updateNodeMutationDataSchema,
+});
 
-export type MarkNodeOpenedMutation = MutationBase & {
-  type: 'mark_node_opened';
-  data: MarkNodeOpenedMutationData;
-};
+export type UpdateNodeMutation = z.infer<typeof updateNodeMutationSchema>;
 
-export type UpdateDocumentMutationData = {
-  documentId: string;
-  updateId: string;
-  data: string;
-  createdAt: string;
-};
+export const deleteNodeMutationDataSchema = z.object({
+  nodeId: z.string(),
+  rootId: z.string(),
+  deletedAt: z.string(),
+});
 
-export type UpdateDocumentMutation = MutationBase & {
-  type: 'update_document';
-  data: UpdateDocumentMutationData;
-};
+export type DeleteNodeMutationData = z.infer<
+  typeof deleteNodeMutationDataSchema
+>;
 
-export type Mutation =
-  | CreateNodeMutation
-  | UpdateNodeMutation
-  | DeleteNodeMutation
-  | CreateNodeReactionMutation
-  | DeleteNodeReactionMutation
-  | MarkNodeSeenMutation
-  | MarkNodeOpenedMutation
-  | UpdateDocumentMutation;
+export const deleteNodeMutationSchema = mutationBaseSchema.extend({
+  type: z.literal('delete_node'),
+  data: deleteNodeMutationDataSchema,
+});
 
+export type DeleteNodeMutation = z.infer<typeof deleteNodeMutationSchema>;
+
+export const createNodeReactionMutationDataSchema = z.object({
+  nodeId: z.string(),
+  reaction: z.string(),
+  rootId: z.string(),
+  createdAt: z.string(),
+});
+
+export type CreateNodeReactionMutationData = z.infer<
+  typeof createNodeReactionMutationDataSchema
+>;
+
+export const createNodeReactionMutationSchema = mutationBaseSchema.extend({
+  type: z.literal('create_node_reaction'),
+  data: createNodeReactionMutationDataSchema,
+});
+
+export type CreateNodeReactionMutation = z.infer<
+  typeof createNodeReactionMutationSchema
+>;
+
+export const deleteNodeReactionMutationDataSchema = z.object({
+  nodeId: z.string(),
+  reaction: z.string(),
+  rootId: z.string(),
+  deletedAt: z.string(),
+});
+
+export type DeleteNodeReactionMutationData = z.infer<
+  typeof deleteNodeReactionMutationDataSchema
+>;
+
+export const deleteNodeReactionMutationSchema = mutationBaseSchema.extend({
+  type: z.literal('delete_node_reaction'),
+  data: deleteNodeReactionMutationDataSchema,
+});
+
+export type DeleteNodeReactionMutation = z.infer<
+  typeof deleteNodeReactionMutationSchema
+>;
+
+export const markNodeSeenMutationDataSchema = z.object({
+  nodeId: z.string(),
+  collaboratorId: z.string(),
+  seenAt: z.string(),
+});
+
+export type MarkNodeSeenMutationData = z.infer<
+  typeof markNodeSeenMutationDataSchema
+>;
+
+export const markNodeSeenMutationSchema = mutationBaseSchema.extend({
+  type: z.literal('mark_node_seen'),
+  data: markNodeSeenMutationDataSchema,
+});
+
+export type MarkNodeSeenMutation = z.infer<typeof markNodeSeenMutationSchema>;
+
+export const markNodeOpenedMutationDataSchema = z.object({
+  nodeId: z.string(),
+  collaboratorId: z.string(),
+  openedAt: z.string(),
+});
+
+export type MarkNodeOpenedMutationData = z.infer<
+  typeof markNodeOpenedMutationDataSchema
+>;
+
+export const markNodeOpenedMutationSchema = mutationBaseSchema.extend({
+  type: z.literal('mark_node_opened'),
+  data: markNodeOpenedMutationDataSchema,
+});
+
+export type MarkNodeOpenedMutation = z.infer<
+  typeof markNodeOpenedMutationSchema
+>;
+
+export const updateDocumentMutationDataSchema = z.object({
+  documentId: z.string(),
+  updateId: z.string(),
+  data: z.string(),
+  createdAt: z.string(),
+});
+
+export type UpdateDocumentMutationData = z.infer<
+  typeof updateDocumentMutationDataSchema
+>;
+
+export const updateDocumentMutationSchema = mutationBaseSchema.extend({
+  type: z.literal('update_document'),
+  data: updateDocumentMutationDataSchema,
+});
+
+export type UpdateDocumentMutation = z.infer<
+  typeof updateDocumentMutationSchema
+>;
+
+export const mutationSchema = z.discriminatedUnion('type', [
+  createNodeMutationSchema,
+  updateNodeMutationSchema,
+  deleteNodeMutationSchema,
+  createNodeReactionMutationSchema,
+  deleteNodeReactionMutationSchema,
+  markNodeSeenMutationSchema,
+  markNodeOpenedMutationSchema,
+  updateDocumentMutationSchema,
+]);
+
+export type Mutation = z.infer<typeof mutationSchema>;
 export type MutationType = Mutation['type'];

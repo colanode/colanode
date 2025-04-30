@@ -1,4 +1,4 @@
-import { WorkspaceOutput } from '@colanode/core';
+import { WorkspaceCreateInput, WorkspaceOutput } from '@colanode/core';
 
 import { MutationHandler } from '@/main/lib/types';
 import { eventBus } from '@/shared/lib/event-bus';
@@ -27,13 +27,15 @@ export class WorkspaceCreateMutationHandler
     }
 
     try {
+      const body: WorkspaceCreateInput = {
+        name: input.name,
+        description: input.description,
+        avatar: input.avatar,
+      };
+
       const { data } = await account.client.post<WorkspaceOutput>(
         `/v1/workspaces`,
-        {
-          name: input.name,
-          description: input.description,
-          avatar: input.avatar,
-        }
+        body
       );
 
       const createdWorkspace = await account.database

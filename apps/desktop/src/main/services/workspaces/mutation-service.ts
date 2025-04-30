@@ -1,4 +1,9 @@
-import { createDebugger, Mutation, SyncMutationsOutput } from '@colanode/core';
+import {
+  createDebugger,
+  Mutation,
+  SyncMutationsInput,
+  SyncMutationsOutput,
+} from '@colanode/core';
 import ms from 'ms';
 
 import { WorkspaceService } from '@/main/services/workspaces/workspace-service';
@@ -88,12 +93,14 @@ export class MutationService {
           `Sending batch ${currentBatch++} of ${totalBatches} mutations for user ${this.workspace.id}`
         );
 
+        const body: SyncMutationsInput = {
+          mutations: batch,
+        };
+
         const { data } =
           await this.workspace.account.client.post<SyncMutationsOutput>(
             `/v1/workspaces/${this.workspace.id}/mutations`,
-            {
-              mutations: batch,
-            }
+            body
           );
 
         const syncedMutationIds: string[] = [];

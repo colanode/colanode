@@ -1,25 +1,38 @@
-import { FastifyPluginCallback } from 'fastify';
+import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+import { z } from 'zod';
 import {
   AccountUpdateInput,
+  accountUpdateInputSchema,
   AccountUpdateOutput,
+  accountUpdateOutputSchema,
   ApiErrorCode,
+  apiErrorOutputSchema,
 } from '@colanode/core';
 
 import { database } from '@/data/database';
 import { eventBus } from '@/lib/event-bus';
 
-interface AccountUpdateParams {
-  accountId: string;
-}
-
-export const accountUpdateRoute: FastifyPluginCallback = (
+export const accountUpdateRoute: FastifyPluginCallbackZod = (
   instance,
   _,
   done
 ) => {
-  instance.put<{ Params: AccountUpdateParams }>(
-    '/:accountId',
-    async (request, reply) => {
+  instance.route({
+    method: 'PUT',
+    url: '/:accountId',
+    schema: {
+      params: z.object({
+        accountId: z.string(),
+      }),
+      body: accountUpdateInputSchema,
+      response: {
+        200: accountUpdateOutputSchema,
+        400: apiErrorOutputSchema,
+        404: apiErrorOutputSchema,
+        401: apiErrorOutputSchema,
+      },
+    },
+    handler: async (request, reply) => {
       const accountId = request.params.accountId;
       const input = request.body as AccountUpdateInput;
 
@@ -120,8 +133,8 @@ export const accountUpdateRoute: FastifyPluginCallback = (
       };
 
       return output;
-    }
-  );
+    },
+  });
 
   done();
 };

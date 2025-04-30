@@ -1,57 +1,6 @@
-import { WorkspaceOutput } from './workspaces';
+import { z } from 'zod';
 
-export type GoogleLoginInput = {
-  access_token: string;
-  token_type: string;
-  expires_in: number;
-  platform: string;
-  version: string;
-};
-
-export type EmailRegisterInput = {
-  name: string;
-  email: string;
-  password: string;
-  platform: string;
-  version: string;
-};
-
-export type EmailLoginInput = {
-  email: string;
-  password: string;
-  platform: string;
-  version: string;
-};
-
-export type GoogleUserInfo = {
-  id: string;
-  email: string;
-  name: string;
-  picture: string;
-};
-
-export type LoginOutput = LoginSuccessOutput | LoginVerifyOutput;
-
-export type LoginSuccessOutput = {
-  type: 'success';
-  account: AccountOutput;
-  workspaces: WorkspaceOutput[];
-  deviceId: string;
-  token: string;
-};
-
-export type LoginVerifyOutput = {
-  type: 'verify';
-  id: string;
-  expiresAt: Date;
-};
-
-export type AccountOutput = {
-  id: string;
-  name: string;
-  email: string;
-  avatar?: string | null;
-};
+import { workspaceOutputSchema } from './workspaces';
 
 export enum AccountStatus {
   Pending = 0,
@@ -59,54 +8,156 @@ export enum AccountStatus {
   Unverified = 2,
 }
 
-export type AccountUpdateInput = {
-  name: string;
-  avatar?: string | null;
-};
+export const accountOutputSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  email: z.string().email(),
+  avatar: z.string().optional().nullable(),
+});
 
-export type AccountUpdateOutput = {
-  id: string;
-  name: string;
-  avatar?: string | null;
-};
+export type AccountOutput = z.infer<typeof accountOutputSchema>;
 
-export type AccountSyncInput = {
-  platform: string;
-  version: string;
-};
+export const accountUpdateInputSchema = z.object({
+  name: z.string(),
+  avatar: z.string().nullable().optional(),
+});
 
-export type AccountSyncOutput = {
-  account: AccountOutput;
-  workspaces: WorkspaceOutput[];
-  token?: string;
-};
+export type AccountUpdateInput = z.infer<typeof accountUpdateInputSchema>;
 
-export type EmailVerifyInput = {
-  id: string;
-  otp: string;
-  platform: string;
-  version: string;
-};
+export const accountUpdateOutputSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+  avatar: z.string().nullable().optional(),
+});
 
-export type EmailPasswordResetInitInput = {
-  email: string;
-  platform: string;
-  version: string;
-};
+export type AccountUpdateOutput = z.infer<typeof accountUpdateOutputSchema>;
 
-export type EmailPasswordResetCompleteInput = {
-  id: string;
-  otp: string;
-  password: string;
-  platform: string;
-  version: string;
-};
+export const accountSyncInputSchema = z.object({
+  platform: z.string(),
+  version: z.string(),
+});
 
-export type EmailPasswordResetInitOutput = {
-  id: string;
-  expiresAt: Date;
-};
+export type AccountSyncInput = z.infer<typeof accountSyncInputSchema>;
 
-export type EmailPasswordResetCompleteOutput = {
-  success: boolean;
-};
+export const emailRegisterInputSchema = z.object({
+  name: z.string({ required_error: 'Name is required' }),
+  email: z.string({ required_error: 'Email is required' }).email({
+    message: 'Invalid email address',
+  }),
+  password: z.string({ required_error: 'Password is required' }),
+  platform: z.string({ required_error: 'Platform is required' }),
+  version: z.string({ required_error: 'Version is required' }),
+});
+
+export type EmailRegisterInput = z.infer<typeof emailRegisterInputSchema>;
+
+export const emailLoginInputSchema = z.object({
+  email: z.string({ required_error: 'Email is required' }).email({
+    message: 'Invalid email address',
+  }),
+  password: z.string({ required_error: 'Password is required' }),
+  platform: z.string({ required_error: 'Platform is required' }),
+  version: z.string({ required_error: 'Version is required' }),
+});
+
+export type EmailLoginInput = z.infer<typeof emailLoginInputSchema>;
+
+export const loginSuccessOutputSchema = z.object({
+  type: z.literal('success'),
+  account: accountOutputSchema,
+  workspaces: z.array(workspaceOutputSchema),
+  deviceId: z.string(),
+  token: z.string(),
+});
+
+export type LoginSuccessOutput = z.infer<typeof loginSuccessOutputSchema>;
+
+export const loginVerifyOutputSchema = z.object({
+  type: z.literal('verify'),
+  id: z.string(),
+  expiresAt: z.date(),
+});
+
+export type LoginVerifyOutput = z.infer<typeof loginVerifyOutputSchema>;
+
+export const loginOutputSchema = z.discriminatedUnion('type', [
+  loginSuccessOutputSchema,
+  loginVerifyOutputSchema,
+]);
+
+export type LoginOutput = z.infer<typeof loginOutputSchema>;
+
+export const accountSyncOutputSchema = z.object({
+  account: accountOutputSchema,
+  workspaces: z.array(workspaceOutputSchema),
+  token: z.string().optional(),
+});
+
+export type AccountSyncOutput = z.infer<typeof accountSyncOutputSchema>;
+
+export const emailVerifyInputSchema = z.object({
+  id: z.string(),
+  otp: z.string(),
+  platform: z.string(),
+  version: z.string(),
+});
+
+export type EmailVerifyInput = z.infer<typeof emailVerifyInputSchema>;
+
+export const emailPasswordResetInitInputSchema = z.object({
+  email: z.string().email(),
+  platform: z.string(),
+  version: z.string(),
+});
+
+export type EmailPasswordResetInitInput = z.infer<
+  typeof emailPasswordResetInitInputSchema
+>;
+
+export const emailPasswordResetCompleteInputSchema = z.object({
+  id: z.string(),
+  otp: z.string(),
+  password: z.string(),
+  platform: z.string(),
+  version: z.string(),
+});
+
+export type EmailPasswordResetCompleteInput = z.infer<
+  typeof emailPasswordResetCompleteInputSchema
+>;
+
+export const emailPasswordResetInitOutputSchema = z.object({
+  id: z.string(),
+  expiresAt: z.date(),
+});
+
+export type EmailPasswordResetInitOutput = z.infer<
+  typeof emailPasswordResetInitOutputSchema
+>;
+
+export const emailPasswordResetCompleteOutputSchema = z.object({
+  success: z.boolean(),
+});
+
+export type EmailPasswordResetCompleteOutput = z.infer<
+  typeof emailPasswordResetCompleteOutputSchema
+>;
+
+export const googleLoginInputSchema = z.object({
+  access_token: z.string(),
+  token_type: z.string(),
+  expires_in: z.number(),
+  platform: z.string(),
+  version: z.string(),
+});
+
+export type GoogleLoginInput = z.infer<typeof googleLoginInputSchema>;
+
+export const googleUserInfoSchema = z.object({
+  id: z.string(),
+  email: z.string().email(),
+  name: z.string(),
+  picture: z.string(),
+});
+
+export type GoogleUserInfo = z.infer<typeof googleUserInfoSchema>;

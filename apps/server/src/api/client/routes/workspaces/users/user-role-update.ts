@@ -1,21 +1,36 @@
-import { FastifyPluginCallback } from 'fastify';
-import { UserRoleUpdateInput, ApiErrorCode, UserStatus } from '@colanode/core';
+import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+import { z } from 'zod';
+import {
+  ApiErrorCode,
+  UserStatus,
+  userRoleUpdateInputSchema,
+  apiErrorOutputSchema,
+} from '@colanode/core';
 
 import { database } from '@/data/database';
 import { eventBus } from '@/lib/event-bus';
 
-interface UserRoleUpdateParams {
-  userId: string;
-}
-
-export const userRoleUpdateRoute: FastifyPluginCallback = (
+export const userRoleUpdateRoute: FastifyPluginCallbackZod = (
   instance,
   _,
   done
 ) => {
-  instance.patch<{ Params: UserRoleUpdateParams; Body: UserRoleUpdateInput }>(
-    '/:userId',
-    async (request, reply) => {
+  instance.route({
+    method: 'PUT',
+    url: '/:userId',
+    schema: {
+      params: z.object({
+        userId: z.string(),
+      }),
+      body: userRoleUpdateInputSchema,
+      response: {
+        200: z.object({ success: z.boolean() }),
+        400: apiErrorOutputSchema,
+        403: apiErrorOutputSchema,
+        404: apiErrorOutputSchema,
+      },
+    },
+    handler: async (request, reply) => {
       const userId = request.params.userId;
       const input = request.body;
       const user = request.user;
@@ -61,8 +76,8 @@ export const userRoleUpdateRoute: FastifyPluginCallback = (
       });
 
       return { success: true };
-    }
-  );
+    },
+  });
 
   done();
 };

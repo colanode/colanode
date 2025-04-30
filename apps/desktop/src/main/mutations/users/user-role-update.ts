@@ -1,3 +1,5 @@
+import { UserRoleUpdateInput } from '@colanode/core';
+
 import { MutationHandler } from '@/main/lib/types';
 import {
   UserRoleUpdateMutationInput,
@@ -17,11 +19,13 @@ export class UserRoleUpdateMutationHandler
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
 
     try {
+      const body: UserRoleUpdateInput = {
+        role: input.role,
+      };
+
       await workspace.account.client.put(
         `/v1/workspaces/${workspace.id}/users/${input.userId}`,
-        {
-          role: input.role,
-        }
+        body
       );
 
       return {

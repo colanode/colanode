@@ -1,4 +1,5 @@
-import { FastifyPluginCallback } from 'fastify';
+import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+import { z } from 'zod';
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { ApiErrorCode } from '@colanode/core';
 
@@ -7,18 +8,20 @@ import { Readable } from 'stream';
 import { avatarS3 } from '@/data/storage';
 import { configuration } from '@/lib/configuration';
 
-interface AvatarDownloadParams {
-  avatarId: string;
-}
-
-export const avatarDownloadRoute: FastifyPluginCallback = (
+export const avatarDownloadRoute: FastifyPluginCallbackZod = (
   instance,
   _,
   done
 ) => {
-  instance.get<{ Params: AvatarDownloadParams }>(
-    '/:avatarId',
-    async (request, reply) => {
+  instance.route({
+    method: 'GET',
+    url: '/:avatarId',
+    schema: {
+      params: z.object({
+        avatarId: z.string(),
+      }),
+    },
+    handler: async (request, reply) => {
       try {
         const avatarId = request.params.avatarId;
         const command = new GetObjectCommand({
@@ -49,8 +52,8 @@ export const avatarDownloadRoute: FastifyPluginCallback = (
           message: 'Failed to download avatar',
         });
       }
-    }
-  );
+    },
+  });
 
   done();
 };

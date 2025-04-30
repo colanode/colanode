@@ -1,4 +1,4 @@
-import { UsersInviteOutput } from '@colanode/core';
+import { UsersInviteInput, UsersInviteOutput } from '@colanode/core';
 
 import { MutationHandler } from '@/main/lib/types';
 import {
@@ -19,12 +19,14 @@ export class UsersInviteMutationHandler
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
 
     try {
+      const body: UsersInviteInput = {
+        emails: input.emails,
+        role: input.role,
+      };
+
       await workspace.account.client.post<UsersInviteOutput>(
         `/v1/workspaces/${workspace.id}/users`,
-        {
-          emails: input.emails,
-          role: input.role,
-        }
+        body
       );
 
       return {
