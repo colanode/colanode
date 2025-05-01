@@ -18,7 +18,7 @@ export const workspaceGetRoute: FastifyPluginCallbackZod = (
 ) => {
   instance.route({
     method: 'GET',
-    url: '/:workspaceId',
+    url: '/',
     schema: {
       params: z.object({
         workspaceId: z.string(),

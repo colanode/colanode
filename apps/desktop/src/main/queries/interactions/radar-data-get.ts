@@ -22,7 +22,14 @@ export class RadarDataGetQueryHandler
     _: RadarDataGetQueryInput,
     ___: RadarDataGetQueryOutput
   ): Promise<ChangeCheckResult<RadarDataGetQueryInput>> {
-    if (event.type === 'radar_data_updated') {
+    const shouldUpdate =
+      event.type === 'radar_data_updated' ||
+      event.type === 'workspace_created' ||
+      event.type === 'workspace_deleted' ||
+      event.type === 'account_created' ||
+      event.type === 'account_deleted';
+
+    if (shouldUpdate) {
       const data = this.getRadarData();
       return {
         hasChanges: true,

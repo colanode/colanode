@@ -65,6 +65,7 @@ import { AccountMetadataSaveMutationHandler } from '@/main/mutations/accounts/ac
 import { AccountMetadataDeleteMutationHandler } from '@/main/mutations/accounts/account-metadata-delete';
 import { EmailPasswordResetInitMutationHandler } from '@/main/mutations/accounts/email-password-reset-init';
 import { EmailPasswordResetCompleteMutationHandler } from '@/main/mutations/accounts/email-password-reset-complete';
+import { WorkspaceDeleteMutationHandler } from '@/main/mutations/workspaces/workspace-delete';
 import { MutationHandler } from '@/main/lib/types';
 import { MutationMap } from '@/shared/mutations';
 
@@ -141,4 +142,5 @@ export const mutationHandlerMap: MutationHandlerMap = {
   email_password_reset_init: new EmailPasswordResetInitMutationHandler(),
   email_password_reset_complete:
     new EmailPasswordResetCompleteMutationHandler(),
+  workspace_delete: new WorkspaceDeleteMutationHandler(),
 };

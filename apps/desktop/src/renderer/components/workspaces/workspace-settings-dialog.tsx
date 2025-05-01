@@ -23,6 +23,7 @@ import {
 import { WorkspaceUpdate } from '@/renderer/components/workspaces/workspace-update';
 import { WorkspaceUsers } from '@/renderer/components/workspaces/workspace-users';
 import { useWorkspace } from '@/renderer/contexts/workspace';
+import { WorkspaceDelete } from '@/renderer/components/workspaces/workspace-delete';
 
 interface WorkspaceSettingsDialogProps {
   open: boolean;
@@ -98,6 +99,7 @@ export const WorkspaceSettingsDialog = ({
                         <SidebarMenuButton
                           isActive={tab === 'delete'}
                           onClick={() => setTab('delete')}
+                          disabled={workspace.role !== 'owner'}
                         >
                           <Trash2 className="mr-2 size-4" />
                           <span>Delete</span>
@@ -113,7 +115,9 @@ export const WorkspaceSettingsDialog = ({
             {match(tab)
               .with('info', () => <WorkspaceUpdate />)
               .with('users', () => <WorkspaceUsers />)
-              .with('delete', () => <p>Coming soon.</p>)
+              .with('delete', () => (
+                <WorkspaceDelete onDeleted={() => onOpenChange(false)} />
+              ))
               .exhaustive()}
           </div>
         </SidebarProvider>
