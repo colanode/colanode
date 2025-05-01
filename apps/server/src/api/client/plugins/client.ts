@@ -1,3 +1,4 @@
+import { ApiHeader } from '@colanode/core';
 import { FastifyPluginCallback, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
 
@@ -34,9 +35,9 @@ const clientDecoratorCallback: FastifyPluginCallback = (fastify, _, done) => {
       request.ip;
 
     const ip = ipValue.split(',')[0]!;
-    const platform = getHeaderAsString(request, 'x-client-platform');
-    const version = getHeaderAsString(request, 'x-client-version');
-    const type = getHeaderAsString(request, 'x-client-type');
+    const platform = getHeaderAsString(request, ApiHeader.ClientPlatform);
+    const version = getHeaderAsString(request, ApiHeader.ClientVersion);
+    const type = getHeaderAsString(request, ApiHeader.ClientType);
 
     request.client = {
       ip,

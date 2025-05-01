@@ -1,5 +1,11 @@
 import { z } from 'zod';
 
+export enum ApiHeader {
+  ClientType = 'colanode-client-type',
+  ClientPlatform = 'colanode-client-platform',
+  ClientVersion = 'colanode-client-version',
+}
+
 export enum ApiErrorCode {
   AccountNotFound = 'account_not_found',
   DeviceNotFound = 'device_not_found',

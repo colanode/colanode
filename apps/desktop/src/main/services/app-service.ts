@@ -1,6 +1,6 @@
 import { Kysely, Migration, Migrator, SqliteDialect } from 'kysely';
 import SQLite from 'better-sqlite3';
-import { ApiErrorCode, createDebugger } from '@colanode/core';
+import { ApiErrorCode, ApiHeader, createDebugger } from '@colanode/core';
 import ms from 'ms';
 import axios from 'axios';
 import semver from 'semver';
@@ -51,9 +51,9 @@ export class AppService {
 
     // register interceptor to add client headers to all requests
     axios.interceptors.request.use((config) => {
-      config.headers['x-client-type'] = 'desktop';
-      config.headers['x-client-platform'] = this.platform;
-      config.headers['x-client-version'] = this.version;
+      config.headers[ApiHeader.ClientType] = 'desktop';
+      config.headers[ApiHeader.ClientPlatform] = this.platform;
+      config.headers[ApiHeader.ClientVersion] = this.version;
       return config;
     });
 
