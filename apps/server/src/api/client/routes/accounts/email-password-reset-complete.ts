@@ -3,14 +3,13 @@ import {
   AccountStatus,
   ApiErrorCode,
   apiErrorOutputSchema,
-  EmailPasswordResetCompleteInput,
+  emailPasswordResetCompleteInputSchema,
   EmailPasswordResetCompleteOutput,
   emailPasswordResetCompleteOutputSchema,
 } from '@colanode/core';
 
 import { database } from '@/data/database';
 import { generatePasswordHash, verifyOtpCode } from '@/lib/accounts';
-import { rateLimitService } from '@/services/rate-limit-service';
 
 export const emailPasswordResetCompleteRoute: FastifyPluginCallbackZod = (
   instance,
@@ -21,6 +20,7 @@ export const emailPasswordResetCompleteRoute: FastifyPluginCallbackZod = (
     method: 'POST',
     url: '/emails/passwords/reset/complete',
     schema: {
+      body: emailPasswordResetCompleteInputSchema,
       response: {
         200: emailPasswordResetCompleteOutputSchema,
         400: apiErrorOutputSchema,
@@ -29,16 +29,7 @@ export const emailPasswordResetCompleteRoute: FastifyPluginCallbackZod = (
       },
     },
     handler: async (request, reply) => {
-      const ip = request.client.ip;
-      const isIpRateLimited = await rateLimitService.isAuthIpRateLimitted(ip);
-      if (isIpRateLimited) {
-        return reply.code(429).send({
-          code: ApiErrorCode.TooManyRequests,
-          message: 'Too many authentication attempts. Please try again later.',
-        });
-      }
-
-      const input = request.body as EmailPasswordResetCompleteInput;
+      const input = request.body;
       const accountId = await verifyOtpCode(input.id, input.otp);
 
       if (!accountId) {

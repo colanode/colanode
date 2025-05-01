@@ -8,7 +8,7 @@ import {
 } from '@colanode/core';
 
 import { database } from '@/data/database';
-import { rateLimitService } from '@/services/rate-limit-service';
+import { isAuthEmailRateLimited } from '@/lib/rate-limits';
 import { configuration } from '@/lib/configuration';
 import {
   buildLoginSuccessOutput,
@@ -34,20 +34,10 @@ export const emailLoginRoute: FastifyPluginCallbackZod = (
       },
     },
     handler: async (request, reply) => {
-      const ip = request.client.ip;
-      const isIpRateLimited = await rateLimitService.isAuthIpRateLimitted(ip);
-      if (isIpRateLimited) {
-        return reply.code(429).send({
-          code: ApiErrorCode.TooManyRequests,
-          message: 'Too many authentication attempts. Please try again later.',
-        });
-      }
-
       const input = request.body;
       const email = input.email.toLowerCase();
 
-      const isEmailRateLimited =
-        await rateLimitService.isAuthEmailRateLimitted(email);
+      const isEmailRateLimited = await isAuthEmailRateLimited(email);
       if (isEmailRateLimited) {
         return reply.code(429).send({
           code: ApiErrorCode.TooManyRequests,

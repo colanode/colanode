@@ -2,30 +2,35 @@ import { FastifyPluginCallback } from 'fastify';
 
 import { accountSyncRoute } from './account-sync';
 import { emailLoginRoute } from './email-login';
-import { loginWithGoogleRoute } from './login-google';
 import { logoutRoute } from './logout';
 import { emailRegisterRoute } from './email-register';
 import { accountUpdateRoute } from './account-update';
 import { emailVerifyRoute } from './email-verify';
 import { emailPasswordResetInitRoute } from './email-password-reset-init';
 import { emailPasswordResetCompleteRoute } from './email-password-reset-complete';
+import { googleLoginRoute } from './google-login';
 
 import { accountAuthenticator } from '@/api/client/plugins/account-auth';
+import { authIpRateLimiter } from '@/api/client/plugins/auth-ip-rate-limit';
 
 export const accountRoutes: FastifyPluginCallback = (instance, _, done) => {
-  instance.register(emailLoginRoute);
-  instance.register(loginWithGoogleRoute);
-  instance.register(emailRegisterRoute);
-  instance.register(emailVerifyRoute);
-  instance.register(emailPasswordResetInitRoute);
-  instance.register(emailPasswordResetCompleteRoute);
+  instance.register((subInstance) => {
+    subInstance.register(authIpRateLimiter);
 
-  instance.register(async (subInstance) => {
-    await subInstance.register(accountAuthenticator);
+    subInstance.register(emailLoginRoute);
+    subInstance.register(emailRegisterRoute);
+    subInstance.register(emailVerifyRoute);
+    subInstance.register(emailPasswordResetInitRoute);
+    subInstance.register(emailPasswordResetCompleteRoute);
+    subInstance.register(googleLoginRoute);
+  });
 
-    await subInstance.register(accountSyncRoute);
-    await subInstance.register(logoutRoute);
-    await subInstance.register(accountUpdateRoute);
+  instance.register((subInstance) => {
+    subInstance.register(accountAuthenticator);
+
+    subInstance.register(accountSyncRoute);
+    subInstance.register(accountUpdateRoute);
+    subInstance.register(logoutRoute);
   });
 
   done();

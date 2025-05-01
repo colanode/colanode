@@ -1,7 +1,6 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 import {
-  AccountUpdateInput,
   accountUpdateInputSchema,
   AccountUpdateOutput,
   accountUpdateOutputSchema,
@@ -34,7 +33,7 @@ export const accountUpdateRoute: FastifyPluginCallbackZod = (
     },
     handler: async (request, reply) => {
       const accountId = request.params.accountId;
-      const input = request.body as AccountUpdateInput;
+      const input = request.body;
 
       if (accountId !== request.account.id) {
         return reply.code(400).send({

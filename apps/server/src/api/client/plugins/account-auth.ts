@@ -3,7 +3,7 @@ import fp from 'fastify-plugin';
 import { ApiErrorCode } from '@colanode/core';
 
 import { parseToken, verifyToken } from '@/lib/tokens';
-import { rateLimitService } from '@/services/rate-limit-service';
+import { isDeviceApiRateLimited } from '@/lib/rate-limits';
 import { RequestAccount } from '@/types/api';
 
 declare module 'fastify' {
@@ -48,9 +48,7 @@ const accountAuthenticatorCallback: FastifyPluginCallback = (
       });
     }
 
-    const isRateLimited = await rateLimitService.isDeviceApiRateLimitted(
-      tokenData.deviceId
-    );
+    const isRateLimited = await isDeviceApiRateLimited(tokenData.deviceId);
 
     if (isRateLimited) {
       return reply.code(429).send({

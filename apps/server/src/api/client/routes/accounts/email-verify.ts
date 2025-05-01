@@ -3,7 +3,7 @@ import {
   AccountStatus,
   ApiErrorCode,
   apiErrorOutputSchema,
-  EmailVerifyInput,
+  emailVerifyInputSchema,
   loginOutputSchema,
 } from '@colanode/core';
 
@@ -19,6 +19,7 @@ export const emailVerifyRoute: FastifyPluginCallbackZod = (
     method: 'POST',
     url: '/emails/verify',
     schema: {
+      body: emailVerifyInputSchema,
       response: {
         200: loginOutputSchema,
         400: apiErrorOutputSchema,
@@ -26,7 +27,7 @@ export const emailVerifyRoute: FastifyPluginCallbackZod = (
       },
     },
     handler: async (request, reply) => {
-      const input = request.body as EmailVerifyInput;
+      const input = request.body;
       const accountId = await verifyOtpCode(input.id, input.otp);
 
       if (!accountId) {

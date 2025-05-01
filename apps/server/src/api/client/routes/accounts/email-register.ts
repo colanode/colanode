@@ -1,17 +1,17 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import {
   AccountStatus,
-  EmailRegisterInput,
   generateId,
   IdType,
   ApiErrorCode,
   apiErrorOutputSchema,
   loginOutputSchema,
+  emailRegisterInputSchema,
 } from '@colanode/core';
 
 import { database } from '@/data/database';
 import { SelectAccount } from '@/data/schema';
-import { rateLimitService } from '@/services/rate-limit-service';
+import { isAuthEmailRateLimited } from '@/lib/rate-limits';
 import { configuration } from '@/lib/configuration';
 import {
   buildLoginSuccessOutput,
@@ -28,6 +28,7 @@ export const emailRegisterRoute: FastifyPluginCallbackZod = (
     method: 'POST',
     url: '/emails/register',
     schema: {
+      body: emailRegisterInputSchema,
       response: {
         200: loginOutputSchema,
         400: apiErrorOutputSchema,
@@ -35,20 +36,10 @@ export const emailRegisterRoute: FastifyPluginCallbackZod = (
       },
     },
     handler: async (request, reply) => {
-      const ip = request.client.ip;
-      const isIpRateLimited = await rateLimitService.isAuthIpRateLimitted(ip);
-      if (isIpRateLimited) {
-        return reply.code(429).send({
-          code: ApiErrorCode.TooManyRequests,
-          message: 'Too many authentication attempts. Please try again later.',
-        });
-      }
-
-      const input = request.body as EmailRegisterInput;
+      const input = request.body;
       const email = input.email.toLowerCase();
 
-      const isEmailRateLimited =
-        await rateLimitService.isAuthEmailRateLimitted(email);
+      const isEmailRateLimited = await isAuthEmailRateLimited(email);
       if (isEmailRateLimited) {
         return reply.code(429).send({
           code: ApiErrorCode.TooManyRequests,

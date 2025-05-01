@@ -2,23 +2,22 @@ import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import {
   AccountStatus,
   generateId,
-  GoogleLoginInput,
   GoogleUserInfo,
   IdType,
   ApiErrorCode,
   apiErrorOutputSchema,
   loginOutputSchema,
+  googleLoginInputSchema,
 } from '@colanode/core';
 import axios from 'axios';
 
 import { database } from '@/data/database';
-import { rateLimitService } from '@/services/rate-limit-service';
 import { configuration } from '@/lib/configuration';
 import { buildLoginSuccessOutput } from '@/lib/accounts';
 
 const GoogleUserInfoUrl = 'https://www.googleapis.com/oauth2/v1/userinfo';
 
-export const loginWithGoogleRoute: FastifyPluginCallbackZod = (
+export const googleLoginRoute: FastifyPluginCallbackZod = (
   instance,
   _,
   done
@@ -27,6 +26,7 @@ export const loginWithGoogleRoute: FastifyPluginCallbackZod = (
     method: 'POST',
     url: '/google/login',
     schema: {
+      body: googleLoginInputSchema,
       response: {
         200: loginOutputSchema,
         400: apiErrorOutputSchema,
@@ -41,16 +41,7 @@ export const loginWithGoogleRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const ip = request.client.ip;
-      const isIpRateLimited = await rateLimitService.isAuthIpRateLimitted(ip);
-      if (isIpRateLimited) {
-        return reply.code(429).send({
-          code: ApiErrorCode.TooManyRequests,
-          message: 'Too many authentication attempts. Please try again later.',
-        });
-      }
-
-      const input = request.body as GoogleLoginInput;
+      const input = request.body;
       const url = `${GoogleUserInfoUrl}?access_token=${input.access_token}`;
       const userInfoResponse = await axios.get(url);
 
