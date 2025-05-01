@@ -7,6 +7,7 @@ import { Account as AccountType } from '@/shared/types/accounts';
 import { useQuery } from '@/renderer/hooks/use-query';
 import { WorkspaceCreate } from '@/renderer/components/workspaces/workspace-create';
 import { Workspace } from '@/renderer/components/workspaces/workspace';
+import { ServerProvider } from '@/renderer/components/servers/server-provider';
 
 interface AccountProps {
   account: AccountType;
@@ -56,45 +57,47 @@ export const Account = ({ account }: AccountProps) => {
       : undefined;
 
   return (
-    <AccountContext.Provider
-      value={{
-        ...account,
-        openSettings: () => setOpenSettings(true),
-        openLogout: () => setOpenLogout(true),
-        openWorkspaceCreate: () => setOpenCreateWorkspace(true),
-        openWorkspace: (id) => {
-          setOpenCreateWorkspace(false);
-          window.colanode.executeMutation({
-            type: 'account_metadata_save',
-            accountId: account.id,
-            key: 'workspace',
-            value: id,
-          });
-        },
-      }}
-    >
-      {!openCreateWorkspace && workspace ? (
-        <Workspace workspace={workspace} />
-      ) : (
-        <WorkspaceCreate
-          onSuccess={handleWorkspaceCreateSuccess}
-          onCancel={handleWorkspaceCreateCancel}
-        />
-      )}
-      {openSettings && (
-        <AccountSettingsDialog
-          open={true}
-          onOpenChange={() => setOpenSettings(false)}
-        />
-      )}
-      {openLogout && (
-        <AccountLogout
-          onCancel={() => setOpenLogout(false)}
-          onLogout={() => {
-            setOpenLogout(false);
-          }}
-        />
-      )}
-    </AccountContext.Provider>
+    <ServerProvider domain={account.server}>
+      <AccountContext.Provider
+        value={{
+          ...account,
+          openSettings: () => setOpenSettings(true),
+          openLogout: () => setOpenLogout(true),
+          openWorkspaceCreate: () => setOpenCreateWorkspace(true),
+          openWorkspace: (id) => {
+            setOpenCreateWorkspace(false);
+            window.colanode.executeMutation({
+              type: 'account_metadata_save',
+              accountId: account.id,
+              key: 'workspace',
+              value: id,
+            });
+          },
+        }}
+      >
+        {!openCreateWorkspace && workspace ? (
+          <Workspace workspace={workspace} />
+        ) : (
+          <WorkspaceCreate
+            onSuccess={handleWorkspaceCreateSuccess}
+            onCancel={handleWorkspaceCreateCancel}
+          />
+        )}
+        {openSettings && (
+          <AccountSettingsDialog
+            open={true}
+            onOpenChange={() => setOpenSettings(false)}
+          />
+        )}
+        {openLogout && (
+          <AccountLogout
+            onCancel={() => setOpenLogout(false)}
+            onLogout={() => {
+              setOpenLogout(false);
+            }}
+          />
+        )}
+      </AccountContext.Provider>
+    </ServerProvider>
   );
 };

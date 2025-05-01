@@ -14,16 +14,33 @@ import {
   AlertDialogTitle,
 } from '@/renderer/components/ui/alert-dialog';
 import { Spinner } from '@/renderer/components/ui/spinner';
+import { useServer } from '@/renderer/contexts/server';
 
 interface WorkspaceDeleteProps {
   onDeleted: () => void;
 }
 
 export const WorkspaceDelete = ({ onDeleted }: WorkspaceDeleteProps) => {
+  const server = useServer();
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
   const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const isDeleteSupported = server.supports('workspace-delete');
+
+  if (!isDeleteSupported) {
+    return (
+      <div className="flex flex-col gap-4">
+        <h3 className="font-heading mb-px text-2xl font-semibold tracking-tight">
+          Delete workspace
+        </h3>
+        <p>
+          This feature is not supported on the server this workspace is hosted
+          on. Please contact your administrator to upgrade the server.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4">

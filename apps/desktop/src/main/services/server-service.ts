@@ -47,6 +47,10 @@ export class ServerService {
     return this.server.domain;
   }
 
+  public get version() {
+    return this.server.version;
+  }
+
   private async sync() {
     const config = await ServerService.fetchServerConfig(this.server.domain);
     const existingState = this.state;
