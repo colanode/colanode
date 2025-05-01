@@ -88,7 +88,7 @@ export class UserListQueryHandler
     const rows = await workspace.database
       .selectFrom('users')
       .selectAll()
-      .orderBy('created_at asc')
+      .orderBy('created_at', 'asc')
       .offset(offset)
       .limit(input.count)
       .execute();
