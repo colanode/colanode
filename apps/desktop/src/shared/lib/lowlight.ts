@@ -1,4 +1,4 @@
-import { all,createLowlight } from 'lowlight';
+import { all, createLowlight } from 'lowlight';
 export const lowlight = createLowlight(all);
 const lowlightLanguages = lowlight.listLanguages();
 
@@ -251,8 +251,7 @@ export const highlightCode = (
       language: result.data?.language,
       nodes,
     };
-  } catch (error) {
-    console.error('highlightCode', error, code, language);
+  } catch {
     return null;
   }
 };

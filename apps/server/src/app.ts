@@ -8,7 +8,7 @@ import {
 } from 'fastify-type-provider-zod';
 
 import { clientRoutes } from '@/api/client/routes';
-import { ipDecorator } from '@/api/client/plugins/ip';
+import { clientDecorator } from '@/api/client/plugins/client';
 import { errorHandler } from '@/api/client/plugins/error-handler';
 
 const debug = createDebugger('server:app');
@@ -31,7 +31,7 @@ export const initApp = async () => {
   });
 
   await server.register(fastifyWebsocket);
-  await server.register(ipDecorator);
+  await server.register(clientDecorator);
   await server.register(clientRoutes, { prefix: '/client/v1' });
 
   server.get('/', (_, reply) => {

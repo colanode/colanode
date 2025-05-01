@@ -43,7 +43,6 @@ export class EmailLoginMutationHandler
 
       return data;
     } catch (error) {
-      console.error(error);
       const apiError = parseApiError(error);
       throw new MutationError(MutationErrorCode.ApiError, apiError.message);
     }

@@ -41,7 +41,7 @@ export const loginWithGoogleRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const ip = request.originalIp;
+      const ip = request.client.ip;
       const isIpRateLimited = await rateLimitService.isAuthIpRateLimitted(ip);
       if (isIpRateLimited) {
         return reply.code(429).send({
@@ -90,7 +90,7 @@ export const loginWithGoogleRoute: FastifyPluginCallbackZod = (
         }
 
         const output = await buildLoginSuccessOutput(existingAccount, {
-          ip: request.originalIp,
+          ip: request.client.ip,
           platform: input.platform,
           version: input.version,
         });
@@ -119,7 +119,7 @@ export const loginWithGoogleRoute: FastifyPluginCallbackZod = (
       }
 
       const output = await buildLoginSuccessOutput(newAccount, {
-        ip: request.originalIp,
+        ip: request.client.ip,
         platform: input.platform,
         version: input.version,
       });

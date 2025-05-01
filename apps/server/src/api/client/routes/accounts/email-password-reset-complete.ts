@@ -29,7 +29,7 @@ export const emailPasswordResetCompleteRoute: FastifyPluginCallbackZod = (
       },
     },
     handler: async (request, reply) => {
-      const ip = request.originalIp;
+      const ip = request.client.ip;
       const isIpRateLimited = await rateLimitService.isAuthIpRateLimitted(ip);
       if (isIpRateLimited) {
         return reply.code(429).send({

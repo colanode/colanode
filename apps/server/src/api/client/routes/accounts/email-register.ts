@@ -35,7 +35,7 @@ export const emailRegisterRoute: FastifyPluginCallbackZod = (
       },
     },
     handler: async (request, reply) => {
-      const ip = request.originalIp;
+      const ip = request.client.ip;
       const isIpRateLimited = await rateLimitService.isAuthIpRateLimitted(ip);
       if (isIpRateLimited) {
         return reply.code(429).send({
@@ -126,9 +126,9 @@ export const emailRegisterRoute: FastifyPluginCallbackZod = (
       }
 
       const output = await buildLoginSuccessOutput(account, {
-        ip: request.originalIp,
-        platform: input.platform,
-        version: input.version,
+        ip: request.client.ip,
+        platform: input.platform || request.client.platform || '',
+        version: input.version || request.client.version || '',
       });
 
       return output;

@@ -47,8 +47,7 @@ export const mutationsSyncRoute: FastifyPluginCallbackZod = (
             id: mutation.id,
             status: status,
           });
-        } catch (error) {
-          console.error('Error handling local mutation', error);
+        } catch {
           results.push({
             id: mutation.id,
             status: 'error',

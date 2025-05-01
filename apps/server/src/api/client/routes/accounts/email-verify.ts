@@ -54,9 +54,9 @@ export const emailVerifyRoute: FastifyPluginCallbackZod = (
       }
 
       const output = await buildLoginSuccessOutput(account, {
-        ip: request.originalIp,
-        platform: input.platform,
-        version: input.version,
+        ip: request.client.ip,
+        platform: input.platform || request.client.platform || '',
+        version: input.version || request.client.version || '',
       });
 
       return output;

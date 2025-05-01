@@ -18,7 +18,7 @@ export const configGetRoute: FastifyPluginCallbackZod = (instance, _, done) => {
         avatar: configuration.server.avatar,
         version: configuration.server.version,
         sha: configuration.server.sha,
-        ip: request.originalIp,
+        ip: request.client.ip,
         attributes: {},
       };
 
