@@ -2,6 +2,10 @@ FROM node:20-alpine
 
 WORKDIR /app
 
+ARG VERSION
+ARG SHA
+RUN echo "{\"version\":\"$VERSION\",\"sha\":\"$SHA\"}" > build.json
+
 # Copy root workspace files
 COPY ../../package.json ../../package-lock.json ./
 

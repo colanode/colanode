@@ -1,3 +1,10 @@
+import fs from 'fs';
+
+interface BuildInfo {
+  version: string;
+  sha: string;
+}
+
 export interface Configuration {
   server: ServerConfiguration;
   account: AccountConfiguration;
@@ -13,6 +20,8 @@ export interface Configuration {
 export type ServerMode = 'standalone' | 'cluster';
 
 export interface ServerConfiguration {
+  version: string;
+  sha: string;
   name: string;
   avatar: string;
   mode: ServerMode;
@@ -145,8 +154,38 @@ const getOptionalEnv = (env: string): string | undefined => {
   return process.env[env];
 };
 
+const parseBuildInfo = (): BuildInfo => {
+  const defaultBuildInfo: BuildInfo = {
+    version: 'dev',
+    sha: 'dev',
+  };
+
+  if (!fs.existsSync('/app/build.json')) {
+    return defaultBuildInfo;
+  }
+
+  const json = fs.readFileSync('/app/build.json', 'utf8');
+  if (!json || json.length === 0) {
+    return defaultBuildInfo;
+  }
+
+  const buildInfo = JSON.parse(json);
+  if (!buildInfo.version || !buildInfo.sha) {
+    return defaultBuildInfo;
+  }
+
+  return {
+    version: buildInfo.version,
+    sha: buildInfo.sha,
+  };
+};
+
+const buildInfo: BuildInfo = parseBuildInfo();
+
 export const configuration: Configuration = {
   server: {
+    version: buildInfo.version,
+    sha: buildInfo.sha,
     name: getRequiredEnv('SERVER_NAME'),
     avatar: getOptionalEnv('SERVER_AVATAR') || '',
     mode: (getOptionalEnv('SERVER_MODE') as ServerMode) || 'standalone',

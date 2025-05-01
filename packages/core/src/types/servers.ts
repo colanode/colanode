@@ -8,6 +8,7 @@ export const serverConfigSchema = z.object({
   name: z.string(),
   avatar: z.string(),
   version: z.string(),
+  sha: z.string(),
   ip: z.string().nullable().optional(),
   attributes: serverAttributesSchema,
 });

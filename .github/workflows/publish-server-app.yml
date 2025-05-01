@@ -36,6 +36,9 @@ jobs:
           context: .
           file: ./apps/server/Dockerfile
           push: true
+          build-args: |
+            VERSION=${{ steps.get_version.outputs.VERSION }}
+            SHA=${{ github.sha }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
