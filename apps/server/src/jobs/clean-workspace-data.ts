@@ -1,6 +1,11 @@
+import { createDebugger } from '@colanode/core';
+
 import { JobHandler } from '@/types/jobs';
 import { database } from '@/data/database';
 import { deleteFile } from '@/lib/files';
+
+const BATCH_SIZE = 500;
+const debug = createDebugger('server:job:clean-workspace-data');
 
 export type CleanWorkspaceDataInput = {
   type: 'clean_workspace_data';
@@ -15,17 +20,17 @@ declare module '@/types/jobs' {
   }
 }
 
-const BATCH_SIZE = 500;
-
 export const cleanWorkspaceDataHandler: JobHandler<
   CleanWorkspaceDataInput
 > = async (input) => {
+  debug(`Cleaning workspace data for ${input.workspaceId}`);
+
   try {
     await deleteWorkspaceUsers(input.workspaceId);
     await deleteWorkspaceNodes(input.workspaceId);
     await deleteWorkspaceUploads(input.workspaceId);
   } catch (error) {
-    console.error('Error cleaning workspace data:', error);
+    debug(`Error cleaning workspace data: ${error}`);
     throw error;
   }
 };
