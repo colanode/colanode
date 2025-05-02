@@ -673,65 +673,37 @@ export const deleteNode = async (
     return null;
   }
 
-  const { deletedNode, updatedCollaborations } = await database
-    .transaction()
-    .execute(async (trx) => {
-      const deletedNode = await trx
-        .deleteFrom('nodes')
-        .returningAll()
-        .where('id', '=', input.nodeId)
-        .executeTakeFirst();
+  const { deletedNode } = await database.transaction().execute(async (trx) => {
+    const deletedNode = await trx
+      .deleteFrom('nodes')
+      .returningAll()
+      .where('id', '=', input.nodeId)
+      .executeTakeFirst();
 
-      if (!deletedNode) {
-        throw new Error('Failed to delete node');
-      }
+    if (!deletedNode) {
+      throw new Error('Failed to delete node');
+    }
 
-      const createdTombstone = await trx
-        .insertInto('node_tombstones')
-        .returningAll()
-        .values({
-          id: node.id,
-          root_id: node.root_id,
-          workspace_id: node.workspace_id,
-          deleted_at: new Date(input.deletedAt),
-          deleted_by: user.id,
-        })
-        .executeTakeFirst();
+    const createdTombstone = await trx
+      .insertInto('node_tombstones')
+      .returningAll()
+      .values({
+        id: node.id,
+        root_id: node.root_id,
+        workspace_id: node.workspace_id,
+        deleted_at: new Date(input.deletedAt),
+        deleted_by: user.id,
+      })
+      .executeTakeFirst();
 
-      if (!createdTombstone) {
-        throw new Error('Failed to create tombstone');
-      }
+    if (!createdTombstone) {
+      throw new Error('Failed to create tombstone');
+    }
 
-      await trx
-        .deleteFrom('node_updates')
-        .where('node_id', '=', input.nodeId)
-        .execute();
-
-      await trx
-        .deleteFrom('node_reactions')
-        .where('node_id', '=', input.nodeId)
-        .execute();
-
-      await trx
-        .deleteFrom('node_interactions')
-        .where('node_id', '=', input.nodeId)
-        .execute();
-
-      const updatedCollaborations = await trx
-        .updateTable('collaborations')
-        .set({
-          deleted_at: new Date(),
-          deleted_by: user.id,
-        })
-        .returningAll()
-        .where('node_id', '=', input.nodeId)
-        .execute();
-
-      return {
-        deletedNode,
-        updatedCollaborations,
-      };
-    });
+    return {
+      deletedNode,
+    };
+  });
 
   if (deletedNode.type === 'file') {
     const upload = await database
@@ -756,15 +728,6 @@ export const deleteNode = async (
     rootId: node.root_id,
     workspaceId: user.workspace_id,
   });
-
-  for (const updatedCollaboration of updatedCollaborations) {
-    eventBus.publish({
-      type: 'collaboration_updated',
-      collaboratorId: updatedCollaboration.collaborator_id,
-      nodeId: input.nodeId,
-      workspaceId: user.workspace_id,
-    });
-  }
 
   await jobService.addJob({
     type: 'clean_node_data',

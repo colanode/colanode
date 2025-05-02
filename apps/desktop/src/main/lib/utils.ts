@@ -176,3 +176,58 @@ export const fetchUserStorageUsed = async (
 
   return BigInt(storageUsedRow?.storage_used ?? 0);
 };
+
+export const deleteNodeRelations = async (
+  database:
+    | Kysely<WorkspaceDatabaseSchema>
+    | Transaction<WorkspaceDatabaseSchema>,
+  nodeId: string
+) => {
+  await database.deleteFrom('node_states').where('id', '=', nodeId).execute();
+
+  await database
+    .deleteFrom('node_updates')
+    .where('node_id', '=', nodeId)
+    .execute();
+
+  await database
+    .deleteFrom('node_interactions')
+    .where('node_id', '=', nodeId)
+    .execute();
+
+  await database
+    .deleteFrom('node_reactions')
+    .where('node_id', '=', nodeId)
+    .execute();
+
+  await database.deleteFrom('node_texts').where('id', '=', nodeId).execute();
+
+  await database
+    .deleteFrom('documents')
+    .where('id', '=', nodeId)
+    .executeTakeFirst();
+
+  await database
+    .deleteFrom('document_states')
+    .where('id', '=', nodeId)
+    .execute();
+
+  await database
+    .deleteFrom('document_updates')
+    .where('document_id', '=', nodeId)
+    .execute();
+
+  await database.deleteFrom('tombstones').where('id', '=', nodeId).execute();
+
+  await database
+    .deleteFrom('node_references')
+    .where('node_id', '=', nodeId)
+    .execute();
+
+  await database
+    .deleteFrom('node_counters')
+    .where('node_id', '=', nodeId)
+    .execute();
+
+  await database.deleteFrom('file_states').where('id', '=', nodeId).execute();
+};

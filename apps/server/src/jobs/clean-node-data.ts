@@ -29,6 +29,9 @@ export const cleanNodeDataHandler: JobHandler<CleanNodeDataInput> = async (
 ) => {
   debug(`Cleaning node data for ${input.nodeId}`);
 
+  await cleanNodeRelations([input.nodeId]);
+  await cleanNodeFiles([input.nodeId]);
+
   let hasMore = true;
   while (hasMore) {
     const children = await database
@@ -80,62 +83,8 @@ const cleanDescendants = async (nodeId: string, userId: string) => {
       deleted_by: userId,
     }));
 
-    await database
-      .deleteFrom('node_updates')
-      .where('node_id', 'in', nodeIds)
-      .execute();
-
-    await database
-      .deleteFrom('node_reactions')
-      .where('node_id', 'in', nodeIds)
-      .execute();
-
-    await database
-      .deleteFrom('node_interactions')
-      .where('node_id', 'in', nodeIds)
-      .execute();
-
-    await database
-      .deleteFrom('node_embeddings')
-      .where('node_id', 'in', nodeIds)
-      .execute();
-
-    await database
-      .deleteFrom('collaborations')
-      .where('node_id', 'in', nodeIds)
-      .execute();
-
-    await database
-      .deleteFrom('document_embeddings')
-      .where('document_id', 'in', nodeIds)
-      .execute();
-
-    await database
-      .deleteFrom('document_updates')
-      .where('document_id', 'in', nodeIds)
-      .execute();
-
-    await database
-      .deleteFrom('document_embeddings')
-      .where('document_id', 'in', nodeIds)
-      .execute();
-
-    const uploads = await database
-      .selectFrom('uploads')
-      .selectAll()
-      .where('file_id', 'in', nodeIds)
-      .execute();
-
-    if (uploads.length > 0) {
-      for (const upload of uploads) {
-        await deleteFile(upload.path);
-      }
-
-      await database
-        .deleteFrom('uploads')
-        .where('file_id', 'in', nodeIds)
-        .execute();
-    }
+    await cleanNodeRelations(nodeIds);
+    await cleanNodeFiles(nodeIds);
 
     await database.transaction().execute(async (trx) => {
       await trx
@@ -155,5 +104,66 @@ const cleanDescendants = async (nodeId: string, userId: string) => {
         workspaceId: node.workspace_id,
       });
     }
+  }
+};
+
+const cleanNodeRelations = async (nodeIds: string[]) => {
+  await database
+    .deleteFrom('node_updates')
+    .where('node_id', 'in', nodeIds)
+    .execute();
+
+  await database
+    .deleteFrom('node_reactions')
+    .where('node_id', 'in', nodeIds)
+    .execute();
+
+  await database
+    .deleteFrom('node_interactions')
+    .where('node_id', 'in', nodeIds)
+    .execute();
+
+  await database
+    .deleteFrom('node_embeddings')
+    .where('node_id', 'in', nodeIds)
+    .execute();
+
+  await database
+    .deleteFrom('collaborations')
+    .where('node_id', 'in', nodeIds)
+    .execute();
+
+  await database
+    .deleteFrom('document_embeddings')
+    .where('document_id', 'in', nodeIds)
+    .execute();
+
+  await database
+    .deleteFrom('document_updates')
+    .where('document_id', 'in', nodeIds)
+    .execute();
+
+  await database
+    .deleteFrom('document_embeddings')
+    .where('document_id', 'in', nodeIds)
+    .execute();
+};
+
+const cleanNodeFiles = async (nodeIds: string[]) => {
+  const uploads = await database
+    .selectFrom('uploads')
+    .selectAll()
+    .where('file_id', 'in', nodeIds)
+    .execute();
+
+  if (uploads.length > 0) {
+    for (const upload of uploads) {
+      await deleteFile(upload.path);
+    }
+
+    await database
+      .deleteFrom('uploads')
+      .where('file_id', 'in', nodeIds)
+      .execute();
   }
 };

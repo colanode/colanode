@@ -15,7 +15,7 @@ import {
 } from '@colanode/core';
 import { decodeState, encodeState, YDoc } from '@colanode/crdt';
 
-import { fetchNodeTree } from '@/main/lib/utils';
+import { deleteNodeRelations, fetchNodeTree } from '@/main/lib/utils';
 import { mapNode, mapNodeReference } from '@/main/lib/mappers';
 import { eventBus } from '@/shared/lib/event-bus';
 import { WorkspaceService } from '@/main/services/workspaces/workspace-service';
@@ -795,7 +795,7 @@ export class NodeService {
       `Applying server delete transaction ${tombstone.id} for node ${tombstone.id}`
     );
 
-    const { deletedNode } = await this.workspace.database
+    const { deletedNode, deletedCollaborations } = await this.workspace.database
       .transaction()
       .execute(async (trx) => {
         const deletedNode = await trx
@@ -804,52 +804,15 @@ export class NodeService {
           .where('id', '=', tombstone.id)
           .executeTakeFirst();
 
-        await trx
-          .deleteFrom('node_updates')
+        const deletedCollaborations = await trx
+          .deleteFrom('collaborations')
           .where('node_id', '=', tombstone.id)
+          .returningAll()
           .execute();
 
-        await trx
-          .deleteFrom('node_states')
-          .where('id', '=', tombstone.id)
-          .execute();
+        await deleteNodeRelations(trx, tombstone.id);
 
-        await trx
-          .deleteFrom('node_reactions')
-          .where('node_id', '=', tombstone.id)
-          .execute();
-
-        await trx
-          .deleteFrom('node_interactions')
-          .where('node_id', '=', tombstone.id)
-          .execute();
-
-        await trx
-          .deleteFrom('node_references')
-          .where('node_id', '=', tombstone.id)
-          .execute();
-
-        await trx
-          .deleteFrom('tombstones')
-          .where('id', '=', tombstone.id)
-          .execute();
-
-        await trx
-          .deleteFrom('documents')
-          .where('id', '=', tombstone.id)
-          .executeTakeFirst();
-
-        await trx
-          .deleteFrom('document_updates')
-          .where('document_id', '=', tombstone.id)
-          .execute();
-
-        await trx
-          .deleteFrom('node_texts')
-          .where('id', '=', tombstone.id)
-          .execute();
-
-        return { deletedNode };
+        return { deletedNode, deletedCollaborations };
       });
 
     if (!deletedNode) {
@@ -858,74 +821,71 @@ export class NodeService {
 
     await this.workspace.nodeCounters.checkCountersForDeletedNode(deletedNode);
 
+    if (deletedNode.type === 'file') {
+      this.workspace.files.deleteFile(deletedNode);
+    }
+
     eventBus.publish({
       type: 'node_deleted',
       accountId: this.workspace.accountId,
       workspaceId: this.workspace.id,
       node: mapNode(deletedNode),
     });
+
+    for (const deletedCollaboration of deletedCollaborations) {
+      eventBus.publish({
+        type: 'collaboration_deleted',
+        accountId: this.workspace.accountId,
+        workspaceId: this.workspace.id,
+        nodeId: deletedCollaboration.node_id,
+      });
+    }
   }
 
   public async revertNodeCreate(mutation: CreateNodeMutationData) {
-    const node = await this.workspace.database
-      .selectFrom('nodes')
-      .selectAll()
-      .where('id', '=', mutation.nodeId)
-      .executeTakeFirst();
+    const { deletedNode, deletedCollaborations } = await this.workspace.database
+      .transaction()
+      .execute(async (tx) => {
+        const deletedNode = await tx
+          .deleteFrom('nodes')
+          .where('id', '=', mutation.nodeId)
+          .returningAll()
+          .executeTakeFirst();
 
-    if (!node) {
+        const deletedCollaborations = await tx
+          .deleteFrom('collaborations')
+          .where('node_id', '=', mutation.nodeId)
+          .returningAll()
+          .execute();
+
+        await deleteNodeRelations(tx, mutation.nodeId);
+
+        return { deletedNode, deletedCollaborations };
+      });
+
+    if (!deletedNode) {
       return;
     }
 
-    await this.workspace.database.transaction().execute(async (tx) => {
-      await tx.deleteFrom('nodes').where('id', '=', mutation.nodeId).execute();
-
-      await tx
-        .deleteFrom('node_updates')
-        .where('node_id', '=', mutation.nodeId)
-        .execute();
-
-      await tx
-        .deleteFrom('node_interactions')
-        .where('node_id', '=', mutation.nodeId)
-        .execute();
-
-      await tx
-        .deleteFrom('node_reactions')
-        .where('node_id', '=', mutation.nodeId)
-        .execute();
-
-      await tx
-        .deleteFrom('node_states')
-        .where('id', '=', mutation.nodeId)
-        .execute();
-
-      await tx
-        .deleteFrom('node_references')
-        .where('node_id', '=', mutation.nodeId)
-        .execute();
-
-      await tx
-        .deleteFrom('documents')
-        .where('id', '=', mutation.nodeId)
-        .execute();
-
-      await tx
-        .deleteFrom('document_updates')
-        .where('document_id', '=', mutation.nodeId)
-        .execute();
-    });
-
-    if (node.type === 'file') {
-      await this.workspace.files.deleteFile(node);
+    if (deletedNode.type === 'file') {
+      this.workspace.files.deleteFile(deletedNode);
     }
 
     eventBus.publish({
       type: 'node_deleted',
       accountId: this.workspace.accountId,
       workspaceId: this.workspace.id,
-      node: mapNode(node),
+      node: mapNode(deletedNode),
     });
+
+    for (const deletedCollaboration of deletedCollaborations) {
+      eventBus.publish({
+        type: 'collaboration_deleted',
+        accountId: this.workspace.accountId,
+        workspaceId: this.workspace.id,
+        nodeId: deletedCollaboration.node_id,
+      });
+    }
   }
 
   public async revertNodeUpdate(mutation: UpdateNodeMutationData) {
@@ -948,42 +908,7 @@ export class NodeService {
       .executeTakeFirst();
 
     if (!node) {
-      // Make sure we don't have any data left behind
-      await this.workspace.database
-        .deleteFrom('node_updates')
-        .where('id', '=', mutation.updateId)
-        .execute();
-
-      await this.workspace.database
-        .deleteFrom('node_interactions')
-        .where('node_id', '=', mutation.nodeId)
-        .execute();
-
-      await this.workspace.database
-        .deleteFrom('node_reactions')
-        .where('node_id', '=', mutation.nodeId)
-        .execute();
-
-      await this.workspace.database
-        .deleteFrom('node_states')
-        .where('id', '=', mutation.nodeId)
-        .execute();
-
-      await this.workspace.database
-        .deleteFrom('node_references')
-        .where('node_id', '=', mutation.nodeId)
-        .execute();
-
-      await this.workspace.database
-        .deleteFrom('documents')
-        .where('id', '=', mutation.nodeId)
-        .execute();
-
-      await this.workspace.database
-        .deleteFrom('document_updates')
-        .where('document_id', '=', mutation.nodeId)
-        .execute();
-
+      await deleteNodeRelations(this.workspace.database, mutation.nodeId);
       return true;
     }
 

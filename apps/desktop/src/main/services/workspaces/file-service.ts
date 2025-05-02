@@ -201,7 +201,7 @@ export class FileService {
     this.triggerUploads();
   }
 
-  public async deleteFile(node: SelectNode): Promise<void> {
+  public deleteFile(node: SelectNode): void {
     const file = mapNode(node);
 
     if (file.type !== 'file') {
