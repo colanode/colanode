@@ -58,6 +58,32 @@ export class NodeReactionsListQueryHandler
       };
     }
 
+    if (
+      event.type === 'node_created' &&
+      event.accountId === input.accountId &&
+      event.workspaceId === input.workspaceId &&
+      event.node.id === input.nodeId
+    ) {
+      const newResult = await this.handleQuery(input);
+
+      return {
+        hasChanges: true,
+        result: newResult,
+      };
+    }
+
+    if (
+      event.type === 'node_deleted' &&
+      event.accountId === input.accountId &&
+      event.workspaceId === input.workspaceId &&
+      event.node.id === input.nodeId
+    ) {
+      return {
+        hasChanges: true,
+        result: [],
+      };
+    }
+
     return {
       hasChanges: false,
     };

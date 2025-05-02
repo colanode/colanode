@@ -56,6 +56,19 @@ export class FileStateGetQueryHandler
       };
     }
 
+    if (
+      event.type === 'node_created' &&
+      event.accountId === input.accountId &&
+      event.workspaceId === input.workspaceId &&
+      event.node.id === input.id
+    ) {
+      const newOutput = await this.handleQuery(input);
+      return {
+        hasChanges: true,
+        result: newOutput,
+      };
+    }
+
     return {
       hasChanges: false,
     };
