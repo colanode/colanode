@@ -21,8 +21,6 @@ class EmailService {
     if (
       !configuration.smtp.host ||
       !configuration.smtp.port ||
-      !configuration.smtp.user ||
-      !configuration.smtp.password ||
       !configuration.smtp.from.email ||
       !configuration.smtp.from.name
     ) {
