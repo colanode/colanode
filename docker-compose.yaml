@@ -151,18 +151,28 @@ services:
       # ───────────────────────────────────────────────────────────────
       # SMTP configuration
       # ---------------------------------------------------------------
+      # If you don't want to use SMTP, set:
+      # SMTP_ENABLED: 'false'
+      # ---------------------------------------------------------------
       # If using the local Mailpit service (defined above), use:
+      # SMTP_ENABLED: 'true'
       # SMTP_HOST: 'smtp'
       # SMTP_PORT: '1025'
       # SMTP_USER: ''
       # SMTP_PASSWORD: ''
-      #
+      # SMTP_EMAIL_FROM: 'your_email@example.com'
+      # SMTP_EMAIL_FROM_NAME: 'Colanode'
+      # ---------------------------------------------------------------
       # If using a real SMTP provider, update these:
+      # SMTP_ENABLED: 'true'
       # SMTP_HOST: 'your_smtp_provider_host'
       # SMTP_PORT: '587' # Or 465, etc.
       # SMTP_USER: 'your_smtp_username'
       # SMTP_PASSWORD: 'your_smtp_password'
+      # SMTP_EMAIL_FROM: 'your_email@example.com'
+      # SMTP_EMAIL_FROM_NAME: 'Colanode'
       # ---------------------------------------------------------------
+      SMTP_ENABLED: 'true'
       SMTP_HOST: 'smtp' # Defaulting to Mailpit service name
       SMTP_PORT: '1025' # Defaulting to Mailpit port
       SMTP_USER: ''
@@ -173,7 +183,7 @@ services:
       # ───────────────────────────────────────────────────────────────
       # AI Configuration
       # ───────────────────────────────────────────────────────────────
-      AI_ENABLED: 'true'
+      AI_ENABLED: 'false'
       AI_NODE_EMBEDDING_DELAY: '5000'
       AI_DOCUMENT_EMBEDDING_DELAY: '10000'
 
