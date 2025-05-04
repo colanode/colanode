@@ -8,7 +8,7 @@ import {
 } from '@colanode/core';
 
 import { database } from '@/data/database';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import { fetchNode, fetchNodeDescendants } from '@/lib/nodes';
 import {
   rewriteQuery,
@@ -17,10 +17,10 @@ import {
   rerankDocuments,
   generateFinalAnswer,
   generateDatabaseFilters,
-} from '@/services/llm-service';
-import { nodeRetrievalService } from '@/services/node-retrieval-service';
-import { documentRetrievalService } from '@/services/document-retrieval-service';
-import { recordsRetrievalService } from '@/services/records-retrieval-service';
+} from '@/lib/ai/llms';
+import { retrieveNodes } from '@/lib/ai/node-retrievals';
+import { retrieveDocuments } from '@/lib/ai/document-retrievals';
+import { retrieveByFilters } from '@/lib/records';
 import {
   AssistantChainState,
   ResponseState,
@@ -29,49 +29,53 @@ import {
   AssistantResponse,
   AssistantInput,
 } from '@/types/assistant';
-import { fetchMetadataForContextItems } from '@/lib/metadata';
+import { fetchMetadataForContextItems } from '@/lib/ai/metadata';
 import { SelectNode } from '@/data/schema';
 import {
   formatChatHistory,
   formatContextDocuments,
   selectTopContext,
   formatMetadataForPrompt,
-} from '@/lib/ai-utils';
+} from '@/lib/ai/utils';
 
-async function generateRewrittenQuery(state: AssistantChainState) {
+const generateRewrittenQuery = async (state: AssistantChainState) => {
   const rewrittenQuery = await rewriteQuery(state.userInput);
   return { rewrittenQuery };
-}
+};
 
-async function assessIntent(state: AssistantChainState) {
+const assessIntent = async (state: AssistantChainState) => {
   const chatHistory = formatChatHistory(state.chatHistory);
   const intent = await assessUserIntent(state.userInput, chatHistory);
   return { intent };
-}
+};
 
-async function generateNoContextResponse(state: AssistantChainState) {
+const generateNoContextResponse = async (state: AssistantChainState) => {
   const chatHistory = formatChatHistory(state.chatHistory);
   const finalAnswer = await generateNoContextAnswer(
     state.userInput,
     chatHistory
   );
   return { finalAnswer };
-}
+};
 
-async function fetchContextDocuments(state: AssistantChainState) {
+const fetchContextDocuments = async (state: AssistantChainState) => {
+  if (!config.ai.enabled) {
+    return { contextDocuments: [] };
+  }
+
   const [nodeResults, documentResults] = await Promise.all([
-    nodeRetrievalService.retrieve(
+    retrieveNodes(
       state.rewrittenQuery,
       state.workspaceId,
       state.userId,
-      configuration.ai.retrieval.hybridSearch.maxResults,
+      config.ai.retrieval.hybridSearch.maxResults,
       state.selectedContextNodeIds
     ),
-    documentRetrievalService.retrieve(
+    retrieveDocuments(
       state.rewrittenQuery,
       state.workspaceId,
       state.userId,
-      configuration.ai.retrieval.hybridSearch.maxResults,
+      config.ai.retrieval.hybridSearch.maxResults,
       state.selectedContextNodeIds
     ),
   ]);
@@ -79,7 +83,7 @@ async function fetchContextDocuments(state: AssistantChainState) {
   if (state.databaseFilters.shouldFilter) {
     const filteredRecords = await Promise.all(
       state.databaseFilters.filters.map(async (filter) => {
-        const records = await recordsRetrievalService.retrieveByFilters(
+        const records = await retrieveByFilters(
           filter.databaseId,
           state.workspaceId,
           state.userId,
@@ -112,9 +116,9 @@ async function fetchContextDocuments(state: AssistantChainState) {
   return {
     contextDocuments: [...nodeResults, ...documentResults, ...databaseResults],
   };
-}
+};
 
-async function fetchChatHistory(state: AssistantChainState) {
+const fetchChatHistory = async (state: AssistantChainState) => {
   const messages = await database
     .selectFrom('nodes')
     .where('parent_id', '=', state.parentMessageId)
@@ -146,9 +150,9 @@ async function fetchChatHistory(state: AssistantChainState) {
   });
 
   return { chatHistory };
-}
+};
 
-async function rerankContextDocuments(state: AssistantChainState) {
+const rerankContextDocuments = async (state: AssistantChainState) => {
   const docsForRerank = state.contextDocuments.map((doc) => ({
     content: doc.pageContent,
     type: doc.metadata.type,
@@ -160,9 +164,9 @@ async function rerankContextDocuments(state: AssistantChainState) {
   );
 
   return { rerankedContext };
-}
+};
 
-async function selectRelevantDocuments(state: AssistantChainState) {
+const selectRelevantDocuments = async (state: AssistantChainState) => {
   if (state.rerankedContext.length === 0) {
     return { topContext: [] };
   }
@@ -189,17 +193,17 @@ async function selectRelevantDocuments(state: AssistantChainState) {
   });
 
   return { topContext };
-}
+};
 
-async function fetchWorkspaceDetails(workspaceId: string) {
+const fetchWorkspaceDetails = async (workspaceId: string) => {
   return database
     .selectFrom('workspaces')
     .where('id', '=', workspaceId)
     .select(['name', 'id'])
     .executeTakeFirst();
-}
+};
 
-async function generateResponse(state: AssistantChainState) {
+const generateResponse = async (state: AssistantChainState) => {
   const workspace = await fetchWorkspaceDetails(state.workspaceId);
   const formattedChatHistory = formatChatHistory(state.chatHistory);
   const formattedContext = formatContextDocuments(state.topContext);
@@ -216,9 +220,9 @@ async function generateResponse(state: AssistantChainState) {
   });
 
   return { finalAnswer: result.answer, citations: result.citations };
-}
+};
 
-async function fetchDatabaseContext(state: AssistantChainState) {
+const fetchDatabaseContext = async (state: AssistantChainState) => {
   const databases = await database
     .selectFrom('nodes as n')
     .innerJoin('collaborations as c', 'c.node_id', 'n.root_id')
@@ -232,7 +236,7 @@ async function fetchDatabaseContext(state: AssistantChainState) {
   const databaseContext: DatabaseContextItem[] = await Promise.all(
     databases.map(async (db) => {
       const dbNode = db as SelectNode;
-      const sampleRecords = await recordsRetrievalService.retrieveByFilters(
+      const sampleRecords = await retrieveByFilters(
         db.id,
         state.workspaceId,
         state.userId,
@@ -261,9 +265,9 @@ async function fetchDatabaseContext(state: AssistantChainState) {
   );
 
   return { databaseContext };
-}
+};
 
-async function generateDatabaseFilterAttributes(state: AssistantChainState) {
+const generateDatabaseFilterAttributes = async (state: AssistantChainState) => {
   if (state.intent === 'no_context' || !state.databaseContext.length) {
     return {
       databaseFilters: { shouldFilter: false, filters: [] } as DatabaseFilters,
@@ -275,7 +279,7 @@ async function generateDatabaseFilterAttributes(state: AssistantChainState) {
   });
 
   return { databaseFilters };
-}
+};
 
 const assistantResponseChain = new StateGraph(ResponseState)
   .addNode('generateRewrittenQuery', generateRewrittenQuery)
@@ -303,15 +307,18 @@ const assistantResponseChain = new StateGraph(ResponseState)
   .addEdge('generateNoContextResponse', '__end__')
   .compile();
 
-const langfuseCallback = configuration.ai.langfuse.enabled
-  ? new CallbackHandler({
-      publicKey: configuration.ai.langfuse.publicKey,
-      secretKey: configuration.ai.langfuse.secretKey,
-      baseUrl: configuration.ai.langfuse.baseUrl,
-    })
-  : undefined;
+const langfuseCallback =
+  config.ai.enabled && config.ai.langfuse.enabled
+    ? new CallbackHandler({
+        publicKey: config.ai.langfuse.publicKey,
+        secretKey: config.ai.langfuse.secretKey,
+        baseUrl: config.ai.langfuse.baseUrl,
+      })
+    : undefined;
 
-async function getFullContextNodeIds(selectedIds: string[]): Promise<string[]> {
+const getFullContextNodeIds = async (
+  selectedIds: string[]
+): Promise<string[]> => {
   const fullSet = new Set<string>();
   for (const id of selectedIds) {
     fullSet.add(id);
@@ -324,11 +331,11 @@ async function getFullContextNodeIds(selectedIds: string[]): Promise<string[]> {
   }
 
   return Array.from(fullSet);
-}
+};
 
-export async function runAssistantResponseChain(
+export const runAssistantResponseChain = async (
   input: AssistantInput
-): Promise<AssistantResponse> {
+): Promise<AssistantResponse> => {
   let fullContextNodeIds: string[] = [];
   if (input.selectedContextNodeIds && input.selectedContextNodeIds.length > 0) {
     fullContextNodeIds = await getFullContextNodeIds(
@@ -349,4 +356,4 @@ export async function runAssistantResponseChain(
     callbacks,
   });
   return { finalAnswer: result.finalAnswer, citations: result.citations };
-}
+};

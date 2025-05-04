@@ -2,9 +2,9 @@ import { OpenAIEmbeddings } from '@langchain/openai';
 import { sql } from 'kysely';
 import { getNodeModel } from '@colanode/core';
 
-import { chunkText } from '@/lib/chunking';
+import { chunkText } from '@/lib/ai/chunking';
 import { database } from '@/data/database';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import { CreateNodeEmbedding } from '@/data/schema';
 import { fetchNode } from '@/lib/nodes';
 
@@ -25,7 +25,7 @@ export const embedNodeHandler = async (input: {
   type: 'embed_node';
   nodeId: string;
 }) => {
-  if (!configuration.ai.enabled) {
+  if (!config.ai.enabled) {
     return;
   }
 
@@ -60,9 +60,9 @@ export const embedNodeHandler = async (input: {
   }
 
   const embeddings = new OpenAIEmbeddings({
-    apiKey: configuration.ai.embedding.apiKey,
-    modelName: configuration.ai.embedding.modelName,
-    dimensions: configuration.ai.embedding.dimensions,
+    apiKey: config.ai.embedding.apiKey,
+    modelName: config.ai.embedding.modelName,
+    dimensions: config.ai.embedding.dimensions,
   });
 
   const existingEmbeddings = await database
@@ -118,7 +118,7 @@ export const embedNodeHandler = async (input: {
     return;
   }
 
-  const batchSize = configuration.ai.embedding.batchSize;
+  const batchSize = config.ai.embedding.batchSize;
   for (let i = 0; i < embeddingsToUpsert.length; i += batchSize) {
     const batch = embeddingsToUpsert.slice(i, i + batchSize);
     const textsToEmbed = batch.map((item) =>

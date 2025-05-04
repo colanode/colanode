@@ -10,7 +10,7 @@ import {
 import { createDocument } from '@/lib/documents';
 import { SelectAccount } from '@/data/schema';
 import { database } from '@/data/database';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import { eventBus } from '@/lib/event-bus';
 import {
   generateInitialMessageBlocks,
@@ -55,8 +55,8 @@ export const createWorkspace = async (
       name: account.name,
       email: account.email,
       avatar: account.avatar,
-      storage_limit: configuration.user.storageLimit.toString(),
-      max_file_size: configuration.user.maxFileSize.toString(),
+      storage_limit: config.user.storageLimit.toString(),
+      max_file_size: config.user.maxFileSize.toString(),
       created_at: date,
       created_by: account.id,
       status: UserStatus.Active,

@@ -1,8 +1,8 @@
 import { RecursiveCharacterTextSplitter } from 'langchain/text_splitter';
 import type { NodeType } from '@colanode/core';
 
-import { configuration } from '@/lib/configuration';
-import { enrichChunk } from '@/services/llm-service';
+import { config } from '@/lib/config';
+import { enrichChunk } from '@/lib/ai/llms';
 import { TextChunk } from '@/types/chunking';
 
 export const chunkText = async (
@@ -10,8 +10,12 @@ export const chunkText = async (
   existingChunks: TextChunk[],
   nodeType: NodeType
 ): Promise<TextChunk[]> => {
-  const chunkSize = configuration.ai.chunking.defaultChunkSize;
-  const chunkOverlap = configuration.ai.chunking.defaultOverlap;
+  if (!config.ai.enabled) {
+    return [];
+  }
+
+  const chunkSize = config.ai.chunking.defaultChunkSize;
+  const chunkOverlap = config.ai.chunking.defaultOverlap;
   const splitter = new RecursiveCharacterTextSplitter({
     chunkSize,
     chunkOverlap,
@@ -22,7 +26,7 @@ export const chunkText = async (
     .map((doc) => ({ text: doc.pageContent }))
     .filter((c) => c.text.trim().length > 5);
 
-  if (!configuration.ai.chunking.enhanceWithContext) {
+  if (!config.ai.chunking.enhanceWithContext) {
     return chunks;
   }
 

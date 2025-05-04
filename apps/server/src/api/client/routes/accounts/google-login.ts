@@ -12,7 +12,7 @@ import {
 import axios from 'axios';
 
 import { database } from '@/data/database';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import { buildLoginSuccessOutput } from '@/lib/accounts';
 
 const GoogleUserInfoUrl = 'https://www.googleapis.com/oauth2/v1/userinfo';
@@ -34,7 +34,7 @@ export const googleLoginRoute: FastifyPluginCallbackZod = (
       },
     },
     handler: async (request, reply) => {
-      if (!configuration.account.allowGoogleLogin) {
+      if (!config.account.allowGoogleLogin) {
         return reply.code(400).send({
           code: ApiErrorCode.GoogleAuthFailed,
           message: 'Google login is not allowed.',

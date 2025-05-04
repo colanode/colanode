@@ -10,7 +10,7 @@ import {
 } from '@colanode/core';
 
 import { avatarS3 } from '@/data/storage';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 
 export const avatarUploadRoute: FastifyPluginCallbackZod = (
   instance,
@@ -64,7 +64,7 @@ export const avatarUploadRoute: FastifyPluginCallbackZod = (
 
         const avatarId = generateId(IdType.Avatar);
         const command = new PutObjectCommand({
-          Bucket: configuration.avatarS3.bucketName,
+          Bucket: config.avatarS3.bucketName,
           Key: `avatars/${avatarId}.jpeg`,
           Body: jpegBuffer,
           ContentType: 'image/jpeg',

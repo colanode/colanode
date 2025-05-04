@@ -4,7 +4,7 @@ import { StringOutputParser } from '@langchain/core/output_parsers';
 import { Document } from '@langchain/core/documents';
 import { NodeType, RecordNode } from '@colanode/core';
 
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import {
   rerankedDocumentsSchema,
   RerankedDocuments,
@@ -24,17 +24,16 @@ import {
   noContextPrompt,
   databaseFilterPrompt,
   chunkSummarizationPrompt,
-} from '@/lib/llm-prompts';
+} from '@/lib/ai/prompts';
 
-const getChatModel = (
-  task: keyof typeof configuration.ai.models
-): ChatOpenAI | ChatGoogleGenerativeAI => {
-  const modelConfig = configuration.ai.models[task];
-  if (!configuration.ai.enabled) {
+const getChatModel = (task: string): ChatOpenAI | ChatGoogleGenerativeAI => {
+  if (!config.ai.enabled) {
     throw new Error('AI is disabled.');
   }
 
-  const providerConfig = configuration.ai.providers[modelConfig.provider];
+  const modelConfig = config.ai.models[task as keyof typeof config.ai.models];
+
+  const providerConfig = config.ai.providers[modelConfig.provider];
   if (!providerConfig.enabled) {
     throw new Error(`${modelConfig.provider} provider is disabled.`);
   }

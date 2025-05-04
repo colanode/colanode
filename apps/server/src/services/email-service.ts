@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import { createDebugger } from '@colanode/core';
 
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 
 interface EmailMessage {
   to: string | string[];
@@ -14,29 +14,22 @@ const debug = createDebugger('server:service:email');
 
 class EmailService {
   private transporter: nodemailer.Transporter | undefined;
-
-  constructor() {}
+  private from: string | undefined;
 
   public async init() {
-    if (
-      !configuration.smtp.host ||
-      !configuration.smtp.port ||
-      !configuration.smtp.user ||
-      !configuration.smtp.password ||
-      !configuration.smtp.from.email ||
-      !configuration.smtp.from.name
-    ) {
+    if (!config.smtp.enabled) {
       debug('SMTP configuration is not set, skipping initialization');
       return;
     }
 
+    this.from = `${config.smtp.from.name} <${config.smtp.from.email}>`;
     this.transporter = nodemailer.createTransport({
-      host: configuration.smtp.host,
-      port: configuration.smtp.port,
-      secure: configuration.smtp.secure,
+      host: config.smtp.host,
+      port: config.smtp.port,
+      secure: config.smtp.secure,
       auth: {
-        user: configuration.smtp.user,
-        pass: configuration.smtp.password,
+        user: config.smtp.user,
+        pass: config.smtp.password,
       },
     });
 
@@ -44,13 +37,13 @@ class EmailService {
   }
 
   public async sendEmail(message: EmailMessage): Promise<void> {
-    if (!this.transporter) {
+    if (!this.transporter || !this.from) {
       debug('Email service not initialized, skipping email send');
       return;
     }
 
     await this.transporter.sendMail({
-      from: `${configuration.smtp.from.name} <${configuration.smtp.from.email}>`,
+      from: this.from,
       ...message,
     });
   }

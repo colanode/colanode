@@ -9,7 +9,7 @@ import {
 
 import { database } from '@/data/database';
 import { isAuthEmailRateLimited } from '@/lib/rate-limits';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import {
   buildLoginSuccessOutput,
   buildLoginVerifyOutput,
@@ -59,7 +59,7 @@ export const emailLoginRoute: FastifyPluginCallbackZod = (
       }
 
       if (account.status === AccountStatus.Unverified) {
-        if (configuration.account.verificationType === 'email') {
+        if (config.account.verificationType === 'email') {
           const output = await buildLoginVerifyOutput(account);
           return output;
         }

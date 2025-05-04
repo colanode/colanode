@@ -12,7 +12,7 @@ import { createDebugger } from '@colanode/core';
 
 import { databaseMigrations } from '@/data/migrations';
 import { DatabaseSchema } from '@/data/schema';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 
 const debug = createDebugger('server:database');
 
@@ -26,11 +26,11 @@ pg.types.setTypeParser(pg.types.builtins.INT4, (val) => {
 
 const dialect = new PostgresDialect({
   pool: new pg.Pool({
-    connectionString: configuration.postgres.url,
+    connectionString: config.postgres.url,
     ssl:
-      configuration.postgres.ssl &&
-      Object.values(configuration.postgres.ssl).some((value) => value)
-        ? configuration.postgres.ssl
+      config.postgres.ssl &&
+      Object.values(config.postgres.ssl).some((value) => value)
+        ? config.postgres.ssl
         : undefined,
   }),
 });

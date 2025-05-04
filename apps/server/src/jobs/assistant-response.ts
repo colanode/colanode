@@ -7,10 +7,10 @@ import {
 } from '@colanode/core';
 
 import { database } from '@/data/database';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import { fetchNode, createNode } from '@/lib/nodes';
 import { JobHandler } from '@/types/jobs';
-import { runAssistantResponseChain } from '@/lib/assistant';
+import { runAssistantResponseChain } from '@/lib/ai/assistants';
 import { SelectNode } from '@/data/schema';
 import { Citation } from '@/types/assistant';
 
@@ -39,7 +39,7 @@ export const assistantResponseHandler: JobHandler<
     selectedContextNodeIds,
   });
 
-  if (!configuration.ai.enabled) {
+  if (!config.ai.enabled) {
     return;
   }
 

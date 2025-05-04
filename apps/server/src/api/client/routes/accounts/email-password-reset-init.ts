@@ -11,7 +11,7 @@ import {
 
 import { database } from '@/data/database';
 import { isAuthEmailRateLimited } from '@/lib/rate-limits';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import { generateOtpCode, saveOtp } from '@/lib/otps';
 import { AccountPasswordResetOtpAttributes, Otp } from '@/types/otps';
 import { jobService } from '@/services/job-service';
@@ -45,9 +45,7 @@ export const emailPasswordResetInitRoute: FastifyPluginCallbackZod = (
       }
 
       const id = generateId(IdType.OtpCode);
-      const expiresAt = new Date(
-        Date.now() + configuration.account.otpTimeout * 1000
-      );
+      const expiresAt = new Date(Date.now() + config.account.otpTimeout * 1000);
       const otpCode = await generateOtpCode();
 
       const account = await database

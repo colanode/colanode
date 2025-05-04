@@ -2,7 +2,7 @@ import { generateId, IdType } from '@colanode/core';
 
 import { Event } from '@/types/events';
 import { redis } from '@/data/redis';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 
 export interface Subscription {
   id: string;
@@ -38,14 +38,14 @@ export class EventBusService {
 
     this.initialized = true;
 
-    if (configuration.server.mode === 'standalone') {
+    if (config.server.mode === 'standalone') {
       return;
     }
 
     const client = redis.duplicate();
     await client.connect();
 
-    client.subscribe(configuration.redis.eventsChannel, (message) => {
+    client.subscribe(config.redis.eventsChannel, (message) => {
       const envelope = JSON.parse(message) as DistributedEventEnvelope;
       if (envelope.hostId === this.hostId) {
         return;
@@ -73,12 +73,12 @@ export class EventBusService {
   public publish(event: Event) {
     this.processEvent(event);
 
-    if (configuration.server.mode === 'standalone') {
+    if (config.server.mode === 'standalone') {
       return;
     }
 
     redis.publish(
-      configuration.redis.eventsChannel,
+      config.redis.eventsChannel,
       JSON.stringify({ event, hostId: this.hostId })
     );
   }

@@ -6,7 +6,7 @@ import { ApiErrorCode } from '@colanode/core';
 import { Readable } from 'stream';
 
 import { avatarS3 } from '@/data/storage';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 
 export const avatarDownloadRoute: FastifyPluginCallbackZod = (
   instance,
@@ -25,7 +25,7 @@ export const avatarDownloadRoute: FastifyPluginCallbackZod = (
       try {
         const avatarId = request.params.avatarId;
         const command = new GetObjectCommand({
-          Bucket: configuration.avatarS3.bucketName,
+          Bucket: config.avatarS3.bucketName,
           Key: `avatars/${avatarId}.jpeg`,
         });
 

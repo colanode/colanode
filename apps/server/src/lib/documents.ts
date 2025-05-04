@@ -15,7 +15,7 @@ import { ConcurrentUpdateResult, UpdateDocumentOutput } from '@/types/nodes';
 import { eventBus } from '@/lib/event-bus';
 import { fetchNode, fetchNodeTree, mapNode } from '@/lib/nodes';
 import { CreateDocumentInput, CreateDocumentOutput } from '@/types/documents';
-import { scheduleDocumentEmbedding } from '@/lib/embeddings';
+import { scheduleDocumentEmbedding } from '@/lib/ai/embeddings';
 
 const debug = createDebugger('server:lib:documents');
 

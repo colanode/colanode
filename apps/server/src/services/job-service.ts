@@ -1,7 +1,7 @@
 import { Job, JobsOptions, Queue, Worker } from 'bullmq';
 import { createDebugger } from '@colanode/core';
 
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import { jobHandlerMap } from '@/jobs';
 import { JobHandler, JobInput } from '@/types/jobs';
 
@@ -17,8 +17,8 @@ class JobService {
 
   // for more information, see: https://docs.bullmq.io/bull/patterns/redis-cluster
 
-  private readonly queueName = configuration.redis.jobs.name;
-  private readonly prefix = `{${configuration.redis.jobs.prefix}}`;
+  private readonly queueName = config.redis.jobs.name;
+  private readonly prefix = `{${config.redis.jobs.prefix}}`;
 
   public initQueue() {
     if (this.jobQueue) {
@@ -28,8 +28,8 @@ class JobService {
     this.jobQueue = new Queue(this.queueName, {
       prefix: this.prefix,
       connection: {
-        db: configuration.redis.db,
-        url: configuration.redis.url,
+        db: config.redis.db,
+        url: config.redis.url,
       },
       defaultJobOptions: {
         removeOnComplete: true,
@@ -40,7 +40,7 @@ class JobService {
       debug(`Job queue error: ${error}`);
     });
 
-    if (configuration.ai.enabled) {
+    if (config.ai.enabled) {
       this.jobQueue.upsertJobScheduler(
         'check_node_embeddings',
         { pattern: '0 */30 * * * *' },
@@ -79,8 +79,8 @@ class JobService {
     this.jobWorker = new Worker(this.queueName, this.handleJobJob, {
       prefix: this.prefix,
       connection: {
-        url: configuration.redis.url,
-        db: configuration.redis.db,
+        url: config.redis.url,
+        db: config.redis.db,
       },
     });
   }

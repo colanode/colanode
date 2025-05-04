@@ -1,12 +1,12 @@
 import { extractDocumentText } from '@colanode/core';
 
 import { database } from '@/data/database';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import {
   fetchEmbeddingCursor,
   scheduleDocumentEmbedding,
   updateEmbeddingCursor,
-} from '@/lib/embeddings';
+} from '@/lib/ai/embeddings';
 
 const BATCH_SIZE = 100;
 
@@ -23,7 +23,7 @@ declare module '@/types/jobs' {
 }
 
 export const checkDocumentEmbeddingsHandler = async () => {
-  if (!configuration.ai.enabled) {
+  if (!config.ai.enabled) {
     return;
   }
 

@@ -7,7 +7,7 @@ import {
 import { FileAttributes } from '@colanode/core';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import { fileS3 } from '@/data/storage';
 
 export const buildFilePath = (
@@ -24,7 +24,7 @@ export const buildUploadUrl = async (
   mimeType: string
 ) => {
   const command = new PutObjectCommand({
-    Bucket: configuration.fileS3.bucketName,
+    Bucket: config.fileS3.bucketName,
     Key: path,
     ContentLength: size,
     ContentType: mimeType,
@@ -40,7 +40,7 @@ export const buildUploadUrl = async (
 
 export const buildDownloadUrl = async (path: string) => {
   const command = new GetObjectCommand({
-    Bucket: configuration.fileS3.bucketName,
+    Bucket: config.fileS3.bucketName,
     Key: path,
   });
 
@@ -53,7 +53,7 @@ export const buildDownloadUrl = async (path: string) => {
 
 export const fetchFileMetadata = async (path: string) => {
   const command = new HeadObjectCommand({
-    Bucket: configuration.fileS3.bucketName,
+    Bucket: config.fileS3.bucketName,
     Key: path,
   });
 
@@ -70,7 +70,7 @@ export const fetchFileMetadata = async (path: string) => {
 
 export const deleteFile = async (path: string) => {
   const command = new DeleteObjectCommand({
-    Bucket: configuration.fileS3.bucketName,
+    Bucket: config.fileS3.bucketName,
     Key: path,
   });
 

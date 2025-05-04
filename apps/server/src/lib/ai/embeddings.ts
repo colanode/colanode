@@ -2,7 +2,7 @@ import { MessageAttributes } from '@colanode/core';
 
 import { redis } from '@/data/redis';
 import { SelectNode } from '@/data/schema';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import { jobService } from '@/services/job-service';
 
 export const fetchEmbeddingCursor = async (
@@ -28,7 +28,7 @@ export const deleteEmbeddingCursor = async (cursorId: string) => {
 };
 
 export const scheduleNodeEmbedding = async (node: SelectNode) => {
-  if (!configuration.ai.enabled) {
+  if (!config.ai.enabled) {
     return;
   }
 
@@ -45,7 +45,7 @@ export const scheduleNodeEmbedding = async (node: SelectNode) => {
 
   // Only add delay for non-message nodes
   if (node.type !== 'message') {
-    jobOptions.delay = configuration.ai.nodeEmbeddingDelay;
+    jobOptions.delay = config.ai.nodeEmbeddingDelay;
   }
 
   await jobService.addJob(
@@ -58,7 +58,7 @@ export const scheduleNodeEmbedding = async (node: SelectNode) => {
 };
 
 export const scheduleDocumentEmbedding = async (documentId: string) => {
-  if (!configuration.ai.enabled) {
+  if (!config.ai.enabled) {
     return;
   }
 
@@ -69,7 +69,7 @@ export const scheduleDocumentEmbedding = async (documentId: string) => {
     },
     {
       jobId: `embed_document:${documentId}`,
-      delay: configuration.ai.documentEmbeddingDelay,
+      delay: config.ai.documentEmbeddingDelay,
     }
   );
 };

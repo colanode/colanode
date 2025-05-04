@@ -12,7 +12,7 @@ import {
 import { database } from '@/data/database';
 import { SelectAccount } from '@/data/schema';
 import { isAuthEmailRateLimited } from '@/lib/rate-limits';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import {
   buildLoginSuccessOutput,
   buildLoginVerifyOutput,
@@ -58,7 +58,7 @@ export const emailRegisterRoute: FastifyPluginCallbackZod = (
       let account: SelectAccount | null | undefined = null;
 
       const status =
-        configuration.account.verificationType === 'automatic'
+        config.account.verificationType === 'automatic'
           ? AccountStatus.Active
           : AccountStatus.Unverified;
 
@@ -104,7 +104,7 @@ export const emailRegisterRoute: FastifyPluginCallbackZod = (
       }
 
       if (account.status === AccountStatus.Unverified) {
-        if (configuration.account.verificationType === 'email') {
+        if (config.account.verificationType === 'email') {
           const output = await buildLoginVerifyOutput(account);
           return output;
         }

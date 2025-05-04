@@ -9,7 +9,7 @@ import {
 } from '@colanode/core';
 import argon2 from '@node-rs/argon2';
 
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import { database } from '@/data/database';
 import { SelectAccount } from '@/data/schema';
 import { generateToken } from '@/lib/tokens';
@@ -137,9 +137,7 @@ export const buildLoginVerifyOutput = async (
   account: SelectAccount
 ): Promise<LoginVerifyOutput> => {
   const id = generateId(IdType.OtpCode);
-  const expiresAt = new Date(
-    Date.now() + configuration.account.otpTimeout * 1000
-  );
+  const expiresAt = new Date(Date.now() + config.account.otpTimeout * 1000);
   const otpCode = await generateOtpCode();
 
   const otp: Otp<AccountVerifyOtpAttributes> = {

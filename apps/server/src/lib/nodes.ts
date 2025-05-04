@@ -39,7 +39,7 @@ import {
 } from '@/lib/collaborations';
 import { jobService } from '@/services/job-service';
 import { deleteFile } from '@/lib/files';
-import { scheduleNodeEmbedding } from '@/lib/embeddings';
+import { scheduleNodeEmbedding } from '@/lib/ai/embeddings';
 
 const debug = createDebugger('server:lib:nodes');
 

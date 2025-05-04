@@ -1,12 +1,12 @@
 import { getNodeModel } from '@colanode/core';
 
 import { database } from '@/data/database';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 import {
   fetchEmbeddingCursor,
   scheduleNodeEmbedding,
   updateEmbeddingCursor,
-} from '@/lib/embeddings';
+} from '@/lib/ai/embeddings';
 
 const BATCH_SIZE = 100;
 
@@ -23,7 +23,7 @@ declare module '@/types/jobs' {
 }
 
 export const checkNodeEmbeddingsHandler = async () => {
-  if (!configuration.ai.enabled) {
+  if (!config.ai.enabled) {
     return;
   }
 

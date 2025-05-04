@@ -16,7 +16,7 @@ import { database } from '@/data/database';
 import { getNameFromEmail } from '@/lib/utils';
 import { SelectAccount } from '@/data/schema';
 import { eventBus } from '@/lib/event-bus';
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 
 export const userCreateRoute: FastifyPluginCallbackZod = (
   instance,
@@ -95,8 +95,8 @@ export const userCreateRoute: FastifyPluginCallbackZod = (
             name: account.name,
             email: account.email,
             avatar: account.avatar,
-            storage_limit: configuration.user.storageLimit.toString(),
-            max_file_size: configuration.user.maxFileSize.toString(),
+            storage_limit: config.user.storageLimit.toString(),
+            max_file_size: config.user.maxFileSize.toString(),
             created_at: new Date(),
             created_by: request.account.id,
             status: UserStatus.Active,

@@ -1,10 +1,10 @@
 import { createClient } from 'redis';
 
-import { configuration } from '@/lib/configuration';
+import { config } from '@/lib/config';
 
 export const redis = createClient({
-  url: configuration.redis.url,
-  database: configuration.redis.db,
+  url: config.redis.url,
+  database: config.redis.db,
 });
 
 export const initRedis = async () => {
