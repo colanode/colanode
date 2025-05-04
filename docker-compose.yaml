@@ -7,7 +7,7 @@ services:
     restart: always
     environment:
       POSTGRES_USER: colanode_user
-      POSTGRES_PASSWORD: your_postgres_password
+      POSTGRES_PASSWORD: postgrespass123
       POSTGRES_DB: colanode_db
     volumes:
       - postgres_data:/var/lib/postgresql/data
@@ -16,20 +16,20 @@ services:
     networks:
       - colanode_network
 
-  redis:
-    image: redis:7
-    container_name: colanode_redis
+  valkey:
+    image: valkey/valkey:8.1
+    container_name: colanode_valkey
     restart: always
-    command: ['redis-server', '--requirepass', 'your_redis_password']
+    command: ['valkey-server', '--requirepass', 'your_valkey_password']
     volumes:
-      - redis_data:/data
+      - valkey_data:/data
     ports:
       - '6379:6379'
     networks:
       - colanode_network
 
   minio:
-    image: minio/minio
+    image: minio/minio:RELEASE.2025-04-08T15-41-24Z
     container_name: colanode_minio
     restart: always
     environment:
@@ -49,6 +49,24 @@ services:
     networks:
       - colanode_network
 
+  # ---------------------------------------------------------------
+  # Optional SMTP Server (Mailpit) for Local Email Testing
+  # ---------------------------------------------------------------
+  # This service runs Mailpit, a local SMTP testing tool.
+  # If you configure the 'server' service to use a real SMTP provider,
+  # you can comment out or remove this entire 'smtp' service block.
+  # Access the Mailpit UI at http://localhost:8025
+  # ---------------------------------------------------------------
+  smtp:
+    image: axllent/mailpit:v1.24.1
+    container_name: colanode_smtp
+    restart: always
+    ports:
+      - '1025:1025' # SMTP IN (Connect server service to this port)
+      - '8025:8025' # Web UI
+    networks:
+      - colanode_network
+
   server:
     build:
       context: .
@@ -58,8 +76,9 @@ services:
     restart: always
     depends_on:
       - postgres
-      - redis
+      - valkey
       - minio
+      # - smtp # Optional
     environment:
       # ───────────────────────────────────────────────────────────────
       # General Node/Server Config
@@ -91,7 +110,7 @@ services:
       # PostgreSQL Configuration
       # ───────────────────────────────────────────────────────────────
       # The server expects a PostgreSQL database with the pgvector extension installed.
-      POSTGRES_URL: 'postgres://colanode_user:your_postgres_password@postgres:5432/colanode_db'
+      POSTGRES_URL: 'postgres://colanode_user:postgrespass123@postgres:5432/colanode_db'
 
       # Optional variables for SSL connection to the database
       POSTGRES_SSL_REJECT_UNAUTHORIZED: 'false'
@@ -102,7 +121,7 @@ services:
       # ───────────────────────────────────────────────────────────────
       # Redis Configuration
       # ───────────────────────────────────────────────────────────────
-      REDIS_URL: 'redis://:your_redis_password@redis:6379/0'
+      REDIS_URL: 'redis://:your_valkey_password@valkey:6379/0'
       REDIS_DB: '0'
       # Optional variables:
       REDIS_JOBS_QUEUE_NAME: 'jobs'
@@ -130,15 +149,26 @@ services:
       S3_FILES_FORCE_PATH_STYLE: 'true'
 
       # ───────────────────────────────────────────────────────────────
-      # SMTP Configuration
-      # ───────────────────────────────────────────────────────────────
-      SMTP_HOST: 'your_smtp_host'
-      SMTP_PORT: '587'
-      SMTP_USER: 'your_smtp_user'
-      SMTP_PASSWORD: 'your_smtp_password'
-      # configuration.ts requires SMTP_EMAIL_FROM and SMTP_EMAIL_FROM_NAME
+      # SMTP configuration
+      # ---------------------------------------------------------------
+      # If using the local Mailpit service (defined above), use:
+      # SMTP_HOST: 'smtp'
+      # SMTP_PORT: '1025'
+      # SMTP_USER: ''
+      # SMTP_PASSWORD: ''
+      #
+      # If using a real SMTP provider, update these:
+      # SMTP_HOST: 'your_smtp_provider_host'
+      # SMTP_PORT: '587' # Or 465, etc.
+      # SMTP_USER: 'your_smtp_username'
+      # SMTP_PASSWORD: 'your_smtp_password'
+      # ---------------------------------------------------------------
+      SMTP_HOST: 'smtp' # Defaulting to Mailpit service name
+      SMTP_PORT: '1025' # Defaulting to Mailpit port
+      SMTP_USER: ''
+      SMTP_PASSWORD: ''
       SMTP_EMAIL_FROM: 'your_email@example.com'
-      SMTP_EMAIL_FROM_NAME: 'ColaNode'
+      SMTP_EMAIL_FROM_NAME: 'Colanode'
 
       # ───────────────────────────────────────────────────────────────
       # AI Configuration
@@ -226,7 +256,7 @@ services:
 
 volumes:
   postgres_data:
-  redis_data:
+  valkey_data:
   minio_data:
 
 networks:
