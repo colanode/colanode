@@ -60,7 +60,7 @@ services:
   #
   # Access the Mailpit UI at http://localhost:8025
   # ---------------------------------------------------------------
-  #smtp:
+  # smtp:
   #  image: axllent/mailpit:v1.24.1
   #  container_name: colanode_smtp
   #  restart: always
