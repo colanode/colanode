@@ -53,19 +53,22 @@ services:
   # Optional SMTP Server (Mailpit) for Local Email Testing
   # ---------------------------------------------------------------
   # This service runs Mailpit, a local SMTP testing tool.
-  # If you configure the 'server' service to use a real SMTP provider,
-  # you can comment out or remove this entire 'smtp' service block.
+  # If you want to test how emails are sent in the 'server' service,
+  # you can uncomment the 'smtp' service block and configure the
+  # SMTP_ENABLED variable to 'true' in the 'server' service environment
+  # variables.
+  #
   # Access the Mailpit UI at http://localhost:8025
   # ---------------------------------------------------------------
-  smtp:
-    image: axllent/mailpit:v1.24.1
-    container_name: colanode_smtp
-    restart: always
-    ports:
-      - '1025:1025' # SMTP IN (Connect server service to this port)
-      - '8025:8025' # Web UI
-    networks:
-      - colanode_network
+  #smtp:
+  #  image: axllent/mailpit:v1.24.1
+  #  container_name: colanode_smtp
+  #  restart: always
+  #  ports:
+  #    - '1025:1025' # SMTP IN (Connect server service to this port)
+  #    - '8025:8025' # Web UI
+  #  networks:
+  #    - colanode_network
 
   server:
     build:
@@ -151,8 +154,9 @@ services:
       # ───────────────────────────────────────────────────────────────
       # SMTP configuration
       # ---------------------------------------------------------------
-      # If you don't want to use SMTP, set:
-      # SMTP_ENABLED: 'false'
+      # We leave the SMTP configuration disabled by default.
+      # ---------------------------------------------------------------
+      SMTP_ENABLED: 'false'
       # ---------------------------------------------------------------
       # If using the local Mailpit service (defined above), use:
       # SMTP_ENABLED: 'true'
@@ -172,91 +176,14 @@ services:
       # SMTP_EMAIL_FROM: 'your_email@example.com'
       # SMTP_EMAIL_FROM_NAME: 'Colanode'
       # ---------------------------------------------------------------
-      SMTP_ENABLED: 'true'
-      SMTP_HOST: 'smtp' # Defaulting to Mailpit service name
-      SMTP_PORT: '1025' # Defaulting to Mailpit port
-      SMTP_USER: ''
-      SMTP_PASSWORD: ''
-      SMTP_EMAIL_FROM: 'your_email@example.com'
-      SMTP_EMAIL_FROM_NAME: 'Colanode'
 
       # ───────────────────────────────────────────────────────────────
       # AI Configuration
-      # ───────────────────────────────────────────────────────────────
+      # ---------------------------------------------------------------
+      # The AI integration is in experimental mode yet and we don't
+      # recommend using it.
+      # ---------------------------------------------------------------
       AI_ENABLED: 'false'
-      AI_NODE_EMBEDDING_DELAY: '5000'
-      AI_DOCUMENT_EMBEDDING_DELAY: '10000'
-
-      # OpenAI Provider
-      OPENAI_API_KEY: 'your_openai_api_key'
-      OPENAI_ENABLED: 'true'
-
-      # Google Provider
-      GOOGLE_API_KEY: 'your_google_api_key'
-      GOOGLE_ENABLED: 'true'
-
-      # Langfuse Configuration
-      LANGFUSE_ENABLED: 'false'
-      LANGFUSE_PUBLIC_KEY: 'your_langfuse_public_key'
-      LANGFUSE_SECRET_KEY: 'your_langfuse_secret_key'
-      LANGFUSE_BASE_URL: 'http://localhost:3005'
-
-      # Intent Recognition Model
-      INTENT_RECOGNITION_PROVIDER: 'google'
-      INTENT_RECOGNITION_MODEL: 'gemini-2.0-flash-lite'
-      INTENT_RECOGNITION_TEMPERATURE: '0.5'
-
-      # Query Rewrite Model
-      QUERY_REWRITE_PROVIDER: 'openai'
-      QUERY_REWRITE_MODEL: 'gpt-4o-mini'
-      QUERY_REWRITE_TEMPERATURE: '0.3'
-
-      # Response Model
-      RESPONSE_PROVIDER: 'google'
-      RESPONSE_MODEL: 'gemini-2.0-flash'
-      RESPONSE_TEMPERATURE: '0.6'
-
-      # Rerank Model
-      RERANK_PROVIDER: 'google'
-      RERANK_MODEL: 'gemini-2.0-flash-lite'
-      RERANK_TEMPERATURE: '0.5'
-
-      # Summarization Model
-      SUMMARIZATION_PROVIDER: 'openai'
-      SUMMARIZATION_MODEL: 'gpt-4o-mini'
-      SUMMARIZATION_TEMPERATURE: '0.3'
-
-      # Chunk Context Enhancer Model
-      CHUNK_CONTEXT_PROVIDER: 'google'
-      CHUNK_CONTEXT_MODEL: 'gemini-2.0-flash-lite'
-      CHUNK_CONTEXT_TEMPERATURE: '0.5'
-
-      # No Context Model
-      NO_CONTEXT_PROVIDER: 'openai'
-      NO_CONTEXT_MODEL: 'gpt-4o-mini'
-      NO_CONTEXT_TEMPERATURE: '0.3'
-
-      # Database Filter Model
-      DATABASE_FILTER_PROVIDER: 'google'
-      DATABASE_FILTER_MODEL: 'gemini-2.0-flash-lite'
-      DATABASE_FILTER_TEMPERATURE: '0.5'
-
-      # Embedding Model
-      EMBEDDING_PROVIDER: 'openai'
-      EMBEDDING_MODEL: 'text-embedding-3-large'
-      EMBEDDING_DIMENSIONS: '2000'
-      EMBEDDING_BATCH_SIZE: '50'
-      EMBEDDING_API_KEY: 'your_embedding_api_key'
-
-      # Chunking Configuration
-      CHUNK_DEFAULT_CHUNK_SIZE: '1000'
-      CHUNK_DEFAULT_OVERLAP: '200'
-      CHUNK_ENHANCE_WITH_CONTEXT: 'true'
-
-      # Retrieval Configuration
-      RETRIEVAL_HYBRID_SEARCH_SEMANTIC_WEIGHT: '0.7'
-      RETRIEVAL_HYBRID_SEARCH_KEYWORD_WEIGHT: '0.3'
-      RETRIEVAL_HYBRID_SEARCH_MAX_RESULTS: '20'
       # ───────────────────────────────────────────────────────────────
 
     ports:
