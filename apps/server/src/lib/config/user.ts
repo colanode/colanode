@@ -1,14 +1,8 @@
 import { z } from 'zod';
 
 export const userConfigSchema = z.object({
-  storageLimit: z.preprocess(
-    (val) => val && BigInt(val as string),
-    z.bigint().default(10737418240n)
-  ),
-  maxFileSize: z.preprocess(
-    (val) => val && BigInt(val as string),
-    z.bigint().default(104857600n)
-  ),
+  storageLimit: z.string().default('10737418240'),
+  maxFileSize: z.string().default('104857600'),
 });
 
 export type UserConfig = z.infer<typeof userConfigSchema>;

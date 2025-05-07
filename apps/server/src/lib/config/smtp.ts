@@ -7,7 +7,7 @@ export const smtpConfigSchema = z.discriminatedUnion('enabled', [
       required_error: 'SMTP_HOST is required when SMTP is enabled',
     }),
     port: z.coerce.number().default(587),
-    secure: z.preprocess((val) => val === 'true', z.boolean().default(false)),
+    secure: z.boolean().default(false),
     user: z.string({
       required_error: 'SMTP_USER is required when SMTP is enabled',
     }),
