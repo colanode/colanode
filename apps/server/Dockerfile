@@ -7,7 +7,7 @@ ARG SHA
 RUN echo "{\"version\":\"$VERSION\",\"sha\":\"$SHA\"}" > build.json
 
 # Copy root workspace files
-COPY ../../package.json ../../package-lock.json ./
+COPY package.json package-lock.json ./
 
 # Copy scripts
 COPY ../../scripts scripts
