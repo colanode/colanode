@@ -71,10 +71,7 @@ services:
   #    - colanode_network
 
   server:
-    build:
-      context: .
-      dockerfile: apps/server/Dockerfile
-    image: colanode_server
+    image: ghcr.io/colanode/server:latest
     container_name: colanode_server
     restart: always
     depends_on:
