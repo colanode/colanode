@@ -28,7 +28,7 @@ const parseBuildInfo = (): BuildInfo => {
   }
 
   try {
-    return buildInfoSchema.parse(json);
+    return buildInfoSchema.parse(JSON.parse(json));
   } catch (error) {
     console.error('Failed to parse build info:', error);
     return defaultBuildInfo;
