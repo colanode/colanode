@@ -113,10 +113,10 @@ services:
       POSTGRES_URL: 'postgres://colanode_user:postgrespass123@postgres:5432/colanode_db'
 
       # Optional variables for SSL connection to the database
-      POSTGRES_SSL_REJECT_UNAUTHORIZED: 'false'
-      POSTGRES_SSL_CA: ''
-      POSTGRES_SSL_KEY: ''
-      POSTGRES_SSL_CERT: ''
+      # POSTGRES_SSL_REJECT_UNAUTHORIZED: 'false'
+      # POSTGRES_SSL_CA: ''
+      # POSTGRES_SSL_KEY: ''
+      # POSTGRES_SSL_CERT: ''
 
       # ───────────────────────────────────────────────────────────────
       # Redis Configuration
