@@ -1,7 +1,7 @@
 import React from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { EmojiPickerRowData } from '@colanode/client/types';
 
-import { EmojiPickerRowData } from '@/shared/types/emojis';
 import { useQuery } from '@/renderer/hooks/use-query';
 import { EmojiBrowserCategory } from '@/renderer/components/emojis/emoji-browser-category';
 import { EmojiBrowserItems } from '@/renderer/components/emojis/emoji-browser-items';

@@ -1,6 +1,7 @@
 import { CollaboratorFieldAttributes } from '@colanode/core';
 import { X } from 'lucide-react';
 import React from 'react';
+import { User } from '@colanode/client/types';
 
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { Badge } from '@/renderer/components/ui/badge';
@@ -14,7 +15,6 @@ import { UserSearch } from '@/renderer/components/users/user-search';
 import { useRecord } from '@/renderer/contexts/record';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQueries } from '@/renderer/hooks/use-queries';
-import { User } from '@/shared/types/users';
 
 interface RecordCollaboratorValueProps {
   field: CollaboratorFieldAttributes;

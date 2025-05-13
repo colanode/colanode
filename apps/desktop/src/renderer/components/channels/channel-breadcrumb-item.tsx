@@ -1,5 +1,6 @@
+import { LocalChannelNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
-import { LocalChannelNode } from '@/shared/types/nodes';
 
 interface ChannelBreadcrumbItemProps {
   channel: LocalChannelNode;

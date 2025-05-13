@@ -1,12 +1,11 @@
-import { formatDate } from '@colanode/core';
+import { formatBytes, formatDate } from '@colanode/core';
 import React from 'react';
+import { LocalFileNode } from '@colanode/client/types';
 
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { FileThumbnail } from '@/renderer/components/files/file-thumbnail';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { formatBytes } from '@/shared/lib/files';
-import { LocalFileNode } from '@/shared/types/nodes';
 
 interface FileSidebarProps {
   file: LocalFileNode;

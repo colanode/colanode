@@ -1,5 +1,6 @@
+import { LocalSpaceNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
-import { LocalSpaceNode } from '@/shared/types/nodes';
 
 interface SpaceBreadcrumbItemProps {
   space: LocalSpaceNode;

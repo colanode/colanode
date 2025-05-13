@@ -1,4 +1,5 @@
 import React from 'react';
+import { Account, Server } from '@colanode/client/types';
 
 import { useApp } from '@/renderer/contexts/app';
 import { EmailLogin } from '@/renderer/components/accounts/email-login';
@@ -6,8 +7,6 @@ import { EmailRegister } from '@/renderer/components/accounts/email-register';
 import { EmailVerify } from '@/renderer/components/accounts/email-verify';
 import { ServerDropdown } from '@/renderer/components/servers/server-dropdown';
 import { Separator } from '@/renderer/components/ui/separator';
-import { Account } from '@/shared/types/accounts';
-import { Server } from '@/shared/types/servers';
 import { EmailPasswordResetComplete } from '@/renderer/components/accounts/email-password-reset-complete';
 import { EmailPasswordResetInit } from '@/renderer/components/accounts/email-password-reset-init';
 

@@ -1,4 +1,5 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { LocalRecordNode } from '@colanode/client/types';
 
 import { Document } from '@/renderer/components/documents/document';
 import { RecordAttributes } from '@/renderer/components/records/record-attributes';
@@ -7,7 +8,6 @@ import { ScrollArea } from '@/renderer/components/ui/scroll-area';
 import { Separator } from '@/renderer/components/ui/separator';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { RecordDatabase } from '@/renderer/components/records/record-database';
-import { LocalRecordNode } from '@/shared/types/nodes';
 
 interface RecordBodyProps {
   record: LocalRecordNode;

@@ -1,3 +1,5 @@
+import { LocalSpaceNode } from '@colanode/client/types';
+
 import {
   Container,
   ContainerBody,
@@ -8,7 +10,6 @@ import { SpaceNotFound } from '@/renderer/components/spaces/space-not-found';
 import { useNodeRadar } from '@/renderer/hooks/use-node-radar';
 import { useNodeContainer } from '@/renderer/hooks/use-node-container';
 import { SpaceBody } from '@/renderer/components/spaces/space-body';
-import { LocalSpaceNode } from '@/shared/types/nodes';
 
 interface SpaceContainerProps {
   spaceId: string;

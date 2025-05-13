@@ -1,13 +1,12 @@
 import { extractNodeRole, isSameDay } from '@colanode/core';
 import { Plus } from 'lucide-react';
+import { LocalRecordNode } from '@colanode/client/types';
 
 import { CalendarViewRecordCard } from '@/renderer/components/databases/calendars/calendar-view-record-card';
 import { RecordProvider } from '@/renderer/components/records/record-provider';
 import { useDatabase } from '@/renderer/contexts/database';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { cn } from '@/shared/lib/utils';
-import { LocalRecordNode } from '@/shared/types/nodes';
-
 interface CalendarViewDayProps {
   date: Date;
   month: Date;

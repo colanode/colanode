@@ -1,10 +1,10 @@
 import { SquareArrowOutUpRight } from 'lucide-react';
+import { LocalFileNode } from '@colanode/client/types';
 
 import { FilePreview } from '@/renderer/components/files/file-preview';
 import { FileSidebar } from '@/renderer/components/files/file-sidebar';
 import { Button } from '@/renderer/components/ui/button';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { LocalFileNode } from '@/shared/types/nodes';
 
 interface FileBodyProps {
   file: LocalFileNode;

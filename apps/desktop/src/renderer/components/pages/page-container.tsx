@@ -1,3 +1,5 @@
+import { LocalPageNode } from '@colanode/client/types';
+
 import { PageNotFound } from '@/renderer/components/pages/page-not-found';
 import { useNodeContainer } from '@/renderer/hooks/use-node-container';
 import { useNodeRadar } from '@/renderer/hooks/use-node-radar';
@@ -10,7 +12,6 @@ import {
 } from '@/renderer/components/ui/container';
 import { ContainerBreadcrumb } from '@/renderer/components/layouts/containers/container-breadrumb';
 import { PageBody } from '@/renderer/components/pages/page-body';
-import { LocalPageNode } from '@/shared/types/nodes';
 
 interface PageContainerProps {
   pageId: string;

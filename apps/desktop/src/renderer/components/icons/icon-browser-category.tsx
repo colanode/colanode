@@ -1,4 +1,4 @@
-import { IconPickerCategoryRow } from '@/shared/types/icons';
+import { IconPickerCategoryRow } from '@colanode/client/types';
 
 interface IconBrowserCategoryProps {
   row: IconPickerCategoryRow;

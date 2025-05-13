@@ -10,6 +10,7 @@ import {
   StickyNote,
 } from 'lucide-react';
 import React from 'react';
+import { LocalSpaceNode } from '@colanode/client/types';
 
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { ChannelCreateDialog } from '@/renderer/components/channels/channel-create-dialog';
@@ -34,7 +35,6 @@ import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
 import { cn } from '@/shared/lib/utils';
 import { useLayout } from '@/renderer/contexts/layout';
-import { LocalSpaceNode } from '@/shared/types/nodes';
 
 interface SpaceSidebarItemProps {
   space: LocalSpaceNode;

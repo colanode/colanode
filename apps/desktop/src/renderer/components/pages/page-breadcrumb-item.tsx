@@ -1,5 +1,6 @@
+import { LocalPageNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
-import { LocalPageNode } from '@/shared/types/nodes';
 
 interface PageBreadcrumbItemProps {
   page: LocalPageNode;

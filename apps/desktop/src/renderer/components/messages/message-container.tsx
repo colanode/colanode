@@ -1,4 +1,5 @@
-import { LocalMessageNode } from '@/shared/types/nodes';
+import { LocalMessageNode } from '@colanode/client/types';
+
 import { MessageNotFound } from '@/renderer/components/messages/message-not-found';
 import {
   Container,

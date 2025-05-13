@@ -1,4 +1,5 @@
 import { match } from 'ts-pattern';
+import { LocalFileNode } from '@colanode/client/types';
 
 import { FileDownload } from '@/renderer/components/files/file-download';
 import { FilePreviewImage } from '@/renderer/components/files/previews/file-preview-image';
@@ -6,7 +7,6 @@ import { FilePreviewOther } from '@/renderer/components/files/previews/file-prev
 import { FilePreviewVideo } from '@/renderer/components/files/previews/file-preview-video';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { getFileUrl } from '@/shared/lib/files';
-import { LocalFileNode } from '@/shared/types/nodes';
 import { useQuery } from '@/renderer/hooks/use-query';
 
 interface FilePreviewProps {

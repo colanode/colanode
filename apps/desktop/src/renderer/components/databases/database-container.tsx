@@ -1,3 +1,5 @@
+import { LocalDatabaseNode } from '@colanode/client/types';
+
 import { DatabaseNotFound } from '@/renderer/components/databases/database-not-found';
 import {
   Container,
@@ -11,7 +13,6 @@ import { useNodeRadar } from '@/renderer/hooks/use-node-radar';
 import { DatabaseSettings } from '@/renderer/components/databases/database-settings';
 import { Database } from '@/renderer/components/databases/database';
 import { DatabaseViews } from '@/renderer/components/databases/database-views';
-import { LocalDatabaseNode } from '@/shared/types/nodes';
 
 interface DatabaseContainerProps {
   databaseId: string;

@@ -1,4 +1,5 @@
 import React from 'react';
+import { LocalRecordNode } from '@colanode/client/types';
 
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import {
@@ -11,7 +12,6 @@ import {
 } from '@/renderer/components/ui/command';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { LocalRecordNode } from '@/shared/types/nodes';
 
 interface RecordSearchProps {
   exclude?: string[];

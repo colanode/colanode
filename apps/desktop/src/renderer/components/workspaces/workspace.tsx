@@ -1,15 +1,15 @@
 import React from 'react';
+import {
+  WorkspaceMetadataKey,
+  WorkspaceMetadataMap,
+  Workspace as WorkspaceType,
+} from '@colanode/client/types';
 
 import { Layout } from '@/renderer/components/layouts/layout';
 import { WorkspaceSettingsDialog } from '@/renderer/components/workspaces/workspace-settings-dialog';
 import { useAccount } from '@/renderer/contexts/account';
 import { WorkspaceContext } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import {
-  WorkspaceMetadataKey,
-  WorkspaceMetadataMap,
-  Workspace as WorkspaceType,
-} from '@/shared/types/workspaces';
 
 interface WorkspaceProps {
   workspace: WorkspaceType;

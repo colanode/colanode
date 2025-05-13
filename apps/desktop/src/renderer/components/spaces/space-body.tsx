@@ -1,5 +1,6 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { Info, Trash2, Users } from 'lucide-react';
+import { LocalSpaceNode } from '@colanode/client/types';
 
 import { NodeCollaborators } from '@/renderer/components/collaborators/node-collaborators';
 import { SpaceDeleteForm } from '@/renderer/components/spaces/space-delete-form';
@@ -11,7 +12,6 @@ import {
 } from '@/renderer/components/ui/tabs';
 import { useLayout } from '@/renderer/contexts/layout';
 import { SpaceGeneralTab } from '@/renderer/components/spaces/space-general-tab';
-import { LocalSpaceNode } from '@/shared/types/nodes';
 
 interface SpaceBodyProps {
   space: LocalSpaceNode;

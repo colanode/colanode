@@ -1,9 +1,9 @@
 import React from 'react';
+import { Account as AccountType } from '@colanode/client/types';
 
 import { AccountLogout } from '@/renderer/components/accounts/account-logout';
 import { AccountSettingsDialog } from '@/renderer/components/accounts/account-settings-dialog';
 import { AccountContext } from '@/renderer/contexts/account';
-import { Account as AccountType } from '@/shared/types/accounts';
 import { useQuery } from '@/renderer/hooks/use-query';
 import { WorkspaceCreate } from '@/renderer/components/workspaces/workspace-create';
 import { Workspace } from '@/renderer/components/workspaces/workspace';

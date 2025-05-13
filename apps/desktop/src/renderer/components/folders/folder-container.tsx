@@ -1,3 +1,5 @@
+import { LocalFolderNode } from '@colanode/client/types';
+
 import { FolderNotFound } from '@/renderer/components/folders/folder-not-found';
 import {
   Container,
@@ -10,7 +12,6 @@ import { useNodeContainer } from '@/renderer/hooks/use-node-container';
 import { useNodeRadar } from '@/renderer/hooks/use-node-radar';
 import { FolderSettings } from '@/renderer/components/folders/folder-settings';
 import { FolderBody } from '@/renderer/components/folders/folder-body';
-import { LocalFolderNode } from '@/shared/types/nodes';
 
 interface FolderContainerProps {
   folderId: string;

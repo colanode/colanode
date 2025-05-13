@@ -1,3 +1,5 @@
+import { LocalChatNode } from '@colanode/client/types';
+
 import {
   Container,
   ContainerBody,
@@ -10,7 +12,6 @@ import { NodeCollaboratorsPopover } from '@/renderer/components/collaborators/no
 import { Conversation } from '@/renderer/components/messages/conversation';
 import { useNodeRadar } from '@/renderer/hooks/use-node-radar';
 import { useNodeContainer } from '@/renderer/hooks/use-node-container';
-import { LocalChatNode } from '@/shared/types/nodes';
 
 interface ChatContainerProps {
   chatId: string;

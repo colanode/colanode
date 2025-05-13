@@ -1,6 +1,5 @@
 import { Database } from 'lucide-react';
-
-import { EditorCommand } from '@/shared/types/editor';
+import { EditorCommand } from '@colanode/client/types';
 
 export const DatabaseCommand: EditorCommand = {
   key: 'database',

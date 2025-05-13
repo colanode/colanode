@@ -1,9 +1,9 @@
 import { LayoutGrid, MessageCircle } from 'lucide-react';
+import { SidebarMenuType } from '@colanode/client/types';
 
 import { SidebarMenuIcon } from '@/renderer/components/layouts/sidebars/sidebar-menu-icon';
 import { SidebarMenuHeader } from '@/renderer/components/layouts/sidebars/sidebar-menu-header';
 import { SidebarMenuFooter } from '@/renderer/components/layouts/sidebars/sidebar-menu-footer';
-import { SidebarMenuType } from '@/shared/types/workspaces';
 import { useApp } from '@/renderer/contexts/app';
 
 interface SidebarMenuProps {

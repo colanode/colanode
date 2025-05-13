@@ -3,6 +3,7 @@ import { Mail } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 import { EmailPasswordResetInitOutput } from '@colanode/core';
+import { Server } from '@colanode/client/types';
 
 import { Button } from '@/renderer/components/ui/button';
 import {
@@ -16,7 +17,6 @@ import { Input } from '@/renderer/components/ui/input';
 import { Spinner } from '@/renderer/components/ui/spinner';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
-import { Server } from '@/shared/types/servers';
 
 const formSchema = z.object({
   email: z.string().min(2).email(),

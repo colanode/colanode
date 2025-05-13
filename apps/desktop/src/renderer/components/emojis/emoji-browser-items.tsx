@@ -1,4 +1,5 @@
-import { EmojiPickerItemsRow } from '@/shared/types/emojis';
+import { EmojiPickerItemsRow } from '@colanode/client/types';
+
 import { useQuery } from '@/renderer/hooks/use-query';
 import { EmojiPickerItem } from '@/renderer/components/emojis/emoji-picker-item';
 

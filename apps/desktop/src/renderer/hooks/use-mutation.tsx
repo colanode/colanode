@@ -1,12 +1,11 @@
 import React from 'react';
-
 import {
   MutationError,
   MutationErrorCode,
   MutationErrorData,
   MutationInput,
   MutationMap,
-} from '@/shared/mutations';
+} from '@colanode/client/mutations';
 
 interface MutationOptions<T extends MutationInput> {
   input: T;

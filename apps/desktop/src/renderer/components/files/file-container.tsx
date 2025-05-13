@@ -1,3 +1,5 @@
+import { LocalFileNode } from '@colanode/client/types';
+
 import { FileBody } from '@/renderer/components/files/file-body';
 import {
   Container,
@@ -9,7 +11,6 @@ import { ContainerBreadcrumb } from '@/renderer/components/layouts/containers/co
 import { FileNotFound } from '@/renderer/components/files/file-not-found';
 import { useNodeContainer } from '@/renderer/hooks/use-node-container';
 import { FileSettings } from '@/renderer/components/files/file-settings';
-import { LocalFileNode } from '@/shared/types/nodes';
 
 interface FileContainerProps {
   fileId: string;

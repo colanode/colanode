@@ -16,10 +16,9 @@ import {
   FloatingPortal,
 } from '@floating-ui/react';
 import { generateId, IdType } from '@colanode/core';
+import { EditorContext, User } from '@colanode/client/types';
 
 import { updateScrollView } from '@/shared/lib/utils';
-import { EditorContext } from '@/shared/types/editor';
-import { User } from '@/shared/types/users';
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { MentionNodeView } from '@/renderer/editor/views';
 

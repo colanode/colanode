@@ -1,4 +1,5 @@
-import { LocalFileNode } from '@/shared/types/nodes';
+import { LocalFileNode } from '@colanode/client/types';
+
 import { FileContextMenu } from '@/renderer/components/files/file-context-menu';
 import { FileThumbnail } from '@/renderer/components/files/file-thumbnail';
 import { GridItem } from '@/renderer/components/folders/grids/grid-item';

@@ -1,8 +1,9 @@
+import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
+
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
 import { useQueries } from '@/renderer/hooks/use-queries';
 import { EmojiElement } from '@/renderer/components/emojis/emoji-element';
-import { NodeReactionCount, LocalMessageNode } from '@/shared/types/nodes';
 
 interface MessageReactionCountTooltipContentProps {
   message: LocalMessageNode;

@@ -1,4 +1,5 @@
-import { LocalChannelNode } from '@/shared/types/nodes';
+import { LocalChannelNode } from '@colanode/client/types';
+
 import { ChannelNotFound } from '@/renderer/components/channels/channel-not-found';
 import {
   Container,

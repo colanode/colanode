@@ -1,4 +1,5 @@
 import { InView } from 'react-intersection-observer';
+import { LocalChannelNode } from '@colanode/client/types';
 
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { UnreadBadge } from '@/renderer/components/ui/unread-badge';
@@ -6,7 +7,6 @@ import { useRadar } from '@/renderer/contexts/radar';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useLayout } from '@/renderer/contexts/layout';
 import { cn } from '@/shared/lib/utils';
-import { LocalChannelNode } from '@/shared/types/nodes';
 
 interface ChannelSidebarItemProps {
   channel: LocalChannelNode;

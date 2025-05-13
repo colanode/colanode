@@ -1,9 +1,10 @@
+import { LocalFileNode } from '@colanode/client/types';
+
 import { FileIcon } from '@/renderer/components/files/file-icon';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
 import { getFileUrl } from '@/shared/lib/files';
 import { cn } from '@/shared/lib/utils';
-import { LocalFileNode } from '@/shared/types/nodes';
 
 interface FileThumbnailProps {
   file: LocalFileNode;

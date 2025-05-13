@@ -1,4 +1,5 @@
 import React from 'react';
+import { LocalNode } from '@colanode/client/types';
 
 import { ChannelSidebarItem } from '@/renderer/components/channels/channel-sidebar-item';
 import { ChatSidebarItem } from '@/renderer/components/chats/chat-sidebar-item';
@@ -6,7 +7,6 @@ import { DatabaseSidebarItem } from '@/renderer/components/databases/database-si
 import { FolderSidebarItem } from '@/renderer/components/folders/folder-sidebar-item';
 import { PageSidebarItem } from '@/renderer/components/pages/page-sidebar-item';
 import { SpaceSidebarItem } from '@/renderer/components/spaces/space-sidebar-item';
-import { LocalNode } from '@/shared/types/nodes';
 
 interface SidebarItemProps {
   node: LocalNode;

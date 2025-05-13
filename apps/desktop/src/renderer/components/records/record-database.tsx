@@ -1,9 +1,9 @@
 import { NodeRole } from '@colanode/core';
+import { LocalDatabaseNode } from '@colanode/client/types';
 
 import { Database } from '@/renderer/components/databases/database';
 import { useQuery } from '@/renderer/hooks/use-query';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { LocalDatabaseNode } from '@/shared/types/nodes';
 
 interface RecordDatabaseProps {
   id: string;

@@ -1,3 +1,5 @@
+import { EditorCommand, EditorCommandProps } from '@colanode/client/types';
+
 import { BlockquoteCommand } from '@/renderer/editor/commands/blockquote';
 import { BulletListCommand } from '@/renderer/editor/commands/bullet-list';
 import { CodeBlockCommand } from '@/renderer/editor/commands/code-block';
@@ -11,7 +13,6 @@ import { OrderedListCommand } from '@/renderer/editor/commands/ordered-list';
 import { PageCommand } from '@/renderer/editor/commands/page';
 import { ParagraphCommand } from '@/renderer/editor/commands/paragraph';
 import { TodoCommand } from '@/renderer/editor/commands/todo';
-import { EditorCommand, EditorCommandProps } from '@/shared/types/editor';
 import { DatabaseCommand } from '@/renderer/editor/commands/database';
 
 export type { EditorCommand, EditorCommandProps };

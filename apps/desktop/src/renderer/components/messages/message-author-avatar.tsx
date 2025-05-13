@@ -1,7 +1,8 @@
+import { LocalMessageNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { LocalMessageNode } from '@/shared/types/nodes';
 
 interface MessageAuthorAvatarProps {
   message: LocalMessageNode;

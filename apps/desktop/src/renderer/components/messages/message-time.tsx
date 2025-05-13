@@ -1,11 +1,11 @@
 import { formatDate, timeAgo } from '@colanode/core';
+import { LocalMessageNode } from '@colanode/client/types';
 
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/renderer/components/ui/tooltip';
-import { LocalMessageNode } from '@/shared/types/nodes';
 
 interface MessageTimeProps {
   message: LocalMessageNode;

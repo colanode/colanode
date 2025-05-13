@@ -1,4 +1,5 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { LocalFolderNode } from '@colanode/client/types';
 
 import { FolderForm } from '@/renderer/components/folders/folder-form';
 import {
@@ -11,7 +12,6 @@ import {
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
-import { LocalFolderNode } from '@/shared/types/nodes';
 
 interface FolderUpdateDialogProps {
   folder: LocalFolderNode;

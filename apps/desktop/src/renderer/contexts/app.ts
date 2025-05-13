@@ -1,6 +1,5 @@
 import { createContext, useContext } from 'react';
-
-import { AppMetadataKey, AppMetadataMap } from '@/shared/types/apps';
+import { AppMetadataKey, AppMetadataMap } from '@colanode/client/types';
 
 interface AppContext {
   getMetadata: <K extends AppMetadataKey>(

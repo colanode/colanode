@@ -8,6 +8,7 @@ import {
   Upload,
 } from 'lucide-react';
 import React from 'react';
+import { LocalFolderNode, FolderLayoutType } from '@colanode/client/types';
 
 import { FolderFiles } from '@/renderer/components/folders/folder-files';
 import { Button } from '@/renderer/components/ui/button';
@@ -22,9 +23,7 @@ import {
 import { Dropzone } from '@/renderer/components/ui/dropzone';
 import { ScrollArea } from '@/renderer/components/ui/scroll-area';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { FolderLayoutType } from '@/shared/types/folders';
 import { toast } from '@/renderer/hooks/use-toast';
-import { LocalFolderNode } from '@/shared/types/nodes';
 
 export type FolderLayoutOption = {
   value: FolderLayoutType;

@@ -1,8 +1,8 @@
 import { CircleX } from 'lucide-react';
+import { LocalMessageNode } from '@colanode/client/types';
 
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { LocalMessageNode } from '@/shared/types/nodes';
 
 interface MessageReplyBannerProps {
   message: LocalMessageNode;

@@ -1,6 +1,7 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
+import { LocalChannelNode } from '@colanode/client/types';
 
 import { ChannelDeleteDialog } from '@/renderer/components/channels/channel-delete-dialog';
 import { ChannelUpdateDialog } from '@/renderer/components/channels/channel-update-dialog';
@@ -13,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { LocalChannelNode } from '@/shared/types/nodes';
 
 interface ChannelSettingsProps {
   channel: LocalChannelNode;

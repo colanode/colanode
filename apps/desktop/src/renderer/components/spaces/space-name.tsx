@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react';
+import { LocalSpaceNode } from '@colanode/client/types';
 
 import { SmartTextInput } from '@/renderer/components/ui/smart-text-input';
-import { LocalSpaceNode } from '@/shared/types/nodes';
 
 interface SpaceNameProps {
   space: LocalSpaceNode;

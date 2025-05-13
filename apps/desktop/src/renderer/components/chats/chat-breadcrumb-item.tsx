@@ -1,7 +1,8 @@
+import { LocalChatNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { LocalChatNode } from '@/shared/types/nodes';
 
 interface ChatBreadcrumbItemProps {
   chat: LocalChatNode;

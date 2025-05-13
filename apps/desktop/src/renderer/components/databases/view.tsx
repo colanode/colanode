@@ -7,6 +7,7 @@ import {
 } from '@colanode/core';
 import React from 'react';
 import { match } from 'ts-pattern';
+import { LocalDatabaseViewNode, ViewField } from '@colanode/client/types';
 
 import { BoardView } from '@/renderer/components/databases/boards/board-view';
 import { CalendarView } from '@/renderer/components/databases/calendars/calendar-view';
@@ -23,9 +24,7 @@ import {
   getDefaultViewFieldDisplay,
   getFieldFilterOperators,
 } from '@/shared/lib/databases';
-import { ViewField } from '@/shared/types/databases';
 import { toast } from '@/renderer/hooks/use-toast';
-import { LocalDatabaseViewNode } from '@/shared/types/nodes';
 
 interface ViewProps {
   view: LocalDatabaseViewNode;

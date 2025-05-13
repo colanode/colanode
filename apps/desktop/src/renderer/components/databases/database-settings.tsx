@@ -1,8 +1,8 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
+import { LocalDatabaseNode } from '@colanode/client/types';
 
-import { LocalDatabaseNode } from '@/shared/types/nodes';
 import { NodeCollaboratorAudit } from '@/renderer/components/collaborators/node-collaborator-audit';
 import { DatabaseDeleteDialog } from '@/renderer/components/databases/database-delete-dialog';
 import { DatabaseUpdateDialog } from '@/renderer/components/databases/database-update-dialog';

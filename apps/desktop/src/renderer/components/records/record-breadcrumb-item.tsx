@@ -1,5 +1,6 @@
+import { LocalRecordNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
-import { LocalRecordNode } from '@/shared/types/nodes';
 
 interface RecordBreadcrumbItemProps {
   record: LocalRecordNode;

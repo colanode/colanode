@@ -1,6 +1,6 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { LocalChannelNode } from '@colanode/client/types';
 
-import { LocalChannelNode } from '@/shared/types/nodes';
 import { ChannelForm } from '@/renderer/components/channels/channel-form';
 import {
   Dialog,

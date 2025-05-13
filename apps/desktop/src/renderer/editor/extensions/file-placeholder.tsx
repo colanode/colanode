@@ -2,9 +2,9 @@ import { generateId, IdType } from '@colanode/core';
 import { CommandProps, mergeAttributes, Node } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { FileMetadata } from '@colanode/client/types';
 
 import { FilePlaceholderNodeView } from '@/renderer/editor/views';
-import { FileMetadata } from '@/shared/types/files';
 import { toast } from '@/renderer/hooks/use-toast';
 
 declare module '@tiptap/core' {

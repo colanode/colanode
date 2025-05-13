@@ -1,6 +1,8 @@
 import { JSONContent } from '@tiptap/core';
 import { Plus, Search, Send, Upload } from 'lucide-react';
 import React from 'react';
+import { editorHasContent } from '@colanode/client/lib';
+import { LocalMessageNode } from '@colanode/client/types';
 
 import {
   MessageEditor,
@@ -18,8 +20,6 @@ import { useConversation } from '@/renderer/contexts/conversation';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
-import { editorHasContent } from '@/shared/lib/editor';
-import { LocalMessageNode } from '@/shared/types/nodes';
 
 export interface MessageCreateRefProps {
   setReplyTo: (replyTo: LocalMessageNode) => void;

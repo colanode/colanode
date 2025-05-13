@@ -12,8 +12,7 @@ import {
   DatabaseViewLayout,
   DatabaseViewFieldFilterAttributes,
 } from '@colanode/core';
-
-import { LocalRecordNode } from '@/shared/types/nodes';
+import { LocalRecordNode } from '@colanode/client/types';
 
 export const getDefaultFieldWidth = (type: FieldType): number => {
   if (!type) return 0;

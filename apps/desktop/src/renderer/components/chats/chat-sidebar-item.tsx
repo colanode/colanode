@@ -1,6 +1,6 @@
 import { InView } from 'react-intersection-observer';
+import { LocalChatNode } from '@colanode/client/types';
 
-import { LocalChatNode } from '@/shared/types/nodes';
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { UnreadBadge } from '@/renderer/components/ui/unread-badge';
 import { useRadar } from '@/renderer/contexts/radar';

@@ -1,13 +1,13 @@
 import { useCallback, useState } from 'react';
-
-import { useWorkspace } from '@/renderer/contexts/workspace';
-import { percentToNumber } from '@/shared/lib/utils';
-import { useWindowSize } from '@/renderer/hooks/use-window-size';
 import {
   ContainerMetadata,
   SidebarMenuType,
   SidebarMetadata,
-} from '@/shared/types/workspaces';
+} from '@colanode/client/types';
+
+import { useWorkspace } from '@/renderer/contexts/workspace';
+import { percentToNumber } from '@/shared/lib/utils';
+import { useWindowSize } from '@/renderer/hooks/use-window-size';
 
 export const useLayoutState = () => {
   const workspace = useWorkspace();

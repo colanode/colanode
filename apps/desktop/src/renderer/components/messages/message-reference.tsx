@@ -1,9 +1,10 @@
+import { LocalMessageNode } from '@colanode/client/types';
+
 import { MessageAuthorAvatar } from '@/renderer/components/messages/message-author-avatar';
 import { MessageAuthorName } from '@/renderer/components/messages/message-author-name';
 import { MessageContent } from '@/renderer/components/messages/message-content';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { LocalMessageNode } from '@/shared/types/nodes';
 
 interface MessageReferenceProps {
   messageId: string;

@@ -1,6 +1,5 @@
 import { createContext, useContext } from 'react';
-
-import { Account } from '@/shared/types/accounts';
+import { Account } from '@colanode/client/types';
 
 interface AccountContext extends Account {
   openSettings: () => void;

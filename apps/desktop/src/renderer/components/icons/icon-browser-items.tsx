@@ -1,6 +1,7 @@
-import { IconPickerItemsRow } from '@/shared/types/icons';
-import { useQuery } from '@/renderer/hooks/use-query';
+import { IconPickerItemsRow } from '@colanode/client/types';
+
 import { IconPickerItem } from '@/renderer/components/icons/icon-picker-item';
+import { useQuery } from '@/renderer/hooks/use-query';
 
 interface IconBrowserItemsProps {
   row: IconPickerItemsRow;

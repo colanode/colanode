@@ -1,8 +1,8 @@
 import { NodeRole, extractNodeRole } from '@colanode/core';
+import { LocalNode } from '@colanode/client/types';
 
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { LocalNode } from '@/shared/types/nodes';
 
 type UseNodeContainerResult<T extends LocalNode> =
   | {

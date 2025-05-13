@@ -1,4 +1,5 @@
 import { extractNodeRole } from '@colanode/core';
+import { LocalRecordNode } from '@colanode/client/types';
 
 import { TableViewNameCell } from '@/renderer/components/databases/tables/table-view-name-cell';
 import { RecordFieldValue } from '@/renderer/components/records/record-field-value';
@@ -6,7 +7,6 @@ import { RecordProvider } from '@/renderer/components/records/record-provider';
 import { useDatabase } from '@/renderer/contexts/database';
 import { useDatabaseView } from '@/renderer/contexts/database-view';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { LocalRecordNode } from '@/shared/types/nodes';
 
 interface TableViewRowProps {
   index: number;

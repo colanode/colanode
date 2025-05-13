@@ -1,7 +1,7 @@
 import React from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import { IconPickerRowData } from '@colanode/client/types';
 
-import { IconPickerRowData } from '@/shared/types/icons';
 import { IconBrowserItems } from '@/renderer/components/icons/icon-browser-items';
 import { IconBrowserCategory } from '@/renderer/components/icons/icon-browser-category';
 import { useQuery } from '@/renderer/hooks/use-query';
@@ -74,10 +74,14 @@ export const IconBrowser = () => {
           };
 
           if (row.type === 'category') {
-            return <IconBrowserCategory row={row} style={style} />;
+            return (
+              <IconBrowserCategory key={row.category} row={row} style={style} />
+            );
           }
 
-          return <IconBrowserItems row={row} style={style} />;
+          return (
+            <IconBrowserItems key={row.category} row={row} style={style} />
+          );
         })}
       </div>
     </div>

@@ -10,6 +10,17 @@ import { debounce, isEqual } from 'lodash-es';
 import React from 'react';
 import { YDoc } from '@colanode/crdt';
 import { RichTextContent, richTextContentSchema } from '@colanode/core';
+import {
+  restoreRelativeSelection,
+  getRelativeSelection,
+  mapContentsToBlocks,
+  buildEditorContent,
+} from '@colanode/client/lib';
+import {
+  LocalNode,
+  DocumentState,
+  DocumentUpdate,
+} from '@colanode/client/types';
 
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import {
@@ -66,14 +77,6 @@ import {
   AutoJoiner,
 } from '@/renderer/editor/extensions';
 import { ToolbarMenu, ActionMenu } from '@/renderer/editor/menus';
-import {
-  restoreRelativeSelection,
-  getRelativeSelection,
-  mapContentsToBlocks,
-  buildEditorContent,
-} from '@/shared/lib/editor';
-import { LocalNode } from '@/shared/types/nodes';
-import { DocumentState, DocumentUpdate } from '@/shared/types/documents';
 import { toast } from '@/renderer/hooks/use-toast';
 
 interface DocumentEditorProps {

@@ -1,39 +1,37 @@
 import started from 'electron-squirrel-startup';
 import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
 import { createDebugger } from '@colanode/core';
+import { QueryInput, QueryMap } from '@colanode/client/queries';
+import { CommandInput, CommandMap } from '@colanode/client/commands';
+import { MutationInput, MutationMap } from '@colanode/client/mutations';
+import { eventBus } from '@colanode/client/lib';
 
+import path from 'path';
 import {
-  app,
+  app as electronApp,
   BrowserWindow,
   ipcMain,
   protocol,
   shell,
   globalShortcut,
 } from 'electron';
-import path from 'path';
 
-import { mediator } from '@/main/mediator';
-import { getAppIconPath } from '@/main/lib/utils';
-import { CommandInput, CommandMap } from '@/shared/commands';
-import { eventBus } from '@/shared/lib/event-bus';
-import { MutationInput, MutationMap } from '@/shared/mutations';
-import { QueryInput, QueryMap } from '@/shared/queries';
-import { appService } from '@/main/services/app-service';
 import {
   handleAssetRequest,
   handleAvatarRequest,
   handleFilePreviewRequest,
   handleFileRequest,
-} from '@/main/lib/protocols';
+} from '@/main/protocols';
+import { app } from '@/main/app-service';
 
 const debug = createDebugger('desktop:main');
 
-app.setName('Colanode');
-app.setAppUserModelId('com.colanode.desktop');
+electronApp.setName('Colanode');
+electronApp.setAppUserModelId('com.colanode.desktop');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
-  app.quit();
+  electronApp.quit();
 }
 
 updateElectronApp({
@@ -47,10 +45,10 @@ updateElectronApp({
 });
 
 const createWindow = async () => {
-  await appService.migrate();
+  await app.migrate();
 
   // Create the browser window.
-  let windowSize = (await appService.metadata.get('window_size'))?.value;
+  let windowSize = (await app.metadata.get('window_size'))?.value;
   const mainWindow = new BrowserWindow({
     width: windowSize?.width ?? 1200,
     height: windowSize?.height ?? 800,
@@ -58,7 +56,7 @@ const createWindow = async () => {
     fullscreenable: true,
     minWidth: 800,
     minHeight: 600,
-    icon: getAppIconPath(),
+    icon: path.join(app.paths.assets, 'colanode-logo-black.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -76,7 +74,7 @@ const createWindow = async () => {
       fullscreen: false,
     };
 
-    appService.metadata.set('window_size', windowSize);
+    app.metadata.set('window_size', windowSize);
   });
 
   mainWindow.on('enter-full-screen', () => {
@@ -86,7 +84,7 @@ const createWindow = async () => {
       fullscreen: true,
     };
 
-    appService.metadata.set('window_size', windowSize);
+    app.metadata.set('window_size', windowSize);
   });
 
   mainWindow.on('leave-full-screen', () => {
@@ -96,7 +94,7 @@ const createWindow = async () => {
       fullscreen: false,
     };
 
-    appService.metadata.set('window_size', windowSize);
+    app.metadata.set('window_size', windowSize);
   });
 
   // and load the index.html of the app.
@@ -160,20 +158,20 @@ const createWindow = async () => {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-app.on('ready', createWindow);
+electronApp.on('ready', createWindow);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on('window-all-closed', () => {
+electronApp.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    app.quit();
+    electronApp.quit();
   }
 
-  mediator.clearSubscriptions();
+  app.mediator.clearSubscriptions();
 });
 
-app.on('activate', () => {
+electronApp.on('activate', () => {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
   if (BrowserWindow.getAllWindows().length === 0) {
@@ -184,7 +182,7 @@ app.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 ipcMain.handle('init', async () => {
-  await appService.init();
+  await app.init();
 });
 
 ipcMain.handle(
@@ -193,7 +191,7 @@ ipcMain.handle(
     _: unknown,
     input: T
   ): Promise<MutationMap[T['type']]['output']> => {
-    return mediator.executeMutation(input);
+    return app.mediator.executeMutation(input);
   }
 );
 
@@ -203,7 +201,7 @@ ipcMain.handle(
     _: unknown,
     input: T
   ): Promise<QueryMap[T['type']]['output']> => {
-    return mediator.executeQuery(input);
+    return app.mediator.executeQuery(input);
   }
 );
 
@@ -214,12 +212,12 @@ ipcMain.handle(
     id: string,
     input: T
   ): Promise<QueryMap[T['type']]['output']> => {
-    return mediator.executeQueryAndSubscribe(id, input);
+    return app.mediator.executeQueryAndSubscribe(id, input);
   }
 );
 
 ipcMain.handle('unsubscribe-query', (_: unknown, id: string): void => {
-  mediator.unsubscribeQuery(id);
+  app.mediator.unsubscribeQuery(id);
 });
 
 ipcMain.handle(
@@ -228,6 +226,6 @@ ipcMain.handle(
     _: unknown,
     input: T
   ): Promise<CommandMap[T['type']]['output']> => {
-    return mediator.executeCommand(input);
+    return app.mediator.executeCommand(input);
   }
 );

@@ -1,7 +1,7 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import React from 'react';
+import { LocalDatabaseNode } from '@colanode/client/types';
 
-import { LocalDatabaseNode } from '@/shared/types/nodes';
 import { DatabaseContext } from '@/renderer/contexts/database';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { toast } from '@/renderer/hooks/use-toast';

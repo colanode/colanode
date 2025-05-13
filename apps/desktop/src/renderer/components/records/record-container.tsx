@@ -1,3 +1,5 @@
+import { LocalRecordNode } from '@colanode/client/types';
+
 import { RecordNotFound } from '@/renderer/components/records/record-not-found';
 import { useNodeContainer } from '@/renderer/hooks/use-node-container';
 import { useNodeRadar } from '@/renderer/hooks/use-node-radar';
@@ -10,7 +12,6 @@ import {
 import { ContainerBreadcrumb } from '@/renderer/components/layouts/containers/container-breadrumb';
 import { RecordBody } from '@/renderer/components/records/record-body';
 import { RecordSettings } from '@/renderer/components/records/record-settings';
-import { LocalRecordNode } from '@/shared/types/nodes';
 
 interface RecordContainerProps {
   recordId: string;

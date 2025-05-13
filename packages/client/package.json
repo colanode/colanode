@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@colanode/client",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    "./types": "./src/types/index.ts",
+    "./lib": "./src/lib/index.ts",
+    "./handlers": "./src/handlers/index.ts",
+    "./databases": "./src/databases/index.ts",
+    "./services": "./src/services/index.ts",
+    "./queries": "./src/queries/index.ts",
+    "./mutations": "./src/mutations/index.ts",
+    "./commands": "./src/commands/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "compile": "tsc --noEmit",
+    "test": "vitest",
+    "lint": "eslint . --max-warnings 0",
+    "build": "tsc",
+    "coverage": "vitest run --coverage "
+  },
+  "devDependencies": {},
+  "dependencies": {}
+}

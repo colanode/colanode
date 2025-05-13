@@ -1,7 +1,7 @@
 import { match } from 'ts-pattern';
 import { getIdType, IdType } from '@colanode/core';
+import { ContainerTab } from '@colanode/client/types';
 
-import { ContainerTab } from '@/shared/types/workspaces';
 import { TabsContent } from '@/renderer/components/ui/tabs';
 import { SpaceContainer } from '@/renderer/components/spaces/space-container';
 import { ChannelContainer } from '@/renderer/components/channels/channel-container';

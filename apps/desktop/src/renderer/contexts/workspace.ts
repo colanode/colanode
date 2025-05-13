@@ -1,10 +1,9 @@
 import { createContext, useContext } from 'react';
-
 import {
   Workspace,
   WorkspaceMetadataKey,
   WorkspaceMetadataMap,
-} from '@/shared/types/workspaces';
+} from '@colanode/client/types';
 
 interface WorkspaceContext extends Workspace {
   openSettings: () => void;

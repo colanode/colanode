@@ -1,7 +1,7 @@
 import { FocusPosition } from '@tiptap/core';
+import { LocalNode } from '@colanode/client/types';
 
 import { DocumentEditor } from '@/renderer/components/documents/document-editor';
-import { LocalNode } from '@/shared/types/nodes';
 import { useQuery } from '@/renderer/hooks/use-query';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 

@@ -1,9 +1,9 @@
 import { mergeAttributes, Node } from '@tiptap/core';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { EditorContext } from '@colanode/client/types';
 
 import { FileNodeView } from '@/renderer/editor/views';
-import { EditorContext } from '@/shared/types/editor';
 import { toast } from '@/renderer/hooks/use-toast';
 
 interface FileNodeOptions {

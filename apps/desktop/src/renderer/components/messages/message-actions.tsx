@@ -1,5 +1,6 @@
 import { MessagesSquare, Reply } from 'lucide-react';
 import React from 'react';
+import { LocalMessageNode } from '@colanode/client/types';
 
 import { MessageDeleteButton } from '@/renderer/components/messages/message-delete-button';
 import { MessageReactionCreatePopover } from '@/renderer/components/messages/message-reaction-create-popover';
@@ -10,7 +11,6 @@ import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
 import { defaultEmojis } from '@/shared/lib/assets';
-import { LocalMessageNode } from '@/shared/types/nodes';
 
 const MessageAction = ({ children }: { children: React.ReactNode }) => {
   return (

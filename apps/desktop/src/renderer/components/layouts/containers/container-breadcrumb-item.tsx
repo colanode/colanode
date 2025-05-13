@@ -1,3 +1,5 @@
+import { LocalNode } from '@colanode/client/types';
+
 import { ChannelBreadcrumbItem } from '@/renderer/components/channels/channel-breadcrumb-item';
 import { ChatBreadcrumbItem } from '@/renderer/components/chats/chat-breadcrumb-item';
 import { DatabaseBreadcrumbItem } from '@/renderer/components/databases/database-breadcrumb-item';
@@ -7,7 +9,6 @@ import { RecordBreadcrumbItem } from '@/renderer/components/records/record-bread
 import { SpaceBreadcrumbItem } from '@/renderer/components/spaces/space-breadcrumb-item';
 import { FileBreadcrumbItem } from '@/renderer/components/files/file-breadcrumb-item';
 import { MessageBreadcrumbItem } from '@/renderer/components/messages/message-breadcrumb-item';
-import { LocalNode } from '@/shared/types/nodes';
 
 interface ContainerBreadcrumbItemProps {
   node: LocalNode;

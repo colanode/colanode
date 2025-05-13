@@ -1,6 +1,6 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { LocalDatabaseNode } from '@colanode/client/types';
 
-import { LocalDatabaseNode } from '@/shared/types/nodes';
 import { DatabaseForm } from '@/renderer/components/databases/database-form';
 import {
   Dialog,

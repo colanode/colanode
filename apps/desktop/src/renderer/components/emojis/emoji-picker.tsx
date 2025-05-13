@@ -1,10 +1,10 @@
 import React from 'react';
+import { Emoji } from '@colanode/client/types';
 
 import { EmojiBrowser } from '@/renderer/components/emojis/emoji-browser';
 import { EmojiSearch } from '@/renderer/components/emojis/emoji-search';
 import { EmojiSkinToneSelector } from '@/renderer/components/emojis/emoji-skin-tone-selector';
 import { EmojiPickerContext } from '@/renderer/contexts/emoji-picker';
-import { Emoji } from '@/shared/types/emojis';
 
 interface EmojiPickerProps {
   onPick: (emoji: Emoji, skinTone: number) => void;

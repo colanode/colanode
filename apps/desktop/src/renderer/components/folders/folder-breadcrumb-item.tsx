@@ -1,5 +1,6 @@
+import { LocalFolderNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
-import { LocalFolderNode } from '@/shared/types/nodes';
 
 interface FolderBreadcrumbItemProps {
   folder: LocalFolderNode;

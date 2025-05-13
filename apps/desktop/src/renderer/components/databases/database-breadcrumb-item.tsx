@@ -1,5 +1,6 @@
+import { LocalDatabaseNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
-import { LocalDatabaseNode } from '@/shared/types/nodes';
 
 interface DatabaseBreadcrumbItemProps {
   database: LocalDatabaseNode;

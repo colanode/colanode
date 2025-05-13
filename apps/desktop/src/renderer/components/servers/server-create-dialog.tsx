@@ -1,4 +1,5 @@
 import React from 'react';
+import { Server } from '@colanode/client/types';
 
 import { Button } from '@/renderer/components/ui/button';
 import {
@@ -14,7 +15,6 @@ import { Label } from '@/renderer/components/ui/label';
 import { Spinner } from '@/renderer/components/ui/spinner';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
-import { Server } from '@/shared/types/servers';
 
 interface ServerCreateDialogProps {
   onCancel: () => void;

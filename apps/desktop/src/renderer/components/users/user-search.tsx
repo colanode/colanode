@@ -1,4 +1,5 @@
 import React from 'react';
+import { User } from '@colanode/client/types';
 
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import {
@@ -11,7 +12,6 @@ import {
 } from '@/renderer/components/ui/command';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { User } from '@/shared/types/users';
 
 interface UserSearchProps {
   exclude?: string[];

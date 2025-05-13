@@ -1,6 +1,7 @@
 import { WorkspaceRole } from '@colanode/core';
 import React from 'react';
 import { InView } from 'react-intersection-observer';
+import { UserListQueryInput } from '@colanode/client/queries';
 
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { Separator } from '@/renderer/components/ui/separator';
@@ -9,7 +10,6 @@ import { WorkspaceUserInvite } from '@/renderer/components/workspaces/workspace-
 import { WorkspaceUserRoleDropdown } from '@/renderer/components/workspaces/workspace-user-role-dropdown';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQueries } from '@/renderer/hooks/use-queries';
-import { UserListQueryInput } from '@/shared/queries/users/user-list';
 
 const USERS_PER_PAGE = 50;
 

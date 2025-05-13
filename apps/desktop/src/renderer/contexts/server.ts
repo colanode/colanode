@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
+import { Server } from '@colanode/client/types';
 
 import { FeatureKey } from '@/shared/lib/features';
-import { Server } from '@/shared/types/servers';
 
 interface ServerContext extends Server {
   supports(feature: FeatureKey): boolean;

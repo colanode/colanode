@@ -1,11 +1,11 @@
 import React from 'react';
 import { InView } from 'react-intersection-observer';
+import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
+import { NodeReactionListQueryInput } from '@colanode/client/queries';
 
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQueries } from '@/renderer/hooks/use-queries';
-import { NodeReactionCount, LocalMessageNode } from '@/shared/types/nodes';
-import { NodeReactionListQueryInput } from '@/shared/queries/nodes/node-reaction-list';
 
 const REACTIONS_PER_PAGE = 20;
 

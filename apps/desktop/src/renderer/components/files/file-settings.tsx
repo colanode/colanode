@@ -1,6 +1,7 @@
 import { Copy, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { LocalFileNode } from '@colanode/client/types';
 
 import { FileDeleteDialog } from '@/renderer/components/files/file-delete-dialog';
 import {
@@ -10,7 +11,6 @@ import {
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { LocalFileNode } from '@/shared/types/nodes';
 
 interface FileSettingsProps {
   file: LocalFileNode;

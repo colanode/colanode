@@ -3,9 +3,9 @@ import { match } from 'ts-pattern';
 import { getIdType, IdType } from '@colanode/core';
 import { X } from 'lucide-react';
 import { useDrag, useDrop } from 'react-dnd';
+import { ContainerTab } from '@colanode/client/types';
 
 import { TabsTrigger } from '@/renderer/components/ui/tabs';
-import { ContainerTab } from '@/shared/types/workspaces';
 import { cn } from '@/shared/lib/utils';
 import { SpaceContainerTab } from '@/renderer/components/spaces/space-container-tab';
 import { ChannelContainerTab } from '@/renderer/components/channels/channel-container-tab';

@@ -1,10 +1,11 @@
+import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
+
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@/renderer/components/ui/tooltip';
 import { MessageReactionCountTooltipContent } from '@/renderer/components/messages/message-reaction-count-tooltip-content';
-import { NodeReactionCount, LocalMessageNode } from '@/shared/types/nodes';
 
 interface MessageReactionCountTooltipProps {
   message: LocalMessageNode;

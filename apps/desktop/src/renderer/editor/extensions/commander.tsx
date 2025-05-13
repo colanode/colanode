@@ -15,9 +15,9 @@ import {
   autoUpdate,
   FloatingPortal,
 } from '@floating-ui/react';
+import { EditorCommand, EditorContext } from '@colanode/client/types';
 
 import { updateScrollView } from '@/shared/lib/utils';
-import { EditorCommand, EditorContext } from '@/shared/types/editor';
 
 interface CommanderOptions {
   commands: EditorCommand[];

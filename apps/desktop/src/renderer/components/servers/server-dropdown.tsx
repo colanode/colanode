@@ -1,6 +1,7 @@
 import { DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu';
 import { ChevronDown } from 'lucide-react';
 import React from 'react';
+import { Server } from '@colanode/client/types';
 
 import { ServerAvatar } from '@/renderer/components/servers/server-avatar';
 import { ServerCreateDialog } from '@/renderer/components/servers/server-create-dialog';
@@ -10,7 +11,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { Server } from '@/shared/types/servers';
 
 interface ServerDropdownProps {
   value: Server;

@@ -1,6 +1,7 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { Copy, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
+import { LocalRecordNode } from '@colanode/client/types';
 
 import { NodeCollaboratorAudit } from '@/renderer/components/collaborators/node-collaborator-audit';
 import { RecordDeleteDialog } from '@/renderer/components/records/record-delete-dialog';
@@ -13,7 +14,6 @@ import {
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { LocalRecordNode } from '@/shared/types/nodes';
 
 interface RecordSettingsProps {
   record: LocalRecordNode;

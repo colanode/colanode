@@ -1,4 +1,5 @@
-import { LocalDatabaseViewNode } from '@/shared/types/nodes';
+import { LocalDatabaseViewNode } from '@colanode/client/types';
+
 import { ViewIcon } from '@/renderer/components/databases/view-icon';
 import { cn } from '@/shared/lib/utils';
 

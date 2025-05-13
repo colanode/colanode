@@ -1,5 +1,7 @@
 import React from 'react';
 import { match } from 'ts-pattern';
+import { FileListQueryInput } from '@colanode/client/queries';
+import { FolderLayoutType } from '@colanode/client/types';
 
 import { GalleryLayout } from '@/renderer/components/folders/galleries/gallery-layout';
 import { GridLayout } from '@/renderer/components/folders/grids/grid-layout';
@@ -7,8 +9,6 @@ import { ListLayout } from '@/renderer/components/folders/lists/list-layout';
 import { FolderContext } from '@/renderer/contexts/folder';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQueries } from '@/renderer/hooks/use-queries';
-import { FileListQueryInput } from '@/shared/queries/files/file-list';
-import { FolderLayoutType } from '@/shared/types/folders';
 import { useLayout } from '@/renderer/contexts/layout';
 
 const FILES_PER_PAGE = 100;

@@ -1,7 +1,8 @@
+import { LocalFileNode } from '@colanode/client/types';
+
 import { FileThumbnail } from '@/renderer/components/files/file-thumbnail';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { LocalFileNode } from '@/shared/types/nodes';
 
 interface FileContainerTabProps {
   fileId: string;

@@ -2,6 +2,7 @@ import type { JSONContent } from '@tiptap/core';
 import { EditorContent, useEditor } from '@tiptap/react';
 import isHotkey from 'is-hotkey';
 import React from 'react';
+import { FileMetadata } from '@colanode/client/types';
 
 import {
   BoldMark,
@@ -27,7 +28,6 @@ import {
   MentionExtension,
 } from '@/renderer/editor/extensions';
 import { ToolbarMenu } from '@/renderer/editor/menus';
-import { FileMetadata } from '@/shared/types/files';
 
 interface MessageEditorProps {
   accountId: string;

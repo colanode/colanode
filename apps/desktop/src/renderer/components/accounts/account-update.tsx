@@ -3,6 +3,7 @@ import { Upload } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+import { Account } from '@colanode/client/types';
 
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { Button } from '@/renderer/components/ui/button';
@@ -19,7 +20,6 @@ import { Spinner } from '@/renderer/components/ui/spinner';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
 import { cn } from '@/shared/lib/utils';
-import { Account } from '@/shared/types/accounts';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),

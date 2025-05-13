@@ -3,11 +3,11 @@
   "display": "Desktop",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "ESNext",
     "noImplicitAny": true,
     "sourceMap": true,
     "outDir": "dist",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "jsx": "react-jsx",
     "paths": {
@@ -16,7 +16,8 @@
   },
   "references": [
     { "path": "../../packages/core/tsconfig.json" },
-    { "path": "../../packages/crdt/tsconfig.json" }
+    { "path": "../../packages/crdt/tsconfig.json" },
+    { "path": "../../packages/client/tsconfig.json" }
   ],
   "include": ["src", "forge.env.d.ts"]
 }

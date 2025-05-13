@@ -1,10 +1,11 @@
+import { LocalSpaceNode } from '@colanode/client/types';
+
 import { SpaceAvatar } from '@/renderer/components/spaces/space-avatar';
 import { SpaceDescription } from '@/renderer/components/spaces/space-description';
 import { SpaceName } from '@/renderer/components/spaces/space-name';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
-import { LocalSpaceNode } from '@/shared/types/nodes';
 
 interface SpaceGeneralTabProps {
   space: LocalSpaceNode;

@@ -4,13 +4,13 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
 import { createRoot } from 'react-dom/client';
+import { Event } from '@colanode/client/types';
 
 import { HTML5Backend } from '@/shared/lib/dnd-backend';
 import { App } from '@/renderer/app';
 import { Toaster } from '@/renderer/components/ui/toaster';
 import { TooltipProvider } from '@/renderer/components/ui/tooltip';
 import { useEventBus } from '@/renderer/hooks/use-event-bus';
-import { Event } from '@/shared/types/events';
 
 export const queryClient = new QueryClient({
   defaultOptions: {

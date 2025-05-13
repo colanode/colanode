@@ -1,6 +1,7 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
+import { LocalPageNode } from '@colanode/client/types';
 
 import { NodeCollaboratorAudit } from '@/renderer/components/collaborators/node-collaborator-audit';
 import { PageDeleteDialog } from '@/renderer/components/pages/page-delete-dialog';
@@ -13,7 +14,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/renderer/components/ui/dropdown-menu';
-import { LocalPageNode } from '@/shared/types/nodes';
 
 interface PageSettingsProps {
   page: LocalPageNode;

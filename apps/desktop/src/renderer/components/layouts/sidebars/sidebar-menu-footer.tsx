@@ -1,5 +1,6 @@
 import { Check, LogOut, Plus, Settings } from 'lucide-react';
 import React from 'react';
+import { UnreadState } from '@colanode/client/types';
 
 import { useApp } from '@/renderer/contexts/app';
 import { Avatar } from '@/renderer/components/avatars/avatar';
@@ -15,7 +16,6 @@ import {
 import { AccountContext, useAccount } from '@/renderer/contexts/account';
 import { useRadar } from '@/renderer/contexts/radar';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { UnreadState } from '@/shared/types/radars';
 
 export function SidebarMenuFooter() {
   const app = useApp();

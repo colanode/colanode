@@ -1,11 +1,14 @@
 import { Download } from 'lucide-react';
+import {
+  DownloadStatus,
+  FileState,
+  LocalFileNode,
+} from '@colanode/client/types';
+import { formatBytes } from '@colanode/core';
 
 import { Spinner } from '@/renderer/components/ui/spinner';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { toast } from '@/renderer/hooks/use-toast';
-import { DownloadStatus, FileState } from '@/shared/types/files';
-import { formatBytes } from '@/shared/lib/files';
-import { LocalFileNode } from '@/shared/types/nodes';
 
 interface FileDownloadProps {
   file: LocalFileNode;

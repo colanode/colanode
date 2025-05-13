@@ -1,4 +1,5 @@
 import { InView } from 'react-intersection-observer';
+import { LocalMessageNode } from '@colanode/client/types';
 
 import { MessageActions } from '@/renderer/components/messages/message-actions';
 import { MessageAuthorAvatar } from '@/renderer/components/messages/message-author-avatar';
@@ -9,7 +10,6 @@ import { MessageTime } from '@/renderer/components/messages/message-time';
 import { MessageReference } from '@/renderer/components/messages/message-reference';
 import { useRadar } from '@/renderer/contexts/radar';
 import { useWorkspace } from '@/renderer/contexts/workspace';
-import { LocalMessageNode } from '@/shared/types/nodes';
 
 interface MessageProps {
   message: LocalMessageNode;

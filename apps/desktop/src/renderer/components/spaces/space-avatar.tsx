@@ -1,7 +1,8 @@
+import { LocalSpaceNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { AvatarPopover } from '@/renderer/components/avatars/avatar-popover';
 import { Button } from '@/renderer/components/ui/button';
-import { LocalSpaceNode } from '@/shared/types/nodes';
 
 interface SpaceAvatarProps {
   space: LocalSpaceNode;

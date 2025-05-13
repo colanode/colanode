@@ -1,7 +1,8 @@
+import { LocalPageNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { LocalPageNode } from '@/shared/types/nodes';
 
 interface PageContainerTabProps {
   pageId: string;

@@ -1,4 +1,5 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { LocalPageNode } from '@colanode/client/types';
 
 import { PageForm } from '@/renderer/components/pages/page-form';
 import {
@@ -11,7 +12,6 @@ import {
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useMutation } from '@/renderer/hooks/use-mutation';
 import { toast } from '@/renderer/hooks/use-toast';
-import { LocalPageNode } from '@/shared/types/nodes';
 
 interface PageUpdateDialogProps {
   page: LocalPageNode;

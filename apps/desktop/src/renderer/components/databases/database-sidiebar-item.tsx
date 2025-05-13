@@ -1,7 +1,8 @@
+import { LocalDatabaseNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useLayout } from '@/renderer/contexts/layout';
 import { cn } from '@/shared/lib/utils';
-import { LocalDatabaseNode } from '@/shared/types/nodes';
 
 interface DatabaseSidebarItemProps {
   database: LocalDatabaseNode;

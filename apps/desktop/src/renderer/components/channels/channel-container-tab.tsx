@@ -1,9 +1,10 @@
+import { LocalChannelNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useQuery } from '@/renderer/hooks/use-query';
 import { useRadar } from '@/renderer/contexts/radar';
 import { UnreadBadge } from '@/renderer/components/ui/unread-badge';
-import { LocalChannelNode } from '@/shared/types/nodes';
 
 interface ChannelContainerTabProps {
   channelId: string;

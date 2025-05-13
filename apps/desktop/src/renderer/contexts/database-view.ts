@@ -5,8 +5,7 @@ import {
   DatabaseViewLayout,
 } from '@colanode/core';
 import { createContext, useContext } from 'react';
-
-import { ViewField } from '@/shared/types/databases';
+import { ViewField } from '@colanode/client/types';
 
 interface DatabaseViewContext {
   id: string;

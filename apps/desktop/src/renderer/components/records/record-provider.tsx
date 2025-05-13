@@ -1,10 +1,10 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import React from 'react';
+import { LocalRecordNode } from '@colanode/client/types';
 
 import { RecordContext } from '@/renderer/contexts/record';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { toast } from '@/renderer/hooks/use-toast';
-import { LocalRecordNode } from '@/shared/types/nodes';
 
 export const RecordProvider = ({
   record,

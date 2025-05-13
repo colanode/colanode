@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Client Library",
+  "extends": "../../tsconfig.base.json",
+  "references": [
+    {
+      "path": "../core"
+    }
+  ],
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "composite": true,
+  }
+}

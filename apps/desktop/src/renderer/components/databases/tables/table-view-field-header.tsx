@@ -2,6 +2,7 @@ import { ArrowDownAz, ArrowDownZa, EyeOff, Filter, Trash2 } from 'lucide-react';
 import { Resizable } from 're-resizable';
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { ViewField } from '@colanode/client/types';
 
 import { FieldDeleteDialog } from '@/renderer/components/databases/fields/field-delete-dialog';
 import { FieldIcon } from '@/renderer/components/databases/fields/field-icon';
@@ -16,7 +17,6 @@ import { useDatabase } from '@/renderer/contexts/database';
 import { useDatabaseView } from '@/renderer/contexts/database-view';
 import { isFilterableField, isSortableField } from '@/shared/lib/databases';
 import { cn } from '@/shared/lib/utils';
-import { ViewField } from '@/shared/types/databases';
 
 interface TableViewFieldHeaderProps {
   viewField: ViewField;

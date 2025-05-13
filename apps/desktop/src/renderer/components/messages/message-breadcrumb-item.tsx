@@ -1,6 +1,5 @@
 import { MessageCircle } from 'lucide-react';
-
-import { LocalMessageNode } from '@/shared/types/nodes';
+import { LocalMessageNode } from '@colanode/client/types';
 
 interface MessageBreadcrumbItemProps {
   message: LocalMessageNode;

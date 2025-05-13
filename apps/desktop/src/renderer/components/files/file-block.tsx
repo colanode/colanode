@@ -1,8 +1,9 @@
+import { LocalFileNode } from '@colanode/client/types';
+
 import { FilePreview } from '@/renderer/components/files/file-preview';
 import { useWorkspace } from '@/renderer/contexts/workspace';
 import { useLayout } from '@/renderer/contexts/layout';
 import { useQuery } from '@/renderer/hooks/use-query';
-import { LocalFileNode } from '@/shared/types/nodes';
 
 interface FileBlockProps {
   id: string;

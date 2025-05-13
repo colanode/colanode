@@ -1,4 +1,5 @@
 import React from 'react';
+import { LocalMessageNode } from '@colanode/client/types';
 
 import { EmojiElement } from '@/renderer/components/emojis/emoji-element';
 import { useWorkspace } from '@/renderer/contexts/workspace';
@@ -8,7 +9,6 @@ import { toast } from '@/renderer/hooks/use-toast';
 import { useQuery } from '@/renderer/hooks/use-query';
 import { MessageReactionCountTooltip } from '@/renderer/components/messages/message-reaction-count-tooltip';
 import { MessageReactionCountsDialog } from '@/renderer/components/messages/message-reaction-counts-dialog';
-import { LocalMessageNode } from '@/shared/types/nodes';
 
 interface MessageReactionCountsProps {
   message: LocalMessageNode;

@@ -1,9 +1,9 @@
 import React from 'react';
+import { Icon } from '@colanode/client/types';
 
 import { IconBrowser } from '@/renderer/components/icons/icon-browser';
 import { IconSearch } from '@/renderer/components/icons/icon-search';
 import { IconPickerContext } from '@/renderer/contexts/icon-picker';
-import { Icon } from '@/shared/types/icons';
 
 interface IconPickerProps {
   onPick: (icon: Icon) => void;

@@ -1,7 +1,8 @@
+import { SidebarMenuType } from '@colanode/client/types';
+
 import { SidebarMenu } from '@/renderer/components/layouts/sidebars/sidebar-menu';
 import { SidebarChats } from '@/renderer/components/layouts/sidebars/sidebar-chats';
 import { SidebarSpaces } from '@/renderer/components/layouts/sidebars/sidebar-spaces';
-import { SidebarMenuType } from '@/shared/types/workspaces';
 
 interface SidebarProps {
   menu: SidebarMenuType;

@@ -1,7 +1,7 @@
 import { X } from 'lucide-react';
 import React from 'react';
+import { User } from '@colanode/client/types';
 
-import { User } from '@/shared/types/users';
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { Badge } from '@/renderer/components/ui/badge';
 import { Button } from '@/renderer/components/ui/button';

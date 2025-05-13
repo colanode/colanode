@@ -1,0 +1,70 @@
+import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
+import { mapAppMetadata } from '../../../lib/mappers';
+import { AppMetadataListQueryInput } from '../../../queries/apps/app-metadata-list';
+import { Event } from '../../../types/events';
+import { AppMetadata } from '../../../types/apps';
+import { SelectAppMetadata } from '../../../databases/app/schema';
+import { AppService } from '../../../services/app-service';
+
+export class AppMetadataListQueryHandler
+  implements QueryHandler<AppMetadataListQueryInput>
+{
+  private readonly app: AppService;
+
+  constructor(app: AppService) {
+    this.app = app;
+  }
+
+  public async handleQuery(
+    _: AppMetadataListQueryInput
+  ): Promise<AppMetadata[]> {
+    const rows = await this.getAppMetadata();
+    if (!rows) {
+      return [];
+    }
+
+    return rows.map(mapAppMetadata);
+  }
+
+  public async checkForChanges(
+    event: Event,
+    _: AppMetadataListQueryInput,
+    output: AppMetadata[]
+  ): Promise<ChangeCheckResult<AppMetadataListQueryInput>> {
+    if (event.type === 'app_metadata_saved') {
+      const newOutput = [
+        ...output.filter((metadata) => metadata.key !== event.metadata.key),
+        event.metadata,
+      ];
+
+      return {
+        hasChanges: true,
+        result: newOutput,
+      };
+    }
+
+    if (event.type === 'app_metadata_deleted') {
+      const newOutput = output.filter(
+        (metadata) => metadata.key !== event.metadata.key
+      );
+
+      return {
+        hasChanges: true,
+        result: newOutput,
+      };
+    }
+
+    return {
+      hasChanges: false,
+    };
+  }
+
+  private async getAppMetadata(): Promise<SelectAppMetadata[] | undefined> {
+    const rows = await this.app.database
+      .selectFrom('metadata')
+      .selectAll()
+      .execute();
+
+    return rows;
+  }
+}

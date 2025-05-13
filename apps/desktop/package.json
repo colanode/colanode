@@ -43,6 +43,7 @@
   "dependencies": {
     "@colanode/core": "*",
     "@colanode/crdt": "*",
+    "@colanode/client": "*",
     "@floating-ui/react": "^0.27.8",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-alert-dialog": "^1.1.11",

@@ -1,6 +1,7 @@
+import { mapBlocksToContents } from '@colanode/client/lib';
+import { LocalMessageNode } from '@colanode/client/types';
+
 import { NodeRenderer } from '@/renderer/editor/renderers/node';
-import { mapBlocksToContents } from '@/shared/lib/editor';
-import { LocalMessageNode } from '@/shared/types/nodes';
 
 interface MessageContentProps {
   message: LocalMessageNode;

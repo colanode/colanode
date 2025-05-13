@@ -1,6 +1,5 @@
 import { createContext, useContext } from 'react';
-
-import { Icon } from '@/shared/types/icons';
+import { Icon } from '@colanode/client/types';
 
 interface IconPickerContextProps {
   onPick: (icon: Icon) => void;

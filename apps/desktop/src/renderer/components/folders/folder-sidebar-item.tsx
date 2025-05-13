@@ -1,7 +1,8 @@
+import { LocalFolderNode } from '@colanode/client/types';
+
 import { Avatar } from '@/renderer/components/avatars/avatar';
 import { useLayout } from '@/renderer/contexts/layout';
 import { cn } from '@/shared/lib/utils';
-import { LocalFolderNode } from '@/shared/types/nodes';
 
 interface FolderSidebarItemProps {
   folder: LocalFolderNode;

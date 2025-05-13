@@ -1,8 +1,8 @@
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { LocalPageNode } from '@colanode/client/types';
 
 import { Document } from '@/renderer/components/documents/document';
 import { ScrollArea } from '@/renderer/components/ui/scroll-area';
-import { LocalPageNode } from '@/shared/types/nodes';
 
 interface PageBodyProps {
   page: LocalPageNode;
