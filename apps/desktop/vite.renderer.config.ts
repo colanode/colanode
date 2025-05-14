@@ -23,6 +23,7 @@ export default defineConfig((env) => {
       preserveSymlinks: true,
       alias: {
         '@': path.resolve(__dirname, './src'),
+        '@colanode/ui': path.resolve(__dirname, '../../packages/ui/src'),
       },
     },
     clearScreen: false,

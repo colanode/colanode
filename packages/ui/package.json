@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@colanode/ui",
+  "version": "1.0.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "files": [
+    "src"
+  ],
+  "scripts": {
+    "compile": "tsc --noEmit",
+    "test": "vitest",
+    "lint": "eslint . --max-warnings 0",
+    "build": "tsc",
+    "coverage": "vitest run --coverage "
+  },
+  "devDependencies": {
+    "postcss": "^8.5.3",
+    "tailwindcss": "^3.4.15"
+  },
+  "dependencies": {
+    "tailwind-merge": "^3.2.0",
+    "tailwindcss-animate": "^1.0.7"
+  }
+}

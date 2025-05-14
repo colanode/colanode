@@ -33,6 +33,7 @@ export default defineConfig((env) => {
       mainFields: ['module', 'jsnext:main', 'jsnext'],
       alias: {
         '@': path.resolve(__dirname, './src'),
+        '@colanode/ui': path.resolve(__dirname, '../../packages/ui/src'),
       },
     },
   };

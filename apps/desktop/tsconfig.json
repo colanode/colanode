@@ -13,11 +13,13 @@
     "paths": {
       "@/*": ["src/*"]
     },
+    "lib": ["dom"]
   },
   "references": [
     { "path": "../../packages/core/tsconfig.json" },
     { "path": "../../packages/crdt/tsconfig.json" },
-    { "path": "../../packages/client/tsconfig.json" }
+    { "path": "../../packages/client/tsconfig.json" },
+    { "path": "../../packages/ui/tsconfig.json" }
   ],
   "include": ["src", "forge.env.d.ts"]
 }

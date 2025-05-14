@@ -31,6 +31,7 @@ export function getBuildConfig(env: ConfigEnv<'build'>): UserConfig {
     resolve: {
       alias: {
         '@': path.resolve(__dirname, './src'),
+        '@colanode/ui': path.resolve(__dirname, '../../packages/ui/src'),
       },
     },
   };
