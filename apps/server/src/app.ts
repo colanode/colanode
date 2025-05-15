@@ -10,6 +10,7 @@ import {
 import { clientRoutes } from '@/api/client/routes';
 import { clientDecorator } from '@/api/client/plugins/client';
 import { errorHandler } from '@/api/client/plugins/error-handler';
+import { corsPlugin } from '@/api/client/plugins/cors';
 
 const debug = createDebugger('server:app');
 
@@ -30,6 +31,7 @@ export const initApp = async () => {
     },
   });
 
+  await server.register(corsPlugin);
   await server.register(fastifyWebsocket);
   await server.register(clientDecorator);
   await server.register(clientRoutes, { prefix: '/client/v1' });

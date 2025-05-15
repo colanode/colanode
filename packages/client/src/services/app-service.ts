@@ -7,7 +7,6 @@ import semver from 'semver';
 import { MetadataService } from './metadata-service';
 import { AccountService } from './accounts/account-service';
 import { ServerService } from './server-service';
-import { NotificationService } from './notification-service';
 import { FileSystem } from './file-system';
 import { AppBuild } from './app-build';
 import { KyselyService } from './kysely-service';
@@ -36,7 +35,6 @@ export class AppService {
   public readonly paths: AppPaths;
   public readonly database: Kysely<AppDatabaseSchema>;
   public readonly metadata: MetadataService;
-  public readonly notifications: NotificationService;
   public readonly kysely: KyselyService;
   public readonly asset: AssetService;
   public readonly mediator: Mediator;
@@ -64,7 +62,6 @@ export class AppService {
     });
 
     this.metadata = new MetadataService(this);
-    this.notifications = new NotificationService(this);
 
     this.cleanupEventLoop = new EventLoop(
       ms('10 minutes'),

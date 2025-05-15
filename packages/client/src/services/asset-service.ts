@@ -1,7 +1,7 @@
 import { Kysely } from 'kysely';
-import { net } from 'electron';
+// import { net } from 'electron';
 
-import path from 'path';
+// import path from 'path';
 
 import { AppService } from './app-service';
 
@@ -60,11 +60,11 @@ export class AssetService {
       }
     }
 
-    if (type === 'fonts') {
-      const filePath = path.join(this.app.paths.fonts, id);
-      const fileUrl = `file://${filePath}`;
-      return net.fetch(fileUrl);
-    }
+    // if (type === 'fonts') {
+    //   const filePath = path.join(this.app.paths.fonts, id);
+    //   const fileUrl = `file://${filePath}`;
+    //   return net.fetch(fileUrl);
+    // }
 
     return new Response(null, { status: 404 });
   }
