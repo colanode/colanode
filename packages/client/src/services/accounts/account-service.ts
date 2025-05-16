@@ -143,7 +143,7 @@ export class AccountService {
       eventBus.unsubscribe(this.eventSubscriptionId);
 
       const accountPath = this.app.paths.account(this.account.id);
-      await this.app.fs.deleteDirectory(accountPath);
+      await this.app.fs.delete(accountPath);
 
       eventBus.publish({
         type: 'account_deleted',

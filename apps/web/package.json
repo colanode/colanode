@@ -29,6 +29,7 @@
     "jsdom": "^26.0.0",
     "typescript": "^5.7.2",
     "vite": "^6.1.0",
+    "vite-plugin-pwa": "^1.0.0",
     "vitest": "^3.0.5",
     "web-vitals": "^4.2.4"
   }

@@ -2,21 +2,25 @@ import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
 import { IconCategoryListQueryInput } from '../../../queries/icons/icon-category-list';
 import { IconCategory } from '../../../types/icons';
 import { Event } from '../../../types/events';
-import { AppService } from '../../../services/app-service';
+import { AssetService } from '../../../services/asset-service';
 
 export class IconCategoryListQueryHandler
   implements QueryHandler<IconCategoryListQueryInput>
 {
-  private readonly app: AppService;
+  private readonly asset: AssetService;
 
-  constructor(app: AppService) {
-    this.app = app;
+  constructor(asset: AssetService) {
+    this.asset = asset;
   }
 
   public async handleQuery(
     _: IconCategoryListQueryInput
   ): Promise<IconCategory[]> {
-    const data = this.app.asset.icons
+    if (!this.asset.icons) {
+      return [];
+    }
+
+    const data = this.asset.icons
       .selectFrom('categories')
       .selectAll()
       .execute();

@@ -15,9 +15,6 @@ import {
 import axios from 'axios';
 import ms from 'ms';
 
-// import fs from 'fs';
-// import path from 'path';
-
 import { WorkspaceService } from './workspace-service';
 
 import { fetchNode, fetchUserStorageUsed } from '../../lib/utils';
@@ -28,6 +25,7 @@ import { EventLoop } from '../../lib/event-loop';
 import { SelectFileState, SelectNode } from '../../databases/workspace';
 import { MutationError, MutationErrorCode } from '../../mutations';
 import { LocalFileNode } from '../../types/nodes';
+import { AppService } from '../app-service';
 
 const UPLOAD_RETRIES_LIMIT = 10;
 const DOWNLOAD_RETRIES_LIMIT = 10;
@@ -36,26 +34,6 @@ const debug = createDebugger('desktop:service:file');
 
 const getFileMetadata = (_: string): FileMetadata | null => {
   return null;
-};
-
-const fs = {
-  existsSync: (_: string) => false,
-  mkdirSync: (_: string, __: { recursive: boolean }) => {},
-  readdirSync: (_: string) => [],
-  rmSync: (_: string, __?: { force: boolean }) => {},
-  copyFileSync: (_: string, __: string) => {},
-  readFileSync: (_: string) => Buffer.from(''),
-  writeFileSync: (_: string, __: Buffer) => {},
-  createReadStream: (_: string) => ({
-    on: (_: string, __: (...args: unknown[]) => void) => {},
-  }),
-  createWriteStream: (_: string) => ({
-    on: (_: string, __: (...args: unknown[]) => void) => {},
-  }),
-  unlinkSync: (_: string) => {},
-  statSync: (_: string) => ({
-    mtimeMs: 0,
-  }),
 };
 
 const path = {
@@ -67,6 +45,7 @@ const path = {
 };
 
 export class FileService {
+  private readonly app: AppService;
   private readonly workspace: WorkspaceService;
   private readonly filesDir: string;
   private readonly tempFilesDir: string;
@@ -76,6 +55,7 @@ export class FileService {
   private readonly cleanupEventLoop: EventLoop;
 
   constructor(workspace: WorkspaceService) {
+    this.app = workspace.account.app;
     this.workspace = workspace;
     this.filesDir = this.workspace.account.app.paths.workspaceFiles(
       this.workspace.accountId,
@@ -87,13 +67,8 @@ export class FileService {
       this.workspace.id
     );
 
-    if (!fs.existsSync(this.filesDir)) {
-      fs.mkdirSync(this.filesDir, { recursive: true });
-    }
-
-    if (!fs.existsSync(this.tempFilesDir)) {
-      fs.mkdirSync(this.tempFilesDir, { recursive: true });
-    }
+    this.app.fs.makeDirectory(this.filesDir);
+    this.app.fs.makeDirectory(this.tempFilesDir);
 
     this.uploadsEventLoop = new EventLoop(
       ms('1 minute'),
@@ -228,7 +203,7 @@ export class FileService {
     this.triggerUploads();
   }
 
-  public deleteFile(node: SelectNode): void {
+  public async deleteFile(node: SelectNode): Promise<void> {
     const file = mapNode(node);
 
     if (file.type !== 'file') {
@@ -236,29 +211,27 @@ export class FileService {
     }
 
     const filePath = this.buildFilePath(file.id, file.attributes.extension);
-    fs.rmSync(filePath, { force: true });
+    await this.app.fs.delete(filePath);
   }
 
-  private copyFileToWorkspace(
+  private async copyFileToWorkspace(
     filePath: string,
     fileId: string,
     fileExtension: string
-  ): void {
+  ): Promise<void> {
     const destinationFilePath = this.buildFilePath(fileId, fileExtension);
 
-    if (!fs.existsSync(this.filesDir)) {
-      fs.mkdirSync(this.filesDir, { recursive: true });
-    }
+    await this.app.fs.makeDirectory(this.filesDir);
 
     debug(`Copying file ${filePath} to ${destinationFilePath}`);
-    fs.copyFileSync(filePath, destinationFilePath);
+    await this.app.fs.copy(filePath, destinationFilePath);
 
     // check if the file is in the temp files directory. If it is in
     // temp files directory it means it has been pasted or dragged
     // therefore we need to delete it
     const fileDirectory = path.dirname(filePath);
     if (fileDirectory === this.tempFilesDir) {
-      fs.rmSync(filePath);
+      await this.app.fs.delete(filePath);
     }
   }
 
@@ -365,8 +338,8 @@ export class FileService {
     }
 
     const filePath = this.buildFilePath(file.id, file.attributes.extension);
-
-    if (!fs.existsSync(filePath)) {
+    const exists = await this.app.fs.exists(filePath);
+    if (!exists) {
       debug(`File ${file.id} not found, deleting from database`);
       return;
     }
@@ -383,7 +356,7 @@ export class FileService {
         );
 
       const presignedUrl = data.url;
-      const fileStream = fs.createReadStream(filePath);
+      const fileStream = this.app.fs.createReadStream(filePath);
 
       let lastProgress = 0;
       await axios.put(presignedUrl, fileStream, {
@@ -544,7 +517,8 @@ export class FileService {
     }
 
     const filePath = this.buildFilePath(file.id, file.attributes.extension);
-    if (fs.existsSync(filePath)) {
+    const exists = await this.app.fs.exists(filePath);
+    if (!exists) {
       const updatedFileState = await this.workspace.database
         .updateTable('file_states')
         .returningAll()
@@ -575,7 +549,7 @@ export class FileService {
         );
 
       const presignedUrl = data.url;
-      const fileStream = fs.createWriteStream(filePath);
+      const fileStream = this.app.fs.createWriteStream(filePath);
       let lastProgress = 0;
 
       await axios
@@ -656,7 +630,7 @@ export class FileService {
   public async cleanDeletedFiles(): Promise<void> {
     debug(`Checking deleted files for workspace ${this.workspace.id}`);
 
-    const fsFiles = fs.readdirSync(this.filesDir);
+    const fsFiles = await this.app.fs.listFiles(this.filesDir);
     while (fsFiles.length > 0) {
       const batch = fsFiles.splice(0, 100);
       const fileIdMap: Record<string, string> = {};
@@ -680,7 +654,7 @@ export class FileService {
         }
 
         const filePath = path.join(this.filesDir, fileIdMap[fileId]!);
-        fs.rmSync(filePath, { force: true });
+        await this.app.fs.delete(filePath);
       }
     }
   }
@@ -688,20 +662,21 @@ export class FileService {
   public async cleanTempFiles(): Promise<void> {
     debug(`Checking temp files for workspace ${this.workspace.id}`);
 
-    if (!fs.existsSync(this.tempFilesDir)) {
+    const exists = await this.app.fs.exists(this.tempFilesDir);
+    if (!exists) {
       return;
     }
 
-    const files = fs.readdirSync(this.tempFilesDir);
+    const files = await this.app.fs.listFiles(this.tempFilesDir);
     const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
     for (const file of files) {
       const filePath = path.join(this.tempFilesDir, file);
-      const stats = fs.statSync(filePath);
+      const metadata = await this.app.fs.metadata(filePath);
 
-      if (stats.mtimeMs < oneDayAgo) {
+      if (metadata.lastModified < oneDayAgo) {
         try {
-          fs.unlinkSync(filePath);
+          await this.app.fs.delete(filePath);
           debug(`Deleted old temp file: ${filePath}`);
         } catch (error) {
           debug(`Failed to delete temp file: ${filePath}`, error);

@@ -11,6 +11,7 @@ import { FileSystem } from './file-system';
 import { AppBuild } from './app-build';
 import { KyselyService } from './kysely-service';
 import { AppPaths } from './app-paths';
+import { AssetService } from './asset-service';
 
 import { AppDatabaseSchema, appDatabaseMigrations } from '../databases/app';
 import { mapServer, mapAccount } from '../lib/mappers';
@@ -19,7 +20,6 @@ import { Server } from '../types/servers';
 import { EventLoop } from '../lib/event-loop';
 import { parseApiError } from '../lib/axios';
 import { eventBus } from '../lib/event-bus';
-import { AssetService } from '../services/asset-service';
 import { Mediator } from '../handlers';
 
 const debug = createDebugger('desktop:service:app');
@@ -36,22 +36,21 @@ export class AppService {
   public readonly database: Kysely<AppDatabaseSchema>;
   public readonly metadata: MetadataService;
   public readonly kysely: KyselyService;
-  public readonly asset: AssetService;
   public readonly mediator: Mediator;
 
   constructor(
     fs: FileSystem,
     build: AppBuild,
     kysely: KyselyService,
-    paths: AppPaths
+    paths: AppPaths,
+    asset: AssetService
   ) {
     this.build = build;
     this.fs = fs;
     this.paths = paths;
     this.kysely = kysely;
     this.database = kysely.build<AppDatabaseSchema>(paths.appDatabase);
-    this.asset = new AssetService(this);
-    this.mediator = new Mediator(this);
+    this.mediator = new Mediator(this, asset);
 
     // register interceptor to add client headers to all requests
     axios.interceptors.request.use((config) => {
@@ -291,6 +290,6 @@ export class AppService {
     await this.database.deleteFrom('accounts').execute();
     await this.database.deleteFrom('metadata').execute();
     await this.database.deleteFrom('deleted_tokens').execute();
-    await this.fs.deleteDirectory(this.paths.accounts);
+    await this.fs.delete(this.paths.accounts);
   }
 }

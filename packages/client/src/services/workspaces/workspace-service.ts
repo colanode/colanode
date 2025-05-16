@@ -129,7 +129,7 @@ export class WorkspaceService {
         this.workspace.id
       );
 
-      await this.account.app.fs.deleteDirectory(workspacePath);
+      await this.account.app.fs.delete(workspacePath);
 
       await this.account.database
         .deleteFrom('workspaces')

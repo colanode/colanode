@@ -36,10 +36,6 @@ export const getColorForId = (id: string) => {
   return colors[index];
 };
 
-export const getAvatarUrl = (accountId: string, avatar: string): string => {
-  return `avatar://${accountId}/${avatar}`;
-};
-
 export const getDefaultNodeAvatar = (type: IdType): string | null => {
   if (type === IdType.Channel) {
     return defaultIcons.chat;

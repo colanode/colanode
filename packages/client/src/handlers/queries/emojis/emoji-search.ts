@@ -3,19 +3,23 @@ import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
 import { EmojiSearchQueryInput } from '../../../queries/emojis/emoji-search';
 import { Emoji } from '../../../types/emojis';
 import { Event } from '../../../types/events';
-import { AppService } from '../../../services/app-service';
+import { AssetService } from '../../../services/asset-service';
 
 export class EmojiSearchQueryHandler
   implements QueryHandler<EmojiSearchQueryInput>
 {
-  private readonly app: AppService;
+  private readonly asset: AssetService;
 
-  constructor(app: AppService) {
-    this.app = app;
+  constructor(asset: AssetService) {
+    this.asset = asset;
   }
 
   public async handleQuery(input: EmojiSearchQueryInput): Promise<Emoji[]> {
-    const data = await this.app.asset.emojis
+    if (!this.asset.emojis) {
+      return [];
+    }
+
+    const data = await this.asset.emojis
       .selectFrom('emojis')
       .innerJoin('emoji_search', 'emojis.id', 'emoji_search.id')
       .selectAll('emojis')

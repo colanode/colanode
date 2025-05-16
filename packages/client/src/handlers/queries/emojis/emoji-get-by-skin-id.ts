@@ -3,19 +3,25 @@ import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
 import { EmojiGetBySkinIdQueryInput } from '../../../queries/emojis/emoji-get-by-skin-id';
 import { Emoji } from '../../../types/emojis';
 import { Event } from '../../../types/events';
-import { AppService } from '../../../services/app-service';
+import { AssetService } from '../../../services/asset-service';
 
 export class EmojiGetBySkinIdQueryHandler
   implements QueryHandler<EmojiGetBySkinIdQueryInput>
 {
-  private readonly app: AppService;
+  private readonly asset: AssetService;
 
-  constructor(app: AppService) {
-    this.app = app;
+  constructor(asset: AssetService) {
+    this.asset = asset;
   }
 
-  public async handleQuery(input: EmojiGetBySkinIdQueryInput): Promise<Emoji> {
-    const data = await this.app.asset.emojis
+  public async handleQuery(
+    input: EmojiGetBySkinIdQueryInput
+  ): Promise<Emoji | null> {
+    if (!this.asset.emojis) {
+      return null;
+    }
+
+    const data = await this.asset.emojis
       .selectFrom('emojis')
       .innerJoin('emoji_svgs', 'emojis.id', 'emoji_svgs.emoji_id')
       .selectAll('emojis')
@@ -23,7 +29,7 @@ export class EmojiGetBySkinIdQueryHandler
       .executeTakeFirst();
 
     if (!data) {
-      throw new Error('Emoji not found');
+      return null;
     }
 
     const emoji = mapEmoji(data);
@@ -33,7 +39,7 @@ export class EmojiGetBySkinIdQueryHandler
   public async checkForChanges(
     _: Event,
     __: EmojiGetBySkinIdQueryInput,
-    ___: Emoji
+    ___: Emoji | null
   ): Promise<ChangeCheckResult<EmojiGetBySkinIdQueryInput>> {
     return {
       hasChanges: false,

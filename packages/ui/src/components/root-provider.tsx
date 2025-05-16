@@ -3,7 +3,7 @@ import '@colanode/ui/styles/index.css';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import React from 'react';
 import { DndProvider } from 'react-dnd';
-import { Event } from '@colanode/client/types';
+import { AppType, Event } from '@colanode/client/types';
 import { App } from '@colanode/ui/components/app';
 import { Toaster } from '@colanode/ui/components/ui/toaster';
 import { TooltipProvider } from '@colanode/ui/components/ui/tooltip';
@@ -21,7 +21,11 @@ export const queryClient = new QueryClient({
   },
 });
 
-export const RootProvider = () => {
+interface RootProviderProps {
+  type: AppType;
+}
+
+export const RootProvider = ({ type }: RootProviderProps) => {
   const eventBus = useEventBus();
 
   React.useEffect(() => {
@@ -58,7 +62,7 @@ export const RootProvider = () => {
     <QueryClientProvider client={queryClient}>
       <DndProvider backend={HTML5Backend}>
         <TooltipProvider>
-          <App />
+          <App type={type} />
         </TooltipProvider>
         <Toaster />
       </DndProvider>

@@ -6,8 +6,13 @@ import { useQuery } from '@colanode/ui/hooks/use-query';
 import { RadarProvider } from '@colanode/ui/components/radar-provider';
 import { Account } from '@colanode/ui/components/accounts/account';
 import { Login } from '@colanode/ui/components/accounts/login';
+import { AppType } from '@colanode/client/types';
 
-export const App = () => {
+interface AppProps {
+  type: AppType;
+}
+
+export const App = ({ type }: AppProps) => {
   const [initialized, setInitialized] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
 
@@ -44,6 +49,7 @@ export const App = () => {
   return (
     <AppContext.Provider
       value={{
+        type,
         getMetadata: (key) => {
           return metadata?.find((metadata) => metadata.key === key)?.value;
         },
@@ -69,6 +75,27 @@ export const App = () => {
             key: 'account',
             value: id,
           });
+        },
+        getEmojiUrl: (id: string) => {
+          if (type === 'desktop') {
+            return `asset://emojis/${id}`;
+          }
+
+          return `/asset/emojis/${id}`;
+        },
+        getIconUrl: (id: string) => {
+          if (type === 'desktop') {
+            return `asset://icons/${id}`;
+          }
+
+          return `/asset/icons/${id}`;
+        },
+        getAvatarUrl: (accountId: string, avatar: string) => {
+          if (type === 'desktop') {
+            return `avatar://${accountId}/${avatar}`;
+          }
+
+          return `/avatars/${accountId}/${avatar}`;
         },
       }}
     >

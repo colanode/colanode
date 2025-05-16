@@ -3,18 +3,22 @@ import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
 import { IconListQueryInput } from '../../../queries/icons/icon-list';
 import { Icon } from '../../../types/icons';
 import { Event } from '../../../types/events';
-import { AppService } from '../../../services/app-service';
+import { AssetService } from '../../../services/asset-service';
 
 export class IconListQueryHandler implements QueryHandler<IconListQueryInput> {
-  private readonly app: AppService;
+  private readonly asset: AssetService;
 
-  constructor(app: AppService) {
-    this.app = app;
+  constructor(asset: AssetService) {
+    this.asset = asset;
   }
 
   public async handleQuery(input: IconListQueryInput): Promise<Icon[]> {
+    if (!this.asset.icons) {
+      return [];
+    }
+
     const offset = input.page * input.count;
-    const data = await this.app.asset.icons
+    const data = await this.asset.icons
       .selectFrom('icons')
       .selectAll()
       .where('category_id', '=', input.category)

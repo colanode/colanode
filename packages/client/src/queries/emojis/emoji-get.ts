@@ -9,7 +9,7 @@ declare module '@colanode/client/queries' {
   interface QueryMap {
     emoji_get: {
       input: EmojiGetQueryInput;
-      output: Emoji;
+      output: Emoji | null;
     };
   }
 }

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite';
 import viteReact from '@vitejs/plugin-react';
 import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
 import { resolve } from 'node:path';
 
@@ -18,7 +19,7 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ['@sqlite.org/sqlite-wasm', 'sqlocal'],
+    exclude: ['sqlocal'],
   },
   plugins: [
     TanStackRouterVite({ autoCodeSplitting: true }),
@@ -34,5 +35,22 @@ export default defineConfig({
         });
       },
     },
+    VitePWA({
+      mode: 'development',
+      base: '/',
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      devOptions: {
+        enabled: true,
+        type: 'module',
+      },
+      srcDir: 'src/workers',
+      filename: 'service.ts',
+      strategies: 'injectManifest',
+      registerType: 'autoUpdate',
+      injectManifest: {
+        minify: false,
+        enableWorkboxModulesLogs: true,
+      },
+    }),
   ],
 });

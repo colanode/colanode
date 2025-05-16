@@ -1,3 +1,5 @@
+export type AppType = 'desktop' | 'web';
+
 export type AppPlatform =
   | 'aix'
   | 'darwin'

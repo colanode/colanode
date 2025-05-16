@@ -39,14 +39,17 @@ import { WorkspaceMetadataListQueryHandler } from './workspaces/workspace-metada
 
 import { QueryHandler } from '../../lib/types';
 import { QueryMap } from '../../queries';
-
-import { AppService } from '~/services/app-service';
+import { AppService } from '../../services/app-service';
+import { AssetService } from '../../services/asset-service';
 
 export type QueryHandlerMap = {
   [K in keyof QueryMap]: QueryHandler<QueryMap[K]['input']>;
 };
 
-export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
+export const buildQueryHandlerMap = (
+  app: AppService,
+  asset: AssetService
+): QueryHandlerMap => {
   return {
     app_metadata_list: new AppMetadataListQueryHandler(app),
     account_list: new AccountListQueryHandler(app),
@@ -61,14 +64,14 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     workspace_list: new WorkspaceListQueryHandler(app),
     user_list: new UserListQueryHandler(app),
     file_list: new FileListQueryHandler(app),
-    emoji_list: new EmojiListQueryHandler(app),
-    emoji_get: new EmojiGetQueryHandler(app),
-    emoji_get_by_skin_id: new EmojiGetBySkinIdQueryHandler(app),
-    emoji_category_list: new EmojiCategoryListQueryHandler(app),
-    emoji_search: new EmojiSearchQueryHandler(app),
-    icon_list: new IconListQueryHandler(app),
-    icon_search: new IconSearchQueryHandler(app),
-    icon_category_list: new IconCategoryListQueryHandler(app),
+    emoji_list: new EmojiListQueryHandler(asset),
+    emoji_get: new EmojiGetQueryHandler(asset),
+    emoji_get_by_skin_id: new EmojiGetBySkinIdQueryHandler(asset),
+    emoji_category_list: new EmojiCategoryListQueryHandler(asset),
+    emoji_search: new EmojiSearchQueryHandler(asset),
+    icon_list: new IconListQueryHandler(asset),
+    icon_search: new IconSearchQueryHandler(asset),
+    icon_category_list: new IconCategoryListQueryHandler(asset),
     node_children_get: new NodeChildrenGetQueryHandler(app),
     radar_data_get: new RadarDataGetQueryHandler(app),
     file_metadata_get: new FileMetadataGetQueryHandler(),

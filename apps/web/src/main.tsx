@@ -1,8 +1,8 @@
 import { createRoot } from 'react-dom/client';
-import { RootProvider } from '@colanode/ui';
 import * as Comlink from 'comlink';
 import { eventBus } from '@colanode/client/lib';
 
+import { Root } from '@/root';
 import { ColanodeWorkerApi } from '@/workers/types';
 import DedicatedWorker from '@/workers/dedicated?worker';
 
@@ -18,4 +18,4 @@ workerApi.subscribe(
 );
 
 const root = createRoot(document.getElementById('root') as HTMLElement);
-root.render(<RootProvider />);
+root.render(<Root />);

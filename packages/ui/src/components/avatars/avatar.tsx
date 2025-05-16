@@ -3,12 +3,11 @@ import { getIdType, IdType } from '@colanode/core';
 import { useAccount } from '@colanode/ui/contexts/account';
 import {
   getAvatarSizeClasses,
-  getAvatarUrl,
   getColorForId,
   getDefaultNodeAvatar,
 } from '@colanode/ui/lib/avatars';
-import { getEmojiUrl, getIconUrl } from '@colanode/ui/lib/assets';
 import { cn } from '@colanode/ui/lib/utils';
+import { useApp } from '@colanode/ui/contexts';
 
 interface AvatarProps {
   id: string;
@@ -69,11 +68,13 @@ const AvatarFallback = ({ id, name, size, className }: AvatarProps) => {
 };
 
 const EmojiAvatar = ({ avatar, size, className }: AvatarProps) => {
+  const app = useApp();
+
   if (!avatar) {
     return null;
   }
 
-  const url = getEmojiUrl(avatar);
+  const url = app.getEmojiUrl(avatar);
   return (
     <img
       src={url}
@@ -84,11 +85,13 @@ const EmojiAvatar = ({ avatar, size, className }: AvatarProps) => {
 };
 
 const IconAvatar = ({ avatar, size, className }: AvatarProps) => {
+  const app = useApp();
+
   if (!avatar) {
     return null;
   }
 
-  const url = getIconUrl(avatar);
+  const url = app.getIconUrl(avatar);
   return (
     <img
       src={url}
@@ -99,6 +102,7 @@ const IconAvatar = ({ avatar, size, className }: AvatarProps) => {
 };
 
 const CustomAvatar = ({ avatar, size, className }: AvatarProps) => {
+  const app = useApp();
   const account = useAccount();
   const [failed, setFailed] = React.useState(false);
 
@@ -110,7 +114,7 @@ const CustomAvatar = ({ avatar, size, className }: AvatarProps) => {
     return <AvatarFallback id={avatar} size={size} className={className} />;
   }
 
-  const url = getAvatarUrl(account.id, avatar);
+  const url = app.getAvatarUrl(account.id, avatar);
   return (
     <img
       src={url}

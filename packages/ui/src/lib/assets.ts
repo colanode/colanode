@@ -1,19 +1,3 @@
-export const getEmojiUrl = (id: string | null | undefined): string => {
-  if (!id) {
-    return '';
-  }
-
-  return `asset://emojis/${id}`;
-};
-
-export const getIconUrl = (id: string | null | undefined): string => {
-  if (!id) {
-    return '';
-  }
-
-  return `asset://icons/${id}`;
-};
-
 export const defaultEmojis = {
   like: '01jhzbzam4bv3y6xrgmfdeaj5jem',
   hand: '01jhzbzacgh2sns93j4xs950qsem',
