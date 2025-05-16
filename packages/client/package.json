@@ -23,6 +23,7 @@
     "build": "tsc",
     "coverage": "vitest run --coverage "
   },
-  "devDependencies": {},
-  "dependencies": {}
+  "dependencies": {
+    "isomorphic-ws": "^5.0.0"
+  }
 }

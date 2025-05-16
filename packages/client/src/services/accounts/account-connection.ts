@@ -1,5 +1,5 @@
 import { Message, createDebugger } from '@colanode/core';
-import { WebSocket } from 'ws';
+import WebSocket from 'isomorphic-ws';
 import ms from 'ms';
 
 import { AccountService } from './account-service';
@@ -58,11 +58,8 @@ export class AccountConnection {
       return;
     }
 
-    this.socket = new WebSocket(this.account.server.synapseUrl, {
-      headers: {
-        authorization: this.account.token,
-      },
-    });
+    const url = `${this.account.server.synapseUrl}?token=${this.account.token}`;
+    this.socket = new WebSocket(url);
 
     this.socket.onmessage = async (event) => {
       const data: string = event.data.toString();
