@@ -12,13 +12,13 @@
   "dependencies": {
     "@colanode/client": "*",
     "@colanode/ui": "*",
+    "@sqlite.org/sqlite-wasm": "^3.49.2-build1",
     "@tanstack/react-router": "^1.114.3",
     "@tanstack/react-router-devtools": "^1.114.3",
     "@tanstack/router-plugin": "^1.114.3",
     "comlink": "^4.4.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
-    "sqlocal": "^0.14.1"
+    "react-dom": "^19.0.0"
   },
   "devDependencies": {
     "@testing-library/dom": "^10.4.0",

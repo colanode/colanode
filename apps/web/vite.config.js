@@ -19,22 +19,11 @@ export default defineConfig({
     },
   },
   optimizeDeps: {
-    exclude: ['sqlocal'],
+    exclude: ['@sqlite.org/sqlite-wasm'],
   },
   plugins: [
     TanStackRouterVite({ autoCodeSplitting: true }),
     viteReact(),
-    {
-      enforce: 'pre',
-      name: 'configure-response-headers',
-      configureServer: (server) => {
-        server.middlewares.use((_req, res, next) => {
-          res.setHeader('Cross-Origin-Embedder-Policy', 'require-corp');
-          res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-          next();
-        });
-      },
-    },
     VitePWA({
       mode: 'development',
       base: '/',
