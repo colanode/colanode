@@ -2,6 +2,7 @@ import AdmZip from 'adm-zip';
 import fetch from 'node-fetch';
 import SQLite from 'better-sqlite3';
 import { generateId, IdType } from '@colanode/core';
+import SvgSprite from 'svg-sprite';
 
 import fs from 'fs';
 import path from 'path';
@@ -68,6 +69,8 @@ const GITHUB_DOMAIN = 'https://github.com';
 
 const WORK_DIR_PATH = 'src/emojis/temp';
 const DATABASE_PATH = 'src/emojis/emojis.db';
+const MIN_DATABASE_PATH = 'src/emojis/emojis-min.db';
+const SPRITE_PATH = 'src/emojis/emojis.svg';
 
 const EMOJI_MART_REPO = 'missive/emoji-mart';
 const EMOJI_MART_TAG = '5.6.0';
@@ -96,6 +99,86 @@ const TWEEMOJI_REPO = 'jdecked/twemoji';
 const TWEEMOJI_TAG = '15.1.0';
 const TWEEMOJI_DIR_PATH = path.join(WORK_DIR_PATH, `twemoji-${TWEEMOJI_TAG}`);
 const TWEEMOJI_SVG_DIR_PATH = path.join(TWEEMOJI_DIR_PATH, 'assets', 'svg');
+
+const CREATE_CATEGORIES_TABLE_SQL = `
+  CREATE TABLE IF NOT EXISTS categories (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    count INTEGER NOT NULL,
+    display_order INTEGER NOT NULL
+  );
+`;
+
+const CREATE_EMOJITS_TABLE_SQL = `
+  CREATE TABLE IF NOT EXISTS emojis (
+    id TEXT PRIMARY KEY,
+    category_id TEXT,
+    code TEXT NOT NULL,
+    name TEXT NOT NULL,
+    tags TEXT,
+    emoticons TEXT,
+    skins TEXT,
+    FOREIGN KEY(category_id) REFERENCES categories(id)
+  );
+`;
+
+const CREATE_EMOJI_SVGS_TABLE_SQL = `
+  CREATE TABLE IF NOT EXISTS emoji_svgs (
+    skin_id TEXT PRIMARY KEY,
+    emoji_id TEXT NOT NULL,
+    svg BLOB NOT NULL
+  );
+`;
+
+const CREATE_EMOJI_SEARCH_TABLE_SQL = `
+  CREATE VIRTUAL TABLE IF NOT EXISTS emoji_search
+  USING fts5(
+    id UNINDEXED,
+    text
+  );
+`;
+
+const CREATE_EMOJI_CATEGORY_INDEX_SQL = `
+  CREATE INDEX IF NOT EXISTS idx_emojis_category_id ON emojis(category_id);
+`;
+
+const UPSERT_CATEGORY_SQL = `
+  INSERT INTO categories (id, name, count, display_order)
+  VALUES (@id, @name, @count, @display_order)
+  ON CONFLICT(id) DO UPDATE SET
+    name=excluded.name,
+    count=excluded.count,
+    display_order=excluded.display_order
+`;
+
+const UPSERT_EMOJI_SQL = `
+  INSERT INTO emojis (id, category_id, code, name, tags, emoticons, skins)
+  VALUES (@id, @category_id, @code, @name, @tags, @emoticons, @skins)
+  ON CONFLICT(id) DO UPDATE SET
+    category_id=excluded.category_id,
+    code=excluded.code,
+    name=excluded.name,
+    tags=excluded.tags,
+    emoticons=excluded.emoticons,
+    skins=excluded.skins
+`;
+
+const DELETE_SEARCH_SQL = `
+  DELETE FROM emoji_search WHERE id = @id
+`;
+
+const INSERT_SEARCH_SQL = `
+  INSERT INTO emoji_search (id, text)
+  VALUES (
+    @id,
+    @text
+  )
+`;
+
+const UPSERT_SVG_SQL = `
+  INSERT OR REPLACE INTO emoji_svgs (skin_id, emoji_id, svg)
+  VALUES (@skin_id, @emoji_id, @svg)
+`;
 
 const downloadZipAndExtract = async (url: string, dir: string) => {
   const response = await fetch(url);
@@ -148,39 +231,22 @@ const getEmojiSkinFileName = (unified: string): string => {
 const initDatabase = () => {
   const database = new SQLite(DATABASE_PATH);
 
-  database.exec(`
-    CREATE TABLE IF NOT EXISTS categories (
-      id TEXT PRIMARY KEY,
-      name TEXT NOT NULL,
-      count INTEGER NOT NULL,
-      display_order INTEGER NOT NULL
-    );
-  
-    CREATE TABLE IF NOT EXISTS emojis (
-      id TEXT PRIMARY KEY,
-      category_id TEXT,
-      code TEXT NOT NULL,
-      name TEXT NOT NULL,
-      tags TEXT,
-      emoticons TEXT,
-      skins TEXT,
-      FOREIGN KEY(category_id) REFERENCES categories(id)
-    );
+  database.exec(CREATE_CATEGORIES_TABLE_SQL);
+  database.exec(CREATE_EMOJITS_TABLE_SQL);
+  database.exec(CREATE_EMOJI_SVGS_TABLE_SQL);
+  database.exec(CREATE_EMOJI_SEARCH_TABLE_SQL);
+  database.exec(CREATE_EMOJI_CATEGORY_INDEX_SQL);
 
-    CREATE INDEX IF NOT EXISTS idx_emojis_category_id ON emojis(category_id);
+  return database;
+};
 
-    CREATE TABLE IF NOT EXISTS emoji_svgs (
-      skin_id TEXT PRIMARY KEY,
-      emoji_id TEXT NOT NULL,
-      svg BLOB NOT NULL
-    );
+const initMinDatabase = () => {
+  const database = new SQLite(MIN_DATABASE_PATH);
 
-    CREATE VIRTUAL TABLE IF NOT EXISTS emoji_search
-    USING fts5(
-      id UNINDEXED,
-      text
-    );
-  `);
+  database.exec(CREATE_CATEGORIES_TABLE_SQL);
+  database.exec(CREATE_EMOJITS_TABLE_SQL);
+  database.exec(CREATE_EMOJI_SEARCH_TABLE_SQL);
+  database.exec(CREATE_EMOJI_CATEGORY_INDEX_SQL);
 
   return database;
 };
@@ -217,46 +283,33 @@ const readExistingMetadata = (database: SQLite.Database) => {
   return { emojis, categories };
 };
 
-const processEmojisIntoDb = (database: SQLite.Database) => {
+const processEmojis = (
+  database: SQLite.Database,
+  minDatabase: SQLite.Database
+) => {
   console.log(`Processing emojis into database...`);
 
-  const insertOrUpdateCategory = database.prepare(`
-    INSERT INTO categories (id, name, count, display_order)
-    VALUES (@id, @name, @count, @display_order)
-    ON CONFLICT(id) DO UPDATE SET
-      name=excluded.name,
-      count=excluded.count,
-      display_order=excluded.display_order
-  `);
+  const sprite = new SvgSprite({
+    mode: {
+      symbol: {
+        dest: SPRITE_PATH,
+      },
+    },
+  });
 
-  const insertOrUpdateEmoji = database.prepare(`
-    INSERT INTO emojis (id, category_id, code, name, tags, emoticons, skins)
-    VALUES (@id, @category_id, @code, @name, @tags, @emoticons, @skins)
-    ON CONFLICT(id) DO UPDATE SET
-      category_id=excluded.category_id,
-      code=excluded.code,
-      name=excluded.name,
-      tags=excluded.tags,
-      emoticons=excluded.emoticons,
-      skins=excluded.skins
-  `);
+  const upsertCategory = database.prepare(UPSERT_CATEGORY_SQL);
+  const upsertCategoryMin = minDatabase.prepare(UPSERT_CATEGORY_SQL);
 
-  const deleteSearch = database.prepare(`
-    DELETE FROM emoji_search WHERE id = @id
-  `);
+  const upsertEmoji = database.prepare(UPSERT_EMOJI_SQL);
+  const upsertEmojiMin = minDatabase.prepare(UPSERT_EMOJI_SQL);
 
-  const insertSearch = database.prepare(`
-    INSERT INTO emoji_search (id, text)
-    VALUES (
-      @id,
-      @text
-    )
-  `);
+  const deleteSearch = database.prepare(DELETE_SEARCH_SQL);
+  const deleteSearchMin = minDatabase.prepare(DELETE_SEARCH_SQL);
 
-  const insertOrReplaceSVG = database.prepare(`
-    INSERT OR REPLACE INTO emoji_svgs (skin_id, emoji_id, svg)
-    VALUES (@skin_id, @emoji_id, @svg)
-  `);
+  const insertSearch = database.prepare(INSERT_SEARCH_SQL);
+  const insertSearchMin = minDatabase.prepare(INSERT_SEARCH_SQL);
+
+  const upsertSvg = database.prepare(UPSERT_SVG_SQL);
 
   const existingMetadata = readExistingMetadata(database);
 
@@ -289,7 +342,13 @@ const processEmojisIntoDb = (database: SQLite.Database) => {
       ? existingCategory.display_order
       : maxDisplayOrder + 1;
 
-    insertOrUpdateCategory.run({
+    upsertCategory.run({
+      id: category.id,
+      name: i18nCategory,
+      count: category.emojis.length,
+      display_order: displayOrder,
+    });
+    upsertCategoryMin.run({
       id: category.id,
       name: i18nCategory,
       count: category.emojis.length,
@@ -310,6 +369,10 @@ const processEmojisIntoDb = (database: SQLite.Database) => {
       const existingEmoji = Object.values(existingMetadata.emojis).find(
         (e) => e.code === emojiMartItem.id
       );
+
+      if (!existingEmoji) {
+        console.log(`New emoji ${emojiMartItem.name}`);
+      }
 
       const finalEmojiId = existingEmoji
         ? existingEmoji.id
@@ -342,7 +405,16 @@ const processEmojisIntoDb = (database: SQLite.Database) => {
         }
       }
 
-      insertOrUpdateEmoji.run({
+      upsertEmoji.run({
+        id: newEmoji.id,
+        category_id: category.id,
+        code: newEmoji.code,
+        name: newEmoji.name,
+        tags: JSON.stringify(newEmoji.tags),
+        emoticons: JSON.stringify(newEmoji.emoticons || []),
+        skins: JSON.stringify(newEmoji.skins),
+      });
+      upsertEmojiMin.run({
         id: newEmoji.id,
         category_id: category.id,
         code: newEmoji.code,
@@ -359,8 +431,13 @@ const processEmojisIntoDb = (database: SQLite.Database) => {
       ].join(' ');
 
       deleteSearch.run({ id: newEmoji.id });
+      deleteSearchMin.run({ id: newEmoji.id });
 
       insertSearch.run({
+        id: newEmoji.id,
+        text,
+      });
+      insertSearchMin.run({
         id: newEmoji.id,
         text,
       });
@@ -375,18 +452,21 @@ const processEmojisIntoDb = (database: SQLite.Database) => {
         }
 
         const svgBuffer = fs.readFileSync(sourceFilePath);
-        insertOrReplaceSVG.run({
+
+        upsertSvg.run({
           skin_id: skin.id,
           emoji_id: newEmoji.id,
           svg: svgBuffer,
         });
+
+        sprite.add(skin.id, null, svgBuffer.toString('utf-8'));
       }
 
       codeToEmojiId[emojiMartItem.id] = finalEmojiId;
     }
   }
 
-  console.log(`Done processing emojis into database.`);
+  console.log(`Done processing emojis.`);
 };
 
 const generateEmojis = async () => {
@@ -398,10 +478,15 @@ const generateEmojis = async () => {
   await downloadTweemojiRepo();
 
   const db = initDatabase();
-  processEmojisIntoDb(db);
+  const minDb = initMinDatabase();
+
+  processEmojis(db, minDb);
+
+  console.log('Vacuuming databases...');
+  db.exec('VACUUM');
+  minDb.exec('VACUUM');
 
   console.log(`Cleaning up...`);
-
   fs.rmSync(WORK_DIR_PATH, {
     recursive: true,
     force: true,
@@ -409,7 +494,7 @@ const generateEmojis = async () => {
     retryDelay: 1000,
   });
 
-  console.log(`All done. The 'emojis.db' file now contains everything!`);
+  console.log(`All done.`);
 };
 
 generateEmojis().catch((err) => {
