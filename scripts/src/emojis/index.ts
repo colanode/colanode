@@ -466,6 +466,13 @@ const processEmojis = (
     }
   }
 
+  console.log('Generating sprite...');
+  sprite.compile((err, result) => {
+    if (err) throw err;
+    const sprite = result.symbol.sprite.contents.toString();
+    fs.writeFileSync(SPRITE_PATH, sprite);
+  });
+
   console.log(`Done processing emojis.`);
 };
 
