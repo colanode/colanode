@@ -9,7 +9,7 @@ export const getAvatarSizeClasses = (size?: string) => {
     return 'size-9';
   }
   if (size === 'large') {
-    return 'w-12 h-12';
+    return 'size-12';
   }
   if (size === 'extra-large') {
     return 'size-16';

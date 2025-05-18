@@ -67,10 +67,12 @@ type EmojiCategory = {
 
 const GITHUB_DOMAIN = 'https://github.com';
 
-const WORK_DIR_PATH = 'src/emojis/temp';
-const DATABASE_PATH = 'src/emojis/emojis.db';
-const MIN_DATABASE_PATH = 'src/emojis/emojis-min.db';
-const SPRITE_PATH = 'src/emojis/emojis.svg';
+const WORK_DIR_PATH = path.resolve('src', 'emojis', 'temp');
+
+const ASSETS_DIR_PATH = path.resolve('..', 'assets');
+const DATABASE_PATH = path.resolve(ASSETS_DIR_PATH, 'emojis.db');
+const MIN_DATABASE_PATH = path.resolve(ASSETS_DIR_PATH, 'emojis.min.db');
+const SPRITE_PATH = path.resolve(ASSETS_DIR_PATH, 'emojis.svg');
 
 const EMOJI_MART_REPO = 'missive/emoji-mart';
 const EMOJI_MART_TAG = '5.6.0';
@@ -119,6 +121,13 @@ const CREATE_EMOJITS_TABLE_SQL = `
     emoticons TEXT,
     skins TEXT,
     FOREIGN KEY(category_id) REFERENCES categories(id)
+  );
+`;
+
+const CREATE_EMOJI_SKINS_TABLE_SQL = `
+  CREATE TABLE IF NOT EXISTS emoji_skins (
+    skin_id TEXT PRIMARY KEY,
+    emoji_id TEXT NOT NULL
   );
 `;
 
@@ -173,6 +182,13 @@ const INSERT_SEARCH_SQL = `
     @id,
     @text
   )
+`;
+
+const UPSERT_EMOJI_SKIN_SQL = ` 
+  INSERT INTO emoji_skins (skin_id, emoji_id)
+  VALUES (@skin_id, @emoji_id)
+  ON CONFLICT(skin_id) DO UPDATE SET
+    emoji_id=excluded.emoji_id
 `;
 
 const UPSERT_SVG_SQL = `
@@ -241,10 +257,15 @@ const initDatabase = () => {
 };
 
 const initMinDatabase = () => {
+  if (fs.existsSync(MIN_DATABASE_PATH)) {
+    fs.rmSync(MIN_DATABASE_PATH);
+  }
+
   const database = new SQLite(MIN_DATABASE_PATH);
 
   database.exec(CREATE_CATEGORIES_TABLE_SQL);
   database.exec(CREATE_EMOJITS_TABLE_SQL);
+  database.exec(CREATE_EMOJI_SKINS_TABLE_SQL);
   database.exec(CREATE_EMOJI_SEARCH_TABLE_SQL);
   database.exec(CREATE_EMOJI_CATEGORY_INDEX_SQL);
 
@@ -310,6 +331,7 @@ const processEmojis = (
   const insertSearchMin = minDatabase.prepare(INSERT_SEARCH_SQL);
 
   const upsertSvg = database.prepare(UPSERT_SVG_SQL);
+  const upsertEmojiSkin = minDatabase.prepare(UPSERT_EMOJI_SKIN_SQL);
 
   const existingMetadata = readExistingMetadata(database);
 
@@ -457,6 +479,10 @@ const processEmojis = (
           skin_id: skin.id,
           emoji_id: newEmoji.id,
           svg: svgBuffer,
+        });
+        upsertEmojiSkin.run({
+          skin_id: skin.id,
+          emoji_id: newEmoji.id,
         });
 
         sprite.add(skin.id, null, svgBuffer.toString('utf-8'));

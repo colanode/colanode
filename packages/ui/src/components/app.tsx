@@ -76,27 +76,6 @@ export const App = ({ type }: AppProps) => {
             value: id,
           });
         },
-        getEmojiUrl: (id: string) => {
-          if (type === 'desktop') {
-            return `asset://emojis/${id}`;
-          }
-
-          return `/asset/emojis/${id}`;
-        },
-        getIconUrl: (id: string) => {
-          if (type === 'desktop') {
-            return `asset://icons/${id}`;
-          }
-
-          return `/asset/icons/${id}`;
-        },
-        getAvatarUrl: (accountId: string, avatar: string) => {
-          if (type === 'desktop') {
-            return `avatar://${accountId}/${avatar}`;
-          }
-
-          return `/avatars/${accountId}/${avatar}`;
-        },
       }}
     >
       <RadarProvider>

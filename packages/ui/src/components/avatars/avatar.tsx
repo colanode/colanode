@@ -7,7 +7,9 @@ import {
   getDefaultNodeAvatar,
 } from '@colanode/ui/lib/avatars';
 import { cn } from '@colanode/ui/lib/utils';
-import { useApp } from '@colanode/ui/contexts';
+import { IconElement } from '@colanode/ui/components/icons/icon-element';
+import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
+import { useAsset } from '@colanode/ui/contexts/asset';
 
 interface AvatarProps {
   id: string;
@@ -25,9 +27,19 @@ export const Avatar = (props: AvatarProps) => {
 
   const avatarType = getIdType(avatar);
   if (avatarType === IdType.EmojiSkin) {
-    return <EmojiAvatar {...props} />;
+    return (
+      <EmojiElement
+        id={avatar}
+        className={cn(getAvatarSizeClasses(props.size), props.className)}
+      />
+    );
   } else if (avatarType === IdType.Icon) {
-    return <IconAvatar {...props} />;
+    return (
+      <IconElement
+        id={avatar}
+        className={cn(getAvatarSizeClasses(props.size), props.className)}
+      />
+    );
   } else {
     return <CustomAvatar {...props} />;
   }
@@ -67,42 +79,8 @@ const AvatarFallback = ({ id, name, size, className }: AvatarProps) => {
   return null;
 };
 
-const EmojiAvatar = ({ avatar, size, className }: AvatarProps) => {
-  const app = useApp();
-
-  if (!avatar) {
-    return null;
-  }
-
-  const url = app.getEmojiUrl(avatar);
-  return (
-    <img
-      src={url}
-      className={cn(getAvatarSizeClasses(size), className)}
-      alt={'Emoji'}
-    />
-  );
-};
-
-const IconAvatar = ({ avatar, size, className }: AvatarProps) => {
-  const app = useApp();
-
-  if (!avatar) {
-    return null;
-  }
-
-  const url = app.getIconUrl(avatar);
-  return (
-    <img
-      src={url}
-      className={cn(getAvatarSizeClasses(size), className)}
-      alt={'Icon'}
-    />
-  );
-};
-
 const CustomAvatar = ({ avatar, size, className }: AvatarProps) => {
-  const app = useApp();
+  const asset = useAsset();
   const account = useAccount();
   const [failed, setFailed] = React.useState(false);
 
@@ -114,7 +92,7 @@ const CustomAvatar = ({ avatar, size, className }: AvatarProps) => {
     return <AvatarFallback id={avatar} size={size} className={className} />;
   }
 
-  const url = app.getAvatarUrl(account.id, avatar);
+  const url = asset.getAvatarUrl(account.id, avatar);
   return (
     <img
       src={url}

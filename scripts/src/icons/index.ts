@@ -69,10 +69,12 @@ type IconCategory = {
 
 const GITHUB_DOMAIN = 'https://github.com';
 
-const WORK_DIR_PATH = 'src/icons/temp';
-const DATABASE_PATH = 'src/icons/icons.db';
-const MIN_DATABASE_PATH = 'src/icons/icons.min.db';
-const SPRITE_PATH = 'src/icons/icons.svg';
+const WORK_DIR_PATH = path.resolve('src', 'icons', 'temp');
+
+const ASSETS_DIR_PATH = path.resolve('..', 'assets');
+const DATABASE_PATH = path.resolve(ASSETS_DIR_PATH, 'icons.db');
+const MIN_DATABASE_PATH = path.resolve(ASSETS_DIR_PATH, 'icons.min.db');
+const SPRITE_PATH = path.resolve(ASSETS_DIR_PATH, 'icons.svg');
 
 const REMIX_ICON_REPO = 'Remix-Design/RemixIcon';
 const REMIX_ICON_TAG = '4.6.0';

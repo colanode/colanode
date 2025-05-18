@@ -18,9 +18,6 @@ interface AppContext {
   openLogin: () => void;
   closeLogin: () => void;
   openAccount: (id: string) => void;
-  getEmojiUrl: (id: string) => string;
-  getIconUrl: (id: string) => string;
-  getAvatarUrl: (accountId: string, avatar: string) => string;
 }
 
 export const AppContext = createContext<AppContext>({} as AppContext);

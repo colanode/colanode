@@ -24,17 +24,6 @@ export class AssetService {
     await Promise.all([this.downloadEmojis(), this.downloadIcons()]);
   }
 
-  public async fetchEmoji(id: string): Promise<Buffer | undefined> {
-    await this.initEmojisDatabase();
-    const emoji = await this.emojis
-      ?.selectFrom('emoji_svgs')
-      .selectAll()
-      .where('skin_id', '=', id)
-      .executeTakeFirst();
-
-    return emoji?.svg;
-  }
-
   private async initEmojisDatabase(): Promise<void> {
     if (this.emojis) {
       return;
@@ -70,17 +59,6 @@ export class AssetService {
       console.error('Failed to download emojis:', error);
       throw error;
     }
-  }
-
-  public async fetchIcon(id: string): Promise<Buffer | undefined> {
-    await this.initIconsDatabase();
-    const icon = await this.icons
-      ?.selectFrom('icon_svgs')
-      .selectAll()
-      .where('id', '=', id)
-      .executeTakeFirst();
-
-    return icon?.svg;
   }
 
   private async initIconsDatabase(): Promise<void> {

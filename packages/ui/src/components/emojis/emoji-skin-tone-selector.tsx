@@ -7,7 +7,7 @@ import {
 } from '@colanode/ui/components/ui/popover';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 import { defaultEmojis } from '@colanode/ui/lib/assets';
-import { useApp } from '@colanode/ui/contexts';
+import { useAsset } from '@colanode/ui/contexts/asset';
 
 interface EmojiSkinToneSelectorProps {
   skinTone: number;
@@ -18,7 +18,7 @@ export const EmojiSkinToneSelector = ({
   skinTone,
   onSkinToneChange,
 }: EmojiSkinToneSelectorProps) => {
-  const app = useApp();
+  const asset = useAsset();
   const [open, setOpen] = React.useState<boolean>(false);
 
   const { data } = useQuery({
@@ -44,7 +44,7 @@ export const EmojiSkinToneSelector = ({
           }`}
         >
           <img
-            src={app.getEmojiUrl(data.skins[skinTone || 0]?.id ?? '')}
+            src={asset.getEmojiUrl(data.skins[skinTone || 0]?.id ?? '')}
             className="h-full w-full"
           />
         </button>
@@ -58,7 +58,7 @@ export const EmojiSkinToneSelector = ({
             }`}
             onClick={() => handleSkinToneSelection(idx)}
           >
-            <EmojiElement id={skin.id} className="h-full w-full" alt="" />
+            <EmojiElement id={skin.id} className="h-full w-full" />
           </button>
         ))}
       </PopoverContent>

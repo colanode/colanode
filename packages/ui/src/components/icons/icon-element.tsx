@@ -1,22 +1,18 @@
 import * as React from 'react';
-import { useApp } from '@colanode/ui/contexts';
+import { useAsset } from '@colanode/ui/contexts/asset';
 
-interface Props extends React.ImgHTMLAttributes<HTMLImageElement> {
+interface Props extends React.SVGProps<SVGSVGElement> {
   id: string;
 }
 
-export const IconElement = React.forwardRef<HTMLImageElement, Props>(
+export const IconElement = React.forwardRef<SVGSVGElement, Props>(
   (props, ref) => {
-    const app = useApp();
+    const asset = useAsset();
 
     return (
-      <img
-        src={app.getIconUrl(props.id)}
-        {...props}
-        alt="Icon"
-        ref={ref}
-        loading="lazy"
-      />
+      <svg ref={ref} {...props}>
+        <use href={asset.getIconUrl(props.id)} />
+      </svg>
     );
   }
 );

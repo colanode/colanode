@@ -23,9 +23,9 @@ export class EmojiGetBySkinIdQueryHandler
 
     const data = await this.asset.emojis
       .selectFrom('emojis')
-      .innerJoin('emoji_svgs', 'emojis.id', 'emoji_svgs.emoji_id')
+      .innerJoin('emoji_skins', 'emojis.id', 'emoji_skins.emoji_id')
       .selectAll('emojis')
-      .where('emoji_svgs.skin_id', '=', input.id)
+      .where('emoji_skins.skin_id', '=', input.id)
       .executeTakeFirst();
 
     if (!data) {

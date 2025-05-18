@@ -9,6 +9,7 @@ import { Toaster } from '@colanode/ui/components/ui/toaster';
 import { TooltipProvider } from '@colanode/ui/components/ui/tooltip';
 import { useEventBus } from '@colanode/ui/hooks/use-event-bus';
 import { HTML5Backend } from '@colanode/ui/lib/dnd-backend';
+import { FontLoader } from '@colanode/ui/components/font-loader';
 
 export const queryClient = new QueryClient({
   defaultOptions: {
@@ -62,6 +63,7 @@ export const RootProvider = ({ type }: RootProviderProps) => {
     <QueryClientProvider client={queryClient}>
       <DndProvider backend={HTML5Backend}>
         <TooltipProvider>
+          <FontLoader />
           <App type={type} />
         </TooltipProvider>
         <Toaster />
