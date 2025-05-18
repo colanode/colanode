@@ -2,25 +2,25 @@ import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
 import { EmojiCategoryListQueryInput } from '../../../queries/emojis/emoji-category-list';
 import { EmojiCategory } from '../../../types/emojis';
 import { Event } from '../../../types/events';
-import { AssetService } from '../../../services/asset-service';
+import { AppService } from '../../../services/app-service';
 
 export class EmojiCategoryListQueryHandler
   implements QueryHandler<EmojiCategoryListQueryInput>
 {
-  private readonly asset: AssetService;
+  private readonly app: AppService;
 
-  constructor(asset: AssetService) {
-    this.asset = asset;
+  constructor(app: AppService) {
+    this.app = app;
   }
 
   public async handleQuery(
     _: EmojiCategoryListQueryInput
   ): Promise<EmojiCategory[]> {
-    if (!this.asset.emojis) {
+    if (!this.app.asset.emojis) {
       return [];
     }
 
-    const data = this.asset.emojis
+    const data = this.app.asset.emojis
       .selectFrom('categories')
       .selectAll()
       .execute();

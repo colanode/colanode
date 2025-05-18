@@ -22,7 +22,6 @@ import {
 import { eventBus } from '../lib/event-bus';
 import { Event } from '../types/events';
 import { AppService } from '../services/app-service';
-import { AssetService } from '../services/asset-service';
 
 const debug = createDebugger('desktop:mediator');
 
@@ -38,9 +37,9 @@ export class Mediator {
   private readonly eventsQueue: Event[] = [];
   private isProcessingEvents = false;
 
-  constructor(app: AppService, asset: AssetService) {
+  constructor(app: AppService) {
     this.app = app;
-    this.queryHandlerMap = buildQueryHandlerMap(app, asset);
+    this.queryHandlerMap = buildQueryHandlerMap(app);
     this.mutationHandlerMap = buildMutationHandlerMap(app);
     this.commandHandlerMap = buildCommandHandlerMap(app);
 

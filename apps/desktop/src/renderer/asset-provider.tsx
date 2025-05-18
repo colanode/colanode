@@ -5,9 +5,11 @@ export const AssetProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AssetContext.Provider
       value={{
+        emojiComponent: 'img',
         getEmojiUrl: (id: string) => {
           return `asset://emojis/${id}`;
         },
+        iconComponent: 'img',
         getIconUrl: (id: string) => {
           return `asset://icons/${id}`;
         },
@@ -15,7 +17,7 @@ export const AssetProvider = ({ children }: { children: React.ReactNode }) => {
           return `avatar://${accountId}/${avatar}`;
         },
         getFontUrl: (font: string) => {
-          return `asset://fonts/${font}`;
+          return `asset://fonts/${font}.otf`;
         },
       }}
     >

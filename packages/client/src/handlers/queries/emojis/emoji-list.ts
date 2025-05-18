@@ -3,24 +3,24 @@ import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
 import { EmojiListQueryInput } from '../../../queries/emojis/emoji-list';
 import { Emoji } from '../../../types/emojis';
 import { Event } from '../../../types/events';
-import { AssetService } from '../../../services/asset-service';
+import { AppService } from '../../../services/app-service';
 
 export class EmojiListQueryHandler
   implements QueryHandler<EmojiListQueryInput>
 {
-  private readonly asset: AssetService;
+  private readonly app: AppService;
 
-  constructor(asset: AssetService) {
-    this.asset = asset;
+  constructor(app: AppService) {
+    this.app = app;
   }
 
   public async handleQuery(input: EmojiListQueryInput): Promise<Emoji[]> {
-    if (!this.asset.emojis) {
+    if (!this.app.asset.emojis) {
       return [];
     }
 
     const offset = input.page * input.count;
-    const data = await this.asset.emojis
+    const data = await this.app.asset.emojis
       .selectFrom('emojis')
       .selectAll()
       .where('category_id', '=', input.category)

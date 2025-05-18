@@ -37,20 +37,21 @@ export class AppService {
   public readonly metadata: MetadataService;
   public readonly kysely: KyselyService;
   public readonly mediator: Mediator;
+  public readonly asset: AssetService;
 
   constructor(
     fs: FileSystem,
     build: AppBuild,
     kysely: KyselyService,
-    paths: AppPaths,
-    asset: AssetService
+    paths: AppPaths
   ) {
     this.build = build;
     this.fs = fs;
     this.paths = paths;
     this.kysely = kysely;
     this.database = kysely.build<AppDatabaseSchema>(paths.appDatabase);
-    this.mediator = new Mediator(this, asset);
+    this.mediator = new Mediator(this);
+    this.asset = new AssetService(this);
 
     // register interceptor to add client headers to all requests
     axios.interceptors.request.use((config) => {

@@ -3,23 +3,23 @@ import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
 import { IconSearchQueryInput } from '../../../queries/icons/icon-search';
 import { Icon } from '../../../types/icons';
 import { Event } from '../../../types/events';
-import { AssetService } from '../../../services/asset-service';
+import { AppService } from '../../../services/app-service';
 
 export class IconSearchQueryHandler
   implements QueryHandler<IconSearchQueryInput>
 {
-  private readonly asset: AssetService;
+  private readonly app: AppService;
 
-  constructor(asset: AssetService) {
-    this.asset = asset;
+  constructor(app: AppService) {
+    this.app = app;
   }
 
   public async handleQuery(input: IconSearchQueryInput): Promise<Icon[]> {
-    if (!this.asset.icons) {
+    if (!this.app.asset.icons) {
       return [];
     }
 
-    const data = await this.asset.icons
+    const data = await this.app.asset.icons
       .selectFrom('icons')
       .innerJoin('icon_search', 'icons.id', 'icon_search.id')
       .selectAll('icons')

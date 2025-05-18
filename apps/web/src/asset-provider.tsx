@@ -5,9 +5,11 @@ export const AssetProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <AssetContext.Provider
       value={{
+        emojiComponent: 'svg',
         getEmojiUrl: (id: string) => {
           return `/assets/emojis.svg#${id}`;
         },
+        iconComponent: 'svg',
         getIconUrl: (id: string) => {
           return `/assets/icons.svg#${id}`;
         },

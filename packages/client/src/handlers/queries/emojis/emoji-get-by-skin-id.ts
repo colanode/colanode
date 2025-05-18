@@ -3,25 +3,25 @@ import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
 import { EmojiGetBySkinIdQueryInput } from '../../../queries/emojis/emoji-get-by-skin-id';
 import { Emoji } from '../../../types/emojis';
 import { Event } from '../../../types/events';
-import { AssetService } from '../../../services/asset-service';
+import { AppService } from '../../../services/app-service';
 
 export class EmojiGetBySkinIdQueryHandler
   implements QueryHandler<EmojiGetBySkinIdQueryInput>
 {
-  private readonly asset: AssetService;
+  private readonly app: AppService;
 
-  constructor(asset: AssetService) {
-    this.asset = asset;
+  constructor(app: AppService) {
+    this.app = app;
   }
 
   public async handleQuery(
     input: EmojiGetBySkinIdQueryInput
   ): Promise<Emoji | null> {
-    if (!this.asset.emojis) {
+    if (!this.app.asset.emojis) {
       return null;
     }
 
-    const data = await this.asset.emojis
+    const data = await this.app.asset.emojis
       .selectFrom('emojis')
       .innerJoin('emoji_skins', 'emojis.id', 'emoji_skins.emoji_id')
       .selectAll('emojis')

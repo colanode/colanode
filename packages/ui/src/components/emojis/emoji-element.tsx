@@ -1,20 +1,23 @@
 import { useAsset } from '@colanode/ui/contexts/asset';
-import * as React from 'react';
 
-interface Props extends React.SVGProps<SVGSVGElement> {
+interface EmojiElementProps {
   id: string;
+  className?: string;
+  onClick?: () => void;
 }
 
-export const EmojiElement = React.forwardRef<SVGSVGElement, Props>(
-  (props, ref) => {
-    const asset = useAsset();
+export const EmojiElement = ({ id, className, onClick }: EmojiElementProps) => {
+  const asset = useAsset();
 
+  if (asset.emojiComponent === 'svg') {
     return (
-      <svg ref={ref} {...props}>
-        <use href={asset.getEmojiUrl(props.id)} />
+      <svg className={className} onClick={onClick}>
+        <use href={asset.getEmojiUrl(id)} />
       </svg>
     );
   }
-);
 
-EmojiElement.displayName = 'EmojiElement';
+  return (
+    <img src={asset.getEmojiUrl(id)} className={className} onClick={onClick} />
+  );
+};

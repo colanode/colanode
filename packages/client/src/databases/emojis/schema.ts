@@ -34,6 +34,16 @@ export type SelectEmojiSkin = Selectable<EmojiSkinsTable>;
 export type CreateEmojiSkin = Insertable<EmojiSkinsTable>;
 export type UpdateEmojiSkin = Updateable<EmojiSkinsTable>;
 
+interface EmojiSvgsTable {
+  skin_id: ColumnType<string, never, never>;
+  emoji_id: ColumnType<string, never, never>;
+  svg: ColumnType<Buffer, never, never>;
+}
+
+export type SelectEmojiSvg = Selectable<EmojiSvgsTable>;
+export type CreateEmojiSvg = Insertable<EmojiSvgsTable>;
+export type UpdateEmojiSvg = Updateable<EmojiSvgsTable>;
+
 interface EmojiSearchTable {
   id: ColumnType<string, never, never>;
   text: ColumnType<string, never, never>;
@@ -46,6 +56,7 @@ export type UpdateEmojiSearch = Updateable<EmojiSearchTable>;
 export interface EmojiDatabaseSchema {
   emojis: EmojisTable;
   emoji_skins: EmojiSkinsTable;
+  emoji_svgs: EmojiSvgsTable;
   categories: EmojiCategoriesTable;
   emoji_search: EmojiSearchTable;
 }

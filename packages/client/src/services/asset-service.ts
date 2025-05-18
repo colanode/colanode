@@ -1,99 +1,100 @@
 import { Kysely } from 'kysely';
 
-import { KyselyService } from './kysely-service';
-import { FileSystem } from './file-system';
-import { AppPaths } from './app-paths';
+import { AppService } from './app-service';
 
 import { EmojiDatabaseSchema, IconDatabaseSchema } from '../databases';
 
 export class AssetService {
-  private readonly kysely: KyselyService;
-  private readonly fs: FileSystem;
-  private readonly paths: AppPaths;
+  private readonly app: AppService;
 
-  public emojis: Kysely<EmojiDatabaseSchema> | null = null;
-  public icons: Kysely<IconDatabaseSchema> | null = null;
+  public readonly emojis: Kysely<EmojiDatabaseSchema>;
+  public readonly icons: Kysely<IconDatabaseSchema>;
 
-  constructor(kysely: KyselyService, fs: FileSystem, paths: AppPaths) {
-    this.kysely = kysely;
-    this.fs = fs;
-    this.paths = paths;
-  }
+  constructor(app: AppService) {
+    this.app = app;
 
-  public async init(): Promise<void> {
-    await Promise.all([this.downloadEmojis(), this.downloadIcons()]);
-  }
-
-  private async initEmojisDatabase(): Promise<void> {
-    if (this.emojis) {
-      return;
-    }
-
-    await this.downloadEmojis();
-    this.emojis = this.kysely.build<EmojiDatabaseSchema>(
-      this.paths.emojisDatabase
+    this.emojis = this.app.kysely.build<EmojiDatabaseSchema>(
+      this.app.paths.emojisDatabase
+    );
+    this.icons = this.app.kysely.build<IconDatabaseSchema>(
+      this.app.paths.iconsDatabase
     );
   }
 
-  private async downloadEmojis(): Promise<void> {
-    const fs = this.fs;
-    const emojiDbPath = this.paths.emojisDatabase;
+  // public async init(): Promise<void> {
+  //   await Promise.all([this.initEmojisDatabase(), this.initIconsDatabase()]);
+  // }
 
-    const exists = await fs.exists(emojiDbPath);
-    if (exists) {
-      return;
-    }
+  // private async initEmojisDatabase(): Promise<void> {
+  //   if (this.emojis) {
+  //     return;
+  //   }
 
-    try {
-      const emojiResponse = await fetch('/emojis.db');
-      if (!emojiResponse.ok) {
-        throw new Error(
-          `Failed to download emoji database: ${emojiResponse.status}`
-        );
-      }
-      console.log('Downloading emojis...', emojiResponse.status);
+  //   await this.downloadEmojis();
+  //   this.emojisDb = this.app.kysely.build<EmojiDatabaseSchema>(
+  //     this.app.paths.emojisDatabase
+  //   );
+  // }
 
-      const emojiData = await emojiResponse.arrayBuffer();
-      await fs.writeFile(emojiDbPath, new Uint8Array(emojiData));
-    } catch (error) {
-      console.error('Failed to download emojis:', error);
-      throw error;
-    }
-  }
+  // private async downloadEmojis(): Promise<void> {
+  //   const fs = this.app.fs;
+  //   const emojiDbPath = this.app.paths.emojisDatabase;
 
-  private async initIconsDatabase(): Promise<void> {
-    if (this.icons) {
-      return;
-    }
+  //   const exists = await fs.exists(emojiDbPath);
+  //   if (exists) {
+  //     return;
+  //   }
 
-    await this.downloadIcons();
-    this.icons = this.kysely.build<IconDatabaseSchema>(
-      this.paths.iconsDatabase
-    );
-  }
+  //   try {
+  //     const emojiResponse = await fetch('/assets/emojis.db');
+  //     if (!emojiResponse.ok) {
+  //       throw new Error(
+  //         `Failed to download emoji database: ${emojiResponse.status}`
+  //       );
+  //     }
+  //     console.log('Downloading emojis...', emojiResponse.status);
 
-  private async downloadIcons(): Promise<void> {
-    const fs = this.fs;
-    const iconDbPath = this.paths.iconsDatabase;
+  //     const emojiData = await emojiResponse.arrayBuffer();
+  //     await fs.writeFile(emojiDbPath, new Uint8Array(emojiData));
+  //   } catch (error) {
+  //     console.error('Failed to download emojis:', error);
+  //     throw error;
+  //   }
+  // }
 
-    const exists = await fs.exists(iconDbPath);
-    if (exists) {
-      return;
-    }
+  // private async initIconsDatabase(): Promise<void> {
+  //   if (this.iconsDb) {
+  //     return;
+  //   }
 
-    try {
-      const iconResponse = await fetch('/icons.db');
-      if (!iconResponse.ok) {
-        throw new Error(
-          `Failed to download icon database: ${iconResponse.status}`
-        );
-      }
-      console.log('Downloading icons...', iconResponse.status);
-      const iconData = await iconResponse.arrayBuffer();
-      await fs.writeFile(iconDbPath, new Uint8Array(iconData));
-    } catch (error) {
-      console.error('Failed to download icons:', error);
-      throw error;
-    }
-  }
+  //   await this.downloadIcons();
+  //   this.iconsDb = this.app.kysely.build<IconDatabaseSchema>(
+  //     this.app.paths.iconsDatabase
+  //   );
+  // }
+
+  // private async downloadIcons(): Promise<void> {
+  //   const fs = this.app.fs;
+  //   const iconDbPath = this.app.paths.iconsDatabase;
+
+  //   const exists = await fs.exists(iconDbPath);
+  //   if (exists) {
+  //     return;
+  //   }
+
+  //   try {
+  //     const iconResponse = await fetch('/assets/icons.db');
+  //     if (!iconResponse.ok) {
+  //       throw new Error(
+  //         `Failed to download icon database: ${iconResponse.status}`
+  //       );
+  //     }
+  //     console.log('Downloading icons...', iconResponse.status);
+  //     const iconData = await iconResponse.arrayBuffer();
+  //     await fs.writeFile(iconDbPath, new Uint8Array(iconData));
+  //   } catch (error) {
+  //     console.error('Failed to download icons:', error);
+  //     throw error;
+  //   }
+  // }
 }

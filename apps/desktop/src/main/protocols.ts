@@ -8,10 +8,50 @@ export const handleAssetRequest = async (
   request: Request
 ): Promise<Response> => {
   const url = request.url.replace('asset://', '');
-  const filePath = path.join(app.paths.assets, url);
-  const fileUrl = `file://${filePath}`;
+  const [type, id] = url.split('/');
+  if (!type || !id) {
+    return new Response(null, { status: 400 });
+  }
 
-  return net.fetch(fileUrl);
+  if (type === 'emojis') {
+    const emoji = await app.asset.emojis
+      .selectFrom('emoji_svgs')
+      .selectAll()
+      .where('skin_id', '=', id)
+      .executeTakeFirst();
+
+    if (emoji) {
+      return new Response(emoji.svg, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+        },
+      });
+    }
+  }
+
+  if (type === 'icons') {
+    const icon = await app.asset.icons
+      .selectFrom('icon_svgs')
+      .selectAll()
+      .where('id', '=', id)
+      .executeTakeFirst();
+
+    if (icon) {
+      return new Response(icon.svg, {
+        headers: {
+          'Content-Type': 'image/svg+xml',
+        },
+      });
+    }
+  }
+
+  if (type === 'fonts') {
+    const filePath = path.join(app.paths.assets, 'fonts', id);
+    const fileUrl = `file://${filePath}`;
+    return net.fetch(fileUrl);
+  }
+
+  return new Response(null, { status: 404 });
 };
 
 export const handleAvatarRequest = async (

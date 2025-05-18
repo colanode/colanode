@@ -23,6 +23,15 @@ export type SelectIcon = Selectable<IconsTable>;
 export type CreateIcon = Insertable<IconsTable>;
 export type UpdateIcon = Updateable<IconsTable>;
 
+interface IconSvgsTable {
+  id: ColumnType<string, never, never>;
+  svg: ColumnType<Buffer, never, never>;
+}
+
+export type SelectIconSvg = Selectable<IconSvgsTable>;
+export type CreateIconSvg = Insertable<IconSvgsTable>;
+export type UpdateIconSvg = Updateable<IconSvgsTable>;
+
 interface IconSearchTable {
   id: ColumnType<string, never, never>;
   text: ColumnType<string, never, never>;
@@ -34,6 +43,7 @@ export type UpdateIconSearch = Updateable<IconSearchTable>;
 
 export interface IconDatabaseSchema {
   icons: IconsTable;
+  icon_svgs: IconSvgsTable;
   categories: IconCategoriesTable;
   icon_search: IconSearchTable;
 }
