@@ -1,13 +1,14 @@
 import React from 'react';
+
 import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
+import { useAsset } from '@colanode/ui/contexts/asset';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 import { defaultEmojis } from '@colanode/ui/lib/assets';
-import { useAsset } from '@colanode/ui/contexts/asset';
 
 interface EmojiSkinToneSelectorProps {
   skinTone: number;

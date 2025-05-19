@@ -1,15 +1,15 @@
 import { LocalMessageNode } from '@colanode/client/types';
+import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
+import { Message } from '@colanode/ui/components/messages/message';
 import { MessageNotFound } from '@colanode/ui/components/messages/message-not-found';
 import {
   Container,
   ContainerBody,
   ContainerHeader,
 } from '@colanode/ui/components/ui/container';
-import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
+import { ConversationContext } from '@colanode/ui/contexts/conversation';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
 import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
-import { Message } from '@colanode/ui/components/messages/message';
-import { ConversationContext } from '@colanode/ui/contexts/conversation';
 
 interface MessageContainerProps {
   messageId: string;

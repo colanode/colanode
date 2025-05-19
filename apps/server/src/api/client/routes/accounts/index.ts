@@ -1,17 +1,17 @@
 import { FastifyPluginCallback } from 'fastify';
 
-import { accountSyncRoute } from './account-sync';
-import { emailLoginRoute } from './email-login';
-import { logoutRoute } from './logout';
-import { emailRegisterRoute } from './email-register';
-import { accountUpdateRoute } from './account-update';
-import { emailVerifyRoute } from './email-verify';
-import { emailPasswordResetInitRoute } from './email-password-reset-init';
-import { emailPasswordResetCompleteRoute } from './email-password-reset-complete';
-import { googleLoginRoute } from './google-login';
+import { accountAuthenticator } from '@colanode/server/api/client/plugins/account-auth';
+import { authIpRateLimiter } from '@colanode/server/api/client/plugins/auth-ip-rate-limit';
 
-import { accountAuthenticator } from '@/api/client/plugins/account-auth';
-import { authIpRateLimiter } from '@/api/client/plugins/auth-ip-rate-limit';
+import { accountSyncRoute } from './account-sync';
+import { accountUpdateRoute } from './account-update';
+import { emailLoginRoute } from './email-login';
+import { emailPasswordResetCompleteRoute } from './email-password-reset-complete';
+import { emailPasswordResetInitRoute } from './email-password-reset-init';
+import { emailRegisterRoute } from './email-register';
+import { emailVerifyRoute } from './email-verify';
+import { googleLoginRoute } from './google-login';
+import { logoutRoute } from './logout';
 
 export const accountRoutes: FastifyPluginCallback = (instance, _, done) => {
   instance.register((subInstance) => {

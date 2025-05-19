@@ -1,4 +1,4 @@
-import { AppPlatform } from '../types/apps';
+import { AppPlatform } from '@colanode/client/types/apps';
 
 export interface AppBuild {
   version: string;

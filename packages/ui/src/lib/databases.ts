@@ -1,3 +1,4 @@
+import { LocalRecordNode } from '@colanode/client/types';
 import {
   compareString,
   FieldAttributes,
@@ -12,7 +13,6 @@ import {
   DatabaseViewLayout,
   DatabaseViewFieldFilterAttributes,
 } from '@colanode/core';
-import { LocalRecordNode } from '@colanode/client/types';
 
 export const getDefaultFieldWidth = (type: FieldType): number => {
   if (!type) return 0;

@@ -1,7 +1,7 @@
 import { Bell, Check, Plus, Settings } from 'lucide-react';
 import React from 'react';
+
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
+import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';

@@ -1,7 +1,7 @@
+import { app } from 'electron';
+
 import { AppBuild } from '@colanode/client/services';
 import { AppPlatform } from '@colanode/client/types';
-
-import { app } from 'electron';
 
 export const appBuild: AppBuild = {
   type: 'desktop',

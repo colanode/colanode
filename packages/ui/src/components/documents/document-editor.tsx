@@ -8,8 +8,7 @@ import {
 } from '@tiptap/react';
 import { debounce, isEqual } from 'lodash-es';
 import React from 'react';
-import { YDoc } from '@colanode/crdt';
-import { RichTextContent, richTextContentSchema } from '@colanode/core';
+
 import {
   restoreRelativeSelection,
   getRelativeSelection,
@@ -21,6 +20,8 @@ import {
   DocumentState,
   DocumentUpdate,
 } from '@colanode/client/types';
+import { RichTextContent, richTextContentSchema } from '@colanode/core';
+import { YDoc } from '@colanode/crdt';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import {
   BlockquoteCommand,

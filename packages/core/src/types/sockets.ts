@@ -1,4 +1,7 @@
-import { SynchronizerInput, SynchronizerMap } from '../synchronizers';
+import {
+  SynchronizerInput,
+  SynchronizerMap,
+} from '@colanode/core/synchronizers';
 
 export type SynchronizerInputMessage = {
   type: 'synchronizer_input';

@@ -1,8 +1,9 @@
 import { FocusPosition } from '@tiptap/core';
+
 import { LocalNode } from '@colanode/client/types';
 import { DocumentEditor } from '@colanode/ui/components/documents/document-editor';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface DocumentProps {
   node: LocalNode;

@@ -6,6 +6,7 @@ import {
 } from '@tiptap/react';
 import { Bold, Code, Italic, Strikethrough, Underline } from 'lucide-react';
 import { useState } from 'react';
+
 import { ColorButton } from '@colanode/ui/editor/menus/color-button';
 import { LinkButton } from '@colanode/ui/editor/menus/link-button';
 import { MarkButton } from '@colanode/ui/editor/menus/mark-button';

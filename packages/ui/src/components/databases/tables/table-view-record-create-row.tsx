@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 

@@ -4,11 +4,10 @@ import {
   DeleteNodeReactionMutation,
   getNodeModel,
 } from '@colanode/core';
-
-import { eventBus } from '@/lib/event-bus';
-import { database } from '@/data/database';
-import { SelectUser } from '@/data/schema';
-import { fetchNodeTree, mapNode } from '@/lib/nodes';
+import { database } from '@colanode/server/data/database';
+import { SelectUser } from '@colanode/server/data/schema';
+import { eventBus } from '@colanode/server/lib/event-bus';
+import { fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
 
 export const createNodeReaction = async (
   user: SelectUser,

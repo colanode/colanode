@@ -1,12 +1,11 @@
-import { PageAttributes } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
-import { MutationError, MutationErrorCode } from '../../../mutations';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
   PageUpdateMutationInput,
   PageUpdateMutationOutput,
-} from '../../../mutations/pages/page-update';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations/pages/page-update';
+import { PageAttributes } from '@colanode/core';
 
 export class PageUpdateMutationHandler
   extends WorkspaceMutationHandlerBase

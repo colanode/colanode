@@ -1,15 +1,16 @@
 import React from 'react';
+
 import { getIdType, IdType } from '@colanode/core';
+import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
+import { IconElement } from '@colanode/ui/components/icons/icon-element';
 import { useAccount } from '@colanode/ui/contexts/account';
+import { useAsset } from '@colanode/ui/contexts/asset';
 import {
   getAvatarSizeClasses,
   getColorForId,
   getDefaultNodeAvatar,
 } from '@colanode/ui/lib/avatars';
 import { cn } from '@colanode/ui/lib/utils';
-import { IconElement } from '@colanode/ui/components/icons/icon-element';
-import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
-import { useAsset } from '@colanode/ui/contexts/asset';
 
 interface AvatarProps {
   id: string;

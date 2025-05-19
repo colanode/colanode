@@ -1,16 +1,16 @@
 import { LocalChatNode } from '@colanode/client/types';
+import { ChatNotFound } from '@colanode/ui/components/chats/chat-not-found';
+import { NodeCollaboratorsPopover } from '@colanode/ui/components/collaborators/node-collaborators-popover';
+import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
+import { Conversation } from '@colanode/ui/components/messages/conversation';
 import {
   Container,
   ContainerBody,
   ContainerHeader,
   ContainerSettings,
 } from '@colanode/ui/components/ui/container';
-import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
-import { ChatNotFound } from '@colanode/ui/components/chats/chat-not-found';
-import { NodeCollaboratorsPopover } from '@colanode/ui/components/collaborators/node-collaborators-popover';
-import { Conversation } from '@colanode/ui/components/messages/conversation';
-import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
+import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
 
 interface ChatContainerProps {
   chatId: string;

@@ -1,4 +1,4 @@
-import { AppMetadataKey, AppMetadataMap } from '../../types/apps';
+import { AppMetadataKey, AppMetadataMap } from '@colanode/client/types/apps';
 
 export type AppMetadataSaveMutationInput = {
   type: 'app_metadata_save';

@@ -1,4 +1,4 @@
-import { NodeReaction } from '../../types/nodes';
+import { NodeReaction } from '@colanode/client/types/nodes';
 
 export type NodeReactionListQueryInput = {
   type: 'node_reaction_list';

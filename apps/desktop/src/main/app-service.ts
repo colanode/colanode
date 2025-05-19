@@ -1,9 +1,8 @@
 import { AppService } from '@colanode/client/services';
-
-import { DesktopKyselyService } from '@/main/kysely-service';
-import { DesktopFileSystem } from '@/main/file-system';
-import { appBuild } from '@/main/app-build';
-import { paths } from '@/main/app-paths';
+import { appBuild } from '@colanode/desktop/main/app-build';
+import { paths } from '@colanode/desktop/main/app-paths';
+import { DesktopFileSystem } from '@colanode/desktop/main/file-system';
+import { DesktopKyselyService } from '@colanode/desktop/main/kysely-service';
 
 export const app = new AppService(
   new DesktopFileSystem(),

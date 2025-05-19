@@ -1,4 +1,6 @@
+import axios from 'axios';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+
 import {
   AccountStatus,
   generateId,
@@ -9,11 +11,9 @@ import {
   loginOutputSchema,
   googleLoginInputSchema,
 } from '@colanode/core';
-import axios from 'axios';
-
-import { database } from '@/data/database';
-import { config } from '@/lib/config';
-import { buildLoginSuccessOutput } from '@/lib/accounts';
+import { database } from '@colanode/server/data/database';
+import { buildLoginSuccessOutput } from '@colanode/server/lib/accounts';
+import { config } from '@colanode/server/lib/config';
 
 const GoogleUserInfoUrl = 'https://www.googleapis.com/oauth2/v1/userinfo';
 

@@ -1,3 +1,9 @@
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
+import {
+  DatabaseCreateMutationInput,
+  DatabaseCreateMutationOutput,
+} from '@colanode/client/mutations/databases/database-create';
 import {
   DatabaseAttributes,
   generateId,
@@ -5,13 +11,6 @@ import {
   IdType,
   DatabaseViewAttributes,
 } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
-import {
-  DatabaseCreateMutationInput,
-  DatabaseCreateMutationOutput,
-} from '../../../mutations/databases/database-create';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
 
 export class DatabaseCreateMutationHandler
   extends WorkspaceMutationHandlerBase

@@ -1,16 +1,15 @@
-import { FileStatus } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
-import { mapFileState, mapNode } from '../../../lib/mappers';
-import { eventBus } from '../../../lib/event-bus';
-import { MutationError, MutationErrorCode } from '../../../mutations';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapFileState, mapNode } from '@colanode/client/lib/mappers';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
+  MutationError,
+  MutationErrorCode,
   FileDownloadMutationInput,
   FileDownloadMutationOutput,
-} from '../../../mutations/files/file-download';
-import { DownloadStatus } from '../../../types/files';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
-import { LocalFileNode } from '../../../types/nodes';
+} from '@colanode/client/mutations';
+import { DownloadStatus, LocalFileNode } from '@colanode/client/types';
+import { FileStatus } from '@colanode/core';
 
 export class FileDownloadMutationHandler
   extends WorkspaceMutationHandlerBase

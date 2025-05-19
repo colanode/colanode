@@ -1,9 +1,7 @@
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapUser } from '@colanode/client/lib/mappers';
+import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import { createDebugger, SyncUserData } from '@colanode/core';
-
-import { WorkspaceService } from './workspace-service';
-
-import { mapUser } from '../../lib/mappers';
-import { eventBus } from '../../lib/event-bus';
 
 const debug = createDebugger('desktop:service:user');
 

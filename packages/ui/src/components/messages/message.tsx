@@ -1,12 +1,13 @@
 import { InView } from 'react-intersection-observer';
+
 import { LocalMessageNode } from '@colanode/client/types';
 import { MessageActions } from '@colanode/ui/components/messages/message-actions';
 import { MessageAuthorAvatar } from '@colanode/ui/components/messages/message-author-avatar';
 import { MessageAuthorName } from '@colanode/ui/components/messages/message-author-name';
 import { MessageContent } from '@colanode/ui/components/messages/message-content';
 import { MessageReactionCounts } from '@colanode/ui/components/messages/message-reaction-counts';
-import { MessageTime } from '@colanode/ui/components/messages/message-time';
 import { MessageReference } from '@colanode/ui/components/messages/message-reference';
+import { MessageTime } from '@colanode/ui/components/messages/message-time';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 

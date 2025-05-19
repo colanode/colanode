@@ -1,4 +1,5 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+
 import {
   CreateUploadOutput,
   ApiErrorCode,
@@ -8,10 +9,9 @@ import {
   createUploadOutputSchema,
   apiErrorOutputSchema,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { mapNode } from '@/lib/nodes';
-import { buildFilePath, buildUploadUrl } from '@/lib/files';
+import { database } from '@colanode/server/data/database';
+import { buildFilePath, buildUploadUrl } from '@colanode/server/lib/files';
+import { mapNode } from '@colanode/server/lib/nodes';
 
 export const fileUploadInitRoute: FastifyPluginCallbackZod = (
   instance,

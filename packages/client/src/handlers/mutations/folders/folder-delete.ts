@@ -1,9 +1,9 @@
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
   FolderDeleteMutationInput,
   FolderDeleteMutationOutput,
-} from '../../../mutations/folders/folder-delete';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations';
 
 export class FolderDeleteMutationHandler
   extends WorkspaceMutationHandlerBase

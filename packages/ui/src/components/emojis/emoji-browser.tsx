@@ -1,9 +1,10 @@
-import React from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import React from 'react';
+
 import { EmojiPickerRowData } from '@colanode/client/types';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 import { EmojiBrowserCategory } from '@colanode/ui/components/emojis/emoji-browser-category';
 import { EmojiBrowserItems } from '@colanode/ui/components/emojis/emoji-browser-items';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 const EMOJIS_PER_ROW = 10;
 

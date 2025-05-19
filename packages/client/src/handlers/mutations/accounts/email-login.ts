@@ -1,13 +1,12 @@
-import { EmailLoginInput, LoginOutput } from '@colanode/core';
 import axios from 'axios';
 
-import { AccountMutationHandlerBase } from './base';
-
-import { MutationHandler } from '../../../lib/types';
-import { EmailLoginMutationInput } from '../../../mutations/accounts/email-login';
-import { MutationError, MutationErrorCode } from '../../../mutations';
-import { parseApiError } from '../../../lib/axios';
-import { AppService } from '../../../services/app-service';
+import { AccountMutationHandlerBase } from '@colanode/client/handlers/mutations/accounts/base';
+import { parseApiError } from '@colanode/client/lib/axios';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
+import { EmailLoginMutationInput } from '@colanode/client/mutations/accounts/email-login';
+import { AppService } from '@colanode/client/services/app-service';
+import { EmailLoginInput, LoginOutput } from '@colanode/core';
 
 export class EmailLoginMutationHandler
   extends AccountMutationHandlerBase

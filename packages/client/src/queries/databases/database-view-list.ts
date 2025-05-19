@@ -1,4 +1,4 @@
-import { LocalDatabaseViewNode } from '../../types/nodes';
+import { LocalDatabaseViewNode } from '@colanode/client/types/nodes';
 
 export type DatabaseViewListQueryInput = {
   type: 'database_view_list';

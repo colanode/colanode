@@ -1,13 +1,14 @@
-import { Mutation } from '@colanode/core';
-
+import {
+  SelectAccountMetadata,
+  SelectWorkspace,
+} from '@colanode/client/databases/account';
 import {
   SelectAccount,
   SelectAppMetadata,
   SelectServer,
-} from '../databases/app';
-import { SelectEmoji } from '../databases/emojis';
-import { SelectIcon } from '../databases/icons';
-import { SelectAccountMetadata, SelectWorkspace } from '../databases/account';
+} from '@colanode/client/databases/app';
+import { SelectEmoji } from '@colanode/client/databases/emojis';
+import { SelectIcon } from '@colanode/client/databases/icons';
 import {
   SelectFileState,
   SelectMutation,
@@ -20,30 +21,35 @@ import {
   SelectDocumentState,
   SelectDocumentUpdate,
   SelectNodeReference,
-} from '../databases/workspace';
+} from '@colanode/client/databases/workspace';
 import {
   Account,
   AccountMetadata,
   AccountMetadataKey,
-} from '../types/accounts';
-import { Server } from '../types/servers';
-import { User } from '../types/users';
-import { FileState } from '../types/files';
+} from '@colanode/client/types/accounts';
+import { AppMetadata, AppMetadataKey } from '@colanode/client/types/apps';
 import {
-  Workspace,
-  WorkspaceMetadata,
-  WorkspaceMetadataKey,
-} from '../types/workspaces';
+  Document,
+  DocumentState,
+  DocumentUpdate,
+} from '@colanode/client/types/documents';
+import { Emoji } from '@colanode/client/types/emojis';
+import { FileState } from '@colanode/client/types/files';
+import { Icon } from '@colanode/client/types/icons';
 import {
   LocalNode,
   NodeInteraction,
   NodeReaction,
   NodeReference,
-} from '../types/nodes';
-import { Emoji } from '../types/emojis';
-import { Icon } from '../types/icons';
-import { AppMetadata, AppMetadataKey } from '../types/apps';
-import { Document, DocumentState, DocumentUpdate } from '../types/documents';
+} from '@colanode/client/types/nodes';
+import { Server } from '@colanode/client/types/servers';
+import { User } from '@colanode/client/types/users';
+import {
+  Workspace,
+  WorkspaceMetadata,
+  WorkspaceMetadataKey,
+} from '@colanode/client/types/workspaces';
+import { Mutation } from '@colanode/core';
 
 export const mapUser = (row: SelectUser): User => {
   return {

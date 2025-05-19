@@ -1,4 +1,4 @@
-import { Icon } from '../../types/icons';
+import { Icon } from '@colanode/client/types/icons';
 
 export type IconSearchQueryInput = {
   type: 'icon_search';

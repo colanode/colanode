@@ -1,5 +1,6 @@
-import { WorkspaceRole } from '@colanode/core';
 import { Check, ChevronDown } from 'lucide-react';
+
+import { WorkspaceRole } from '@colanode/core';
 import {
   DropdownMenu,
   DropdownMenuContent,

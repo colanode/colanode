@@ -1,4 +1,4 @@
-import { WorkspaceRadarData } from '../../types/radars';
+import { WorkspaceRadarData } from '@colanode/client/types/radars';
 
 export type RadarDataGetQueryInput = {
   type: 'radar_data_get';

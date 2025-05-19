@@ -1,6 +1,5 @@
 import { NodeAttributes } from '@colanode/core';
-
-import { SelectDocumentUpdate, SelectNode } from '@/data/schema';
+import { SelectDocumentUpdate, SelectNode } from '@colanode/server/data/schema';
 
 export type NodeCollaborator = {
   nodeId: string;

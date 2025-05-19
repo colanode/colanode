@@ -1,3 +1,5 @@
+import argon2 from '@node-rs/argon2';
+
 import {
   IdType,
   UserStatus,
@@ -7,22 +9,29 @@ import {
   generateId,
   LoginVerifyOutput,
 } from '@colanode/core';
-import argon2 from '@node-rs/argon2';
-
-import { config } from '@/lib/config';
-import { database } from '@/data/database';
-import { SelectAccount } from '@/data/schema';
-import { generateToken } from '@/lib/tokens';
-import { createDefaultWorkspace } from '@/lib/workspaces';
-import { jobService } from '@/services/job-service';
-import { emailPasswordResetTemplate, emailVerifyTemplate } from '@/templates';
-import { emailService } from '@/services/email-service';
-import { deleteOtp, fetchOtp, generateOtpCode, saveOtp } from '@/lib/otps';
+import { database } from '@colanode/server/data/database';
+import { SelectAccount } from '@colanode/server/data/schema';
+import { config } from '@colanode/server/lib/config';
+import {
+  deleteOtp,
+  fetchOtp,
+  generateOtpCode,
+  saveOtp,
+} from '@colanode/server/lib/otps';
+import { generateToken } from '@colanode/server/lib/tokens';
+import { createDefaultWorkspace } from '@colanode/server/lib/workspaces';
+import { emailService } from '@colanode/server/services/email-service';
+import { jobService } from '@colanode/server/services/job-service';
+import {
+  emailPasswordResetTemplate,
+  emailVerifyTemplate,
+} from '@colanode/server/templates';
 import {
   Otp,
   AccountVerifyOtpAttributes,
   AccountPasswordResetOtpAttributes,
-} from '@/types/otps';
+} from '@colanode/server/types/otps';
+
 interface DeviceMetadata {
   ip: string | undefined;
   platform: string;

@@ -1,5 +1,6 @@
 import { Editor } from '@tiptap/core';
 import { Baseline } from 'lucide-react';
+
 import {
   Popover,
   PopoverContent,

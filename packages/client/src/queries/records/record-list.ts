@@ -1,9 +1,8 @@
+import { LocalRecordNode } from '@colanode/client/types/nodes';
 import {
   DatabaseViewFilterAttributes,
   DatabaseViewSortAttributes,
 } from '@colanode/core';
-
-import { LocalRecordNode } from '../../types/nodes';
 
 export type RecordListQueryInput = {
   type: 'record_list';

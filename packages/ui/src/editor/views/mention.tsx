@@ -1,9 +1,10 @@
 import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewWrapper } from '@tiptap/react';
+
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 import { defaultClasses } from '@colanode/ui/editor/classes';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 export const MentionNodeView = ({ node }: NodeViewProps) => {
   const workspace = useWorkspace();

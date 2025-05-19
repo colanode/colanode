@@ -1,12 +1,13 @@
 import { useState, useEffect } from 'react';
-import { AppContext } from '@colanode/ui/contexts/app';
-import { DelayedComponent } from '@colanode/ui/components/ui/delayed-component';
-import { AppLoader } from '@colanode/ui/components/app-loader';
-import { useQuery } from '@colanode/ui/hooks/use-query';
-import { RadarProvider } from '@colanode/ui/components/radar-provider';
+
+import { AppType } from '@colanode/client/types';
 import { Account } from '@colanode/ui/components/accounts/account';
 import { Login } from '@colanode/ui/components/accounts/login';
-import { AppType } from '@colanode/client/types';
+import { AppLoader } from '@colanode/ui/components/app-loader';
+import { RadarProvider } from '@colanode/ui/components/radar-provider';
+import { DelayedComponent } from '@colanode/ui/components/ui/delayed-component';
+import { AppContext } from '@colanode/ui/contexts/app';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface AppProps {
   type: AppType;

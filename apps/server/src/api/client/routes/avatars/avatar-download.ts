@@ -1,12 +1,12 @@
-import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
-import { z } from 'zod';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
-import { ApiErrorCode } from '@colanode/core';
-
 import { Readable } from 'stream';
 
-import { avatarS3 } from '@/data/storage';
-import { config } from '@/lib/config';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+import { z } from 'zod';
+
+import { ApiErrorCode } from '@colanode/core';
+import { avatarS3 } from '@colanode/server/data/storage';
+import { config } from '@colanode/server/lib/config';
 
 export const avatarDownloadRoute: FastifyPluginCallbackZod = (
   instance,

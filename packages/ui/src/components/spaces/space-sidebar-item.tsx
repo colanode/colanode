@@ -1,4 +1,3 @@
-import { compareString } from '@colanode/core';
 import {
   ChevronRight,
   Database,
@@ -10,7 +9,9 @@ import {
   StickyNote,
 } from 'lucide-react';
 import React from 'react';
+
 import { LocalSpaceNode } from '@colanode/client/types';
+import { compareString } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { ChannelCreateDialog } from '@colanode/ui/components/channels/channel-create-dialog';
 import { DatabaseCreateDialog } from '@colanode/ui/components/databases/database-create-dialog';
@@ -30,9 +31,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
+import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface SpaceSidebarItemProps {

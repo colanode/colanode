@@ -1,7 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useEffect } from 'react';
+
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { AvatarPopover } from '@colanode/ui/components/avatars/avatar-popover';
 import { Button } from '@colanode/ui/components/ui/button';

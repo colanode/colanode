@@ -1,6 +1,7 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons';
 import * as React from 'react';
 import { DayPicker } from 'react-day-picker';
+
 import { buttonVariants } from '@colanode/ui/components/ui/button';
 import { cn } from '@colanode/ui/lib/utils';
 

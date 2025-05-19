@@ -1,13 +1,14 @@
 import React from 'react';
+
 import { Account, Server } from '@colanode/client/types';
-import { useApp } from '@colanode/ui/contexts/app';
 import { EmailLogin } from '@colanode/ui/components/accounts/email-login';
+import { EmailPasswordResetComplete } from '@colanode/ui/components/accounts/email-password-reset-complete';
+import { EmailPasswordResetInit } from '@colanode/ui/components/accounts/email-password-reset-init';
 import { EmailRegister } from '@colanode/ui/components/accounts/email-register';
 import { EmailVerify } from '@colanode/ui/components/accounts/email-verify';
 import { ServerDropdown } from '@colanode/ui/components/servers/server-dropdown';
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { EmailPasswordResetComplete } from '@colanode/ui/components/accounts/email-password-reset-complete';
-import { EmailPasswordResetInit } from '@colanode/ui/components/accounts/email-password-reset-init';
+import { useApp } from '@colanode/ui/contexts/app';
 
 interface LoginFormProps {
   accounts: Account[];

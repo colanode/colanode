@@ -1,7 +1,8 @@
-import { NodeRole, hasNodeRole } from '@colanode/core';
 import { Copy, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
+
 import { LocalRecordNode } from '@colanode/client/types';
+import { NodeRole, hasNodeRole } from '@colanode/core';
 import { NodeCollaboratorAudit } from '@colanode/ui/components/collaborators/node-collaborator-audit';
 import { RecordDeleteDialog } from '@colanode/ui/components/records/record-delete-dialog';
 import {

@@ -1,4 +1,4 @@
-import { FileState } from '../../types/files';
+import { FileState } from '@colanode/client/types/files';
 
 export type FileStateGetQueryInput = {
   type: 'file_state_get';

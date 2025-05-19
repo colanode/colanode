@@ -1,5 +1,6 @@
 import { Plus } from 'lucide-react';
 import React from 'react';
+
 import { SpaceCreateDialog } from '@colanode/ui/components/spaces/space-create-dialog';
 
 export const SpaceCreateButton = () => {

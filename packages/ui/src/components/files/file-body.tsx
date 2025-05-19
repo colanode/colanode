@@ -1,4 +1,5 @@
 import { SquareArrowOutUpRight } from 'lucide-react';
+
 import { LocalFileNode } from '@colanode/client/types';
 import { FilePreview } from '@colanode/ui/components/files/file-preview';
 import { FileSidebar } from '@colanode/ui/components/files/file-sidebar';

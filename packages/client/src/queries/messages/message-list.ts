@@ -1,4 +1,4 @@
-import { LocalMessageNode } from '../../types/nodes';
+import { LocalMessageNode } from '@colanode/client/types/nodes';
 
 export type MessageListQueryInput = {
   type: 'message_list';

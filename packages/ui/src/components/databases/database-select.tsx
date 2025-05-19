@@ -1,5 +1,6 @@
 import { Check, ChevronsUpDown } from 'lucide-react';
 import React from 'react';
+
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -15,8 +16,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface DatabaseSelectProps {

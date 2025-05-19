@@ -1,4 +1,4 @@
-import { LocalFileNode } from '../../types/nodes';
+import { LocalFileNode } from '@colanode/client/types/nodes';
 
 export type FileListQueryInput = {
   type: 'file_list';

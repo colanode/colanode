@@ -1,4 +1,5 @@
 import { InView } from 'react-intersection-observer';
+
 import { TableViewEmptyPlaceholder } from '@colanode/ui/components/databases/tables/table-view-empty-placeholder';
 import { TableViewRow } from '@colanode/ui/components/databases/tables/table-view-row';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';

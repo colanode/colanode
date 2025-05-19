@@ -1,13 +1,12 @@
-import { UserRoleUpdateInput } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { parseApiError } from '@colanode/client/lib/axios';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
   UserRoleUpdateMutationInput,
   UserRoleUpdateMutationOutput,
-} from '../../../mutations/workspaces/workspace-user-role-update';
-import { MutationError, MutationErrorCode } from '../../../mutations';
-import { parseApiError } from '../../../lib/axios';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations/workspaces/workspace-user-role-update';
+import { UserRoleUpdateInput } from '@colanode/core';
 
 export class UserRoleUpdateMutationHandler
   extends WorkspaceMutationHandlerBase

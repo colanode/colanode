@@ -1,10 +1,10 @@
-import { createRoot } from 'react-dom/client';
 import * as Comlink from 'comlink';
-import { eventBus } from '@colanode/client/lib';
+import { createRoot } from 'react-dom/client';
 
-import { Root } from '@/root';
-import { ColanodeWorkerApi } from '@/workers/types';
-import DedicatedWorker from '@/workers/dedicated?worker';
+import { eventBus } from '@colanode/client/lib';
+import { Root } from '@colanode/web/root';
+import DedicatedWorker from '@colanode/web/workers/dedicated?worker';
+import { ColanodeWorkerApi } from '@colanode/web/workers/types';
 
 const worker = new DedicatedWorker();
 const workerApi = Comlink.wrap<ColanodeWorkerApi>(worker);

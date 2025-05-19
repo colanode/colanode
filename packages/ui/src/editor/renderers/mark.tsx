@@ -1,5 +1,6 @@
 import { JSONContent } from '@tiptap/core';
 import React from 'react';
+
 import { defaultClasses } from '@colanode/ui/editor/classes';
 
 interface MarkRendererProps {

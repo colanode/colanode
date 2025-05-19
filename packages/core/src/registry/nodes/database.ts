@@ -1,10 +1,9 @@
 import { z } from 'zod';
 
-import { fieldAttributesSchema } from './field';
-import { NodeModel } from './core';
-
-import { extractNodeRole } from '../../lib/nodes';
-import { hasNodeRole } from '../../lib/permissions';
+import { extractNodeRole } from '@colanode/core/lib/nodes';
+import { hasNodeRole } from '@colanode/core/lib/permissions';
+import { NodeModel } from '@colanode/core/registry/nodes/core';
+import { fieldAttributesSchema } from '@colanode/core/registry/nodes/field';
 
 export const databaseAttributesSchema = z.object({
   type: z.literal('database'),

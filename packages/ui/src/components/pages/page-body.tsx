@@ -1,5 +1,5 @@
-import { NodeRole, hasNodeRole } from '@colanode/core';
 import { LocalPageNode } from '@colanode/client/types';
+import { NodeRole, hasNodeRole } from '@colanode/core';
 import { Document } from '@colanode/ui/components/documents/document';
 import { ScrollArea } from '@colanode/ui/components/ui/scroll-area';
 

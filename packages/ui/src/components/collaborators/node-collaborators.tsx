@@ -1,5 +1,6 @@
-import { Node, NodeRole, extractNodeName, hasNodeRole } from '@colanode/core';
 import React from 'react';
+
+import { Node, NodeRole, extractNodeName, hasNodeRole } from '@colanode/core';
 import { NodeCollaborator } from '@colanode/ui/components/collaborators/node-collaborator';
 import { NodeCollaboratorCreate } from '@colanode/ui/components/collaborators/node-collaborator-create';
 import { Separator } from '@colanode/ui/components/ui/separator';

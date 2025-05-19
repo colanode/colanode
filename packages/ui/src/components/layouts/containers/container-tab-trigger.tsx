@@ -1,19 +1,20 @@
-import React from 'react';
-import { match } from 'ts-pattern';
-import { getIdType, IdType } from '@colanode/core';
 import { X } from 'lucide-react';
+import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+import { match } from 'ts-pattern';
+
 import { ContainerTab } from '@colanode/client/types';
-import { TabsTrigger } from '@colanode/ui/components/ui/tabs';
-import { SpaceContainerTab } from '@colanode/ui/components/spaces/space-container-tab';
+import { getIdType, IdType } from '@colanode/core';
 import { ChannelContainerTab } from '@colanode/ui/components/channels/channel-container-tab';
-import { FileContainerTab } from '@colanode/ui/components/files/file-container-tab';
-import { DatabaseContainerTab } from '@colanode/ui/components/databases/database-container-tab';
-import { RecordContainerTab } from '@colanode/ui/components/records/record-container-tab';
-import { FolderContainerTab } from '@colanode/ui/components/folders/folder-container-tab';
 import { ChatContainerTab } from '@colanode/ui/components/chats/chat-container-tab';
-import { PageContainerTab } from '@colanode/ui/components/pages/page-container-tab';
+import { DatabaseContainerTab } from '@colanode/ui/components/databases/database-container-tab';
+import { FileContainerTab } from '@colanode/ui/components/files/file-container-tab';
+import { FolderContainerTab } from '@colanode/ui/components/folders/folder-container-tab';
 import { MessageContainerTab } from '@colanode/ui/components/messages/message-container-tab';
+import { PageContainerTab } from '@colanode/ui/components/pages/page-container-tab';
+import { RecordContainerTab } from '@colanode/ui/components/records/record-container-tab';
+import { SpaceContainerTab } from '@colanode/ui/components/spaces/space-container-tab';
+import { TabsTrigger } from '@colanode/ui/components/ui/tabs';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface ContainerTabTriggerProps {

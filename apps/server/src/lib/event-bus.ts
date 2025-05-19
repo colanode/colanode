@@ -1,8 +1,7 @@
 import { generateId, IdType } from '@colanode/core';
-
-import { Event } from '@/types/events';
-import { redis } from '@/data/redis';
-import { config } from '@/lib/config';
+import { redis } from '@colanode/server/data/redis';
+import { config } from '@colanode/server/lib/config';
+import { Event } from '@colanode/server/types/events';
 
 export interface Subscription {
   id: string;

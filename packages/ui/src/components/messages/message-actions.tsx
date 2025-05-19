@@ -1,9 +1,10 @@
 import { MessagesSquare, Reply } from 'lucide-react';
 import React from 'react';
+
 import { LocalMessageNode } from '@colanode/client/types';
 import { MessageDeleteButton } from '@colanode/ui/components/messages/message-delete-button';
-import { MessageReactionCreatePopover } from '@colanode/ui/components/messages/message-reaction-create-popover';
 import { MessageQuickReaction } from '@colanode/ui/components/messages/message-quick-reaction';
+import { MessageReactionCreatePopover } from '@colanode/ui/components/messages/message-reaction-create-popover';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';

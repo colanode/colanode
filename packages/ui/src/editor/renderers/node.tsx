@@ -1,6 +1,7 @@
 import { JSONContent } from '@tiptap/core';
 import { ReactElement } from 'react';
 import { match } from 'ts-pattern';
+
 import { BlockquoteRenderer } from '@colanode/ui/editor/renderers/blockquote';
 import { BulletListRenderer } from '@colanode/ui/editor/renderers/bullet-list';
 import { CodeBlockRenderer } from '@colanode/ui/editor/renderers/code-block';
@@ -11,13 +12,13 @@ import { Heading2Renderer } from '@colanode/ui/editor/renderers/heading2';
 import { Heading3Renderer } from '@colanode/ui/editor/renderers/heading3';
 import { ListItemRenderer } from '@colanode/ui/editor/renderers/list-item';
 import { MarkRenderer } from '@colanode/ui/editor/renderers/mark';
+import { MentionRenderer } from '@colanode/ui/editor/renderers/mention';
 import { MessageRenderer } from '@colanode/ui/editor/renderers/message';
 import { OrderedListRenderer } from '@colanode/ui/editor/renderers/ordered-list';
 import { ParagraphRenderer } from '@colanode/ui/editor/renderers/paragraph';
 import { TaskItemRenderer } from '@colanode/ui/editor/renderers/task-item';
 import { TaskListRenderer } from '@colanode/ui/editor/renderers/task-list';
 import { TextRenderer } from '@colanode/ui/editor/renderers/text';
-import { MentionRenderer } from '@colanode/ui/editor/renderers/mention';
 
 interface NodeRendererProps {
   node: JSONContent;

@@ -1,4 +1,5 @@
 import { CircleX } from 'lucide-react';
+
 import { LocalMessageNode } from '@colanode/client/types';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';

@@ -1,9 +1,7 @@
+import { SelectCollaboration } from '@colanode/client/databases/workspace';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import { SyncCollaborationData, createDebugger } from '@colanode/core';
-
-import { WorkspaceService } from './workspace-service';
-
-import { eventBus } from '../../lib/event-bus';
-import { SelectCollaboration } from '../../databases/workspace';
 
 const debug = createDebugger('desktop:service:collaboration');
 

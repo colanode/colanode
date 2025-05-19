@@ -1,10 +1,10 @@
-import { WorkspaceQueryHandlerBase } from '../workspace-query-handler-base';
-import { SelectUser } from '../../../databases/workspace';
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { mapUser } from '../../../lib/mappers';
-import { UserListQueryInput } from '../../../queries/users/user-list';
-import { Event } from '../../../types/events';
-import { User } from '../../../types/users';
+import { SelectUser } from '@colanode/client/databases/workspace';
+import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib';
+import { mapUser } from '@colanode/client/lib/mappers';
+import { UserListQueryInput } from '@colanode/client/queries/users/user-list';
+import { Event } from '@colanode/client/types/events';
+import { User } from '@colanode/client/types/users';
 
 export class UserListQueryHandler
   extends WorkspaceQueryHandlerBase

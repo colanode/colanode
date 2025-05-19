@@ -1,9 +1,9 @@
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
   PageDeleteMutationInput,
   PageDeleteMutationOutput,
-} from '../../../mutations/pages/page-delete';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
-import { MutationHandler } from '../../../lib/types';
+} from '@colanode/client/mutations/pages/page-delete';
 
 export class PageDeleteMutationHandler
   extends WorkspaceMutationHandlerBase

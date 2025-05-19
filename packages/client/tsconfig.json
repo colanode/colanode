@@ -11,5 +11,10 @@
     "declaration": true, 
     "declarationMap": true,
     "composite": true,
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "@colanode/client/*": ["src/*"]
+    },
   }
 }

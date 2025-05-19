@@ -1,5 +1,6 @@
-import { NodeRole } from '@colanode/core';
 import { Trash2 } from 'lucide-react';
+
+import { NodeRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { NodeCollaboratorRoleDropdown } from '@colanode/ui/components/collaborators/node-collaborator-role-dropdown';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';

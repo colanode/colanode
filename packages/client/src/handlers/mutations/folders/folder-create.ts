@@ -1,11 +1,10 @@
-import { FolderAttributes, generateId, IdType } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
   FolderCreateMutationInput,
   FolderCreateMutationOutput,
-} from '../../../mutations/folders/folder-create';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations';
+import { FolderAttributes, generateId, IdType } from '@colanode/core';
 
 export class FolderCreateMutationHandler
   extends WorkspaceMutationHandlerBase

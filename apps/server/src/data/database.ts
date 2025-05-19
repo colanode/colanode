@@ -8,11 +8,11 @@ import {
   UpdateResult,
 } from 'kysely';
 import pg from 'pg';
-import { createDebugger } from '@colanode/core';
 
-import { databaseMigrations } from '@/data/migrations';
-import { DatabaseSchema } from '@/data/schema';
-import { config } from '@/lib/config';
+import { createDebugger } from '@colanode/core';
+import { databaseMigrations } from '@colanode/server/data/migrations';
+import { DatabaseSchema } from '@colanode/server/data/schema';
+import { config } from '@colanode/server/lib/config';
 
 const debug = createDebugger('server:database');
 

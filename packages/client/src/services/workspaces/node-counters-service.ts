@@ -1,17 +1,16 @@
 import AsyncLock from 'async-lock';
-import { getIdType, IdType, MentionConstants } from '@colanode/core';
 import { sql } from 'kysely';
-
-import { WorkspaceService } from './workspace-service';
 
 import {
   SelectNode,
   SelectNodeCounter,
   SelectNodeInteraction,
   SelectNodeReference,
-} from '../../databases/workspace';
-import { eventBus } from '../../lib/event-bus';
-import { NodeCounterType } from '../../types/nodes';
+} from '@colanode/client/databases/workspace';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
+import { NodeCounterType } from '@colanode/client/types/nodes';
+import { getIdType, IdType, MentionConstants } from '@colanode/core';
 
 export class NodeCountersService {
   private readonly workspace: WorkspaceService;

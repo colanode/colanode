@@ -1,9 +1,9 @@
-import { mapIcon } from '../../../lib/mappers';
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { IconListQueryInput } from '../../../queries/icons/icon-list';
-import { Icon } from '../../../types/icons';
-import { Event } from '../../../types/events';
-import { AppService } from '../../../services/app-service';
+import { mapIcon } from '@colanode/client/lib';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
+import { IconListQueryInput } from '@colanode/client/queries/icons/icon-list';
+import { AppService } from '@colanode/client/services/app-service';
+import { Event } from '@colanode/client/types/events';
+import { Icon } from '@colanode/client/types/icons';
 
 export class IconListQueryHandler implements QueryHandler<IconListQueryInput> {
   private readonly app: AppService;

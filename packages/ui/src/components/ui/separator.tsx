@@ -1,5 +1,6 @@
 import * as SeparatorPrimitive from '@radix-ui/react-separator';
 import * as React from 'react';
+
 import { cn } from '@colanode/ui/lib/utils';
 
 const Separator = React.forwardRef<

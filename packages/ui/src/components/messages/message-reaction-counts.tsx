@@ -1,12 +1,13 @@
 import React from 'react';
+
 import { LocalMessageNode } from '@colanode/client/types';
 import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 import { MessageReactionCountTooltip } from '@colanode/ui/components/messages/message-reaction-count-tooltip';
 import { MessageReactionCountsDialog } from '@colanode/ui/components/messages/message-reaction-counts-dialog';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { useQuery } from '@colanode/ui/hooks/use-query';
+import { toast } from '@colanode/ui/hooks/use-toast';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface MessageReactionCountsProps {

@@ -1,4 +1,5 @@
 import { Filter } from 'lucide-react';
+
 import { ViewFilterAddPopover } from '@colanode/ui/components/databases/search/view-filter-add-popover';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 

@@ -1,4 +1,5 @@
 import { Plus } from 'lucide-react';
+
 import { ViewBooleanFieldFilter } from '@colanode/ui/components/databases/search/view-boolean-field-filter';
 import { ViewCreatedAtFieldFilter } from '@colanode/ui/components/databases/search/view-created-at-field-fitler';
 import { ViewDateFieldFilter } from '@colanode/ui/components/databases/search/view-date-field-filter';

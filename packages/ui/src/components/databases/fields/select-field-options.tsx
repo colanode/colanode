@@ -1,9 +1,10 @@
+import { Check, Plus, X } from 'lucide-react';
+import React from 'react';
+
 import {
   MultiSelectFieldAttributes,
   SelectFieldAttributes,
 } from '@colanode/core';
-import { Check, Plus, X } from 'lucide-react';
-import React from 'react';
 import { SelectOptionBadge } from '@colanode/ui/components/databases/fields/select-option-badge';
 import { SelectOptionSettingsPopover } from '@colanode/ui/components/databases/fields/select-option-settings-popover';
 import {

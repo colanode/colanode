@@ -1,7 +1,8 @@
 import { Copy, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
-import { NodeRole, hasNodeRole } from '@colanode/core';
+
 import { LocalFileNode } from '@colanode/client/types';
+import { NodeRole, hasNodeRole } from '@colanode/core';
 import { FileDeleteDialog } from '@colanode/ui/components/files/file-delete-dialog';
 import {
   DropdownMenu,

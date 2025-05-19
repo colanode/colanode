@@ -1,4 +1,4 @@
-import { AccountMetadata } from '../../types/accounts';
+import { AccountMetadata } from '@colanode/client/types/accounts';
 
 export type AccountMetadataListQueryInput = {
   type: 'account_metadata_list';

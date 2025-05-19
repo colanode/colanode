@@ -3,11 +3,10 @@ import {
   SyncNodeReactionsInput,
   SyncNodeReactionData,
 } from '@colanode/core';
-
-import { BaseSynchronizer } from '@/synchronizers/base';
-import { Event } from '@/types/events';
-import { database } from '@/data/database';
-import { SelectNodeReaction } from '@/data/schema';
+import { database } from '@colanode/server/data/database';
+import { SelectNodeReaction } from '@colanode/server/data/schema';
+import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
+import { Event } from '@colanode/server/types/events';
 
 export class NodeReactionSynchronizer extends BaseSynchronizer<SyncNodeReactionsInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncNodeReactionsInput> | null> {

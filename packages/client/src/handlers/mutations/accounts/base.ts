@@ -1,10 +1,9 @@
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
+import { AppService } from '@colanode/client/services/app-service';
+import { ServerService } from '@colanode/client/services/server-service';
 import { LoginSuccessOutput } from '@colanode/core';
-
-import { AppService } from '../../../services/app-service';
-import { ServerService } from '../../../services/server-service';
-import { MutationError, MutationErrorCode } from '../../../mutations';
-import { mapAccount, mapWorkspace } from '../../../lib/mappers';
-import { eventBus } from '../../../lib/event-bus';
 
 export abstract class AccountMutationHandlerBase {
   protected readonly app: AppService;

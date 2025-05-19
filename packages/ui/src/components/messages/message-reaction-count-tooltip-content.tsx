@@ -1,8 +1,8 @@
 import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
-import { useQueries } from '@colanode/ui/hooks/use-queries';
 import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useQueries } from '@colanode/ui/hooks/use-queries';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface MessageReactionCountTooltipContentProps {
   message: LocalMessageNode;

@@ -1,9 +1,10 @@
+import React from 'react';
+
+import { RecordListQueryInput } from '@colanode/client/queries';
 import {
   DatabaseViewFilterAttributes,
   DatabaseViewSortAttributes,
 } from '@colanode/core';
-import React from 'react';
-import { RecordListQueryInput } from '@colanode/client/queries';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQueries } from '@colanode/ui/hooks/use-queries';

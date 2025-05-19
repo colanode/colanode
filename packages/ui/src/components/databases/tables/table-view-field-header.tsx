@@ -2,6 +2,7 @@ import { ArrowDownAz, ArrowDownZa, EyeOff, Filter, Trash2 } from 'lucide-react';
 import { Resizable } from 're-resizable';
 import React from 'react';
 import { useDrag, useDrop } from 'react-dnd';
+
 import { ViewField } from '@colanode/client/types';
 import { FieldDeleteDialog } from '@colanode/ui/components/databases/fields/field-delete-dialog';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';

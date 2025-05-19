@@ -1,9 +1,9 @@
-import { SelectServer } from '../../../databases/app';
-import { AppService } from '../../../services/app-service';
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { ServerListQueryInput } from '../../../queries/servers/server-list';
-import { Event } from '../../../types/events';
-import { Server } from '../../../types/servers';
+import { SelectServer } from '@colanode/client/databases/app';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib';
+import { ServerListQueryInput } from '@colanode/client/queries/servers/server-list';
+import { AppService } from '@colanode/client/services/app-service';
+import { Event } from '@colanode/client/types/events';
+import { Server } from '@colanode/client/types/servers';
 
 export class ServerListQueryHandler
   implements QueryHandler<ServerListQueryInput>

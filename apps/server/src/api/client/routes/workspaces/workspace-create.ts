@@ -1,13 +1,13 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+
 import {
   ApiErrorCode,
   workspaceCreateInputSchema,
   apiErrorOutputSchema,
   workspaceOutputSchema,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { createWorkspace } from '@/lib/workspaces';
+import { database } from '@colanode/server/data/database';
+import { createWorkspace } from '@colanode/server/lib/workspaces';
 
 export const workspaceCreateRoute: FastifyPluginCallbackZod = (
   instance,

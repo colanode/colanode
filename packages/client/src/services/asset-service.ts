@@ -1,8 +1,10 @@
 import { Kysely } from 'kysely';
 
-import { AppService } from './app-service';
-
-import { EmojiDatabaseSchema, IconDatabaseSchema } from '../databases';
+import {
+  EmojiDatabaseSchema,
+  IconDatabaseSchema,
+} from '@colanode/client/databases';
+import { AppService } from '@colanode/client/services/app-service';
 
 export class AssetService {
   private readonly app: AppService;

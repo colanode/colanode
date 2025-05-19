@@ -1,8 +1,8 @@
-import { NodeRole } from '@colanode/core';
 import { LocalDatabaseNode } from '@colanode/client/types';
+import { NodeRole } from '@colanode/core';
 import { Database } from '@colanode/ui/components/databases/database';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface RecordDatabaseProps {
   id: string;

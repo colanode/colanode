@@ -1,10 +1,10 @@
-import { AppService } from '../../../services/app-service';
-import { MutationHandler } from '../../../lib/types';
-import { MutationError, MutationErrorCode } from '../../../mutations';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
   AccountLogoutMutationInput,
   AccountLogoutMutationOutput,
-} from '../../../mutations/accounts/account-logout';
+} from '@colanode/client/mutations/accounts/account-logout';
+import { AppService } from '@colanode/client/services/app-service';
 
 export class AccountLogoutMutationHandler
   implements MutationHandler<AccountLogoutMutationInput>

@@ -1,5 +1,5 @@
-import { NodeRole, hasNodeRole } from '@colanode/core';
 import { LocalPageNode } from '@colanode/client/types';
+import { NodeRole, hasNodeRole } from '@colanode/core';
 import { PageForm } from '@colanode/ui/components/pages/page-form';
 import {
   Dialog,

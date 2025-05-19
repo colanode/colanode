@@ -1,5 +1,6 @@
-import { FieldAttributes, DatabaseViewSortAttributes } from '@colanode/core';
 import { ChevronDown, Trash2 } from 'lucide-react';
+
+import { FieldAttributes, DatabaseViewSortAttributes } from '@colanode/core';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { Button } from '@colanode/ui/components/ui/button';
 import {

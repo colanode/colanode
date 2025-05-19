@@ -1,9 +1,10 @@
-import { KyselyBuildOptions, KyselyService } from '@colanode/client/services';
-import { Kysely, SqliteDialect } from 'kysely';
-import SQLite from 'better-sqlite3';
-
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
+
+import SQLite from 'better-sqlite3';
+import { Kysely, SqliteDialect } from 'kysely';
+
+import { KyselyBuildOptions, KyselyService } from '@colanode/client/services';
 
 export class DesktopKyselyService implements KyselyService {
   build<T>(options: KyselyBuildOptions): Kysely<T> {
@@ -17,7 +18,9 @@ export class DesktopKyselyService implements KyselyService {
       readonly: options.readonly,
     });
 
-    database.pragma('journal_mode = WAL');
+    if (!options.readonly) {
+      database.pragma('journal_mode = WAL');
+    }
 
     return new Kysely<T>({
       dialect: new SqliteDialect({

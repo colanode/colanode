@@ -1,10 +1,10 @@
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { mapWorkspaceMetadata } from '../../../lib/mappers';
-import { WorkspaceMetadataListQueryInput } from '../../../queries/workspaces/workspace-metadata-list';
-import { Event } from '../../../types/events';
-import { WorkspaceMetadata } from '../../../types/workspaces';
-import { WorkspaceQueryHandlerBase } from '../workspace-query-handler-base';
-import { SelectWorkspaceMetadata } from '../../../databases/workspace/schema';
+import { SelectWorkspaceMetadata } from '@colanode/client/databases/workspace/schema';
+import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib';
+import { mapWorkspaceMetadata } from '@colanode/client/lib/mappers';
+import { WorkspaceMetadataListQueryInput } from '@colanode/client/queries/workspaces/workspace-metadata-list';
+import { Event } from '@colanode/client/types/events';
+import { WorkspaceMetadata } from '@colanode/client/types/workspaces';
 
 export class WorkspaceMetadataListQueryHandler
   extends WorkspaceQueryHandlerBase

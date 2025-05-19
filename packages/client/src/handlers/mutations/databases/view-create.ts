@@ -1,17 +1,16 @@
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { mapNode } from '@colanode/client/lib/mappers';
+import { MutationHandler } from '@colanode/client/lib/types';
+import {
+  ViewCreateMutationInput,
+  ViewCreateMutationOutput,
+} from '@colanode/client/mutations/databases/view-create';
 import {
   generateId,
   generateNodeIndex,
   IdType,
   DatabaseViewAttributes,
 } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
-import {
-  ViewCreateMutationInput,
-  ViewCreateMutationOutput,
-} from '../../../mutations/databases/view-create';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
-import { mapNode } from '../../../lib/mappers';
 
 export class ViewCreateMutationHandler
   extends WorkspaceMutationHandlerBase

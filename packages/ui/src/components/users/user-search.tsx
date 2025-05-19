@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { User } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import {

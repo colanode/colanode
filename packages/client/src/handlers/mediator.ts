@@ -1,27 +1,35 @@
-import { createDebugger } from '@colanode/core';
 import { isEqual } from 'lodash-es';
+
 import { CommandInput, CommandMap } from '@colanode/client/commands';
-import { QueryInput, QueryMap } from '@colanode/client/queries';
-
-import { buildMutationHandlerMap, MutationHandlerMap } from './mutations';
-import { buildQueryHandlerMap, QueryHandlerMap } from './queries';
-import { buildCommandHandlerMap, CommandHandlerMap } from './commands';
-
+import {
+  buildCommandHandlerMap,
+  CommandHandlerMap,
+} from '@colanode/client/handlers/commands';
+import {
+  buildMutationHandlerMap,
+  MutationHandlerMap,
+} from '@colanode/client/handlers/mutations';
+import {
+  buildQueryHandlerMap,
+  QueryHandlerMap,
+} from '@colanode/client/handlers/queries';
+import { eventBus } from '@colanode/client/lib/event-bus';
 import {
   MutationHandler,
   CommandHandler,
   QueryHandler,
   SubscribedQuery,
-} from '../lib/types';
+} from '@colanode/client/lib/types';
 import {
   MutationError,
   MutationErrorCode,
   MutationInput,
   MutationResult,
-} from '../mutations';
-import { eventBus } from '../lib/event-bus';
-import { Event } from '../types/events';
-import { AppService } from '../services/app-service';
+} from '@colanode/client/mutations';
+import { QueryInput, QueryMap } from '@colanode/client/queries';
+import { AppService } from '@colanode/client/services/app-service';
+import { Event } from '@colanode/client/types/events';
+import { createDebugger } from '@colanode/core';
 
 const debug = createDebugger('desktop:mediator');
 

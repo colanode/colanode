@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { ViewFilters } from '@colanode/ui/components/databases/search/view-filters';
 import { ViewSorts } from '@colanode/ui/components/databases/search/view-sorts';
 import { Separator } from '@colanode/ui/components/ui/separator';

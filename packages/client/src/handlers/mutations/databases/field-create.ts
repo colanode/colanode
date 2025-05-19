@@ -1,3 +1,11 @@
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { fetchNode } from '@colanode/client/lib/utils';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
+import {
+  FieldCreateMutationInput,
+  FieldCreateMutationOutput,
+} from '@colanode/client/mutations/databases/field-create';
 import {
   compareString,
   DatabaseAttributes,
@@ -7,15 +15,6 @@ import {
   generateNodeIndex,
   IdType,
 } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
-import {
-  FieldCreateMutationInput,
-  FieldCreateMutationOutput,
-} from '../../../mutations/databases/field-create';
-import { MutationError, MutationErrorCode } from '../../../mutations';
-import { fetchNode } from '../../../lib/utils';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
 
 export class FieldCreateMutationHandler
   extends WorkspaceMutationHandlerBase

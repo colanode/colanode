@@ -1,3 +1,23 @@
+import axios from 'axios';
+import ms from 'ms';
+
+import {
+  SelectFileState,
+  SelectNode,
+} from '@colanode/client/databases/workspace';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { EventLoop } from '@colanode/client/lib/event-loop';
+import { mapFileState, mapNode } from '@colanode/client/lib/mappers';
+import { fetchNode, fetchUserStorageUsed } from '@colanode/client/lib/utils';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
+import { AppService } from '@colanode/client/services/app-service';
+import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
+import {
+  DownloadStatus,
+  FileMetadata,
+  UploadStatus,
+} from '@colanode/client/types/files';
+import { LocalFileNode } from '@colanode/client/types/nodes';
 import {
   CompleteUploadInput,
   CompleteUploadOutput,
@@ -12,20 +32,6 @@ import {
   generateId,
   formatBytes,
 } from '@colanode/core';
-import axios from 'axios';
-import ms from 'ms';
-
-import { WorkspaceService } from './workspace-service';
-
-import { fetchNode, fetchUserStorageUsed } from '../../lib/utils';
-import { mapFileState, mapNode } from '../../lib/mappers';
-import { eventBus } from '../../lib/event-bus';
-import { DownloadStatus, FileMetadata, UploadStatus } from '../../types/files';
-import { EventLoop } from '../../lib/event-loop';
-import { SelectFileState, SelectNode } from '../../databases/workspace';
-import { MutationError, MutationErrorCode } from '../../mutations';
-import { LocalFileNode } from '../../types/nodes';
-import { AppService } from '../app-service';
 
 const UPLOAD_RETRIES_LIMIT = 10;
 const DOWNLOAD_RETRIES_LIMIT = 10;

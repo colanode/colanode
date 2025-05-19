@@ -1,11 +1,11 @@
 import { useFloating, shift, offset, FloatingPortal } from '@floating-ui/react';
-import { GripVertical, Plus } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
 import { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { NodeSelection, TextSelection } from '@tiptap/pm/state';
 // @ts-expect-error - we can just ignore this for now
 import { __serializeForClipboard } from '@tiptap/pm/view';
 import { Editor } from '@tiptap/react';
+import { GripVertical, Plus } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
 
 interface ActionMenuProps {
   editor: Editor | null;

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import {
   Command,

@@ -29,13 +29,23 @@
       "error",
       {
         "groups": [
-          "external",
           "builtin",
+          "external",
           "internal",
-          "sibling",
-          "parent",
-          "index"
+          ["parent", "sibling", "index"]
         ],
+        "pathGroups": [
+          {
+            "pattern": "@colanode/**",
+            "group": "internal",
+            "position": "after"
+          }
+        ],
+        "pathGroupsExcludedImportTypes": ["builtin"],
+        "alphabetize": {
+          "order": "asc",
+          "caseInsensitive": true
+        },
         "newlines-between": "always"
       }
     ]

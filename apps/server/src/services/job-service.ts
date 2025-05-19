@@ -1,9 +1,8 @@
 import { Job, JobsOptions, Queue, Worker } from 'bullmq';
-import { createDebugger } from '@colanode/core';
 
-import { config } from '@/lib/config';
-import { jobHandlerMap } from '@/jobs';
-import { JobHandler, JobInput } from '@/types/jobs';
+import { createDebugger } from '@colanode/core';
+import { jobHandlerMap, JobHandler, JobInput } from '@colanode/server/jobs';
+import { config } from '@colanode/server/lib/config';
 
 const debug = createDebugger('server:service:job');
 

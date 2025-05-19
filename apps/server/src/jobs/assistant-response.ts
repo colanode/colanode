@@ -5,14 +5,13 @@ import {
   getNodeModel,
   MessageAttributes,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { config } from '@/lib/config';
-import { fetchNode, createNode } from '@/lib/nodes';
-import { JobHandler } from '@/types/jobs';
-import { runAssistantResponseChain } from '@/lib/ai/assistants';
-import { SelectNode } from '@/data/schema';
-import { Citation } from '@/types/assistant';
+import { database } from '@colanode/server/data/database';
+import { SelectNode } from '@colanode/server/data/schema';
+import { JobHandler } from '@colanode/server/jobs';
+import { runAssistantResponseChain } from '@colanode/server/lib/ai/assistants';
+import { config } from '@colanode/server/lib/config';
+import { fetchNode, createNode } from '@colanode/server/lib/nodes';
+import { Citation } from '@colanode/server/types/assistant';
 
 export type AssistantResponseInput = {
   type: 'assistant_response';
@@ -21,7 +20,7 @@ export type AssistantResponseInput = {
   selectedContextNodeIds?: string[];
 };
 
-declare module '@/types/jobs' {
+declare module '@colanode/server/jobs' {
   interface JobMap {
     assistant_response: {
       input: AssistantResponseInput;

@@ -1,7 +1,7 @@
-import { AppPaths } from '@colanode/client/services';
-
 import { app } from 'electron';
 import path from 'path';
+
+import { AppPaths } from '@colanode/client/services';
 
 export const appPath = app.getPath('userData');
 

@@ -1,16 +1,17 @@
 import { match } from 'ts-pattern';
-import { getIdType, IdType } from '@colanode/core';
+
 import { ContainerTab } from '@colanode/client/types';
-import { TabsContent } from '@colanode/ui/components/ui/tabs';
-import { SpaceContainer } from '@colanode/ui/components/spaces/space-container';
+import { getIdType, IdType } from '@colanode/core';
 import { ChannelContainer } from '@colanode/ui/components/channels/channel-container';
 import { ChatContainer } from '@colanode/ui/components/chats/chat-container';
 import { DatabaseContainer } from '@colanode/ui/components/databases/database-container';
 import { FileContainer } from '@colanode/ui/components/files/file-container';
 import { FolderContainer } from '@colanode/ui/components/folders/folder-container';
+import { MessageContainer } from '@colanode/ui/components/messages/message-container';
 import { PageContainer } from '@colanode/ui/components/pages/page-container';
 import { RecordContainer } from '@colanode/ui/components/records/record-container';
-import { MessageContainer } from '@colanode/ui/components/messages/message-container';
+import { SpaceContainer } from '@colanode/ui/components/spaces/space-container';
+import { TabsContent } from '@colanode/ui/components/ui/tabs';
 
 interface ContainerTabContentProps {
   tab: ContainerTab;

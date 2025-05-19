@@ -1,12 +1,11 @@
+import { SelectNode } from '@colanode/client/databases/workspace';
+import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
+import { mapNode } from '@colanode/client/lib/mappers';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
+import { DatabaseViewListQueryInput } from '@colanode/client/queries/databases/database-view-list';
+import { Event } from '@colanode/client/types/events';
+import { LocalDatabaseViewNode } from '@colanode/client/types/nodes';
 import { compareString } from '@colanode/core';
-
-import { SelectNode } from '../../../databases/workspace';
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { mapNode } from '../../../lib/mappers';
-import { DatabaseViewListQueryInput } from '../../../queries/databases/database-view-list';
-import { Event } from '../../../types/events';
-import { WorkspaceQueryHandlerBase } from '../workspace-query-handler-base';
-import { LocalDatabaseViewNode } from '../../../types/nodes';
 
 export class DatabaseViewListQueryHandler
   extends WorkspaceQueryHandlerBase

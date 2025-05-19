@@ -1,5 +1,6 @@
 import { SmilePlus } from 'lucide-react';
 import React from 'react';
+
 import { EmojiPicker } from '@colanode/ui/components/emojis/emoji-picker';
 import {
   Popover,

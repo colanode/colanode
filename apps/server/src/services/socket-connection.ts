@@ -1,4 +1,5 @@
 import { WebSocket } from 'ws';
+
 import {
   Message,
   SynchronizerInput,
@@ -6,9 +7,16 @@ import {
   UserStatus,
   createDebugger,
 } from '@colanode/core';
-
-import { RequestAccount } from '@/types/api';
-import { database } from '@/data/database';
+import { database } from '@colanode/server/data/database';
+import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
+import { CollaborationSynchronizer } from '@colanode/server/synchronizers/collaborations';
+import { DocumentUpdateSynchronizer } from '@colanode/server/synchronizers/document-updates';
+import { NodeInteractionSynchronizer } from '@colanode/server/synchronizers/node-interactions';
+import { NodeReactionSynchronizer } from '@colanode/server/synchronizers/node-reactions';
+import { NodeTombstoneSynchronizer } from '@colanode/server/synchronizers/node-tombstones';
+import { NodeUpdatesSynchronizer } from '@colanode/server/synchronizers/node-updates';
+import { UserSynchronizer } from '@colanode/server/synchronizers/users';
+import { RequestAccount } from '@colanode/server/types/api';
 import {
   AccountUpdatedEvent,
   CollaborationCreatedEvent,
@@ -18,16 +26,8 @@ import {
   UserUpdatedEvent,
   WorkspaceDeletedEvent,
   WorkspaceUpdatedEvent,
-} from '@/types/events';
-import { ConnectedUser } from '@/types/users';
-import { BaseSynchronizer } from '@/synchronizers/base';
-import { UserSynchronizer } from '@/synchronizers/users';
-import { CollaborationSynchronizer } from '@/synchronizers/collaborations';
-import { NodeUpdatesSynchronizer } from '@/synchronizers/node-updates';
-import { NodeReactionSynchronizer } from '@/synchronizers/node-reactions';
-import { NodeTombstoneSynchronizer } from '@/synchronizers/node-tombstones';
-import { NodeInteractionSynchronizer } from '@/synchronizers/node-interactions';
-import { DocumentUpdateSynchronizer } from '@/synchronizers/document-updates';
+} from '@colanode/server/types/events';
+import { ConnectedUser } from '@colanode/server/types/users';
 
 type SocketUser = {
   user: ConnectedUser;

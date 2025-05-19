@@ -1,5 +1,8 @@
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
+
 import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
+import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
+import { MessageReactionCountsDialogList } from '@colanode/ui/components/messages/message-reaction-counts-dialog-list';
 import {
   Dialog,
   DialogContent,
@@ -11,8 +14,6 @@ import {
   TabsList,
   TabsTrigger,
 } from '@colanode/ui/components/ui/tabs';
-import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
-import { MessageReactionCountsDialogList } from '@colanode/ui/components/messages/message-reaction-counts-dialog-list';
 
 interface MessageReactionCountsDialogProps {
   message: LocalMessageNode;

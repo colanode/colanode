@@ -1,11 +1,12 @@
-import React from 'react';
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
+import React from 'react';
+
 import { View } from '@colanode/ui/components/databases/view';
 import { ScrollBar } from '@colanode/ui/components/ui/scroll-area';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { DatabaseViewsContext } from '@colanode/ui/contexts/database-views';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 export const DatabaseViews = () => {
   const workspace = useWorkspace();

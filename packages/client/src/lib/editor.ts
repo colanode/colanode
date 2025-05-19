@@ -1,3 +1,7 @@
+import { Editor, JSONContent } from '@tiptap/core';
+import { Node as ProseMirrorNode, ResolvedPos } from '@tiptap/pm/model';
+import { NodeSelection, TextSelection } from '@tiptap/pm/state';
+
 import {
   Block,
   BlockLeaf,
@@ -8,9 +12,6 @@ import {
   IdType,
   RichTextContent,
 } from '@colanode/core';
-import { Editor, JSONContent } from '@tiptap/core';
-import { Node as ProseMirrorNode, ResolvedPos } from '@tiptap/pm/model';
-import { NodeSelection, TextSelection } from '@tiptap/pm/state';
 
 const leafBlockTypes = new Set([
   EditorNodeTypes.Paragraph,

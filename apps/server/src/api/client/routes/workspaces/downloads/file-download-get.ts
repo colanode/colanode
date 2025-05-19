@@ -1,5 +1,6 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+
 import {
   CreateDownloadOutput,
   hasNodeRole,
@@ -9,10 +10,9 @@ import {
   createDownloadOutputSchema,
   apiErrorOutputSchema,
 } from '@colanode/core';
-
-import { fetchNodeTree, mapNode } from '@/lib/nodes';
-import { database } from '@/data/database';
-import { buildDownloadUrl } from '@/lib/files';
+import { database } from '@colanode/server/data/database';
+import { buildDownloadUrl } from '@colanode/server/lib/files';
+import { fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
 
 export const fileDownloadGetRoute: FastifyPluginCallbackZod = (
   instance,

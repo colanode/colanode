@@ -1,7 +1,8 @@
-import { WorkspaceRole } from '@colanode/core';
 import React from 'react';
 import { InView } from 'react-intersection-observer';
+
 import { UserListQueryInput } from '@colanode/client/queries';
+import { WorkspaceRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Spinner } from '@colanode/ui/components/ui/spinner';

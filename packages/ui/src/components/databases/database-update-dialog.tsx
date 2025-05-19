@@ -1,5 +1,5 @@
-import { NodeRole, hasNodeRole } from '@colanode/core';
 import { LocalDatabaseNode } from '@colanode/client/types';
+import { NodeRole, hasNodeRole } from '@colanode/core';
 import { DatabaseForm } from '@colanode/ui/components/databases/database-form';
 import {
   Dialog,

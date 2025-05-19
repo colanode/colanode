@@ -1,5 +1,6 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+
 import {
   AccountStatus,
   ApiErrorCode,
@@ -11,12 +12,11 @@ import {
   usersInviteOutputSchema,
   UserStatus,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { getNameFromEmail } from '@/lib/utils';
-import { SelectAccount } from '@/data/schema';
-import { eventBus } from '@/lib/event-bus';
-import { config } from '@/lib/config';
+import { database } from '@colanode/server/data/database';
+import { SelectAccount } from '@colanode/server/data/schema';
+import { config } from '@colanode/server/lib/config';
+import { eventBus } from '@colanode/server/lib/event-bus';
+import { getNameFromEmail } from '@colanode/server/lib/utils';
 
 export const userCreateRoute: FastifyPluginCallbackZod = (
   instance,

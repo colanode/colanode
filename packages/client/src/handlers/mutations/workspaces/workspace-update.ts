@@ -1,16 +1,16 @@
-import { WorkspaceUpdateInput } from '@colanode/core';
-
-import { AppService } from '../../../services/app-service';
-import { MutationHandler } from '../../../lib/types';
-import { mapWorkspace } from '../../../lib/mappers';
-import { parseApiError } from '../../../lib/axios';
-import { eventBus } from '../../../lib/event-bus';
-import { MutationError, MutationErrorCode } from '../../../mutations';
+import { parseApiError } from '@colanode/client/lib/axios';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapWorkspace } from '@colanode/client/lib/mappers';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
+  MutationError,
+  MutationErrorCode,
   WorkspaceUpdateMutationInput,
   WorkspaceUpdateMutationOutput,
-} from '../../../mutations/workspaces/workspace-update';
-import { Workspace } from '../../../types/workspaces';
+} from '@colanode/client/mutations';
+import { AppService } from '@colanode/client/services/app-service';
+import { Workspace } from '@colanode/client/types';
+import { WorkspaceUpdateInput } from '@colanode/core';
 
 export class WorkspaceUpdateMutationHandler
   implements MutationHandler<WorkspaceUpdateMutationInput>

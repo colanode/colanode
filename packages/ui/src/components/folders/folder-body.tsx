@@ -1,4 +1,3 @@
-import { NodeRole } from '@colanode/core';
 import {
   Check,
   Filter,
@@ -8,7 +7,9 @@ import {
   Upload,
 } from 'lucide-react';
 import React from 'react';
+
 import { LocalFolderNode, FolderLayoutType } from '@colanode/client/types';
+import { NodeRole } from '@colanode/core';
 import { FolderFiles } from '@colanode/ui/components/folders/folder-files';
 import { Button } from '@colanode/ui/components/ui/button';
 import {

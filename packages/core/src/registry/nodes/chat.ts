@@ -1,8 +1,7 @@
 import { z } from 'zod';
 
-import { NodeModel, nodeRoleEnum } from './core';
-
-import { hasWorkspaceRole } from '../../lib/permissions';
+import { hasWorkspaceRole } from '@colanode/core/lib/permissions';
+import { NodeModel, nodeRoleEnum } from '@colanode/core/registry/nodes/core';
 
 export const chatAttributesSchema = z.object({
   type: z.literal('chat'),

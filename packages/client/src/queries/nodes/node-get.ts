@@ -1,4 +1,4 @@
-import { LocalNode } from '../../types/nodes';
+import { LocalNode } from '@colanode/client/types/nodes';
 
 export type NodeGetQueryInput = {
   type: 'node_get';

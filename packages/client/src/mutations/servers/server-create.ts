@@ -1,4 +1,4 @@
-import { Server } from '../../types/servers';
+import { Server } from '@colanode/client/types/servers';
 
 export type ServerCreateMutationInput = {
   type: 'server_create';

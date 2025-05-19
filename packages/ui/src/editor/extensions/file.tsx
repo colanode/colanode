@@ -1,6 +1,7 @@
 import { mergeAttributes, Node } from '@tiptap/core';
-import { ReactNodeViewRenderer } from '@tiptap/react';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
+import { ReactNodeViewRenderer } from '@tiptap/react';
+
 import { EditorContext } from '@colanode/client/types';
 import { FileNodeView } from '@colanode/ui/editor/views';
 import { toast } from '@colanode/ui/hooks/use-toast';

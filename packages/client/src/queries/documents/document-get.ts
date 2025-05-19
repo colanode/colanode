@@ -1,4 +1,4 @@
-import { Document } from '../../types/documents';
+import { Document } from '@colanode/client/types/documents';
 
 export type DocumentGetQueryInput = {
   type: 'document_get';

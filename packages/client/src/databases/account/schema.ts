@@ -1,5 +1,6 @@
-import { WorkspaceRole } from '@colanode/core';
 import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
+
+import { WorkspaceRole } from '@colanode/core';
 
 interface WorkspaceTable {
   id: ColumnType<string, string, never>;

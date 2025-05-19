@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+
 import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';

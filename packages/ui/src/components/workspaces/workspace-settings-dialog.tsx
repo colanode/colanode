@@ -2,6 +2,7 @@ import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Info, Trash2, Users } from 'lucide-react';
 import React from 'react';
 import { match } from 'ts-pattern';
+
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import {
   Dialog,
@@ -19,10 +20,10 @@ import {
   SidebarMenuItem,
   SidebarProvider,
 } from '@colanode/ui/components/ui/sidebar';
+import { WorkspaceDelete } from '@colanode/ui/components/workspaces/workspace-delete';
 import { WorkspaceUpdate } from '@colanode/ui/components/workspaces/workspace-update';
 import { WorkspaceUsers } from '@colanode/ui/components/workspaces/workspace-users';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { WorkspaceDelete } from '@colanode/ui/components/workspaces/workspace-delete';
 
 interface WorkspaceSettingsDialogProps {
   open: boolean;

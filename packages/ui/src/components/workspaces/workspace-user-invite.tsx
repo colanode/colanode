@@ -1,7 +1,8 @@
-import { isValidEmail } from '@colanode/core';
 import { X } from 'lucide-react';
 import React from 'react';
+
 import { Workspace } from '@colanode/client/types';
+import { isValidEmail } from '@colanode/core';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';

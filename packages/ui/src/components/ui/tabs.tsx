@@ -1,5 +1,6 @@
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import * as React from 'react';
+
 import { cn } from '@colanode/ui/lib/utils';
 
 const Tabs = TabsPrimitive.Root;

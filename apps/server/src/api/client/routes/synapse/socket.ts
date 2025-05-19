@@ -1,7 +1,7 @@
 import { FastifyPluginCallback } from 'fastify';
 
-import { accountAuthenticator } from '@/api/client/plugins/account-auth';
-import { socketService } from '@/services/socket-service';
+import { accountAuthenticator } from '@colanode/server/api/client/plugins/account-auth';
+import { socketService } from '@colanode/server/services/socket-service';
 
 export const socketHandler: FastifyPluginCallback = (instance, _, done) => {
   instance.register(accountAuthenticator);

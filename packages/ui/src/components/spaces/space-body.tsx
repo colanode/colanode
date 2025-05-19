@@ -1,8 +1,10 @@
-import { NodeRole, hasNodeRole } from '@colanode/core';
 import { Info, Trash2, Users } from 'lucide-react';
+
 import { LocalSpaceNode } from '@colanode/client/types';
+import { NodeRole, hasNodeRole } from '@colanode/core';
 import { NodeCollaborators } from '@colanode/ui/components/collaborators/node-collaborators';
 import { SpaceDeleteForm } from '@colanode/ui/components/spaces/space-delete-form';
+import { SpaceGeneralTab } from '@colanode/ui/components/spaces/space-general-tab';
 import {
   Tabs,
   TabsContent,
@@ -10,7 +12,6 @@ import {
   TabsTrigger,
 } from '@colanode/ui/components/ui/tabs';
 import { useLayout } from '@colanode/ui/contexts/layout';
-import { SpaceGeneralTab } from '@colanode/ui/components/spaces/space-general-tab';
 
 interface SpaceBodyProps {
   space: LocalSpaceNode;

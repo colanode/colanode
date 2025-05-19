@@ -1,5 +1,5 @@
-import { NodeRole, hasNodeRole } from '@colanode/core';
 import { LocalFolderNode } from '@colanode/client/types';
+import { NodeRole, hasNodeRole } from '@colanode/core';
 import { FolderForm } from '@colanode/ui/components/folders/folder-form';
 import {
   Dialog,

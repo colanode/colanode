@@ -1,4 +1,5 @@
 import { mergeAttributes, Node, textblockTypeInputRule } from '@tiptap/core';
+
 import { defaultClasses } from '@colanode/ui/editor/classes';
 
 export interface Heading3Options {

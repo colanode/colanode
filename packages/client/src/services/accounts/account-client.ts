@@ -5,12 +5,10 @@ import axios, {
   AxiosResponse,
   isAxiosError,
 } from 'axios';
+
+import { BackoffCalculator } from '@colanode/client/lib/backoff-calculator';
+import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { createDebugger } from '@colanode/core';
-
-import { AccountService } from './account-service';
-
-import { BackoffCalculator } from '../../lib/backoff-calculator';
-
 const debug = createDebugger('desktop:service:account');
 
 export class AccountClient {

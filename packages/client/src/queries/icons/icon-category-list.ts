@@ -1,4 +1,4 @@
-import { IconCategory } from '../../types/icons';
+import { IconCategory } from '@colanode/client/types/icons';
 
 export type IconCategoryListQueryInput = {
   type: 'icon_category_list';

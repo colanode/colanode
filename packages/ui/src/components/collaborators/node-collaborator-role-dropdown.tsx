@@ -1,4 +1,5 @@
 import { Check, ChevronDown } from 'lucide-react';
+
 import { NodeRole } from '@colanode/core';
 import {
   DropdownMenu,

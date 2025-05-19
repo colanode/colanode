@@ -1,4 +1,4 @@
-import { User } from '../../types/users';
+import { User } from '@colanode/client/types/users';
 
 export type UserListQueryInput = {
   type: 'user_list';

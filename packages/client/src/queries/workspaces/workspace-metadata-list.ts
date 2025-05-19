@@ -1,4 +1,4 @@
-import { WorkspaceMetadata } from '../../types/workspaces';
+import { WorkspaceMetadata } from '@colanode/client/types/workspaces';
 
 export type WorkspaceMetadataListQueryInput = {
   type: 'workspace_metadata_list';

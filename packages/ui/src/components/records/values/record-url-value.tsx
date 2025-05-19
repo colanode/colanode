@@ -1,5 +1,6 @@
-import { isValidUrl, UrlFieldAttributes } from '@colanode/core';
 import { ExternalLink } from 'lucide-react';
+
+import { isValidUrl, UrlFieldAttributes } from '@colanode/core';
 import {
   HoverCard,
   HoverCardContent,

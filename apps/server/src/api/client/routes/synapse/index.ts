@@ -1,8 +1,8 @@
 import { FastifyPluginCallback } from 'fastify';
 
-import { socketHandler } from './socket';
+import { accountAuthenticator } from '@colanode/server/api/client/plugins/account-auth';
 
-import { accountAuthenticator } from '@/api/client/plugins/account-auth';
+import { socketHandler } from './socket';
 
 export const synapseRoutes: FastifyPluginCallback = (instance, _, done) => {
   instance.register(accountAuthenticator);

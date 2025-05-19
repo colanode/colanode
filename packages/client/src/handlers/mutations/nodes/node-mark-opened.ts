@@ -1,14 +1,13 @@
-import { MarkNodeOpenedMutation, generateId, IdType } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapNodeInteraction } from '@colanode/client/lib/mappers';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { fetchNode } from '@colanode/client/lib/utils';
 import {
   NodeMarkOpenedMutationInput,
   NodeMarkOpenedMutationOutput,
-} from '../../../mutations/nodes/node-mark-opened';
-import { mapNodeInteraction } from '../../../lib/mappers';
-import { fetchNode } from '../../../lib/utils';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
-import { eventBus } from '../../../lib/event-bus';
+} from '@colanode/client/mutations/nodes/node-mark-opened';
+import { MarkNodeOpenedMutation, generateId, IdType } from '@colanode/core';
 
 export class NodeMarkOpenedMutationHandler
   extends WorkspaceMutationHandlerBase

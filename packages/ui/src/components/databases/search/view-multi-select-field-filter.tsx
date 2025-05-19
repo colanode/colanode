@@ -1,8 +1,9 @@
+import { ChevronDown, Trash2 } from 'lucide-react';
+
 import {
   MultiSelectFieldAttributes,
   DatabaseViewFieldFilterAttributes,
 } from '@colanode/core';
-import { ChevronDown, Trash2 } from 'lucide-react';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { SelectFieldOptions } from '@colanode/ui/components/databases/fields/select-field-options';
 import { SelectOptionBadge } from '@colanode/ui/components/databases/fields/select-option-badge';

@@ -1,7 +1,8 @@
-import { NodeRole, hasNodeRole } from '@colanode/core';
 import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
+
 import { LocalChannelNode } from '@colanode/client/types';
+import { NodeRole, hasNodeRole } from '@colanode/core';
 import { ChannelDeleteDialog } from '@colanode/ui/components/channels/channel-delete-dialog';
 import { ChannelUpdateDialog } from '@colanode/ui/components/channels/channel-update-dialog';
 import { NodeCollaboratorAudit } from '@colanode/ui/components/collaborators/node-collaborator-audit';

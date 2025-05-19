@@ -1,6 +1,7 @@
-import { FieldAttributes } from '@colanode/core';
 import { Trash2 } from 'lucide-react';
 import React from 'react';
+
+import { FieldAttributes } from '@colanode/core';
 import { FieldDeleteDialog } from '@colanode/ui/components/databases/fields/field-delete-dialog';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { FieldRenameInput } from '@colanode/ui/components/databases/fields/field-rename-input';

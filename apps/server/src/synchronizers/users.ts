@@ -3,11 +3,10 @@ import {
   SyncUserData,
   SyncUsersInput,
 } from '@colanode/core';
-
-import { BaseSynchronizer } from '@/synchronizers/base';
-import { Event } from '@/types/events';
-import { database } from '@/data/database';
-import { SelectUser } from '@/data/schema';
+import { database } from '@colanode/server/data/database';
+import { SelectUser } from '@colanode/server/data/schema';
+import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
+import { Event } from '@colanode/server/types/events';
 
 export class UserSynchronizer extends BaseSynchronizer<SyncUsersInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncUsersInput> | null> {

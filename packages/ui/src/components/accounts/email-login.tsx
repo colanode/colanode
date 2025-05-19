@@ -2,8 +2,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Mail } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { LoginOutput } from '@colanode/core';
+
 import { Server } from '@colanode/client/types';
+import { LoginOutput } from '@colanode/core';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   Form,

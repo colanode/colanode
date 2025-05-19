@@ -1,5 +1,6 @@
-import { BooleanFieldAttributes } from '@colanode/core';
 import React from 'react';
+
+import { BooleanFieldAttributes } from '@colanode/core';
 import { Checkbox } from '@colanode/ui/components/ui/checkbox';
 import { useRecord } from '@colanode/ui/contexts/record';
 

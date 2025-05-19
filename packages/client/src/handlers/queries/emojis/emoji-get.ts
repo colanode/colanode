@@ -1,9 +1,9 @@
-import { mapEmoji } from '../../../lib/mappers';
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { EmojiGetQueryInput } from '../../../queries/emojis/emoji-get';
-import { Emoji } from '../../../types/emojis';
-import { Event } from '../../../types/events';
-import { AppService } from '../../../services/app-service';
+import { mapEmoji } from '@colanode/client/lib/mappers';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
+import { EmojiGetQueryInput } from '@colanode/client/queries/emojis/emoji-get';
+import { AppService } from '@colanode/client/services/app-service';
+import { Emoji } from '@colanode/client/types/emojis';
+import { Event } from '@colanode/client/types/events';
 
 export class EmojiGetQueryHandler implements QueryHandler<EmojiGetQueryInput> {
   private readonly app: AppService;

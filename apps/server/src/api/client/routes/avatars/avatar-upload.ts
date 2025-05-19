@@ -1,6 +1,7 @@
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import sharp from 'sharp';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+
 import {
   ApiErrorCode,
   apiErrorOutputSchema,
@@ -8,9 +9,8 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
-
-import { avatarS3 } from '@/data/storage';
-import { config } from '@/lib/config';
+import { avatarS3 } from '@colanode/server/data/storage';
+import { config } from '@colanode/server/lib/config';
 
 export const avatarUploadRoute: FastifyPluginCallbackZod = (
   instance,

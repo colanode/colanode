@@ -2,6 +2,7 @@ import { Slot } from '@radix-ui/react-slot';
 import { cva, VariantProps } from 'class-variance-authority';
 import { PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import * as React from 'react';
+
 import { Button } from '@colanode/ui/components/ui/button';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Separator } from '@colanode/ui/components/ui/separator';

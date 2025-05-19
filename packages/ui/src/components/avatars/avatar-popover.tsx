@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { AvatarPicker } from '@colanode/ui/components/avatars/avatar-picker';
 import {
   Popover,

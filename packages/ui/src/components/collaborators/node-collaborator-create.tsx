@@ -1,6 +1,7 @@
 import React from 'react';
-import { NodeRole } from '@colanode/core';
+
 import { User } from '@colanode/client/types';
+import { NodeRole } from '@colanode/core';
 import { NodeCollaboratorRoleDropdown } from '@colanode/ui/components/collaborators/node-collaborator-role-dropdown';
 import { NodeCollaboratorSearch } from '@colanode/ui/components/collaborators/node-collaborator-search';
 import { Button } from '@colanode/ui/components/ui/button';

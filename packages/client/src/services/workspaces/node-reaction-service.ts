@@ -1,3 +1,9 @@
+import { SelectNodeReaction } from '@colanode/client/databases/workspace';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapNodeReaction } from '@colanode/client/lib/mappers';
+import { fetchNodeTree } from '@colanode/client/lib/utils';
+import { MutationErrorCode, MutationError } from '@colanode/client/mutations';
+import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import {
   createDebugger,
   CreateNodeReactionMutation,
@@ -10,14 +16,6 @@ import {
   SyncNodeReactionData,
   CanReactNodeContext,
 } from '@colanode/core';
-
-import { WorkspaceService } from './workspace-service';
-
-import { eventBus } from '../../lib/event-bus';
-import { mapNodeReaction } from '../../lib/mappers';
-import { SelectNodeReaction } from '../../databases/workspace';
-import { MutationErrorCode, MutationError } from '../../mutations';
-import { fetchNodeTree } from '../../lib/utils';
 
 const debug = createDebugger('desktop:service:node-reaction');
 

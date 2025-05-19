@@ -1,3 +1,7 @@
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { Synchronizer } from '@colanode/client/services/workspaces/synchronizer';
+import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
+import { Event } from '@colanode/client/types/events';
 import {
   createDebugger,
   SyncCollaborationsInput,
@@ -15,12 +19,6 @@ import {
   SyncDocumentUpdatesInput,
   SyncDocumentUpdateData,
 } from '@colanode/core';
-
-import { WorkspaceService } from './workspace-service';
-import { Synchronizer } from './synchronizer';
-
-import { Event } from '../../types/events';
-import { eventBus } from '../../lib/event-bus';
 
 interface RootSynchronizers {
   nodeUpdates: Synchronizer<SyncNodesUpdatesInput>;

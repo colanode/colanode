@@ -1,4 +1,3 @@
-import { FieldType } from '@colanode/core';
 import {
   Cable,
   Calendar,
@@ -14,6 +13,8 @@ import {
   Text,
   User,
 } from 'lucide-react';
+
+import { FieldType } from '@colanode/core';
 
 interface FieldIconProps {
   type?: FieldType;

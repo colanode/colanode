@@ -1,15 +1,14 @@
+import ms from 'ms';
+
+import { EventLoop } from '@colanode/client/lib/event-loop';
+import { mapMutation } from '@colanode/client/lib/mappers';
+import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import {
   createDebugger,
   Mutation,
   SyncMutationsInput,
   SyncMutationsOutput,
 } from '@colanode/core';
-import ms from 'ms';
-
-import { WorkspaceService } from './workspace-service';
-
-import { mapMutation } from '../../lib/mappers';
-import { EventLoop } from '../../lib/event-loop';
 
 const READ_SIZE = 500;
 const BATCH_SIZE = 50;

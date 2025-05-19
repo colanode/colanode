@@ -1,6 +1,7 @@
-import { ApiHeader } from '@colanode/core';
 import { FastifyPluginCallback, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
+
+import { ApiHeader } from '@colanode/core';
 
 export interface ClientContext {
   ip: string;

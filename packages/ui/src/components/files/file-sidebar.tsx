@@ -1,6 +1,7 @@
-import { formatBytes, formatDate } from '@colanode/core';
 import React from 'react';
+
 import { LocalFileNode } from '@colanode/client/types';
+import { formatBytes, formatDate } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';

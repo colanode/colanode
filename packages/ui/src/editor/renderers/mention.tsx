@@ -1,8 +1,9 @@
 import { JSONContent } from '@tiptap/core';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { defaultClasses } from '@colanode/ui/editor/classes';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface MentionRendererProps {
   node: JSONContent;

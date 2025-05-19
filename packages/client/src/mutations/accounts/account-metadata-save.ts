@@ -1,4 +1,7 @@
-import { AccountMetadataKey, AccountMetadataMap } from '../../types/accounts';
+import {
+  AccountMetadataKey,
+  AccountMetadataMap,
+} from '@colanode/client/types/accounts';
 
 export type AccountMetadataSaveMutationInput = {
   type: 'account_metadata_save';

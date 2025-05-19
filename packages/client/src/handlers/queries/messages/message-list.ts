@@ -1,12 +1,11 @@
+import { SelectNode } from '@colanode/client/databases/workspace';
+import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
+import { mapNode } from '@colanode/client/lib';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
+import { MessageListQueryInput } from '@colanode/client/queries/messages/message-list';
+import { Event } from '@colanode/client/types/events';
+import { LocalMessageNode } from '@colanode/client/types/nodes';
 import { compareString } from '@colanode/core';
-
-import { WorkspaceQueryHandlerBase } from '../workspace-query-handler-base';
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { mapNode } from '../../../lib/mappers';
-import { MessageListQueryInput } from '../../../queries/messages/message-list';
-import { Event } from '../../../types/events';
-import { SelectNode } from '../../../databases/workspace';
-import { LocalMessageNode } from '../../../types/nodes';
 
 export class MessageListQueryHandler
   extends WorkspaceQueryHandlerBase

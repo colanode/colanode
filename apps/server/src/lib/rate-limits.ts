@@ -1,6 +1,6 @@
 import { sha256 } from 'js-sha256';
 
-import { redis } from '@/data/redis';
+import { redis } from '@colanode/server/data/redis';
 
 interface RateLimitConfig {
   limit: number;

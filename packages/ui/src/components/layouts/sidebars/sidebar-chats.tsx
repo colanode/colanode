@@ -1,9 +1,9 @@
-import { useQuery } from '@colanode/ui/hooks/use-query';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { ChatSidebarItem } from '@colanode/ui/components/chats/chat-sidebar-item';
 import { ChatCreatePopover } from '@colanode/ui/components/chats/chat-create-popover';
-import { cn } from '@colanode/ui/lib/utils';
+import { ChatSidebarItem } from '@colanode/ui/components/chats/chat-sidebar-item';
 import { useLayout } from '@colanode/ui/contexts/layout';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useQuery } from '@colanode/ui/hooks/use-query';
+import { cn } from '@colanode/ui/lib/utils';
 
 export const SidebarChats = () => {
   const workspace = useWorkspace();

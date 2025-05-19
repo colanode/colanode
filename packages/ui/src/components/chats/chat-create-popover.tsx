@@ -1,15 +1,16 @@
 import { SquarePen } from 'lucide-react';
 import React from 'react';
+
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { UserSearch } from '@colanode/ui/components/users/user-search';
+import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { toast } from '@colanode/ui/hooks/use-toast';
-import { useLayout } from '@colanode/ui/contexts/layout';
 
 export const ChatCreatePopover = () => {
   const workspace = useWorkspace();

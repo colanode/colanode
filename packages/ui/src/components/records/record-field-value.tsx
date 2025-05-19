@@ -8,12 +8,12 @@ import { RecordEmailValue } from '@colanode/ui/components/records/values/record-
 import { RecordMultiSelectValue } from '@colanode/ui/components/records/values/record-multi-select-value';
 import { RecordNumberValue } from '@colanode/ui/components/records/values/record-number-value';
 import { RecordPhoneValue } from '@colanode/ui/components/records/values/record-phone-value';
+import { RecordRelationValue } from '@colanode/ui/components/records/values/record-relation-value';
 import { RecordSelectValue } from '@colanode/ui/components/records/values/record-select-value';
 import { RecordTextValue } from '@colanode/ui/components/records/values/record-text-value';
 import { RecordUpdatedAtValue } from '@colanode/ui/components/records/values/record-updated-at-value';
 import { RecordUpdatedByValue } from '@colanode/ui/components/records/values/record-updated-by-value';
 import { RecordUrlValue } from '@colanode/ui/components/records/values/record-url-value';
-import { RecordRelationValue } from '@colanode/ui/components/records/values/record-relation-value';
 
 interface RecordFieldValueProps {
   field: FieldAttributes;

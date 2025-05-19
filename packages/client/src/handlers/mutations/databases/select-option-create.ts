@@ -1,3 +1,10 @@
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
+import {
+  SelectOptionCreateMutationInput,
+  SelectOptionCreateMutationOutput,
+} from '@colanode/client/mutations/databases/select-option-create';
 import {
   compareString,
   DatabaseAttributes,
@@ -5,14 +12,6 @@ import {
   generateNodeIndex,
   IdType,
 } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
-import {
-  SelectOptionCreateMutationInput,
-  SelectOptionCreateMutationOutput,
-} from '../../../mutations/databases/select-option-create';
-import { MutationError, MutationErrorCode } from '../../../mutations';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
 
 export class SelectOptionCreateMutationHandler
   extends WorkspaceMutationHandlerBase

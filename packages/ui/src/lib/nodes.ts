@@ -1,5 +1,5 @@
-import { extractNodeCollaborators, Node, NodeType } from '@colanode/core';
 import { NodeCollaborator } from '@colanode/client/types';
+import { extractNodeCollaborators, Node, NodeType } from '@colanode/core';
 
 export const getDefaultNodeIcon = (type: NodeType) => {
   switch (type) {

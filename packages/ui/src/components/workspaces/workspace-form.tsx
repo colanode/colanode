@@ -1,9 +1,10 @@
-import { generateId, IdType } from '@colanode/core';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Upload } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+import { generateId, IdType } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {

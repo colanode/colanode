@@ -1,16 +1,16 @@
 import { FastifyPluginCallback } from 'fastify';
 
-import { fileRoutes } from './files';
+import { accountAuthenticator } from '@colanode/server/api/client/plugins/account-auth';
+import { workspaceAuthenticator } from '@colanode/server/api/client/plugins/workspace-auth';
+
 import { downloadRoutes } from './downloads';
-import { userRoutes } from './users';
+import { fileRoutes } from './files';
 import { mutationsRoutes } from './mutations';
+import { userRoutes } from './users';
 import { workspaceCreateRoute } from './workspace-create';
 import { workspaceDeleteRoute } from './workspace-delete';
 import { workspaceGetRoute } from './workspace-get';
 import { workspaceUpdateRoute } from './workspace-update';
-
-import { accountAuthenticator } from '@/api/client/plugins/account-auth';
-import { workspaceAuthenticator } from '@/api/client/plugins/workspace-auth';
 
 export const workspaceRoutes: FastifyPluginCallback = (instance, _, done) => {
   instance.register(accountAuthenticator);

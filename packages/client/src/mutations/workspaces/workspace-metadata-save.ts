@@ -1,7 +1,7 @@
 import {
   WorkspaceMetadataMap,
   WorkspaceMetadataKey,
-} from '../../types/workspaces';
+} from '@colanode/client/types/workspaces';
 
 export type WorkspaceMetadataSaveMutationInput = {
   type: 'workspace_metadata_save';

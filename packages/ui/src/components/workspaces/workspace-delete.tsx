@@ -1,8 +1,5 @@
 import React from 'react';
-import { Button } from '@colanode/ui/components/ui/button';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -12,8 +9,12 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@colanode/ui/components/ui/alert-dialog';
+import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useServer } from '@colanode/ui/contexts/server';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface WorkspaceDeleteProps {
   onDeleted: () => void;

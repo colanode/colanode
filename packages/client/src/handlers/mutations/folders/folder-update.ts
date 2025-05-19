@@ -1,12 +1,12 @@
-import { FolderAttributes } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
-import { MutationError, MutationErrorCode } from '../../../mutations';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
+  MutationError,
+  MutationErrorCode,
   FolderUpdateMutationInput,
   FolderUpdateMutationOutput,
-} from '../../../mutations/folders/folder-update';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations';
+import { FolderAttributes } from '@colanode/core';
 
 export class FolderUpdateMutationHandler
   extends WorkspaceMutationHandlerBase

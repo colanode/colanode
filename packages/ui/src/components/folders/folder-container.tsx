@@ -1,16 +1,16 @@
 import { LocalFolderNode } from '@colanode/client/types';
+import { FolderBody } from '@colanode/ui/components/folders/folder-body';
 import { FolderNotFound } from '@colanode/ui/components/folders/folder-not-found';
+import { FolderSettings } from '@colanode/ui/components/folders/folder-settings';
+import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
 import {
   Container,
   ContainerBody,
   ContainerHeader,
   ContainerSettings,
 } from '@colanode/ui/components/ui/container';
-import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
 import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
-import { FolderSettings } from '@colanode/ui/components/folders/folder-settings';
-import { FolderBody } from '@colanode/ui/components/folders/folder-body';
 
 interface FolderContainerProps {
   folderId: string;

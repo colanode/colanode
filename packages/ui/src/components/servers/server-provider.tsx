@@ -1,6 +1,6 @@
+import { ServerNotFound } from '@colanode/ui/components/servers/server-not-found';
 import { ServerContext } from '@colanode/ui/contexts/server';
 import { useQuery } from '@colanode/ui/hooks/use-query';
-import { ServerNotFound } from '@colanode/ui/components/servers/server-not-found';
 import { isFeatureSupported } from '@colanode/ui/lib/features';
 
 interface ServerProviderProps {

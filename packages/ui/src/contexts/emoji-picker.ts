@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+
 import { Emoji } from '@colanode/client/types';
 
 interface EmojiPickerContextProps {

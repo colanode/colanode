@@ -1,26 +1,28 @@
-import { Kysely, Migration, Migrator } from 'kysely';
-import { ApiErrorCode, ApiHeader, createDebugger } from '@colanode/core';
-import ms from 'ms';
 import axios from 'axios';
+import { Kysely, Migration, Migrator } from 'kysely';
+import ms from 'ms';
 import semver from 'semver';
 
-import { MetadataService } from './metadata-service';
-import { AccountService } from './accounts/account-service';
-import { ServerService } from './server-service';
-import { FileSystem } from './file-system';
-import { AppBuild } from './app-build';
-import { KyselyService } from './kysely-service';
-import { AppPaths } from './app-paths';
-import { AssetService } from './asset-service';
-
-import { AppDatabaseSchema, appDatabaseMigrations } from '../databases/app';
-import { mapServer, mapAccount } from '../lib/mappers';
-import { Account } from '../types/accounts';
-import { Server } from '../types/servers';
-import { EventLoop } from '../lib/event-loop';
-import { parseApiError } from '../lib/axios';
-import { eventBus } from '../lib/event-bus';
-import { Mediator } from '../handlers';
+import {
+  AppDatabaseSchema,
+  appDatabaseMigrations,
+} from '@colanode/client/databases/app';
+import { Mediator } from '@colanode/client/handlers';
+import { parseApiError } from '@colanode/client/lib/axios';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { EventLoop } from '@colanode/client/lib/event-loop';
+import { mapServer, mapAccount } from '@colanode/client/lib/mappers';
+import { AccountService } from '@colanode/client/services/accounts/account-service';
+import { AppBuild } from '@colanode/client/services/app-build';
+import { AppPaths } from '@colanode/client/services/app-paths';
+import { AssetService } from '@colanode/client/services/asset-service';
+import { FileSystem } from '@colanode/client/services/file-system';
+import { KyselyService } from '@colanode/client/services/kysely-service';
+import { MetadataService } from '@colanode/client/services/metadata-service';
+import { ServerService } from '@colanode/client/services/server-service';
+import { Account } from '@colanode/client/types/accounts';
+import { Server } from '@colanode/client/types/servers';
+import { ApiErrorCode, ApiHeader, createDebugger } from '@colanode/core';
 
 const debug = createDebugger('desktop:service:app');
 

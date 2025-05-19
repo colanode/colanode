@@ -2,6 +2,7 @@ import { EditorCommand, EditorCommandProps } from '@colanode/client/types';
 import { BlockquoteCommand } from '@colanode/ui/editor/commands/blockquote';
 import { BulletListCommand } from '@colanode/ui/editor/commands/bullet-list';
 import { CodeBlockCommand } from '@colanode/ui/editor/commands/code-block';
+import { DatabaseCommand } from '@colanode/ui/editor/commands/database';
 import { DividerCommand } from '@colanode/ui/editor/commands/divider';
 import { FileCommand } from '@colanode/ui/editor/commands/file';
 import { FolderCommand } from '@colanode/ui/editor/commands/folder';
@@ -12,7 +13,6 @@ import { OrderedListCommand } from '@colanode/ui/editor/commands/ordered-list';
 import { PageCommand } from '@colanode/ui/editor/commands/page';
 import { ParagraphCommand } from '@colanode/ui/editor/commands/paragraph';
 import { TodoCommand } from '@colanode/ui/editor/commands/todo';
-import { DatabaseCommand } from '@colanode/ui/editor/commands/database';
 
 export type { EditorCommand, EditorCommandProps };
 

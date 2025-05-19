@@ -1,5 +1,6 @@
-import { ZodText } from '@colanode/core';
 import { z } from 'zod';
+
+import { ZodText } from '@colanode/core';
 
 export const booleanFieldValueSchema = z.object({
   type: z.literal('boolean'),

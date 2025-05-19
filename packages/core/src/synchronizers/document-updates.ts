@@ -1,4 +1,4 @@
-import { UpdateMergeMetadata } from '../types/crdt';
+import { UpdateMergeMetadata } from '@colanode/core/types/crdt';
 
 export type SyncDocumentUpdatesInput = {
   type: 'document_updates';

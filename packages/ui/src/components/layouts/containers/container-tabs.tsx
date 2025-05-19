@@ -1,10 +1,11 @@
 import React from 'react';
 import { useDrop } from 'react-dnd';
+
 import { ContainerTab } from '@colanode/client/types';
-import { ScrollArea, ScrollBar } from '@colanode/ui/components/ui/scroll-area';
-import { Tabs, TabsList } from '@colanode/ui/components/ui/tabs';
 import { ContainerTabContent } from '@colanode/ui/components/layouts/containers/container-tab-content';
 import { ContainerTabTrigger } from '@colanode/ui/components/layouts/containers/container-tab-trigger';
+import { ScrollArea, ScrollBar } from '@colanode/ui/components/ui/scroll-area';
+import { Tabs, TabsList } from '@colanode/ui/components/ui/tabs';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface ContainerTabsProps {

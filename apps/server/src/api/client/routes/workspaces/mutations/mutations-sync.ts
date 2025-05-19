@@ -1,4 +1,5 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+
 import {
   SyncMutationResult,
   SyncMutationStatus,
@@ -13,16 +14,21 @@ import {
   UpdateDocumentMutation,
   syncMutationsInputSchema,
 } from '@colanode/core';
-
-import { SelectUser } from '@/data/schema';
+import { SelectUser } from '@colanode/server/data/schema';
+import { updateDocumentFromMutation } from '@colanode/server/lib/documents';
+import {
+  markNodeAsOpened,
+  markNodeAsSeen,
+} from '@colanode/server/lib/node-interactions';
+import {
+  createNodeReaction,
+  deleteNodeReaction,
+} from '@colanode/server/lib/node-reactions';
 import {
   createNodeFromMutation,
   updateNodeFromMutation,
   deleteNode,
-} from '@/lib/nodes';
-import { createNodeReaction, deleteNodeReaction } from '@/lib/node-reactions';
-import { markNodeAsOpened, markNodeAsSeen } from '@/lib/node-interactions';
-import { updateDocumentFromMutation } from '@/lib/documents';
+} from '@colanode/server/lib/nodes';
 
 export const mutationsSyncRoute: FastifyPluginCallbackZod = (
   instance,

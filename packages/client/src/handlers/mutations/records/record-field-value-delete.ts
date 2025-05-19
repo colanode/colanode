@@ -1,12 +1,11 @@
-import { RecordAttributes } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
-import { MutationError, MutationErrorCode } from '../../../mutations';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
   RecordFieldValueDeleteMutationInput,
   RecordFieldValueDeleteMutationOutput,
-} from '../../../mutations/records/record-field-value-delete';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations/records/record-field-value-delete';
+import { RecordAttributes } from '@colanode/core';
 
 export class RecordFieldValueDeleteMutationHandler
   extends WorkspaceMutationHandlerBase

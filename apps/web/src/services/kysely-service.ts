@@ -1,4 +1,7 @@
-import { KyselyBuildOptions, KyselyService } from '@colanode/client/services';
+import sqlite3InitModule, {
+  type BindableValue,
+  type Database,
+} from '@sqlite.org/sqlite-wasm';
 import {
   CompiledQuery,
   type DatabaseConnection,
@@ -10,12 +13,9 @@ import {
   SqliteIntrospector,
   SqliteQueryCompiler,
 } from 'kysely';
-import sqlite3InitModule, {
-  type BindableValue,
-  type Database,
-} from '@sqlite.org/sqlite-wasm';
 
-import { WebFileSystem } from './file-system';
+import { KyselyBuildOptions, KyselyService } from '@colanode/client/services';
+import { WebFileSystem } from '@colanode/web/services/file-system';
 
 export class WebKyselyService implements KyselyService {
   build<T>(options: KyselyBuildOptions): Kysely<T> {

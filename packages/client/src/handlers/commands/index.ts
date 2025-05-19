@@ -1,10 +1,9 @@
-import { FileDialogOpenCommandHandler } from './file-dialog-open';
-import { FileOpenCommandHandler } from './file-open';
-import { UrlOpenCommandHandler } from './url-open';
-
-import { CommandHandler } from '../../lib/types';
-import { CommandMap } from '../../commands';
-import { AppService } from '../../services/app-service';
+import { CommandMap } from '@colanode/client/commands';
+import { FileDialogOpenCommandHandler } from '@colanode/client/handlers/commands/file-dialog-open';
+import { FileOpenCommandHandler } from '@colanode/client/handlers/commands/file-open';
+import { UrlOpenCommandHandler } from '@colanode/client/handlers/commands/url-open';
+import { CommandHandler } from '@colanode/client/lib/types';
+import { AppService } from '@colanode/client/services/app-service';
 
 export type CommandHandlerMap = {
   [K in keyof CommandMap]: CommandHandler<CommandMap[K]['input']>;

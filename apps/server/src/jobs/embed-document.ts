@@ -1,19 +1,19 @@
 import { OpenAIEmbeddings } from '@langchain/openai';
 import { sql } from 'kysely';
-import { extractDocumentText, getNodeModel } from '@colanode/core';
 
-import { chunkText } from '@/lib/ai/chunking';
-import { database } from '@/data/database';
-import { config } from '@/lib/config';
-import { CreateDocumentEmbedding } from '@/data/schema';
-import { fetchNode } from '@/lib/nodes';
+import { extractDocumentText, getNodeModel } from '@colanode/core';
+import { database } from '@colanode/server/data/database';
+import { CreateDocumentEmbedding } from '@colanode/server/data/schema';
+import { chunkText } from '@colanode/server/lib/ai/chunking';
+import { config } from '@colanode/server/lib/config';
+import { fetchNode } from '@colanode/server/lib/nodes';
 
 export type EmbedDocumentInput = {
   type: 'embed_document';
   documentId: string;
 };
 
-declare module '@/types/jobs' {
+declare module '@colanode/server/jobs' {
   interface JobMap {
     embed_document: {
       input: EmbedDocumentInput;

@@ -1,8 +1,8 @@
 import { WebSocket } from 'ws';
 
-import { SocketConnection } from '@/services/socket-connection';
-import { eventBus } from '@/lib/event-bus';
-import { RequestAccount } from '@/types/api';
+import { eventBus } from '@colanode/server/lib/event-bus';
+import { SocketConnection } from '@colanode/server/services/socket-connection';
+import { RequestAccount } from '@colanode/server/types/api';
 
 class SocketService {
   private readonly connections: Map<string, SocketConnection> = new Map();

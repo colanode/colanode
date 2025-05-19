@@ -1,6 +1,7 @@
 import { JSONContent } from '@tiptap/core';
 import { Plus, Search, Send, Upload } from 'lucide-react';
 import React from 'react';
+
 import { editorHasContent } from '@colanode/client/lib';
 import { LocalMessageNode } from '@colanode/client/types';
 import {

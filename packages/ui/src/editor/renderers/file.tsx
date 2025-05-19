@@ -1,4 +1,5 @@
 import { JSONContent } from '@tiptap/core';
+
 import { FileBlock } from '@colanode/ui/components/files/file-block';
 
 interface FileRendererProps {

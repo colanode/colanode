@@ -1,6 +1,7 @@
-import { EditorNodeTypes, generateId, IdType } from '@colanode/core';
 import { Extension } from '@tiptap/react';
 import { Plugin, PluginKey } from 'prosemirror-state';
+
+import { EditorNodeTypes, generateId, IdType } from '@colanode/core';
 
 const types = [
   EditorNodeTypes.Paragraph,

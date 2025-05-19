@@ -1,11 +1,10 @@
-import { generateId, IdType, RecordAttributes } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
   RecordCreateMutationInput,
   RecordCreateMutationOutput,
-} from '../../../mutations/records/record-create';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations/records/record-create';
+import { generateId, IdType, RecordAttributes } from '@colanode/core';
 
 export class RecordCreateMutationHandler
   extends WorkspaceMutationHandlerBase

@@ -1,4 +1,5 @@
 import { useEffect, useRef } from 'react';
+
 import { LocalSpaceNode } from '@colanode/client/types';
 import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 

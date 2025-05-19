@@ -1,9 +1,9 @@
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { mapFileState } from '../../../lib/mappers';
-import { FileStateGetQueryInput } from '../../../queries/files/file-state-get';
-import { Event } from '../../../types/events';
-import { FileState } from '../../../types/files';
-import { WorkspaceQueryHandlerBase } from '../workspace-query-handler-base';
+import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
+import { mapFileState } from '@colanode/client/lib/mappers';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
+import { FileStateGetQueryInput } from '@colanode/client/queries/files/file-state-get';
+import { Event } from '@colanode/client/types/events';
+import { FileState } from '@colanode/client/types/files';
 
 export class FileStateGetQueryHandler
   extends WorkspaceQueryHandlerBase

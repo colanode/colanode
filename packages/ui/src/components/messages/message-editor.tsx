@@ -2,6 +2,7 @@ import type { JSONContent } from '@tiptap/core';
 import { EditorContent, useEditor } from '@tiptap/react';
 import isHotkey from 'is-hotkey';
 import React from 'react';
+
 import { FileMetadata } from '@colanode/client/types';
 import {
   BoldMark,

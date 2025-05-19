@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash-es';
+
 import {
   CanCreateNodeContext,
   CanDeleteNodeContext,
@@ -13,16 +15,22 @@ import {
   UpdateNodeMutationData,
 } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
-import { cloneDeep } from 'lodash-es';
-
-import { database } from '@/data/database';
+import { database } from '@colanode/server/data/database';
 import {
   CreateCollaboration,
   SelectCollaboration,
   SelectNode,
   SelectNodeUpdate,
   SelectUser,
-} from '@/data/schema';
+} from '@colanode/server/data/schema';
+import { scheduleNodeEmbedding } from '@colanode/server/lib/ai/embeddings';
+import {
+  applyCollaboratorUpdates,
+  checkCollaboratorChanges,
+} from '@colanode/server/lib/collaborations';
+import { eventBus } from '@colanode/server/lib/event-bus';
+import { deleteFile } from '@colanode/server/lib/files';
+import { jobService } from '@colanode/server/services/job-service';
 import {
   ConcurrentUpdateResult,
   CreateNodeInput,
@@ -31,15 +39,7 @@ import {
   DeleteNodeOutput,
   UpdateNodeInput,
   UpdateNodeOutput,
-} from '@/types/nodes';
-import { eventBus } from '@/lib/event-bus';
-import {
-  applyCollaboratorUpdates,
-  checkCollaboratorChanges,
-} from '@/lib/collaborations';
-import { jobService } from '@/services/job-service';
-import { deleteFile } from '@/lib/files';
-import { scheduleNodeEmbedding } from '@/lib/ai/embeddings';
+} from '@colanode/server/types/nodes';
 
 const debug = createDebugger('server:lib:nodes');
 

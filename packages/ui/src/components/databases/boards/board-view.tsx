@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
 import { BoardViewSettings } from '@colanode/ui/components/databases/boards/board-view-settings';
 import { ViewFilterButton } from '@colanode/ui/components/databases/search/view-filter-button';

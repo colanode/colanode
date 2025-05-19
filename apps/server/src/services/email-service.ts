@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
-import { createDebugger } from '@colanode/core';
 
-import { config } from '@/lib/config';
+import { createDebugger } from '@colanode/core';
+import { config } from '@colanode/server/lib/config';
 
 interface EmailMessage {
   to: string | string[];

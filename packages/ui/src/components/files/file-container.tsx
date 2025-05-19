@@ -1,15 +1,15 @@
 import { LocalFileNode } from '@colanode/client/types';
 import { FileBody } from '@colanode/ui/components/files/file-body';
+import { FileNotFound } from '@colanode/ui/components/files/file-not-found';
+import { FileSettings } from '@colanode/ui/components/files/file-settings';
+import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
 import {
   Container,
   ContainerBody,
   ContainerHeader,
   ContainerSettings,
 } from '@colanode/ui/components/ui/container';
-import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
-import { FileNotFound } from '@colanode/ui/components/files/file-not-found';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
-import { FileSettings } from '@colanode/ui/components/files/file-settings';
 
 interface FileContainerProps {
   fileId: string;

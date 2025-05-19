@@ -1,7 +1,7 @@
 // import { BrowserWindow, dialog } from 'electron';
 
-import { CommandHandler } from '../../lib/types';
-import { FileDialogOpenCommandInput } from '../../commands/file-dialog-open';
+import { FileDialogOpenCommandInput } from '@colanode/client/commands/file-dialog-open';
+import { CommandHandler } from '@colanode/client/lib/types';
 
 export class FileDialogOpenCommandHandler
   implements CommandHandler<FileDialogOpenCommandInput>

@@ -1,7 +1,7 @@
 import { LocalFileNode } from '@colanode/client/types';
 import { FilePreview } from '@colanode/ui/components/files/file-preview';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLayout } from '@colanode/ui/contexts/layout';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface FileBlockProps {

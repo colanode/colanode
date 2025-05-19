@@ -1,7 +1,7 @@
-import { RootProvider } from '@colanode/ui';
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
-import { AssetProvider } from './asset-provider';
+import { RootProvider } from '@colanode/ui';
+import { AssetProvider } from '@colanode/web/asset-provider';
 
 export const Root = () => {
   useRegisterSW({

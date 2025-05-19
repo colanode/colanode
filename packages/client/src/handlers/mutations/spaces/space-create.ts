@@ -1,3 +1,10 @@
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
+import {
+  SpaceCreateMutationInput,
+  SpaceCreateMutationOutput,
+} from '@colanode/client/mutations/spaces/space-create';
 import {
   ChannelAttributes,
   generateId,
@@ -5,14 +12,6 @@ import {
   PageAttributes,
   SpaceAttributes,
 } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
-import {
-  SpaceCreateMutationInput,
-  SpaceCreateMutationOutput,
-} from '../../../mutations/spaces/space-create';
-import { MutationError, MutationErrorCode } from '../../../mutations';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
 
 export class SpaceCreateMutationHandler
   extends WorkspaceMutationHandlerBase

@@ -1,7 +1,7 @@
 // import { shell } from 'electron';
 
-import { CommandHandler } from '../../lib/types';
-import { UrlOpenCommandInput } from '../../commands/url-open';
+import { UrlOpenCommandInput } from '@colanode/client/commands/url-open';
+import { CommandHandler } from '@colanode/client/lib/types';
 
 export class UrlOpenCommandHandler
   implements CommandHandler<UrlOpenCommandInput>

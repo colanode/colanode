@@ -2,6 +2,7 @@ import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewWrapper } from '@tiptap/react';
 import { X } from 'lucide-react';
 import { match } from 'ts-pattern';
+
 import { FilePreviewImage } from '@colanode/ui/components/files/previews/file-preview-image';
 import { FilePreviewOther } from '@colanode/ui/components/files/previews/file-preview-other';
 import { FilePreviewVideo } from '@colanode/ui/components/files/previews/file-preview-video';

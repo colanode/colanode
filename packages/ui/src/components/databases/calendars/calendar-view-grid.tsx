@@ -1,12 +1,13 @@
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import React from 'react';
+import { DayPicker, DayProps } from 'react-day-picker';
+
 import {
   FieldAttributes,
   isSameDay,
   toUTCDate,
   DatabaseViewFilterAttributes,
 } from '@colanode/core';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import React from 'react';
-import { DayPicker, DayProps } from 'react-day-picker';
 import { CalendarViewDay } from '@colanode/ui/components/databases/calendars/calendar-view-day';
 import { buttonVariants } from '@colanode/ui/components/ui/button';
 import { useDatabase } from '@colanode/ui/contexts/database';

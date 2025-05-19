@@ -2,7 +2,7 @@ import { net } from 'electron';
 import fs from 'fs';
 import path from 'path';
 
-import { app } from '@/main/app-service';
+import { app } from '@colanode/desktop/main/app-service';
 
 export const handleAssetRequest = async (
   request: Request

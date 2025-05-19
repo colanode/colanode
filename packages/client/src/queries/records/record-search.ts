@@ -1,4 +1,4 @@
-import { LocalRecordNode } from '../../types/nodes';
+import { LocalRecordNode } from '@colanode/client/types/nodes';
 
 export type RecordSearchQueryInput = {
   type: 'record_search';

@@ -1,7 +1,8 @@
 import React from 'react';
 import { InView } from 'react-intersection-observer';
-import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
+
 import { NodeReactionListQueryInput } from '@colanode/client/queries';
+import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQueries } from '@colanode/ui/hooks/use-queries';

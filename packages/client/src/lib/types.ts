@@ -1,7 +1,7 @@
-import { CommandInput, CommandMap } from '../commands';
-import { MutationInput, MutationMap } from '../mutations';
-import { QueryInput, QueryMap } from '../queries';
-import { Event } from '../types/events';
+import { CommandInput, CommandMap } from '@colanode/client/commands';
+import { MutationInput, MutationMap } from '@colanode/client/mutations';
+import { QueryInput, QueryMap } from '@colanode/client/queries';
+import { Event } from '@colanode/client/types/events';
 
 export interface MutationHandler<T extends MutationInput> {
   handleMutation: (input: T) => Promise<MutationMap[T['type']]['output']>;

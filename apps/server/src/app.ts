@@ -1,16 +1,16 @@
-import { createDebugger } from '@colanode/core';
-import { fastify } from 'fastify';
 import fastifyMultipart from '@fastify/multipart';
 import fastifyWebsocket from '@fastify/websocket';
+import { fastify } from 'fastify';
 import {
   serializerCompiler,
   validatorCompiler,
 } from 'fastify-type-provider-zod';
 
-import { clientRoutes } from '@/api/client/routes';
-import { clientDecorator } from '@/api/client/plugins/client';
-import { errorHandler } from '@/api/client/plugins/error-handler';
-import { corsPlugin } from '@/api/client/plugins/cors';
+import { createDebugger } from '@colanode/core';
+import { clientDecorator } from '@colanode/server/api/client/plugins/client';
+import { corsPlugin } from '@colanode/server/api/client/plugins/cors';
+import { errorHandler } from '@colanode/server/api/client/plugins/error-handler';
+import { clientRoutes } from '@colanode/server/api/client/routes';
 
 const debug = createDebugger('server:app');
 

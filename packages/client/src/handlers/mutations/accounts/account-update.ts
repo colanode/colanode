@@ -1,15 +1,14 @@
-import { AccountUpdateInput, AccountUpdateOutput } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
-import { eventBus } from '../../../lib/event-bus';
+import { parseApiError } from '@colanode/client/lib/axios';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapAccount } from '@colanode/client/lib/mappers';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
   AccountUpdateMutationInput,
   AccountUpdateMutationOutput,
-} from '../../../mutations/accounts/account-update';
-import { MutationError, MutationErrorCode } from '../../../mutations';
-import { parseApiError } from '../../../lib/axios';
-import { AppService } from '../../../services/app-service';
-import { mapAccount } from '../../../lib/mappers';
+} from '@colanode/client/mutations/accounts/account-update';
+import { AppService } from '@colanode/client/services/app-service';
+import { AccountUpdateInput, AccountUpdateOutput } from '@colanode/core';
 
 export class AccountUpdateMutationHandler
   implements MutationHandler<AccountUpdateMutationInput>

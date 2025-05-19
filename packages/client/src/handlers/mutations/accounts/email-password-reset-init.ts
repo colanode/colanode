@@ -1,19 +1,18 @@
+import axios from 'axios';
+
+import { AccountMutationHandlerBase } from '@colanode/client/handlers/mutations/accounts/base';
+import { parseApiError } from '@colanode/client/lib/axios';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
+import {
+  EmailPasswordResetInitMutationInput,
+  EmailPasswordResetInitMutationOutput,
+} from '@colanode/client/mutations/accounts/email-password-reset-init';
+import { AppService } from '@colanode/client/services/app-service';
 import {
   EmailPasswordResetInitInput,
   EmailPasswordResetInitOutput,
 } from '@colanode/core';
-import axios from 'axios';
-
-import { AccountMutationHandlerBase } from './base';
-
-import { MutationHandler } from '../../../lib/types';
-import {
-  EmailPasswordResetInitMutationInput,
-  EmailPasswordResetInitMutationOutput,
-} from '../../../mutations/accounts/email-password-reset-init';
-import { MutationError, MutationErrorCode } from '../../../mutations';
-import { parseApiError } from '../../../lib/axios';
-import { AppService } from '../../../services/app-service';
 
 export class EmailPasswordResetInitMutationHandler
   extends AccountMutationHandlerBase

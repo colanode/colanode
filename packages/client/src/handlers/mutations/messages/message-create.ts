@@ -1,17 +1,16 @@
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib';
+import { mapContentsToBlocks } from '@colanode/client/lib/editor';
+import {
+  MessageCreateMutationInput,
+  MessageCreateMutationOutput,
+} from '@colanode/client/mutations';
 import {
   EditorNodeTypes,
   generateId,
   IdType,
   MessageAttributes,
 } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
-import { mapContentsToBlocks } from '../../../lib/editor';
-import {
-  MessageCreateMutationInput,
-  MessageCreateMutationOutput,
-} from '../../../mutations/messages/message-create';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
 
 interface MessageFile {
   id: string;

@@ -1,11 +1,12 @@
-import { RecordNode } from '@colanode/core';
 import isHotkey from 'is-hotkey';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import React, { Fragment } from 'react';
+
+import { RecordNode } from '@colanode/core';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface NameEditorProps {

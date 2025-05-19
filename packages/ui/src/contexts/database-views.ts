@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+
 import { LocalDatabaseViewNode } from '@colanode/client/types';
 
 interface DatabaseViewsContext {

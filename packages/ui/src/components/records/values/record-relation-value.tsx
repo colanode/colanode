@@ -1,8 +1,9 @@
-import { RecordNode, RelationFieldAttributes } from '@colanode/core';
 import { X } from 'lucide-react';
 import React from 'react';
-import { RecordSearch } from '@colanode/ui/components/records/record-search';
+
+import { RecordNode, RelationFieldAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { RecordSearch } from '@colanode/ui/components/records/record-search';
 import { Badge } from '@colanode/ui/components/ui/badge';
 import {
   Popover,

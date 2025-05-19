@@ -1,6 +1,7 @@
 import { Resizable } from 're-resizable';
-import { ContainerTabs } from '@colanode/ui/components/layouts/containers/container-tabs';
+
 import { ContainerBlank } from '@colanode/ui/components/layouts/containers/container-blank';
+import { ContainerTabs } from '@colanode/ui/components/layouts/containers/container-tabs';
 import { Sidebar } from '@colanode/ui/components/layouts/sidebars/sidebar';
 import { LayoutContext } from '@colanode/ui/contexts/layout';
 import { useLayoutState } from '@colanode/ui/hooks/use-layout-state';

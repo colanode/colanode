@@ -1,3 +1,7 @@
+import React from 'react';
+import { match } from 'ts-pattern';
+
+import { LocalDatabaseViewNode, ViewField } from '@colanode/client/types';
 import {
   compareString,
   SortDirection,
@@ -5,16 +9,13 @@ import {
   DatabaseViewFilterAttributes,
   DatabaseViewSortAttributes,
 } from '@colanode/core';
-import React from 'react';
-import { match } from 'ts-pattern';
-import { LocalDatabaseViewNode, ViewField } from '@colanode/client/types';
 import { BoardView } from '@colanode/ui/components/databases/boards/board-view';
 import { CalendarView } from '@colanode/ui/components/databases/calendars/calendar-view';
 import { TableView } from '@colanode/ui/components/databases/tables/table-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { DatabaseViewContext } from '@colanode/ui/contexts/database-view';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLayout } from '@colanode/ui/contexts/layout';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { toast } from '@colanode/ui/hooks/use-toast';
 import {
   generateFieldValuesFromFilters,

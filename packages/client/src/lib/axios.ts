@@ -1,4 +1,5 @@
 import { isAxiosError } from 'axios';
+
 import { ApiErrorCode, ApiErrorOutput } from '@colanode/core';
 
 export const parseApiError = (error: unknown): ApiErrorOutput => {

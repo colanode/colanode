@@ -1,4 +1,4 @@
-import { DocumentUpdate } from '../../types/documents';
+import { DocumentUpdate } from '@colanode/client/types/documents';
 
 export type DocumentUpdatesListQueryInput = {
   type: 'document_updates_list';

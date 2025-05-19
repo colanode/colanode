@@ -6,17 +6,16 @@ import {
   WorkspaceStatus,
   UserStatus,
 } from '@colanode/core';
-
-import { createDocument } from '@/lib/documents';
-import { SelectAccount } from '@/data/schema';
-import { database } from '@/data/database';
-import { config } from '@/lib/config';
-import { eventBus } from '@/lib/event-bus';
+import { database } from '@colanode/server/data/database';
+import { SelectAccount } from '@colanode/server/data/schema';
 import {
   generateInitialMessageBlocks,
   generateWelcomePageBlocks,
-} from '@/lib/blocks';
-import { createNode } from '@/lib/nodes';
+} from '@colanode/server/lib/blocks';
+import { config } from '@colanode/server/lib/config';
+import { createDocument } from '@colanode/server/lib/documents';
+import { eventBus } from '@colanode/server/lib/event-bus';
+import { createNode } from '@colanode/server/lib/nodes';
 
 export const createWorkspace = async (
   account: SelectAccount,

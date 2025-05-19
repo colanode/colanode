@@ -3,6 +3,7 @@ import {
   UseQueryOptions as TanstackUseQueryOptions,
 } from '@tanstack/react-query';
 import { sha256 } from 'js-sha256';
+
 import { QueryInput, QueryMap } from '@colanode/client/queries';
 
 type UseQueryOptions<T extends QueryInput> = Omit<

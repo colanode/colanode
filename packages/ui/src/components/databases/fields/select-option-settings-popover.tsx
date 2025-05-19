@@ -1,6 +1,7 @@
-import { SelectOptionAttributes } from '@colanode/core';
 import { Ellipsis, Trash2 } from 'lucide-react';
 import React from 'react';
+
+import { SelectOptionAttributes } from '@colanode/core';
 import { SelectOptionDeleteDialog } from '@colanode/ui/components/databases/fields/select-option-delete-dialog';
 import { Label } from '@colanode/ui/components/ui/label';
 import {

@@ -2,6 +2,7 @@ import { ArrowDownAz, ArrowDownZa, Filter, Type } from 'lucide-react';
 import { Resizable } from 're-resizable';
 import React from 'react';
 import { useDrop } from 'react-dnd';
+
 import { Input } from '@colanode/ui/components/ui/input';
 import {
   Popover,

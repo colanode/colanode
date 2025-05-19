@@ -1,5 +1,6 @@
-import { toUTCDate } from '@colanode/core';
 import React from 'react';
+
+import { toUTCDate } from '@colanode/core';
 import { Calendar } from '@colanode/ui/components/ui/calendar';
 import {
   Popover,

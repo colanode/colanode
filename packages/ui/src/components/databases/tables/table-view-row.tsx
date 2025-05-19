@@ -1,5 +1,5 @@
-import { extractNodeRole } from '@colanode/core';
 import { LocalRecordNode } from '@colanode/client/types';
+import { extractNodeRole } from '@colanode/core';
 import { TableViewNameCell } from '@colanode/ui/components/databases/tables/table-view-name-cell';
 import { RecordFieldValue } from '@colanode/ui/components/records/record-field-value';
 import { RecordProvider } from '@colanode/ui/components/records/record-provider';

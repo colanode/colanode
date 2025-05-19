@@ -1,5 +1,6 @@
-import { Node, NodeRole } from '@colanode/core';
 import { UserRoundPlus } from 'lucide-react';
+
+import { Node, NodeRole } from '@colanode/core';
 import { NodeCollaborators } from '@colanode/ui/components/collaborators/node-collaborators';
 import {
   Popover,

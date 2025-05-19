@@ -1,4 +1,4 @@
-import { EmojiCategory } from '../../types/emojis';
+import { EmojiCategory } from '@colanode/client/types/emojis';
 
 export type EmojiCategoryListQueryInput = {
   type: 'emoji_category_list';

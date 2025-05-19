@@ -1,5 +1,6 @@
 import { JSONContent } from '@tiptap/core';
 import React from 'react';
+
 import { NodeRenderer } from '@colanode/ui/editor/renderers/node';
 
 interface NodeChildrenRendererProps {

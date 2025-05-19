@@ -1,10 +1,12 @@
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapAppMetadata } from '@colanode/client/lib/mappers';
+import { AppService } from '@colanode/client/services/app-service';
+import {
+  AppMetadata,
+  AppMetadataKey,
+  AppMetadataMap,
+} from '@colanode/client/types/apps';
 import { createDebugger } from '@colanode/core';
-
-import { AppService } from './app-service';
-
-import { AppMetadata, AppMetadataMap, AppMetadataKey } from '../types/apps';
-import { mapAppMetadata } from '../lib/mappers';
-import { eventBus } from '../lib/event-bus';
 
 const debug = createDebugger('desktop:service:metadata');
 

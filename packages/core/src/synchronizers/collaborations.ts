@@ -1,4 +1,4 @@
-import { NodeRole } from '../registry/nodes/core';
+import { NodeRole } from '@colanode/core/registry/nodes/core';
 
 export type SyncCollaborationsInput = {
   type: 'collaborations';

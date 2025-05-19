@@ -1,12 +1,12 @@
 import { sql } from 'kysely';
 
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { mapNode } from '../../../lib/mappers';
-import { RecordSearchQueryInput } from '../../../queries/records/record-search';
-import { Event } from '../../../types/events';
-import { SelectNode } from '../../../databases/workspace';
-import { WorkspaceQueryHandlerBase } from '../workspace-query-handler-base';
-import { LocalRecordNode } from '../../../types/nodes';
+import { SelectNode } from '@colanode/client/databases/workspace';
+import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib';
+import { mapNode } from '@colanode/client/lib/mappers';
+import { RecordSearchQueryInput } from '@colanode/client/queries/records/record-search';
+import { Event } from '@colanode/client/types/events';
+import { LocalRecordNode } from '@colanode/client/types/nodes';
 
 export class RecordSearchQueryHandler
   extends WorkspaceQueryHandlerBase

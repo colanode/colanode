@@ -1,11 +1,11 @@
-import { MutationHandler } from '../../../lib/types';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapAppMetadata } from '@colanode/client/lib/mappers';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
   AppMetadataSaveMutationInput,
   AppMetadataSaveMutationOutput,
-} from '../../../mutations/apps/app-metadata-save';
-import { eventBus } from '../../../lib/event-bus';
-import { mapAppMetadata } from '../../../lib/mappers';
-import { AppService } from '../../../services/app-service';
+} from '@colanode/client/mutations/apps/app-metadata-save';
+import { AppService } from '@colanode/client/services/app-service';
 
 export class AppMetadataSaveMutationHandler
   implements MutationHandler<AppMetadataSaveMutationInput>

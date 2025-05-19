@@ -1,11 +1,11 @@
-import { AppService } from '../../../services/app-service';
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
 import {
   RadarDataGetQueryInput,
   RadarDataGetQueryOutput,
-} from '../../../queries/interactions/radar-data-get';
-import { Event } from '../../../types/events';
-import { WorkspaceRadarData } from '../../../types/radars';
+} from '@colanode/client/queries/interactions/radar-data-get';
+import { AppService } from '@colanode/client/services/app-service';
+import { Event } from '@colanode/client/types/events';
+import { WorkspaceRadarData } from '@colanode/client/types/radars';
 
 export class RadarDataGetQueryHandler
   implements QueryHandler<RadarDataGetQueryInput>

@@ -1,12 +1,3 @@
-import started from 'electron-squirrel-startup';
-import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
-import { createDebugger } from '@colanode/core';
-import { QueryInput, QueryMap } from '@colanode/client/queries';
-import { CommandInput, CommandMap } from '@colanode/client/commands';
-import { MutationInput, MutationMap } from '@colanode/client/mutations';
-import { eventBus } from '@colanode/client/lib';
-
-import path from 'path';
 import {
   app as electronApp,
   BrowserWindow,
@@ -15,14 +6,23 @@ import {
   shell,
   globalShortcut,
 } from 'electron';
+import path from 'path';
 
+import started from 'electron-squirrel-startup';
+import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
+
+import { CommandInput, CommandMap } from '@colanode/client/commands';
+import { eventBus } from '@colanode/client/lib';
+import { MutationInput, MutationMap } from '@colanode/client/mutations';
+import { QueryInput, QueryMap } from '@colanode/client/queries';
+import { createDebugger } from '@colanode/core';
+import { app } from '@colanode/desktop/main/app-service';
 import {
   handleAssetRequest,
   handleAvatarRequest,
   handleFilePreviewRequest,
   handleFileRequest,
-} from '@/main/protocols';
-import { app } from '@/main/app-service';
+} from '@colanode/desktop/main/protocols';
 
 const debug = createDebugger('desktop:main');
 

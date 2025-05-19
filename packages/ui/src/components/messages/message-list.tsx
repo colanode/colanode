@@ -1,7 +1,8 @@
-import { compareString } from '@colanode/core';
 import React from 'react';
 import { InView } from 'react-intersection-observer';
+
 import { MessageListQueryInput } from '@colanode/client/queries';
+import { compareString } from '@colanode/core';
 import { Message } from '@colanode/ui/components/messages/message';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';

@@ -1,3 +1,5 @@
+import { createContext, useContext } from 'react';
+
 import {
   BooleanFieldAttributes,
   CollaboratorFieldAttributes,
@@ -15,7 +17,6 @@ import {
   TextFieldAttributes,
   UrlFieldAttributes,
 } from '@colanode/core';
-import { createContext, useContext } from 'react';
 
 interface RecordContext {
   id: string;

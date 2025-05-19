@@ -1,8 +1,9 @@
-import React from 'react';
 import { useVirtualizer } from '@tanstack/react-virtual';
+import React from 'react';
+
 import { IconPickerRowData } from '@colanode/client/types';
-import { IconBrowserItems } from '@colanode/ui/components/icons/icon-browser-items';
 import { IconBrowserCategory } from '@colanode/ui/components/icons/icon-browser-category';
+import { IconBrowserItems } from '@colanode/ui/components/icons/icon-browser-items';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 
 const ICONS_PER_ROW = 10;

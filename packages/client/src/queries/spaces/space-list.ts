@@ -1,4 +1,4 @@
-import { LocalSpaceNode } from '../../types/nodes';
+import { LocalSpaceNode } from '@colanode/client/types/nodes';
 
 export type SpaceListQueryInput = {
   type: 'space_list';

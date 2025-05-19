@@ -1,11 +1,11 @@
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapWorkspaceMetadata } from '@colanode/client/lib/mappers';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
   WorkspaceMetadataSaveMutationInput,
   WorkspaceMetadataSaveMutationOutput,
-} from '../../../mutations/workspaces/workspace-metadata-save';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
-import { eventBus } from '../../../lib/event-bus';
-import { mapWorkspaceMetadata } from '../../../lib/mappers';
+} from '@colanode/client/mutations/workspaces/workspace-metadata-save';
 
 export class WorkspaceMetadataSaveMutationHandler
   extends WorkspaceMutationHandlerBase

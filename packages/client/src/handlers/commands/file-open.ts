@@ -1,5 +1,5 @@
-import { CommandHandler } from '../../lib/types';
-import { FileOpenCommandInput } from '../../commands/file-open';
+import { FileOpenCommandInput } from '@colanode/client/commands/file-open';
+import { CommandHandler } from '@colanode/client/lib/types';
 
 export class FileOpenCommandHandler
   implements CommandHandler<FileOpenCommandInput>

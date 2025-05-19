@@ -1,9 +1,9 @@
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
   RecordDeleteMutationInput,
   RecordDeleteMutationOutput,
-} from '../../../mutations/records/record-delete';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations/records/record-delete';
 
 export class RecordDeleteMutationHandler
   extends WorkspaceMutationHandlerBase

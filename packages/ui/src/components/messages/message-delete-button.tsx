@@ -1,5 +1,6 @@
 import { Trash2 } from 'lucide-react';
 import React from 'react';
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -10,10 +11,10 @@ import {
   AlertDialogTitle,
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
+import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { toast } from '@colanode/ui/hooks/use-toast';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
 
 interface MessageDeleteButtonProps {
   id: string;

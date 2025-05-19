@@ -4,11 +4,10 @@ import {
   MarkNodeOpenedMutation,
   MarkNodeSeenMutation,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { SelectUser } from '@/data/schema';
-import { mapNode } from '@/lib/nodes';
-import { eventBus } from '@/lib/event-bus';
+import { database } from '@colanode/server/data/database';
+import { SelectUser } from '@colanode/server/data/schema';
+import { eventBus } from '@colanode/server/lib/event-bus';
+import { mapNode } from '@colanode/server/lib/nodes';
 
 export const markNodeAsSeen = async (
   user: SelectUser,

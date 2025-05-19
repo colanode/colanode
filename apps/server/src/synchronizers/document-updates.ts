@@ -4,11 +4,10 @@ import {
   SyncDocumentUpdateData,
 } from '@colanode/core';
 import { encodeState } from '@colanode/crdt';
-
-import { BaseSynchronizer } from '@/synchronizers/base';
-import { Event } from '@/types/events';
-import { database } from '@/data/database';
-import { SelectDocumentUpdate } from '@/data/schema';
+import { database } from '@colanode/server/data/database';
+import { SelectDocumentUpdate } from '@colanode/server/data/schema';
+import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
+import { Event } from '@colanode/server/types/events';
 
 export class DocumentUpdateSynchronizer extends BaseSynchronizer<SyncDocumentUpdatesInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncDocumentUpdatesInput> | null> {

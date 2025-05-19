@@ -1,9 +1,9 @@
-import { defineConfig } from 'vite';
-import viteReact from '@vitejs/plugin-react';
-import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
-import { VitePWA } from 'vite-plugin-pwa';
-
 import { resolve } from 'node:path';
+
+import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
+import viteReact from '@vitejs/plugin-react';
+import { defineConfig } from 'vite';
+import { VitePWA } from 'vite-plugin-pwa';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -13,9 +13,11 @@ export default defineConfig({
   },
   resolve: {
     alias: {
-      '@': resolve(__dirname, './src'),
-      '@colanode/ui': resolve(__dirname, '../../packages/ui/src'),
+      '@colanode/web': resolve(__dirname, './src'),
+      '@colanode/core': resolve(__dirname, '../../packages/core/src'),
+      '@colanode/crdt': resolve(__dirname, '../../packages/crdt/src'),
       '@colanode/client': resolve(__dirname, '../../packages/client/src'),
+      '@colanode/ui': resolve(__dirname, '../../packages/ui/src'),
     },
   },
   optimizeDeps: {

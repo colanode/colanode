@@ -7,10 +7,10 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
+import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { toast } from '@colanode/ui/hooks/use-toast';
-import { useLayout } from '@colanode/ui/contexts/layout';
 
 interface DatabaseCreateDialogProps {
   spaceId: string;

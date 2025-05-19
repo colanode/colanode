@@ -1,3 +1,21 @@
+import { Kysely, Migration, Migrator } from 'kysely';
+import ms from 'ms';
+
+import {
+  AccountDatabaseSchema,
+  accountDatabaseMigrations,
+} from '@colanode/client/databases/account';
+import { parseApiError } from '@colanode/client/lib/axios';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { EventLoop } from '@colanode/client/lib/event-loop';
+import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
+import { AccountClient } from '@colanode/client/services/accounts/account-client';
+import { AccountConnection } from '@colanode/client/services/accounts/account-connection';
+import { AppService } from '@colanode/client/services/app-service';
+import { ServerService } from '@colanode/client/services/server-service';
+import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
+import { Account } from '@colanode/client/types/accounts';
+import { Workspace } from '@colanode/client/types/workspaces';
 import {
   AccountSyncInput,
   AccountSyncOutput,
@@ -6,25 +24,6 @@ import {
   createDebugger,
   Message,
 } from '@colanode/core';
-import { Kysely, Migration, Migrator } from 'kysely';
-import ms from 'ms';
-
-import { AccountConnection } from './account-connection';
-import { AccountClient } from './account-client';
-
-import { ServerService } from '../server-service';
-import {
-  AccountDatabaseSchema,
-  accountDatabaseMigrations,
-} from '../../databases/account';
-import { mapAccount, mapWorkspace } from '../../lib/mappers';
-import { WorkspaceService } from '../workspaces/workspace-service';
-import { AppService } from '../app-service';
-import { eventBus } from '../../lib/event-bus';
-import { parseApiError } from '../../lib/axios';
-import { Account } from '../../types/accounts';
-import { Workspace } from '../../types/workspaces';
-import { EventLoop } from '../../lib/event-loop';
 
 const debug = createDebugger('desktop:service:account');
 

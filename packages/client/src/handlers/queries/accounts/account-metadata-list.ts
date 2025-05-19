@@ -1,10 +1,10 @@
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { mapAccountMetadata } from '../../../lib/mappers';
-import { AccountMetadataListQueryInput } from '../../../queries/accounts/account-metadata-list';
-import { Event } from '../../../types/events';
-import { AccountMetadata } from '../../../types/accounts';
-import { SelectAccountMetadata } from '../../../databases/account/schema';
-import { AppService } from '../../../services/app-service';
+import { SelectAccountMetadata } from '@colanode/client/databases/account/schema';
+import { mapAccountMetadata } from '@colanode/client/lib/mappers';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
+import { AccountMetadataListQueryInput } from '@colanode/client/queries/accounts/account-metadata-list';
+import { AppService } from '@colanode/client/services/app-service';
+import { AccountMetadata } from '@colanode/client/types/accounts';
+import { Event } from '@colanode/client/types/events';
 
 export class AccountMetadataListQueryHandler
   implements QueryHandler<AccountMetadataListQueryInput>

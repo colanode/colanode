@@ -1,5 +1,6 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+
 import {
   FileStatus,
   ApiErrorCode,
@@ -7,10 +8,9 @@ import {
   apiErrorOutputSchema,
   completeUploadInputSchema,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { mapNode, updateNode } from '@/lib/nodes';
-import { fetchFileMetadata } from '@/lib/files';
+import { database } from '@colanode/server/data/database';
+import { fetchFileMetadata } from '@colanode/server/lib/files';
+import { mapNode, updateNode } from '@colanode/server/lib/nodes';
 
 export const fileUploadCompleteRoute: FastifyPluginCallbackZod = (
   instance,

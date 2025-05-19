@@ -1,5 +1,6 @@
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Info, Trash2 } from 'lucide-react';
+
 import { AccountUpdate } from '@colanode/ui/components/accounts/account-update';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import {

@@ -1,5 +1,5 @@
-import { formatDate, timeAgo } from '@colanode/core';
 import { LocalMessageNode } from '@colanode/client/types';
+import { formatDate, timeAgo } from '@colanode/core';
 import {
   Tooltip,
   TooltipContent,

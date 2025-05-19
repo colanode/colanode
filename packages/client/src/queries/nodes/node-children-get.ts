@@ -1,6 +1,5 @@
+import { LocalNode } from '@colanode/client/types/nodes';
 import { NodeType } from '@colanode/core';
-
-import { LocalNode } from '../../types/nodes';
 
 export type NodeChildrenGetQueryInput = {
   type: 'node_children_get';

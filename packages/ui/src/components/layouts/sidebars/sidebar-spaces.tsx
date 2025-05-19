@@ -1,7 +1,7 @@
-import { useQuery } from '@colanode/ui/hooks/use-query';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { SpaceCreateButton } from '@colanode/ui/components/spaces/space-create-button';
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 export const SidebarSpaces = () => {
   const workspace = useWorkspace();

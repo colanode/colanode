@@ -4,6 +4,7 @@ import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react';
 import { Check, ChevronDown, Clipboard } from 'lucide-react';
 import React from 'react';
+
 import {
   Command,
   CommandEmpty,

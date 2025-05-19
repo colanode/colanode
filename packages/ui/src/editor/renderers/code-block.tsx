@@ -1,6 +1,7 @@
 import { JSONContent } from '@tiptap/core';
 import { Clipboard } from 'lucide-react';
 import React from 'react';
+
 import { defaultClasses } from '@colanode/ui/editor/classes';
 import { highlightCode, languages } from '@colanode/ui/lib/lowlight';
 

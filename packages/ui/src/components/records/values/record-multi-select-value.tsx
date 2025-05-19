@@ -1,5 +1,6 @@
-import { MultiSelectFieldAttributes } from '@colanode/core';
 import React from 'react';
+
+import { MultiSelectFieldAttributes } from '@colanode/core';
 import { SelectFieldOptions } from '@colanode/ui/components/databases/fields/select-field-options';
 import { SelectOptionBadge } from '@colanode/ui/components/databases/fields/select-option-badge';
 import {

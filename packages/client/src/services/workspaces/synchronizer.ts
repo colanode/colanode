@@ -1,3 +1,10 @@
+import { sha256 } from 'js-sha256';
+import ms from 'ms';
+
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { EventLoop } from '@colanode/client/lib/event-loop';
+import { AccountConnection } from '@colanode/client/services/accounts/account-connection';
+import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import {
   SynchronizerOutputMessage,
   SynchronizerInputMessage,
@@ -6,14 +13,6 @@ import {
   createDebugger,
   Message,
 } from '@colanode/core';
-import { sha256 } from 'js-sha256';
-import ms from 'ms';
-
-import { WorkspaceService } from './workspace-service';
-
-import { AccountConnection } from '../accounts/account-connection';
-import { EventLoop } from '../../lib/event-loop';
-import { eventBus } from '../../lib/event-bus';
 
 export type SynchronizerStatus = 'idle' | 'waiting' | 'processing';
 

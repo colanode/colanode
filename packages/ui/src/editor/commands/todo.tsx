@@ -1,4 +1,5 @@
 import { ListTodo } from 'lucide-react';
+
 import { EditorCommand } from '@colanode/client/types';
 
 export const TodoCommand: EditorCommand = {

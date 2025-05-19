@@ -1,9 +1,9 @@
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
   DatabaseDeleteMutationInput,
   DatabaseDeleteMutationOutput,
-} from '../../../mutations/databases/database-delete';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations/databases/database-delete';
 
 export class DatabaseDeleteMutationHandler
   extends WorkspaceMutationHandlerBase

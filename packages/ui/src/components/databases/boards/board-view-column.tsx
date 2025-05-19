@@ -1,6 +1,7 @@
-import { SelectFieldAttributes, SelectOptionAttributes } from '@colanode/core';
 import React from 'react';
 import { useDrop } from 'react-dnd';
+
+import { SelectFieldAttributes, SelectOptionAttributes } from '@colanode/core';
 import { BoardViewColumnHeader } from '@colanode/ui/components/databases/boards/board-view-column-header';
 import { BoardViewColumnRecords } from '@colanode/ui/components/databases/boards/board-view-column-records';
 import { getSelectOptionLightColorClass } from '@colanode/ui/lib/databases';

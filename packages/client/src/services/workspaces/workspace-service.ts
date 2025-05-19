@@ -1,24 +1,24 @@
-import { createDebugger, WorkspaceRole } from '@colanode/core';
 import { Kysely, Migration, Migrator } from 'kysely';
 
 import {
   WorkspaceDatabaseSchema,
   workspaceDatabaseMigrations,
-} from '../../databases/workspace';
-import { AccountService } from '../../services/accounts/account-service';
-import { NodeService } from '../../services/workspaces/node-service';
-import { NodeInteractionService } from '../../services/workspaces/node-interaction-service';
-import { NodeReactionService } from '../../services/workspaces/node-reaction-service';
-import { FileService } from '../../services/workspaces/file-service';
-import { Workspace } from '../../types/workspaces';
-import { MutationService } from '../../services/workspaces/mutation-service';
-import { UserService } from '../../services/workspaces/user-service';
-import { CollaborationService } from '../../services/workspaces/collaboration-service';
-import { SyncService } from '../../services/workspaces/sync-service';
-import { RadarService } from '../../services/workspaces/radar-service';
-import { DocumentService } from '../../services/workspaces/document-service';
-import { NodeCountersService } from '../../services/workspaces/node-counters-service';
-import { eventBus } from '../../lib/event-bus';
+} from '@colanode/client/databases/workspace';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { AccountService } from '@colanode/client/services/accounts/account-service';
+import { CollaborationService } from '@colanode/client/services/workspaces/collaboration-service';
+import { DocumentService } from '@colanode/client/services/workspaces/document-service';
+import { FileService } from '@colanode/client/services/workspaces/file-service';
+import { MutationService } from '@colanode/client/services/workspaces/mutation-service';
+import { NodeCountersService } from '@colanode/client/services/workspaces/node-counters-service';
+import { NodeInteractionService } from '@colanode/client/services/workspaces/node-interaction-service';
+import { NodeReactionService } from '@colanode/client/services/workspaces/node-reaction-service';
+import { NodeService } from '@colanode/client/services/workspaces/node-service';
+import { RadarService } from '@colanode/client/services/workspaces/radar-service';
+import { SyncService } from '@colanode/client/services/workspaces/sync-service';
+import { UserService } from '@colanode/client/services/workspaces/user-service';
+import { Workspace } from '@colanode/client/types/workspaces';
+import { createDebugger, WorkspaceRole } from '@colanode/core';
 
 const debug = createDebugger('desktop:service:workspace');
 

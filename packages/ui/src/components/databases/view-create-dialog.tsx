@@ -1,9 +1,10 @@
-import { FieldAttributes, FieldType } from '@colanode/core';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Calendar, Columns, Table } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
+
+import { FieldAttributes, FieldType } from '@colanode/core';
 import { FieldSelect } from '@colanode/ui/components/databases/fields/field-select';
 import { Button } from '@colanode/ui/components/ui/button';
 import {

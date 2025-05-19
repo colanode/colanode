@@ -1,19 +1,25 @@
-import { Message } from '@colanode/core';
-
-import { AppMetadata } from '../types/apps';
-import { Account, AccountMetadata } from '../types/accounts';
-import { Server } from '../types/servers';
-import { Workspace, WorkspaceMetadata } from '../types/workspaces';
-import { User } from '../types/users';
-import { FileState } from '../types/files';
+import { Account, AccountMetadata } from '@colanode/client/types/accounts';
+import { AppMetadata } from '@colanode/client/types/apps';
+import {
+  Document,
+  DocumentState,
+  DocumentUpdate,
+} from '@colanode/client/types/documents';
+import { FileState } from '@colanode/client/types/files';
 import {
   LocalNode,
   NodeCounter,
   NodeInteraction,
   NodeReaction,
   NodeReference,
-} from '../types/nodes';
-import { Document, DocumentState, DocumentUpdate } from '../types/documents';
+} from '@colanode/client/types/nodes';
+import { Server } from '@colanode/client/types/servers';
+import { User } from '@colanode/client/types/users';
+import {
+  Workspace,
+  WorkspaceMetadata,
+} from '@colanode/client/types/workspaces';
+import { Message } from '@colanode/core';
 
 export type UserCreatedEvent = {
   type: 'user_created';

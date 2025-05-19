@@ -1,9 +1,9 @@
-import { DocumentUpdate } from '../../../types/documents';
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { Event } from '../../../types/events';
-import { WorkspaceQueryHandlerBase } from '../workspace-query-handler-base';
-import { DocumentUpdatesListQueryInput } from '../../../queries/documents/document-updates-list';
-import { mapDocumentUpdate } from '../../../lib/mappers';
+import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
+import { mapDocumentUpdate } from '@colanode/client/lib/mappers';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
+import { DocumentUpdatesListQueryInput } from '@colanode/client/queries/documents/document-updates-list';
+import { DocumentUpdate } from '@colanode/client/types/documents';
+import { Event } from '@colanode/client/types/events';
 
 export class DocumentUpdatesListQueryHandler
   extends WorkspaceQueryHandlerBase

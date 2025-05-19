@@ -1,11 +1,10 @@
-import { generateId, IdType, PageAttributes } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
   PageCreateMutationInput,
   PageCreateMutationOutput,
-} from '../../../mutations/pages/page-create';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations/pages/page-create';
+import { generateId, IdType, PageAttributes } from '@colanode/core';
 
 export class PageCreateMutationHandler
   extends WorkspaceMutationHandlerBase

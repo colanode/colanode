@@ -1,6 +1,7 @@
-import { extractNodeRole, isSameDay } from '@colanode/core';
 import { Plus } from 'lucide-react';
+
 import { LocalRecordNode } from '@colanode/client/types';
+import { extractNodeRole, isSameDay } from '@colanode/core';
 import { CalendarViewRecordCard } from '@colanode/ui/components/databases/calendars/calendar-view-record-card';
 import { RecordProvider } from '@colanode/ui/components/records/record-provider';
 import { useDatabase } from '@colanode/ui/contexts/database';

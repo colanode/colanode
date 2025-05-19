@@ -1,4 +1,4 @@
-import { LocalChatNode } from '../../types/nodes';
+import { LocalChatNode } from '@colanode/client/types/nodes';
 
 export type ChatListQueryInput = {
   type: 'chat_list';

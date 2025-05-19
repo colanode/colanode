@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { LocalNode } from '@colanode/client/types';
+import { ContainerBreadcrumbItem } from '@colanode/ui/components/layouts/containers/container-breadcrumb-item';
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -14,7 +16,6 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { useLayout } from '@colanode/ui/contexts/layout';
-import { ContainerBreadcrumbItem } from '@colanode/ui/components/layouts/containers/container-breadcrumb-item';
 
 interface ContainerBreadcrumbProps {
   breadcrumb: LocalNode[];

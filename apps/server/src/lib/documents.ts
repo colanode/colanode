@@ -8,14 +8,19 @@ import {
   UpdateDocumentMutationData,
 } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
-
-import { database } from '@/data/database';
-import { SelectUser } from '@/data/schema';
-import { ConcurrentUpdateResult, UpdateDocumentOutput } from '@/types/nodes';
-import { eventBus } from '@/lib/event-bus';
-import { fetchNode, fetchNodeTree, mapNode } from '@/lib/nodes';
-import { CreateDocumentInput, CreateDocumentOutput } from '@/types/documents';
-import { scheduleDocumentEmbedding } from '@/lib/ai/embeddings';
+import { database } from '@colanode/server/data/database';
+import { SelectUser } from '@colanode/server/data/schema';
+import { scheduleDocumentEmbedding } from '@colanode/server/lib/ai/embeddings';
+import { eventBus } from '@colanode/server/lib/event-bus';
+import { fetchNode, fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
+import {
+  CreateDocumentInput,
+  CreateDocumentOutput,
+} from '@colanode/server/types/documents';
+import {
+  ConcurrentUpdateResult,
+  UpdateDocumentOutput,
+} from '@colanode/server/types/nodes';
 
 const debug = createDebugger('server:lib:documents');
 

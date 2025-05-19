@@ -1,3 +1,11 @@
+import {
+  useFloating,
+  offset,
+  flip,
+  shift,
+  autoUpdate,
+  FloatingPortal,
+} from '@floating-ui/react';
 import type { Range } from '@tiptap/core';
 import { Editor, Node } from '@tiptap/core';
 import { ReactNodeViewRenderer, ReactRenderer } from '@tiptap/react';
@@ -7,16 +15,9 @@ import {
   type SuggestionProps,
 } from '@tiptap/suggestion';
 import React from 'react';
-import {
-  useFloating,
-  offset,
-  flip,
-  shift,
-  autoUpdate,
-  FloatingPortal,
-} from '@floating-ui/react';
-import { generateId, IdType } from '@colanode/core';
+
 import { EditorContext, User } from '@colanode/client/types';
+import { generateId, IdType } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { MentionNodeView } from '@colanode/ui/editor/views';
 import { updateScrollView } from '@colanode/ui/lib/utils';

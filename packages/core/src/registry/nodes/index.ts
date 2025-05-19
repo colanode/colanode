@@ -1,13 +1,13 @@
 import { ChannelAttributes, channelModel } from './channel';
 import { ChatAttributes, chatModel } from './chat';
 import { DatabaseAttributes, databaseModel } from './database';
+import { DatabaseViewAttributes, databaseViewModel } from './database-view';
+import { FileAttributes, fileModel } from './file';
 import { FolderAttributes, folderModel } from './folder';
+import { MessageAttributes, messageModel } from './message';
 import { PageAttributes, pageModel } from './page';
 import { RecordAttributes, recordModel } from './record';
 import { SpaceAttributes, spaceModel } from './space';
-import { MessageAttributes, messageModel } from './message';
-import { DatabaseViewAttributes, databaseViewModel } from './database-view';
-import { FileAttributes, fileModel } from './file';
 
 type NodeBase = {
   id: string;

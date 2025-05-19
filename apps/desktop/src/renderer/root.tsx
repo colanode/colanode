@@ -1,7 +1,7 @@
 import { createRoot } from 'react-dom/client';
-import { RootProvider } from '@colanode/ui';
 
-import { AssetProvider } from '@/renderer/asset-provider';
+import { AssetProvider } from '@colanode/desktop/renderer/asset-provider';
+import { RootProvider } from '@colanode/ui';
 
 const Root = () => {
   return (

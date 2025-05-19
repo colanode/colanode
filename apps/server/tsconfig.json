@@ -4,7 +4,11 @@
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "paths": {
-      "@/*": ["./src/*"]
+      "@colanode/server/*": ["./src/*"],
+      "@colanode/core/*": ["../../packages/core/src/*"],
+      "@colanode/crdt/*": ["../../packages/crdt/src/*"],
+      "@colanode/client/*": ["../../packages/client/src/*"],
+      "@colanode/ui/*": ["../../packages/ui/src/*"]
     }
   },
   "references": [

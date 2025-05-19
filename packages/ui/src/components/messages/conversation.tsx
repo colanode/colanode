@@ -1,6 +1,7 @@
-import { NodeRole, hasNodeRole } from '@colanode/core';
 import React from 'react';
 import { InView } from 'react-intersection-observer';
+
+import { NodeRole, hasNodeRole } from '@colanode/core';
 import {
   MessageCreate,
   MessageCreateRefProps,

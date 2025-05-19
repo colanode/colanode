@@ -1,12 +1,13 @@
 import { set } from 'lodash-es';
 
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
   NodeCollaboratorCreateMutationInput,
   NodeCollaboratorCreateMutationOutput,
-} from '../../../mutations/nodes/node-collaborator-create';
-import { MutationError, MutationErrorCode } from '../../../mutations';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+  MutationError,
+  MutationErrorCode,
+} from '@colanode/client/mutations';
 
 export class NodeCollaboratorCreateMutationHandler
   extends WorkspaceMutationHandlerBase

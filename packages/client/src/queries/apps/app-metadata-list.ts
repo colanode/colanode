@@ -1,4 +1,4 @@
-import { AppMetadata } from '../../types/apps';
+import { AppMetadata } from '@colanode/client/types/apps';
 
 export type AppMetadataListQueryInput = {
   type: 'app_metadata_list';

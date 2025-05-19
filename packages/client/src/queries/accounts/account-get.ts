@@ -1,4 +1,4 @@
-import { Account } from '../../types/accounts';
+import { Account } from '@colanode/client/types/accounts';
 
 export type AccountGetQueryInput = {
   type: 'account_get';

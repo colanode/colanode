@@ -1,5 +1,6 @@
 import { Folder, Trash2 } from 'lucide-react';
 import React from 'react';
+
 import { FileDeleteDialog } from '@colanode/ui/components/files/file-delete-dialog';
 import {
   ContextMenu,

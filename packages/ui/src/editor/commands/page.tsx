@@ -1,4 +1,5 @@
 import { FileText } from 'lucide-react';
+
 import { EditorCommand } from '@colanode/client/types';
 
 export const PageCommand: EditorCommand = {

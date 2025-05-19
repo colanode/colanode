@@ -1,13 +1,12 @@
-import { UsersInviteInput, UsersInviteOutput } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { parseApiError } from '@colanode/client/lib/axios';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
   UsersInviteMutationInput,
   UsersInviteMutationOutput,
-} from '../../../mutations/workspaces/workspace-users-invite';
-import { MutationError, MutationErrorCode } from '../../../mutations';
-import { parseApiError } from '../../../lib/axios';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations/workspaces/workspace-users-invite';
+import { UsersInviteInput, UsersInviteOutput } from '@colanode/core';
 
 export class UsersInviteMutationHandler
   extends WorkspaceMutationHandlerBase

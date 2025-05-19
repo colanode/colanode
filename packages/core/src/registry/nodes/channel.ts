@@ -1,11 +1,9 @@
 import { z } from 'zod';
 
-import { NodeModel } from './core';
-
-import { extractNodeRole } from '../../lib/nodes';
-import { hasNodeRole } from '../../lib/permissions';
-
-import { NodeAttributes } from '.';
+import { extractNodeRole } from '@colanode/core/lib/nodes';
+import { hasNodeRole } from '@colanode/core/lib/permissions';
+import { NodeAttributes } from '@colanode/core/registry/nodes';
+import { NodeModel } from '@colanode/core/registry/nodes/core';
 
 export const channelAttributesSchema = z.object({
   type: z.literal('channel'),

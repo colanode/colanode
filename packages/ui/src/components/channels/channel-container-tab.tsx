@@ -1,9 +1,9 @@
 import { LocalChannelNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
+import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
-import { useRadar } from '@colanode/ui/contexts/radar';
-import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 
 interface ChannelContainerTabProps {
   channelId: string;

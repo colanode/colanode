@@ -1,5 +1,6 @@
-import { UpdatedByFieldAttributes } from '@colanode/core';
 import React from 'react';
+
+import { UpdatedByFieldAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';

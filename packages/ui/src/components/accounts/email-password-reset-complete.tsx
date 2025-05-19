@@ -1,8 +1,9 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckCircle, Lock } from 'lucide-react';
+import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { useState } from 'react';
+
 import { Server } from '@colanode/client/types';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -14,9 +15,9 @@ import {
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useCountdown } from '@colanode/ui/hooks/use-countdown';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { toast } from '@colanode/ui/hooks/use-toast';
-import { useCountdown } from '@colanode/ui/hooks/use-countdown';
 
 const formSchema = z
   .object({

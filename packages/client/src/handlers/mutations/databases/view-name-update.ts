@@ -1,12 +1,11 @@
-import { DatabaseViewAttributes } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationErrorCode, MutationError } from '@colanode/client/mutations';
 import {
   ViewNameUpdateMutationInput,
   ViewNameUpdateMutationOutput,
-} from '../../../mutations/databases/view-name-update';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
-import { MutationErrorCode, MutationError } from '../../../mutations';
+} from '@colanode/client/mutations/databases/view-name-update';
+import { DatabaseViewAttributes } from '@colanode/core';
 
 export class ViewNameUpdateMutationHandler
   extends WorkspaceMutationHandlerBase

@@ -1,7 +1,8 @@
-import { NodeRole, hasNodeRole } from '@colanode/core';
 import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
 import React from 'react';
+
 import { LocalPageNode } from '@colanode/client/types';
+import { NodeRole, hasNodeRole } from '@colanode/core';
 import { NodeCollaboratorAudit } from '@colanode/ui/components/collaborators/node-collaborator-audit';
 import { PageDeleteDialog } from '@colanode/ui/components/pages/page-delete-dialog';
 import { PageUpdateDialog } from '@colanode/ui/components/pages/page-update-dialog';

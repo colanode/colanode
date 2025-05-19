@@ -1,9 +1,8 @@
 import { AppService } from '@colanode/client/services';
-
-import { WebKyselyService } from '@/services/kysely-service';
-import { WebFileSystem } from '@/services/file-system';
-import { appBuild } from '@/services/app-build';
-import { paths } from '@/services/app-paths';
+import { appBuild } from '@colanode/web/services/app-build';
+import { paths } from '@colanode/web/services/app-paths';
+import { WebFileSystem } from '@colanode/web/services/file-system';
+import { WebKyselyService } from '@colanode/web/services/kysely-service';
 
 const fs = new WebFileSystem();
 const kysely = new WebKyselyService();

@@ -8,11 +8,11 @@ import {
   AlertDialogTitle,
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useLayout } from '@colanode/ui/contexts/layout';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { toast } from '@colanode/ui/hooks/use-toast';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
 
 interface DatabaseDeleteDialogProps {
   open: boolean;

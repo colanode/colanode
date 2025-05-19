@@ -1,12 +1,11 @@
-import { Message, createDebugger } from '@colanode/core';
 import WebSocket from 'isomorphic-ws';
 import ms from 'ms';
 
-import { AccountService } from './account-service';
-
-import { BackoffCalculator } from '../../lib/backoff-calculator';
-import { EventLoop } from '../../lib/event-loop';
-import { eventBus } from '../../lib/event-bus';
+import { BackoffCalculator } from '@colanode/client/lib/backoff-calculator';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { EventLoop } from '@colanode/client/lib/event-loop';
+import { AccountService } from '@colanode/client/services/accounts/account-service';
+import { Message, createDebugger } from '@colanode/core';
 
 const debug = createDebugger('desktop:service:account-connection');
 

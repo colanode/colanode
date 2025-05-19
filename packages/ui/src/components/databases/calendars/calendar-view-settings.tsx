@@ -1,5 +1,6 @@
 import { Eye, EyeOff, Trash2 } from 'lucide-react';
 import React from 'react';
+
 import { AvatarPopover } from '@colanode/ui/components/avatars/avatar-popover';
 import { FieldDeleteDialog } from '@colanode/ui/components/databases/fields/field-delete-dialog';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';

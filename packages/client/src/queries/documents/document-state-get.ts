@@ -1,4 +1,4 @@
-import { DocumentState } from '../../types/documents';
+import { DocumentState } from '@colanode/client/types/documents';
 
 export type DocumentStateGetQueryInput = {
   type: 'document_state_get';

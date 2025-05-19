@@ -1,9 +1,9 @@
 import { FastifyPluginCallback } from 'fastify';
 
-import { avatarUploadRoute } from './avatar-upload';
-import { avatarDownloadRoute } from './avatar-download';
+import { accountAuthenticator } from '@colanode/server/api/client/plugins/account-auth';
 
-import { accountAuthenticator } from '@/api/client/plugins/account-auth';
+import { avatarDownloadRoute } from './avatar-download';
+import { avatarUploadRoute } from './avatar-upload';
 
 export const avatarRoutes: FastifyPluginCallback = (instance, _, done) => {
   instance.register(accountAuthenticator);

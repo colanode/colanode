@@ -1,6 +1,7 @@
-import { FieldAttributes, FieldType } from '@colanode/core';
 import { Check, ChevronDown } from 'lucide-react';
 import React from 'react';
+
+import { FieldAttributes, FieldType } from '@colanode/core';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { Button } from '@colanode/ui/components/ui/button';
 import {

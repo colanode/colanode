@@ -1,4 +1,5 @@
 import { SeparatorHorizontal } from 'lucide-react';
+
 import { EditorCommand } from '@colanode/client/types';
 
 export const DividerCommand: EditorCommand = {

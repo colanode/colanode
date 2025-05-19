@@ -1,12 +1,13 @@
 import React from 'react';
+
 import { Account as AccountType } from '@colanode/client/types';
 import { AccountLogout } from '@colanode/ui/components/accounts/account-logout';
 import { AccountSettingsDialog } from '@colanode/ui/components/accounts/account-settings-dialog';
+import { ServerProvider } from '@colanode/ui/components/servers/server-provider';
+import { Workspace } from '@colanode/ui/components/workspaces/workspace';
+import { WorkspaceCreate } from '@colanode/ui/components/workspaces/workspace-create';
 import { AccountContext } from '@colanode/ui/contexts/account';
 import { useQuery } from '@colanode/ui/hooks/use-query';
-import { WorkspaceCreate } from '@colanode/ui/components/workspaces/workspace-create';
-import { Workspace } from '@colanode/ui/components/workspaces/workspace';
-import { ServerProvider } from '@colanode/ui/components/servers/server-provider';
 
 interface AccountProps {
   account: AccountType;

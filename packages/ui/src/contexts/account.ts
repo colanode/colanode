@@ -1,4 +1,5 @@
 import { createContext, useContext } from 'react';
+
 import { Account } from '@colanode/client/types';
 
 interface AccountContext extends Account {

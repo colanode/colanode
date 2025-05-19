@@ -1,13 +1,12 @@
-import { WorkspaceOutput } from '@colanode/core';
-
-import { AppService } from '../../../services/app-service';
-import { MutationHandler } from '../../../lib/types';
-import { parseApiError } from '../../../lib/axios';
-import { MutationError, MutationErrorCode } from '../../../mutations';
+import { parseApiError } from '@colanode/client/lib/axios';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
   WorkspaceDeleteMutationInput,
   WorkspaceDeleteMutationOutput,
-} from '../../../mutations/workspaces/workspace-delete';
+} from '@colanode/client/mutations/workspaces/workspace-delete';
+import { AppService } from '@colanode/client/services/app-service';
+import { WorkspaceOutput } from '@colanode/core';
 
 export class WorkspaceDeleteMutationHandler
   implements MutationHandler<WorkspaceDeleteMutationInput>

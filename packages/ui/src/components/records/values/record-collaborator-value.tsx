@@ -1,7 +1,8 @@
-import { CollaboratorFieldAttributes } from '@colanode/core';
 import { X } from 'lucide-react';
 import React from 'react';
+
 import { User } from '@colanode/client/types';
+import { CollaboratorFieldAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Badge } from '@colanode/ui/components/ui/badge';
 import {

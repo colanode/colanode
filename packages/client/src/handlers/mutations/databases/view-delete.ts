@@ -1,9 +1,9 @@
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
 import {
   ViewDeleteMutationInput,
   ViewDeleteMutationOutput,
-} from '../../../mutations/databases/view-delete';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations/databases/view-delete';
 
 export class ViewDeleteMutationHandler
   extends WorkspaceMutationHandlerBase

@@ -1,11 +1,12 @@
+import { createContext, useContext } from 'react';
+
+import { ViewField } from '@colanode/client/types';
 import {
   SortDirection,
   DatabaseViewFilterAttributes,
   DatabaseViewSortAttributes,
   DatabaseViewLayout,
 } from '@colanode/core';
-import { createContext, useContext } from 'react';
-import { ViewField } from '@colanode/client/types';
 
 interface DatabaseViewContext {
   id: string;

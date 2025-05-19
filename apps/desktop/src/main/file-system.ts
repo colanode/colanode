@@ -1,6 +1,6 @@
-import { FileMetadata, FileSystem } from '@colanode/client/services';
-
 import fs from 'fs';
+
+import { FileMetadata, FileSystem } from '@colanode/client/services';
 
 export class DesktopFileSystem implements FileSystem {
   public async makeDirectory(path: string): Promise<void> {

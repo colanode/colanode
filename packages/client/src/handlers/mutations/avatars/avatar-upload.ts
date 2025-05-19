@@ -2,14 +2,13 @@
 
 // import fs from 'fs';
 
-import { MutationHandler } from '../../../lib/types';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
   AvatarUploadMutationInput,
   AvatarUploadMutationOutput,
-} from '../../../mutations/avatars/avatar-upload';
-import { MutationError, MutationErrorCode } from '../../../mutations';
-// import { parseApiError } from '../../../lib/axios';
-import { AppService } from '../../../services/app-service';
+} from '@colanode/client/mutations/avatars/avatar-upload';
+import { AppService } from '@colanode/client/services/app-service';
 
 // interface AvatarUploadResponse {
 //   id: string;

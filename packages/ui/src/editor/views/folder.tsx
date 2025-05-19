@@ -1,9 +1,10 @@
 import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewWrapper } from '@tiptap/react';
+
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
-import { useLayout } from '@colanode/ui/contexts/layout';
 
 export const FolderNodeView = ({ node }: NodeViewProps) => {
   const workspace = useWorkspace();

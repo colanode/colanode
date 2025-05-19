@@ -1,4 +1,5 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+
 import {
   AccountSyncOutput,
   WorkspaceOutput,
@@ -9,8 +10,7 @@ import {
   apiErrorOutputSchema,
   accountSyncInputSchema,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
+import { database } from '@colanode/server/data/database';
 
 export const accountSyncRoute: FastifyPluginCallbackZod = (
   instance,

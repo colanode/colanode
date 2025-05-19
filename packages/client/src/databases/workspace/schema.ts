@@ -1,3 +1,7 @@
+import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
+
+import { DownloadStatus, UploadStatus } from '@colanode/client/types/files';
+import { NodeCounterType } from '@colanode/client/types/nodes';
 import {
   MutationType,
   NodeType,
@@ -5,10 +9,6 @@ import {
   UserStatus,
   DocumentType,
 } from '@colanode/core';
-import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
-
-import { DownloadStatus, UploadStatus } from '../../types/files';
-import { NodeCounterType } from '../../types/nodes';
 
 interface UserTable {
   id: ColumnType<string, string, never>;

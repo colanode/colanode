@@ -1,10 +1,10 @@
-import { SelectWorkspace } from '../../../databases/account';
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { mapWorkspace } from '../../../lib/mappers';
-import { WorkspaceGetQueryInput } from '../../../queries/workspaces/workspace-get';
-import { Event } from '../../../types/events';
-import { Workspace } from '../../../types/workspaces';
-import { AppService } from '../../../services/app-service';
+import { SelectWorkspace } from '@colanode/client/databases/account';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib';
+import { mapWorkspace } from '@colanode/client/lib/mappers';
+import { WorkspaceGetQueryInput } from '@colanode/client/queries/workspaces/workspace-get';
+import { AppService } from '@colanode/client/services/app-service';
+import { Event } from '@colanode/client/types/events';
+import { Workspace } from '@colanode/client/types/workspaces';
 
 export class WorkspaceGetQueryHandler
   implements QueryHandler<WorkspaceGetQueryInput>

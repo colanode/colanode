@@ -1,4 +1,4 @@
-import { Workspace } from '../../types/workspaces';
+import { Workspace } from '@colanode/client/types/workspaces';
 
 export type WorkspaceGetQueryInput = {
   type: 'workspace_get';

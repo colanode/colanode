@@ -1,5 +1,5 @@
-import { NodeRole, extractNodeRole } from '@colanode/core';
 import { LocalNode } from '@colanode/client/types';
+import { NodeRole, extractNodeRole } from '@colanode/core';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 

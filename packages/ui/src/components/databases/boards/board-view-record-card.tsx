@@ -1,10 +1,11 @@
-import { SelectFieldAttributes, SelectOptionAttributes } from '@colanode/core';
 import React from 'react';
 import { useDrag } from 'react-dnd';
+
+import { SelectFieldAttributes, SelectOptionAttributes } from '@colanode/core';
 import { RecordFieldValue } from '@colanode/ui/components/records/record-field-value';
-import { useRecord } from '@colanode/ui/contexts/record';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useLayout } from '@colanode/ui/contexts/layout';
+import { useRecord } from '@colanode/ui/contexts/record';
 
 interface DragResult {
   option: SelectOptionAttributes;

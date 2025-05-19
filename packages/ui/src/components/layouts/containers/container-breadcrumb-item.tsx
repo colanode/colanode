@@ -2,12 +2,12 @@ import { LocalNode } from '@colanode/client/types';
 import { ChannelBreadcrumbItem } from '@colanode/ui/components/channels/channel-breadcrumb-item';
 import { ChatBreadcrumbItem } from '@colanode/ui/components/chats/chat-breadcrumb-item';
 import { DatabaseBreadcrumbItem } from '@colanode/ui/components/databases/database-breadcrumb-item';
+import { FileBreadcrumbItem } from '@colanode/ui/components/files/file-breadcrumb-item';
 import { FolderBreadcrumbItem } from '@colanode/ui/components/folders/folder-breadcrumb-item';
+import { MessageBreadcrumbItem } from '@colanode/ui/components/messages/message-breadcrumb-item';
 import { PageBreadcrumbItem } from '@colanode/ui/components/pages/page-breadcrumb-item';
 import { RecordBreadcrumbItem } from '@colanode/ui/components/records/record-breadcrumb-item';
 import { SpaceBreadcrumbItem } from '@colanode/ui/components/spaces/space-breadcrumb-item';
-import { FileBreadcrumbItem } from '@colanode/ui/components/files/file-breadcrumb-item';
-import { MessageBreadcrumbItem } from '@colanode/ui/components/messages/message-breadcrumb-item';
 
 interface ContainerBreadcrumbItemProps {
   node: LocalNode;

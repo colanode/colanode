@@ -1,10 +1,10 @@
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { mapAppMetadata } from '../../../lib/mappers';
-import { AppMetadataListQueryInput } from '../../../queries/apps/app-metadata-list';
-import { Event } from '../../../types/events';
-import { AppMetadata } from '../../../types/apps';
-import { SelectAppMetadata } from '../../../databases/app/schema';
-import { AppService } from '../../../services/app-service';
+import { SelectAppMetadata } from '@colanode/client/databases/app/schema';
+import { mapAppMetadata } from '@colanode/client/lib/mappers';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
+import { AppMetadataListQueryInput } from '@colanode/client/queries/apps/app-metadata-list';
+import { AppService } from '@colanode/client/services/app-service';
+import { AppMetadata } from '@colanode/client/types/apps';
+import { Event } from '@colanode/client/types/events';
 
 export class AppMetadataListQueryHandler
   implements QueryHandler<AppMetadataListQueryInput>

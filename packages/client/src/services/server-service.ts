@@ -1,13 +1,12 @@
-import { createDebugger, ServerConfig } from '@colanode/core';
 import axios, { isAxiosError } from 'axios';
 import ms from 'ms';
 
-import { AppService } from './app-service';
-
-import { eventBus } from '../lib/event-bus';
-import { EventLoop } from '../lib/event-loop';
-import { mapServer } from '../lib/mappers';
-import { Server } from '../types/servers';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { EventLoop } from '@colanode/client/lib/event-loop';
+import { mapServer } from '@colanode/client/lib/mappers';
+import { AppService } from '@colanode/client/services/app-service';
+import { Server } from '@colanode/client/types/servers';
+import { createDebugger, ServerConfig } from '@colanode/core';
 
 type ServerState = {
   isAvailable: boolean;

@@ -1,9 +1,8 @@
 import { Check, LogOut, Plus, Settings } from 'lucide-react';
 import React from 'react';
+
 import { UnreadState } from '@colanode/client/types';
-import { useApp } from '@colanode/ui/contexts/app';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,7 +11,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
+import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { AccountContext, useAccount } from '@colanode/ui/contexts/account';
+import { useApp } from '@colanode/ui/contexts/app';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 

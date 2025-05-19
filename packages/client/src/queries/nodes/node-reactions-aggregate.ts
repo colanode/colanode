@@ -1,4 +1,4 @@
-import { NodeReactionCount } from '../../types/nodes';
+import { NodeReactionCount } from '@colanode/client/types/nodes';
 
 export type NodeReactionsAggregateQueryInput = {
   type: 'node_reactions_aggregate';

@@ -1,8 +1,8 @@
-import { ChangeCheckResult, QueryHandler } from '../../../lib/types';
-import { IconCategoryListQueryInput } from '../../../queries/icons/icon-category-list';
-import { IconCategory } from '../../../types/icons';
-import { Event } from '../../../types/events';
-import { AppService } from '../../../services/app-service';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
+import { IconCategoryListQueryInput } from '@colanode/client/queries/icons/icon-category-list';
+import { AppService } from '@colanode/client/services/app-service';
+import { Event } from '@colanode/client/types/events';
+import { IconCategory } from '@colanode/client/types/icons';
 
 export class IconCategoryListQueryHandler
   implements QueryHandler<IconCategoryListQueryInput>

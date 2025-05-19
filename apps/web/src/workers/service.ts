@@ -1,8 +1,8 @@
 // Service worker that intercepts requests with the path /asset
 declare const self: ServiceWorkerGlobalScope;
 
-import { WebFileSystem } from '../services/file-system';
-import { paths } from '../services/app-paths';
+import { paths } from '@colanode/web/services/app-paths';
+import { WebFileSystem } from '@colanode/web/services/file-system';
 
 const fs = new WebFileSystem();
 

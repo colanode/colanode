@@ -1,5 +1,6 @@
 import { Editor } from '@tiptap/core';
 import { Check, Link, Trash2 } from 'lucide-react';
+
 import { isValidUrl } from '@colanode/core';
 import { Input } from '@colanode/ui/components/ui/input';
 import {

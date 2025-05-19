@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { RecordAvatar } from '@colanode/ui/components/records/record-avatar';
 import { RecordField } from '@colanode/ui/components/records/record-field';
 import { RecordFieldValue } from '@colanode/ui/components/records/record-field-value';

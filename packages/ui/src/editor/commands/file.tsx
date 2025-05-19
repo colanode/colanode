@@ -1,4 +1,5 @@
 import { FilePlus } from 'lucide-react';
+
 import { EditorCommand } from '@colanode/client/types';
 
 export const FileCommand: EditorCommand = {

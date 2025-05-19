@@ -1,4 +1,17 @@
 import {
+  CreateNodeReference,
+  SelectNode,
+  SelectNodeReference,
+} from '@colanode/client/databases/workspace';
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapNode, mapNodeReference } from '@colanode/client/lib/mappers';
+import {
+  applyMentionUpdates,
+  checkMentionChanges,
+} from '@colanode/client/lib/mentions';
+import { deleteNodeRelations, fetchNodeTree } from '@colanode/client/lib/utils';
+import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
+import {
   generateId,
   IdType,
   createDebugger,
@@ -14,18 +27,6 @@ import {
   CanDeleteNodeContext,
 } from '@colanode/core';
 import { decodeState, encodeState, YDoc } from '@colanode/crdt';
-
-import { WorkspaceService } from './workspace-service';
-
-import { deleteNodeRelations, fetchNodeTree } from '../../lib/utils';
-import { mapNode, mapNodeReference } from '../../lib/mappers';
-import { eventBus } from '../../lib/event-bus';
-import {
-  CreateNodeReference,
-  SelectNode,
-  SelectNodeReference,
-} from '../../databases/workspace';
-import { applyMentionUpdates, checkMentionChanges } from '../../lib/mentions';
 
 const UPDATE_RETRIES_LIMIT = 20;
 

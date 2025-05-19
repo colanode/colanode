@@ -1,8 +1,8 @@
 import * as Comlink from 'comlink';
-import { eventBus } from '@colanode/client/lib';
 
-import { ColanodeWorkerApi } from '@/workers/types';
-import { app } from '@/services/app-service';
+import { eventBus } from '@colanode/client/lib';
+import { app } from '@colanode/web/services/app-service';
+import { ColanodeWorkerApi } from '@colanode/web/workers/types';
 
 const api: ColanodeWorkerApi = {
   async init() {

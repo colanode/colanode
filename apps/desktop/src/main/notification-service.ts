@@ -1,7 +1,7 @@
+import { app } from 'electron';
+
 import { eventBus } from '@colanode/client/lib';
 import { AppService } from '@colanode/client/services';
-
-import { app } from 'electron';
 
 export class NotificationService {
   private readonly appService: AppService;

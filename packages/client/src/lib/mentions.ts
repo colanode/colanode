@@ -1,10 +1,10 @@
-import { Mention } from '@colanode/core';
 import { Transaction } from 'kysely';
 
 import {
   WorkspaceDatabaseSchema,
   SelectNodeReference,
-} from '../databases/workspace/schema';
+} from '@colanode/client/databases/workspace/schema';
+import { Mention } from '@colanode/core';
 
 type MentionChangeResult = {
   addedMentions: Mention[];

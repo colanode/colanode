@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Icon } from '@colanode/client/types';
 import { IconBrowser } from '@colanode/ui/components/icons/icon-browser';
 import { IconSearch } from '@colanode/ui/components/icons/icon-search';

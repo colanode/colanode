@@ -1,4 +1,4 @@
-import { useAsset } from '../contexts/asset';
+import { useAsset } from '@colanode/ui/contexts/asset';
 
 export const FontLoader = () => {
   const asset = useAsset();

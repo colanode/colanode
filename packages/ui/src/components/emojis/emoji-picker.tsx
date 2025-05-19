@@ -1,4 +1,5 @@
 import React from 'react';
+
 import { Emoji } from '@colanode/client/types';
 import { EmojiBrowser } from '@colanode/ui/components/emojis/emoji-browser';
 import { EmojiSearch } from '@colanode/ui/components/emojis/emoji-search';

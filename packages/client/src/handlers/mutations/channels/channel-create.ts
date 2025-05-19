@@ -1,12 +1,11 @@
-import { ChannelAttributes, generateId, IdType } from '@colanode/core';
-
-import { MutationHandler } from '../../../lib/types';
+import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
+import { MutationHandler } from '@colanode/client/lib/types';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
   ChannelCreateMutationInput,
   ChannelCreateMutationOutput,
-} from '../../../mutations/channels/channel-create';
-import { MutationError, MutationErrorCode } from '../../../mutations';
-import { WorkspaceMutationHandlerBase } from '../workspace-mutation-handler-base';
+} from '@colanode/client/mutations/channels/channel-create';
+import { ChannelAttributes, generateId, IdType } from '@colanode/core';
 
 export class ChannelCreateMutationHandler
   extends WorkspaceMutationHandlerBase

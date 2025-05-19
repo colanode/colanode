@@ -1,5 +1,6 @@
-import { Node } from '@colanode/core';
 import { useEffect } from 'react';
+
+import { Node } from '@colanode/core';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
