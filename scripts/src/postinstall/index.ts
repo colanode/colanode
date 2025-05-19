@@ -36,7 +36,7 @@ const copyFile = (source: string, target: string | string[]) => {
 
 const execute = () => {
   copyFile(EMOJIS_DB_PATH, path.resolve(DESKTOP_ASSETS_DIR, 'emojis.db'));
-  copyFile(EMOJIS_MIN_DB_PATH, path.resolve(WEB_ASSETS_DIR, 'emojis.min.db'));
+  copyFile(EMOJIS_MIN_DB_PATH, path.resolve(WEB_ASSETS_DIR, 'emojis.db'));
 
   copyFile(EMOJI_SVG_PATH, [
     path.resolve(DESKTOP_ASSETS_DIR, 'emojis.svg'),
@@ -44,7 +44,7 @@ const execute = () => {
   ]);
 
   copyFile(ICONS_DB_PATH, path.resolve(DESKTOP_ASSETS_DIR, 'icons.db'));
-  copyFile(ICONS_MIN_DB_PATH, path.resolve(WEB_ASSETS_DIR, 'icons.min.db'));
+  copyFile(ICONS_MIN_DB_PATH, path.resolve(WEB_ASSETS_DIR, 'icons.db'));
 
   copyFile(ICONS_SVG_PATH, [
     path.resolve(DESKTOP_ASSETS_DIR, 'icons.svg'),

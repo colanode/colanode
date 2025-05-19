@@ -48,9 +48,10 @@ export class AccountService {
     this.server = server;
     this.app = app;
 
-    this.database = app.kysely.build<AccountDatabaseSchema>(
-      app.paths.accountDatabase(this.account.id)
-    );
+    this.database = app.kysely.build<AccountDatabaseSchema>({
+      path: app.paths.accountDatabase(this.account.id),
+      readonly: false,
+    });
 
     this.client = new AccountClient(this);
     this.connection = new AccountConnection(this);

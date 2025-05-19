@@ -82,9 +82,8 @@ export const EmojiBrowser = () => {
             );
           }
 
-          return (
-            <EmojiBrowserItems row={row} style={style} key={row.category} />
-          );
+          const key = `${row.category}-${row.page}`;
+          return <EmojiBrowserItems row={row} style={style} key={key} />;
         })}
       </div>
     </div>

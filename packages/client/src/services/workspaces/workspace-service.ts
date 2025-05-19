@@ -45,9 +45,13 @@ export class WorkspaceService {
     this.workspace = workspace;
     this.account = account;
 
-    this.database = account.app.kysely.build<WorkspaceDatabaseSchema>(
-      account.app.paths.workspaceDatabase(this.account.id, this.workspace.id)
-    );
+    this.database = account.app.kysely.build<WorkspaceDatabaseSchema>({
+      path: account.app.paths.workspaceDatabase(
+        this.account.id,
+        this.workspace.id
+      ),
+      readonly: false,
+    });
 
     this.nodes = new NodeService(this);
     this.nodeInteractions = new NodeInteractionService(this);

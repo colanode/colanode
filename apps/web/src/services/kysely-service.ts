@@ -1,4 +1,4 @@
-import { KyselyService } from '@colanode/client/services';
+import { KyselyBuildOptions, KyselyService } from '@colanode/client/services';
 import {
   CompiledQuery,
   type DatabaseConnection,
@@ -15,10 +15,11 @@ import sqlite3InitModule, {
   type Database,
 } from '@sqlite.org/sqlite-wasm';
 
+import { WebFileSystem } from './file-system';
+
 export class WebKyselyService implements KyselyService {
-  build<T>(path: string): Kysely<T> {
-    console.log('build kysely', path);
-    const dialect = new SqliteWasmDialect(path);
+  build<T>(options: KyselyBuildOptions): Kysely<T> {
+    const dialect = new SqliteWasmDialect(options);
 
     return new Kysely<T>({
       dialect,
@@ -27,27 +28,28 @@ export class WebKyselyService implements KyselyService {
 }
 
 export class SqliteWasmDialect implements Dialect {
-  private readonly path: string;
+  private readonly options: KyselyBuildOptions;
 
-  constructor(path: string) {
-    this.path = path;
+  constructor(options: KyselyBuildOptions) {
+    this.options = options;
   }
 
   createAdapter = () => new SqliteAdapter();
-  createDriver = () => new SqliteWasmDriver(this.path);
+  createDriver = () => new SqliteWasmDriver(this.options);
   createIntrospector = (db: Kysely<unknown>) => new SqliteIntrospector(db);
   createQueryCompiler = () => new SqliteQueryCompiler();
 }
 
 class SqliteWasmDriver implements Driver {
+  private readonly fs = new WebFileSystem();
   private readonly mutex = new ConnectionMutex();
-  private readonly path: string;
+  private readonly options: KyselyBuildOptions;
 
   private database?: Database;
   private connection?: DatabaseConnection;
 
-  constructor(path: string) {
-    this.path = path;
+  constructor(options: KyselyBuildOptions) {
+    this.options = options;
   }
 
   async init(): Promise<void> {
@@ -56,8 +58,19 @@ class SqliteWasmDriver implements Driver {
       printErr: console.error,
     });
 
-    const pool = await sqlite3.installOpfsSAHPoolVfs({});
-    this.database = new pool.OpfsSAHPoolDb(this.path);
+    const pool = await sqlite3.installOpfsSAHPoolVfs({
+      name: this.buildVfsName(),
+    });
+
+    if (this.options.readonly) {
+      const databaseExists = await this.fs.exists(this.options.path);
+      if (databaseExists) {
+        const databaseContent = await this.fs.readFile(this.options.path);
+        await pool.importDb(this.buildImportDbPath(), databaseContent);
+      }
+    }
+
+    this.database = new pool.OpfsSAHPoolDb(this.options.path);
     this.connection = new SqliteConnection(this.database);
   }
 
@@ -84,6 +97,16 @@ class SqliteWasmDriver implements Driver {
 
   async destroy(): Promise<void> {
     this.database?.close();
+  }
+
+  private buildVfsName(): string {
+    return this.options.path.replace(/\//g, '_').split('.')[0]!;
+  }
+
+  private buildImportDbPath(): string {
+    return this.options.path.startsWith('/')
+      ? this.options.path
+      : '/' + this.options.path;
   }
 }
 

@@ -1,69 +1,51 @@
 // Service worker that intercepts requests with the path /asset
 declare const self: ServiceWorkerGlobalScope;
 
-import { AssetService } from '@colanode/client/services';
-
-import { WebKyselyService } from '../services/kysely-service';
 import { WebFileSystem } from '../services/file-system';
 import { paths } from '../services/app-paths';
 
-// Initialize asset service
 const fs = new WebFileSystem();
-const kysely = new WebKyselyService();
-const assetService = new AssetService(kysely, fs, paths);
+
+const downloadDbs = async () => {
+  console.log('Downloading databases.');
+  await Promise.all([downloadEmojis(), downloadIcons()]);
+};
+
+const downloadEmojis = async () => {
+  try {
+    const emojiResponse = await fetch('/assets/emojis.db');
+    if (!emojiResponse.ok) {
+      throw new Error(
+        `Failed to download emoji database: ${emojiResponse.status}`
+      );
+    }
+    const emojiData = await emojiResponse.arrayBuffer();
+    await fs.writeFile(paths.emojisDatabase, new Uint8Array(emojiData));
+  } catch (error) {
+    console.error('Failed to download emojis:', error);
+  }
+};
+
+const downloadIcons = async () => {
+  try {
+    const iconResponse = await fetch('/assets/icons.db');
+    if (!iconResponse.ok) {
+      throw new Error(
+        `Failed to download icon database: ${iconResponse.status}`
+      );
+    }
+    const iconData = await iconResponse.arrayBuffer();
+    await fs.writeFile(paths.iconsDatabase, new Uint8Array(iconData));
+  } catch (error) {
+    console.error('Failed to download icons:', error);
+  }
+};
 
 self.addEventListener('install', (event: ExtendableEvent) => {
-  event.waitUntil(assetService.init());
+  event.waitUntil(downloadDbs());
   event.waitUntil(self.skipWaiting());
 });
 
 self.addEventListener('activate', (event: ExtendableEvent) => {
   event.waitUntil(self.clients.claim());
-});
-
-self.addEventListener('fetch', async (event: FetchEvent) => {
-  const url = new URL(event.request.url);
-  const segments = url.pathname.split('/').filter(Boolean);
-
-  if (segments[0] !== 'asset') {
-    return;
-  }
-
-  const assetType = segments[1];
-  const assetId = segments[2];
-
-  if (!assetType || !assetId) {
-    event.respondWith(new Response('Invalid asset path', { status: 404 }));
-    return;
-  }
-
-  if (assetType === 'emojis') {
-    const emoji = await assetService.fetchEmoji(assetId);
-
-    if (!emoji) {
-      event.respondWith(new Response('Emoji not found', { status: 404 }));
-      return;
-    }
-
-    event.respondWith(
-      new Response(emoji, {
-        headers: { 'Content-Type': 'image/svg+xml' },
-      })
-    );
-  } else if (assetType === 'icons') {
-    const icon = await assetService.fetchIcon(assetId);
-
-    if (!icon) {
-      event.respondWith(new Response('Icon not found', { status: 404 }));
-      return;
-    }
-
-    event.respondWith(
-      new Response(icon, {
-        headers: { 'Content-Type': 'image/svg+xml' },
-      })
-    );
-  } else {
-    event.respondWith(new Response('Invalid asset type', { status: 404 }));
-  }
 });

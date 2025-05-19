@@ -1,5 +1,10 @@
 import { Kysely } from 'kysely';
 
+export interface KyselyBuildOptions {
+  path: string;
+  readonly?: boolean;
+}
+
 export interface KyselyService {
-  build<T>(path: string): Kysely<T>;
+  build<T>(options: KyselyBuildOptions): Kysely<T>;
 }

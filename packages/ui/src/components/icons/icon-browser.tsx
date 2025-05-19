@@ -78,9 +78,8 @@ export const IconBrowser = () => {
             );
           }
 
-          return (
-            <IconBrowserItems key={row.category} row={row} style={style} />
-          );
+          const key = `${row.category}-${row.page}`;
+          return <IconBrowserItems key={key} row={row} style={style} />;
         })}
       </div>
     </div>
