@@ -8,6 +8,9 @@ import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationMap } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
 import { Event } from '@colanode/client/types';
+import { generateId, IdType } from '@colanode/core';
+
+const windowId = generateId(IdType.Window);
 
 contextBridge.exposeInMainWorld('colanode', {
   init: () => ipcRenderer.invoke('init'),
@@ -25,14 +28,19 @@ contextBridge.exposeInMainWorld('colanode', {
   },
 
   executeQueryAndSubscribe: <T extends QueryInput>(
-    id: string,
+    key: string,
     input: T
   ): Promise<QueryMap[T['type']]['output']> => {
-    return ipcRenderer.invoke('execute-query-and-subscribe', id, input);
+    return ipcRenderer.invoke(
+      'execute-query-and-subscribe',
+      key,
+      windowId,
+      input
+    );
   },
 
-  unsubscribeQuery: (id: string): Promise<void> => {
-    return ipcRenderer.invoke('unsubscribe-query', id);
+  unsubscribeQuery: (key: string): Promise<void> => {
+    return ipcRenderer.invoke('unsubscribe-query', key, windowId);
   },
 
   executeCommand: <T extends CommandInput>(

@@ -209,16 +209,20 @@ ipcMain.handle(
   'execute-query-and-subscribe',
   async <T extends QueryInput>(
     _: unknown,
-    id: string,
+    key: string,
+    windowId: string,
     input: T
   ): Promise<QueryMap[T['type']]['output']> => {
-    return app.mediator.executeQueryAndSubscribe(id, input);
+    return app.mediator.executeQueryAndSubscribe(key, windowId, input);
   }
 );
 
-ipcMain.handle('unsubscribe-query', (_: unknown, id: string): void => {
-  app.mediator.unsubscribeQuery(id);
-});
+ipcMain.handle(
+  'unsubscribe-query',
+  (_: unknown, key: string, windowId: string): void => {
+    app.mediator.unsubscribeQuery(key, windowId);
+  }
+);
 
 ipcMain.handle(
   'execute-command',
