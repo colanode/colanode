@@ -31,3 +31,105 @@ declare global {
     eventBus: EventBus;
   }
 }
+
+export type BroadcastMutationMessage = {
+  type: 'mutation';
+  mutationId: string;
+  input: MutationInput;
+};
+
+export type BroadcastMutationResultMessage = {
+  type: 'mutation_result';
+  mutationId: string;
+  result: MutationResult<MutationInput>;
+};
+
+export type BroadcastQueryMessage = {
+  type: 'query';
+  queryId: string;
+  input: QueryInput;
+};
+
+export type BroadcastQueryResultMessage = {
+  type: 'query_result';
+  queryId: string;
+  result: QueryMap[QueryInput['type']]['output'];
+};
+
+export type BroadcastQueryAndSubscribeMessage = {
+  type: 'query_and_subscribe';
+  queryId: string;
+  id: string;
+  input: QueryInput;
+};
+
+export type BroadcastQueryAndSubscribeResultMessage = {
+  type: 'query_and_subscribe_result';
+  id: string;
+  queryId: string;
+  result: QueryMap[QueryInput['type']]['output'];
+};
+
+export type BroadcastQueryUnsubscribeMessage = {
+  type: 'query_unsubscribe';
+  id: string;
+};
+
+export type BroadcastCommandMessage = {
+  type: 'command';
+  commandId: string;
+  input: CommandInput;
+};
+
+export type BroadcastCommandResultMessage = {
+  type: 'command_result';
+  commandId: string;
+  result: CommandMap[CommandInput['type']]['output'];
+};
+
+export type BroadcastEventMessage = {
+  type: 'event';
+  event: Event;
+};
+
+export type BroadcastMessage =
+  | BroadcastMutationMessage
+  | BroadcastMutationResultMessage
+  | BroadcastQueryMessage
+  | BroadcastQueryResultMessage
+  | BroadcastQueryAndSubscribeMessage
+  | BroadcastQueryAndSubscribeResultMessage
+  | BroadcastQueryUnsubscribeMessage
+  | BroadcastCommandMessage
+  | BroadcastCommandResultMessage
+  | BroadcastEventMessage;
+
+export type PendingQuery = {
+  type: 'query';
+  queryId: string;
+  input: QueryInput;
+  resolve: (result: QueryMap[QueryInput['type']]['output']) => void;
+  reject: (error: string) => void;
+};
+
+export type PendingQueryAndSubscribe = {
+  type: 'query_and_subscribe';
+  queryId: string;
+  id: string;
+  input: QueryInput;
+  resolve: (result: QueryMap[QueryInput['type']]['output']) => void;
+  reject: (error: string) => void;
+};
+
+export type PendingMutation = {
+  type: 'mutation';
+  mutationId: string;
+  input: MutationInput;
+  resolve: (result: MutationResult<MutationInput>) => void;
+  reject: (error: string) => void;
+};
+
+export type PendingPromise =
+  | PendingQuery
+  | PendingQueryAndSubscribe
+  | PendingMutation;
