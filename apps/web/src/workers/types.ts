@@ -13,10 +13,10 @@ export interface ColanodeWorkerApi {
     input: T
   ) => Promise<QueryMap[T['type']]['output']>;
   executeQueryAndSubscribe: <T extends QueryInput>(
-    id: string,
+    key: string,
     input: T
   ) => Promise<QueryMap[T['type']]['output']>;
-  unsubscribeQuery: (id: string) => Promise<void>;
+  unsubscribeQuery: (key: string) => Promise<void>;
   executeCommand: <T extends CommandInput>(
     input: T
   ) => Promise<CommandMap[T['type']]['output']>;
@@ -59,20 +59,23 @@ export type BroadcastQueryResultMessage = {
 export type BroadcastQueryAndSubscribeMessage = {
   type: 'query_and_subscribe';
   queryId: string;
-  id: string;
+  key: string;
+  windowId: string;
   input: QueryInput;
 };
 
 export type BroadcastQueryAndSubscribeResultMessage = {
   type: 'query_and_subscribe_result';
-  id: string;
+  key: string;
+  windowId: string;
   queryId: string;
   result: QueryMap[QueryInput['type']]['output'];
 };
 
 export type BroadcastQueryUnsubscribeMessage = {
   type: 'query_unsubscribe';
-  id: string;
+  key: string;
+  windowId: string;
 };
 
 export type BroadcastCommandMessage = {
@@ -89,6 +92,7 @@ export type BroadcastCommandResultMessage = {
 
 export type BroadcastEventMessage = {
   type: 'event';
+  windowId: string;
   event: Event;
 };
 
@@ -115,7 +119,8 @@ export type PendingQuery = {
 export type PendingQueryAndSubscribe = {
   type: 'query_and_subscribe';
   queryId: string;
-  id: string;
+  key: string;
+  windowId: string;
   input: QueryInput;
   resolve: (result: QueryMap[QueryInput['type']]['output']) => void;
   reject: (error: string) => void;

@@ -12,10 +12,10 @@ export interface ColanodeApi {
     input: T
   ) => Promise<QueryMap[T['type']]['output']>;
   executeQueryAndSubscribe: <T extends QueryInput>(
-    id: string,
+    key: string,
     input: T
   ) => Promise<QueryMap[T['type']]['output']>;
-  unsubscribeQuery: (id: string) => Promise<void>;
+  unsubscribeQuery: (key: string) => Promise<void>;
   executeCommand: <T extends CommandInput>(
     input: T
   ) => Promise<CommandMap[T['type']]['output']>;

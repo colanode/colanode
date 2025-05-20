@@ -15,7 +15,7 @@ export class EventBusService {
   private subscriptions: Map<string, Subscription>;
   private id = 0;
 
-  public constructor() {
+  constructor() {
     this.subscriptions = new Map<string, Subscription>();
   }
 

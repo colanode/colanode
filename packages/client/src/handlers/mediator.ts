@@ -79,13 +79,16 @@ export class Mediator {
   }
 
   public async executeQueryAndSubscribe<T extends QueryInput>(
-    id: string,
+    key: string,
+    windowId: string,
     input: T
   ): Promise<QueryMap[T['type']]['output']> {
     debug(`Executing query and subscribing: ${input.type}`);
 
-    if (this.subscribedQueries.has(id)) {
-      return this.subscribedQueries.get(id)!.result;
+    const subscribedQuery = this.subscribedQueries.get(key);
+    if (subscribedQuery) {
+      subscribedQuery.windowIds.add(windowId);
+      return subscribedQuery.result;
     }
 
     const handler = this.queryHandlerMap[
@@ -96,16 +99,26 @@ export class Mediator {
     }
 
     const result = await handler.handleQuery(input);
-    this.subscribedQueries.set(id, {
+    this.subscribedQueries.set(key, {
       input,
       result,
+      windowIds: new Set([windowId]),
     });
     return result;
   }
 
-  public unsubscribeQuery(id: string) {
-    debug(`Unsubscribing query: ${id}`);
-    this.subscribedQueries.delete(id);
+  public unsubscribeQuery(key: string, windowId: string) {
+    debug(`Unsubscribing query: ${key}`);
+
+    const subscribedQuery = this.subscribedQueries.get(key);
+    if (!subscribedQuery) {
+      return;
+    }
+
+    subscribedQuery.windowIds.delete(windowId);
+    if (subscribedQuery.windowIds.size === 0) {
+      this.subscribedQueries.delete(key);
+    }
   }
 
   public clearSubscriptions() {
@@ -152,6 +165,7 @@ export class Mediator {
       this.subscribedQueries.set(id, {
         input: query.input,
         result,
+        windowIds: query.windowIds,
       });
 
       eventBus.publish({

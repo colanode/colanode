@@ -23,6 +23,7 @@ export interface QueryHandler<T extends QueryInput> {
 export type SubscribedQuery<T extends QueryInput> = {
   input: T;
   result: QueryMap[T['type']]['output'];
+  windowIds: Set<string>;
 };
 
 export type ChangeCheckResult<T extends QueryInput> = {

@@ -19,6 +19,7 @@ import {
   PendingPromise,
 } from '@colanode/web/workers/types';
 
+const windowId = generateId(IdType.Window);
 const pendingPromises = new Map<string, PendingPromise>();
 let app: AppService | null = null;
 
@@ -50,7 +51,8 @@ navigator.locks.request('colanode', async () => {
       promise.resolve(result);
     } else if (promise.type === 'query_and_subscribe') {
       const result = await app.mediator.executeQueryAndSubscribe(
-        promise.id,
+        promise.key,
+        promise.windowId,
         promise.input
       );
       promise.resolve(result);
@@ -62,6 +64,14 @@ navigator.locks.request('colanode', async () => {
     pendingPromises.delete(id);
   }
 
+  eventBus.subscribe((event) => {
+    broadcastMessage({
+      type: 'event',
+      windowId,
+      event,
+    });
+  });
+
   await new Promise(() => {});
 });
 
@@ -71,6 +81,10 @@ const broadcastMessage = (message: BroadcastMessage) => {
 
 const handleMessage = async (message: BroadcastMessage) => {
   if (message.type === 'event') {
+    if (message.windowId === windowId) {
+      return;
+    }
+
     eventBus.publish(message.event);
   } else if (message.type === 'mutation') {
     if (!app) {
@@ -101,14 +115,16 @@ const handleMessage = async (message: BroadcastMessage) => {
     }
 
     const result = await app.mediator.executeQueryAndSubscribe(
-      message.id,
+      message.key,
+      message.windowId,
       message.input
     );
 
     broadcastMessage({
       type: 'query_and_subscribe_result',
       queryId: message.queryId,
-      id: message.id,
+      key: message.key,
+      windowId: message.windowId,
       result,
     });
   } else if (message.type === 'query_unsubscribe') {
@@ -116,7 +132,7 @@ const handleMessage = async (message: BroadcastMessage) => {
       return;
     }
 
-    app.mediator.unsubscribeQuery(message.id);
+    app.mediator.unsubscribeQuery(message.key, message.windowId);
   } else if (message.type === 'query_result') {
     const promise = pendingPromises.get(message.queryId);
     if (!promise || promise.type !== 'query') {
@@ -200,16 +216,17 @@ const api: ColanodeWorkerApi = {
     broadcastMessage(message);
     return promise;
   },
-  executeQueryAndSubscribe(id, input) {
+  executeQueryAndSubscribe(key, input) {
     if (app) {
-      return app.mediator.executeQueryAndSubscribe(id, input);
+      return app.mediator.executeQueryAndSubscribe(key, windowId, input);
     }
 
     const queryId = generateId(IdType.Query);
     const message: BroadcastQueryAndSubscribeMessage = {
       type: 'query_and_subscribe',
       queryId,
-      id,
+      key,
+      windowId,
       input,
     };
 
@@ -218,7 +235,8 @@ const api: ColanodeWorkerApi = {
         pendingPromises.set(queryId, {
           type: 'query_and_subscribe',
           queryId,
-          id,
+          key,
+          windowId,
           input,
           resolve,
           reject,
@@ -229,15 +247,16 @@ const api: ColanodeWorkerApi = {
     broadcastMessage(message);
     return promise;
   },
-  unsubscribeQuery(id) {
+  unsubscribeQuery(key) {
     if (app) {
-      app.mediator.unsubscribeQuery(id);
+      app.mediator.unsubscribeQuery(key, windowId);
       return Promise.resolve();
     }
 
     const message: BroadcastQueryUnsubscribeMessage = {
       type: 'query_unsubscribe',
-      id,
+      key,
+      windowId,
     };
 
     broadcastMessage(message);
@@ -251,7 +270,8 @@ const api: ColanodeWorkerApi = {
     throw new Error('App not initialized');
   },
   subscribe(callback) {
-    return Promise.resolve(eventBus.subscribe(callback));
+    const id = eventBus.subscribe(callback);
+    return Promise.resolve(id);
   },
   unsubscribe(subscriptionId) {
     eventBus.unsubscribe(subscriptionId);
@@ -259,10 +279,6 @@ const api: ColanodeWorkerApi = {
   },
   publish(event) {
     eventBus.publish(event);
-    broadcastMessage({
-      type: 'event',
-      event,
-    });
   },
 };
 
