@@ -3,8 +3,8 @@ import React from 'react';
 import { getIdType, IdType } from '@colanode/core';
 import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
 import { IconElement } from '@colanode/ui/components/icons/icon-element';
+import { useApp } from '@colanode/ui/contexts';
 import { useAccount } from '@colanode/ui/contexts/account';
-import { useAsset } from '@colanode/ui/contexts/asset';
 import {
   getAvatarSizeClasses,
   getColorForId,
@@ -81,7 +81,7 @@ const AvatarFallback = ({ id, name, size, className }: AvatarProps) => {
 };
 
 const CustomAvatar = ({ avatar, size, className }: AvatarProps) => {
-  const asset = useAsset();
+  const app = useApp();
   const account = useAccount();
   const [failed, setFailed] = React.useState(false);
 
@@ -93,7 +93,11 @@ const CustomAvatar = ({ avatar, size, className }: AvatarProps) => {
     return <AvatarFallback id={avatar} size={size} className={className} />;
   }
 
-  const url = asset.getAvatarUrl(account.id, avatar);
+  const url =
+    app.type === 'web'
+      ? `/assets/avatars/${account.id}/${avatar}`
+      : `avatar://${account.id}/${avatar}`;
+
   return (
     <img
       src={url}

@@ -1,7 +1,6 @@
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
 import { RootProvider } from '@colanode/ui';
-import { AssetProvider } from '@colanode/web/asset-provider';
 
 export const Root = () => {
   useRegisterSW({
@@ -14,9 +13,5 @@ export const Root = () => {
     },
   });
 
-  return (
-    <AssetProvider>
-      <RootProvider type="web" />
-    </AssetProvider>
-  );
+  return <RootProvider type="web" />;
 };

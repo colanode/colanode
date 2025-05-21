@@ -1,3 +1,5 @@
+/// <reference lib="webworker" />
+
 // Service worker that intercepts requests with the path /asset
 declare const self: ServiceWorkerGlobalScope;
 
@@ -7,7 +9,6 @@ import { WebFileSystem } from '@colanode/web/services/file-system';
 const fs = new WebFileSystem();
 
 const downloadDbs = async () => {
-  console.log('Downloading databases.');
   await Promise.all([downloadEmojis(), downloadIcons()]);
 };
 

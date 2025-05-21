@@ -1,4 +1,4 @@
-import { useAsset } from '@colanode/ui/contexts/asset';
+import { useApp } from '@colanode/ui/contexts';
 
 interface EmojiElementProps {
   id: string;
@@ -7,17 +7,17 @@ interface EmojiElementProps {
 }
 
 export const EmojiElement = ({ id, className, onClick }: EmojiElementProps) => {
-  const asset = useAsset();
+  const app = useApp();
 
-  if (asset.emojiComponent === 'svg') {
+  if (app.type === 'web') {
     return (
       <svg className={className} onClick={onClick}>
-        <use href={asset.getEmojiUrl(id)} />
+        <use href={`/assets/emojis.svg#${id}`} />
       </svg>
     );
   }
 
   return (
-    <img src={asset.getEmojiUrl(id)} className={className} onClick={onClick} />
+    <img src={`asset://emojis/${id}`} className={className} onClick={onClick} />
   );
 };

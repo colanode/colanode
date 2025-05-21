@@ -1,4 +1,4 @@
-import { useAsset } from '@colanode/ui/contexts/asset';
+import { useApp } from '@colanode/ui/contexts';
 
 interface IconElementProps {
   id: string;
@@ -6,15 +6,15 @@ interface IconElementProps {
 }
 
 export const IconElement = ({ id, className }: IconElementProps) => {
-  const asset = useAsset();
+  const app = useApp();
 
-  if (asset.iconComponent === 'svg') {
+  if (app.type === 'web') {
     return (
       <svg className={className}>
-        <use href={asset.getIconUrl(id)} />
+        <use href={`/assets/icons.svg#${id}`} />
       </svg>
     );
   }
 
-  return <img src={asset.getIconUrl(id)} className={className} />;
+  return <img src={`asset://icons/${id}`} className={className} />;
 };

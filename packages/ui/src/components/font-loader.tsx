@@ -1,13 +1,17 @@
-import { useAsset } from '@colanode/ui/contexts/asset';
+import { useApp } from '@colanode/ui/contexts';
 
 export const FontLoader = () => {
-  const asset = useAsset();
+  const app = useApp();
+  const fontUrl =
+    app.type === 'web'
+      ? `/assets/fonts/neotrax.otf`
+      : `asset://fonts/neotrax.otf`;
 
   return (
     <style>{`
       @font-face {
         font-family: 'neotrax';
-        src: url('${asset.getFontUrl('neotrax')}') format('truetype');
+        src: url('${fontUrl}') format('truetype');
         font-weight: normal;
         font-style: normal;
       }
