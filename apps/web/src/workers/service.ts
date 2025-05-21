@@ -50,3 +50,32 @@ self.addEventListener('install', (event: ExtendableEvent) => {
 self.addEventListener('activate', (event: ExtendableEvent) => {
   event.waitUntil(self.clients.claim());
 });
+
+self.addEventListener('fetch', (event: FetchEvent) => {
+  if (event.request.url.includes('/assets/avatars')) {
+    event.respondWith(
+      (async () => {
+        const path = event.request.url.split('/assets/avatars/')[1];
+        const [accountId, avatarId] = path?.split('/') ?? [];
+
+        if (!accountId || !avatarId) {
+          return new Response('Not found', { status: 404 });
+        }
+
+        const avatarPath = paths.accountAvatar(accountId, avatarId);
+        const exists = await fs.exists(avatarPath);
+
+        if (!exists) {
+          return new Response('Not found', { status: 404 });
+        }
+
+        const fileBuffer = await fs.readFile(avatarPath);
+        return new Response(fileBuffer, {
+          headers: {
+            'Content-Type': 'image/jpeg',
+          },
+        });
+      })()
+    );
+  }
+});

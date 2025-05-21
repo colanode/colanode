@@ -39,6 +39,7 @@ export enum IdType {
   OtpCode = 'ot',
   Mention = 'me',
   Window = 'wi',
+  TempFile = 'tf',
 }
 
 export const generateId = (type: IdType): string => {

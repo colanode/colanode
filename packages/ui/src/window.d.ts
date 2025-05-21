@@ -1,4 +1,3 @@
-import { CommandInput, CommandMap } from '@colanode/client/commands';
 import { EventBus } from '@colanode/client/lib';
 import { MutationInput, MutationResult } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
@@ -16,9 +15,7 @@ export interface ColanodeApi {
     input: T
   ) => Promise<QueryMap[T['type']]['output']>;
   unsubscribeQuery: (key: string) => Promise<void>;
-  executeCommand: <T extends CommandInput>(
-    input: T
-  ) => Promise<CommandMap[T['type']]['output']>;
+  saveTempFile: (file: File) => Promise<string>;
 }
 
 declare global {

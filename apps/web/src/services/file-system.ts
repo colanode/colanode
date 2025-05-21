@@ -217,6 +217,7 @@ export class WebFileSystem implements FileSystem {
     const { parent, name } = await this.getFileLocation(path, false);
     const fileHandle = await parent.getFileHandle(name);
     const file = await fileHandle.getFile();
+
     return {
       lastModified: file.lastModified,
       size: file.size,

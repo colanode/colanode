@@ -24,6 +24,7 @@
     "coverage": "vitest run --coverage "
   },
   "dependencies": {
+    "file-type": "^20.5.0",
     "isomorphic-ws": "^5.0.0"
   }
 }

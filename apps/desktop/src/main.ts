@@ -6,12 +6,12 @@ import {
   shell,
   globalShortcut,
 } from 'electron';
+import fs from 'fs/promises';
 import path from 'path';
 
 import started from 'electron-squirrel-startup';
 import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
 
-import { CommandInput, CommandMap } from '@colanode/client/commands';
 import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationMap } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
@@ -225,11 +225,18 @@ ipcMain.handle(
 );
 
 ipcMain.handle(
-  'execute-command',
-  async <T extends CommandInput>(
+  'save-temp-file',
+  async (
     _: unknown,
-    input: T
-  ): Promise<CommandMap[T['type']]['output']> => {
-    return app.mediator.executeCommand(input);
+    file: { name: string; size: number; type: string; buffer: Buffer }
+  ): Promise<string> => {
+    const extension = path.extname(file.name);
+    const baseName = path.basename(file.name, extension);
+    const newFileName = `${baseName}${extension}`;
+    const filePath = app.paths.tempFile(newFileName);
+
+    await fs.writeFile(filePath, file.buffer);
+
+    return newFileName;
   }
 );

@@ -38,10 +38,6 @@ const DOWNLOAD_RETRIES_LIMIT = 10;
 
 const debug = createDebugger('desktop:service:file');
 
-const getFileMetadata = (_: string): FileMetadata | null => {
-  return null;
-};
-
 const path = {
   join: (_: string, __: string) => '',
   parse: (_: string) => ({
@@ -50,11 +46,14 @@ const path = {
   dirname: (_: string) => '',
 };
 
+const getFileMetadata = (_: string): FileMetadata | null => {
+  return null;
+};
+
 export class FileService {
   private readonly app: AppService;
   private readonly workspace: WorkspaceService;
   private readonly filesDir: string;
-  private readonly tempFilesDir: string;
 
   private readonly uploadsEventLoop: EventLoop;
   private readonly downloadsEventLoop: EventLoop;
@@ -68,13 +67,7 @@ export class FileService {
       this.workspace.id
     );
 
-    this.tempFilesDir = this.workspace.account.app.paths.workspaceTempFiles(
-      this.workspace.accountId,
-      this.workspace.id
-    );
-
     this.app.fs.makeDirectory(this.filesDir);
-    this.app.fs.makeDirectory(this.tempFilesDir);
 
     this.uploadsEventLoop = new EventLoop(
       ms('1 minute'),
@@ -97,7 +90,6 @@ export class FileService {
       ms('5 minutes'),
       () => {
         this.cleanDeletedFiles();
-        this.cleanTempFiles();
       }
     );
 
@@ -236,7 +228,7 @@ export class FileService {
     // temp files directory it means it has been pasted or dragged
     // therefore we need to delete it
     const fileDirectory = path.dirname(filePath);
-    if (fileDirectory === this.tempFilesDir) {
+    if (fileDirectory === this.app.paths.temp) {
       await this.app.fs.delete(filePath);
     }
   }
@@ -661,32 +653,6 @@ export class FileService {
 
         const filePath = path.join(this.filesDir, fileIdMap[fileId]!);
         await this.app.fs.delete(filePath);
-      }
-    }
-  }
-
-  public async cleanTempFiles(): Promise<void> {
-    debug(`Checking temp files for workspace ${this.workspace.id}`);
-
-    const exists = await this.app.fs.exists(this.tempFilesDir);
-    if (!exists) {
-      return;
-    }
-
-    const files = await this.app.fs.listFiles(this.tempFilesDir);
-    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-
-    for (const file of files) {
-      const filePath = path.join(this.tempFilesDir, file);
-      const metadata = await this.app.fs.metadata(filePath);
-
-      if (metadata.lastModified < oneDayAgo) {
-        try {
-          await this.app.fs.delete(filePath);
-          debug(`Deleted old temp file: ${filePath}`);
-        } catch (error) {
-          debug(`Failed to delete temp file: ${filePath}`, error);
-        }
       }
     }
   }

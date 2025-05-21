@@ -63,50 +63,14 @@ export const handleAvatarRequest = async (
     return new Response(null, { status: 400 });
   }
 
-  const avatarsDir = app.paths.account(accountId);
-  const avatarPath = path.join(avatarsDir, `${avatarId}.jpeg`);
+  const avatarPath = app.paths.accountAvatar(accountId, avatarId);
   const avatarLocalUrl = `file://${avatarPath}`;
 
-  // Check if the avatar file already exists
-  if (fs.existsSync(avatarPath)) {
-    return net.fetch(avatarLocalUrl);
-  }
-
-  // Download the avatar file if it doesn't exist
-  const account = app.getAccount(accountId);
-
-  if (!account) {
+  if (!fs.existsSync(avatarPath)) {
     return new Response(null, { status: 404 });
   }
 
-  const response = await account.client.get<NodeJS.ReadableStream>(
-    `/v1/avatars/${avatarId}`,
-    {
-      responseType: 'stream',
-    }
-  );
-
-  if (response.status !== 200 || !response.data) {
-    return new Response(null, { status: 404 });
-  }
-
-  if (!fs.existsSync(avatarsDir)) {
-    fs.mkdirSync(avatarsDir, { recursive: true });
-  }
-
-  const fileStream = fs.createWriteStream(avatarPath);
-
-  return new Promise((resolve, reject) => {
-    response.data.pipe(fileStream);
-
-    fileStream.on('finish', async () => {
-      resolve(net.fetch(avatarLocalUrl));
-    });
-
-    fileStream.on('error', (err) => {
-      reject(new Response(null, { status: 500, statusText: err.message }));
-    });
-  });
+  return net.fetch(avatarLocalUrl);
 };
 
 export const handleFilePreviewRequest = async (

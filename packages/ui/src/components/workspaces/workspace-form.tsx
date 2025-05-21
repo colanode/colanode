@@ -19,6 +19,7 @@ import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { Textarea } from '@colanode/ui/components/ui/textarea';
 import { useAccount } from '@colanode/ui/contexts/account';
+import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { toast } from '@colanode/ui/hooks/use-toast';
 import { cn } from '@colanode/ui/lib/utils';
@@ -51,8 +52,10 @@ export const WorkspaceForm = ({
   const account = useAccount();
 
   const id = React.useRef(generateId(IdType.Workspace));
-  const [isFileDialogOpen, setIsFileDialogOpen] = React.useState(false);
   const { mutate, isPending } = useMutation();
+  const { isOpen, open } = useFileDialog({
+    accept: 'image/jpeg, image/jpg, image/png, image/webp',
+  });
 
   const form = useForm<formSchemaType>({
     resolver: zodResolver(formSchema),
@@ -74,49 +77,42 @@ export const WorkspaceForm = ({
             <div
               className="group relative cursor-pointer"
               onClick={async () => {
-                if (isPending || isFileDialogOpen || readOnly) {
+                if (isPending || isOpen || readOnly) {
                   return;
                 }
 
-                setIsFileDialogOpen(true);
-                const result = await window.colanode.executeCommand({
-                  type: 'file_dialog_open',
-                  options: {
-                    properties: ['openFile'],
-                    filters: [
-                      { name: 'Images', extensions: ['jpg', 'png', 'jpeg'] },
-                    ],
-                  },
-                });
+                open({
+                  onSelect(files) {
+                    const file = files[0];
+                    if (!file) {
+                      return;
+                    }
 
-                if (result.canceled || !result.filePaths.length) {
-                  setIsFileDialogOpen(false);
-                  return;
-                }
-
-                const filePath = result.filePaths[0];
-                if (!filePath) {
-                  setIsFileDialogOpen(false);
-                  return;
-                }
-
-                mutate({
-                  input: {
-                    type: 'avatar_upload',
-                    accountId: account.id,
-                    filePath: filePath,
+                    mutate({
+                      input: {
+                        type: 'avatar_upload',
+                        accountId: account.id,
+                        fileName: file,
+                      },
+                      onSuccess(output) {
+                        form.setValue('avatar', output.id);
+                      },
+                      onError(error) {
+                        toast({
+                          title: 'Failed to upload avatar',
+                          description: error.message,
+                          variant: 'destructive',
+                        });
+                      },
+                    });
                   },
-                  onSuccess(output) {
-                    form.setValue('avatar', output.id);
-                    setIsFileDialogOpen(false);
-                  },
-                  onError(error) {
+                  onError() {
                     toast({
                       title: 'Failed to upload avatar',
-                      description: error.message,
+                      description:
+                        'An error occurred while uploading the avatar. Please try again.',
                       variant: 'destructive',
                     });
-                    setIsFileDialogOpen(false);
                   },
                 });
               }}

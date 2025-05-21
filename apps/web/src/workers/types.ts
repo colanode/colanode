@@ -1,4 +1,3 @@
-import { CommandInput, CommandMap } from '@colanode/client/commands';
 import { EventBus } from '@colanode/client/lib';
 import { MutationInput, MutationResult } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
@@ -17,12 +16,10 @@ export interface ColanodeWorkerApi {
     input: T
   ) => Promise<QueryMap[T['type']]['output']>;
   unsubscribeQuery: (key: string) => Promise<void>;
-  executeCommand: <T extends CommandInput>(
-    input: T
-  ) => Promise<CommandMap[T['type']]['output']>;
   subscribe: (callback: (event: Event) => void) => Promise<string>;
   unsubscribe: (subscriptionId: string) => Promise<void>;
   publish: (event: Event) => void;
+  saveTempFile: (file: File) => Promise<string>;
 }
 
 declare global {
@@ -78,18 +75,6 @@ export type BroadcastQueryUnsubscribeMessage = {
   windowId: string;
 };
 
-export type BroadcastCommandMessage = {
-  type: 'command';
-  commandId: string;
-  input: CommandInput;
-};
-
-export type BroadcastCommandResultMessage = {
-  type: 'command_result';
-  commandId: string;
-  result: CommandMap[CommandInput['type']]['output'];
-};
-
 export type BroadcastEventMessage = {
   type: 'event';
   windowId: string;
@@ -104,8 +89,6 @@ export type BroadcastMessage =
   | BroadcastQueryAndSubscribeMessage
   | BroadcastQueryAndSubscribeResultMessage
   | BroadcastQueryUnsubscribeMessage
-  | BroadcastCommandMessage
-  | BroadcastCommandResultMessage
   | BroadcastEventMessage;
 
 export type PendingQuery = {

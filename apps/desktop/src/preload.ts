@@ -3,7 +3,6 @@
 
 import { contextBridge, ipcRenderer } from 'electron';
 
-import { CommandInput, CommandMap } from '@colanode/client/commands';
 import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationMap } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
@@ -43,10 +42,14 @@ contextBridge.exposeInMainWorld('colanode', {
     return ipcRenderer.invoke('unsubscribe-query', key, windowId);
   },
 
-  executeCommand: <T extends CommandInput>(
-    input: T
-  ): Promise<CommandMap[T['type']]['output']> => {
-    return ipcRenderer.invoke('execute-command', input);
+  saveTempFile: async (file: File): Promise<string> => {
+    const arrayBuffer = await file.arrayBuffer();
+    return ipcRenderer.invoke('save-temp-file', {
+      buffer: Buffer.from(arrayBuffer),
+      name: file.name,
+      type: file.type,
+      size: file.size,
+    });
   },
 });
 

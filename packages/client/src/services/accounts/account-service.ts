@@ -88,6 +88,15 @@ export class AccountService {
 
   public async init(): Promise<void> {
     await this.migrate();
+    await this.app.fs.makeDirectory(this.app.paths.account(this.account.id));
+    await this.app.fs.makeDirectory(
+      this.app.paths.accountAvatars(this.account.id)
+    );
+
+    if (this.account.avatar) {
+      await this.downloadAvatar(this.account.avatar);
+    }
+
     this.connection.init();
     this.eventLoop.start();
 
@@ -166,6 +175,28 @@ export class AccountService {
     });
 
     await migrator.migrateToLatest();
+  }
+
+  public async downloadAvatar(avatar: string): Promise<void> {
+    try {
+      const avatarPath = this.app.paths.accountAvatar(this.account.id, avatar);
+
+      const exists = await this.app.fs.exists(avatarPath);
+      if (exists) {
+        return;
+      }
+
+      const response = await this.client.get<ArrayBuffer>(
+        `/v1/avatars/${avatar}`,
+        { responseType: 'arraybuffer' }
+      );
+
+      const avatarBytes = new Uint8Array(response.data);
+      await this.app.fs.writeFile(avatarPath, avatarBytes);
+    } catch (err) {
+      console.error(err);
+      debug(`Error downloading avatar for account ${this.account.id}: ${err}`);
+    }
   }
 
   private async initWorkspaces(): Promise<void> {
@@ -256,6 +287,10 @@ export class AccountService {
         return;
       }
 
+      if (updatedAccount.avatar) {
+        await this.downloadAvatar(updatedAccount.avatar);
+      }
+
       debug(`Updated account ${this.account.email} after sync`);
       const account = mapAccount(updatedAccount);
       this.updateAccount(account);
@@ -290,6 +325,10 @@ export class AccountService {
             continue;
           }
 
+          if (createdWorkspace.avatar) {
+            await this.downloadAvatar(createdWorkspace.avatar);
+          }
+
           const mappedWorkspace = mapWorkspace(createdWorkspace);
           await this.initWorkspace(mappedWorkspace);
 
@@ -315,6 +354,10 @@ export class AccountService {
           if (updatedWorkspace) {
             const mappedWorkspace = mapWorkspace(updatedWorkspace);
             workspaceService.updateWorkspace(mappedWorkspace);
+
+            if (updatedWorkspace.avatar) {
+              await this.downloadAvatar(updatedWorkspace.avatar);
+            }
 
             eventBus.publish({
               type: 'workspace_updated',

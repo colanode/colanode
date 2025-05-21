@@ -12,7 +12,8 @@ dotenv.config();
 const init = async () => {
   await migrate();
   await initRedis();
-  await initApp();
+
+  initApp();
 
   jobService.initQueue();
   await jobService.initWorker();

@@ -1,4 +1,3 @@
-import fastifyMultipart from '@fastify/multipart';
 import fastifyWebsocket from '@fastify/websocket';
 import { fastify } from 'fastify';
 import {
@@ -14,27 +13,20 @@ import { clientRoutes } from '@colanode/server/api/client/routes';
 
 const debug = createDebugger('server:app');
 
-export const initApp = async () => {
+export const initApp = () => {
   const server = fastify({
     bodyLimit: 10 * 1024 * 1024, // 10MB
   });
 
-  // register the global error handler in the beginning of the app
   server.register(errorHandler);
 
   server.setSerializerCompiler(serializerCompiler);
   server.setValidatorCompiler(validatorCompiler);
 
-  await server.register(fastifyMultipart, {
-    limits: {
-      fileSize: 10 * 1024 * 1024, // 10MB
-    },
-  });
-
-  await server.register(corsPlugin);
-  await server.register(fastifyWebsocket);
-  await server.register(clientDecorator);
-  await server.register(clientRoutes, { prefix: '/client/v1' });
+  server.register(corsPlugin);
+  server.register(fastifyWebsocket);
+  server.register(clientDecorator);
+  server.register(clientRoutes, { prefix: '/client/v1' });
 
   server.get('/', (_, reply) => {
     reply.send(

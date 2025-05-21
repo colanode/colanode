@@ -1,10 +1,5 @@
 import { isEqual } from 'lodash-es';
 
-import { CommandInput, CommandMap } from '@colanode/client/commands';
-import {
-  buildCommandHandlerMap,
-  CommandHandlerMap,
-} from '@colanode/client/handlers/commands';
 import {
   buildMutationHandlerMap,
   MutationHandlerMap,
@@ -16,7 +11,6 @@ import {
 import { eventBus } from '@colanode/client/lib/event-bus';
 import {
   MutationHandler,
-  CommandHandler,
   QueryHandler,
   SubscribedQuery,
 } from '@colanode/client/lib/types';
@@ -37,7 +31,6 @@ export class Mediator {
   private readonly app: AppService;
   private readonly queryHandlerMap: QueryHandlerMap;
   private readonly mutationHandlerMap: MutationHandlerMap;
-  private readonly commandHandlerMap: CommandHandlerMap;
 
   private readonly subscribedQueries: Map<string, SubscribedQuery<QueryInput>> =
     new Map();
@@ -49,7 +42,6 @@ export class Mediator {
     this.app = app;
     this.queryHandlerMap = buildQueryHandlerMap(app);
     this.mutationHandlerMap = buildMutationHandlerMap(app);
-    this.commandHandlerMap = buildCommandHandlerMap(app);
 
     eventBus.subscribe((event: Event) => {
       if (event.type === 'query_result_updated') {
@@ -217,21 +209,5 @@ export class Mediator {
         },
       };
     }
-  }
-
-  public async executeCommand<T extends CommandInput>(
-    input: T
-  ): Promise<CommandMap[T['type']]['output']> {
-    debug(`Executing command: ${input.type}`);
-
-    const handler = this.commandHandlerMap[
-      input.type
-    ] as unknown as CommandHandler<T>;
-
-    if (!handler) {
-      throw new Error(`No handler found for command type: ${input.type}`);
-    }
-
-    return handler.handleCommand(input);
   }
 }

@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Upload } from 'lucide-react';
-import React from 'react';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
 
@@ -17,6 +16,7 @@ import {
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { toast } from '@colanode/ui/hooks/use-toast';
 import { cn } from '@colanode/ui/lib/utils';
@@ -32,8 +32,9 @@ type formSchemaType = z.infer<typeof formSchema>;
 export const AccountUpdate = ({ account }: { account: Account }) => {
   const { mutate: uploadAvatar, isPending: isUploadingAvatar } = useMutation();
   const { mutate: updateAccount, isPending: isUpdatingAccount } = useMutation();
-
-  const [isFileDialogOpen, setIsFileDialogOpen] = React.useState(false);
+  const { isOpen, open } = useFileDialog({
+    accept: 'image/jpeg, image/jpg, image/png, image/webp',
+  });
 
   const form = useForm<formSchemaType>({
     resolver: zodResolver(formSchema),
@@ -84,55 +85,44 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
             <div
               className="group relative cursor-pointer"
               onClick={async () => {
-                if (
-                  isUpdatingAccount ||
-                  isUploadingAvatar ||
-                  isFileDialogOpen
-                ) {
+                if (isUpdatingAccount || isUploadingAvatar || isOpen) {
                   return;
                 }
 
-                setIsFileDialogOpen(true);
-                const result = await window.colanode.executeCommand({
-                  type: 'file_dialog_open',
-                  options: {
-                    properties: ['openFile'],
-                    filters: [
-                      { name: 'Images', extensions: ['jpg', 'png', 'jpeg'] },
-                    ],
-                  },
-                });
-
-                if (result.canceled || !result.filePaths.length) {
-                  setIsFileDialogOpen(false);
-                  return;
-                }
-
-                const filePath = result.filePaths[0];
-                if (!filePath) {
-                  setIsFileDialogOpen(false);
-                  return;
-                }
-
-                uploadAvatar({
-                  input: {
-                    type: 'avatar_upload',
-                    accountId: account.id,
-                    filePath: filePath,
-                  },
-                  onSuccess(output) {
-                    if (output.id) {
-                      form.setValue('avatar', output.id);
+                open({
+                  onSelect(files) {
+                    const file = files[0];
+                    if (!file) {
+                      return;
                     }
-                    setIsFileDialogOpen(false);
+
+                    uploadAvatar({
+                      input: {
+                        type: 'avatar_upload',
+                        accountId: account.id,
+                        fileName: file,
+                      },
+                      onSuccess(output) {
+                        if (output.id) {
+                          form.setValue('avatar', output.id);
+                        }
+                      },
+                      onError(error) {
+                        toast({
+                          title: 'Failed to upload avatar',
+                          description: error.message,
+                          variant: 'destructive',
+                        });
+                      },
+                    });
                   },
-                  onError(error) {
+                  onError() {
                     toast({
                       title: 'Failed to upload avatar',
-                      description: error.message,
+                      description:
+                        'An error occurred while uploading the avatar. Please try again.',
                       variant: 'destructive',
                     });
-                    setIsFileDialogOpen(false);
                   },
                 });
               }}

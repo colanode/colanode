@@ -21,6 +21,8 @@ import {
 
 const windowId = generateId(IdType.Window);
 const pendingPromises = new Map<string, PendingPromise>();
+
+const fs = new WebFileSystem();
 let app: AppService | null = null;
 
 const broadcast = new BroadcastChannel('colanode');
@@ -29,12 +31,7 @@ broadcast.onmessage = (event) => {
 };
 
 navigator.locks.request('colanode', async () => {
-  app = new AppService(
-    new WebFileSystem(),
-    appBuild,
-    new WebKyselyService(),
-    paths
-  );
+  app = new AppService(fs, appBuild, new WebKyselyService(), paths);
 
   await app.migrate();
   await app.init();
@@ -262,13 +259,6 @@ const api: ColanodeWorkerApi = {
     broadcastMessage(message);
     return Promise.resolve();
   },
-  executeCommand(input) {
-    if (app) {
-      return app.mediator.executeCommand(input);
-    }
-
-    throw new Error('App not initialized');
-  },
   subscribe(callback) {
     const id = eventBus.subscribe(callback);
     return Promise.resolve(id);
@@ -279,6 +269,17 @@ const api: ColanodeWorkerApi = {
   },
   publish(event) {
     eventBus.publish(event);
+  },
+  async saveTempFile(file) {
+    const fileId = generateId(IdType.TempFile);
+    const extension = file.name.substring(file.name.lastIndexOf('.'));
+    const newFileName = `${fileId}${extension}`;
+
+    const arrayBuffer = await file.arrayBuffer();
+    const fileData = new Uint8Array(arrayBuffer);
+
+    await fs.writeFile(paths.tempFile(newFileName), fileData);
+    return newFileName;
   },
 };
 

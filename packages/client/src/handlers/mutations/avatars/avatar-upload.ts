@@ -1,6 +1,4 @@
-// import FormData from 'form-data';
-
-// import fs from 'fs';
+import { fileTypeFromBuffer } from 'file-type';
 
 import { MutationHandler } from '@colanode/client/lib/types';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
@@ -10,9 +8,9 @@ import {
 } from '@colanode/client/mutations/avatars/avatar-upload';
 import { AppService } from '@colanode/client/services/app-service';
 
-// interface AvatarUploadResponse {
-//   id: string;
-// }
+interface AvatarUploadResponse {
+  id: string;
+}
 
 export class AvatarUploadMutationHandler
   implements MutationHandler<AvatarUploadMutationInput>
@@ -35,29 +33,51 @@ export class AvatarUploadMutationHandler
       );
     }
 
-    throw new Error('Not implemented');
+    try {
+      const filePath = `${this.app.paths.temp}/${input.fileName}`;
+      const fileExists = await this.app.fs.exists(filePath);
 
-    // try {
-    //   const filePath = input.filePath;
-    //   const fileStream = fs.createReadStream(filePath);
+      if (!fileExists) {
+        throw new Error(`File ${filePath} does not exist`);
+      }
 
-    //   const formData = new FormData();
-    //   formData.append('avatar', fileStream);
+      const fileBuffer = await this.app.fs.readFile(filePath);
+      const fileType = await fileTypeFromBuffer(fileBuffer);
 
-    //   const { data } = await account.client.post<AvatarUploadResponse>(
-    //     '/v1/avatars',
-    //     formData,
-    //     {
-    //       headers: formData.getHeaders(),
-    //     }
-    //   );
+      if (!fileType) {
+        throw new Error('Could not determine file type');
+      }
 
-    //   return {
-    //     id: data.id,
-    //   };
-    // } catch (error) {
-    //   const apiError = parseApiError(error);
-    //   throw new MutationError(MutationErrorCode.ApiError, apiError.message);
-    // }
+      const { data } = await account.client.post<AvatarUploadResponse>(
+        '/v1/avatars',
+        fileBuffer,
+        {
+          headers: {
+            'Content-Type': fileType.mime,
+          },
+        }
+      );
+
+      await account.downloadAvatar(data.id);
+
+      return {
+        id: data.id,
+      };
+    } catch (error) {
+      if (error instanceof Error) {
+        throw new MutationError(MutationErrorCode.ApiError, error.message);
+      }
+      throw new MutationError(
+        MutationErrorCode.ApiError,
+        'Unknown error occurred'
+      );
+    } finally {
+      try {
+        const filePath = `${this.app.paths.temp}/${input.fileName}`;
+        await this.app.fs.delete(filePath);
+      } catch {
+        // Ignore cleanup errors
+      }
+    }
   }
 }

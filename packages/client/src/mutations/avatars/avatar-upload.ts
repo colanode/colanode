@@ -1,7 +1,7 @@
 export type AvatarUploadMutationInput = {
   type: 'avatar_upload';
   accountId: string;
-  filePath: string;
+  fileName: string;
 };
 
 export type AvatarUploadMutationOutput = {

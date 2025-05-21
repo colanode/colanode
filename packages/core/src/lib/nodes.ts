@@ -27,6 +27,16 @@ export const extractNodeName = (attributes: NodeAttributes): string | null => {
   return null;
 };
 
+export const extractNodeAvatar = (
+  attributes: NodeAttributes
+): string | null => {
+  if ('avatar' in attributes && attributes.avatar) {
+    return attributes.avatar as string;
+  }
+
+  return null;
+};
+
 export const extractNodeRole = (
   tree: Node | Node[],
   collaboratorId: string

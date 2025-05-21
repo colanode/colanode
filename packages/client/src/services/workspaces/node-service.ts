@@ -25,6 +25,7 @@ import {
   CanCreateNodeContext,
   CanUpdateAttributesContext,
   CanDeleteNodeContext,
+  extractNodeAvatar,
 } from '@colanode/core';
 import { decodeState, encodeState, YDoc } from '@colanode/crdt';
 
@@ -193,11 +194,14 @@ export class NodeService {
 
     debug(`Created node ${createdNode.id} with type ${createdNode.type}`);
 
+    const node = mapNode(createdNode);
+    await this.downloadNodeAvatar(node.attributes);
+
     eventBus.publish({
       type: 'node_created',
       accountId: this.workspace.accountId,
       workspaceId: this.workspace.id,
-      node: mapNode(createdNode),
+      node,
     });
 
     for (const createdNodeReference of createdNodeReferences) {
@@ -383,11 +387,14 @@ export class NodeService {
     if (updatedNode) {
       debug(`Updated node ${updatedNode.id} with type ${updatedNode.type}`);
 
+      const node = mapNode(updatedNode);
+      await this.downloadNodeAvatar(node.attributes);
+
       eventBus.publish({
         type: 'node_updated',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
-        node: mapNode(updatedNode),
+        node,
       });
     } else {
       debug(`Failed to update node ${nodeId}`);
@@ -611,11 +618,14 @@ export class NodeService {
 
     debug(`Created node ${createdNode.id} with type ${createdNode.type}`);
 
+    const node = mapNode(createdNode);
+    await this.downloadNodeAvatar(node.attributes);
+
     eventBus.publish({
       type: 'node_created',
       accountId: this.workspace.accountId,
       workspaceId: this.workspace.id,
-      node: mapNode(createdNode),
+      node,
     });
 
     for (const createdNodeReference of createdNodeReferences) {
@@ -761,11 +771,14 @@ export class NodeService {
 
     debug(`Updated node ${updatedNode.id} with type ${updatedNode.type}`);
 
+    const node = mapNode(updatedNode);
+    await this.downloadNodeAvatar(node.attributes);
+
     eventBus.publish({
       type: 'node_updated',
       accountId: this.workspace.accountId,
       workspaceId: this.workspace.id,
-      node: mapNode(updatedNode),
+      node,
     });
 
     for (const createdNodeReference of createdNodeReferences) {
@@ -1106,5 +1119,13 @@ export class NodeService {
     }
 
     return false;
+  }
+
+  private async downloadNodeAvatar(attributes: NodeAttributes) {
+    const avatar = extractNodeAvatar(attributes);
+
+    if (avatar) {
+      await this.workspace.account.downloadAvatar(avatar);
+    }
   }
 }

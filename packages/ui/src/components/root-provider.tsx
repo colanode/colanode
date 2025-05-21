@@ -64,7 +64,7 @@ export const RootProvider = ({ type }: RootProviderProps) => {
     <QueryClientProvider client={queryClient}>
       <DndProvider backend={HTML5Backend}>
         <TooltipProvider>
-          <FontLoader />
+          <FontLoader type={type} />
           <App type={type} />
         </TooltipProvider>
         <Toaster />

@@ -1,4 +1,3 @@
-export * from './commands';
 export * from './mutations';
 export * from './queries';
 export * from './mediator';

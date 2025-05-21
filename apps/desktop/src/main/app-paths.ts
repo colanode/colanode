@@ -58,6 +58,8 @@ export const paths: AppPaths = {
   app: appPath,
   appDatabase: appDatabasePath,
   accounts: accountsDirectoryPath,
+  temp: path.join(appPath, 'temp'),
+  tempFile: (name: string) => path.join(appPath, 'temp', name),
   account: (accountId: string) => getAccountDirectoryPath(accountId),
   accountDatabase: (accountId: string) =>
     path.join(getAccountDirectoryPath(accountId), 'account.db'),
@@ -70,10 +72,10 @@ export const paths: AppPaths = {
     ),
   workspaceFiles: (accountId: string, workspaceId: string) =>
     getWorkspaceFilesDirectoryPath(accountId, workspaceId),
-  workspaceTempFiles: (accountId: string, workspaceId: string) =>
-    getWorkspaceTempFilesDirectoryPath(accountId, workspaceId),
   accountAvatars: (accountId: string) =>
     getAccountAvatarsDirectoryPath(accountId),
+  accountAvatar: (accountId: string, avatarId: string) =>
+    path.join(getAccountAvatarsDirectoryPath(accountId), avatarId + '.jpeg'),
   assets: getAssetsSourcePath(),
   fonts: path.join(getAssetsSourcePath(), 'fonts'),
   emojisDatabase: path.join(getAssetsSourcePath(), 'emojis.db'),

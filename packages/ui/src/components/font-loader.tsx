@@ -1,11 +1,12 @@
-import { useApp } from '@colanode/ui/contexts';
+import { AppType } from '@colanode/client/types';
 
-export const FontLoader = () => {
-  const app = useApp();
+interface FontLoaderProps {
+  type: AppType;
+}
+
+export const FontLoader = ({ type }: FontLoaderProps) => {
   const fontUrl =
-    app.type === 'web'
-      ? `/assets/fonts/neotrax.otf`
-      : `asset://fonts/neotrax.otf`;
+    type === 'web' ? `/assets/fonts/neotrax.otf` : `asset://fonts/neotrax.otf`;
 
   return (
     <style>{`

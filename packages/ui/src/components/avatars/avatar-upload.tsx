@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useAccount } from '@colanode/ui/contexts/account';
+import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { toast } from '@colanode/ui/hooks/use-toast';
 
@@ -13,8 +14,10 @@ interface AvatarUploadProps {
 export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
   const account = useAccount();
   const { mutate, isPending } = useMutation();
+  const { isOpen, open } = useFileDialog({
+    accept: 'image/jpeg, image/jpg, image/png, image/webp',
+  });
 
-  const [isFileDialogOpen, setIsFileDialogOpen] = React.useState(false);
   const [url, setUrl] = React.useState<string | undefined>(undefined);
 
   const handleSubmit = async (_: string) => {
@@ -54,49 +57,43 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
         type="button"
         className="w-full"
         variant="outline"
-        disabled={isPending || isFileDialogOpen}
+        disabled={isPending || isOpen}
         onClick={async () => {
-          if (isPending || isFileDialogOpen) {
+          if (isPending || isOpen) {
             return;
           }
 
-          setIsFileDialogOpen(true);
-          const result = await window.colanode.executeCommand({
-            type: 'file_dialog_open',
-            options: {
-              properties: ['openFile'],
-              filters: [{ name: 'Images', extensions: ['jpg', 'png', 'jpeg'] }],
-            },
-          });
+          open({
+            onSelect(files) {
+              const file = files[0];
+              if (!file) {
+                return;
+              }
 
-          if (result.canceled || !result.filePaths.length) {
-            setIsFileDialogOpen(false);
-            return;
-          }
-
-          const filePath = result.filePaths[0];
-          if (!filePath) {
-            setIsFileDialogOpen(false);
-            return;
-          }
-
-          mutate({
-            input: {
-              type: 'avatar_upload',
-              accountId: account.id,
-              filePath: filePath,
+              mutate({
+                input: {
+                  type: 'avatar_upload',
+                  accountId: account.id,
+                  fileName: file,
+                },
+                onSuccess(output) {
+                  onUpload(output.id);
+                },
+                onError(error) {
+                  toast({
+                    title: 'Failed to upload avatar',
+                    description: error.message,
+                    variant: 'destructive',
+                  });
+                },
+              });
             },
-            onSuccess(output) {
-              onUpload(output.id);
-              setIsFileDialogOpen(false);
-            },
-            onError(error) {
+            onError() {
               toast({
                 title: 'Failed to upload avatar',
-                description: error.message,
+                description: 'An error occurred while uploading the avatar.',
                 variant: 'destructive',
               });
-              setIsFileDialogOpen(false);
             },
           });
         }}

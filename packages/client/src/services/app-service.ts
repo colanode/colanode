@@ -121,6 +121,8 @@ export class AppService {
   public async init(): Promise<void> {
     await this.initServers();
     await this.initAccounts();
+    await this.fs.makeDirectory(this.paths.temp);
+
     this.cleanupEventLoop.start();
   }
 
@@ -218,6 +220,7 @@ export class AppService {
 
   private async cleanup(): Promise<void> {
     await this.syncDeletedTokens();
+    await this.cleanTempFiles();
   }
 
   private async syncDeletedTokens(): Promise<void> {
@@ -288,6 +291,31 @@ export class AppService {
           `Failed to logout account ${deletedToken.account_id} from server ${deletedToken.domain}`,
           error
         );
+      }
+    }
+  }
+
+  private async cleanTempFiles(): Promise<void> {
+    debug(`Cleaning temp files`);
+
+    const exists = await this.fs.exists(this.paths.temp);
+    if (!exists) {
+      return;
+    }
+
+    const filePaths = await this.fs.listFiles(this.paths.temp);
+    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+
+    for (const filePath of filePaths) {
+      const metadata = await this.fs.metadata(filePath);
+
+      if (metadata.lastModified < oneDayAgo) {
+        try {
+          await this.fs.delete(filePath);
+          debug(`Deleted old temp file: ${filePath}`);
+        } catch (error) {
+          debug(`Failed to delete temp file: ${filePath}`, error);
+        }
       }
     }
   }
