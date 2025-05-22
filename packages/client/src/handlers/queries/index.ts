@@ -6,6 +6,7 @@ import { AccountGetQueryHandler } from './accounts/account-get';
 import { AccountMetadataListQueryHandler } from './accounts/account-metadata-list';
 import { AccountListQueryHandler } from './accounts/accounts-list';
 import { AppMetadataListQueryHandler } from './apps/app-metadata-list';
+import { AvatarUrlGetQueryHandler } from './avatars/avatar-url-get';
 import { ChatListQueryHandler } from './chats/chat-list';
 import { DatabaseListQueryHandler } from './databases/database-list';
 import { DatabaseViewListQueryHandler } from './databases/database-view-list';
@@ -18,7 +19,6 @@ import { EmojiGetBySkinIdQueryHandler } from './emojis/emoji-get-by-skin-id';
 import { EmojiListQueryHandler } from './emojis/emoji-list';
 import { EmojiSearchQueryHandler } from './emojis/emoji-search';
 import { FileListQueryHandler } from './files/file-list';
-import { FileMetadataGetQueryHandler } from './files/file-metadata-get';
 import { FileStateGetQueryHandler } from './files/file-state-get';
 import { IconCategoryListQueryHandler } from './icons/icon-category-list';
 import { IconListQueryHandler } from './icons/icon-list';
@@ -48,6 +48,7 @@ export type QueryHandlerMap = {
 export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
   return {
     app_metadata_list: new AppMetadataListQueryHandler(app),
+    avatar_url_get: new AvatarUrlGetQueryHandler(app),
     account_list: new AccountListQueryHandler(app),
     message_list: new MessageListQueryHandler(app),
     node_reaction_list: new NodeReactionsListQueryHandler(app),
@@ -70,7 +71,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     icon_category_list: new IconCategoryListQueryHandler(app),
     node_children_get: new NodeChildrenGetQueryHandler(app),
     radar_data_get: new RadarDataGetQueryHandler(app),
-    file_metadata_get: new FileMetadataGetQueryHandler(),
     account_get: new AccountGetQueryHandler(app),
     workspace_get: new WorkspaceGetQueryHandler(app),
     database_list: new DatabaseListQueryHandler(app),

@@ -24,8 +24,6 @@ import {
 import { app } from '@colanode/desktop/main/app-service';
 import {
   handleAssetRequest,
-  handleAvatarRequest,
-  handleTempFileRequest,
   handleFileRequest,
 } from '@colanode/desktop/main/protocols';
 
@@ -122,21 +120,9 @@ const createWindow = async () => {
     }
   });
 
-  if (!protocol.isProtocolHandled('avatar')) {
-    protocol.handle('avatar', (request) => {
-      return handleAvatarRequest(request);
-    });
-  }
-
   if (!protocol.isProtocolHandled('local-file')) {
     protocol.handle('local-file', (request) => {
       return handleFileRequest(request);
-    });
-  }
-
-  if (!protocol.isProtocolHandled('temp-file')) {
-    protocol.handle('temp-file', (request) => {
-      return handleTempFileRequest(request);
     });
   }
 

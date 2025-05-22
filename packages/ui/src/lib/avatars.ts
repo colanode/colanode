@@ -1,7 +1,17 @@
 import { hashCode, IdType } from '@colanode/core';
 import { defaultIcons } from '@colanode/ui/lib/assets';
 
-export const getAvatarSizeClasses = (size?: string) => {
+export type AvatarSize = 'small' | 'medium' | 'large' | 'extra-large';
+
+export interface AvatarProps {
+  id: string;
+  name?: string | null;
+  avatar?: string | null;
+  size?: AvatarSize;
+  className?: string;
+}
+
+export const getAvatarSizeClasses = (size?: AvatarSize) => {
   if (size === 'small') {
     return 'size-5';
   }

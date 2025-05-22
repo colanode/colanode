@@ -51,10 +51,12 @@ export class AppService {
     this.fs = fs;
     this.path = path;
     this.kysely = kysely;
+
     this.database = kysely.build<AppDatabaseSchema>({
       path: path.appDatabase,
       readonly: false,
     });
+
     this.mediator = new Mediator(this);
     this.asset = new AssetService(this);
 

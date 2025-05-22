@@ -14,7 +14,6 @@ export * from './emojis/emoji-get';
 export * from './emojis/emoji-list';
 export * from './emojis/emoji-search';
 export * from './files/file-list';
-export * from './files/file-metadata-get';
 export * from './files/file-state-get';
 export * from './icons/icon-category-list';
 export * from './icons/icon-list';
@@ -36,6 +35,7 @@ export * from './users/user-search';
 export * from './workspaces/workspace-get';
 export * from './workspaces/workspace-list';
 export * from './workspaces/workspace-metadata-list';
+export * from './avatars/avatar-url-get';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface QueryMap {}

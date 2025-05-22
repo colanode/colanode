@@ -277,6 +277,12 @@ export type NodeCounterDeletedEvent = {
   counter: NodeCounter;
 };
 
+export type AvatarDownloadedEvent = {
+  type: 'avatar_downloaded';
+  accountId: string;
+  avatarId: string;
+};
+
 export type Event =
   | UserCreatedEvent
   | UserUpdatedEvent
@@ -318,4 +324,5 @@ export type Event =
   | NodeReferenceCreatedEvent
   | NodeReferenceDeletedEvent
   | NodeCounterUpdatedEvent
-  | NodeCounterDeletedEvent;
+  | NodeCounterDeletedEvent
+  | AvatarDownloadedEvent;

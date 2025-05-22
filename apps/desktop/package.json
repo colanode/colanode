@@ -37,6 +37,9 @@
     "vite": "^6.3.5"
   },
   "dependencies": {
+    "@colanode/core": "*",
+    "@colanode/client": "*",
+    "@colanode/ui": "*",
     "better-sqlite3": "^11.10.0",
     "electron-squirrel-startup": "^1.0.1",
     "kysely": "^0.28.2",

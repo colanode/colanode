@@ -180,13 +180,13 @@ export class AccountService {
     await migrator.migrateToLatest();
   }
 
-  public async downloadAvatar(avatar: string): Promise<void> {
+  public async downloadAvatar(avatar: string): Promise<boolean> {
     try {
       const avatarPath = this.app.path.accountAvatar(this.account.id, avatar);
 
       const exists = await this.app.fs.exists(avatarPath);
       if (exists) {
-        return;
+        return true;
       }
 
       const response = await this.client.get<ArrayBuffer>(
@@ -196,10 +196,20 @@ export class AccountService {
 
       const avatarBytes = new Uint8Array(response.data);
       await this.app.fs.writeFile(avatarPath, avatarBytes);
+
+      eventBus.publish({
+        type: 'avatar_downloaded',
+        accountId: this.account.id,
+        avatarId: avatar,
+      });
+
+      return true;
     } catch (err) {
       console.error(err);
       debug(`Error downloading avatar for account ${this.account.id}: ${err}`);
     }
+
+    return false;
   }
 
   private async initWorkspaces(): Promise<void> {

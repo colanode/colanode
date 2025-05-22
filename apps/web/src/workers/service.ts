@@ -57,34 +57,7 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
 self.addEventListener('fetch', (event: FetchEvent) => {
   const url = new URL(event.request.url);
 
-  if (url.pathname.startsWith('/assets/avatars')) {
-    event.respondWith(
-      (async () => {
-        const urlPath = url.pathname.split('/assets/avatars/')[1];
-        const [accountId, avatarId] = urlPath?.split('/') ?? [];
-
-        if (!accountId || !avatarId) {
-          return new Response('Not found', { status: 404 });
-        }
-
-        const avatarPath = path.accountAvatar(accountId, avatarId);
-        const exists = await fs.exists(avatarPath);
-
-        if (!exists) {
-          return new Response('Not found', { status: 404 });
-        }
-
-        const fileBuffer = await fs.readFile(avatarPath);
-        const fileType = await fileTypeFromBuffer(fileBuffer);
-
-        return new Response(fileBuffer, {
-          headers: {
-            'Content-Type': fileType?.mime ?? 'image/jpeg',
-          },
-        });
-      })()
-    );
-  } else if (url.pathname.startsWith('/files')) {
+  if (url.pathname.startsWith('/files')) {
     event.respondWith(
       (async () => {
         const urlPath = url.pathname.split('/files/')[1];

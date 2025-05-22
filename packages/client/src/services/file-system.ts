@@ -14,4 +14,5 @@ export interface FileSystem {
   readFile(path: string): Promise<Uint8Array>;
   writeFile(path: string, data: Uint8Array): Promise<void>;
   metadata(path: string): Promise<FileMetadata>;
+  url(path: string): Promise<string>;
 }

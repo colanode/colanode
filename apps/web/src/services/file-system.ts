@@ -223,4 +223,11 @@ export class WebFileSystem implements FileSystem {
       size: file.size,
     };
   }
+
+  public async url(path: string): Promise<string> {
+    const { parent, name } = await this.getFileLocation(path, false);
+    const fileHandle = await parent.getFileHandle(name);
+    const file = await fileHandle.getFile();
+    return URL.createObjectURL(file);
+  }
 }
