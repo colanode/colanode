@@ -159,7 +159,6 @@ const handleMessage = async (message: BroadcastMessage) => {
 };
 
 const api: ColanodeWorkerApi = {
-  async init() {},
   executeMutation(input) {
     if (app) {
       return app.mediator.executeMutation(input);

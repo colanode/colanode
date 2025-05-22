@@ -4,8 +4,8 @@ import { toast } from 'sonner';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useAccount } from '@colanode/ui/contexts/account';
-import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { openFileDialog } from '@colanode/ui/lib/files';
 
 interface AvatarUploadProps {
   onUpload: (id: string) => void;
@@ -14,9 +14,6 @@ interface AvatarUploadProps {
 export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
   const account = useAccount();
   const { mutate, isPending } = useMutation();
-  const { isOpen, open } = useFileDialog({
-    accept: 'image/jpeg, image/jpg, image/png, image/webp',
-  });
 
   const [url, setUrl] = React.useState<string | undefined>(undefined);
 
@@ -57,37 +54,38 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
         type="button"
         className="w-full"
         variant="outline"
-        disabled={isPending || isOpen}
+        disabled={isPending}
         onClick={async () => {
-          if (isPending || isOpen) {
+          if (isPending) {
             return;
           }
 
-          open({
-            onSelect(files) {
-              const file = files[0];
-              if (!file) {
-                return;
-              }
-
-              mutate({
-                input: {
-                  type: 'avatar_upload',
-                  accountId: account.id,
-                  file,
-                },
-                onSuccess(output) {
-                  onUpload(output.id);
-                },
-                onError(error) {
-                  toast.error(error.message);
-                },
-              });
-            },
-            onError() {
-              toast.error('Failed to upload avatar');
-            },
+          const result = await openFileDialog({
+            accept: 'image/jpeg, image/jpg, image/png, image/webp',
           });
+
+          if (result.type === 'success') {
+            const file = result.files[0];
+            if (!file) {
+              return;
+            }
+
+            mutate({
+              input: {
+                type: 'avatar_upload',
+                accountId: account.id,
+                file,
+              },
+              onSuccess(output) {
+                onUpload(output.id);
+              },
+              onError(error) {
+                toast.error(error.message);
+              },
+            });
+          } else if (result.type === 'error') {
+            toast.error(result.error);
+          }
         }}
       >
         {isPending && <Spinner className="mr-1" />}

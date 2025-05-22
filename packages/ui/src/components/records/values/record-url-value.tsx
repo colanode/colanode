@@ -57,10 +57,7 @@ export const RecordUrlValue = ({ field, readOnly }: RecordUrlValueProps) => {
           onClick={() => {
             if (!canOpen) return;
 
-            window.colanode.executeCommand({
-              type: 'url_open',
-              url,
-            });
+            window.colanode.openExternalUrl(url);
           }}
         >
           {url}

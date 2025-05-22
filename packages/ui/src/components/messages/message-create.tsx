@@ -19,8 +19,8 @@ import {
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { openFileDialog } from '@colanode/ui/lib/files';
 
 export interface MessageCreateRefProps {
   setReplyTo: (replyTo: LocalMessageNode) => void;
@@ -32,7 +32,6 @@ export const MessageCreate = React.forwardRef<MessageCreateRefProps>(
     const conversation = useConversation();
 
     const { mutate, isPending } = useMutation();
-    const { isOpen, open } = useFileDialog();
 
     const messageEditorRef = React.useRef<MessageEditorRefProps>(null);
     const [content, setContent] = React.useState<JSONContent | null>(null);
@@ -100,22 +99,16 @@ export const MessageCreate = React.forwardRef<MessageCreateRefProps>(
         return;
       }
 
-      if (isOpen) {
-        return;
-      }
+      const result = await openFileDialog();
 
-      open({
-        onSelect(files) {
-          files.forEach((file) => {
-            messageEditorRef.current?.addTempFile(file);
-          });
-        },
-        onError(error) {
-          console.error(error);
-          toast.error('An error occurred while adding the file.');
-        },
-      });
-    }, [messageEditorRef, isOpen]);
+      if (result.type === 'success') {
+        result.files.forEach((file) => {
+          messageEditorRef.current?.addTempFile(file);
+        });
+      } else if (result.type === 'error') {
+        toast.error(result.error);
+      }
+    }, [messageEditorRef]);
 
     return (
       <div className="mt-1">

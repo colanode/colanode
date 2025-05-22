@@ -51,6 +51,10 @@ contextBridge.exposeInMainWorld('colanode', {
       size: file.size,
     });
   },
+
+  openExternalUrl: async (url: string) => {
+    return ipcRenderer.invoke('open-external-url', url);
+  },
 });
 
 contextBridge.exposeInMainWorld('eventBus', {

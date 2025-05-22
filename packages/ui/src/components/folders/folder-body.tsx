@@ -24,7 +24,7 @@ import {
 import { Dropzone } from '@colanode/ui/components/ui/dropzone';
 import { ScrollArea } from '@colanode/ui/components/ui/scroll-area';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
+import { openFileDialog } from '@colanode/ui/lib/files';
 
 export type FolderLayoutOption = {
   value: FolderLayoutType;
@@ -67,38 +67,32 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
   const workspace = useWorkspace();
 
   const [layout, setLayout] = React.useState<FolderLayoutType>('grid');
-  const { isOpen, open } = useFileDialog();
 
   const currentLayout =
     folderLayouts.find((l) => l.value === layout) ?? folderLayouts[0];
 
-  const openFileDialog = async () => {
-    if (isOpen) {
-      return;
-    }
+  const handleUploadClick = async () => {
+    const result = await openFileDialog();
 
-    open({
-      onSelect(files) {
-        files.forEach((file) => {
-          window.colanode
-            .executeMutation({
-              type: 'file_create',
-              accountId: workspace.accountId,
-              workspaceId: workspace.id,
-              file,
-              parentId: folder.id,
-            })
-            .then((result) => {
-              if (!result.success) {
-                toast.error(result.error.message);
-              }
-            });
-        });
-      },
-      onCancel() {
-        toast.error('An error occurred while uploading the files.');
-      },
-    });
+    if (result.type === 'success') {
+      result.files.forEach((file) => {
+        window.colanode
+          .executeMutation({
+            type: 'file_create',
+            accountId: workspace.accountId,
+            workspaceId: workspace.id,
+            file,
+            parentId: folder.id,
+          })
+          .then((result) => {
+            if (!result.success) {
+              toast.error(result.error.message);
+            }
+          });
+      });
+    } else if (result.type === 'error') {
+      toast.error(result.error);
+    }
   };
 
   return (
@@ -111,7 +105,7 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
       <div className="flex h-full max-h-full flex-col gap-4 overflow-y-auto">
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-2">
-            <Button type="button" variant="outline" onClick={openFileDialog}>
+            <Button type="button" variant="outline" onClick={handleUploadClick}>
               <Upload className="mr-2 size-4" /> Upload
             </Button>
           </div>

@@ -17,8 +17,8 @@ import {
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { openFileDialog } from '@colanode/ui/lib/files';
 import { cn } from '@colanode/ui/lib/utils';
 
 const formSchema = z.object({
@@ -32,9 +32,6 @@ type formSchemaType = z.infer<typeof formSchema>;
 export const AccountUpdate = ({ account }: { account: Account }) => {
   const { mutate: uploadAvatar, isPending: isUploadingAvatar } = useMutation();
   const { mutate: updateAccount, isPending: isUpdatingAccount } = useMutation();
-  const { isOpen, open } = useFileDialog({
-    accept: 'image/jpeg, image/jpg, image/png, image/webp',
-  });
 
   const form = useForm<formSchemaType>({
     resolver: zodResolver(formSchema),
@@ -77,39 +74,38 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
             <div
               className="group relative cursor-pointer"
               onClick={async () => {
-                if (isUpdatingAccount || isUploadingAvatar || isOpen) {
+                if (isUpdatingAccount || isUploadingAvatar) {
                   return;
                 }
 
-                open({
-                  onSelect(files) {
-                    const file = files[0];
-                    if (!file) {
-                      return;
-                    }
-
-                    uploadAvatar({
-                      input: {
-                        type: 'avatar_upload',
-                        accountId: account.id,
-                        file,
-                      },
-                      onSuccess(output) {
-                        if (output.id) {
-                          form.setValue('avatar', output.id);
-                        }
-                      },
-                      onError(error) {
-                        toast.error(error.message);
-                      },
-                    });
-                  },
-                  onError() {
-                    toast.error(
-                      'An error occurred while uploading the avatar. Please try again.'
-                    );
-                  },
+                const result = await openFileDialog({
+                  accept: 'image/jpeg, image/jpg, image/png, image/webp',
                 });
+
+                if (result.type === 'success') {
+                  const file = result.files[0];
+                  if (!file) {
+                    return;
+                  }
+
+                  uploadAvatar({
+                    input: {
+                      type: 'avatar_upload',
+                      accountId: account.id,
+                      file,
+                    },
+                    onSuccess(output) {
+                      if (output.id) {
+                        form.setValue('avatar', output.id);
+                      }
+                    },
+                    onError(error) {
+                      toast.error(error.message);
+                    },
+                  });
+                } else if (result.type === 'error') {
+                  toast.error(result.error);
+                }
               }}
             >
               <Avatar

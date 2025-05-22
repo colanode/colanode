@@ -9,7 +9,6 @@ import { App } from '@colanode/ui/components/app';
 import { FontLoader } from '@colanode/ui/components/font-loader';
 import { Toaster } from '@colanode/ui/components/ui/toaster';
 import { TooltipProvider } from '@colanode/ui/components/ui/tooltip';
-import { useEventBus } from '@colanode/ui/hooks/use-event-bus';
 import { HTML5Backend } from '@colanode/ui/lib/dnd-backend';
 
 export const queryClient = new QueryClient({
@@ -28,10 +27,8 @@ interface RootProviderProps {
 }
 
 export const RootProvider = ({ type }: RootProviderProps) => {
-  const eventBus = useEventBus();
-
   React.useEffect(() => {
-    const id = eventBus.subscribe((event: Event) => {
+    const id = window.eventBus.subscribe((event: Event) => {
       if (event.type === 'query_result_updated') {
         const result = event.result;
         const queryId = event.id;
@@ -56,7 +53,7 @@ export const RootProvider = ({ type }: RootProviderProps) => {
     });
 
     return () => {
-      eventBus.unsubscribe(id);
+      window.eventBus.unsubscribe(id);
     };
   }, []);
 

@@ -1,12 +1,8 @@
 import { FileSubtype } from '@colanode/core';
 
-export type FileMetadata = {
-  path: string;
-  mimeType: string;
-  extension: string;
-  name: string;
-  size: number;
-  type: FileSubtype;
+export type OpenFileDialogOptions = {
+  accept?: string;
+  multiple?: boolean;
 };
 
 export type TempFile = {

@@ -259,3 +259,7 @@ ipcMain.handle(
     };
   }
 );
+
+ipcMain.handle('open-external-url', (_, url: string) => {
+  shell.openExternal(url);
+});

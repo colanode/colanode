@@ -1,6 +1,8 @@
 import { FilePlus } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { EditorCommand } from '@colanode/client/types';
+import { openFileDialog } from '@colanode/ui/lib/files';
 
 export const FileCommand: EditorCommand = {
   key: 'file',
@@ -14,47 +16,37 @@ export const FileCommand: EditorCommand = {
       return;
     }
 
-    const result = await window.colanode.executeCommand({
-      type: 'file_dialog_open',
-      options: {
-        properties: ['openFile'],
-        buttonLabel: 'Upload',
-        title: 'Upload files to page',
-      },
-    });
-
-    if (result.canceled) {
-      return;
-    }
-
-    const filePath = result.filePaths[0];
-    if (!filePath) {
-      return;
-    }
-
     const { accountId, workspaceId, documentId } = context;
-    const output = await window.colanode.executeMutation({
-      type: 'file_create',
-      filePath,
-      accountId,
-      workspaceId,
-      parentId: documentId,
-    });
+    const result = await openFileDialog();
 
-    if (!output.success) {
-      return;
+    if (result.type === 'success') {
+      result.files.forEach(async (file) => {
+        const output = await window.colanode.executeMutation({
+          type: 'file_create',
+          file,
+          accountId,
+          workspaceId,
+          parentId: documentId,
+        });
+
+        if (!output.success) {
+          return;
+        }
+
+        editor
+          .chain()
+          .focus()
+          .deleteRange(range)
+          .insertContent({
+            type: 'file',
+            attrs: {
+              id: output.output.id,
+            },
+          })
+          .run();
+      });
+    } else if (result.type === 'error') {
+      toast.error(result.error);
     }
-
-    editor
-      .chain()
-      .focus()
-      .deleteRange(range)
-      .insertContent({
-        type: 'file',
-        attrs: {
-          id: output.output.id,
-        },
-      })
-      .run();
   },
 };

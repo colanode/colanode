@@ -20,8 +20,8 @@ import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { Textarea } from '@colanode/ui/components/ui/textarea';
 import { useAccount } from '@colanode/ui/contexts/account';
-import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { openFileDialog } from '@colanode/ui/lib/files';
 import { cn } from '@colanode/ui/lib/utils';
 
 const formSchema = z.object({
@@ -53,9 +53,6 @@ export const WorkspaceForm = ({
 
   const id = React.useRef(generateId(IdType.Workspace));
   const { mutate, isPending } = useMutation();
-  const { isOpen, open } = useFileDialog({
-    accept: 'image/jpeg, image/jpg, image/png, image/webp',
-  });
 
   const form = useForm<formSchemaType>({
     resolver: zodResolver(formSchema),
@@ -77,35 +74,36 @@ export const WorkspaceForm = ({
             <div
               className="group relative cursor-pointer"
               onClick={async () => {
-                if (isPending || isOpen || readOnly) {
+                if (isPending || readOnly) {
                   return;
                 }
 
-                open({
-                  onSelect(files) {
-                    const file = files[0];
-                    if (!file) {
-                      return;
-                    }
-
-                    mutate({
-                      input: {
-                        type: 'avatar_upload',
-                        accountId: account.id,
-                        file,
-                      },
-                      onSuccess(output) {
-                        form.setValue('avatar', output.id);
-                      },
-                      onError(error) {
-                        toast.error(error.message);
-                      },
-                    });
-                  },
-                  onError() {
-                    toast.error('Failed to upload avatar');
-                  },
+                const result = await openFileDialog({
+                  accept: 'image/jpeg, image/jpg, image/png, image/webp',
                 });
+
+                if (result.type === 'success') {
+                  const file = result.files[0];
+                  if (!file) {
+                    return;
+                  }
+
+                  mutate({
+                    input: {
+                      type: 'avatar_upload',
+                      accountId: account.id,
+                      file,
+                    },
+                    onSuccess(output) {
+                      form.setValue('avatar', output.id);
+                    },
+                    onError(error) {
+                      toast.error(error.message);
+                    },
+                  });
+                } else if (result.type === 'error') {
+                  toast.error(result.error);
+                }
               }}
             >
               <Avatar
