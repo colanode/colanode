@@ -38,7 +38,7 @@ export const ToolbarMenu = (props: ToolbarMenuProps) => {
         editor.isActive('database') ||
         editor.isActive('folder') ||
         editor.isActive('file') ||
-        editor.isActive('filePlaceholder')
+        editor.isActive('tempFile')
       ) {
         return false;
       }

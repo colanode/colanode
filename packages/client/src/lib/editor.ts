@@ -267,7 +267,7 @@ export const editorHasContent = (block?: JSONContent) => {
     return true;
   }
 
-  if (block.type === 'filePlaceholder' && block.attrs?.id) {
+  if (block.type === 'tempFile' && block.attrs?.id) {
     return true;
   }
 

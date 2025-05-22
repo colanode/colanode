@@ -4,7 +4,10 @@ import { mapContentsToBlocks } from '@colanode/client/lib/editor';
 import {
   MessageCreateMutationInput,
   MessageCreateMutationOutput,
+  MutationError,
+  MutationErrorCode,
 } from '@colanode/client/mutations';
+import { TempFile } from '@colanode/client/types';
 import {
   EditorNodeTypes,
   generateId,
@@ -14,7 +17,7 @@ import {
 
 interface MessageFile {
   id: string;
-  path: string;
+  file: TempFile;
 }
 
 export class MessageCreateMutationHandler
@@ -33,13 +36,20 @@ export class MessageCreateMutationHandler
 
     // check if there are nested nodes (files, pages, folders etc.)
     for (const block of Object.values(blocks)) {
-      if (block.type === EditorNodeTypes.FilePlaceholder) {
-        const path = block.attrs?.path;
+      if (block.type === EditorNodeTypes.TempFile) {
+        const file = block.attrs?.file as TempFile;
+        if (!file) {
+          throw new MutationError(
+            MutationErrorCode.FileInvalid,
+            'File is invalid or could not be read.'
+          );
+        }
+
         const fileId = generateId(IdType.File);
 
         filesToCreate.push({
           id: fileId,
-          path: path,
+          file,
         });
 
         block.id = fileId;
@@ -63,7 +73,7 @@ export class MessageCreateMutationHandler
     });
 
     for (const file of filesToCreate) {
-      await workspace.files.createFile(file.id, messageId, file.path);
+      await workspace.files.createFile(file.id, messageId, file.file);
     }
 
     return {

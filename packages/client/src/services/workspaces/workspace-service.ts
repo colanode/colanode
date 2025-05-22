@@ -46,7 +46,7 @@ export class WorkspaceService {
     this.account = account;
 
     this.database = account.app.kysely.build<WorkspaceDatabaseSchema>({
-      path: account.app.paths.workspaceDatabase(
+      path: account.app.path.workspaceDatabase(
         this.account.id,
         this.workspace.id
       ),
@@ -128,7 +128,7 @@ export class WorkspaceService {
       this.mutations.destroy();
       this.radar.destroy();
 
-      const workspacePath = this.account.app.paths.workspace(
+      const workspacePath = this.account.app.path.workspace(
         this.account.id,
         this.workspace.id
       );

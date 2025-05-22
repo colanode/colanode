@@ -7,7 +7,6 @@ import {
   globalShortcut,
 } from 'electron';
 import fs from 'fs/promises';
-import path from 'path';
 
 import started from 'electron-squirrel-startup';
 import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
@@ -15,12 +14,18 @@ import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
 import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationMap } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
-import { createDebugger } from '@colanode/core';
+import { TempFile } from '@colanode/client/types';
+import {
+  createDebugger,
+  extractFileSubtype,
+  generateId,
+  IdType,
+} from '@colanode/core';
 import { app } from '@colanode/desktop/main/app-service';
 import {
   handleAssetRequest,
   handleAvatarRequest,
-  handleFilePreviewRequest,
+  handleTempFileRequest,
   handleFileRequest,
 } from '@colanode/desktop/main/protocols';
 
@@ -56,9 +61,9 @@ const createWindow = async () => {
     fullscreenable: true,
     minWidth: 800,
     minHeight: 600,
-    icon: path.join(app.paths.assets, 'colanode-logo-black.png'),
+    icon: app.path.join(app.path.assets, 'colanode-logo-black.png'),
     webPreferences: {
-      preload: path.join(__dirname, 'preload.js'),
+      preload: app.path.join(__dirname, 'preload.js'),
     },
     autoHideMenuBar: true,
     titleBarStyle: 'hiddenInset',
@@ -104,7 +109,10 @@ const createWindow = async () => {
     // mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
+      app.path.join(
+        __dirname,
+        `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`
+      )
     );
   }
 
@@ -126,9 +134,9 @@ const createWindow = async () => {
     });
   }
 
-  if (!protocol.isProtocolHandled('local-file-preview')) {
-    protocol.handle('local-file-preview', (request) => {
-      return handleFilePreviewRequest(request);
+  if (!protocol.isProtocolHandled('temp-file')) {
+    protocol.handle('temp-file', (request) => {
+      return handleTempFileRequest(request);
     });
   }
 
@@ -229,14 +237,25 @@ ipcMain.handle(
   async (
     _: unknown,
     file: { name: string; size: number; type: string; buffer: Buffer }
-  ): Promise<string> => {
-    const extension = path.extname(file.name);
-    const baseName = path.basename(file.name, extension);
-    const newFileName = `${baseName}${extension}`;
-    const filePath = app.paths.tempFile(newFileName);
+  ): Promise<TempFile> => {
+    const id = generateId(IdType.TempFile);
+    const name = app.path.filename(file.name);
+    const extension = app.path.extension(file.name);
+    const mimeType = file.type;
+    const type = extractFileSubtype(mimeType);
+    const fileName = `${name}.${id}${extension}`;
+    const filePath = app.path.tempFile(fileName);
 
     await fs.writeFile(filePath, file.buffer);
 
-    return newFileName;
+    return {
+      id,
+      name: fileName,
+      size: file.size,
+      mimeType,
+      type,
+      path: filePath,
+      extension,
+    };
   }
 );

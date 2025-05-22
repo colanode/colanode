@@ -16,11 +16,11 @@ export class AssetService {
     this.app = app;
 
     this.emojis = this.app.kysely.build<EmojiDatabaseSchema>({
-      path: this.app.paths.emojisDatabase,
+      path: this.app.path.emojisDatabase,
       readonly: true,
     });
     this.icons = this.app.kysely.build<IconDatabaseSchema>({
-      path: this.app.paths.iconsDatabase,
+      path: this.app.path.iconsDatabase,
       readonly: true,
     });
   }

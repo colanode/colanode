@@ -48,7 +48,7 @@ export class AccountService {
     this.app = app;
 
     this.database = app.kysely.build<AccountDatabaseSchema>({
-      path: app.paths.accountDatabase(this.account.id),
+      path: app.path.accountDatabase(this.account.id),
       readonly: false,
     });
 
@@ -88,9 +88,9 @@ export class AccountService {
 
   public async init(): Promise<void> {
     await this.migrate();
-    await this.app.fs.makeDirectory(this.app.paths.account(this.account.id));
+    await this.app.fs.makeDirectory(this.app.path.account(this.account.id));
     await this.app.fs.makeDirectory(
-      this.app.paths.accountAvatars(this.account.id)
+      this.app.path.accountAvatars(this.account.id)
     );
 
     if (this.account.avatar) {
@@ -151,7 +151,7 @@ export class AccountService {
       this.eventLoop.stop();
       eventBus.unsubscribe(this.eventSubscriptionId);
 
-      const accountPath = this.app.paths.account(this.account.id);
+      const accountPath = this.app.path.account(this.account.id);
       await this.app.fs.delete(accountPath);
 
       eventBus.publish({
@@ -179,7 +179,7 @@ export class AccountService {
 
   public async downloadAvatar(avatar: string): Promise<void> {
     try {
-      const avatarPath = this.app.paths.accountAvatar(this.account.id, avatar);
+      const avatarPath = this.app.path.accountAvatar(this.account.id, avatar);
 
       const exists = await this.app.fs.exists(avatarPath);
       if (exists) {

@@ -74,7 +74,7 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
                 input: {
                   type: 'avatar_upload',
                   accountId: account.id,
-                  fileName: file,
+                  file,
                 },
                 onSuccess(output) {
                   onUpload(output.id);

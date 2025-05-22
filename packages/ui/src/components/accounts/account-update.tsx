@@ -100,7 +100,7 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
                       input: {
                         type: 'avatar_upload',
                         accountId: account.id,
-                        fileName: file,
+                        file,
                       },
                       onSuccess(output) {
                         if (output.id) {

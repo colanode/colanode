@@ -18,6 +18,7 @@ import {
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { toast } from '@colanode/ui/hooks/use-toast';
 
@@ -31,6 +32,7 @@ export const MessageCreate = React.forwardRef<MessageCreateRefProps>(
     const conversation = useConversation();
 
     const { mutate, isPending } = useMutation();
+    const { isOpen, open } = useFileDialog();
 
     const messageEditorRef = React.useRef<MessageEditorRefProps>(null);
     const [content, setContent] = React.useState<JSONContent | null>(null);
@@ -102,42 +104,26 @@ export const MessageCreate = React.forwardRef<MessageCreateRefProps>(
         return;
       }
 
-      const result = await window.colanode.executeCommand({
-        type: 'file_dialog_open',
-        options: {
-          properties: ['openFile'],
-          buttonLabel: 'Upload',
-          title: 'Upload files to message',
+      if (isOpen) {
+        return;
+      }
+
+      open({
+        onSelect(files) {
+          files.forEach((file) => {
+            messageEditorRef.current?.addTempFile(file);
+          });
+        },
+        onError(error) {
+          console.error(error);
+          toast({
+            title: 'Failed to add file',
+            description: 'An error occurred while adding the file.',
+            variant: 'destructive',
+          });
         },
       });
-
-      if (result.canceled) {
-        return;
-      }
-
-      const filePath = result.filePaths[0];
-      if (!filePath) {
-        return;
-      }
-
-      const fileMetadata = await window.colanode.executeQuery({
-        type: 'file_metadata_get',
-        path: filePath,
-      });
-
-      if (fileMetadata === null) {
-        toast({
-          title: 'Failed to add file',
-          description:
-            'Something went wrong adding file to the message. Please try again!',
-          variant: 'destructive',
-        });
-
-        return;
-      }
-
-      messageEditorRef.current?.addFile(fileMetadata);
-    }, [messageEditorRef]);
+    }, [messageEditorRef, isOpen]);
 
     return (
       <div className="mt-1">

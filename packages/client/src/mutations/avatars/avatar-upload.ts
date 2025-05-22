@@ -1,7 +1,9 @@
+import { TempFile } from '@colanode/client/types';
+
 export type AvatarUploadMutationInput = {
   type: 'avatar_upload';
   accountId: string;
-  fileName: string;
+  file: TempFile;
 };
 
 export type AvatarUploadMutationOutput = {

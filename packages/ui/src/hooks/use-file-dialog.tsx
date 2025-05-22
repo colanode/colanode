@@ -1,12 +1,14 @@
 import { useCallback, useRef, useState } from 'react';
 
+import { TempFile } from '@colanode/client/types';
+
 type FileDialogOptions = {
   accept?: string;
   multiple?: boolean;
 };
 
 type FileDialogCallbacks = {
-  onSelect?: (files: string[]) => void;
+  onSelect?: (files: TempFile[]) => void;
   onCancel?: () => void;
   onError?: (error: unknown) => void;
 };

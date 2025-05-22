@@ -14,11 +14,11 @@ import { EventLoop } from '@colanode/client/lib/event-loop';
 import { mapServer, mapAccount } from '@colanode/client/lib/mappers';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { AppBuild } from '@colanode/client/services/app-build';
-import { AppPaths } from '@colanode/client/services/app-paths';
 import { AssetService } from '@colanode/client/services/asset-service';
 import { FileSystem } from '@colanode/client/services/file-system';
 import { KyselyService } from '@colanode/client/services/kysely-service';
 import { MetadataService } from '@colanode/client/services/metadata-service';
+import { PathService } from '@colanode/client/services/path-service';
 import { ServerService } from '@colanode/client/services/server-service';
 import { Account } from '@colanode/client/types/accounts';
 import { Server } from '@colanode/client/types/servers';
@@ -34,7 +34,7 @@ export class AppService {
 
   public readonly build: AppBuild;
   public readonly fs: FileSystem;
-  public readonly paths: AppPaths;
+  public readonly path: PathService;
   public readonly database: Kysely<AppDatabaseSchema>;
   public readonly metadata: MetadataService;
   public readonly kysely: KyselyService;
@@ -45,14 +45,14 @@ export class AppService {
     fs: FileSystem,
     build: AppBuild,
     kysely: KyselyService,
-    paths: AppPaths
+    path: PathService
   ) {
     this.build = build;
     this.fs = fs;
-    this.paths = paths;
+    this.path = path;
     this.kysely = kysely;
     this.database = kysely.build<AppDatabaseSchema>({
-      path: paths.appDatabase,
+      path: path.appDatabase,
       readonly: false,
     });
     this.mediator = new Mediator(this);
@@ -121,7 +121,7 @@ export class AppService {
   public async init(): Promise<void> {
     await this.initServers();
     await this.initAccounts();
-    await this.fs.makeDirectory(this.paths.temp);
+    await this.fs.makeDirectory(this.path.temp);
 
     this.cleanupEventLoop.start();
   }
@@ -298,12 +298,12 @@ export class AppService {
   private async cleanTempFiles(): Promise<void> {
     debug(`Cleaning temp files`);
 
-    const exists = await this.fs.exists(this.paths.temp);
+    const exists = await this.fs.exists(this.path.temp);
     if (!exists) {
       return;
     }
 
-    const filePaths = await this.fs.listFiles(this.paths.temp);
+    const filePaths = await this.fs.listFiles(this.path.temp);
     const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
     for (const filePath of filePaths) {
@@ -324,6 +324,6 @@ export class AppService {
     await this.database.deleteFrom('accounts').execute();
     await this.database.deleteFrom('metadata').execute();
     await this.database.deleteFrom('deleted_tokens').execute();
-    await this.fs.delete(this.paths.accounts);
+    await this.fs.delete(this.path.accounts);
   }
 }

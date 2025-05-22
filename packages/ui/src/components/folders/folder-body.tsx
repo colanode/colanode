@@ -23,6 +23,7 @@ import {
 import { Dropzone } from '@colanode/ui/components/ui/dropzone';
 import { ScrollArea } from '@colanode/ui/components/ui/scroll-area';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
 import { toast } from '@colanode/ui/hooks/use-toast';
 
 export type FolderLayoutOption = {
@@ -66,55 +67,46 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
   const workspace = useWorkspace();
 
   const [layout, setLayout] = React.useState<FolderLayoutType>('grid');
-  const isDialogOpenedRef = React.useRef(false);
+  const { isOpen, open } = useFileDialog();
 
   const currentLayout =
     folderLayouts.find((l) => l.value === layout) ?? folderLayouts[0];
 
   const openFileDialog = async () => {
-    if (isDialogOpenedRef.current) {
+    if (isOpen) {
       return;
     }
 
-    isDialogOpenedRef.current = true;
-    const commandResult = await window.colanode.executeCommand({
-      type: 'file_dialog_open',
-      options: {
-        properties: ['openFile'],
-        buttonLabel: 'Upload',
-        title: 'Upload files to folder',
+    open({
+      onSelect(files) {
+        files.forEach((file) => {
+          window.colanode
+            .executeMutation({
+              type: 'file_create',
+              accountId: workspace.accountId,
+              workspaceId: workspace.id,
+              file,
+              parentId: folder.id,
+            })
+            .then((result) => {
+              if (!result.success) {
+                toast({
+                  title: 'Failed to upload file',
+                  description: result.error.message,
+                  variant: 'destructive',
+                });
+              }
+            });
+        });
+      },
+      onCancel() {
+        toast({
+          title: 'Failed to upload files',
+          description: 'An error occurred while uploading the files.',
+          variant: 'destructive',
+        });
       },
     });
-
-    if (commandResult.canceled) {
-      isDialogOpenedRef.current = false;
-      return;
-    }
-
-    const filePath = commandResult.filePaths[0];
-
-    if (!filePath) {
-      isDialogOpenedRef.current = false;
-      return;
-    }
-
-    const mutationResult = await window.colanode.executeMutation({
-      type: 'file_create',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
-      filePath,
-      parentId: folder.id,
-    });
-
-    if (!mutationResult.success) {
-      toast({
-        title: 'Failed to upload file',
-        description: mutationResult.error.message,
-        variant: 'destructive',
-      });
-    }
-
-    isDialogOpenedRef.current = false;
   };
 
   return (
@@ -166,11 +158,6 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
           <FolderFiles id={folder.id} name="Folder" layout={layout} />
         </ScrollArea>
       </div>
-      {/* <FolderUploads
-        uploads={Object.values(uploads)}
-        open={openUploads}
-          setOpen={setOpenUploads}
-        /> */}
     </Dropzone>
   );
 };

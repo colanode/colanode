@@ -14,7 +14,7 @@ import { AppService } from '@colanode/client/services/app-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import {
   DownloadStatus,
-  FileMetadata,
+  TempFile,
   UploadStatus,
 } from '@colanode/client/types/files';
 import { LocalFileNode } from '@colanode/client/types/nodes';
@@ -38,18 +38,6 @@ const DOWNLOAD_RETRIES_LIMIT = 10;
 
 const debug = createDebugger('desktop:service:file');
 
-const path = {
-  join: (_: string, __: string) => '',
-  parse: (_: string) => ({
-    name: '',
-  }),
-  dirname: (_: string) => '',
-};
-
-const getFileMetadata = (_: string): FileMetadata | null => {
-  return null;
-};
-
 export class FileService {
   private readonly app: AppService;
   private readonly workspace: WorkspaceService;
@@ -62,7 +50,7 @@ export class FileService {
   constructor(workspace: WorkspaceService) {
     this.app = workspace.account.app;
     this.workspace = workspace;
-    this.filesDir = this.workspace.account.app.paths.workspaceFiles(
+    this.filesDir = this.workspace.account.app.path.workspaceFiles(
       this.workspace.accountId,
       this.workspace.id
     );
@@ -101,17 +89,9 @@ export class FileService {
   public async createFile(
     id: string,
     parentId: string,
-    path: string
+    file: TempFile
   ): Promise<void> {
-    const metadata = getFileMetadata(path);
-    if (!metadata) {
-      throw new MutationError(
-        MutationErrorCode.FileInvalid,
-        'File is invalid or could not be read.'
-      );
-    }
-
-    const fileSize = BigInt(metadata.size);
+    const fileSize = BigInt(file.size);
     const maxFileSize = BigInt(this.workspace.maxFileSize);
     if (fileSize > maxFileSize) {
       throw new MutationError(
@@ -147,17 +127,17 @@ export class FileService {
       );
     }
 
-    this.copyFileToWorkspace(path, id, metadata.extension);
+    this.copyFileToWorkspace(file.path, id, file.extension);
 
     const attributes: FileAttributes = {
       type: 'file',
-      subtype: extractFileSubtype(metadata.mimeType),
+      subtype: extractFileSubtype(file.mimeType),
       parentId: parentId,
-      name: metadata.name,
-      originalName: metadata.name,
-      extension: metadata.extension,
-      mimeType: metadata.mimeType,
-      size: metadata.size,
+      name: file.name,
+      originalName: file.name,
+      extension: file.extension,
+      mimeType: file.mimeType,
+      size: file.size,
       status: FileStatus.Pending,
       version: generateId(IdType.Version),
     };
@@ -227,8 +207,8 @@ export class FileService {
     // check if the file is in the temp files directory. If it is in
     // temp files directory it means it has been pasted or dragged
     // therefore we need to delete it
-    const fileDirectory = path.dirname(filePath);
-    if (fileDirectory === this.app.paths.temp) {
+    const fileDirectory = this.app.path.dirname(filePath);
+    if (fileDirectory === this.app.path.temp) {
       await this.app.fs.delete(filePath);
     }
   }
@@ -634,7 +614,7 @@ export class FileService {
       const fileIdMap: Record<string, string> = {};
 
       for (const file of batch) {
-        const id = path.parse(file).name;
+        const id = this.app.path.filename(file);
         fileIdMap[id] = file;
       }
 
@@ -651,13 +631,13 @@ export class FileService {
           continue;
         }
 
-        const filePath = path.join(this.filesDir, fileIdMap[fileId]!);
+        const filePath = this.app.path.join(this.filesDir, fileIdMap[fileId]!);
         await this.app.fs.delete(filePath);
       }
     }
   }
 
   private buildFilePath(id: string, extension: string): string {
-    return path.join(this.filesDir, `${id}${extension}`);
+    return this.app.path.join(this.filesDir, `${id}${extension}`);
   }
 }

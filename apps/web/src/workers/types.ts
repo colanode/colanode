@@ -1,7 +1,7 @@
 import { EventBus } from '@colanode/client/lib';
 import { MutationInput, MutationResult } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
-import { Event } from '@colanode/client/types';
+import { Event, TempFile } from '@colanode/client/types';
 
 export interface ColanodeWorkerApi {
   init: () => Promise<void>;
@@ -19,7 +19,7 @@ export interface ColanodeWorkerApi {
   subscribe: (callback: (event: Event) => void) => Promise<string>;
   unsubscribe: (subscriptionId: string) => Promise<void>;
   publish: (event: Event) => void;
-  saveTempFile: (file: File) => Promise<string>;
+  saveTempFile: (file: File) => Promise<TempFile>;
 }
 
 declare global {

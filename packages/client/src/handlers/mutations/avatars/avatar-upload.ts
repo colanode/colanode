@@ -1,5 +1,3 @@
-import { fileTypeFromBuffer } from 'file-type';
-
 import { MutationHandler } from '@colanode/client/lib/types';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
@@ -34,7 +32,7 @@ export class AvatarUploadMutationHandler
     }
 
     try {
-      const filePath = `${this.app.paths.temp}/${input.fileName}`;
+      const filePath = input.file.path;
       const fileExists = await this.app.fs.exists(filePath);
 
       if (!fileExists) {
@@ -42,18 +40,12 @@ export class AvatarUploadMutationHandler
       }
 
       const fileBuffer = await this.app.fs.readFile(filePath);
-      const fileType = await fileTypeFromBuffer(fileBuffer);
-
-      if (!fileType) {
-        throw new Error('Could not determine file type');
-      }
-
       const { data } = await account.client.post<AvatarUploadResponse>(
         '/v1/avatars',
         fileBuffer,
         {
           headers: {
-            'Content-Type': fileType.mime,
+            'Content-Type': input.file.mimeType,
           },
         }
       );
@@ -73,8 +65,7 @@ export class AvatarUploadMutationHandler
       );
     } finally {
       try {
-        const filePath = `${this.app.paths.temp}/${input.fileName}`;
-        await this.app.fs.delete(filePath);
+        await this.app.fs.delete(input.file.path);
       } catch {
         // Ignore cleanup errors
       }

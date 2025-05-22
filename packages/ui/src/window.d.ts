@@ -1,6 +1,7 @@
 import { EventBus } from '@colanode/client/lib';
 import { MutationInput, MutationResult } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
+import { TempFile } from '@colanode/client/types';
 
 export interface ColanodeApi {
   init: () => Promise<void>;
@@ -15,7 +16,7 @@ export interface ColanodeApi {
     input: T
   ) => Promise<QueryMap[T['type']]['output']>;
   unsubscribeQuery: (key: string) => Promise<void>;
-  saveTempFile: (file: File) => Promise<string>;
+  saveTempFile: (file: File) => Promise<TempFile>;
 }
 
 declare global {

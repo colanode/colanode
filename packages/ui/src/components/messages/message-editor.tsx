@@ -3,7 +3,7 @@ import { EditorContent, useEditor } from '@tiptap/react';
 import isHotkey from 'is-hotkey';
 import React from 'react';
 
-import { FileMetadata } from '@colanode/client/types';
+import { TempFile } from '@colanode/client/types';
 import {
   BoldMark,
   CodeBlockNode,
@@ -12,7 +12,7 @@ import {
   DividerNode,
   DropcursorExtension,
   FileNode,
-  FilePlaceholderNode,
+  TempFileNode,
   HighlightMark,
   IdExtension,
   ItalicMark,
@@ -41,7 +41,7 @@ interface MessageEditorProps {
 export interface MessageEditorRefProps {
   focus: () => void;
   clear: () => void;
-  addFile: (file: FileMetadata) => void;
+  addTempFile: (file: TempFile) => void;
 }
 
 export const MessageEditor = React.forwardRef<
@@ -71,10 +71,7 @@ export const MessageEditor = React.forwardRef<
         HighlightMark,
         LinkMark,
         DropcursorExtension,
-        FilePlaceholderNode.configure({
-          accountId: props.accountId,
-          workspaceId: props.workspaceId,
-        }),
+        TempFileNode,
         FileNode,
         MentionExtension.configure({
           context: {
@@ -118,12 +115,12 @@ export const MessageEditor = React.forwardRef<
 
       editor.chain().clearContent(true).focus().run();
     },
-    addFile: (file: FileMetadata) => {
+    addTempFile: (file: TempFile) => {
       if (editor == null) {
         return;
       }
 
-      editor.chain().focus().addFilePlaceholder(file).run();
+      editor.chain().focus().addTempFile(file).run();
     },
   }));
 

@@ -5,4 +5,4 @@ export * from './file-system';
 export * from './kysely-service';
 export * from './asset-service';
 export * from './app-build';
-export * from './app-paths';
+export * from './path-service';

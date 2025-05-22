@@ -2,7 +2,6 @@ import { LocalFileNode } from '@colanode/client/types';
 import { FileIcon } from '@colanode/ui/components/files/file-icon';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
-import { getFileUrl } from '@colanode/ui/lib/files';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface FileThumbnailProps {
@@ -21,12 +20,7 @@ export const FileThumbnail = ({ file, className }: FileThumbnailProps) => {
   });
 
   if (file.attributes.subtype === 'image' && data?.downloadProgress === 100) {
-    const url = getFileUrl(
-      workspace.accountId,
-      workspace.id,
-      file.id,
-      file.attributes.extension
-    );
+    const url = workspace.getFileUrl(file.id, file.attributes.extension);
 
     return (
       <img

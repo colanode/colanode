@@ -17,7 +17,6 @@ import { DeleteControlExtension } from '@colanode/ui/editor/extensions/delete-co
 import { DividerNode } from '@colanode/ui/editor/extensions/divider';
 import { DropcursorExtension } from '@colanode/ui/editor/extensions/dropcursor';
 import { FileNode } from '@colanode/ui/editor/extensions/file';
-import { FilePlaceholderNode } from '@colanode/ui/editor/extensions/file-placeholder';
 import { FolderNode } from '@colanode/ui/editor/extensions/folder';
 import { Heading1Node } from '@colanode/ui/editor/extensions/heading1';
 import { Heading2Node } from '@colanode/ui/editor/extensions/heading2';
@@ -36,6 +35,7 @@ import { PlaceholderExtension } from '@colanode/ui/editor/extensions/placeholder
 import { TabKeymapExtension } from '@colanode/ui/editor/extensions/tab-keymap';
 import { TaskItemNode } from '@colanode/ui/editor/extensions/task-item';
 import { TaskListNode } from '@colanode/ui/editor/extensions/task-list';
+import { TempFileNode } from '@colanode/ui/editor/extensions/temp-file';
 import { TrailingNode } from '@colanode/ui/editor/extensions/trailing-node';
 
 export {
@@ -51,7 +51,7 @@ export {
   DocumentNode,
   DropcursorExtension,
   FileNode,
-  FilePlaceholderNode,
+  TempFileNode,
   FolderNode,
   Heading1Node,
   Heading2Node,

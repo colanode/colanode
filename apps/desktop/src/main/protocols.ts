@@ -46,7 +46,7 @@ export const handleAssetRequest = async (
   }
 
   if (type === 'fonts') {
-    const filePath = path.join(app.paths.assets, 'fonts', id);
+    const filePath = path.join(app.path.assets, 'fonts', id);
     const fileUrl = `file://${filePath}`;
     return net.fetch(fileUrl);
   }
@@ -63,7 +63,7 @@ export const handleAvatarRequest = async (
     return new Response(null, { status: 400 });
   }
 
-  const avatarPath = app.paths.accountAvatar(accountId, avatarId);
+  const avatarPath = app.path.accountAvatar(accountId, avatarId);
   const avatarLocalUrl = `file://${avatarPath}`;
 
   if (!fs.existsSync(avatarPath)) {
@@ -73,10 +73,10 @@ export const handleAvatarRequest = async (
   return net.fetch(avatarLocalUrl);
 };
 
-export const handleFilePreviewRequest = async (
+export const handleTempFileRequest = async (
   request: Request
 ): Promise<Response> => {
-  const url = request.url.replace('local-file-preview://', 'file://');
+  const url = request.url.replace('temp-file://', 'file://');
   return net.fetch(url);
 };
 
@@ -89,7 +89,7 @@ export const handleFileRequest = async (
     return new Response(null, { status: 400 });
   }
 
-  const workspaceFilesDir = app.paths.workspaceFiles(accountId, workspaceId);
+  const workspaceFilesDir = app.path.workspaceFiles(accountId, workspaceId);
   const filePath = path.join(workspaceFilesDir, file);
 
   if (fs.existsSync(filePath)) {

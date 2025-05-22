@@ -4,11 +4,11 @@ import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationResult } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
 import { AppService } from '@colanode/client/services';
-import { generateId, IdType } from '@colanode/core';
+import { extractFileSubtype, generateId, IdType } from '@colanode/core';
 import { appBuild } from '@colanode/web/services/app-build';
-import { paths } from '@colanode/web/services/app-paths';
 import { WebFileSystem } from '@colanode/web/services/file-system';
 import { WebKyselyService } from '@colanode/web/services/kysely-service';
+import { WebPathService } from '@colanode/web/services/path-service';
 import {
   BroadcastMessage,
   BroadcastMutationMessage,
@@ -23,6 +23,7 @@ const windowId = generateId(IdType.Window);
 const pendingPromises = new Map<string, PendingPromise>();
 
 const fs = new WebFileSystem();
+const path = new WebPathService();
 let app: AppService | null = null;
 
 const broadcast = new BroadcastChannel('colanode');
@@ -31,7 +32,7 @@ broadcast.onmessage = (event) => {
 };
 
 navigator.locks.request('colanode', async () => {
-  app = new AppService(fs, appBuild, new WebKyselyService(), paths);
+  app = new AppService(fs, appBuild, new WebKyselyService(), path);
 
   await app.migrate();
   await app.init();
@@ -271,15 +272,28 @@ const api: ColanodeWorkerApi = {
     eventBus.publish(event);
   },
   async saveTempFile(file) {
-    const fileId = generateId(IdType.TempFile);
-    const extension = file.name.substring(file.name.lastIndexOf('.'));
-    const newFileName = `${fileId}${extension}`;
+    const id = generateId(IdType.TempFile);
+    const name = path.filename(file.name);
+    const extension = path.extension(file.name);
+    const mimeType = file.type;
+    const type = extractFileSubtype(mimeType);
+    const fileName = `${name}.${id}${extension}`;
 
     const arrayBuffer = await file.arrayBuffer();
     const fileData = new Uint8Array(arrayBuffer);
 
-    await fs.writeFile(paths.tempFile(newFileName), fileData);
-    return newFileName;
+    const filePath = path.tempFile(fileName);
+    await fs.writeFile(filePath, fileData);
+
+    return {
+      id,
+      name: file.name,
+      size: file.size,
+      type,
+      path: filePath,
+      extension,
+      mimeType,
+    };
   },
 };
 

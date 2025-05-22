@@ -92,7 +92,7 @@ export const WorkspaceForm = ({
                       input: {
                         type: 'avatar_upload',
                         accountId: account.id,
-                        fileName: file,
+                        file,
                       },
                       onSuccess(output) {
                         form.setValue('avatar', output.id);

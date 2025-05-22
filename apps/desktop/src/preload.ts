@@ -6,7 +6,7 @@ import { contextBridge, ipcRenderer } from 'electron';
 import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationMap } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
-import { Event } from '@colanode/client/types';
+import { Event, TempFile } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
 
 const windowId = generateId(IdType.Window);
@@ -42,7 +42,7 @@ contextBridge.exposeInMainWorld('colanode', {
     return ipcRenderer.invoke('unsubscribe-query', key, windowId);
   },
 
-  saveTempFile: async (file: File): Promise<string> => {
+  saveTempFile: async (file: File): Promise<TempFile> => {
     const arrayBuffer = await file.arrayBuffer();
     return ipcRenderer.invoke('save-temp-file', {
       buffer: Buffer.from(arrayBuffer),

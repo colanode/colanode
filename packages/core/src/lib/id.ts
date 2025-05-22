@@ -29,7 +29,6 @@ export enum IdType {
   Avatar = 'av',
   Icon = 'ic',
   File = 'fi',
-  FilePlaceholder = 'fp',
   Device = 'de',
   Upload = 'up',
   Update = 'ud',

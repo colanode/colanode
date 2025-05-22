@@ -9,6 +9,16 @@ export type FileMetadata = {
   type: FileSubtype;
 };
 
+export type TempFile = {
+  id: string;
+  name: string;
+  path: string;
+  size: number;
+  type: FileSubtype;
+  mimeType: string;
+  extension: string;
+};
+
 export type FileState = {
   id: string;
   version: string;

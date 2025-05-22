@@ -2,7 +2,7 @@ import { mergeAttributes, Node } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { ReactNodeViewRenderer } from '@tiptap/react';
 
-import { EditorContext } from '@colanode/client/types';
+import { EditorContext, TempFile } from '@colanode/client/types';
 import { FileNodeView } from '@colanode/ui/editor/views';
 import { toast } from '@colanode/ui/hooks/use-toast';
 
@@ -16,7 +16,7 @@ declare module '@tiptap/core' {
       /**
        * Insert a file
        */
-      addFile: (path: string) => ReturnType;
+      addFile: (file: TempFile) => ReturnType;
     };
   }
 }
@@ -45,12 +45,12 @@ export const FileNode = Node.create<FileNodeOptions>({
   addCommands() {
     const options = this.options;
     return {
-      addFile: (path: string) => {
+      addFile: (file: TempFile) => {
         return ({ editor, tr }) => {
           (async () => {
             const fileCreateResult = await window.colanode.executeMutation({
               type: 'file_create',
-              filePath: path,
+              file,
               accountId: options.context.accountId,
               workspaceId: options.context.workspaceId,
               parentId: options.context.documentId,
@@ -104,27 +104,8 @@ export const FileNode = Node.create<FileNodeOptions>({
 
             (async () => {
               for (const file of files) {
-                const buffer = await file.arrayBuffer();
-                const fileSaveResult = await window.colanode.executeMutation({
-                  type: 'file_save_temp',
-                  name: file.name,
-                  buffer,
-                  accountId: options.context.accountId,
-                  workspaceId: options.context.workspaceId,
-                });
-
-                if (!fileSaveResult.success) {
-                  toast({
-                    variant: 'destructive',
-                    title: 'Failed to add file',
-                    description: fileSaveResult.error.message,
-                  });
-
-                  return;
-                }
-
-                const path = fileSaveResult.output.path;
-                editor.commands.addFile(path);
+                const tempFile = await window.colanode.saveTempFile(file);
+                editor.commands.addFile(tempFile);
               }
             })();
 
@@ -143,27 +124,8 @@ export const FileNode = Node.create<FileNodeOptions>({
 
             (async () => {
               for (const file of files) {
-                const buffer = await file.arrayBuffer();
-                const fileSaveResult = await window.colanode.executeMutation({
-                  type: 'file_save_temp',
-                  name: file.name,
-                  buffer,
-                  accountId: options.context.accountId,
-                  workspaceId: options.context.workspaceId,
-                });
-
-                if (!fileSaveResult.success) {
-                  toast({
-                    variant: 'destructive',
-                    title: 'Failed to add file',
-                    description: fileSaveResult.error.message,
-                  });
-
-                  return;
-                }
-
-                const path = fileSaveResult.output.path;
-                editor.commands.addFile(path);
+                const tempFile = await window.colanode.saveTempFile(file);
+                editor.commands.addFile(tempFile);
               }
             })();
 

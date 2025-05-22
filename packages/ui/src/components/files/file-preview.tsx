@@ -7,7 +7,6 @@ import { FilePreviewOther } from '@colanode/ui/components/files/previews/file-pr
 import { FilePreviewVideo } from '@colanode/ui/components/files/previews/file-preview-video';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
-import { getFileUrl } from '@colanode/ui/lib/files';
 
 interface FilePreviewProps {
   file: LocalFileNode;
@@ -31,12 +30,7 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
     return <FileDownload file={file} state={data} />;
   }
 
-  const url = getFileUrl(
-    workspace.accountId,
-    workspace.id,
-    file.id,
-    file.attributes.extension
-  );
+  const url = workspace.getFileUrl(file.id, file.attributes.extension);
 
   return match(file.attributes.subtype)
     .with('image', () => (
