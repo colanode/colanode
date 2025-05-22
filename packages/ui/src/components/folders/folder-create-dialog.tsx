@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 import { generateId, IdType } from '@colanode/core';
 import { FolderForm } from '@colanode/ui/components/folders/folder-form';
 import {
@@ -10,7 +12,6 @@ import {
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface FolderCreateDialogProps {
   spaceId: string;
@@ -66,11 +67,7 @@ export const FolderCreateDialog = ({
                 layout.previewLeft(output.id);
               },
               onError(error) {
-                toast({
-                  title: 'Failed to create folder',
-                  description: error.message,
-                  variant: 'destructive',
-                });
+                toast.error(error.message);
               },
             });
           }}

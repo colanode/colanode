@@ -1,4 +1,5 @@
 import { Trash2 } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { NodeRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
@@ -6,7 +7,6 @@ import { NodeCollaboratorRoleDropdown } from '@colanode/ui/components/collaborat
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { useQuery } from '@colanode/ui/hooks/use-query';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface NodeCollaboratorProps {
   nodeId: string;
@@ -61,11 +61,7 @@ export const NodeCollaborator = ({
                 workspaceId: workspace.id,
               },
               onError(error) {
-                toast({
-                  title: 'Failed to update collaborator',
-                  description: error.message,
-                  variant: 'destructive',
-                });
+                toast.error(error.message);
               },
             });
           }}

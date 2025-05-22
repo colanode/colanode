@@ -1,5 +1,6 @@
 import { SquarePen } from 'lucide-react';
 import React from 'react';
+import { toast } from 'sonner';
 
 import {
   Popover,
@@ -10,7 +11,6 @@ import { UserSearch } from '@colanode/ui/components/users/user-search';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 export const ChatCreatePopover = () => {
   const workspace = useWorkspace();
@@ -41,11 +41,7 @@ export const ChatCreatePopover = () => {
                 setOpen(false);
               },
               onError(error) {
-                toast({
-                  title: 'Failed to create chat',
-                  description: error.message,
-                  variant: 'destructive',
-                });
+                toast.error(error.message);
               },
             });
           }}

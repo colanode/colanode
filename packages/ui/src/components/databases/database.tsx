@@ -1,10 +1,10 @@
 import React from 'react';
+import { toast } from 'sonner';
 
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { DatabaseContext } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface DatabaseProps {
   database: LocalDatabaseNode;
@@ -39,11 +39,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to create field',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         renameField: async (id, name) => {
@@ -59,11 +55,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update field',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         deleteField: async (id) => {
@@ -78,11 +70,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to delete field',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         createSelectOption: async (fieldId, name, color) => {
@@ -99,11 +87,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to create select option',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         updateSelectOption: async (fieldId, attributes) => {
@@ -121,11 +105,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update select option',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         deleteSelectOption: async (fieldId, optionId) => {
@@ -141,11 +121,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to delete select option',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
       }}

@@ -7,6 +7,7 @@ import {
   Upload,
 } from 'lucide-react';
 import React from 'react';
+import { toast } from 'sonner';
 
 import { LocalFolderNode, FolderLayoutType } from '@colanode/client/types';
 import { NodeRole } from '@colanode/core';
@@ -24,7 +25,6 @@ import { Dropzone } from '@colanode/ui/components/ui/dropzone';
 import { ScrollArea } from '@colanode/ui/components/ui/scroll-area';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 export type FolderLayoutOption = {
   value: FolderLayoutType;
@@ -90,21 +90,13 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
             })
             .then((result) => {
               if (!result.success) {
-                toast({
-                  title: 'Failed to upload file',
-                  description: result.error.message,
-                  variant: 'destructive',
-                });
+                toast.error(result.error.message);
               }
             });
         });
       },
       onCancel() {
-        toast({
-          title: 'Failed to upload files',
-          description: 'An error occurred while uploading the files.',
-          variant: 'destructive',
-        });
+        toast.error('An error occurred while uploading the files.');
       },
     });
   };

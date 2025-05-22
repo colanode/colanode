@@ -1,13 +1,13 @@
 import isHotkey from 'is-hotkey';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import React, { Fragment } from 'react';
+import { toast } from 'sonner';
 
 import { RecordNode } from '@colanode/core';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface NameEditorProps {
   initialValue: string;
@@ -81,11 +81,7 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
         setIsEditing(false);
       },
       onError(error) {
-        toast({
-          title: 'Failed to update record',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast.error(error.message);
       },
     });
   };

@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Plus } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import * as z from 'zod';
 
 import { DatabaseSelect } from '@colanode/ui/components/databases/database-select';
@@ -25,7 +26,6 @@ import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 const formSchema = z.object({
   name: z.string(),
@@ -88,11 +88,7 @@ export const FieldCreatePopover = () => {
         form.reset();
       },
       onError(error) {
-        toast({
-          title: 'Failed to create field',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast.error(error.message);
       },
     });
   };

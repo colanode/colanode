@@ -1,5 +1,6 @@
 import { MessagesSquare, Reply } from 'lucide-react';
 import React from 'react';
+import { toast } from 'sonner';
 
 import { LocalMessageNode } from '@colanode/client/types';
 import { MessageDeleteButton } from '@colanode/ui/components/messages/message-delete-button';
@@ -9,7 +10,6 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 import { defaultEmojis } from '@colanode/ui/lib/assets';
 
 const MessageAction = ({ children }: { children: React.ReactNode }) => {
@@ -48,11 +48,7 @@ export const MessageActions = ({ message }: MessageActionsProps) => {
           rootId: conversation.rootId,
         },
         onError(error) {
-          toast({
-            title: 'Failed to add reaction',
-            description: error.message,
-            variant: 'destructive',
-          });
+          toast.error(error.message);
         },
       });
     },
@@ -102,11 +98,7 @@ export const MessageActions = ({ message }: MessageActionsProps) => {
                 rootId: conversation.rootId,
               },
               onError(error) {
-                toast({
-                  title: 'Failed to add reaction',
-                  description: error.message,
-                  variant: 'destructive',
-                });
+                toast.error(error.message);
               },
             });
           }}

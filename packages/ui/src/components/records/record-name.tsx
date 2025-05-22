@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
+import { toast } from 'sonner';
 
 import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 export const RecordName = () => {
   const workspace = useWorkspace();
@@ -46,11 +46,7 @@ export const RecordName = () => {
             workspaceId: workspace.id,
           },
           onError(error) {
-            toast({
-              title: 'Failed to update record name',
-              description: error.message,
-              variant: 'destructive',
-            });
+            toast.error(error.message);
           },
         });
       }}

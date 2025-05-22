@@ -31,7 +31,7 @@ export class NotificationService {
 
     const accounts = this.appService.getAccounts();
     if (accounts.length === 0) {
-      app.dock.setBadge('');
+      app?.dock?.setBadge('');
       return;
     }
 
@@ -49,11 +49,11 @@ export class NotificationService {
     }
 
     if (unreadCount > 0) {
-      app.dock.setBadge(unreadCount.toString());
+      app?.dock?.setBadge(unreadCount.toString());
     } else if (hasUnread) {
-      app.dock.setBadge('·');
+      app?.dock?.setBadge('·');
     } else {
-      app.dock.setBadge('');
+      app?.dock?.setBadge('');
     }
   }
 }

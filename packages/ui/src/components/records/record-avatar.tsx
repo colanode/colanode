@@ -1,10 +1,11 @@
+import { toast } from 'sonner';
+
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { AvatarPopover } from '@colanode/ui/components/avatars/avatar-popover';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 export const RecordAvatar = () => {
   const workspace = useWorkspace();
@@ -40,11 +41,7 @@ export const RecordAvatar = () => {
             workspaceId: workspace.id,
           },
           onError(error) {
-            toast({
-              title: 'Failed to update record avatar',
-              description: error.message,
-              variant: 'destructive',
-            });
+            toast.error(error.message);
           },
         });
       }}

@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -11,7 +13,6 @@ import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface AccountLogoutProps {
   onCancel: () => void;
@@ -52,11 +53,7 @@ export const AccountLogout = ({ onCancel, onLogout }: AccountLogoutProps) => {
                   onLogout();
                 },
                 onError(error) {
-                  toast({
-                    title: 'Failed to logout',
-                    description: error.message,
-                    variant: 'destructive',
-                  });
+                  toast.error(error.message);
                 },
               });
             }}

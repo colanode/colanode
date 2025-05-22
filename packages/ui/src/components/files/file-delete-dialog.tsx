@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -11,7 +13,6 @@ import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface FileDeleteDialogProps {
   fileId: string;
@@ -56,11 +57,7 @@ export const FileDeleteDialog = ({
                   onOpenChange(false);
                 },
                 onError(error) {
-                  toast({
-                    title: 'Failed to delete file',
-                    description: error.message,
-                    variant: 'destructive',
-                  });
+                  toast.error(error.message);
                 },
               });
             }}

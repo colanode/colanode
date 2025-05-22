@@ -1,11 +1,11 @@
 import React from 'react';
+import { toast } from 'sonner';
 
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface AvatarUploadProps {
   onUpload: (id: string) => void;
@@ -80,20 +80,12 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
                   onUpload(output.id);
                 },
                 onError(error) {
-                  toast({
-                    title: 'Failed to upload avatar',
-                    description: error.message,
-                    variant: 'destructive',
-                  });
+                  toast.error(error.message);
                 },
               });
             },
             onError() {
-              toast({
-                title: 'Failed to upload avatar',
-                description: 'An error occurred while uploading the avatar.',
-                variant: 'destructive',
-              });
+              toast.error('Failed to upload avatar');
             },
           });
         }}

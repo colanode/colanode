@@ -1,10 +1,10 @@
 import React from 'react';
+import { toast } from 'sonner';
 
 import { LocalRecordNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { RecordContext } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 export const RecordProvider = ({
   record,
@@ -45,11 +45,7 @@ export const RecordProvider = ({
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update record field value',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         removeFieldValue: async (field) => {
@@ -62,11 +58,7 @@ export const RecordProvider = ({
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to delete record field value',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         getBooleanValue: (field) => {

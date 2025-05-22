@@ -1,4 +1,5 @@
 import { Check, ChevronDown } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { WorkspaceRole } from '@colanode/core';
 import {
@@ -10,7 +11,6 @@ import {
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface WorkspaceRoleItem {
   name: string;
@@ -109,11 +109,7 @@ export const WorkspaceUserRoleDropdown = ({
                     role: role.value,
                   },
                   onError(error) {
-                    toast({
-                      title: 'Failed to update role',
-                      description: error.message,
-                      variant: 'destructive',
-                    });
+                    toast.error(error.message);
                   },
                 });
               }}

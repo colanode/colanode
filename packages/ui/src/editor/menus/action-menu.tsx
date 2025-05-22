@@ -1,8 +1,6 @@
 import { useFloating, shift, offset, FloatingPortal } from '@floating-ui/react';
 import { Node as ProseMirrorNode } from '@tiptap/pm/model';
 import { NodeSelection, TextSelection } from '@tiptap/pm/state';
-// @ts-expect-error - we can just ignore this for now
-import { __serializeForClipboard } from '@tiptap/pm/view';
 import { Editor } from '@tiptap/react';
 import { GripVertical, Plus } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
@@ -198,7 +196,7 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
             );
 
             const slice = view.current.state.selection.content();
-            const { dom, text } = __serializeForClipboard(view.current, slice);
+            const { dom, text } = view.current.serializeForClipboard(slice);
 
             event.dataTransfer.clearData();
             event.dataTransfer.effectAllowed = 'copyMove';

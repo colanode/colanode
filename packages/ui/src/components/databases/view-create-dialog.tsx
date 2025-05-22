@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Calendar, Columns, Table } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { FieldAttributes, FieldType } from '@colanode/core';
@@ -28,7 +29,6 @@ import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 import { cn } from '@colanode/ui/lib/utils';
 
 const formSchema = z.object({
@@ -109,22 +109,16 @@ export const ViewCreateDialog = ({
 
     if (values.type === 'board') {
       if (!values.groupBy) {
-        toast({
-          title: 'Failed to create board view',
-          description:
-            'You need to specify a group by field to create a board view',
-          variant: 'destructive',
-        });
+        toast.error(
+          'You need to specify a group by field to create a board view'
+        );
         return;
       }
     } else if (values.type === 'calendar') {
       if (!values.groupBy) {
-        toast({
-          title: 'Failed to create calendar view',
-          description:
-            'You need to specify a group by field to create a calendar view',
-          variant: 'destructive',
-        });
+        toast.error(
+          'You need to specify a group by field to create a calendar view'
+        );
         return;
       }
     }
@@ -144,11 +138,7 @@ export const ViewCreateDialog = ({
         onOpenChange(false);
       },
       onError(error) {
-        toast({
-          title: 'Failed to create view',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast.error(error.message);
       },
     });
   };

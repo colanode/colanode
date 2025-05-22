@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { Button } from '@colanode/ui/components/ui/button';
@@ -24,7 +25,6 @@ import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { Textarea } from '@colanode/ui/components/ui/textarea';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),
@@ -78,11 +78,7 @@ export const SpaceCreateDialog = ({
         form.reset();
       },
       onError(error) {
-        toast({
-          title: 'Failed to create space',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast.error(error.message);
       },
     });
   };

@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'sonner';
 
 import {
   AlertDialog,
@@ -13,7 +14,6 @@ import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface SpaceDeleteFormProps {
   id: string;
@@ -73,18 +73,10 @@ export const SpaceDeleteForm = ({ id, onDeleted }: SpaceDeleteFormProps) => {
                   onSuccess() {
                     setShowDeleteModal(false);
                     onDeleted();
-                    toast({
-                      title: 'Space deleted',
-                      description: 'Space was deleted successfully',
-                      variant: 'default',
-                    });
+                    toast.success('Space deleted');
                   },
                   onError(error) {
-                    toast({
-                      title: 'Failed to delete space',
-                      description: error.message,
-                      variant: 'destructive',
-                    });
+                    toast.error(error.message);
                   },
                 });
               }}

@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'sonner';
 import { match } from 'ts-pattern';
 
 import { LocalDatabaseViewNode, ViewField } from '@colanode/client/types';
@@ -16,7 +17,6 @@ import { useDatabase } from '@colanode/ui/contexts/database';
 import { DatabaseViewContext } from '@colanode/ui/contexts/database-view';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { toast } from '@colanode/ui/hooks/use-toast';
 import {
   generateFieldValuesFromFilters,
   generateViewFieldIndex,
@@ -86,11 +86,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update view',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         updateAvatar: async (avatar: string) => {
@@ -108,11 +104,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update view',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         setFieldDisplay: async (id: string, display: boolean) => {
@@ -141,11 +133,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update view',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         resizeField: async (id: string, width: number) => {
@@ -178,11 +166,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update view',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         resizeName: async (width: number) => {
@@ -206,11 +190,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update view',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         moveField: async (id: string, after: string) => {
@@ -248,11 +228,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update view',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           }
         },
         isFieldFilterOpened: (fieldId: string) =>
@@ -293,11 +269,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update view',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           } else {
             setOpenedFieldFilters((prev) => [...prev, fieldId]);
           }
@@ -327,11 +299,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update view',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           } else {
             setIsSearchBarOpened(true);
           }
@@ -358,11 +326,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update view',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           } else {
             setIsSearchBarOpened(true);
           }
@@ -401,11 +365,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update view',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           } else {
             setIsSearchBarOpened(true);
             setIsSortsOpened(true);
@@ -433,11 +393,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update view',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           } else {
             setIsSearchBarOpened(true);
             setIsSortsOpened(true);
@@ -465,11 +421,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to update view',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           } else {
             setIsSearchBarOpened(true);
             setIsSortsOpened(true);
@@ -514,11 +466,7 @@ export const View = ({ view }: ViewProps) => {
           });
 
           if (!result.success) {
-            toast({
-              title: 'Failed to create record',
-              description: result.error.message,
-              variant: 'destructive',
-            });
+            toast.error(result.error.message);
           } else {
             layout.previewLeft(result.output.id, true);
           }

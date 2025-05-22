@@ -1,5 +1,6 @@
 import { Trash2 } from 'lucide-react';
 import React from 'react';
+import { toast } from 'sonner';
 
 import {
   AlertDialog,
@@ -14,7 +15,6 @@ import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface MessageDeleteButtonProps {
   id: string;
@@ -59,11 +59,7 @@ export const MessageDeleteButton = ({ id }: MessageDeleteButtonProps) => {
                     setShowDeleteModal(false);
                   },
                   onError(error) {
-                    toast({
-                      title: 'Failed to delete message',
-                      description: error.message,
-                      variant: 'destructive',
-                    });
+                    toast.error(error.message);
                   },
                 });
               }}

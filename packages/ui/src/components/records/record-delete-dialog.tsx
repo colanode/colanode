@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -12,7 +14,6 @@ import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface RecordDeleteDialogProps {
   open: boolean;
@@ -59,11 +60,7 @@ export const RecordDeleteDialog = ({
                   layout.close(recordId);
                 },
                 onError(error) {
-                  toast({
-                    title: 'Failed to delete record',
-                    description: error.message,
-                    variant: 'destructive',
-                  });
+                  toast.error(error.message);
                 },
               });
             }}

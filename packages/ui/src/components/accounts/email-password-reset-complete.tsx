@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { CheckCircle, Lock } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { Server } from '@colanode/client/types';
@@ -17,7 +18,6 @@ import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useCountdown } from '@colanode/ui/hooks/use-countdown';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 const formSchema = z
   .object({
@@ -64,11 +64,7 @@ export const EmailPasswordResetComplete = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (remainingSeconds <= 0) {
-      toast({
-        title: 'Code has expired',
-        description: 'Please request a new code',
-        variant: 'destructive',
-      });
+      toast.error('Code has expired');
       return;
     }
 
@@ -84,11 +80,7 @@ export const EmailPasswordResetComplete = ({
         setShowSuccess(true);
       },
       onError(error) {
-        toast({
-          title: 'Failed to reset password',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast.error(error.message);
       },
     });
   };

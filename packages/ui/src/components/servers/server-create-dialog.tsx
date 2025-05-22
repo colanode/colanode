@@ -1,4 +1,5 @@
 import React from 'react';
+import { toast } from 'sonner';
 
 import { Server } from '@colanode/client/types';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -14,7 +15,6 @@ import { Input } from '@colanode/ui/components/ui/input';
 import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface ServerCreateDialogProps {
   onCancel: () => void;
@@ -67,11 +67,7 @@ export const ServerCreateDialog = ({
                   onCreate(output.server);
                 },
                 onError(error) {
-                  toast({
-                    title: 'Failed to add server',
-                    description: error.message,
-                    variant: 'destructive',
-                  });
+                  toast.error(error.message);
                 },
               });
             }}

@@ -1,7 +1,8 @@
+import { toast } from 'sonner';
+
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 export const WorkspaceUpdate = () => {
   const workspace = useWorkspace();
@@ -27,18 +28,10 @@ export const WorkspaceUpdate = () => {
             avatar: values.avatar ?? null,
           },
           onSuccess() {
-            toast({
-              title: 'Workspace updated',
-              description: 'Workspace was updated successfully',
-              variant: 'default',
-            });
+            toast.success('Workspace updated');
           },
           onError(error) {
-            toast({
-              title: 'Failed to update workspace',
-              description: error.message,
-              variant: 'destructive',
-            });
+            toast.error(error.message);
           },
         });
       }}

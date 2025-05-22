@@ -1,6 +1,7 @@
 import { JSONContent } from '@tiptap/core';
 import { Plus, Search, Send, Upload } from 'lucide-react';
 import React from 'react';
+import { toast } from 'sonner';
 
 import { editorHasContent } from '@colanode/client/lib';
 import { LocalMessageNode } from '@colanode/client/types';
@@ -20,7 +21,6 @@ import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 export interface MessageCreateRefProps {
   setReplyTo: (replyTo: LocalMessageNode) => void;
@@ -84,11 +84,7 @@ export const MessageCreate = React.forwardRef<MessageCreateRefProps>(
           }
         },
         onError(error) {
-          toast({
-            title: 'Failed to create message',
-            description: error.message,
-            variant: 'destructive',
-          });
+          toast.error(error.message);
         },
       });
     }, [
@@ -116,11 +112,7 @@ export const MessageCreate = React.forwardRef<MessageCreateRefProps>(
         },
         onError(error) {
           console.error(error);
-          toast({
-            title: 'Failed to add file',
-            description: 'An error occurred while adding the file.',
-            variant: 'destructive',
-          });
+          toast.error('An error occurred while adding the file.');
         },
       });
     }, [messageEditorRef, isOpen]);

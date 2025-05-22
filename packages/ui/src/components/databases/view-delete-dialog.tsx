@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -12,7 +14,6 @@ import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface ViewDeleteDialogProps {
   id: string;
@@ -63,11 +64,7 @@ export const ViewDeleteDialog = ({
                   onOpenChange(false);
                 },
                 onError(error) {
-                  toast({
-                    title: 'Failed to delete view',
-                    description: error.message,
-                    variant: 'destructive',
-                  });
+                  toast.error(error.message);
                 },
               });
             }}

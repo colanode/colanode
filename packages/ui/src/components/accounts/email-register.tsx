@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Mail } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { Server } from '@colanode/client/types';
@@ -16,7 +17,6 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 const formSchema = z
   .object({
@@ -68,11 +68,7 @@ export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
         onSuccess(output);
       },
       onError(error) {
-        toast({
-          title: 'Failed to register',
-          description: error.message,
-          variant: 'destructive',
-        });
+        toast.error(error.message);
       },
     });
   };

@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { DatabaseForm } from '@colanode/ui/components/databases/database-form';
@@ -10,7 +12,6 @@ import {
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface DatabaseUpdateDialogProps {
   database: LocalDatabaseNode;
@@ -66,18 +67,10 @@ export const DatabaseUpdateDialog = ({
               },
               onSuccess() {
                 onOpenChange(false);
-                toast({
-                  title: 'Database updated',
-                  description: 'Database was updated successfully',
-                  variant: 'default',
-                });
+                toast.success('Database updated');
               },
               onError(error) {
-                toast({
-                  title: 'Failed to update database',
-                  description: error.message,
-                  variant: 'destructive',
-                });
+                toast.error(error.message);
               },
             });
           }}

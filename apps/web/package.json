@@ -22,6 +22,7 @@
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
     "typescript": "^5.7.2",
     "vite": "^6.1.0",
     "vite-plugin-pwa": "^1.0.0",

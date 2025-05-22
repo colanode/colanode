@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Upload } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { z } from 'zod';
 
 import { generateId, IdType } from '@colanode/core';
@@ -21,7 +22,6 @@ import { Textarea } from '@colanode/ui/components/ui/textarea';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { useFileDialog } from '@colanode/ui/hooks/use-file-dialog';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 import { cn } from '@colanode/ui/lib/utils';
 
 const formSchema = z.object({
@@ -98,21 +98,12 @@ export const WorkspaceForm = ({
                         form.setValue('avatar', output.id);
                       },
                       onError(error) {
-                        toast({
-                          title: 'Failed to upload avatar',
-                          description: error.message,
-                          variant: 'destructive',
-                        });
+                        toast.error(error.message);
                       },
                     });
                   },
                   onError() {
-                    toast({
-                      title: 'Failed to upload avatar',
-                      description:
-                        'An error occurred while uploading the avatar. Please try again.',
-                      variant: 'destructive',
-                    });
+                    toast.error('Failed to upload avatar');
                   },
                 });
               }}

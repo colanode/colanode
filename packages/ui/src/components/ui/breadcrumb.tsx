@@ -1,5 +1,5 @@
-import { ChevronRightIcon, DotsHorizontalIcon } from '@radix-ui/react-icons';
 import { Slot } from '@radix-ui/react-slot';
+import { ChevronRightIcon, EllipsisIcon } from 'lucide-react';
 import * as React from 'react';
 
 import { cn } from '@colanode/ui/lib/utils';
@@ -98,7 +98,7 @@ const BreadcrumbEllipsis = ({
     className={cn('flex h-9 w-9 items-center justify-center', className)}
     {...props}
   >
-    <DotsHorizontalIcon className="h-4 w-4" />
+    <EllipsisIcon className="h-4 w-4" />
     <span className="sr-only">More</span>
   </span>
 );

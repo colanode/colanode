@@ -1,10 +1,10 @@
 import { mergeAttributes, Node } from '@tiptap/core';
 import { Plugin, PluginKey } from '@tiptap/pm/state';
 import { ReactNodeViewRenderer } from '@tiptap/react';
+import { toast } from 'sonner';
 
 import { EditorContext, TempFile } from '@colanode/client/types';
 import { FileNodeView } from '@colanode/ui/editor/views';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface FileNodeOptions {
   context: EditorContext;
@@ -57,11 +57,7 @@ export const FileNode = Node.create<FileNodeOptions>({
             });
 
             if (!fileCreateResult.success) {
-              toast({
-                variant: 'destructive',
-                title: 'Failed to add file',
-                description: fileCreateResult.error.message,
-              });
+              toast.error(fileCreateResult.error.message);
               return;
             }
 

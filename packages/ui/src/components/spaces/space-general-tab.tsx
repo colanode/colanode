@@ -1,10 +1,11 @@
+import { toast } from 'sonner';
+
 import { LocalSpaceNode } from '@colanode/client/types';
 import { SpaceAvatar } from '@colanode/ui/components/spaces/space-avatar';
 import { SpaceDescription } from '@colanode/ui/components/spaces/space-description';
 import { SpaceName } from '@colanode/ui/components/spaces/space-name';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface SpaceGeneralTabProps {
   space: LocalSpaceNode;
@@ -32,11 +33,7 @@ export const SpaceGeneralTab = ({ space, readonly }: SpaceGeneralTabProps) => {
                 workspaceId: workspace.id,
               },
               onError(error) {
-                toast({
-                  title: 'Failed to update space avatar',
-                  description: error.message,
-                  variant: 'destructive',
-                });
+                toast.error(error.message);
               },
             });
           }}
@@ -54,11 +51,7 @@ export const SpaceGeneralTab = ({ space, readonly }: SpaceGeneralTabProps) => {
                 workspaceId: workspace.id,
               },
               onError(error) {
-                toast({
-                  title: 'Failed to update space name',
-                  description: error.message,
-                  variant: 'destructive',
-                });
+                toast.error(error.message);
               },
             });
           }}
@@ -79,11 +72,7 @@ export const SpaceGeneralTab = ({ space, readonly }: SpaceGeneralTabProps) => {
                 workspaceId: workspace.id,
               },
               onError(error) {
-                toast({
-                  title: 'Failed to update space description',
-                  description: error.message,
-                  variant: 'destructive',
-                });
+                toast.error(error.message);
               },
             });
           }}

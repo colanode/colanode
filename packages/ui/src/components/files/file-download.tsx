@@ -1,4 +1,5 @@
 import { Download } from 'lucide-react';
+import { toast } from 'sonner';
 
 import {
   DownloadStatus,
@@ -8,7 +9,6 @@ import {
 import { formatBytes } from '@colanode/core';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface FileDownloadProps {
   file: LocalFileNode;
@@ -44,11 +44,7 @@ export const FileDownload = ({ file, state }: FileDownloadProps) => {
             });
 
             if (!result.success) {
-              toast({
-                title: 'Failed to download file',
-                description: result.error.message,
-                variant: 'destructive',
-              });
+              toast.error(result.error.message);
             }
           }}
         >

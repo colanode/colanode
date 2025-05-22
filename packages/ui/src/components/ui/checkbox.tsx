@@ -1,5 +1,5 @@
 import * as CheckboxPrimitive from '@radix-ui/react-checkbox';
-import { CheckIcon } from '@radix-ui/react-icons';
+import { CheckIcon } from 'lucide-react';
 import * as React from 'react';
 
 import { cn } from '@colanode/ui/lib/utils';

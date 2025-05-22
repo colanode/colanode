@@ -1,5 +1,6 @@
 import { Check, Plus, X } from 'lucide-react';
 import React from 'react';
+import { toast } from 'sonner';
 
 import {
   MultiSelectFieldAttributes,
@@ -18,7 +19,6 @@ import {
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 import { getRandomSelectOptionColor } from '@colanode/ui/lib/databases';
 
 interface SelectFieldOptionsProps {
@@ -128,11 +128,7 @@ export const SelectFieldOptions = ({
                     onSelect(output.id);
                   },
                   onError(error) {
-                    toast({
-                      title: 'Failed to create select option',
-                      description: error.message,
-                      variant: 'destructive',
-                    });
+                    toast.error(error.message);
                   },
                 });
               }}

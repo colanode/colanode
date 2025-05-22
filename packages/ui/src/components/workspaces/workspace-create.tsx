@@ -1,7 +1,8 @@
+import { toast } from 'sonner';
+
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface WorkspaceCreateProps {
   onSuccess: (id: string) => void;
@@ -37,11 +38,7 @@ export const WorkspaceCreate = ({
                 onSuccess(output.id);
               },
               onError(error) {
-                toast({
-                  title: 'Failed to create workspace',
-                  description: error.message,
-                  variant: 'destructive',
-                });
+                toast.error(error.message);
               },
             });
           }}

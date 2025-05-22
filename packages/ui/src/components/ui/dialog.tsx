@@ -1,5 +1,5 @@
 import * as DialogPrimitive from '@radix-ui/react-dialog';
-import { Cross2Icon } from '@radix-ui/react-icons';
+import { XIcon } from 'lucide-react';
 import * as React from 'react';
 
 import { cn } from '@colanode/ui/lib/utils';
@@ -57,7 +57,7 @@ const DialogClose = React.forwardRef<
     )}
     {...props}
   >
-    <Cross2Icon className="h-4 w-4" />
+    <XIcon className="h-4 w-4" />
     <span className="sr-only">Close</span>
   </DialogPrimitive.Close>
 ));

@@ -8,6 +8,7 @@ import {
 } from '@tiptap/react';
 import { debounce, isEqual } from 'lodash-es';
 import React from 'react';
+import { toast } from 'sonner';
 
 import {
   restoreRelativeSelection,
@@ -77,7 +78,6 @@ import {
   AutoJoiner,
 } from '@colanode/ui/editor/extensions';
 import { ToolbarMenu, ActionMenu } from '@colanode/ui/editor/menus';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface DocumentEditorProps {
   node: LocalNode;
@@ -154,11 +154,7 @@ export const DocumentEditor = ({
         });
 
         if (!result.success) {
-          toast({
-            title: 'Failed to save changes',
-            description: result.error.message,
-            variant: 'destructive',
-          });
+          toast.error(result.error.message);
         }
       }, 500),
     [node.id]

@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 import { LocalFolderNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { FolderForm } from '@colanode/ui/components/folders/folder-form';
@@ -10,7 +12,6 @@ import {
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface FolderUpdateDialogProps {
   folder: LocalFolderNode;
@@ -64,18 +65,10 @@ export const FolderUpdateDialog = ({
               },
               onSuccess() {
                 onOpenChange(false);
-                toast({
-                  title: 'Folder updated',
-                  description: 'Folder was updated successfully',
-                  variant: 'default',
-                });
+                toast.success('Folder was updated successfully');
               },
               onError(error) {
-                toast({
-                  title: 'Failed to update folder',
-                  description: error.message,
-                  variant: 'destructive',
-                });
+                toast.error(error.message);
               },
             });
           }}

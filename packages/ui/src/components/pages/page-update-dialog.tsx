@@ -1,3 +1,5 @@
+import { toast } from 'sonner';
+
 import { LocalPageNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { PageForm } from '@colanode/ui/components/pages/page-form';
@@ -10,7 +12,6 @@ import {
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { toast } from '@colanode/ui/hooks/use-toast';
 
 interface PageUpdateDialogProps {
   page: LocalPageNode;
@@ -64,18 +65,10 @@ export const PageUpdateDialog = ({
               },
               onSuccess() {
                 onOpenChange(false);
-                toast({
-                  title: 'Page updated',
-                  description: 'Page was updated successfully',
-                  variant: 'default',
-                });
+                toast.success('Page was updated successfully');
               },
               onError(error) {
-                toast({
-                  title: 'Failed to update page',
-                  description: error.message,
-                  variant: 'destructive',
-                });
+                toast.error(error.message);
               },
             });
           }}
