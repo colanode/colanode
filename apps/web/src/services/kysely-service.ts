@@ -1,4 +1,6 @@
 import sqlite3InitModule, {
+  SAHPoolUtil,
+  Sqlite3Static,
   type BindableValue,
   type Database,
 } from '@sqlite.org/sqlite-wasm';
@@ -18,24 +20,70 @@ import { KyselyBuildOptions, KyselyService } from '@colanode/client/services';
 import { WebFileSystem } from '@colanode/web/services/file-system';
 
 export class WebKyselyService implements KyselyService {
-  build<T>(options: KyselyBuildOptions): Kysely<T> {
-    const dialect = new SqliteWasmDialect(options);
+  private readonly pools: Map<string, SAHPoolUtil> = new Map();
+  private sqlite3?: Sqlite3Static;
+
+  public build<T>(options: KyselyBuildOptions): Kysely<T> {
+    const dialect = new SqliteWasmDialect(this, options);
 
     return new Kysely<T>({
       dialect,
     });
   }
+
+  public async delete(path: string): Promise<void> {
+    const pool = this.pools.get(path);
+    if (pool) {
+      await pool.removeVfs();
+      this.pools.delete(path);
+    } else {
+      if (!this.sqlite3) {
+        this.sqlite3 = await sqlite3InitModule({
+          print: console.log,
+          printErr: console.error,
+        });
+      }
+
+      const pool = await this.sqlite3.installOpfsSAHPoolVfs({
+        name: this.buildVfsName(path),
+      });
+
+      pool.removeVfs();
+    }
+  }
+
+  public async buildPool(path: string): Promise<SAHPoolUtil> {
+    if (!this.sqlite3) {
+      this.sqlite3 = await sqlite3InitModule({
+        print: console.log,
+        printErr: console.error,
+      });
+    }
+
+    const pool = await this.sqlite3.installOpfsSAHPoolVfs({
+      name: this.buildVfsName(path),
+    });
+
+    this.pools.set(path, pool);
+    return pool;
+  }
+
+  private buildVfsName(path: string): string {
+    return path.replace(/\//g, '_').split('.')[0]!;
+  }
 }
 
 export class SqliteWasmDialect implements Dialect {
+  private readonly kysely: WebKyselyService;
   private readonly options: KyselyBuildOptions;
 
-  constructor(options: KyselyBuildOptions) {
+  constructor(kysely: WebKyselyService, options: KyselyBuildOptions) {
+    this.kysely = kysely;
     this.options = options;
   }
 
   createAdapter = () => new SqliteAdapter();
-  createDriver = () => new SqliteWasmDriver(this.options);
+  createDriver = () => new SqliteWasmDriver(this.kysely, this.options);
   createIntrospector = (db: Kysely<unknown>) => new SqliteIntrospector(db);
   createQueryCompiler = () => new SqliteQueryCompiler();
 }
@@ -43,24 +91,19 @@ export class SqliteWasmDialect implements Dialect {
 class SqliteWasmDriver implements Driver {
   private readonly fs = new WebFileSystem();
   private readonly mutex = new ConnectionMutex();
+  private readonly kysely: WebKyselyService;
   private readonly options: KyselyBuildOptions;
 
   private database?: Database;
   private connection?: DatabaseConnection;
 
-  constructor(options: KyselyBuildOptions) {
+  constructor(kysely: WebKyselyService, options: KyselyBuildOptions) {
+    this.kysely = kysely;
     this.options = options;
   }
 
   async init(): Promise<void> {
-    const sqlite3 = await sqlite3InitModule({
-      print: console.log,
-      printErr: console.error,
-    });
-
-    const pool = await sqlite3.installOpfsSAHPoolVfs({
-      name: this.buildVfsName(),
-    });
+    const pool = await this.kysely.buildPool(this.options.path);
 
     if (this.options.readonly) {
       const databaseExists = await this.fs.exists(this.options.path);
@@ -97,10 +140,6 @@ class SqliteWasmDriver implements Driver {
 
   async destroy(): Promise<void> {
     this.database?.close();
-  }
-
-  private buildVfsName(): string {
-    return this.options.path.replace(/\//g, '_').split('.')[0]!;
   }
 
   private buildImportDbPath(): string {

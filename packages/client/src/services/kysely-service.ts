@@ -7,4 +7,5 @@ export interface KyselyBuildOptions {
 
 export interface KyselyService {
   build<T>(options: KyselyBuildOptions): Kysely<T>;
+  delete(path: string): Promise<void>;
 }

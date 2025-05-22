@@ -128,6 +128,13 @@ export class WorkspaceService {
       this.mutations.destroy();
       this.radar.destroy();
 
+      const databasePath = this.account.app.path.workspaceDatabase(
+        this.account.id,
+        this.workspace.id
+      );
+
+      await this.account.app.kysely.delete(databasePath);
+
       const workspacePath = this.account.app.path.workspace(
         this.account.id,
         this.workspace.id

@@ -28,4 +28,10 @@ export class DesktopKyselyService implements KyselyService {
       }),
     });
   }
+
+  async delete(path: string): Promise<void> {
+    if (fs.existsSync(path)) {
+      fs.unlinkSync(path);
+    }
+  }
 }

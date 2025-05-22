@@ -151,6 +151,9 @@ export class AccountService {
       this.eventLoop.stop();
       eventBus.unsubscribe(this.eventSubscriptionId);
 
+      const databasePath = this.app.path.accountDatabase(this.account.id);
+      await this.app.kysely.delete(databasePath);
+
       const accountPath = this.app.path.account(this.account.id);
       await this.app.fs.delete(accountPath);
 
