@@ -12,7 +12,8 @@ export interface PathService {
   workspaceFile: (
     accountId: string,
     workspaceId: string,
-    file: string
+    fileId: string,
+    extension: string
   ) => string;
   accountAvatars: (accountId: string) => string;
   accountAvatar: (accountId: string, avatarId: string) => string;

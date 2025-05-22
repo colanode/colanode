@@ -22,15 +22,27 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
     workspaceId: workspace.id,
   });
 
-  if (isPending) {
+  const { data: urlData, isPending: isUrlPending } = useQuery(
+    {
+      type: 'file_url_get',
+      id: file.id,
+      extension: file.attributes.extension,
+      accountId: workspace.accountId,
+      workspaceId: workspace.id,
+    },
+    {
+      enabled: data?.downloadProgress === 100,
+    }
+  );
+
+  if (isPending || isUrlPending) {
     return null;
   }
 
-  if (data?.downloadProgress !== 100) {
+  const url = urlData?.url;
+  if (data?.downloadProgress !== 100 || !url) {
     return <FileDownload file={file} state={data} />;
   }
-
-  const url = workspace.getFileUrl(file.id, file.attributes.extension);
 
   return match(file.attributes.subtype)
     .with('image', () => (

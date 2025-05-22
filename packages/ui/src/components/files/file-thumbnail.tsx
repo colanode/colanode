@@ -19,9 +19,26 @@ export const FileThumbnail = ({ file, className }: FileThumbnailProps) => {
     workspaceId: workspace.id,
   });
 
-  if (file.attributes.subtype === 'image' && data?.downloadProgress === 100) {
-    const url = workspace.getFileUrl(file.id, file.attributes.extension);
+  const { data: urlData } = useQuery(
+    {
+      type: 'file_url_get',
+      id: file.id,
+      extension: file.attributes.extension,
+      accountId: workspace.accountId,
+      workspaceId: workspace.id,
+    },
+    {
+      enabled: data?.downloadProgress === 100,
+    }
+  );
 
+  const url = urlData?.url;
+
+  if (
+    file.attributes.subtype === 'image' &&
+    data?.downloadProgress === 100 &&
+    url
+  ) {
     return (
       <img
         src={url}

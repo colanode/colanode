@@ -284,6 +284,8 @@ const api: ColanodeWorkerApi = {
     const filePath = path.tempFile(fileName);
     await fs.writeFile(filePath, fileData);
 
+    const url = await fs.url(filePath);
+
     return {
       id,
       name: file.name,
@@ -292,6 +294,7 @@ const api: ColanodeWorkerApi = {
       path: filePath,
       extension,
       mimeType,
+      url,
     };
   },
 };

@@ -127,7 +127,7 @@ export class FileService {
       );
     }
 
-    this.copyFileToWorkspace(file.path, id, file.extension);
+    await this.copyFileToWorkspace(file.path, id, file.extension);
 
     const attributes: FileAttributes = {
       type: 'file',

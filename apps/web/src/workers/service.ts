@@ -3,8 +3,6 @@
 // Service worker that intercepts requests with the path /asset
 declare const self: ServiceWorkerGlobalScope;
 
-import { fileTypeFromBuffer } from 'file-type';
-
 import { WebFileSystem } from '@colanode/web/services/file-system';
 import { WebPathService } from '@colanode/web/services/path-service';
 
@@ -52,62 +50,4 @@ self.addEventListener('install', (event: ExtendableEvent) => {
 
 self.addEventListener('activate', (event: ExtendableEvent) => {
   event.waitUntil(self.clients.claim());
-});
-
-self.addEventListener('fetch', (event: FetchEvent) => {
-  const url = new URL(event.request.url);
-
-  if (url.pathname.startsWith('/files')) {
-    event.respondWith(
-      (async () => {
-        const urlPath = url.pathname.split('/files/')[1];
-        const [accountId, workspaceId, file] = urlPath?.split('/') ?? [];
-
-        if (!accountId || !workspaceId || !file) {
-          return new Response('Not found', { status: 404 });
-        }
-
-        const filePath = path.workspaceFile(accountId, workspaceId, file);
-        const exists = await fs.exists(filePath);
-
-        if (!exists) {
-          return new Response('Not found', { status: 404 });
-        }
-
-        const fileBuffer = await fs.readFile(filePath);
-        const fileType = await fileTypeFromBuffer(fileBuffer);
-
-        return new Response(fileBuffer, {
-          headers: {
-            'Content-Type': fileType?.mime ?? 'application/octet-stream',
-          },
-        });
-      })()
-    );
-  } else if (url.pathname.startsWith('/temp')) {
-    event.respondWith(
-      (async () => {
-        const name = url.pathname.split('/temp/')[1];
-        if (!name) {
-          return new Response('Not found', { status: 404 });
-        }
-
-        const filePath = path.tempFile(name);
-        const exists = await fs.exists(filePath);
-
-        if (!exists) {
-          return new Response('Not found', { status: 404 });
-        }
-
-        const fileBuffer = await fs.readFile(filePath);
-        const fileType = await fileTypeFromBuffer(fileBuffer);
-
-        return new Response(fileBuffer, {
-          headers: {
-            'Content-Type': fileType?.mime ?? 'application/octet-stream',
-          },
-        });
-      })()
-    );
-  }
 });

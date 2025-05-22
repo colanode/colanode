@@ -16,7 +16,6 @@ interface WorkspaceContext extends Workspace {
     value: WorkspaceMetadataMap[K]['value']
   ) => void;
   deleteMetadata: <K extends WorkspaceMetadataKey>(key: K) => void;
-  getFileUrl: (id: string, extension: string) => string;
 }
 
 export const WorkspaceContext = createContext<WorkspaceContext>(

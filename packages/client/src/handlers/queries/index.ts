@@ -20,6 +20,7 @@ import { EmojiListQueryHandler } from './emojis/emoji-list';
 import { EmojiSearchQueryHandler } from './emojis/emoji-search';
 import { FileListQueryHandler } from './files/file-list';
 import { FileStateGetQueryHandler } from './files/file-state-get';
+import { FileUrlGetQueryHandler } from './files/file-url-get';
 import { IconCategoryListQueryHandler } from './icons/icon-category-list';
 import { IconListQueryHandler } from './icons/icon-list';
 import { IconSearchQueryHandler } from './icons/icon-search';
@@ -61,6 +62,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     workspace_list: new WorkspaceListQueryHandler(app),
     user_list: new UserListQueryHandler(app),
     file_list: new FileListQueryHandler(app),
+    file_url_get: new FileUrlGetQueryHandler(app),
     emoji_list: new EmojiListQueryHandler(app),
     emoji_get: new EmojiGetQueryHandler(app),
     emoji_get_by_skin_id: new EmojiGetBySkinIdQueryHandler(app),

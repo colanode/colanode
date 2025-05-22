@@ -7,7 +7,6 @@ import {
 } from '@colanode/client/types';
 import { Layout } from '@colanode/ui/components/layouts/layout';
 import { WorkspaceSettingsDialog } from '@colanode/ui/components/workspaces/workspace-settings-dialog';
-import { useApp } from '@colanode/ui/contexts';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
@@ -17,7 +16,6 @@ interface WorkspaceProps {
 }
 
 export const Workspace = ({ workspace }: WorkspaceProps) => {
-  const app = useApp();
   const account = useAccount();
   const [openSettings, setOpenSettings] = React.useState(false);
 
@@ -69,13 +67,6 @@ export const Workspace = ({ workspace }: WorkspaceProps) => {
             workspaceId: workspace.id,
             key,
           });
-        },
-        getFileUrl(id, extension) {
-          if (app.type === 'web') {
-            return `/files/${account.id}/${workspace.id}/${id}${extension}`;
-          }
-
-          return `local-file://${account.id}/${workspace.id}/${id}${extension}`;
         },
       }}
     >

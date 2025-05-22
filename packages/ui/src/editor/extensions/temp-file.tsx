@@ -42,6 +42,9 @@ export const TempFileNode = Node.create({
       extension: {
         default: null,
       },
+      url: {
+        default: null,
+      },
     };
   },
   renderHTML({ HTMLAttributes }) {

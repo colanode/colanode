@@ -13,6 +13,7 @@ export type TempFile = {
   type: FileSubtype;
   mimeType: string;
   extension: string;
+  url: string;
 };
 
 export type FileState = {

@@ -6,7 +6,6 @@ import {
   shell,
   globalShortcut,
 } from 'electron';
-import fs from 'fs/promises';
 
 import started from 'electron-squirrel-startup';
 import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
@@ -232,7 +231,8 @@ ipcMain.handle(
     const fileName = `${name}.${id}${extension}`;
     const filePath = app.path.tempFile(fileName);
 
-    await fs.writeFile(filePath, file.buffer);
+    await app.fs.writeFile(filePath, file.buffer);
+    const url = await app.fs.url(filePath);
 
     return {
       id,
@@ -242,6 +242,7 @@ ipcMain.handle(
       type,
       path: filePath,
       extension,
+      url,
     };
   }
 );

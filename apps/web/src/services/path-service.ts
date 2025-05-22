@@ -65,9 +65,13 @@ export class WebPathService implements PathService {
   public workspaceFile(
     accountId: string,
     workspaceId: string,
-    file: string
+    fileId: string,
+    extension: string
   ): string {
-    return this.join(this.workspaceFiles(accountId, workspaceId), file);
+    return this.join(
+      this.workspaceFiles(accountId, workspaceId),
+      fileId + extension
+    );
   }
 
   public accountAvatars(accountId: string): string {

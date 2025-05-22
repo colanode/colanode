@@ -36,6 +36,7 @@ export * from './workspaces/workspace-get';
 export * from './workspaces/workspace-list';
 export * from './workspaces/workspace-metadata-list';
 export * from './avatars/avatar-url-get';
+export * from './files/file-url-get';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface QueryMap {}

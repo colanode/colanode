@@ -103,11 +103,12 @@ export class DesktopPathService implements PathService {
   public workspaceFile(
     accountId: string,
     workspaceId: string,
-    file: string
+    fileId: string,
+    extension: string
   ): string {
     return this.nativePath.join(
       this.getWorkspaceFilesDirectoryPath(accountId, workspaceId),
-      file
+      fileId + extension
     );
   }
 

@@ -7,10 +7,8 @@ import { TempFile } from '@colanode/client/types';
 import { FilePreviewImage } from '@colanode/ui/components/files/previews/file-preview-image';
 import { FilePreviewOther } from '@colanode/ui/components/files/previews/file-preview-other';
 import { FilePreviewVideo } from '@colanode/ui/components/files/previews/file-preview-video';
-import { useApp } from '@colanode/ui/contexts';
 
 export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
-  const app = useApp();
   const file = node.attrs as TempFile;
 
   if (!file) {
@@ -20,7 +18,6 @@ export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
   const mimeType = file.mimeType;
   const name = file.name;
   const type = file.type;
-  const url = app.type === 'web' ? `/${file.path}` : `temp-file://${file.path}`;
 
   return (
     <NodeViewWrapper
@@ -35,8 +32,8 @@ export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
           <X className="size-4" />
         </button>
         {match(type)
-          .with('image', () => <FilePreviewImage url={url} name={name} />)
-          .with('video', () => <FilePreviewVideo url={url} />)
+          .with('image', () => <FilePreviewImage url={file.url} name={name} />)
+          .with('video', () => <FilePreviewVideo url={file.url} />)
           .with('other', () => <FilePreviewOther mimeType={mimeType} />)
           .otherwise(() => null)}
       </div>
