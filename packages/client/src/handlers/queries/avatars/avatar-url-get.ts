@@ -22,7 +22,6 @@ export class AvatarUrlGetQueryHandler
       input.accountId,
       input.avatarId
     );
-    console.log('avatarPath', avatarPath);
 
     const avatarExists = await this.app.fs.exists(avatarPath);
     if (avatarExists) {

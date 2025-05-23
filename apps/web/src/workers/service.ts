@@ -83,6 +83,12 @@ self.addEventListener('activate', (event: ExtendableEvent) => {
 });
 
 self.addEventListener('fetch', (event: FetchEvent) => {
+  const requestUrl = new URL(event.request.url);
+
+  if (requestUrl.origin !== self.location.origin) {
+    return;
+  }
+
   event.respondWith(
     (async () => {
       try {

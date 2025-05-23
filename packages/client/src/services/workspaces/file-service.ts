@@ -127,7 +127,10 @@ export class FileService {
       );
     }
 
-    await this.copyFileToWorkspace(file.path, id, file.extension);
+    const destinationFilePath = this.buildFilePath(id, file.extension);
+    await this.app.fs.makeDirectory(this.filesDir);
+    await this.app.fs.copy(file.path, destinationFilePath);
+    await this.app.fs.delete(file.path);
 
     const attributes: FileAttributes = {
       type: 'file',
@@ -190,27 +193,6 @@ export class FileService {
 
     const filePath = this.buildFilePath(file.id, file.attributes.extension);
     await this.app.fs.delete(filePath);
-  }
-
-  private async copyFileToWorkspace(
-    filePath: string,
-    fileId: string,
-    fileExtension: string
-  ): Promise<void> {
-    const destinationFilePath = this.buildFilePath(fileId, fileExtension);
-
-    await this.app.fs.makeDirectory(this.filesDir);
-
-    debug(`Copying file ${filePath} to ${destinationFilePath}`);
-    await this.app.fs.copy(filePath, destinationFilePath);
-
-    // check if the file is in the temp files directory. If it is in
-    // temp files directory it means it has been pasted or dragged
-    // therefore we need to delete it
-    const fileDirectory = this.app.path.dirname(filePath);
-    if (fileDirectory === this.app.path.temp) {
-      await this.app.fs.delete(filePath);
-    }
   }
 
   public triggerUploads(): void {
