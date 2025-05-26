@@ -69,11 +69,11 @@ export class EventLoop {
     }
 
     const timeout = this.triggered ? this.debounce : this.interval;
+    this.status = 'scheduled';
     this.timeout = setTimeout(() => {
       this.execute();
     }, timeout);
 
-    this.status = 'scheduled';
     this.triggered = false;
   }
 }
