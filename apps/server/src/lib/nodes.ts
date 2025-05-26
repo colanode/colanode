@@ -6,12 +6,14 @@ import {
   CanUpdateAttributesContext,
   createDebugger,
   CreateNodeMutationData,
+  DeleteNodeMutationData,
   extractNodeCollaborators,
   generateId,
   getNodeModel,
   IdType,
   Node,
   NodeAttributes,
+  MutationStatus,
   UpdateNodeMutationData,
 } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
@@ -34,11 +36,7 @@ import { jobService } from '@colanode/server/services/job-service';
 import {
   ConcurrentUpdateResult,
   CreateNodeInput,
-  CreateNodeOutput,
-  DeleteNodeInput,
-  DeleteNodeOutput,
   UpdateNodeInput,
-  UpdateNodeOutput,
 } from '@colanode/server/types/nodes';
 
 const debug = createDebugger('server:lib:nodes');
@@ -107,15 +105,13 @@ export const fetchNodeDescendants = async (
   return result.map((row) => row.descendant_id);
 };
 
-export const createNode = async (
-  input: CreateNodeInput
-): Promise<CreateNodeOutput | null> => {
+export const createNode = async (input: CreateNodeInput): Promise<boolean> => {
   const model = getNodeModel(input.attributes.type);
   const ydoc = new YDoc();
   const update = ydoc.update(model.attributesSchema, input.attributes);
 
   if (!update) {
-    return null;
+    return false;
   }
 
   const attributes = ydoc.getObject<NodeAttributes>();
@@ -206,39 +202,35 @@ export const createNode = async (
 
     await scheduleNodeEmbedding(createdNode);
 
-    return {
-      node: createdNode,
-    };
+    return true;
   } catch (error) {
     debug(`Failed to create node transaction: ${error}`);
-    return null;
+    return false;
   }
 };
 
-export const updateNode = async (
-  input: UpdateNodeInput
-): Promise<UpdateNodeOutput | null> => {
+export const updateNode = async (input: UpdateNodeInput): Promise<boolean> => {
   for (let count = 0; count < UPDATE_RETRIES_LIMIT; count++) {
     const result = await tryUpdateNode(input);
 
     if (result.type === 'success') {
-      return result.output;
+      return true;
     }
 
     if (result.type === 'error') {
-      return null;
+      return false;
     }
   }
 
-  return null;
+  return false;
 };
 
 export const tryUpdateNode = async (
   input: UpdateNodeInput
-): Promise<ConcurrentUpdateResult<UpdateNodeOutput>> => {
+): Promise<ConcurrentUpdateResult<SelectNode>> => {
   const node = await fetchNode(input.nodeId);
   if (!node) {
-    return { type: 'error', output: null };
+    return { type: 'error', error: 'Node not found' };
   }
 
   const nodeUpdates = await fetchNodeUpdates(input.nodeId);
@@ -250,14 +242,14 @@ export const tryUpdateNode = async (
   const currentAttributes = ydoc.getObject<NodeAttributes>();
   const updatedAttributes = input.updater(cloneDeep(currentAttributes));
   if (!updatedAttributes) {
-    return { type: 'error', output: null };
+    return { type: 'error', error: 'Failed to update node' };
   }
 
   const model = getNodeModel(node.type);
   const update = ydoc.update(model.attributesSchema, updatedAttributes);
 
   if (!update) {
-    return { type: 'success', output: null };
+    return { type: 'error', error: 'Failed to update node' };
   }
 
   const attributes = ydoc.getObject<NodeAttributes>();
@@ -353,19 +345,22 @@ export const tryUpdateNode = async (
 
     return {
       type: 'success',
-      output: {
-        node: updatedNode,
-      },
+      output: updatedNode,
     };
   } catch {
-    return { type: 'retry', output: null };
+    return { type: 'retry' };
   }
 };
 
 export const createNodeFromMutation = async (
   user: SelectUser,
   mutation: CreateNodeMutationData
-): Promise<CreateNodeOutput | null> => {
+): Promise<MutationStatus> => {
+  const existingNode = await fetchNode(mutation.nodeId);
+  if (existingNode) {
+    return MutationStatus.OK;
+  }
+
   const ydoc = new YDoc(mutation.data);
   const attributes = ydoc.getObject<NodeAttributes>();
   const model = getNodeModel(attributes.type);
@@ -389,7 +384,7 @@ export const createNodeFromMutation = async (
   };
 
   if (!model.canCreate(canCreateNodeContext)) {
-    return null;
+    return MutationStatus.FORBIDDEN;
   }
 
   const rootId = tree[0]?.id ?? mutation.nodeId;
@@ -475,19 +470,27 @@ export const createNodeFromMutation = async (
 
     await scheduleNodeEmbedding(createdNode);
 
-    return {
-      node: createdNode,
-    };
+    return MutationStatus.CREATED;
   } catch (error) {
     debug(`Failed to create node transaction: ${error}`);
-    return null;
+    return MutationStatus.INTERNAL_SERVER_ERROR;
   }
 };
 
 export const updateNodeFromMutation = async (
   user: SelectUser,
   mutation: UpdateNodeMutationData
-): Promise<UpdateNodeOutput | null> => {
+): Promise<MutationStatus> => {
+  const existingNodeUpdate = await database
+    .selectFrom('node_updates')
+    .selectAll()
+    .where('id', '=', mutation.updateId)
+    .executeTakeFirst();
+
+  if (existingNodeUpdate) {
+    return MutationStatus.OK;
+  }
+
   for (let count = 0; count < UPDATE_RETRIES_LIMIT; count++) {
     const result = await tryUpdateNodeFromMutation(user, mutation);
 
@@ -496,25 +499,25 @@ export const updateNodeFromMutation = async (
     }
 
     if (result.type === 'error') {
-      return null;
+      return MutationStatus.INTERNAL_SERVER_ERROR;
     }
   }
 
-  return null;
+  return MutationStatus.INTERNAL_SERVER_ERROR;
 };
 
 const tryUpdateNodeFromMutation = async (
   user: SelectUser,
   mutation: UpdateNodeMutationData
-): Promise<ConcurrentUpdateResult<UpdateNodeOutput>> => {
+): Promise<ConcurrentUpdateResult<MutationStatus>> => {
   const tree = await fetchNodeTree(mutation.nodeId);
   if (tree.length === 0) {
-    return { type: 'error', output: null };
+    return { type: 'success', output: MutationStatus.NOT_FOUND };
   }
 
   const node = tree[tree.length - 1];
   if (!node || node.id !== mutation.nodeId) {
-    return { type: 'error', output: null };
+    return { type: 'success', output: MutationStatus.NOT_FOUND };
   }
 
   const nodeUpdates = await fetchNodeUpdates(mutation.nodeId);
@@ -543,7 +546,7 @@ const tryUpdateNodeFromMutation = async (
 
   const model = getNodeModel(node.type);
   if (!model.canUpdateAttributes(canUpdateNodeContext)) {
-    return { type: 'error', output: null };
+    return { type: 'success', output: MutationStatus.FORBIDDEN };
   }
 
   const collaboratorChanges = checkCollaboratorChanges(
@@ -632,29 +635,24 @@ const tryUpdateNodeFromMutation = async (
 
     await scheduleNodeEmbedding(updatedNode);
 
-    return {
-      type: 'success',
-      output: {
-        node: updatedNode,
-      },
-    };
+    return { type: 'success', output: MutationStatus.OK };
   } catch {
-    return { type: 'retry', output: null };
+    return { type: 'retry' };
   }
 };
 
-export const deleteNode = async (
+export const deleteNodeFromMutation = async (
   user: SelectUser,
-  input: DeleteNodeInput
-): Promise<DeleteNodeOutput | null> => {
-  const tree = await fetchNodeTree(input.nodeId);
+  mutation: DeleteNodeMutationData
+): Promise<MutationStatus> => {
+  const tree = await fetchNodeTree(mutation.nodeId);
   if (tree.length === 0) {
-    return null;
+    return MutationStatus.OK;
   }
 
   const node = tree[tree.length - 1];
-  if (!node || node.id !== input.nodeId) {
-    return null;
+  if (!node || node.id !== mutation.nodeId) {
+    return MutationStatus.OK;
   }
 
   const model = getNodeModel(node.type);
@@ -670,14 +668,14 @@ export const deleteNode = async (
   };
 
   if (!model.canDelete(canDeleteNodeContext)) {
-    return null;
+    return MutationStatus.FORBIDDEN;
   }
 
   const { deletedNode } = await database.transaction().execute(async (trx) => {
     const deletedNode = await trx
       .deleteFrom('nodes')
       .returningAll()
-      .where('id', '=', input.nodeId)
+      .where('id', '=', mutation.nodeId)
       .executeTakeFirst();
 
     if (!deletedNode) {
@@ -691,7 +689,7 @@ export const deleteNode = async (
         id: node.id,
         root_id: node.root_id,
         workspace_id: node.workspace_id,
-        deleted_at: new Date(input.deletedAt),
+        deleted_at: new Date(mutation.deletedAt),
         deleted_by: user.id,
       })
       .executeTakeFirst();
@@ -709,7 +707,7 @@ export const deleteNode = async (
     const upload = await database
       .selectFrom('uploads')
       .selectAll()
-      .where('file_id', '=', input.nodeId)
+      .where('file_id', '=', mutation.nodeId)
       .executeTakeFirst();
 
     if (upload) {
@@ -717,26 +715,24 @@ export const deleteNode = async (
 
       await database
         .deleteFrom('uploads')
-        .where('file_id', '=', input.nodeId)
+        .where('file_id', '=', mutation.nodeId)
         .execute();
     }
   }
 
   eventBus.publish({
     type: 'node_deleted',
-    nodeId: input.nodeId,
+    nodeId: mutation.nodeId,
     rootId: node.root_id,
     workspaceId: user.workspace_id,
   });
 
   await jobService.addJob({
     type: 'clean_node_data',
-    nodeId: input.nodeId,
+    nodeId: mutation.nodeId,
     workspaceId: user.workspace_id,
     userId: user.id,
   });
 
-  return {
-    node: deletedNode,
-  };
+  return MutationStatus.OK;
 };

@@ -3,6 +3,7 @@ import {
   CreateNodeReactionMutation,
   DeleteNodeReactionMutation,
   getNodeModel,
+  MutationStatus,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { SelectUser } from '@colanode/server/data/schema';
@@ -12,20 +13,20 @@ import { fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
 export const createNodeReaction = async (
   user: SelectUser,
   mutation: CreateNodeReactionMutation
-): Promise<boolean> => {
+): Promise<MutationStatus> => {
   const tree = await fetchNodeTree(mutation.data.nodeId);
   if (!tree) {
-    return false;
+    return MutationStatus.NOT_FOUND;
   }
 
   const node = tree[tree.length - 1]!;
   if (!node) {
-    return false;
+    return MutationStatus.NOT_FOUND;
   }
 
   const root = tree[0]!;
   if (!root) {
-    return false;
+    return MutationStatus.NOT_FOUND;
   }
 
   const model = getNodeModel(node.type);
@@ -41,7 +42,7 @@ export const createNodeReaction = async (
   };
 
   if (!model.canReact(context)) {
-    return false;
+    return MutationStatus.FORBIDDEN;
   }
 
   const createdNodeReaction = await database
@@ -64,7 +65,7 @@ export const createNodeReaction = async (
     .executeTakeFirst();
 
   if (!createdNodeReaction) {
-    return false;
+    return MutationStatus.INTERNAL_SERVER_ERROR;
   }
 
   eventBus.publish({
@@ -75,26 +76,26 @@ export const createNodeReaction = async (
     workspaceId: createdNodeReaction.workspace_id,
   });
 
-  return true;
+  return MutationStatus.CREATED;
 };
 
 export const deleteNodeReaction = async (
   user: SelectUser,
   mutation: DeleteNodeReactionMutation
-): Promise<boolean> => {
+): Promise<MutationStatus> => {
   const tree = await fetchNodeTree(mutation.data.nodeId);
   if (!tree) {
-    return false;
+    return MutationStatus.NOT_FOUND;
   }
 
   const node = tree[tree.length - 1]!;
   if (!node) {
-    return false;
+    return MutationStatus.NOT_FOUND;
   }
 
   const root = tree[0]!;
   if (!root) {
-    return false;
+    return MutationStatus.NOT_FOUND;
   }
 
   const model = getNodeModel(node.type);
@@ -110,7 +111,7 @@ export const deleteNodeReaction = async (
   };
 
   if (!model.canReact(context)) {
-    return false;
+    return MutationStatus.FORBIDDEN;
   }
 
   const deletedNodeReaction = await database
@@ -124,7 +125,7 @@ export const deleteNodeReaction = async (
     .executeTakeFirst();
 
   if (!deletedNodeReaction) {
-    return false;
+    return MutationStatus.OK;
   }
 
   eventBus.publish({
@@ -135,5 +136,5 @@ export const deleteNodeReaction = async (
     workspaceId: node.workspace_id,
   });
 
-  return true;
+  return MutationStatus.OK;
 };

@@ -6,6 +6,7 @@ import { WorkspaceService } from '@colanode/client/services/workspaces/workspace
 import {
   createDebugger,
   Mutation,
+  MutationStatus,
   SyncMutationsInput,
   SyncMutationsOutput,
 } from '@colanode/core';
@@ -107,7 +108,7 @@ export class MutationService {
         const unsyncedMutationIds: string[] = [];
 
         for (const result of response.results) {
-          if (result.status === 'success') {
+          if (result.status === MutationStatus.OK) {
             syncedMutationIds.push(result.id);
           } else {
             unsyncedMutationIds.push(result.id);
