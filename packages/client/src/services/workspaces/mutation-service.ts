@@ -97,16 +97,16 @@ export class MutationService {
           mutations: batch,
         };
 
-        const { data } =
-          await this.workspace.account.client.post<SyncMutationsOutput>(
-            `/v1/workspaces/${this.workspace.id}/mutations`,
-            body
-          );
+        const response = await this.workspace.account.client
+          .post(`v1/workspaces/${this.workspace.id}/mutations`, {
+            json: body,
+          })
+          .json<SyncMutationsOutput>();
 
         const syncedMutationIds: string[] = [];
         const unsyncedMutationIds: string[] = [];
 
-        for (const result of data.results) {
+        for (const result of response.results) {
           if (result.status === 'success') {
             syncedMutationIds.push(result.id);
           } else {

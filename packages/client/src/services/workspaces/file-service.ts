@@ -300,32 +300,22 @@ export class FileService {
 
     try {
       const fileBuffer = await this.app.fs.readFile(filePath);
-      let lastProgress = 0;
 
       await this.workspace.account.client.put(
-        `/v1/workspaces/${this.workspace.id}/files/${file.id}`,
-        fileBuffer,
+        `v1/workspaces/${this.workspace.id}/files/${file.id}`,
         {
+          body: fileBuffer,
           headers: {
             'Content-Type': file.attributes.mimeType,
-            'Content-Length': file.attributes.size,
+            'Content-Length': file.attributes.size.toString(),
           },
-          onUploadProgress: async (progressEvent) => {
-            const progress = Math.round(
-              (progressEvent.loaded / file.attributes.size) * 100
-            );
-
-            if (progress >= lastProgress) {
-              return;
-            }
-
-            lastProgress = progress;
-
+          onUploadProgress: async (progress, _chunk) => {
+            const percent = Math.round((progress.percent || 0) * 100);
             const updatedFileState = await this.workspace.database
               .updateTable('file_states')
               .returningAll()
               .set({
-                upload_progress: progress,
+                upload_progress: percent,
               })
               .where('id', '=', file.id)
               .executeTakeFirst();
@@ -481,12 +471,36 @@ export class FileService {
     }
 
     try {
-      const response = await this.workspace.account.client.get<ArrayBuffer>(
-        `/v1/workspaces/${this.workspace.id}/files/${file.id}`,
-        { responseType: 'arraybuffer' }
+      const response = await this.workspace.account.client.get(
+        `v1/workspaces/${this.workspace.id}/files/${file.id}`,
+        {
+          onDownloadProgress: async (progress, _chunk) => {
+            const percent = Math.round((progress.percent || 0) * 100);
+
+            const updatedFileState = await this.workspace.database
+              .updateTable('file_states')
+              .returningAll()
+              .set({
+                download_progress: percent,
+              })
+              .where('id', '=', file.id)
+              .executeTakeFirst();
+
+            if (!updatedFileState) {
+              return;
+            }
+
+            eventBus.publish({
+              type: 'file_state_updated',
+              accountId: this.workspace.accountId,
+              workspaceId: this.workspace.id,
+              fileState: mapFileState(updatedFileState),
+            });
+          },
+        }
       );
 
-      const fileBytes = new Uint8Array(response.data);
+      const fileBytes = new Uint8Array(await response.arrayBuffer());
       await this.app.fs.writeFile(filePath, fileBytes);
 
       const updatedFileState = await this.workspace.database

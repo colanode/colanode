@@ -40,20 +40,19 @@ export class AvatarUploadMutationHandler
       }
 
       const fileBuffer = await this.app.fs.readFile(filePath);
-      const { data } = await account.client.post<AvatarUploadResponse>(
-        '/v1/avatars',
-        fileBuffer,
-        {
+      const response = await account.client
+        .post('v1/avatars', {
+          body: fileBuffer,
           headers: {
             'Content-Type': input.file.mimeType,
           },
-        }
-      );
+        })
+        .json<AvatarUploadResponse>();
 
-      await account.downloadAvatar(data.id);
+      await account.downloadAvatar(response.id);
 
       return {
-        id: data.id,
+        id: response.id,
       };
     } catch (error) {
       if (error instanceof Error) {

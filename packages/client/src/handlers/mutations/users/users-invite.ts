@@ -1,5 +1,5 @@
 import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
-import { parseApiError } from '@colanode/client/lib/axios';
+import { parseApiError } from '@colanode/client/lib/ky';
 import { MutationHandler } from '@colanode/client/lib/types';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
@@ -23,16 +23,17 @@ export class UsersInviteMutationHandler
         role: input.role,
       };
 
-      await workspace.account.client.post<UsersInviteOutput>(
-        `/v1/workspaces/${workspace.id}/users`,
-        body
-      );
+      await workspace.account.client
+        .post(`v1/workspaces/${workspace.id}/users`, {
+          json: body,
+        })
+        .json<UsersInviteOutput>();
 
       return {
         success: true,
       };
     } catch (error) {
-      const apiError = parseApiError(error);
+      const apiError = await parseApiError(error);
       throw new MutationError(MutationErrorCode.ApiError, apiError.message);
     }
   }

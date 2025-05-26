@@ -1,4 +1,4 @@
-import axios from 'axios';
+import ky, { KyInstance } from 'ky';
 import { Kysely, Migration, Migrator } from 'kysely';
 import ms from 'ms';
 import semver from 'semver';
@@ -8,9 +8,9 @@ import {
   appDatabaseMigrations,
 } from '@colanode/client/databases/app';
 import { Mediator } from '@colanode/client/handlers';
-import { parseApiError } from '@colanode/client/lib/axios';
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { EventLoop } from '@colanode/client/lib/event-loop';
+import { parseApiError } from '@colanode/client/lib/ky';
 import { mapServer, mapAccount } from '@colanode/client/lib/mappers';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { AppBuild } from '@colanode/client/services/app-build';
@@ -40,6 +40,7 @@ export class AppService {
   public readonly kysely: KyselyService;
   public readonly mediator: Mediator;
   public readonly asset: AssetService;
+  public readonly client: KyInstance;
 
   constructor(
     fs: FileSystem,
@@ -60,12 +61,13 @@ export class AppService {
     this.mediator = new Mediator(this);
     this.asset = new AssetService(this);
 
-    // register interceptor to add client headers to all requests
-    axios.interceptors.request.use((config) => {
-      config.headers[ApiHeader.ClientType] = this.build.type;
-      config.headers[ApiHeader.ClientPlatform] = this.build.platform;
-      config.headers[ApiHeader.ClientVersion] = this.build.version;
-      return config;
+    this.client = ky.create({
+      headers: {
+        [ApiHeader.ClientType]: this.build.type,
+        [ApiHeader.ClientPlatform]: this.build.platform,
+        [ApiHeader.ClientVersion]: this.build.version,
+      },
+      timeout: ms('30 seconds'),
     });
 
     this.metadata = new MetadataService(this);
@@ -254,11 +256,14 @@ export class AppService {
       }
 
       try {
-        await axios.delete(`${serverService.apiBaseUrl}/v1/accounts/logout`, {
-          headers: {
-            Authorization: `Bearer ${deletedToken.token}`,
-          },
-        });
+        await this.client.delete(
+          `${serverService.apiBaseUrl}/v1/accounts/logout`,
+          {
+            headers: {
+              Authorization: `Bearer ${deletedToken.token}`,
+            },
+          }
+        );
 
         await this.database
           .deleteFrom('deleted_tokens')
@@ -270,7 +275,7 @@ export class AppService {
           `Logged out account ${deletedToken.account_id} from server ${deletedToken.domain}`
         );
       } catch (error) {
-        const parsedError = parseApiError(error);
+        const parsedError = await parseApiError(error);
         if (
           parsedError.code === ApiErrorCode.TokenInvalid ||
           parsedError.code === ApiErrorCode.AccountNotFound ||

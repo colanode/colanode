@@ -1,8 +1,8 @@
-import axios from 'axios';
+import ky from 'ky';
 
 import { AccountMutationHandlerBase } from '@colanode/client/handlers/mutations/accounts/base';
 import { MutationHandler } from '@colanode/client/lib';
-import { parseApiError } from '@colanode/client/lib/axios';
+import { parseApiError } from '@colanode/client/lib/ky';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
   EmailPasswordResetCompleteMutationInput,
@@ -35,20 +35,24 @@ export class EmailPasswordResetCompleteMutationHandler
     }
 
     try {
-      const emailPasswordResetCompleteInput: EmailPasswordResetCompleteInput = {
+      const body: EmailPasswordResetCompleteInput = {
         id: input.id,
         otp: input.otp,
         password: input.password,
       };
 
-      const { data } = await axios.post<EmailPasswordResetCompleteOutput>(
-        `${server.apiBaseUrl}/v1/accounts/emails/passwords/reset/complete`,
-        emailPasswordResetCompleteInput
-      );
+      const response = await ky
+        .post(
+          `${server.apiBaseUrl}/v1/accounts/emails/passwords/reset/complete`,
+          {
+            json: body,
+          }
+        )
+        .json<EmailPasswordResetCompleteOutput>();
 
-      return data;
+      return response;
     } catch (error) {
-      const apiError = parseApiError(error);
+      const apiError = await parseApiError(error);
       throw new MutationError(MutationErrorCode.ApiError, apiError.message);
     }
   }

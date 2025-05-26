@@ -1,5 +1,5 @@
-import { parseApiError } from '@colanode/client/lib/axios';
 import { eventBus } from '@colanode/client/lib/event-bus';
+import { parseApiError } from '@colanode/client/lib/ky';
 import { mapWorkspace } from '@colanode/client/lib/mappers';
 import { MutationHandler } from '@colanode/client/lib/types';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
@@ -38,24 +38,25 @@ export class WorkspaceCreateMutationHandler
         avatar: input.avatar,
       };
 
-      const { data } = await account.client.post<WorkspaceOutput>(
-        `/v1/workspaces`,
-        body
-      );
+      const response = await account.client
+        .post(`v1/workspaces`, {
+          json: body,
+        })
+        .json<WorkspaceOutput>();
 
       const createdWorkspace = await account.database
         .insertInto('workspaces')
         .returningAll()
         .values({
-          id: data.id,
-          account_id: data.user.accountId,
-          name: data.name,
-          description: data.description,
-          avatar: data.avatar,
-          role: data.user.role,
-          storage_limit: data.user.storageLimit,
-          max_file_size: data.user.maxFileSize,
-          user_id: data.user.id,
+          id: response.id,
+          account_id: response.user.accountId,
+          name: response.name,
+          description: response.description,
+          avatar: response.avatar,
+          role: response.user.role,
+          storage_limit: response.user.storageLimit,
+          max_file_size: response.user.maxFileSize,
+          user_id: response.user.id,
           created_at: new Date().toISOString(),
         })
         .onConflict((cb) => cb.doNothing())
@@ -81,7 +82,7 @@ export class WorkspaceCreateMutationHandler
         userId: createdWorkspace.user_id,
       };
     } catch (error) {
-      const apiError = parseApiError(error);
+      const apiError = await parseApiError(error);
       throw new MutationError(MutationErrorCode.ApiError, apiError.message);
     }
   }

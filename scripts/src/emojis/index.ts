@@ -1,11 +1,12 @@
-import AdmZip from 'adm-zip';
-import fetch from 'node-fetch';
-import SQLite from 'better-sqlite3';
-import { generateId, IdType } from '@colanode/core';
-import SvgSprite from 'svg-sprite';
-
 import fs from 'fs';
 import path from 'path';
+
+import AdmZip from 'adm-zip';
+import SQLite from 'better-sqlite3';
+import ky from 'ky';
+import SvgSprite from 'svg-sprite';
+
+import { generateId, IdType } from '@colanode/core';
 
 type EmojiMartI18n = {
   categories: Record<string, string>;
@@ -197,9 +198,7 @@ const UPSERT_SVG_SQL = `
 `;
 
 const downloadZipAndExtract = async (url: string, dir: string) => {
-  const response = await fetch(url);
-  if (!response.ok) throw new Error(`Failed to download ${url}`);
-
+  const response = await ky.get(url);
   const buffer = await response.arrayBuffer();
   const zip = new AdmZip(Buffer.from(buffer));
   zip.extractAllTo(dir, true);

@@ -1,5 +1,5 @@
-import { parseApiError } from '@colanode/client/lib/axios';
 import { eventBus } from '@colanode/client/lib/event-bus';
+import { parseApiError } from '@colanode/client/lib/ky';
 import { mapAccount } from '@colanode/client/lib/mappers';
 import { MutationHandler } from '@colanode/client/lib/types';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
@@ -37,16 +37,17 @@ export class AccountUpdateMutationHandler
         avatar: input.avatar,
       };
 
-      const { data } = await accountService.client.put<AccountUpdateOutput>(
-        `/v1/accounts/${input.id}`,
-        body
-      );
+      const response = await accountService.client
+        .put(`v1/accounts/${input.id}`, {
+          json: body,
+        })
+        .json<AccountUpdateOutput>();
 
       const updatedAccount = await this.app.database
         .updateTable('accounts')
         .set({
-          name: data.name,
-          avatar: data.avatar,
+          name: response.name,
+          avatar: response.avatar,
           updated_at: new Date().toISOString(),
         })
         .where('id', '=', input.id)
@@ -72,7 +73,7 @@ export class AccountUpdateMutationHandler
         success: true,
       };
     } catch (error) {
-      const apiError = parseApiError(error);
+      const apiError = await parseApiError(error);
       throw new MutationError(MutationErrorCode.ApiError, apiError.message);
     }
   }

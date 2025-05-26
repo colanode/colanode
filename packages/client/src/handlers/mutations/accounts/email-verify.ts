@@ -1,7 +1,7 @@
-import axios from 'axios';
+import ky from 'ky';
 
 import { AccountMutationHandlerBase } from '@colanode/client/handlers/mutations/accounts/base';
-import { parseApiError } from '@colanode/client/lib/axios';
+import { parseApiError } from '@colanode/client/lib/ky';
 import { MutationHandler } from '@colanode/client/lib/types';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import { EmailVerifyMutationInput } from '@colanode/client/mutations/accounts/email-verify';
@@ -27,28 +27,29 @@ export class EmailVerifyMutationHandler
     }
 
     try {
-      const emailVerifyInput: EmailVerifyInput = {
+      const body: EmailVerifyInput = {
         id: input.id,
         otp: input.otp,
       };
 
-      const { data } = await axios.post<LoginOutput>(
-        `${server.apiBaseUrl}/v1/accounts/emails/verify`,
-        emailVerifyInput
-      );
+      const response = await ky
+        .post(`${server.apiBaseUrl}/v1/accounts/emails/verify`, {
+          json: body,
+        })
+        .json<LoginOutput>();
 
-      if (data.type === 'verify') {
+      if (response.type === 'verify') {
         throw new MutationError(
           MutationErrorCode.EmailVerificationFailed,
           'Email verification failed! Please try again.'
         );
       }
 
-      await this.handleLoginSuccess(data, server);
+      await this.handleLoginSuccess(response, server);
 
-      return data;
+      return response;
     } catch (error) {
-      const apiError = parseApiError(error);
+      const apiError = await parseApiError(error);
       throw new MutationError(MutationErrorCode.ApiError, apiError.message);
     }
   }

@@ -1,14 +1,22 @@
-import FormData from 'form-data';
-import axios from 'axios';
-import { LoginSuccessOutput } from '@colanode/core';
-
 import fs from 'fs';
 import path from 'path';
 
-import { FakerAccount, User } from './types';
+import ky from 'ky';
+
+import { ApiHeader, LoginSuccessOutput } from '@colanode/core';
+
 import { NodeGenerator } from './node-generator';
+import { FakerAccount, User } from './types';
 
 const SERVER_DOMAIN = 'http://localhost:3000';
+const api = ky.create({
+  prefixUrl: `${SERVER_DOMAIN}/client/v1`,
+  headers: {
+    [ApiHeader.ClientType]: 'seed',
+    [ApiHeader.ClientPlatform]: 'seed',
+    [ApiHeader.ClientVersion]: '0.0.1',
+  },
+});
 
 const uploadAvatar = async (
   token: string,
@@ -16,22 +24,18 @@ const uploadAvatar = async (
 ): Promise<string> => {
   const avatarStream = fs.createReadStream(avatarPath);
 
-  const formData = new FormData();
-  formData.append('avatar', avatarStream);
-
   try {
-    const { data } = await axios.post<{ id: string }>(
-      `${SERVER_DOMAIN}/client/v1/avatars`,
-      formData,
-      {
+    const response = await api
+      .post(`${SERVER_DOMAIN}/client/v1/avatars`, {
+        body: avatarStream,
         headers: {
           Authorization: `Bearer ${token}`,
-          ...formData.getHeaders(),
+          'Content-Type': 'image/webp',
         },
-      }
-    );
+      })
+      .json<{ id: string }>();
 
-    return data.id;
+    return response.id;
   } catch (error) {
     console.error('Error uploading avatar:', error);
     throw error;
@@ -42,37 +46,38 @@ const createAccount = async (
   account: FakerAccount
 ): Promise<LoginSuccessOutput> => {
   const url = `${SERVER_DOMAIN}/client/v1/accounts/emails/register`;
-  const { data } = await axios.post<LoginSuccessOutput>(url, {
-    name: account.name,
-    email: account.email,
-    password: account.password,
-    platform: 'seed',
-    version: '0.0.4',
-  });
+  const response = await ky
+    .post(url, {
+      json: {
+        name: account.name,
+        email: account.email,
+        password: account.password,
+      },
+    })
+    .json<LoginSuccessOutput>();
 
-  if (data.type !== 'success') {
+  if (response.type !== 'success') {
     throw new Error('Failed to create account');
   }
 
   const avatarPath = path.resolve(`src/seed/avatars/${account.avatar}`);
-  const avatarId = await uploadAvatar(data.token, avatarPath);
-  data.account.avatar = avatarId;
+  const avatarId = await uploadAvatar(response.token, avatarPath);
+  response.account.avatar = avatarId;
 
-  const updateAccountUrl = `${SERVER_DOMAIN}/client/v1/accounts/${data.account.id}`;
-  await axios.put(
-    updateAccountUrl,
-    {
-      name: account.name,
-      avatar: avatarId,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${data.token}`,
+  const updateAccountUrl = `${SERVER_DOMAIN}/client/v1/accounts/${response.account.id}`;
+  await ky
+    .put(updateAccountUrl, {
+      json: {
+        name: account.name,
+        avatar: avatarId,
       },
-    }
-  );
+      headers: {
+        Authorization: `Bearer ${response.token}`,
+      },
+    })
+    .json<LoginSuccessOutput>();
 
-  return data;
+  return response;
 };
 
 const createMainAccountAndWorkspace = async (
@@ -94,19 +99,18 @@ const createMainAccountAndWorkspace = async (
 
   // update workspace name and description here
   const updateWorkspaceUrl = `${SERVER_DOMAIN}/client/v1/workspaces/${workspace.id}`;
-  await axios.put(
-    updateWorkspaceUrl,
-    {
-      name: workspace.name,
-      description: workspace.description,
-      avatar: avatarId,
-    },
-    {
+  await ky
+    .put(updateWorkspaceUrl, {
+      json: {
+        name: workspace.name,
+        description: workspace.description,
+        avatar: avatarId,
+      },
       headers: {
         Authorization: `Bearer ${login.token}`,
       },
-    }
-  );
+    })
+    .json<LoginSuccessOutput>();
 
   return login;
 };
@@ -121,18 +125,17 @@ const inviteAccountsToWorkspace = async (
   }
 
   const url = `${SERVER_DOMAIN}/client/v1/workspaces/${workspace.id}/users`;
-  await axios.post(
-    url,
-    {
-      emails: otherFakerAccounts.map((account) => account.email),
-      role: 'admin',
-    },
-    {
+  await ky
+    .post(url, {
+      json: {
+        emails: otherFakerAccounts.map((account) => account.email),
+        role: 'admin',
+      },
       headers: {
         Authorization: `Bearer ${mainAccount.token}`,
       },
-    }
-  );
+    })
+    .json<LoginSuccessOutput>();
 };
 
 const sendMutations = async (user: User, workspaceId: string) => {
@@ -151,15 +154,14 @@ const sendMutations = async (user: User, workspaceId: string) => {
       `Sending batch ${currentBatch++} of ${totalBatches} mutations for user ${user.login.account.email}`
     );
 
-    await axios.post(
-      url,
-      {
+    await ky.post(url, {
+      json: {
         mutations: batch,
       },
-      {
-        headers: { Authorization: `Bearer ${user.login.token}` },
-      }
-    );
+      headers: {
+        Authorization: `Bearer ${user.login.token}`,
+      },
+    });
   }
 };
 

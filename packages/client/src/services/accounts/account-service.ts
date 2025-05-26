@@ -1,3 +1,4 @@
+import { KyInstance } from 'ky';
 import { Kysely, Migration, Migrator } from 'kysely';
 import ms from 'ms';
 
@@ -5,11 +6,10 @@ import {
   AccountDatabaseSchema,
   accountDatabaseMigrations,
 } from '@colanode/client/databases/account';
-import { parseApiError } from '@colanode/client/lib/axios';
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { EventLoop } from '@colanode/client/lib/event-loop';
+import { parseApiError } from '@colanode/client/lib/ky';
 import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
-import { AccountClient } from '@colanode/client/services/accounts/account-client';
 import { AccountConnection } from '@colanode/client/services/accounts/account-connection';
 import { AppService } from '@colanode/client/services/app-service';
 import { ServerService } from '@colanode/client/services/server-service';
@@ -38,7 +38,7 @@ export class AccountService {
   public readonly database: Kysely<AccountDatabaseSchema>;
 
   public readonly connection: AccountConnection;
-  public readonly client: AccountClient;
+  public readonly client: KyInstance;
   private readonly eventSubscriptionId: string;
 
   constructor(account: Account, server: ServerService, app: AppService) {
@@ -53,8 +53,13 @@ export class AccountService {
       readonly: false,
     });
 
-    this.client = new AccountClient(this);
     this.connection = new AccountConnection(this);
+    this.client = this.app.client.extend({
+      prefixUrl: this.server.apiBaseUrl,
+      headers: {
+        Authorization: `Bearer ${this.account.token}`,
+      },
+    });
 
     this.sync = this.sync.bind(this);
     this.eventLoop = new EventLoop(ms('1 minute'), ms('1 second'), this.sync);
@@ -196,11 +201,10 @@ export class AccountService {
       }
 
       const response = await this.client.get<ArrayBuffer>(
-        `/v1/avatars/${avatar}`,
-        { responseType: 'arraybuffer' }
+        `v1/avatars/${avatar}`
       );
 
-      const avatarBytes = new Uint8Array(response.data);
+      const avatarBytes = new Uint8Array(await response.arrayBuffer());
       await this.app.fs.writeFile(avatarPath, avatarBytes);
 
       eventBus.publish({
@@ -273,21 +277,20 @@ export class AccountService {
     }
 
     try {
-      const { data } = await this.client.post<AccountSyncOutput>(
-        '/v1/accounts/sync',
-        {}
-      );
+      const response = await this.client
+        .post('v1/accounts/sync')
+        .json<AccountSyncOutput>();
 
       const hasChanges =
-        data.account.name !== this.account.name ||
-        data.account.avatar !== this.account.avatar;
+        response.account.name !== this.account.name ||
+        response.account.avatar !== this.account.avatar;
 
       const updatedAccount = await this.app.database
         .updateTable('accounts')
         .returningAll()
         .set({
-          name: data.account.name,
-          avatar: data.account.avatar,
+          name: response.account.name,
+          avatar: response.account.avatar,
           updated_at: hasChanges
             ? new Date().toISOString()
             : this.account.updatedAt,
@@ -314,7 +317,7 @@ export class AccountService {
         account,
       });
 
-      for (const workspace of data.workspaces) {
+      for (const workspace of response.workspaces) {
         const workspaceService = this.getWorkspace(workspace.id);
         if (!workspaceService) {
           const createdWorkspace = await this.database
@@ -383,7 +386,7 @@ export class AccountService {
 
       const workspaceIds = this.workspaces.keys();
       for (const workspaceId of workspaceIds) {
-        const updatedWorkspace = data.workspaces.find(
+        const updatedWorkspace = response.workspaces.find(
           (w) => w.id === workspaceId
         );
 
@@ -392,7 +395,7 @@ export class AccountService {
         }
       }
     } catch (error) {
-      const parsedError = parseApiError(error);
+      const parsedError = await parseApiError(error);
       if (this.isSyncInvalid(parsedError)) {
         debug(`Account ${this.account.email} is not valid, logging out...`);
         await this.logout();

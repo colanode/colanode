@@ -1,4 +1,4 @@
-import axios, { isAxiosError } from 'axios';
+import ky from 'ky';
 import ms from 'ms';
 
 import { eventBus } from '@colanode/client/lib/event-bus';
@@ -18,7 +18,7 @@ type ServerState = {
 const debug = createDebugger('desktop:service:server');
 
 export class ServerService {
-  private readonly appService: AppService;
+  private readonly app: AppService;
 
   private state: ServerState | null = null;
   private eventLoop: EventLoop;
@@ -27,8 +27,8 @@ export class ServerService {
   public readonly synapseUrl: string;
   public readonly apiBaseUrl: string;
 
-  constructor(appService: AppService, server: Server) {
-    this.appService = appService;
+  constructor(app: AppService, server: Server) {
+    this.app = app;
     this.server = server;
     this.synapseUrl = ServerService.buildSynapseUrl(server.domain);
     this.apiBaseUrl = ServerService.buildApiBaseUrl(server.domain);
@@ -79,7 +79,7 @@ export class ServerService {
     );
 
     if (config) {
-      const updatedServer = await this.appService.database
+      const updatedServer = await this.app.database
         .updateTable('servers')
         .returningAll()
         .set({
@@ -110,16 +110,10 @@ export class ServerService {
     const baseUrl = this.buildApiBaseUrl(domain);
     const configUrl = `${baseUrl}/v1/config`;
     try {
-      const { data } = await axios.get<ServerConfig>(configUrl);
-      return data;
+      const response = await ky.get(configUrl).json<ServerConfig>();
+      return response;
     } catch (error) {
-      if (isAxiosError(error)) {
-        debug(
-          `Server ${domain} is unavailable. Code: ${error.code}, Message: ${error.message}`
-        );
-      } else {
-        debug(`Server ${domain} is unavailable. Unknown error: ${error}`);
-      }
+      debug(`Server ${domain} is unavailable. ${error}`);
     }
 
     return null;

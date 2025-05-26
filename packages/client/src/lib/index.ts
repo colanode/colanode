@@ -1,4 +1,4 @@
-export * from './axios';
+export * from './ky';
 export * from './backoff-calculator';
 export * from './editor';
 export * from './event-bus';

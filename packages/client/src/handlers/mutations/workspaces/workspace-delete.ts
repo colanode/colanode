@@ -1,4 +1,4 @@
-import { parseApiError } from '@colanode/client/lib/axios';
+import { parseApiError } from '@colanode/client/lib/ky';
 import { MutationHandler } from '@colanode/client/lib/types';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
@@ -38,17 +38,17 @@ export class WorkspaceDeleteMutationHandler
     }
 
     try {
-      const { data } = await accountService.client.delete<WorkspaceOutput>(
-        `/v1/workspaces/${input.workspaceId}`
-      );
+      const response = await accountService.client
+        .delete(`/v1/workspaces/${input.workspaceId}`)
+        .json<WorkspaceOutput>();
 
-      await accountService.deleteWorkspace(data.id);
+      await accountService.deleteWorkspace(response.id);
 
       return {
-        id: data.id,
+        id: response.id,
       };
     } catch (error) {
-      const apiError = parseApiError(error);
+      const apiError = await parseApiError(error);
       throw new MutationError(MutationErrorCode.ApiError, apiError.message);
     }
   }

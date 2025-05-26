@@ -81,3 +81,9 @@ export const userRoleUpdateInputSchema = z.object({
 });
 
 export type UserRoleUpdateInput = z.infer<typeof userRoleUpdateInputSchema>;
+
+export const userRoleUpdateOutputSchema = z.object({
+  success: z.boolean(),
+});
+
+export type UserRoleUpdateOutput = z.infer<typeof userRoleUpdateOutputSchema>;

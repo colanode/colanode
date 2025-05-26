@@ -1,7 +1,7 @@
-import axios from 'axios';
+import ky from 'ky';
 
 import { AccountMutationHandlerBase } from '@colanode/client/handlers/mutations/accounts/base';
-import { parseApiError } from '@colanode/client/lib/axios';
+import { parseApiError } from '@colanode/client/lib/ky';
 import { MutationHandler } from '@colanode/client/lib/types';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import { EmailRegisterMutationInput } from '@colanode/client/mutations/accounts/email-register';
@@ -29,26 +29,27 @@ export class EmailRegisterMutationHandler
     }
 
     try {
-      const emailRegisterInput: EmailRegisterInput = {
+      const body: EmailRegisterInput = {
         name: input.name,
         email: input.email,
         password: input.password,
       };
 
-      const { data } = await axios.post<LoginOutput>(
-        `${server.apiBaseUrl}/v1/accounts/emails/register`,
-        emailRegisterInput
-      );
+      const response = await ky
+        .post(`${server.apiBaseUrl}/v1/accounts/emails/register`, {
+          json: body,
+        })
+        .json<LoginOutput>();
 
-      if (data.type === 'verify') {
-        return data;
+      if (response.type === 'verify') {
+        return response;
       }
 
-      await this.handleLoginSuccess(data, server);
+      await this.handleLoginSuccess(response, server);
 
-      return data;
+      return response;
     } catch (error) {
-      const apiError = parseApiError(error);
+      const apiError = await parseApiError(error);
       throw new MutationError(MutationErrorCode.ApiError, apiError.message);
     }
   }
