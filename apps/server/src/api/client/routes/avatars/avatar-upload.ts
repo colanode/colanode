@@ -10,7 +10,7 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
-import { avatarS3 } from '@colanode/server/data/storage';
+import { s3Client } from '@colanode/server/data/storage';
 import { config } from '@colanode/server/lib/config';
 
 const ALLOWED_MIME_TYPES = [
@@ -99,13 +99,13 @@ export const avatarUploadRoute: FastifyPluginCallbackZod = (
 
         const avatarId = generateId(IdType.Avatar);
         const command = new PutObjectCommand({
-          Bucket: config.avatarS3.bucketName,
+          Bucket: config.storage.bucketName,
           Key: `avatars/${avatarId}.jpeg`,
           Body: jpegBuffer,
           ContentType: 'image/jpeg',
         });
 
-        await avatarS3.send(command);
+        await s3Client.send(command);
 
         return { success: true, id: avatarId };
       } catch {

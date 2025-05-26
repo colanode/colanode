@@ -22,7 +22,7 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
     workspaceId: workspace.id,
   });
 
-  const { data: urlData, isPending: isUrlPending } = useQuery(
+  const { data: urlData } = useQuery(
     {
       type: 'file_url_get',
       id: file.id,
@@ -35,7 +35,7 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
     }
   );
 
-  if (isPending || isUrlPending) {
+  if (isPending) {
     return null;
   }
 

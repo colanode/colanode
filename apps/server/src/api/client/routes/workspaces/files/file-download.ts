@@ -1,20 +1,21 @@
+import { Readable } from 'stream';
+
+import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
 
 import {
-  CreateDownloadOutput,
   hasNodeRole,
   ApiErrorCode,
   extractNodeRole,
   FileStatus,
-  createDownloadOutputSchema,
-  apiErrorOutputSchema,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
-import { buildDownloadUrl } from '@colanode/server/lib/files';
+import { s3Client } from '@colanode/server/data/storage';
+import { config } from '@colanode/server/lib/config';
 import { fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
 
-export const fileDownloadGetRoute: FastifyPluginCallbackZod = (
+export const fileDownloadRoute: FastifyPluginCallbackZod = (
   instance,
   _,
   done
@@ -25,12 +26,8 @@ export const fileDownloadGetRoute: FastifyPluginCallbackZod = (
     schema: {
       params: z.object({
         fileId: z.string(),
+        workspaceId: z.string(),
       }),
-      response: {
-        200: createDownloadOutputSchema,
-        400: apiErrorOutputSchema,
-        404: apiErrorOutputSchema,
-      },
     },
     handler: async (request, reply) => {
       const fileId = request.params.fileId;
@@ -87,12 +84,28 @@ export const fileDownloadGetRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const presignedUrl = await buildDownloadUrl(upload.path);
-      const output: CreateDownloadOutput = {
-        url: presignedUrl,
-      };
+      const command = new GetObjectCommand({
+        Bucket: config.storage.bucketName,
+        Key: upload.path,
+      });
 
-      return output;
+      const fileResponse = await s3Client.send(command);
+      if (!fileResponse.Body) {
+        return reply.code(404).send({
+          code: ApiErrorCode.FileNotFound,
+          message: 'File not found.',
+        });
+      }
+
+      if (fileResponse.Body instanceof Readable) {
+        reply.header('Content-Type', fileResponse.ContentType);
+        return reply.send(fileResponse.Body);
+      }
+
+      return reply.code(404).send({
+        code: ApiErrorCode.FileNotFound,
+        message: 'File not found.',
+      });
     },
   });
 

@@ -1,11 +1,11 @@
 import { FastifyPluginCallback } from 'fastify';
 
-import { fileUploadCompleteRoute } from './file-upload-complete';
-import { fileUploadInitRoute } from './file-upload-init';
+import { fileDownloadRoute } from './file-download';
+import { fileUploadRoute } from './file-upload';
 
 export const fileRoutes: FastifyPluginCallback = (instance, _, done) => {
-  instance.register(fileUploadCompleteRoute);
-  instance.register(fileUploadInitRoute);
+  instance.register(fileUploadRoute);
+  instance.register(fileDownloadRoute);
 
   done();
 };

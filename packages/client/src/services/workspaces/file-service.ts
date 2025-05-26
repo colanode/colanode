@@ -1,4 +1,3 @@
-import axios from 'axios';
 import ms from 'ms';
 
 import {
@@ -19,11 +18,6 @@ import {
 } from '@colanode/client/types/files';
 import { LocalFileNode } from '@colanode/client/types/nodes';
 import {
-  CompleteUploadInput,
-  CompleteUploadOutput,
-  CreateDownloadOutput,
-  CreateUploadInput,
-  CreateUploadOutput,
   FileAttributes,
   FileStatus,
   IdType,
@@ -305,65 +299,49 @@ export class FileService {
     }
 
     try {
-      const createUploadInput: CreateUploadInput = {
-        fileId: file.id,
-      };
-
-      const { data } =
-        await this.workspace.account.client.post<CreateUploadOutput>(
-          `/v1/workspaces/${this.workspace.id}/files`,
-          createUploadInput
-        );
-
-      const presignedUrl = data.url;
-      const fileStream = this.app.fs.createReadStream(filePath);
-
+      const fileBuffer = await this.app.fs.readFile(filePath);
       let lastProgress = 0;
-      await axios.put(presignedUrl, fileStream, {
-        headers: {
-          'Content-Type': file.attributes.mimeType,
-          'Content-Length': file.attributes.size,
-        },
-        onUploadProgress: async (progressEvent) => {
-          const progress = Math.round(
-            (progressEvent.loaded / file.attributes.size) * 100
-          );
 
-          if (progress >= lastProgress) {
-            return;
-          }
-
-          lastProgress = progress;
-
-          const updatedFileState = await this.workspace.database
-            .updateTable('file_states')
-            .returningAll()
-            .set({
-              upload_progress: progress,
-            })
-            .where('id', '=', file.id)
-            .executeTakeFirst();
-
-          if (!updatedFileState) {
-            return;
-          }
-
-          eventBus.publish({
-            type: 'file_state_updated',
-            accountId: this.workspace.accountId,
-            workspaceId: this.workspace.id,
-            fileState: mapFileState(updatedFileState),
-          });
-        },
-      });
-
-      const completeUploadInput: CompleteUploadInput = {
-        uploadId: data.uploadId,
-      };
-
-      await this.workspace.account.client.put<CompleteUploadOutput>(
+      await this.workspace.account.client.put(
         `/v1/workspaces/${this.workspace.id}/files/${file.id}`,
-        completeUploadInput
+        fileBuffer,
+        {
+          headers: {
+            'Content-Type': file.attributes.mimeType,
+            'Content-Length': file.attributes.size,
+          },
+          onUploadProgress: async (progressEvent) => {
+            const progress = Math.round(
+              (progressEvent.loaded / file.attributes.size) * 100
+            );
+
+            if (progress >= lastProgress) {
+              return;
+            }
+
+            lastProgress = progress;
+
+            const updatedFileState = await this.workspace.database
+              .updateTable('file_states')
+              .returningAll()
+              .set({
+                upload_progress: progress,
+              })
+              .where('id', '=', file.id)
+              .executeTakeFirst();
+
+            if (!updatedFileState) {
+              return;
+            }
+
+            eventBus.publish({
+              type: 'file_state_updated',
+              accountId: this.workspace.accountId,
+              workspaceId: this.workspace.id,
+              fileState: mapFileState(updatedFileState),
+            });
+          },
+        }
       );
 
       const finalFileState = await this.workspace.database
@@ -478,7 +456,7 @@ export class FileService {
 
     const filePath = this.buildFilePath(file.id, file.attributes.extension);
     const exists = await this.app.fs.exists(filePath);
-    if (!exists) {
+    if (exists) {
       const updatedFileState = await this.workspace.database
         .updateTable('file_states')
         .returningAll()
@@ -503,51 +481,13 @@ export class FileService {
     }
 
     try {
-      const { data } =
-        await this.workspace.account.client.get<CreateDownloadOutput>(
-          `/v1/workspaces/${this.workspace.id}/downloads/${file.id}`
-        );
+      const response = await this.workspace.account.client.get<ArrayBuffer>(
+        `/v1/workspaces/${this.workspace.id}/files/${file.id}`,
+        { responseType: 'arraybuffer' }
+      );
 
-      const presignedUrl = data.url;
-      const fileStream = this.app.fs.createWriteStream(filePath);
-      let lastProgress = 0;
-
-      await axios
-        .get(presignedUrl, {
-          responseType: 'stream',
-          onDownloadProgress: async (progressEvent) => {
-            const progress = Math.round(
-              (progressEvent.loaded / file.attributes.size) * 100
-            );
-
-            if (progress <= lastProgress) {
-              return;
-            }
-
-            lastProgress = progress;
-
-            const updatedFileState = await this.workspace.database
-              .updateTable('file_states')
-              .returningAll()
-              .set({
-                download_progress: progress,
-              })
-              .where('id', '=', fileState.id)
-              .executeTakeFirst();
-
-            if (updatedFileState) {
-              eventBus.publish({
-                type: 'file_state_updated',
-                accountId: this.workspace.accountId,
-                workspaceId: this.workspace.id,
-                fileState: mapFileState(updatedFileState),
-              });
-            }
-          },
-        })
-        .then((response) => {
-          response.data.pipe(fileStream);
-        });
+      const fileBytes = new Uint8Array(response.data);
+      await this.app.fs.writeFile(filePath, fileBytes);
 
       const updatedFileState = await this.workspace.database
         .updateTable('file_states')

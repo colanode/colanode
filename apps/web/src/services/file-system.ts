@@ -145,30 +145,21 @@ export class WebFileSystem implements FileSystem {
   public async createWriteStream(
     path: string
   ): Promise<WritableStream<Uint8Array>> {
-    // In browser environments, we'll create a WritableStream that collects chunks
-    // and writes them all at once when the stream is closed
-    const chunks: Uint8Array[] = [];
+    const { parent, name } = await this.getFileLocation(path, /*create*/ true);
+    const fileHandle = await parent.getFileHandle(name, { create: true });
+    const file = await fileHandle.createWritable({ keepExistingData: false });
 
     return new WritableStream<Uint8Array>({
-      write: (chunk) => {
-        chunks.push(chunk);
+      async write(chunk) {
+        // write each chunk directly to disk
+        await file.write(chunk);
       },
-      close: async () => {
-        // Calculate total size
-        let totalSize = 0;
-        for (const chunk of chunks) {
-          totalSize += chunk.length;
-        }
-
-        // Combine all chunks and write to file when stream is finished
-        const combinedData = new Uint8Array(totalSize);
-        let offset = 0;
-        for (const chunk of chunks) {
-          combinedData.set(chunk, offset);
-          offset += chunk.length;
-        }
-
-        await this.writeFile(path, combinedData);
+      async close() {
+        await file.close(); // makes the data durable
+      },
+      abort(reason) {
+        // tidy up on error
+        file.abort?.(reason);
       },
     });
   }

@@ -22,6 +22,8 @@ import {
   ApiErrorCode,
   ApiErrorOutput,
   createDebugger,
+  getIdType,
+  IdType,
   Message,
 } from '@colanode/core';
 
@@ -181,6 +183,11 @@ export class AccountService {
   }
 
   public async downloadAvatar(avatar: string): Promise<boolean> {
+    const type = getIdType(avatar);
+    if (type !== IdType.Avatar) {
+      return false;
+    }
+
     try {
       const avatarPath = this.app.path.accountAvatar(this.account.id, avatar);
 
