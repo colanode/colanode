@@ -80,11 +80,10 @@ export const googleLoginRoute: FastifyPluginCallbackZod = (
             .execute();
         }
 
-        const output = await buildLoginSuccessOutput(existingAccount, {
-          ip: request.client.ip,
-          platform: input.platform,
-          version: input.version,
-        });
+        const output = await buildLoginSuccessOutput(
+          existingAccount,
+          request.client
+        );
         return output;
       }
 
@@ -109,12 +108,7 @@ export const googleLoginRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const output = await buildLoginSuccessOutput(newAccount, {
-        ip: request.client.ip,
-        platform: input.platform,
-        version: input.version,
-      });
-
+      const output = await buildLoginSuccessOutput(newAccount, request.client);
       return output;
     },
   });

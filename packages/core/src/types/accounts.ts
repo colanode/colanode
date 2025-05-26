@@ -32,21 +32,12 @@ export const accountUpdateOutputSchema = z.object({
 
 export type AccountUpdateOutput = z.infer<typeof accountUpdateOutputSchema>;
 
-export const accountSyncInputSchema = z.object({
-  platform: z.string(),
-  version: z.string(),
-});
-
-export type AccountSyncInput = z.infer<typeof accountSyncInputSchema>;
-
 export const emailRegisterInputSchema = z.object({
   name: z.string({ required_error: 'Name is required' }),
   email: z.string({ required_error: 'Email is required' }).email({
     message: 'Invalid email address',
   }),
   password: z.string({ required_error: 'Password is required' }),
-  platform: z.string({ required_error: 'Platform is required' }),
-  version: z.string({ required_error: 'Version is required' }),
 });
 
 export type EmailRegisterInput = z.infer<typeof emailRegisterInputSchema>;
@@ -56,8 +47,6 @@ export const emailLoginInputSchema = z.object({
     message: 'Invalid email address',
   }),
   password: z.string({ required_error: 'Password is required' }),
-  platform: z.string({ required_error: 'Platform is required' }),
-  version: z.string({ required_error: 'Version is required' }),
 });
 
 export type EmailLoginInput = z.infer<typeof emailLoginInputSchema>;
@@ -98,16 +87,12 @@ export type AccountSyncOutput = z.infer<typeof accountSyncOutputSchema>;
 export const emailVerifyInputSchema = z.object({
   id: z.string(),
   otp: z.string(),
-  platform: z.string(),
-  version: z.string(),
 });
 
 export type EmailVerifyInput = z.infer<typeof emailVerifyInputSchema>;
 
 export const emailPasswordResetInitInputSchema = z.object({
   email: z.string().email(),
-  platform: z.string(),
-  version: z.string(),
 });
 
 export type EmailPasswordResetInitInput = z.infer<
@@ -118,8 +103,6 @@ export const emailPasswordResetCompleteInputSchema = z.object({
   id: z.string(),
   otp: z.string(),
   password: z.string(),
-  platform: z.string(),
-  version: z.string(),
 });
 
 export type EmailPasswordResetCompleteInput = z.infer<
@@ -147,8 +130,6 @@ export const googleLoginInputSchema = z.object({
   access_token: z.string(),
   token_type: z.string(),
   expires_in: z.number(),
-  platform: z.string(),
-  version: z.string(),
 });
 
 export type GoogleLoginInput = z.infer<typeof googleLoginInputSchema>;

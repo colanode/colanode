@@ -39,8 +39,6 @@ export class EmailPasswordResetCompleteMutationHandler
         id: input.id,
         otp: input.otp,
         password: input.password,
-        platform: this.app.build.platform,
-        version: this.app.build.version,
       };
 
       const { data } = await axios.post<EmailPasswordResetCompleteOutput>(

@@ -17,7 +17,6 @@ import { WorkspaceService } from '@colanode/client/services/workspaces/workspace
 import { Account } from '@colanode/client/types/accounts';
 import { Workspace } from '@colanode/client/types/workspaces';
 import {
-  AccountSyncInput,
   AccountSyncOutput,
   ApiErrorCode,
   ApiErrorOutput,
@@ -274,14 +273,9 @@ export class AccountService {
     }
 
     try {
-      const body: AccountSyncInput = {
-        platform: this.app.build.platform,
-        version: this.app.build.version,
-      };
-
       const { data } = await this.client.post<AccountSyncOutput>(
         '/v1/accounts/sync',
-        body
+        {}
       );
 
       const hasChanges =

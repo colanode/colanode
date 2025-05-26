@@ -2,13 +2,7 @@ import { FastifyPluginCallback, FastifyRequest } from 'fastify';
 import fp from 'fastify-plugin';
 
 import { ApiHeader } from '@colanode/core';
-
-export interface ClientContext {
-  ip: string;
-  platform?: string;
-  version?: string;
-  type?: string;
-}
+import { ClientContext } from '@colanode/server/types/api';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -42,9 +36,9 @@ const clientDecoratorCallback: FastifyPluginCallback = (fastify, _, done) => {
 
     request.client = {
       ip,
-      platform,
-      version,
-      type,
+      platform: platform || 'unknown',
+      version: version || 'unknown',
+      type: type || 'unknown',
     };
   });
 

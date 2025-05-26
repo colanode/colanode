@@ -30,8 +30,6 @@ export class EmailVerifyMutationHandler
       const emailVerifyInput: EmailVerifyInput = {
         id: input.id,
         otp: input.otp,
-        platform: this.app.build.platform,
-        version: this.app.build.version,
       };
 
       const { data } = await axios.post<LoginOutput>(

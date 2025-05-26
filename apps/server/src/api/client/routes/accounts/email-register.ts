@@ -116,12 +116,7 @@ export const emailRegisterRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const output = await buildLoginSuccessOutput(account, {
-        ip: request.client.ip,
-        platform: input.platform || request.client.platform || '',
-        version: input.version || request.client.version || '',
-      });
-
+      const output = await buildLoginSuccessOutput(account, request.client);
       return output;
     },
   });

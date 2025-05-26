@@ -33,8 +33,6 @@ export class EmailRegisterMutationHandler
         name: input.name,
         email: input.email,
         password: input.password,
-        platform: this.app.build.platform,
-        version: this.app.build.version,
       };
 
       const { data } = await axios.post<LoginOutput>(

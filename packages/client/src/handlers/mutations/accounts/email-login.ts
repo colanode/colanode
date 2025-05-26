@@ -30,8 +30,6 @@ export class EmailLoginMutationHandler
       const emailLoginInput: EmailLoginInput = {
         email: input.email,
         password: input.password,
-        platform: this.app.build.platform,
-        version: this.app.build.version,
       };
 
       const { data } = await axios.post<LoginOutput>(

@@ -26,17 +26,12 @@ import {
   emailPasswordResetTemplate,
   emailVerifyTemplate,
 } from '@colanode/server/templates';
+import { ClientContext } from '@colanode/server/types/api';
 import {
   Otp,
   AccountVerifyOtpAttributes,
   AccountPasswordResetOtpAttributes,
 } from '@colanode/server/types/otps';
-
-interface DeviceMetadata {
-  ip: string | undefined;
-  platform: string;
-  version: string;
-}
 
 export const generatePasswordHash = async (
   password: string
@@ -57,7 +52,7 @@ export const verifyPassword = async (
 
 export const buildLoginSuccessOutput = async (
   account: SelectAccount,
-  metadata: DeviceMetadata
+  client: ClientContext
 ): Promise<LoginSuccessOutput> => {
   const users = await database
     .selectFrom('users')
@@ -116,9 +111,9 @@ export const buildLoginSuccessOutput = async (
       token_salt: salt,
       token_generated_at: new Date(),
       type: 1,
-      ip: metadata.ip,
-      platform: metadata.platform,
-      version: metadata.version,
+      ip: client.ip,
+      platform: client.platform,
+      version: client.version,
       created_at: new Date(),
     })
     .returningAll()

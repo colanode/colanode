@@ -37,8 +37,6 @@ export class EmailPasswordResetInitMutationHandler
     try {
       const emailPasswordResetInitInput: EmailPasswordResetInitInput = {
         email: input.email,
-        platform: this.app.build.platform,
-        version: this.app.build.version,
       };
 
       const { data } = await axios.post<EmailPasswordResetInitOutput>(

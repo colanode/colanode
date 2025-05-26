@@ -83,12 +83,7 @@ export const emailLoginRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const output = await buildLoginSuccessOutput(account, {
-        ip: request.ip,
-        platform: input.platform,
-        version: input.version,
-      });
-
+      const output = await buildLoginSuccessOutput(account, request.client);
       return output;
     },
   });
