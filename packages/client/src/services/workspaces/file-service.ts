@@ -293,37 +293,15 @@ export class FileService {
     }
 
     try {
-      const fileBuffer = await this.app.fs.readFile(filePath);
+      const fileStream = await this.app.fs.readStream(filePath);
 
       await this.workspace.account.client.put(
         `v1/workspaces/${this.workspace.id}/files/${file.id}`,
         {
-          body: fileBuffer,
+          body: fileStream,
           headers: {
             'Content-Type': file.attributes.mimeType,
             'Content-Length': file.attributes.size.toString(),
-          },
-          onUploadProgress: async (progress, _chunk) => {
-            const percent = Math.round((progress.percent || 0) * 100);
-            const updatedFileState = await this.workspace.database
-              .updateTable('file_states')
-              .returningAll()
-              .set({
-                upload_progress: percent,
-              })
-              .where('id', '=', file.id)
-              .executeTakeFirst();
-
-            if (!updatedFileState) {
-              return;
-            }
-
-            eventBus.publish({
-              type: 'file_state_updated',
-              accountId: this.workspace.accountId,
-              workspaceId: this.workspace.id,
-              fileState: mapFileState(updatedFileState),
-            });
           },
         }
       );
@@ -349,7 +327,9 @@ export class FileService {
       }
 
       debug(`File ${file.id} uploaded successfully`);
-    } catch {
+    } catch (error) {
+      debug(`Error uploading file ${file.id}: ${error}`);
+
       const updatedFileState = await this.workspace.database
         .updateTable('file_states')
         .returningAll()

@@ -39,12 +39,13 @@ export class AvatarUploadMutationHandler
         throw new Error(`File ${filePath} does not exist`);
       }
 
-      const fileBuffer = await this.app.fs.readFile(filePath);
+      const fileStream = await this.app.fs.readStream(filePath);
       const response = await account.client
         .post('v1/avatars', {
-          body: fileBuffer,
+          body: fileStream,
           headers: {
             'Content-Type': input.file.mimeType,
+            'Content-Length': input.file.size.toString(),
           },
         })
         .json<AvatarUploadResponse>();
@@ -58,6 +59,7 @@ export class AvatarUploadMutationHandler
       if (error instanceof Error) {
         throw new MutationError(MutationErrorCode.ApiError, error.message);
       }
+
       throw new MutationError(
         MutationErrorCode.ApiError,
         'Unknown error occurred'

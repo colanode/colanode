@@ -1,5 +1,4 @@
 import { PutObjectCommand } from '@aws-sdk/client-s3';
-import fastifyMultipart from '@fastify/multipart';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import sharp from 'sharp';
 
@@ -20,18 +19,12 @@ const ALLOWED_MIME_TYPES = [
   'image/webp',
 ];
 
-const FILE_TYPES_REGEX = /jpeg|jpg|png|webp/;
-
 export const avatarUploadRoute: FastifyPluginCallbackZod = (
   instance,
   _,
   done
 ) => {
-  instance.register(fastifyMultipart, {
-    limits: {
-      fileSize: 10 * 1024 * 1024, // 10MB
-    },
-  });
+  instance.removeAllContentTypeParsers();
 
   ALLOWED_MIME_TYPES.forEach((mimeType) => {
     instance.addContentTypeParser(
@@ -53,41 +46,20 @@ export const avatarUploadRoute: FastifyPluginCallbackZod = (
         500: apiErrorOutputSchema,
       },
     },
+    bodyLimit: 1024 * 1024 * 10, // 10MB
     handler: async (request, reply) => {
       try {
-        let buffer: Buffer;
         const contentType = request.headers['content-type'] || '';
 
-        if (ALLOWED_MIME_TYPES.includes(contentType)) {
-          buffer = request.body as Buffer;
-        } else if (contentType.startsWith('multipart/form-data')) {
-          const file = await request.file();
-          if (!file) {
-            return reply.code(400).send({
-              code: ApiErrorCode.AvatarFileNotUploaded,
-              message: 'Avatar file not uploaded as part of request',
-            });
-          }
-
-          const extname = FILE_TYPES_REGEX.test(file.filename.toLowerCase());
-          const mimetype = FILE_TYPES_REGEX.test(file.mimetype);
-
-          if (!mimetype || !extname) {
-            return reply.code(400).send({
-              code: ApiErrorCode.AvatarFileNotUploaded,
-              message: 'Only images are allowed',
-            });
-          }
-
-          buffer = await file.toBuffer();
-        } else {
+        if (!ALLOWED_MIME_TYPES.includes(contentType)) {
           return reply.code(400).send({
             code: ApiErrorCode.AvatarFileNotUploaded,
             message:
-              'Invalid content type. Must be either multipart/form-data or a direct image upload',
+              'Invalid content type. Must be a direct image upload of type jpeg, jpg, png, or webp',
           });
         }
 
+        const buffer = request.body as Buffer;
         const jpegBuffer = await sharp(buffer)
           .resize({
             width: 500,

@@ -1,4 +1,8 @@
-import { FileMetadata, FileSystem } from '@colanode/client/services';
+import {
+  FileMetadata,
+  FileReadStream,
+  FileSystem,
+} from '@colanode/client/services';
 
 export class WebFileSystem implements FileSystem {
   private root: FileSystemDirectoryHandle | null = null;
@@ -125,26 +129,14 @@ export class WebFileSystem implements FileSystem {
     await this.writeFile(destination, data);
   }
 
-  public async createReadStream(
-    path: string
-  ): Promise<ReadableStream<Uint8Array>> {
-    // In browser environments, we'll create a Readable from the file content
-    const data = await this.readFile(path);
-
-    // Create a Readable stream from the buffer
-    const readable = new ReadableStream<Uint8Array>({
-      start(controller) {
-        controller.enqueue(data);
-        controller.close();
-      },
-    });
-
-    return readable;
+  public async readStream(path: string): Promise<FileReadStream> {
+    const { parent, name } = await this.getFileLocation(path, false);
+    const fileHandle = await parent.getFileHandle(name);
+    const file = await fileHandle.getFile();
+    return file;
   }
 
-  public async createWriteStream(
-    path: string
-  ): Promise<WritableStream<Uint8Array>> {
+  public async writeStream(path: string): Promise<WritableStream<Uint8Array>> {
     const { parent, name } = await this.getFileLocation(path, /*create*/ true);
     const fileHandle = await parent.getFileHandle(name, { create: true });
     const file = await fileHandle.createWritable({ keepExistingData: false });
@@ -187,8 +179,6 @@ export class WebFileSystem implements FileSystem {
     const fileHandle = await parent.getFileHandle(name);
     const file = await fileHandle.getFile();
     const arrayBuffer = await file.arrayBuffer();
-
-    // Convert ArrayBuffer to Buffer-like object
     return new Uint8Array(arrayBuffer);
   }
 

@@ -21,13 +21,11 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
   _,
   done
 ) => {
-  instance.addContentTypeParser(
-    '*',
-    { parseAs: 'buffer' },
-    (_, payload, done) => {
-      done(null, payload);
-    }
-  );
+  instance.removeAllContentTypeParsers();
+
+  instance.addContentTypeParser('*', (_request, _payload, done) => {
+    done(null);
+  });
 
   instance.route({
     method: 'PUT',
@@ -43,6 +41,7 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
         404: apiErrorOutputSchema,
       },
     },
+    bodyLimit: 1024 * 1024 * 100, // 100MB
     handler: async (request, reply) => {
       const { workspaceId, fileId } = request.params;
       const user = request.user;
@@ -106,11 +105,11 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
 
       const path = buildFilePath(workspaceId, fileId, file.attributes);
 
-      const buffer = request.body as Buffer;
+      const stream = request.raw;
       const uploadCommand = new PutObjectCommand({
         Bucket: config.storage.bucketName,
         Key: path,
-        Body: buffer,
+        Body: stream,
         ContentType: file.attributes.mimeType,
         ContentLength: file.attributes.size,
       });

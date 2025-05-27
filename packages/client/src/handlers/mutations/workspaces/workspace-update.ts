@@ -49,7 +49,7 @@ export class WorkspaceUpdateMutationHandler
       };
 
       const response = await accountService.client
-        .put(`/v1/workspaces/${input.id}`, {
+        .put(`v1/workspaces/${input.id}`, {
           json: body,
         })
         .json<Workspace>();

@@ -39,7 +39,7 @@ export class WorkspaceDeleteMutationHandler
 
     try {
       const response = await accountService.client
-        .delete(`/v1/workspaces/${input.workspaceId}`)
+        .delete(`v1/workspaces/${input.workspaceId}`)
         .json<WorkspaceOutput>();
 
       await accountService.deleteWorkspace(response.id);

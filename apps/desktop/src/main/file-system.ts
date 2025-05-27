@@ -1,6 +1,11 @@
 import fs from 'fs';
+import { Writable } from 'stream';
 
-import { FileMetadata, FileSystem } from '@colanode/client/services';
+import {
+  FileMetadata,
+  FileReadStream,
+  FileSystem,
+} from '@colanode/client/services';
 
 export class DesktopFileSystem implements FileSystem {
   public async makeDirectory(path: string): Promise<void> {
@@ -18,24 +23,13 @@ export class DesktopFileSystem implements FileSystem {
     await fs.promises.copyFile(source, destination);
   }
 
-  public createReadStream(path: string): Promise<ReadableStream<Uint8Array>> {
-    return new Promise((resolve, reject) => {
-      const stream = fs.createReadStream(path);
-      stream.on('open', () =>
-        resolve(stream as unknown as ReadableStream<Uint8Array>)
-      );
-      stream.on('error', reject);
-    });
+  public async readStream(path: string): Promise<FileReadStream> {
+    return fs.createReadStream(path);
   }
 
-  public createWriteStream(path: string): Promise<WritableStream<Uint8Array>> {
-    return new Promise((resolve, reject) => {
-      const stream = fs.createWriteStream(path);
-      stream.on('open', () =>
-        resolve(stream as unknown as WritableStream<Uint8Array>)
-      );
-      stream.on('error', reject);
-    });
+  public async writeStream(path: string): Promise<WritableStream<Uint8Array>> {
+    const stream = fs.createWriteStream(path);
+    return Writable.toWeb(stream) as WritableStream<Uint8Array>;
   }
 
   public listFiles(path: string): Promise<string[]> {
