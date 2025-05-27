@@ -54,25 +54,19 @@ export class FileService {
     this.uploadsEventLoop = new EventLoop(
       ms('1 minute'),
       ms('1 second'),
-      () => {
-        this.uploadFiles();
-      }
+      this.uploadFiles.bind(this)
     );
 
     this.downloadsEventLoop = new EventLoop(
       ms('1 minute'),
       ms('1 second'),
-      () => {
-        this.downloadFiles();
-      }
+      this.downloadFiles.bind(this)
     );
 
     this.cleanupEventLoop = new EventLoop(
       ms('10 minutes'),
       ms('5 minutes'),
-      () => {
-        this.cleanDeletedFiles();
-      }
+      this.cleanDeletedFiles.bind(this)
     );
 
     this.uploadsEventLoop.start();

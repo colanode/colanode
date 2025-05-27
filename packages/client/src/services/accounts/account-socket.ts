@@ -5,11 +5,11 @@ import { BackoffCalculator } from '@colanode/client/lib/backoff-calculator';
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { EventLoop } from '@colanode/client/lib/event-loop';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
-import { Message, createDebugger } from '@colanode/core';
+import { Message, SocketInitOutput, createDebugger } from '@colanode/core';
 
-const debug = createDebugger('desktop:service:account-connection');
+const debug = createDebugger('desktop:service:account-socket');
 
-export class AccountConnection {
+export class AccountSocket {
   private readonly account: AccountService;
   private readonly eventLoop: EventLoop;
 
@@ -19,15 +19,17 @@ export class AccountConnection {
 
   private eventSubscriptionId: string;
 
-  constructor(accountService: AccountService) {
-    this.account = accountService;
+  constructor(account: AccountService) {
+    this.account = account;
     this.socket = null;
     this.backoffCalculator = new BackoffCalculator();
     this.closingCount = 0;
 
-    this.eventLoop = new EventLoop(ms('1 minute'), ms('1 second'), () => {
-      this.checkConnection();
-    });
+    this.eventLoop = new EventLoop(
+      ms('1 minute'),
+      ms('1 second'),
+      this.checkConnection.bind(this)
+    );
 
     this.eventSubscriptionId = eventBus.subscribe((event) => {
       if (
@@ -39,7 +41,7 @@ export class AccountConnection {
     });
   }
 
-  public init(): void {
+  public async init(): Promise<void> {
     this.eventLoop.start();
 
     if (!this.account.server.isAvailable) {
@@ -49,7 +51,6 @@ export class AccountConnection {
     debug(`Initializing socket connection for account ${this.account.id}`);
 
     if (this.socket && this.isConnected()) {
-      this.socket.ping();
       return;
     }
 
@@ -57,8 +58,13 @@ export class AccountConnection {
       return;
     }
 
-    const url = `${this.account.server.synapseUrl}?token=${this.account.token}`;
-    this.socket = new WebSocket(url);
+    const response = await this.account.client
+      .post('v1/sockets')
+      .json<SocketInitOutput>();
+
+    this.socket = new WebSocket(
+      `${this.account.server.socketBaseUrl}/v1/sockets/${response.id}`
+    );
 
     this.socket.onmessage = async (event) => {
       const data: string = event.data.toString();
@@ -133,28 +139,33 @@ export class AccountConnection {
   }
 
   private checkConnection(): void {
-    debug(`Checking connection for account ${this.account.id}`);
-    if (!this.account.server.isAvailable) {
-      return;
-    }
-
-    if (this.isConnected()) {
-      this.socket?.ping();
-      return;
-    }
-
-    if (this.socket == null || this.socket.readyState === WebSocket.CLOSED) {
-      this.init();
-      return;
-    }
-
-    if (this.socket.readyState === WebSocket.CLOSING) {
-      this.closingCount++;
-
-      if (this.closingCount > 50) {
-        this.socket.terminate();
-        this.closingCount = 0;
+    try {
+      debug(`Checking connection for account ${this.account.id}`);
+      if (!this.account.server.isAvailable) {
+        return;
       }
+
+      if (this.isConnected()) {
+        return;
+      }
+
+      if (this.socket == null || this.socket.readyState === WebSocket.CLOSED) {
+        this.init();
+        return;
+      }
+
+      if (this.socket.readyState === WebSocket.CLOSING) {
+        this.closingCount++;
+
+        if (this.closingCount > 50) {
+          this.socket.terminate();
+          this.closingCount = 0;
+        }
+      }
+    } catch (error) {
+      debug(
+        `Error checking connection for account ${this.account.id}: ${error}`
+      );
     }
   }
 }

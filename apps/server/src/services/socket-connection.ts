@@ -16,7 +16,6 @@ import { NodeReactionSynchronizer } from '@colanode/server/synchronizers/node-re
 import { NodeTombstoneSynchronizer } from '@colanode/server/synchronizers/node-tombstones';
 import { NodeUpdatesSynchronizer } from '@colanode/server/synchronizers/node-updates';
 import { UserSynchronizer } from '@colanode/server/synchronizers/users';
-import { RequestAccount } from '@colanode/server/types/api';
 import {
   AccountUpdatedEvent,
   CollaborationCreatedEvent,
@@ -27,6 +26,7 @@ import {
   WorkspaceDeletedEvent,
   WorkspaceUpdatedEvent,
 } from '@colanode/server/types/events';
+import { SocketContext } from '@colanode/server/types/sockets';
 import { ConnectedUser } from '@colanode/server/types/users';
 
 type SocketUser = {
@@ -38,17 +38,19 @@ type SocketUser = {
 const debug = createDebugger('server:service:socket-connection');
 
 export class SocketConnection {
-  private readonly account: RequestAccount;
+  private readonly context: SocketContext;
   private readonly socket: WebSocket;
 
   private readonly users: Map<string, SocketUser> = new Map();
   private readonly pendingUsers: Map<string, Promise<SocketUser | null>> =
     new Map();
 
-  constructor(account: RequestAccount, socket: WebSocket) {
-    debug(`New connection, account:${account.id}, device:${account.deviceId}`);
+  constructor(context: SocketContext, socket: WebSocket) {
+    debug(
+      `New connection, account:${context.accountId}, device:${context.deviceId}`
+    );
 
-    this.account = account;
+    this.context = context;
     this.socket = socket;
 
     this.socket.on('message', (data) => {
@@ -58,11 +60,11 @@ export class SocketConnection {
   }
 
   public getDeviceId() {
-    return this.account.deviceId;
+    return this.context.deviceId;
   }
 
   public getAccountId() {
-    return this.account.id;
+    return this.context.accountId;
   }
 
   public sendMessage(message: Message) {
@@ -75,7 +77,7 @@ export class SocketConnection {
 
   private async handleMessage(message: Message) {
     debug(
-      `Socket message, account:${this.account.id}, device:${this.account.deviceId}, type:${message.type}`
+      `Socket message, account:${this.context.accountId}, device:${this.context.deviceId}, type:${message.type}`
     );
 
     if (message.type === 'synchronizer_input') {
@@ -231,7 +233,7 @@ export class SocketConnection {
     if (
       !user ||
       user.status !== UserStatus.Active ||
-      user.account_id !== this.account.id
+      user.account_id !== this.context.accountId
     ) {
       return null;
     }
@@ -251,8 +253,8 @@ export class SocketConnection {
     const connectedUser: ConnectedUser = {
       userId: user.id,
       workspaceId: user.workspace_id,
-      accountId: this.account.id,
-      deviceId: this.account.deviceId,
+      accountId: this.context.accountId,
+      deviceId: this.context.deviceId,
     };
 
     const rootIds = new Set<string>();
@@ -275,13 +277,13 @@ export class SocketConnection {
   }
 
   private handleAccountUpdatedEvent(event: AccountUpdatedEvent) {
-    if (event.accountId !== this.account.id) {
+    if (event.accountId !== this.context.accountId) {
       return;
     }
 
     this.sendMessage({
       type: 'account_updated',
-      accountId: this.account.id,
+      accountId: this.context.accountId,
     });
   }
 
@@ -311,7 +313,7 @@ export class SocketConnection {
 
     this.sendMessage({
       type: 'workspace_deleted',
-      accountId: this.account.id,
+      accountId: this.context.accountId,
     });
   }
 
@@ -347,7 +349,7 @@ export class SocketConnection {
   }
 
   private handleUserCreatedEvent(event: UserCreatedEvent) {
-    if (event.accountId !== this.account.id) {
+    if (event.accountId !== this.context.accountId) {
       return;
     }
 
@@ -360,7 +362,7 @@ export class SocketConnection {
   }
 
   private handleUserUpdatedEvent(event: UserUpdatedEvent) {
-    if (event.accountId !== this.account.id) {
+    if (event.accountId !== this.context.accountId) {
       return;
     }
 

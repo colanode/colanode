@@ -22,24 +22,15 @@ const accountAuthenticatorCallback: FastifyPluginCallback = (
   }
 
   fastify.addHook('onRequest', async (request, reply) => {
-    let authHeader = request.headers.authorization;
-    if (
-      !authHeader &&
-      typeof request.query === 'object' &&
-      request.query !== null &&
-      'token' in request.query
-    ) {
-      authHeader = request.query.token as string;
-    }
-
-    if (!authHeader) {
+    const auth = request.headers.authorization;
+    if (!auth) {
       return reply.code(401).send({
         code: ApiErrorCode.TokenMissing,
         message: 'No token provided',
       });
     }
 
-    const parts = authHeader.split(' ');
+    const parts = auth.split(' ');
     const token = parts.length === 2 ? parts[1] : parts[0];
 
     if (!token) {

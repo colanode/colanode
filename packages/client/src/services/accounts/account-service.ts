@@ -10,7 +10,7 @@ import { eventBus } from '@colanode/client/lib/event-bus';
 import { EventLoop } from '@colanode/client/lib/event-loop';
 import { parseApiError } from '@colanode/client/lib/ky';
 import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
-import { AccountConnection } from '@colanode/client/services/accounts/account-connection';
+import { AccountSocket } from '@colanode/client/services/accounts/account-socket';
 import { AppService } from '@colanode/client/services/app-service';
 import { ServerService } from '@colanode/client/services/server-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
@@ -37,7 +37,7 @@ export class AccountService {
   public readonly server: ServerService;
   public readonly database: Kysely<AccountDatabaseSchema>;
 
-  public readonly connection: AccountConnection;
+  public readonly socket: AccountSocket;
   public readonly client: KyInstance;
   private readonly eventSubscriptionId: string;
 
@@ -53,16 +53,19 @@ export class AccountService {
       readonly: false,
     });
 
-    this.connection = new AccountConnection(this);
+    this.socket = new AccountSocket(this);
     this.client = this.app.client.extend({
-      prefixUrl: this.server.apiBaseUrl,
+      prefixUrl: this.server.httpBaseUrl,
       headers: {
         Authorization: `Bearer ${this.account.token}`,
       },
     });
 
-    this.sync = this.sync.bind(this);
-    this.eventLoop = new EventLoop(ms('1 minute'), ms('1 second'), this.sync);
+    this.eventLoop = new EventLoop(
+      ms('1 minute'),
+      ms('1 second'),
+      this.sync.bind(this)
+    );
 
     this.eventSubscriptionId = eventBus.subscribe((event) => {
       if (
@@ -103,7 +106,7 @@ export class AccountService {
       await this.downloadAvatar(this.account.avatar);
     }
 
-    this.connection.init();
+    this.socket.init();
     this.eventLoop.start();
 
     await this.initWorkspaces();
@@ -153,7 +156,7 @@ export class AccountService {
       }
 
       this.database.destroy();
-      this.connection.close();
+      this.socket.close();
       this.eventLoop.stop();
       eventBus.unsubscribe(this.eventSubscriptionId);
 

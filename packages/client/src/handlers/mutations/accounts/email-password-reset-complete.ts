@@ -43,7 +43,7 @@ export class EmailPasswordResetCompleteMutationHandler
 
       const response = await ky
         .post(
-          `${server.apiBaseUrl}/v1/accounts/emails/passwords/reset/complete`,
+          `${server.httpBaseUrl}/v1/accounts/emails/passwords/reset/complete`,
           {
             json: body,
           }

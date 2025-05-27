@@ -23,10 +23,7 @@ export class MutationService {
   constructor(workspaceService: WorkspaceService) {
     this.workspace = workspaceService;
 
-    this.eventLoop = new EventLoop(ms('1 minute'), 100, () => {
-      this.sync();
-    });
-
+    this.eventLoop = new EventLoop(ms('1 minute'), 100, this.sync.bind(this));
     this.eventLoop.start();
   }
 

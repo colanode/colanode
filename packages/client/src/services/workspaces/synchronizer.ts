@@ -3,7 +3,7 @@ import ms from 'ms';
 
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { EventLoop } from '@colanode/client/lib/event-loop';
-import { AccountConnection } from '@colanode/client/services/accounts/account-connection';
+import { AccountSocket } from '@colanode/client/services/accounts/account-socket';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import {
   SynchronizerOutputMessage,
@@ -22,7 +22,7 @@ export class Synchronizer<TInput extends SynchronizerInput> {
   private readonly id: string;
   private readonly input: TInput;
   private readonly workspace: WorkspaceService;
-  private readonly connection: AccountConnection;
+  private readonly connection: AccountSocket;
   private readonly cursorKey: string;
   private readonly eventLoop: EventLoop;
   private readonly eventSubscriptionId: string;
@@ -36,21 +36,23 @@ export class Synchronizer<TInput extends SynchronizerInput> {
   private initialized: boolean = false;
 
   constructor(
-    workspaceService: WorkspaceService,
+    workspace: WorkspaceService,
     input: TInput,
     cursorKey: string,
     processor: (data: SynchronizerMap[TInput['type']]['data']) => Promise<void>
   ) {
-    this.workspace = workspaceService;
-    this.connection = workspaceService.account.connection;
+    this.workspace = workspace;
+    this.connection = workspace.account.socket;
     this.input = input;
     this.cursorKey = cursorKey;
     this.id = this.generateId();
     this.processor = processor;
 
-    this.eventLoop = new EventLoop(ms('1 minute'), ms('1 second'), () => {
-      this.ping();
-    });
+    this.eventLoop = new EventLoop(
+      ms('1 minute'),
+      ms('1 second'),
+      this.ping.bind(this)
+    );
 
     this.eventSubscriptionId = eventBus.subscribe((event) => {
       if (

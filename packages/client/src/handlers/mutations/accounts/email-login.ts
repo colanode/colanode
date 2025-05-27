@@ -33,7 +33,7 @@ export class EmailLoginMutationHandler
       };
 
       const response = await ky
-        .post(`${server.apiBaseUrl}/v1/accounts/emails/login`, {
+        .post(`${server.httpBaseUrl}/v1/accounts/emails/login`, {
           json: body,
         })
         .json<LoginOutput>();

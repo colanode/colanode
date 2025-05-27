@@ -36,7 +36,7 @@ export class EmailRegisterMutationHandler
       };
 
       const response = await ky
-        .post(`${server.apiBaseUrl}/v1/accounts/emails/register`, {
+        .post(`${server.httpBaseUrl}/v1/accounts/emails/register`, {
           json: body,
         })
         .json<LoginOutput>();

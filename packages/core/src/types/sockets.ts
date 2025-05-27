@@ -1,7 +1,15 @@
+import { z } from 'zod';
+
 import {
   SynchronizerInput,
   SynchronizerMap,
 } from '@colanode/core/synchronizers';
+
+export const socketInitOutputSchema = z.object({
+  id: z.string(),
+});
+
+export type SocketInitOutput = z.infer<typeof socketInitOutputSchema>;
 
 export type SynchronizerInputMessage = {
   type: 'synchronizer_input';

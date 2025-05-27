@@ -33,7 +33,7 @@ export class EmailVerifyMutationHandler
       };
 
       const response = await ky
-        .post(`${server.apiBaseUrl}/v1/accounts/emails/verify`, {
+        .post(`${server.httpBaseUrl}/v1/accounts/emails/verify`, {
           json: body,
         })
         .json<LoginOutput>();

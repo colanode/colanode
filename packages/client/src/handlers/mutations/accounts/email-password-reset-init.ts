@@ -40,7 +40,7 @@ export class EmailPasswordResetInitMutationHandler
       };
 
       const response = await ky
-        .post(`${server.apiBaseUrl}/v1/accounts/emails/passwords/reset/init`, {
+        .post(`${server.httpBaseUrl}/v1/accounts/emails/passwords/reset/init`, {
           json: body,
         })
         .json<EmailPasswordResetInitOutput>();

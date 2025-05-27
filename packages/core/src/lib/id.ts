@@ -39,6 +39,7 @@ export enum IdType {
   Mention = 'me',
   Window = 'wi',
   TempFile = 'tf',
+  Socket = 'sk',
 }
 
 export const generateId = (type: IdType): string => {

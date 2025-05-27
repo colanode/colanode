@@ -23,7 +23,10 @@ export const saveOtp = async <T>(id: string, otp: Otp<T>): Promise<void> => {
     1
   );
   await redis.set(redisKey, JSON.stringify(otp), {
-    EX: expireSeconds,
+    expiration: {
+      type: 'EX',
+      value: expireSeconds,
+    },
   });
 };
 

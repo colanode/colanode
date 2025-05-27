@@ -24,18 +24,20 @@ export class ServerService {
   private eventLoop: EventLoop;
 
   public readonly server: Server;
-  public readonly synapseUrl: string;
-  public readonly apiBaseUrl: string;
+  public readonly socketBaseUrl: string;
+  public readonly httpBaseUrl: string;
 
   constructor(app: AppService, server: Server) {
     this.app = app;
     this.server = server;
-    this.synapseUrl = ServerService.buildSynapseUrl(server.domain);
-    this.apiBaseUrl = ServerService.buildApiBaseUrl(server.domain);
+    this.socketBaseUrl = ServerService.buildSocketUrl(server.domain);
+    this.httpBaseUrl = ServerService.buildHttpBaseUrl(server.domain);
 
-    this.eventLoop = new EventLoop(ms('1 minute'), ms('1 second'), () => {
-      this.sync();
-    });
+    this.eventLoop = new EventLoop(
+      ms('1 minute'),
+      ms('1 second'),
+      this.sync.bind(this)
+    );
     this.eventLoop.start();
   }
 
@@ -107,7 +109,7 @@ export class ServerService {
   }
 
   public static async fetchServerConfig(domain: string) {
-    const baseUrl = this.buildApiBaseUrl(domain);
+    const baseUrl = this.buildHttpBaseUrl(domain);
     const configUrl = `${baseUrl}/v1/config`;
     try {
       const response = await ky.get(configUrl).json<ServerConfig>();
@@ -119,13 +121,13 @@ export class ServerService {
     return null;
   }
 
-  private static buildApiBaseUrl(domain: string) {
+  private static buildHttpBaseUrl(domain: string) {
     const protocol = domain.startsWith('localhost:') ? 'http' : 'https';
     return `${protocol}://${domain}/client`;
   }
 
-  private static buildSynapseUrl(domain: string) {
+  private static buildSocketUrl(domain: string) {
     const protocol = domain.startsWith('localhost:') ? 'ws' : 'wss';
-    return `${protocol}://${domain}/client/v1/synapse`;
+    return `${protocol}://${domain}/client`;
   }
 }

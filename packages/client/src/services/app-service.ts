@@ -75,9 +75,7 @@ export class AppService {
     this.cleanupEventLoop = new EventLoop(
       ms('10 minutes'),
       ms('1 minute'),
-      () => {
-        this.cleanup();
-      }
+      this.cleanup.bind(this)
     );
 
     this.eventSubscriptionId = eventBus.subscribe((event) => {
@@ -247,8 +245,8 @@ export class AppService {
     }
 
     for (const deletedToken of deletedTokens) {
-      const serverService = this.servers.get(deletedToken.domain);
-      if (!serverService || !serverService.isAvailable) {
+      const server = this.servers.get(deletedToken.domain);
+      if (!server || !server.isAvailable) {
         debug(
           `Server ${deletedToken.domain} is not available for logging out account ${deletedToken.account_id}`
         );
@@ -256,14 +254,11 @@ export class AppService {
       }
 
       try {
-        await this.client.delete(
-          `${serverService.apiBaseUrl}/v1/accounts/logout`,
-          {
-            headers: {
-              Authorization: `Bearer ${deletedToken.token}`,
-            },
-          }
-        );
+        await this.client.delete(`${server.httpBaseUrl}/v1/accounts/logout`, {
+          headers: {
+            Authorization: `Bearer ${deletedToken.token}`,
+          },
+        });
 
         await this.database
           .deleteFrom('deleted_tokens')
