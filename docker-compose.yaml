@@ -92,6 +92,11 @@ services:
       # Possible values for SERVER_MODE: 'standalone', 'cluster'
       SERVER_MODE: 'standalone'
 
+      # Optional CORS Configuration. By default the server is accessible from 'https://app.colanode.com'.
+      # You can change this to allow custom origins (use comma to separate multiple origins) or '*' to allow all origins.
+      # SERVER_CORS_ORIGIN: 'https://app.colanode.com'
+      # SERVER_CORS_MAX_AGE: '7200'
+
       # ───────────────────────────────────────────────────────────────
       # Account Configuration
       # ───────────────────────────────────────────────────────────────
@@ -129,24 +134,14 @@ services:
       REDIS_EVENTS_CHANNEL: 'events'
 
       # ───────────────────────────────────────────────────────────────
-      # S3 Configuration for Avatars
+      # S3 configuration for files and avatars.
+      # In the future we will support other storage providers.
       # ───────────────────────────────────────────────────────────────
-      S3_AVATARS_ENDPOINT: 'http://minio:9000'
-      S3_AVATARS_ACCESS_KEY: 'minioadmin'
-      S3_AVATARS_SECRET_KEY: 'your_minio_password'
-      S3_AVATARS_BUCKET_NAME: 'colanode-avatars'
-      S3_AVATARS_REGION: 'us-east-1'
-      S3_AVATARS_FORCE_PATH_STYLE: 'true'
-
-      # ───────────────────────────────────────────────────────────────
-      # S3 Configuration for Files
-      # ───────────────────────────────────────────────────────────────
-      S3_FILES_ENDPOINT: 'http://minio:9000'
-      S3_FILES_ACCESS_KEY: 'minioadmin'
-      S3_FILES_SECRET_KEY: 'your_minio_password'
-      S3_FILES_BUCKET_NAME: 'colanode-files'
-      S3_FILES_REGION: 'us-east-1'
-      S3_FILES_FORCE_PATH_STYLE: 'true'
+      STORAGE_S3_ENDPOINT: 'http://minio:9000'
+      STORAGE_S3_ACCESS_KEY: 'minioadmin'
+      STORAGE_S3_SECRET_KEY: 'your_minio_password'
+      STORAGE_S3_BUCKET_NAME: 'colanode-avatars'
+      STORAGE_S3_REGION: 'us-east-1'
 
       # ───────────────────────────────────────────────────────────────
       # SMTP configuration
