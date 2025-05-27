@@ -1,6 +1,5 @@
 import { resolve } from 'node:path';
 
-import { TanStackRouterVite } from '@tanstack/router-plugin/vite';
 import viteReact from '@vitejs/plugin-react';
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
@@ -24,7 +23,6 @@ export default defineConfig({
     exclude: ['@sqlite.org/sqlite-wasm'],
   },
   plugins: [
-    TanStackRouterVite({ autoCodeSplitting: true }),
     viteReact(),
     VitePWA({
       mode: 'development',

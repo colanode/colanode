@@ -13,14 +13,9 @@
     "@colanode/client": "*",
     "@colanode/ui": "*",
     "@sqlite.org/sqlite-wasm": "^3.49.2-build1",
-    "@tanstack/react-router": "^1.120.5",
-    "@tanstack/react-router-devtools": "^1.120.6",
-    "@tanstack/router-plugin": "^1.120.5",
     "comlink": "^4.4.2"
   },
   "devDependencies": {
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/react": "^16.2.0",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.21",
     "typescript": "^5.7.2",
