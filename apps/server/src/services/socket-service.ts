@@ -59,7 +59,9 @@ class SocketService {
       this.connections.delete(context.deviceId);
     }
 
-    const connection = new SocketConnection(context, socket);
+    const connection = new SocketConnection(context, socket, () =>
+      this.connections.delete(context.deviceId)
+    );
     this.connections.set(context.deviceId, connection);
 
     return true;

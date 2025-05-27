@@ -45,7 +45,7 @@ export class SocketConnection {
   private readonly pendingUsers: Map<string, Promise<SocketUser | null>> =
     new Map();
 
-  constructor(context: SocketContext, socket: WebSocket) {
+  constructor(context: SocketContext, socket: WebSocket, onClose: () => void) {
     debug(
       `New connection, account:${context.accountId}, device:${context.deviceId}`
     );
@@ -56,6 +56,14 @@ export class SocketConnection {
     this.socket.on('message', (data) => {
       const message = JSON.parse(data.toString()) as Message;
       this.handleMessage(message);
+    });
+
+    this.socket.on('close', () => {
+      debug(
+        `Connection closed, account:${this.context.accountId}, device:${this.context.deviceId}`
+      );
+
+      onClose();
     });
   }
 
