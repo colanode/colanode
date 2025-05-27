@@ -1,4 +1,6 @@
+import { isServerOutdated } from '@colanode/client/lib';
 import { ServerNotFound } from '@colanode/ui/components/servers/server-not-found';
+import { ServerUpgradeRequired } from '@colanode/ui/components/servers/server-upgrade-required';
 import { ServerContext } from '@colanode/ui/contexts/server';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 import { isFeatureSupported } from '@colanode/ui/lib/features';
@@ -23,6 +25,8 @@ export const ServerProvider = ({ domain, children }: ServerProviderProps) => {
     return <ServerNotFound domain={domain} />;
   }
 
+  const isOutdated = isServerOutdated(server.version);
+
   return (
     <ServerContext.Provider
       value={{
@@ -32,7 +36,7 @@ export const ServerProvider = ({ domain, children }: ServerProviderProps) => {
         },
       }}
     >
-      {children}
+      {isOutdated ? <ServerUpgradeRequired /> : children}
     </ServerContext.Provider>
   );
 };

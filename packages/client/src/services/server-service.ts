@@ -4,6 +4,7 @@ import ms from 'ms';
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { EventLoop } from '@colanode/client/lib/event-loop';
 import { mapServer } from '@colanode/client/lib/mappers';
+import { isServerOutdated } from '@colanode/client/lib/servers';
 import { AppService } from '@colanode/client/services/app-service';
 import { Server } from '@colanode/client/types/servers';
 import { createDebugger, ServerConfig } from '@colanode/core';
@@ -26,12 +27,14 @@ export class ServerService {
   public readonly server: Server;
   public readonly socketBaseUrl: string;
   public readonly httpBaseUrl: string;
+  public readonly isOutdated: boolean;
 
   constructor(app: AppService, server: Server) {
     this.app = app;
     this.server = server;
     this.socketBaseUrl = ServerService.buildSocketUrl(server.domain);
     this.httpBaseUrl = ServerService.buildHttpBaseUrl(server.domain);
+    this.isOutdated = isServerOutdated(server.version);
 
     this.eventLoop = new EventLoop(
       ms('1 minute'),
@@ -42,7 +45,7 @@ export class ServerService {
   }
 
   public get isAvailable() {
-    return this.state?.isAvailable ?? false;
+    return !this.isOutdated && (this.state?.isAvailable ?? false);
   }
 
   public get domain() {
