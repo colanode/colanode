@@ -272,14 +272,15 @@ export const DocumentEditor = ({
       return;
     }
 
+    const newYDoc = buildYDoc(state, updates);
+    const afterContent = newYDoc.getObject<RichTextContent>();
     const beforeContent = ydocRef.current.getObject<RichTextContent>();
-    ydocRef.current.applyUpdate(state.state);
-    const afterContent = ydocRef.current.getObject<RichTextContent>();
 
-    if (isEqual(beforeContent, afterContent)) {
+    if (isEqual(afterContent, beforeContent)) {
       return;
     }
 
+    ydocRef.current = newYDoc;
     const editorContent = buildEditorContent(node.id, afterContent);
     revisionRef.current = state.revision;
 
@@ -289,7 +290,7 @@ export const DocumentEditor = ({
     if (relativeSelection != null) {
       restoreRelativeSelection(editor, relativeSelection);
     }
-  }, [state?.revision]);
+  }, [state, updates, editor]);
 
   return (
     <div className="min-h-[500px]">

@@ -136,62 +136,86 @@ export class DocumentService {
       })
     );
 
-    const { createdDocument, createdMutation, createdNodeReferences } =
-      await this.workspace.database.transaction().execute(async (trx) => {
-        const createdDocument = await trx
-          .insertInto('documents')
+    const {
+      createdDocument,
+      createdMutation,
+      createdNodeReferences,
+      createdUpdate,
+    } = await this.workspace.database.transaction().execute(async (trx) => {
+      const createdDocument = await trx
+        .insertInto('documents')
+        .returningAll()
+        .values({
+          id: id,
+          content: JSON.stringify(content),
+          local_revision: '0',
+          server_revision: '0',
+          created_at: updatedAt,
+          created_by: this.workspace.userId,
+        })
+        .onConflict((cb) => cb.doNothing())
+        .executeTakeFirst();
+
+      if (!createdDocument) {
+        throw new Error('Failed to create document');
+      }
+
+      const createdUpdate = await trx
+        .insertInto('document_updates')
+        .returningAll()
+        .values({
+          id: updateId,
+          document_id: createdDocument.id,
+          data: update,
+          created_at: updatedAt,
+        })
+        .executeTakeFirst();
+
+      if (!createdUpdate) {
+        throw new Error('Failed to create document update');
+      }
+
+      const createdMutation = await trx
+        .insertInto('mutations')
+        .returningAll()
+        .values({
+          id: generateId(IdType.Mutation),
+          type: 'update_document',
+          data: JSON.stringify({
+            documentId: id,
+            updateId: updateId,
+            data: encodeState(update),
+            createdAt: updatedAt,
+          }),
+          created_at: updatedAt,
+          retries: 0,
+        })
+        .executeTakeFirst();
+
+      await trx
+        .insertInto('document_texts')
+        .values({
+          id: id,
+          text: text,
+        })
+        .executeTakeFirst();
+
+      let createdNodeReferences: CreateNodeReference[] = [];
+      if (nodeReferencesToCreate.length > 0) {
+        createdNodeReferences = await trx
+          .insertInto('node_references')
           .returningAll()
-          .values({
-            id: id,
-            content: JSON.stringify(content),
-            local_revision: '0',
-            server_revision: '0',
-            created_at: updatedAt,
-            created_by: this.workspace.userId,
-          })
-          .onConflict((cb) => cb.doNothing())
-          .executeTakeFirst();
+          .values(nodeReferencesToCreate)
+          .execute();
+      }
 
-        if (!createdDocument) {
-          throw new Error('Failed to create document');
-        }
-
-        const createdMutation = await trx
-          .insertInto('mutations')
-          .returningAll()
-          .values({
-            id: generateId(IdType.Mutation),
-            type: 'update_document',
-            data: JSON.stringify({
-              documentId: id,
-              updateId: updateId,
-              data: encodeState(update),
-              createdAt: updatedAt,
-            }),
-            created_at: updatedAt,
-            retries: 0,
-          })
-          .executeTakeFirst();
-
-        await trx
-          .insertInto('document_texts')
-          .values({
-            id: id,
-            text: text,
-          })
-          .executeTakeFirst();
-
-        let createdNodeReferences: CreateNodeReference[] = [];
-        if (nodeReferencesToCreate.length > 0) {
-          createdNodeReferences = await trx
-            .insertInto('node_references')
-            .returningAll()
-            .values(nodeReferencesToCreate)
-            .execute();
-        }
-
-        return { createdDocument, createdMutation, createdNodeReferences };
-      });
+      return {
+        createdDocument,
+        createdMutation,
+        createdNodeReferences,
+        createdUpdate,
+      };
+    });
 
     if (createdDocument) {
       eventBus.publish({
@@ -199,6 +223,15 @@ export class DocumentService {
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         document: mapDocument(createdDocument),
+      });
+    }
+
+    if (createdUpdate) {
+      eventBus.publish({
+        type: 'document_update_created',
+        accountId: this.workspace.accountId,
+        workspaceId: this.workspace.id,
+        documentUpdate: mapDocumentUpdate(createdUpdate),
       });
     }
 
