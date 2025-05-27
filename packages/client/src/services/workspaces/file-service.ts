@@ -288,7 +288,7 @@ export class FileService {
     const filePath = this.buildFilePath(file.id, file.attributes.extension);
     const exists = await this.app.fs.exists(filePath);
     if (!exists) {
-      debug(`File ${file.id} not found, deleting from database`);
+      debug(`File ${file.id} not found`);
       return;
     }
 
@@ -474,8 +474,8 @@ export class FileService {
         }
       );
 
-      const fileBytes = new Uint8Array(await response.arrayBuffer());
-      await this.app.fs.writeFile(filePath, fileBytes);
+      const writeStream = await this.app.fs.writeStream(filePath);
+      await response.body?.pipeTo(writeStream);
 
       const updatedFileState = await this.workspace.database
         .updateTable('file_states')

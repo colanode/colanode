@@ -44,11 +44,6 @@ export class DesktopFileSystem implements FileSystem {
     return fs.promises.writeFile(path, data);
   }
 
-  public statSync(path: string): { mtimeMs: number } {
-    const stats = fs.statSync(path);
-    return { mtimeMs: stats.mtime.getTime() };
-  }
-
   public async delete(path: string): Promise<void> {
     await fs.promises.rm(path, { recursive: true, force: true });
   }
