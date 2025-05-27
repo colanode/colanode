@@ -1,5 +1,5 @@
-import path from 'path';
 import fs from 'fs';
+import path from 'path';
 
 const ASSETS_DIR = path.resolve('assets');
 const EMOJIS_DB_PATH = path.resolve(ASSETS_DIR, 'emojis.db');
@@ -55,6 +55,16 @@ const execute = () => {
     path.resolve(DESKTOP_ASSETS_DIR, 'fonts', NEOTRAX_FONT_NAME),
     path.resolve(WEB_ASSETS_DIR, 'fonts', NEOTRAX_FONT_NAME),
   ]);
+
+  copyFile(
+    path.resolve(ASSETS_DIR, 'colanode-logo-black-192.png'),
+    path.resolve(WEB_ASSETS_DIR, 'colanode-logo-black-192.png')
+  );
+
+  copyFile(
+    path.resolve(ASSETS_DIR, 'colanode-logo-black-512.png'),
+    path.resolve(WEB_ASSETS_DIR, 'colanode-logo-black-512.png')
+  );
 };
 
 execute();
