@@ -8,13 +8,9 @@ export const isFeatureSupported = (
   feature: FeatureKey,
   version: string
 ): boolean => {
-  if (version === 'dev') {
-    return true;
-  }
-
   const parsedVersion = semver.parse(version);
   if (!parsedVersion) {
-    return false;
+    return true;
   }
 
   const featureVersion = FeatureVersions[feature];

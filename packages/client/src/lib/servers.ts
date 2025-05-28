@@ -1,9 +1,10 @@
 import semver from 'semver';
 
 export const isServerOutdated = (version: string) => {
-  if (version === 'dev') {
+  const parsedVersion = semver.parse(version);
+  if (!parsedVersion) {
     return false;
   }
 
-  return semver.gte(version, '2.2.0');
+  return semver.gte(parsedVersion, '2.2.0');
 };

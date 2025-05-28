@@ -1,14 +1,5 @@
 export type AppType = 'desktop' | 'web';
 
-export type AppPlatform =
-  | 'aix'
-  | 'darwin'
-  | 'freebsd'
-  | 'linux'
-  | 'openbsd'
-  | 'sunos'
-  | 'win32';
-
 export type WindowSize = {
   width: number;
   height: number;
@@ -17,7 +8,7 @@ export type WindowSize = {
 
 export type AppPlatformMetadata = {
   key: 'platform';
-  value: AppPlatform;
+  value: string;
   createdAt: string;
   updatedAt: string | null;
 };

@@ -1,5 +1,3 @@
-import ky from 'ky';
-
 import { AccountMutationHandlerBase } from '@colanode/client/handlers/mutations/accounts/base';
 import { MutationHandler } from '@colanode/client/lib';
 import { parseApiError } from '@colanode/client/lib/ky';
@@ -41,7 +39,7 @@ export class EmailPasswordResetCompleteMutationHandler
         password: input.password,
       };
 
-      const response = await ky
+      const response = await this.app.client
         .post(
           `${server.httpBaseUrl}/v1/accounts/emails/passwords/reset/complete`,
           {

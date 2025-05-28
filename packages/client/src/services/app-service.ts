@@ -99,8 +99,9 @@ export class AppService {
 
     await migrator.migrateToLatest();
 
-    const version = await this.metadata.get('version');
-    if (version && semver.lt(version.value, '0.1.0')) {
+    const versionMetadata = await this.metadata.get('version');
+    const version = semver.parse(versionMetadata?.value);
+    if (version && semver.lt(version, '0.1.0')) {
       await this.deleteAllData();
     }
 

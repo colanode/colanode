@@ -8,6 +8,7 @@ import {
   LoginSuccessOutput,
   generateId,
   LoginVerifyOutput,
+  trimString,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { SelectAccount } from '@colanode/server/data/schema';
@@ -27,6 +28,7 @@ import {
   emailVerifyTemplate,
 } from '@colanode/server/templates';
 import { ClientContext } from '@colanode/server/types/api';
+import { DeviceType } from '@colanode/server/types/devices';
 import {
   Otp,
   AccountVerifyOtpAttributes,
@@ -110,9 +112,9 @@ export const buildLoginSuccessOutput = async (
       token_hash: hash,
       token_salt: salt,
       token_generated_at: new Date(),
-      type: 1,
+      type: client.type === 'desktop' ? DeviceType.Desktop : DeviceType.Web,
       ip: client.ip,
-      platform: client.platform,
+      platform: trimString(client.platform, 255),
       version: client.version,
       created_at: new Date(),
     })

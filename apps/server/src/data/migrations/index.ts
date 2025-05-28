@@ -19,6 +19,7 @@ import { createUserAccountIdIndex } from './00016-create-user-account-id-index';
 import { createVectorExtension } from './00017-create-vector-extension';
 import { createNodeEmbeddingsTable } from './00018-create-node-embeddings-table';
 import { createDocumentEmbeddingsTable } from './00019-create-document-embeddings-table';
+import { alterDevicesPlatformColumn } from './00020-alter-devices-platform-column';
 
 export const databaseMigrations: Record<string, Migration> = {
   '00001_create_accounts_table': createAccountsTable,
@@ -40,4 +41,5 @@ export const databaseMigrations: Record<string, Migration> = {
   '00017_create_vector_extension': createVectorExtension,
   '00018_create_node_embeddings_table': createNodeEmbeddingsTable,
   '00019_create_document_embeddings_table': createDocumentEmbeddingsTable,
+  '00020_alter_devices_platform_column': alterDevicesPlatformColumn,
 };

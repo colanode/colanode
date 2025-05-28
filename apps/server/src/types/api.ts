@@ -3,9 +3,11 @@ export type RequestAccount = {
   deviceId: string;
 };
 
+export type ClientType = 'web' | 'desktop';
+
 export type ClientContext = {
   ip: string;
   platform: string;
   version: string;
-  type: string;
+  type: ClientType;
 };

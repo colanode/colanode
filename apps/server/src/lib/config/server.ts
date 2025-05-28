@@ -14,8 +14,8 @@ export type BuildInfo = z.infer<typeof buildInfoSchema>;
 
 const parseBuildInfo = (): BuildInfo => {
   const defaultBuildInfo: BuildInfo = {
-    version: 'dev',
-    sha: 'dev',
+    version: '#',
+    sha: '#',
   };
 
   if (!fs.existsSync('/app/build.json')) {
@@ -36,8 +36,8 @@ const parseBuildInfo = (): BuildInfo => {
 };
 
 export const serverConfigSchema = z.object({
-  version: z.string().default('dev'),
-  sha: z.string().default('dev'),
+  version: z.string().default('#'),
+  sha: z.string().default('#'),
   name: z.string().default('Colanode Server'),
   avatar: z.string().optional(),
   mode: serverModeSchema.default('standalone'),

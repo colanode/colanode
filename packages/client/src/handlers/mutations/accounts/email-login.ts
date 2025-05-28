@@ -1,5 +1,3 @@
-import ky from 'ky';
-
 import { AccountMutationHandlerBase } from '@colanode/client/handlers/mutations/accounts/base';
 import { parseApiError } from '@colanode/client/lib/ky';
 import { MutationHandler } from '@colanode/client/lib/types';
@@ -32,7 +30,7 @@ export class EmailLoginMutationHandler
         password: input.password,
       };
 
-      const response = await ky
+      const response = await this.app.client
         .post(`${server.httpBaseUrl}/v1/accounts/emails/login`, {
           json: body,
         })
