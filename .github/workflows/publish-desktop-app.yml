@@ -37,6 +37,19 @@ jobs:
           $version = $env:GITHUB_REF -replace '^refs/tags/v',''
           echo "VERSION=$version" >> $env:GITHUB_ENV
 
+      - name: Set version and commit SHA into build.ts
+        run: |
+          cat <<EOF > ./packages/core/src/types/build.ts
+          // This file is auto-generated during CI/CD
+          const VERSION = "${{ env.VERSION }}";
+          const SHA = "${{ github.sha }}";
+
+          export const build = {
+              version: VERSION,
+              sha: SHA
+          };
+          EOF
+
       - name: Decode certificate
         run: |
           $certPath = Join-Path -Path $env:RUNNER_TEMP -ChildPath "build_cert.pfx"

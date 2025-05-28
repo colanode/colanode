@@ -3,9 +3,8 @@ import * as Comlink from 'comlink';
 import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationResult } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
-import { AppService } from '@colanode/client/services';
+import { AppMeta, AppService } from '@colanode/client/services';
 import { extractFileSubtype, generateId, IdType } from '@colanode/core';
-import { appBuild } from '@colanode/web/services/app-build';
 import { WebFileSystem } from '@colanode/web/services/file-system';
 import { WebKyselyService } from '@colanode/web/services/kysely-service';
 import { WebPathService } from '@colanode/web/services/path-service';
@@ -32,7 +31,12 @@ broadcast.onmessage = (event) => {
 };
 
 navigator.locks.request('colanode', async () => {
-  app = new AppService(fs, appBuild, new WebKyselyService(), path);
+  const appMeta: AppMeta = {
+    type: 'web',
+    platform: navigator.userAgent,
+  };
+
+  app = new AppService(appMeta, fs, new WebKyselyService(), path);
 
   await app.migrate();
   await app.init();

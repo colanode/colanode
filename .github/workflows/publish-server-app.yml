@@ -32,7 +32,20 @@ jobs:
 
       - name: Get the version
         id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Set version and commit SHA into build.ts
+        run: |
+          cat <<EOF > ./packages/core/src/types/build.ts
+          // This file is auto-generated during CI/CD
+          const VERSION = "${{ env.VERSION }}";
+          const SHA = "${{ github.sha }}";
+
+          export const build = {
+              version: VERSION,
+              sha: SHA
+          };
+          EOF
 
       - name: Build and push Colanode server image
         uses: docker/build-push-action@v5
@@ -41,12 +54,9 @@ jobs:
           file: ./apps/server/Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64
-          build-args: |
-            VERSION=${{ steps.get_version.outputs.VERSION }}
-            SHA=${{ github.sha }}
           tags: |
             ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:latest
-            ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:${{ steps.get_version.outputs.VERSION }}
+            ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:${{ env.VERSION }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}

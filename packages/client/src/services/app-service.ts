@@ -13,7 +13,7 @@ import { EventLoop } from '@colanode/client/lib/event-loop';
 import { parseApiError } from '@colanode/client/lib/ky';
 import { mapServer, mapAccount } from '@colanode/client/lib/mappers';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
-import { AppBuild } from '@colanode/client/services/app-build';
+import { AppMeta } from '@colanode/client/services/app-meta';
 import { AssetService } from '@colanode/client/services/asset-service';
 import { FileSystem } from '@colanode/client/services/file-system';
 import { KyselyService } from '@colanode/client/services/kysely-service';
@@ -22,7 +22,7 @@ import { PathService } from '@colanode/client/services/path-service';
 import { ServerService } from '@colanode/client/services/server-service';
 import { Account } from '@colanode/client/types/accounts';
 import { Server } from '@colanode/client/types/servers';
-import { ApiErrorCode, ApiHeader, createDebugger } from '@colanode/core';
+import { ApiErrorCode, ApiHeader, build, createDebugger } from '@colanode/core';
 
 const debug = createDebugger('desktop:service:app');
 
@@ -32,7 +32,7 @@ export class AppService {
   private readonly cleanupEventLoop: EventLoop;
   private readonly eventSubscriptionId: string;
 
-  public readonly build: AppBuild;
+  public readonly meta: AppMeta;
   public readonly fs: FileSystem;
   public readonly path: PathService;
   public readonly database: Kysely<AppDatabaseSchema>;
@@ -43,12 +43,12 @@ export class AppService {
   public readonly client: KyInstance;
 
   constructor(
+    meta: AppMeta,
     fs: FileSystem,
-    build: AppBuild,
     kysely: KyselyService,
     path: PathService
   ) {
-    this.build = build;
+    this.meta = meta;
     this.fs = fs;
     this.path = path;
     this.kysely = kysely;
@@ -63,9 +63,9 @@ export class AppService {
 
     this.client = ky.create({
       headers: {
-        [ApiHeader.ClientType]: this.build.type,
-        [ApiHeader.ClientPlatform]: this.build.platform,
-        [ApiHeader.ClientVersion]: this.build.version,
+        [ApiHeader.ClientType]: this.meta.type,
+        [ApiHeader.ClientPlatform]: this.meta.platform,
+        [ApiHeader.ClientVersion]: build.version,
       },
       timeout: ms('30 seconds'),
     });
@@ -105,8 +105,8 @@ export class AppService {
       await this.deleteAllData();
     }
 
-    await this.metadata.set('version', this.build.version);
-    await this.metadata.set('platform', this.build.platform);
+    await this.metadata.set('version', build.version);
+    await this.metadata.set('platform', this.meta.platform);
   }
 
   public getAccount(id: string): AccountService | null {
