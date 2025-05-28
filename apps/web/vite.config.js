@@ -27,7 +27,7 @@ export default defineConfig({
     VitePWA({
       mode: 'development',
       base: '/',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png'],
+      includeAssets: ['favicon.ico'],
       devOptions: {
         enabled: true,
         type: 'module',
@@ -39,6 +39,7 @@ export default defineConfig({
       injectManifest: {
         minify: false,
         enableWorkboxModulesLogs: true,
+        maximumFileSizeToCacheInBytes: 10 * 1024 * 1024, // 10MB
       },
     }),
   ],
