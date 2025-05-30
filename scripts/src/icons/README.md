@@ -16,7 +16,8 @@ By consolidating icons from [Remix Icon](https://github.com/Remix-Design/RemixIc
 
    - Unzips the downloaded archives into a temporary working directory (`src/icons/temp`).
    - For **Remix Icon**, it reads a `tags.json` file (inside the unzipped folder) to identify additional icon tags and categories.
-   - For **Simple Icons**, it reads a `_data/simple-icons.json` file to gather icon metadata (such as official title and slug).
+   - For **Simple Icons 14 or earlier**, it reads a `_data/simple-icons.json` file to gather icon metadata (such as official title and slug).
+   - For **Simple Icons 15 or later**, it reads a `data/simple-icons.json` file to gather icon metadata.
 
 3. **Process & Generate**
 

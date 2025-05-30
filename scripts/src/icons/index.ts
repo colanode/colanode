@@ -88,7 +88,7 @@ const SIMPLE_ICONS_DIR_PATH = path.join(
 );
 const SIMPLE_ICONS_DATA_FILE_PATH = path.join(
   SIMPLE_ICONS_DIR_PATH,
-  '_data',
+  Number(SIMPLE_ICONS_TAG.split('.').at(0)) >= 15 ? 'data' : '_data',
   'simple-icons.json'
 );
 const SIMPLE_ICONS_ICONS_DIR_PATH = path.join(SIMPLE_ICONS_DIR_PATH, 'icons');
