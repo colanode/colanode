@@ -1,10 +1,9 @@
 import { z } from 'zod';
 
-import { NodeModel } from './core';
-
-import { richTextContentSchema } from '../documents/rich-text';
-import { extractNodeRole } from '../../lib/nodes';
-import { hasNodeRole } from '../../lib/permissions';
+import { extractNodeRole } from '@colanode/core/lib/nodes';
+import { hasNodeRole } from '@colanode/core/lib/permissions';
+import { richTextContentSchema } from '@colanode/core/registry/documents/rich-text';
+import { NodeModel } from '@colanode/core/registry/nodes/core';
 
 export const pageAttributesSchema = z.object({
   type: z.literal('page'),

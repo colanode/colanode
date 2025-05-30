@@ -1,17 +1,13 @@
 import { z } from 'zod';
 
 import { accountConfigSchema, readAccountConfigVariables } from './account';
-import { readServerConfigVariables, serverConfigSchema } from './server';
-import { readUserConfigVariables, userConfigSchema } from './user';
-import { postgresConfigSchema, readPostgresConfigVariables } from './postgres';
-import {
-  readAvatarsS3ConfigVariables,
-  readFilesS3ConfigVariables,
-  s3ConfigSchema,
-} from './s3';
 import { aiConfigSchema, readAiConfigVariables } from './ai';
-import { readSmtpConfigVariables, smtpConfigSchema } from './smtp';
+import { postgresConfigSchema, readPostgresConfigVariables } from './postgres';
 import { readRedisConfigVariables, redisConfigSchema } from './redis';
+import { readServerConfigVariables, serverConfigSchema } from './server';
+import { readSmtpConfigVariables, smtpConfigSchema } from './smtp';
+import { readStorageConfigVariables, storageConfigSchema } from './storage';
+import { readUserConfigVariables, userConfigSchema } from './user';
 
 const configSchema = z.object({
   server: serverConfigSchema,
@@ -19,8 +15,7 @@ const configSchema = z.object({
   user: userConfigSchema,
   postgres: postgresConfigSchema,
   redis: redisConfigSchema,
-  avatarS3: s3ConfigSchema,
-  fileS3: s3ConfigSchema,
+  storage: storageConfigSchema,
   smtp: smtpConfigSchema,
   ai: aiConfigSchema,
 });
@@ -35,8 +30,7 @@ const readConfigVariables = (): Configuration => {
       user: readUserConfigVariables(),
       postgres: readPostgresConfigVariables(),
       redis: readRedisConfigVariables(),
-      avatarS3: readAvatarsS3ConfigVariables(),
-      fileS3: readFilesS3ConfigVariables(),
+      storage: readStorageConfigVariables(),
       smtp: readSmtpConfigVariables(),
       ai: readAiConfigVariables(),
     };

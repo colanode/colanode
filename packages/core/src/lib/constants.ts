@@ -14,7 +14,7 @@ export const EditorNodeTypes = {
   Page: 'page',
   File: 'file',
   Folder: 'folder',
-  FilePlaceholder: 'filePlaceholder',
+  TempFile: 'tempFile',
 };
 
 export type SortDirection = 'asc' | 'desc';

@@ -1,4 +1,5 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+
 import {
   AccountStatus,
   emailLoginInputSchema,
@@ -6,15 +7,14 @@ import {
   apiErrorOutputSchema,
   loginOutputSchema,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { isAuthEmailRateLimited } from '@/lib/rate-limits';
-import { config } from '@/lib/config';
+import { database } from '@colanode/server/data/database';
 import {
   buildLoginSuccessOutput,
   buildLoginVerifyOutput,
   verifyPassword,
-} from '@/lib/accounts';
+} from '@colanode/server/lib/accounts';
+import { config } from '@colanode/server/lib/config';
+import { isAuthEmailRateLimited } from '@colanode/server/lib/rate-limits';
 
 export const emailLoginRoute: FastifyPluginCallbackZod = (
   instance,
@@ -83,12 +83,7 @@ export const emailLoginRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const output = await buildLoginSuccessOutput(account, {
-        ip: request.ip,
-        platform: input.platform,
-        version: input.version,
-      });
-
+      const output = await buildLoginSuccessOutput(account, request.client);
       return output;
     },
   });

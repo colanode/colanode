@@ -1,9 +1,8 @@
 import { MessageAttributes } from '@colanode/core';
-
-import { redis } from '@/data/redis';
-import { SelectNode } from '@/data/schema';
-import { config } from '@/lib/config';
-import { jobService } from '@/services/job-service';
+import { redis } from '@colanode/server/data/redis';
+import { SelectNode } from '@colanode/server/data/schema';
+import { config } from '@colanode/server/lib/config';
+import { jobService } from '@colanode/server/services/job-service';
 
 export const fetchEmbeddingCursor = async (
   cursorId: string

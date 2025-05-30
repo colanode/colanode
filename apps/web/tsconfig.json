@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Web",
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ES2022",
+    "jsx": "react-jsx",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "types": ["vite/client", "vite-plugin-pwa/client"],
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@colanode/web/*": ["./src/*"],
+      "@colanode/core/*": ["../../packages/core/src/*"],
+      "@colanode/crdt/*": ["../../packages/crdt/src/*"],
+      "@colanode/client/*": ["../../packages/client/src/*"],
+      "@colanode/ui/*": ["../../packages/ui/src/*"]
+    }
+  },
+  "references": [
+    { "path": "../../packages/core/tsconfig.json" },
+    { "path": "../../packages/crdt/tsconfig.json" },
+    { "path": "../../packages/client/tsconfig.json" },
+    { "path": "../../packages/ui/tsconfig.json" }
+  ],
+  "include": ["**/*.ts", "**/*.tsx"]
+}

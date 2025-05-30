@@ -1,7 +1,7 @@
+import path from 'path';
+
 import type { ConfigEnv, UserConfig } from 'vite';
 import { defineConfig, mergeConfig } from 'vite';
-
-import path from 'path';
 
 import { external, getBuildConfig, pluginHotRestart } from './vite.base.config';
 
@@ -28,7 +28,14 @@ export default defineConfig((env) => {
     plugins: [pluginHotRestart('reload')],
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src'),
+        '@colanode/desktop': path.resolve(__dirname, './src'),
+        '@colanode/core': path.resolve(__dirname, '../../packages/core/src'),
+        '@colanode/crdt': path.resolve(__dirname, '../../packages/crdt/src'),
+        '@colanode/client': path.resolve(
+          __dirname,
+          '../../packages/client/src'
+        ),
+        '@colanode/ui': path.resolve(__dirname, '../../packages/ui/src'),
       },
     },
   };

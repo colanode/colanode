@@ -3,11 +3,10 @@ import {
   SyncNodeTombstonesInput,
   SyncNodeTombstoneData,
 } from '@colanode/core';
-
-import { BaseSynchronizer } from '@/synchronizers/base';
-import { Event } from '@/types/events';
-import { database } from '@/data/database';
-import { SelectNodeTombstone } from '@/data/schema';
+import { database } from '@colanode/server/data/database';
+import { SelectNodeTombstone } from '@colanode/server/data/schema';
+import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
+import { Event } from '@colanode/server/types/events';
 
 export class NodeTombstoneSynchronizer extends BaseSynchronizer<SyncNodeTombstonesInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncNodeTombstonesInput> | null> {

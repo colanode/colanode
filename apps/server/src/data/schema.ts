@@ -1,4 +1,12 @@
 import {
+  ColumnType,
+  Insertable,
+  JSONColumnType,
+  Selectable,
+  Updateable,
+} from 'kysely';
+
+import {
   NodeAttributes,
   NodeRole,
   NodeType,
@@ -8,13 +16,6 @@ import {
   DocumentContent,
   UpdateMergeMetadata,
 } from '@colanode/core';
-import {
-  ColumnType,
-  Insertable,
-  JSONColumnType,
-  Selectable,
-  Updateable,
-} from 'kysely';
 
 interface AccountTable {
   id: ColumnType<string, string, never>;

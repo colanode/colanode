@@ -1,6 +1,5 @@
 import { DocumentContent } from '@colanode/core';
-
-import { SelectDocument } from '@/data/schema';
+import { SelectDocument } from '@colanode/server/data/schema';
 
 export type CreateDocumentInput = {
   nodeId: string;

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-import { blockSchema } from '../block';
+import { blockSchema } from '@colanode/core/registry/block';
 
 export const richTextContentSchema = z.object({
   type: z.literal('rich_text'),

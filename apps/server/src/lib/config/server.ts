@@ -1,58 +1,34 @@
 import { z } from 'zod';
 
-import fs from 'fs';
+import { build } from '@colanode/core';
 
 const serverModeSchema = z.enum(['standalone', 'cluster']);
 export type ServerMode = z.infer<typeof serverModeSchema>;
 
-const buildInfoSchema = z.object({
-  version: z.string(),
-  sha: z.string(),
-});
-
-export type BuildInfo = z.infer<typeof buildInfoSchema>;
-
-const parseBuildInfo = (): BuildInfo => {
-  const defaultBuildInfo: BuildInfo = {
-    version: 'dev',
-    sha: 'dev',
-  };
-
-  if (!fs.existsSync('/app/build.json')) {
-    return defaultBuildInfo;
-  }
-
-  const json = fs.readFileSync('/app/build.json', 'utf8');
-  if (!json || json.length === 0) {
-    return defaultBuildInfo;
-  }
-
-  try {
-    return buildInfoSchema.parse(JSON.parse(json));
-  } catch (error) {
-    console.error('Failed to parse build info:', error);
-    return defaultBuildInfo;
-  }
-};
-
 export const serverConfigSchema = z.object({
-  version: z.string().default('dev'),
-  sha: z.string().default('dev'),
+  version: z.string().default(build.version),
+  sha: z.string().default(build.sha),
   name: z.string().default('Colanode Server'),
   avatar: z.string().optional(),
   mode: serverModeSchema.default('standalone'),
+  cors: z.object({
+    origin: z.string().default('https://app.colanode.com'),
+    maxAge: z.number().default(7200),
+  }),
 });
 
 export type ServerConfig = z.infer<typeof serverConfigSchema>;
 
 export const readServerConfigVariables = () => {
-  const buildInfo = parseBuildInfo();
-
   return {
-    version: buildInfo.version,
-    sha: buildInfo.sha,
+    version: build.version,
+    sha: build.sha,
     name: process.env.SERVER_NAME,
     avatar: process.env.SERVER_AVATAR,
     mode: process.env.SERVER_MODE,
+    cors: {
+      origin: process.env.SERVER_CORS_ORIGIN,
+      maxAge: process.env.SERVER_CORS_MAX_AGE,
+    },
   };
 };

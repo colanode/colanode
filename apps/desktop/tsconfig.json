@@ -3,20 +3,27 @@
   "display": "Desktop",
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "module": "commonjs",
+    "module": "ESNext",
     "noImplicitAny": true,
     "sourceMap": true,
     "outDir": "dist",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "jsx": "react-jsx",
     "paths": {
-      "@/*": ["src/*"]
+      "@colanode/desktop/*": ["src/*"],
+      "@colanode/core/*": ["../../packages/core/src/*"],
+      "@colanode/crdt/*": ["../../packages/crdt/src/*"],
+      "@colanode/client/*": ["../../packages/client/src/*"],
+      "@colanode/ui/*": ["../../packages/ui/src/*"]
     },
+    "lib": ["dom"]
   },
   "references": [
     { "path": "../../packages/core/tsconfig.json" },
-    { "path": "../../packages/crdt/tsconfig.json" }
+    { "path": "../../packages/crdt/tsconfig.json" },
+    { "path": "../../packages/client/tsconfig.json" },
+    { "path": "../../packages/ui/tsconfig.json" }
   ],
   "include": ["src", "forge.env.d.ts"]
 }

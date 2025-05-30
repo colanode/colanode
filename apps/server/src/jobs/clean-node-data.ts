@@ -1,10 +1,9 @@
 import { createDebugger } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { JobHandler } from '@/types/jobs';
-import { eventBus } from '@/lib/event-bus';
-import { CreateNodeTombstone } from '@/data/schema';
-import { deleteFile } from '@/lib/files';
+import { database } from '@colanode/server/data/database';
+import { CreateNodeTombstone } from '@colanode/server/data/schema';
+import { JobHandler } from '@colanode/server/jobs';
+import { eventBus } from '@colanode/server/lib/event-bus';
+import { deleteFile } from '@colanode/server/lib/files';
 
 const BATCH_SIZE = 100;
 const debug = createDebugger('server:job:clean-node-data');
@@ -16,7 +15,7 @@ export type CleanNodeDataInput = {
   userId: string;
 };
 
-declare module '@/types/jobs' {
+declare module '@colanode/server/jobs' {
   interface JobMap {
     clean_node_data: {
       input: CleanNodeDataInput;

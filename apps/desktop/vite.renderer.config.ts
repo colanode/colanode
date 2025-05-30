@@ -1,7 +1,7 @@
+import path from 'path';
+
 import type { ConfigEnv, UserConfig } from 'vite';
 import { defineConfig } from 'vite';
-
-import path from 'path';
 
 import { pluginExposeRenderer } from './vite.base.config';
 
@@ -22,7 +22,14 @@ export default defineConfig((env) => {
     resolve: {
       preserveSymlinks: true,
       alias: {
-        '@': path.resolve(__dirname, './src'),
+        '@colanode/desktop': path.resolve(__dirname, './src'),
+        '@colanode/core': path.resolve(__dirname, '../../packages/core/src'),
+        '@colanode/crdt': path.resolve(__dirname, '../../packages/crdt/src'),
+        '@colanode/client': path.resolve(
+          __dirname,
+          '../../packages/client/src'
+        ),
+        '@colanode/ui': path.resolve(__dirname, '../../packages/ui/src'),
       },
     },
     clearScreen: false,
