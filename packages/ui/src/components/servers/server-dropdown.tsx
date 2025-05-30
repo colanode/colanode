@@ -1,4 +1,3 @@
-import { DropdownMenuSeparator } from '@radix-ui/react-dropdown-menu';
 import { ChevronDown } from 'lucide-react';
 import React from 'react';
 
@@ -9,6 +8,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 
