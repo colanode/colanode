@@ -29,7 +29,6 @@ export enum IdType {
   Avatar = 'av',
   Icon = 'ic',
   File = 'fi',
-  FilePlaceholder = 'fp',
   Device = 'de',
   Upload = 'up',
   Update = 'ud',
@@ -38,6 +37,9 @@ export enum IdType {
   Block = 'bl',
   OtpCode = 'ot',
   Mention = 'me',
+  Window = 'wi',
+  TempFile = 'tf',
+  Socket = 'sk',
 }
 
 export const generateId = (type: IdType): string => {

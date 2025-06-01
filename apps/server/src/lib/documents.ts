@@ -5,17 +5,20 @@ import {
   generateId,
   getNodeModel,
   IdType,
+  MutationStatus,
   UpdateDocumentMutationData,
 } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
-
-import { database } from '@/data/database';
-import { SelectUser } from '@/data/schema';
-import { ConcurrentUpdateResult, UpdateDocumentOutput } from '@/types/nodes';
-import { eventBus } from '@/lib/event-bus';
-import { fetchNode, fetchNodeTree, mapNode } from '@/lib/nodes';
-import { CreateDocumentInput, CreateDocumentOutput } from '@/types/documents';
-import { scheduleDocumentEmbedding } from '@/lib/ai/embeddings';
+import { database } from '@colanode/server/data/database';
+import { SelectUser } from '@colanode/server/data/schema';
+import { scheduleDocumentEmbedding } from '@colanode/server/lib/ai/embeddings';
+import { eventBus } from '@colanode/server/lib/event-bus';
+import { fetchNode, fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
+import {
+  CreateDocumentInput,
+  CreateDocumentOutput,
+} from '@colanode/server/types/documents';
+import { ConcurrentUpdateResult } from '@colanode/server/types/nodes';
 
 const debug = createDebugger('server:lib:documents');
 
@@ -111,7 +114,17 @@ export const createDocument = async (
 export const updateDocumentFromMutation = async (
   user: SelectUser,
   mutation: UpdateDocumentMutationData
-): Promise<UpdateDocumentOutput | null> => {
+): Promise<MutationStatus> => {
+  const existingDocumentUpdate = await database
+    .selectFrom('document_updates')
+    .where('id', '=', mutation.updateId)
+    .selectAll()
+    .executeTakeFirst();
+
+  if (existingDocumentUpdate) {
+    return MutationStatus.OK;
+  }
+
   for (let count = 0; count < UPDATE_RETRIES_LIMIT; count++) {
     const result = await tryUpdateDocumentFromMutation(user, mutation);
 
@@ -120,30 +133,30 @@ export const updateDocumentFromMutation = async (
     }
 
     if (result.type === 'error') {
-      return null;
+      return MutationStatus.INTERNAL_SERVER_ERROR;
     }
   }
 
-  return null;
+  return MutationStatus.INTERNAL_SERVER_ERROR;
 };
 
 const tryUpdateDocumentFromMutation = async (
   user: SelectUser,
   mutation: UpdateDocumentMutationData
-): Promise<ConcurrentUpdateResult<UpdateDocumentOutput>> => {
+): Promise<ConcurrentUpdateResult<MutationStatus>> => {
   const tree = await fetchNodeTree(mutation.documentId);
-  if (!tree) {
-    return { type: 'error', output: null };
+  if (tree.length === 0) {
+    return { type: 'success', output: MutationStatus.NOT_FOUND };
   }
 
   const node = tree[tree.length - 1];
   if (!node) {
-    return { type: 'error', output: null };
+    return { type: 'success', output: MutationStatus.NOT_FOUND };
   }
 
   const model = getNodeModel(node.type);
   if (!model.documentSchema) {
-    return { type: 'error', output: null };
+    return { type: 'success', output: MutationStatus.NOT_FOUND };
   }
 
   const context: CanUpdateDocumentContext = {
@@ -158,7 +171,7 @@ const tryUpdateDocumentFromMutation = async (
   };
 
   if (!model.canUpdateDocument(context)) {
-    return { type: 'error', output: null };
+    return { type: 'success', output: MutationStatus.FORBIDDEN };
   }
 
   const document = await database
@@ -182,7 +195,7 @@ const tryUpdateDocumentFromMutation = async (
   const content = ydoc.getObject<DocumentContent>();
 
   if (!model.documentSchema.safeParse(content).success) {
-    return { type: 'error', output: null };
+    return { type: 'success', output: MutationStatus.BAD_REQUEST };
   }
 
   try {
@@ -266,12 +279,10 @@ const tryUpdateDocumentFromMutation = async (
 
     return {
       type: 'success',
-      output: {
-        update: createdDocumentUpdate,
-      },
+      output: MutationStatus.OK,
     };
   } catch (error) {
     debug(`Failed to update document: ${error}`);
-    return { type: 'retry', output: null };
+    return { type: 'retry' };
   }
 };

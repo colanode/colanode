@@ -1,12 +1,12 @@
-import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
-import { z } from 'zod';
-import { GetObjectCommand } from '@aws-sdk/client-s3';
-import { ApiErrorCode } from '@colanode/core';
-
 import { Readable } from 'stream';
 
-import { avatarS3 } from '@/data/storage';
-import { config } from '@/lib/config';
+import { GetObjectCommand } from '@aws-sdk/client-s3';
+import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+import { z } from 'zod';
+
+import { ApiErrorCode } from '@colanode/core';
+import { s3Client } from '@colanode/server/data/storage';
+import { config } from '@colanode/server/lib/config';
 
 export const avatarDownloadRoute: FastifyPluginCallbackZod = (
   instance,
@@ -25,11 +25,11 @@ export const avatarDownloadRoute: FastifyPluginCallbackZod = (
       try {
         const avatarId = request.params.avatarId;
         const command = new GetObjectCommand({
-          Bucket: config.avatarS3.bucketName,
+          Bucket: config.storage.bucketName,
           Key: `avatars/${avatarId}.jpeg`,
         });
 
-        const avatarResponse = await avatarS3.send(command);
+        const avatarResponse = await s3Client.send(command);
         if (!avatarResponse.Body) {
           return reply.code(400).send({
             code: ApiErrorCode.AvatarNotFound,

@@ -3,11 +3,10 @@ import {
   SyncCollaborationsInput,
   SyncCollaborationData,
 } from '@colanode/core';
-
-import { BaseSynchronizer } from '@/synchronizers/base';
-import { Event } from '@/types/events';
-import { database } from '@/data/database';
-import { SelectCollaboration } from '@/data/schema';
+import { database } from '@colanode/server/data/database';
+import { SelectCollaboration } from '@colanode/server/data/schema';
+import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
+import { Event } from '@colanode/server/types/events';
 
 export class CollaborationSynchronizer extends BaseSynchronizer<SyncCollaborationsInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncCollaborationsInput> | null> {

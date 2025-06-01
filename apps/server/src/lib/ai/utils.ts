@@ -1,8 +1,11 @@
 import { Document } from '@langchain/core/documents';
 
-import { SearchResult } from '@/types/retrieval';
-import { RerankedContextItem } from '@/types/assistant';
-import { NodeMetadata, DocumentMetadata } from '@/types/metadata';
+import { RerankedContextItem } from '@colanode/server/types/assistant';
+import {
+  NodeMetadata,
+  DocumentMetadata,
+} from '@colanode/server/types/metadata';
+import { SearchResult } from '@colanode/server/types/retrieval';
 
 export const formatDate = (date?: Date | null): string => {
   if (!date) return 'Unknown time';

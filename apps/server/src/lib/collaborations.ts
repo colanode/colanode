@@ -1,11 +1,14 @@
+import { Transaction } from 'kysely';
+
 import {
   extractNodeCollaborators,
   NodeAttributes,
   NodeRole,
 } from '@colanode/core';
-import { Transaction } from 'kysely';
-
-import { DatabaseSchema, SelectCollaboration } from '@/data/schema';
+import {
+  DatabaseSchema,
+  SelectCollaboration,
+} from '@colanode/server/data/schema';
 
 type CollaboratorChangeResult = {
   addedCollaborators: Record<string, NodeRole>;

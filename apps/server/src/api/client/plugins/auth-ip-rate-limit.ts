@@ -1,8 +1,8 @@
 import { FastifyPluginCallback } from 'fastify';
 import fp from 'fastify-plugin';
-import { ApiErrorCode } from '@colanode/core';
 
-import { isAuthIpRateLimited } from '@/lib/rate-limits';
+import { ApiErrorCode } from '@colanode/core';
+import { isAuthIpRateLimited } from '@colanode/server/lib/rate-limits';
 
 const authIpRateLimiterCallback: FastifyPluginCallback = (fastify, _, done) => {
   fastify.addHook('onRequest', async (request, reply) => {

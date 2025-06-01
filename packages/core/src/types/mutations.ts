@@ -1,12 +1,22 @@
 import { z } from 'zod';
 
-export const syncMutationStatusSchema = z.enum(['success', 'error']);
+export enum MutationStatus {
+  OK = 200,
+  CREATED = 201,
+  BAD_REQUEST = 400,
+  UNAUTHORIZED = 401,
+  FORBIDDEN = 403,
+  NOT_FOUND = 404,
+  CONFLICT = 409,
+  METHOD_NOT_ALLOWED = 405,
+  INTERNAL_SERVER_ERROR = 500,
+}
 
-export type SyncMutationStatus = z.infer<typeof syncMutationStatusSchema>;
+export const mutationStatusSchema = z.nativeEnum(MutationStatus);
 
 export const syncMutationResultSchema = z.object({
   id: z.string(),
-  status: syncMutationStatusSchema,
+  status: mutationStatusSchema,
 });
 
 export type SyncMutationResult = z.infer<typeof syncMutationResultSchema>;

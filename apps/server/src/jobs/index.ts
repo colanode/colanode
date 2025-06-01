@@ -1,13 +1,19 @@
-import { cleanNodeDataHandler } from '@/jobs/clean-node-data';
-import { cleanWorkspaceDataHandler } from '@/jobs/clean-workspace-data';
-import { JobHandler, JobMap } from '@/types/jobs';
-import { sendEmailVerifyEmailHandler } from '@/jobs/send-email-verify-email';
-import { sendEmailPasswordResetEmailHandler } from '@/jobs/send-email-password-reset-email';
-import { embedNodeHandler } from '@/jobs/embed-node';
-import { embedDocumentHandler } from '@/jobs/embed-document';
-import { assistantResponseHandler } from '@/jobs/assistant-response';
-import { checkNodeEmbeddingsHandler } from '@/jobs/check-node-embeddings';
-import { checkDocumentEmbeddingsHandler } from '@/jobs/check-document-embeddings';
+import { assistantResponseHandler } from '@colanode/server/jobs/assistant-response';
+import { checkDocumentEmbeddingsHandler } from '@colanode/server/jobs/check-document-embeddings';
+import { checkNodeEmbeddingsHandler } from '@colanode/server/jobs/check-node-embeddings';
+import { cleanNodeDataHandler } from '@colanode/server/jobs/clean-node-data';
+import { cleanWorkspaceDataHandler } from '@colanode/server/jobs/clean-workspace-data';
+import { embedDocumentHandler } from '@colanode/server/jobs/embed-document';
+import { embedNodeHandler } from '@colanode/server/jobs/embed-node';
+import { sendEmailPasswordResetEmailHandler } from '@colanode/server/jobs/send-email-password-reset-email';
+import { sendEmailVerifyEmailHandler } from '@colanode/server/jobs/send-email-verify-email';
+
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type
+export interface JobMap {}
+
+export type JobInput = JobMap[keyof JobMap]['input'];
+
+export type JobHandler<T extends JobInput> = (input: T) => Promise<void>;
 
 type JobHandlerMap = {
   [K in keyof JobMap]: JobHandler<JobMap[K]['input']>;

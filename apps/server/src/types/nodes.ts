@@ -1,7 +1,5 @@
 import { NodeAttributes } from '@colanode/core';
 
-import { SelectDocumentUpdate, SelectNode } from '@/data/schema';
-
 export type NodeCollaborator = {
   nodeId: string;
   collaboratorId: string;
@@ -16,10 +14,6 @@ export type CreateNodeInput = {
   workspaceId: string;
 };
 
-export type CreateNodeOutput = {
-  node: SelectNode;
-};
-
 export type UpdateNodeInput = {
   nodeId: string;
   userId: string;
@@ -27,25 +21,7 @@ export type UpdateNodeInput = {
   updater: (attributes: NodeAttributes) => NodeAttributes | null;
 };
 
-export type UpdateNodeOutput = {
-  node: SelectNode;
-};
-
-export type DeleteNodeInput = {
-  nodeId: string;
-  rootId: string;
-  deletedAt: string;
-};
-
-export type DeleteNodeOutput = {
-  node: SelectNode;
-};
-
-export type UpdateDocumentOutput = {
-  update: SelectDocumentUpdate;
-};
-
-export type ConcurrentUpdateResult<T> = {
-  type: 'success' | 'error' | 'retry';
-  output: T | null;
-};
+export type ConcurrentUpdateResult<T> =
+  | { type: 'success'; output: T }
+  | { type: 'error'; error: string }
+  | { type: 'retry' };

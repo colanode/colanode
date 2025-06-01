@@ -1,8 +1,8 @@
-import type { ConfigEnv, Plugin, UserConfig } from 'vite';
-
 import { builtinModules } from 'node:module';
 import type { AddressInfo } from 'node:net';
 import path from 'path';
+
+import type { ConfigEnv, Plugin, UserConfig } from 'vite';
 
 export const builtins = [
   'electron',
@@ -30,7 +30,14 @@ export function getBuildConfig(env: ConfigEnv<'build'>): UserConfig {
     clearScreen: false,
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, './src'),
+        '@colanode/desktop': path.resolve(__dirname, './src'),
+        '@colanode/core': path.resolve(__dirname, '../../packages/core/src'),
+        '@colanode/crdt': path.resolve(__dirname, '../../packages/crdt/src'),
+        '@colanode/client': path.resolve(
+          __dirname,
+          '../../packages/client/src'
+        ),
+        '@colanode/ui': path.resolve(__dirname, '../../packages/ui/src'),
       },
     },
   };

@@ -1,4 +1,4 @@
-import { WorkspaceRole, NodeRole } from '../index';
+import { NodeRole, WorkspaceRole } from '@colanode/core';
 
 export type UserInput = {
   userId: string;

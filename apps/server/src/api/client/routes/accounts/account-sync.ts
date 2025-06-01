@@ -1,4 +1,5 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+
 import {
   AccountSyncOutput,
   WorkspaceOutput,
@@ -7,10 +8,8 @@ import {
   UserStatus,
   accountSyncOutputSchema,
   apiErrorOutputSchema,
-  accountSyncInputSchema,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
+import { database } from '@colanode/server/data/database';
 
 export const accountSyncRoute: FastifyPluginCallbackZod = (
   instance,
@@ -21,7 +20,6 @@ export const accountSyncRoute: FastifyPluginCallbackZod = (
     method: 'POST',
     url: '/sync',
     schema: {
-      body: accountSyncInputSchema,
       response: {
         200: accountSyncOutputSchema,
         400: apiErrorOutputSchema,
@@ -56,14 +54,13 @@ export const accountSyncRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const input = request.body;
       await database
         .updateTable('devices')
         .set({
           synced_at: new Date(),
           ip: request.client.ip,
-          platform: input.platform || request.client.platform,
-          version: input.version || request.client.version,
+          platform: request.client.platform,
+          version: request.client.version,
         })
         .where('id', '=', device.id)
         .execute();

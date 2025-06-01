@@ -1,15 +1,15 @@
-import { StateGraph } from '@langchain/langgraph';
 import { Document } from '@langchain/core/documents';
+import { StateGraph } from '@langchain/langgraph';
 import { CallbackHandler } from 'langfuse-langchain';
+
 import {
   DatabaseAttributes,
   getNodeModel,
   RecordAttributes,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { config } from '@/lib/config';
-import { fetchNode, fetchNodeDescendants } from '@/lib/nodes';
+import { database } from '@colanode/server/data/database';
+import { SelectNode } from '@colanode/server/data/schema';
+import { retrieveDocuments } from '@colanode/server/lib/ai/document-retrievals';
 import {
   rewriteQuery,
   assessUserIntent,
@@ -17,10 +17,18 @@ import {
   rerankDocuments,
   generateFinalAnswer,
   generateDatabaseFilters,
-} from '@/lib/ai/llms';
-import { retrieveNodes } from '@/lib/ai/node-retrievals';
-import { retrieveDocuments } from '@/lib/ai/document-retrievals';
-import { retrieveByFilters } from '@/lib/records';
+} from '@colanode/server/lib/ai/llms';
+import { fetchMetadataForContextItems } from '@colanode/server/lib/ai/metadata';
+import { retrieveNodes } from '@colanode/server/lib/ai/node-retrievals';
+import {
+  formatChatHistory,
+  formatContextDocuments,
+  selectTopContext,
+  formatMetadataForPrompt,
+} from '@colanode/server/lib/ai/utils';
+import { config } from '@colanode/server/lib/config';
+import { fetchNode, fetchNodeDescendants } from '@colanode/server/lib/nodes';
+import { retrieveByFilters } from '@colanode/server/lib/records';
 import {
   AssistantChainState,
   ResponseState,
@@ -28,15 +36,7 @@ import {
   DatabaseContextItem,
   AssistantResponse,
   AssistantInput,
-} from '@/types/assistant';
-import { fetchMetadataForContextItems } from '@/lib/ai/metadata';
-import { SelectNode } from '@/data/schema';
-import {
-  formatChatHistory,
-  formatContextDocuments,
-  selectTopContext,
-  formatMetadataForPrompt,
-} from '@/lib/ai/utils';
+} from '@colanode/server/types/assistant';
 
 const generateRewrittenQuery = async (state: AssistantChainState) => {
   const rewrittenQuery = await rewriteQuery(state.userInput);

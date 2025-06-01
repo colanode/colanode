@@ -1,12 +1,11 @@
 import { getNodeModel } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { config } from '@/lib/config';
+import { database } from '@colanode/server/data/database';
 import {
   fetchEmbeddingCursor,
   scheduleNodeEmbedding,
   updateEmbeddingCursor,
-} from '@/lib/ai/embeddings';
+} from '@colanode/server/lib/ai/embeddings';
+import { config } from '@colanode/server/lib/config';
 
 const BATCH_SIZE = 100;
 
@@ -14,7 +13,7 @@ export type CheckNodeEmbeddingsInput = {
   type: 'check_node_embeddings';
 };
 
-declare module '@/types/jobs' {
+declare module '@colanode/server/jobs' {
   interface JobMap {
     check_node_embeddings: {
       input: CheckNodeEmbeddingsInput;

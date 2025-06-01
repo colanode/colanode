@@ -4,11 +4,11 @@ import {
   GetObjectCommand,
   HeadObjectCommand,
 } from '@aws-sdk/client-s3';
-import { FileAttributes } from '@colanode/core';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 
-import { config } from '@/lib/config';
-import { fileS3 } from '@/data/storage';
+import { FileAttributes } from '@colanode/core';
+import { s3Client } from '@colanode/server/data/storage';
+import { config } from '@colanode/server/lib/config';
 
 export const buildFilePath = (
   workspaceId: string,
@@ -24,14 +24,14 @@ export const buildUploadUrl = async (
   mimeType: string
 ) => {
   const command = new PutObjectCommand({
-    Bucket: config.fileS3.bucketName,
+    Bucket: config.storage.bucketName,
     Key: path,
     ContentLength: size,
     ContentType: mimeType,
   });
 
   const expiresIn = 60 * 60 * 4; // 4 hours
-  const presignedUrl = await getSignedUrl(fileS3, command, {
+  const presignedUrl = await getSignedUrl(s3Client, command, {
     expiresIn,
   });
 
@@ -40,11 +40,11 @@ export const buildUploadUrl = async (
 
 export const buildDownloadUrl = async (path: string) => {
   const command = new GetObjectCommand({
-    Bucket: config.fileS3.bucketName,
+    Bucket: config.storage.bucketName,
     Key: path,
   });
 
-  const presignedUrl = await getSignedUrl(fileS3, command, {
+  const presignedUrl = await getSignedUrl(s3Client, command, {
     expiresIn: 60 * 60 * 4, // 4 hours
   });
 
@@ -53,12 +53,12 @@ export const buildDownloadUrl = async (path: string) => {
 
 export const fetchFileMetadata = async (path: string) => {
   const command = new HeadObjectCommand({
-    Bucket: config.fileS3.bucketName,
+    Bucket: config.storage.bucketName,
     Key: path,
   });
 
   try {
-    const headObject = await fileS3.send(command);
+    const headObject = await s3Client.send(command);
     return {
       size: headObject.ContentLength,
       mimeType: headObject.ContentType,
@@ -70,9 +70,9 @@ export const fetchFileMetadata = async (path: string) => {
 
 export const deleteFile = async (path: string) => {
   const command = new DeleteObjectCommand({
-    Bucket: config.fileS3.bucketName,
+    Bucket: config.storage.bucketName,
     Key: path,
   });
 
-  await fileS3.send(command);
+  await s3Client.send(command);
 };

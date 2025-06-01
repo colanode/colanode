@@ -1,7 +1,8 @@
-import { ApiErrorCode, createDebugger } from '@colanode/core';
 import { FastifyPluginCallback } from 'fastify';
 import fp from 'fastify-plugin';
 import { hasZodFastifySchemaValidationErrors } from 'fastify-type-provider-zod';
+
+import { ApiErrorCode, createDebugger } from '@colanode/core';
 
 const debug = createDebugger('api:client:error-handler');
 

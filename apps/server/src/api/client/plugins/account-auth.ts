@@ -1,10 +1,10 @@
 import { FastifyPluginCallback } from 'fastify';
 import fp from 'fastify-plugin';
-import { ApiErrorCode } from '@colanode/core';
 
-import { parseToken, verifyToken } from '@/lib/tokens';
-import { isDeviceApiRateLimited } from '@/lib/rate-limits';
-import { RequestAccount } from '@/types/api';
+import { ApiErrorCode } from '@colanode/core';
+import { isDeviceApiRateLimited } from '@colanode/server/lib/rate-limits';
+import { parseToken, verifyToken } from '@colanode/server/lib/tokens';
+import { RequestAccount } from '@colanode/server/types/api';
 
 declare module 'fastify' {
   interface FastifyRequest {
@@ -22,14 +22,14 @@ const accountAuthenticatorCallback: FastifyPluginCallback = (
   }
 
   fastify.addHook('onRequest', async (request, reply) => {
-    if (!request.headers.authorization) {
+    const auth = request.headers.authorization;
+    if (!auth) {
       return reply.code(401).send({
         code: ApiErrorCode.TokenMissing,
         message: 'No token provided',
       });
     }
 
-    const auth = request.headers.authorization;
     const parts = auth.split(' ');
     const token = parts.length === 2 ? parts[1] : parts[0];
 

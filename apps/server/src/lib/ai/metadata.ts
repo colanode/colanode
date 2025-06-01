@@ -4,8 +4,7 @@ import {
   RecordAttributes,
   DatabaseAttributes,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
+import { database } from '@colanode/server/data/database';
 import {
   NodeMetadata,
   DocumentMetadata,
@@ -15,7 +14,7 @@ import {
   ParentContextInfo,
   DatabaseInfo,
   DatabaseFieldInfo,
-} from '@/types/metadata';
+} from '@colanode/server/types/metadata';
 
 const fetchBaseMetadata = async (
   id: string,

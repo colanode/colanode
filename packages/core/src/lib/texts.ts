@@ -1,5 +1,5 @@
-import { DocumentContent } from '../registry/documents';
-import { Block } from '../registry/block';
+import { Block } from '@colanode/core/registry/block';
+import { DocumentContent } from '@colanode/core/registry/documents';
 
 export const extractDocumentText = (id: string, content: DocumentContent) => {
   return extractBlockTexts(id, content.blocks);

@@ -3,17 +3,17 @@ import {
   hasNodeRole,
   MarkNodeOpenedMutation,
   MarkNodeSeenMutation,
+  MutationStatus,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { SelectUser } from '@/data/schema';
-import { mapNode } from '@/lib/nodes';
-import { eventBus } from '@/lib/event-bus';
+import { database } from '@colanode/server/data/database';
+import { SelectUser } from '@colanode/server/data/schema';
+import { eventBus } from '@colanode/server/lib/event-bus';
+import { mapNode } from '@colanode/server/lib/nodes';
 
 export const markNodeAsSeen = async (
   user: SelectUser,
   mutation: MarkNodeSeenMutation
-): Promise<boolean> => {
+): Promise<MutationStatus> => {
   const node = await database
     .selectFrom('nodes')
     .select(['id', 'root_id', 'workspace_id'])
@@ -21,7 +21,7 @@ export const markNodeAsSeen = async (
     .executeTakeFirst();
 
   if (!node) {
-    return false;
+    return MutationStatus.NOT_FOUND;
   }
 
   const root = await database
@@ -31,13 +31,13 @@ export const markNodeAsSeen = async (
     .executeTakeFirst();
 
   if (!root) {
-    return false;
+    return MutationStatus.NOT_FOUND;
   }
 
   const rootNode = mapNode(root);
   const role = extractNodeRole(rootNode, user.id);
   if (!role || !hasNodeRole(role, 'viewer')) {
-    return false;
+    return MutationStatus.FORBIDDEN;
   }
 
   const existingInteraction = await database
@@ -52,7 +52,7 @@ export const markNodeAsSeen = async (
     existingInteraction.last_seen_at !== null &&
     existingInteraction.last_seen_at <= new Date(mutation.data.seenAt)
   ) {
-    return true;
+    return MutationStatus.OK;
   }
 
   const lastSeenAt = new Date(mutation.data.seenAt);
@@ -77,7 +77,7 @@ export const markNodeAsSeen = async (
     .executeTakeFirst();
 
   if (!createdInteraction) {
-    return false;
+    return MutationStatus.INTERNAL_SERVER_ERROR;
   }
 
   eventBus.publish({
@@ -88,13 +88,13 @@ export const markNodeAsSeen = async (
     workspaceId: createdInteraction.workspace_id,
   });
 
-  return true;
+  return MutationStatus.OK;
 };
 
 export const markNodeAsOpened = async (
   user: SelectUser,
   mutation: MarkNodeOpenedMutation
-): Promise<boolean> => {
+): Promise<MutationStatus> => {
   const node = await database
     .selectFrom('nodes')
     .select(['id', 'root_id', 'workspace_id'])
@@ -102,7 +102,7 @@ export const markNodeAsOpened = async (
     .executeTakeFirst();
 
   if (!node) {
-    return false;
+    return MutationStatus.NOT_FOUND;
   }
 
   const root = await database
@@ -112,13 +112,13 @@ export const markNodeAsOpened = async (
     .executeTakeFirst();
 
   if (!root) {
-    return false;
+    return MutationStatus.NOT_FOUND;
   }
 
   const rootNode = mapNode(root);
   const role = extractNodeRole(rootNode, user.id);
   if (!role || !hasNodeRole(role, 'viewer')) {
-    return false;
+    return MutationStatus.FORBIDDEN;
   }
 
   const existingInteraction = await database
@@ -133,7 +133,7 @@ export const markNodeAsOpened = async (
     existingInteraction.last_opened_at !== null &&
     existingInteraction.last_opened_at <= new Date(mutation.data.openedAt)
   ) {
-    return true;
+    return MutationStatus.OK;
   }
 
   const lastOpenedAt = new Date(mutation.data.openedAt);
@@ -158,7 +158,7 @@ export const markNodeAsOpened = async (
     .executeTakeFirst();
 
   if (!createdInteraction) {
-    return false;
+    return MutationStatus.INTERNAL_SERVER_ERROR;
   }
 
   eventBus.publish({
@@ -169,5 +169,5 @@ export const markNodeAsOpened = async (
     workspaceId: createdInteraction.workspace_id,
   });
 
-  return true;
+  return MutationStatus.OK;
 };

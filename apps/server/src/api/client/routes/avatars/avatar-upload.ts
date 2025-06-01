@@ -1,6 +1,7 @@
+import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import sharp from 'sharp';
-import { PutObjectCommand } from '@aws-sdk/client-s3';
+
 import {
   ApiErrorCode,
   apiErrorOutputSchema,
@@ -8,15 +9,33 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
+import { s3Client } from '@colanode/server/data/storage';
+import { config } from '@colanode/server/lib/config';
 
-import { avatarS3 } from '@/data/storage';
-import { config } from '@/lib/config';
+const ALLOWED_MIME_TYPES = [
+  'image/jpeg',
+  'image/jpg',
+  'image/png',
+  'image/webp',
+];
 
 export const avatarUploadRoute: FastifyPluginCallbackZod = (
   instance,
   _,
   done
 ) => {
+  instance.removeAllContentTypeParsers();
+
+  ALLOWED_MIME_TYPES.forEach((mimeType) => {
+    instance.addContentTypeParser(
+      mimeType,
+      { parseAs: 'buffer' },
+      (_req, payload, done) => {
+        done(null, payload);
+      }
+    );
+  });
+
   instance.route({
     method: 'POST',
     url: '/',
@@ -27,32 +46,20 @@ export const avatarUploadRoute: FastifyPluginCallbackZod = (
         500: apiErrorOutputSchema,
       },
     },
+    bodyLimit: 1024 * 1024 * 10, // 10MB
     handler: async (request, reply) => {
       try {
-        const file = await request.file();
-        if (!file) {
+        const contentType = request.headers['content-type'] || '';
+
+        if (!ALLOWED_MIME_TYPES.includes(contentType)) {
           return reply.code(400).send({
             code: ApiErrorCode.AvatarFileNotUploaded,
-            message: 'Avatar file not uploaded as part of request',
+            message:
+              'Invalid content type. Must be a direct image upload of type jpeg, jpg, png, or webp',
           });
         }
 
-        // Validate file type
-        const filetypes = /jpeg|jpg|png|webp/;
-        const extname = filetypes.test(file.filename.toLowerCase());
-        const mimetype = filetypes.test(file.mimetype);
-
-        if (!mimetype || !extname) {
-          return reply.code(400).send({
-            code: ApiErrorCode.AvatarFileNotUploaded,
-            message: 'Only images are allowed',
-          });
-        }
-
-        // Read the file buffer
-        const buffer = await file.toBuffer();
-
-        // Resize image to a maximum of 500x500 pixels while keeping aspect ratio, and convert to JPEG using Sharp
+        const buffer = request.body as Buffer;
         const jpegBuffer = await sharp(buffer)
           .resize({
             width: 500,
@@ -64,13 +71,14 @@ export const avatarUploadRoute: FastifyPluginCallbackZod = (
 
         const avatarId = generateId(IdType.Avatar);
         const command = new PutObjectCommand({
-          Bucket: config.avatarS3.bucketName,
+          Bucket: config.storage.bucketName,
           Key: `avatars/${avatarId}.jpeg`,
           Body: jpegBuffer,
           ContentType: 'image/jpeg',
         });
 
-        await avatarS3.send(command);
+        await s3Client.send(command);
+
         return { success: true, id: avatarId };
       } catch {
         return reply.code(500).send({

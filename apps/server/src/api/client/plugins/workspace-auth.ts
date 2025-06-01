@@ -1,9 +1,9 @@
 import { FastifyPluginCallback } from 'fastify';
 import fp from 'fastify-plugin';
-import { ApiErrorCode, UserStatus } from '@colanode/core';
 
-import { database } from '@/data/database';
-import { SelectUser } from '@/data/schema';
+import { ApiErrorCode, UserStatus } from '@colanode/core';
+import { database } from '@colanode/server/data/database';
+import { SelectUser } from '@colanode/server/data/schema';
 
 declare module 'fastify' {
   interface FastifyRequest {

@@ -1,4 +1,4 @@
-import { UserStatus, WorkspaceRole } from '../types/workspaces';
+import { UserStatus, WorkspaceRole } from '@colanode/core/types/workspaces';
 
 export type SyncUsersInput = {
   type: 'users';

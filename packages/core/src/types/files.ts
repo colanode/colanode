@@ -1,35 +1,11 @@
 import { z } from 'zod';
 
-export const createUploadInputSchema = z.object({
-  fileId: z.string(),
-});
-
-export type CreateUploadInput = z.infer<typeof createUploadInputSchema>;
-
-export const createUploadOutputSchema = z.object({
-  url: z.string(),
-  uploadId: z.string(),
-});
-
-export type CreateUploadOutput = z.infer<typeof createUploadOutputSchema>;
-
-export const createDownloadOutputSchema = z.object({
-  url: z.string(),
-});
-
-export type CreateDownloadOutput = z.infer<typeof createDownloadOutputSchema>;
-
-export const completeUploadInputSchema = z.object({
-  uploadId: z.string(),
-});
-
-export type CompleteUploadInput = z.infer<typeof completeUploadInputSchema>;
-
-export const completeUploadOutputSchema = z.object({
+export const fileUploadOutputSchema = z.object({
   success: z.boolean(),
+  uploadId: z.string(),
 });
 
-export type CompleteUploadOutput = z.infer<typeof completeUploadOutputSchema>;
+export type FileUploadOutput = z.infer<typeof fileUploadOutputSchema>;
 
 export const fileSubtypeSchema = z.enum([
   'image',

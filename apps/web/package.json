@@ -1,0 +1,25 @@
+{
+  "name": "@colanode/web",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --port 4000",
+    "start": "vite --port 4000",
+    "build": "vite build && tsc",
+    "serve": "vite preview",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@colanode/client": "*",
+    "@colanode/ui": "*",
+    "@sqlite.org/sqlite-wasm": "^3.49.2-build1",
+    "comlink": "^4.4.2"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.21",
+    "typescript": "^5.7.2",
+    "vite": "^6.1.0",
+    "vite-plugin-pwa": "^1.0.0"
+  }
+}

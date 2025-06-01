@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "UI Library",
+  "extends": "../../tsconfig.base.json",
+  "references": [
+    {
+      "path": "../core",
+    },
+    {
+      "path": "../client"
+    }
+  ],
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "composite": true,
+    "jsx": "react-jsx",
+    "rootDir": "src",
+    "baseUrl": ".",
+    "paths": {
+      "@colanode/ui/*": ["src/*"]
+    },
+  }
+}

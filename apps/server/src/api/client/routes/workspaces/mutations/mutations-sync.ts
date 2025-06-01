@@ -1,28 +1,26 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+
 import {
   SyncMutationResult,
-  SyncMutationStatus,
+  MutationStatus,
   Mutation,
-  CreateNodeMutation,
-  DeleteNodeMutation,
-  CreateNodeReactionMutation,
-  DeleteNodeReactionMutation,
-  MarkNodeSeenMutation,
-  MarkNodeOpenedMutation,
-  UpdateNodeMutation,
-  UpdateDocumentMutation,
   syncMutationsInputSchema,
 } from '@colanode/core';
-
-import { SelectUser } from '@/data/schema';
+import { SelectUser } from '@colanode/server/data/schema';
+import { updateDocumentFromMutation } from '@colanode/server/lib/documents';
+import {
+  markNodeAsOpened,
+  markNodeAsSeen,
+} from '@colanode/server/lib/node-interactions';
+import {
+  createNodeReaction,
+  deleteNodeReaction,
+} from '@colanode/server/lib/node-reactions';
 import {
   createNodeFromMutation,
   updateNodeFromMutation,
-  deleteNode,
-} from '@/lib/nodes';
-import { createNodeReaction, deleteNodeReaction } from '@/lib/node-reactions';
-import { markNodeAsOpened, markNodeAsSeen } from '@/lib/node-interactions';
-import { updateDocumentFromMutation } from '@/lib/documents';
+  deleteNodeFromMutation,
+} from '@colanode/server/lib/nodes';
 
 export const mutationsSyncRoute: FastifyPluginCallbackZod = (
   instance,
@@ -50,7 +48,7 @@ export const mutationsSyncRoute: FastifyPluginCallbackZod = (
         } catch {
           results.push({
             id: mutation.id,
-            status: 'error',
+            status: MutationStatus.INTERNAL_SERVER_ERROR,
           });
         }
       }
@@ -65,107 +63,24 @@ export const mutationsSyncRoute: FastifyPluginCallbackZod = (
 const handleMutation = async (
   user: SelectUser,
   mutation: Mutation
-): Promise<SyncMutationStatus> => {
+): Promise<MutationStatus> => {
   if (mutation.type === 'create_node') {
-    return await handleCreateNode(user, mutation);
+    return await createNodeFromMutation(user, mutation.data);
   } else if (mutation.type === 'update_node') {
-    return await handleUpdateNode(user, mutation);
+    return await updateNodeFromMutation(user, mutation.data);
   } else if (mutation.type === 'delete_node') {
-    return await handleDeleteNode(user, mutation);
+    return await deleteNodeFromMutation(user, mutation.data);
   } else if (mutation.type === 'create_node_reaction') {
-    return await handleCreateNodeReaction(user, mutation);
+    return await createNodeReaction(user, mutation);
   } else if (mutation.type === 'delete_node_reaction') {
-    return await handleDeleteNodeReaction(user, mutation);
+    return await deleteNodeReaction(user, mutation);
   } else if (mutation.type === 'mark_node_seen') {
-    return await handleMarkNodeSeen(user, mutation);
+    return await markNodeAsSeen(user, mutation);
   } else if (mutation.type === 'mark_node_opened') {
-    return await handleMarkNodeOpened(user, mutation);
+    return await markNodeAsOpened(user, mutation);
   } else if (mutation.type === 'update_document') {
-    return await handleUpdateDocument(user, mutation);
+    return await updateDocumentFromMutation(user, mutation.data);
   } else {
-    return 'error';
+    return MutationStatus.METHOD_NOT_ALLOWED;
   }
-};
-
-const handleCreateNode = async (
-  user: SelectUser,
-  mutation: CreateNodeMutation
-): Promise<SyncMutationStatus> => {
-  const output = await createNodeFromMutation(user, mutation.data);
-
-  if (!output) {
-    return 'error';
-  }
-
-  return 'success';
-};
-
-const handleUpdateNode = async (
-  user: SelectUser,
-  mutation: UpdateNodeMutation
-): Promise<SyncMutationStatus> => {
-  const output = await updateNodeFromMutation(user, mutation.data);
-
-  if (!output) {
-    return 'error';
-  }
-
-  return 'success';
-};
-
-const handleDeleteNode = async (
-  user: SelectUser,
-  mutation: DeleteNodeMutation
-): Promise<SyncMutationStatus> => {
-  const output = await deleteNode(user, {
-    nodeId: mutation.data.nodeId,
-    rootId: mutation.data.rootId,
-    deletedAt: mutation.data.deletedAt,
-  });
-
-  if (!output) {
-    return 'error';
-  }
-
-  return 'success';
-};
-
-const handleCreateNodeReaction = async (
-  user: SelectUser,
-  mutation: CreateNodeReactionMutation
-): Promise<SyncMutationStatus> => {
-  const output = await createNodeReaction(user, mutation);
-  return output ? 'success' : 'error';
-};
-
-const handleDeleteNodeReaction = async (
-  user: SelectUser,
-  mutation: DeleteNodeReactionMutation
-): Promise<SyncMutationStatus> => {
-  const output = await deleteNodeReaction(user, mutation);
-  return output ? 'success' : 'error';
-};
-
-const handleMarkNodeSeen = async (
-  user: SelectUser,
-  mutation: MarkNodeSeenMutation
-): Promise<SyncMutationStatus> => {
-  const output = await markNodeAsSeen(user, mutation);
-  return output ? 'success' : 'error';
-};
-
-const handleMarkNodeOpened = async (
-  user: SelectUser,
-  mutation: MarkNodeOpenedMutation
-): Promise<SyncMutationStatus> => {
-  const output = await markNodeAsOpened(user, mutation);
-  return output ? 'success' : 'error';
-};
-
-const handleUpdateDocument = async (
-  user: SelectUser,
-  mutation: UpdateDocumentMutation
-): Promise<SyncMutationStatus> => {
-  const output = await updateDocumentFromMutation(user, mutation.data);
-  return output ? 'success' : 'error';
 };

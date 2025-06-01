@@ -1,12 +1,13 @@
 import { Document } from '@langchain/core/documents';
 import { Annotation } from '@langchain/langgraph';
+
+import { SelectNode } from '@colanode/server/data/schema';
 import {
   RerankedDocuments,
   CitedAnswer,
   DatabaseFilterResult,
   RewrittenQuery,
-} from './llm';
-import { SelectNode } from '@/data/schema';
+} from '@colanode/server/types/llm';
 
 export type Citation = {
   sourceId: string;

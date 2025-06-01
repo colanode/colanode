@@ -1,5 +1,6 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod';
+
 import {
   WorkspaceOutput,
   ApiErrorCode,
@@ -7,9 +8,8 @@ import {
   workspaceOutputSchema,
   workspaceUpdateInputSchema,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { eventBus } from '@/lib/event-bus';
+import { database } from '@colanode/server/data/database';
+import { eventBus } from '@colanode/server/lib/event-bus';
 
 export const workspaceUpdateRoute: FastifyPluginCallbackZod = (
   instance,

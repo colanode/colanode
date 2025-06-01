@@ -1,6 +1,9 @@
 import { z } from 'zod';
 
-import { richTextContentSchema, RichTextContent } from './rich-text';
+import {
+  richTextContentSchema,
+  RichTextContent,
+} from '@colanode/core/registry/documents/rich-text';
 
 export const documentContentSchema = z.discriminatedUnion('type', [
   richTextContentSchema,

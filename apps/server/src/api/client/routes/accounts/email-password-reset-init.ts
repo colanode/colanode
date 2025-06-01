@@ -1,4 +1,5 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+
 import {
   generateId,
   IdType,
@@ -8,13 +9,15 @@ import {
   emailPasswordResetInitOutputSchema,
   emailPasswordResetInitInputSchema,
 } from '@colanode/core';
-
-import { database } from '@/data/database';
-import { isAuthEmailRateLimited } from '@/lib/rate-limits';
-import { config } from '@/lib/config';
-import { generateOtpCode, saveOtp } from '@/lib/otps';
-import { AccountPasswordResetOtpAttributes, Otp } from '@/types/otps';
-import { jobService } from '@/services/job-service';
+import { database } from '@colanode/server/data/database';
+import { config } from '@colanode/server/lib/config';
+import { generateOtpCode, saveOtp } from '@colanode/server/lib/otps';
+import { isAuthEmailRateLimited } from '@colanode/server/lib/rate-limits';
+import { jobService } from '@colanode/server/services/job-service';
+import {
+  AccountPasswordResetOtpAttributes,
+  Otp,
+} from '@colanode/server/types/otps';
 
 export const emailPasswordResetInitRoute: FastifyPluginCallbackZod = (
   instance,

@@ -1,6 +1,6 @@
 import { generateKeyBetween } from 'fractional-indexing-jittered';
 
-import { Node, NodeAttributes, NodeRole } from '../index';
+import { Node, NodeAttributes, NodeRole } from '@colanode/core';
 
 export const extractNodeCollaborators = (
   attributes: NodeAttributes | NodeAttributes[]
@@ -22,6 +22,16 @@ export const extractNodeCollaborators = (
 export const extractNodeName = (attributes: NodeAttributes): string | null => {
   if ('name' in attributes && attributes.name) {
     return attributes.name as string;
+  }
+
+  return null;
+};
+
+export const extractNodeAvatar = (
+  attributes: NodeAttributes
+): string | null => {
+  if ('avatar' in attributes && attributes.avatar) {
+    return attributes.avatar as string;
   }
 
   return null;

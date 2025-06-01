@@ -1,18 +1,19 @@
 import dotenv from 'dotenv';
 
-import { eventBus } from '@/lib/event-bus';
-import { initApp } from '@/app';
-import { migrate } from '@/data/database';
-import { initRedis } from '@/data/redis';
-import { jobService } from '@/services/job-service';
-import { emailService } from '@/services/email-service';
+import { initApp } from '@colanode/server/app';
+import { migrate } from '@colanode/server/data/database';
+import { initRedis } from '@colanode/server/data/redis';
+import { eventBus } from '@colanode/server/lib/event-bus';
+import { emailService } from '@colanode/server/services/email-service';
+import { jobService } from '@colanode/server/services/job-service';
 
 dotenv.config();
 
 const init = async () => {
   await migrate();
   await initRedis();
-  await initApp();
+
+  initApp();
 
   jobService.initQueue();
   await jobService.initWorker();

@@ -10,18 +10,18 @@
     "seed": "tsx src/seed/index.ts"
   },
   "devDependencies": {
-    "@faker-js/faker": "^9.7.0",
+    "@faker-js/faker": "^9.8.0",
     "@types/adm-zip": "^0.5.7",
     "@types/better-sqlite3": "^7.6.12",
+    "@types/svg-sprite": "^0.0.39",
     "tsx": "^4.19.3"
   },
   "dependencies": {
     "@colanode/core": "*",
     "@colanode/crdt": "*",
     "adm-zip": "^0.5.16",
-    "axios": "^1.7.9",
     "better-sqlite3": "^11.8.1",
-    "form-data": "^4.0.2",
-    "node-fetch": "^3.3.2"
+    "ky": "^1.8.1",
+    "svg-sprite": "^2.0.4"
   }
 }

@@ -1,8 +1,7 @@
 import { createDebugger } from '@colanode/core';
-
-import { JobHandler } from '@/types/jobs';
-import { database } from '@/data/database';
-import { deleteFile } from '@/lib/files';
+import { database } from '@colanode/server/data/database';
+import { JobHandler } from '@colanode/server/jobs';
+import { deleteFile } from '@colanode/server/lib/files';
 
 const BATCH_SIZE = 500;
 const debug = createDebugger('server:job:clean-workspace-data');
@@ -12,7 +11,7 @@ export type CleanWorkspaceDataInput = {
   workspaceId: string;
 };
 
-declare module '@/types/jobs' {
+declare module '@colanode/server/jobs' {
   interface JobMap {
     clean_workspace_data: {
       input: CleanWorkspaceDataInput;
