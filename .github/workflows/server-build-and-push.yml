@@ -1,4 +1,4 @@
-name: Publish server app
+name: Build and push server docker image
 
 on:
   push:
@@ -55,7 +55,6 @@ jobs:
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:latest
             ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:${{ env.VERSION }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}

@@ -1,0 +1,81 @@
+name: Build and deploy web app to Cloudflare
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: Deploy
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Get the version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Set version and commit SHA into build.ts
+        run: |
+          cat <<EOF > ./packages/core/src/types/build.ts
+          // This file is auto-generated during CI/CD
+          const VERSION = "${{ env.VERSION }}";
+          const SHA = "${{ github.sha }}";
+
+          export const build = {
+              version: VERSION,
+              sha: SHA
+          };
+          EOF
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages/core
+        working-directory: packages/core
+        run: npm run build
+
+      - name: Build packages/crdt
+        working-directory: packages/crdt
+        run: npm run build
+
+      - name: Build packages/client
+        working-directory: packages/client
+        run: npm run build
+
+      - name: Build packages/ui
+        working-directory: packages/ui
+        run: npm run build
+
+      - name: Build Web App
+        working-directory: apps/web
+        run: npm run build
+
+      - name: Create wrangler.jsonc
+        working-directory: apps/web
+        run: |
+          cat > wrangler.jsonc << EOF
+          {
+            "name": "${{ secrets.CLOUDFLARE_WORKER_NAME }}",
+            "compatibility_date": "2025-05-28",
+            "assets": {
+              "directory": "./dist",
+              "not_found_handling": "single-page-application"
+            }
+          }
+          EOF
+
+      - name: Deploy
+        uses: cloudflare/wrangler-action@v3
+        with:
+          workingDirectory: ./apps/web
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: deploy
