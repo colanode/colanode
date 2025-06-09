@@ -47,7 +47,7 @@ export const RecordCollaboratorValue = ({
   const collaboratorIds = record.getCollaboratorValue(field) ?? [];
   const results = useQueries(
     collaboratorIds.map((id) => ({
-      type: 'user_get',
+      type: 'user.get',
       userId: id,
       accountId: workspace.accountId,
       workspaceId: workspace.id,

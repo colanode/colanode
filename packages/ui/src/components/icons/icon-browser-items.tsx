@@ -8,14 +8,14 @@ interface IconBrowserItemsProps {
 }
 
 export const IconBrowserItems = ({ row, style }: IconBrowserItemsProps) => {
-  const { data } = useQuery({
-    type: 'icon_list',
+  const iconListQuery = useQuery({
+    type: 'icon.list',
     category: row.category,
     page: row.page,
     count: row.count,
   });
 
-  const icons = data ?? [];
+  const icons = iconListQuery.data ?? [];
   return (
     <div className="flex flex-row gap-1" style={style}>
       {icons.map((icon) => (

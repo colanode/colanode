@@ -6,13 +6,13 @@ interface EmojiSearchProps {
 }
 
 export const EmojiSearch = ({ query }: EmojiSearchProps) => {
-  const { data } = useQuery({
-    type: 'emoji_search',
+  const emojiSearchQuery = useQuery({
+    type: 'emoji.search',
     query,
     count: 100,
   });
 
-  const emojis = data ?? [];
+  const emojis = emojiSearchQuery.data ?? [];
 
   return (
     <div className="grid w-full min-w-full grid-cols-10 gap-1">

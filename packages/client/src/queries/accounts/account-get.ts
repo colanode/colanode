@@ -1,13 +1,13 @@
 import { Account } from '@colanode/client/types/accounts';
 
 export type AccountGetQueryInput = {
-  type: 'account_get';
+  type: 'account.get';
   accountId: string;
 };
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    account_get: {
+    'account.get': {
       input: AccountGetQueryInput;
       output: Account | null;
     };

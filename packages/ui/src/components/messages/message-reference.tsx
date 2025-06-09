@@ -11,20 +11,20 @@ interface MessageReferenceProps {
 
 export const MessageReference = ({ messageId }: MessageReferenceProps) => {
   const workspace = useWorkspace();
-  const { data, isPending } = useQuery({
-    type: 'node_get',
+  const nodeGetQuery = useQuery({
+    type: 'node.get',
     nodeId: messageId,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  if (isPending) {
+  if (nodeGetQuery.isPending) {
     return null;
   }
 
-  const message = data as LocalMessageNode;
+  const message = nodeGetQuery.data as LocalMessageNode;
 
-  if (!data) {
+  if (!message) {
     return (
       <div className="flex flex-row gap-2 border-l-4 p-2">
         <span className="text-sm text-muted-foreground">

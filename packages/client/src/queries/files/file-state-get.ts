@@ -1,7 +1,7 @@
 import { FileState } from '@colanode/client/types/files';
 
 export type FileStateGetQueryInput = {
-  type: 'file_state_get';
+  type: 'file.state.get';
   id: string;
   accountId: string;
   workspaceId: string;
@@ -9,7 +9,7 @@ export type FileStateGetQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    file_state_get: {
+    'file.state.get': {
       input: FileStateGetQueryInput;
       output: FileState | null;
     };

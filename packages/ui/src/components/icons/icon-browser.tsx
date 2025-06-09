@@ -9,11 +9,11 @@ import { useQuery } from '@colanode/ui/hooks/use-query';
 const ICONS_PER_ROW = 10;
 
 export const IconBrowser = () => {
-  const { data } = useQuery({
-    type: 'icon_category_list',
+  const iconCategoryListQuery = useQuery({
+    type: 'icon.category.list',
   });
 
-  const categories = data ?? [];
+  const categories = iconCategoryListQuery.data ?? [];
   const rowDataArray = React.useMemo<IconPickerRowData[]>(() => {
     const rows: IconPickerRowData[] = [];
 

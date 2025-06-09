@@ -1,7 +1,7 @@
 import { Document } from '@colanode/client/types/documents';
 
 export type DocumentGetQueryInput = {
-  type: 'document_get';
+  type: 'document.get';
   documentId: string;
   accountId: string;
   workspaceId: string;
@@ -9,7 +9,7 @@ export type DocumentGetQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    document_get: {
+    'document.get': {
       input: DocumentGetQueryInput;
       output: Document | null;
     };

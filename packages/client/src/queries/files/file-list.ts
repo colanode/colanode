@@ -1,7 +1,7 @@
 import { LocalFileNode } from '@colanode/client/types/nodes';
 
 export type FileListQueryInput = {
-  type: 'file_list';
+  type: 'file.list';
   parentId: string;
   page: number;
   count: number;
@@ -11,7 +11,7 @@ export type FileListQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    file_list: {
+    'file.list': {
       input: FileListQueryInput;
       output: LocalFileNode[];
     };

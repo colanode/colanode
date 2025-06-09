@@ -22,14 +22,14 @@ export const MessageReactionCounts = ({
 
   const { mutate, isPending } = useMutation();
 
-  const { data } = useQuery({
-    type: 'node_reactions_aggregate',
+  const nodeReactionsAggregateQuery = useQuery({
+    type: 'node.reactions.aggregate',
     nodeId: message.id,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  const reactionCounts = data ?? [];
+  const reactionCounts = nodeReactionsAggregateQuery.data ?? [];
   if (reactionCounts.length === 0) {
     return null;
   }

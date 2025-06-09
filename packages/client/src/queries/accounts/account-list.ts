@@ -1,12 +1,12 @@
 import { Account } from '@colanode/client/types/accounts';
 
 export type AccountListQueryInput = {
-  type: 'account_list';
+  type: 'account.list';
 };
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    account_list: {
+    'account.list': {
       input: AccountListQueryInput;
       output: Account[];
     };

@@ -1,7 +1,7 @@
 import { LocalRecordNode } from '@colanode/client/types/nodes';
 
 export type RecordSearchQueryInput = {
-  type: 'record_search';
+  type: 'record.search';
   searchQuery: string;
   accountId: string;
   workspaceId: string;
@@ -11,7 +11,7 @@ export type RecordSearchQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    record_search: {
+    'record.search': {
       input: RecordSearchQueryInput;
       output: LocalRecordNode[];
     };

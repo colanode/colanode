@@ -13,14 +13,14 @@ export const DatabaseViews = () => {
   const database = useDatabase();
   const [activeViewId, setActiveViewId] = React.useState<string | null>(null);
 
-  const { data } = useQuery({
-    type: 'database_view_list',
+  const databaseViewListQuery = useQuery({
+    type: 'database.view.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     databaseId: database.id,
   });
 
-  const views = data ?? [];
+  const views = databaseViewListQuery.data ?? [];
   const activeView = views.find((view) => view.id === activeViewId);
 
   React.useEffect(() => {

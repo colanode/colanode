@@ -8,14 +8,14 @@ interface EmojiBrowserItemsProps {
 }
 
 export const EmojiBrowserItems = ({ row, style }: EmojiBrowserItemsProps) => {
-  const { data } = useQuery({
-    type: 'emoji_list',
+  const emojiListQuery = useQuery({
+    type: 'emoji.list',
     category: row.category,
     page: row.page,
     count: row.count,
   });
 
-  const emojis = data ?? [];
+  const emojis = emojiListQuery.data ?? [];
   return (
     <div className="flex flex-row gap-1" style={style}>
       {emojis.map((emoji) => (

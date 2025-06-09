@@ -1,7 +1,7 @@
 import { LocalSpaceNode } from '@colanode/client/types/nodes';
 
 export type SpaceListQueryInput = {
-  type: 'space_list';
+  type: 'space.list';
   page: number;
   count: number;
   accountId: string;
@@ -10,7 +10,7 @@ export type SpaceListQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    space_list: {
+    'space.list': {
       input: SpaceListQueryInput;
       output: LocalSpaceNode[];
     };

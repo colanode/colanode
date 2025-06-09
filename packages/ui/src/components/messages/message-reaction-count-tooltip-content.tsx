@@ -15,13 +15,13 @@ export const MessageReactionCountTooltipContent = ({
 }: MessageReactionCountTooltipContentProps) => {
   const workspace = useWorkspace();
 
-  const { data: emoji } = useQuery({
-    type: 'emoji_get_by_skin_id',
+  const emojiGetQuery = useQuery({
+    type: 'emoji.get.by.skin.id',
     id: reactionCount.reaction,
   });
 
-  const { data: reactions } = useQuery({
-    type: 'node_reaction_list',
+  const nodeReactionListQuery = useQuery({
+    type: 'node.reaction.list',
     nodeId: message.id,
     reaction: reactionCount.reaction,
     accountId: workspace.accountId,
@@ -30,11 +30,13 @@ export const MessageReactionCountTooltipContent = ({
     count: 3,
   });
 
-  const userIds = reactions?.map((reaction) => reaction.collaboratorId) ?? [];
+  const userIds =
+    nodeReactionListQuery.data?.map((reaction) => reaction.collaboratorId) ??
+    [];
 
   const results = useQueries(
     userIds.map((userId) => ({
-      type: 'user_get',
+      type: 'user.get',
       accountId: workspace.accountId,
       workspaceId: workspace.id,
       userId,
@@ -45,7 +47,7 @@ export const MessageReactionCountTooltipContent = ({
     .filter((result) => result.data !== null)
     .map((result) => result.data!.customName ?? result.data!.name);
 
-  const emojiName = `:${emoji?.code ?? reactionCount.reaction}:`;
+  const emojiName = `:${emojiGetQuery.data?.code ?? reactionCount.reaction}:`;
 
   return (
     <div className="flex items-center gap-4">

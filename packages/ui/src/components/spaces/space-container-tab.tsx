@@ -10,18 +10,18 @@ interface SpaceContainerTabProps {
 export const SpaceContainerTab = ({ spaceId }: SpaceContainerTabProps) => {
   const workspace = useWorkspace();
 
-  const { data, isPending } = useQuery({
-    type: 'node_get',
+  const nodeGetQuery = useQuery({
+    type: 'node.get',
     nodeId: spaceId,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  if (isPending) {
+  if (nodeGetQuery.isPending) {
     return <p className="text-sm text-muted-foreground">Loading...</p>;
   }
 
-  const space = data as LocalSpaceNode;
+  const space = nodeGetQuery.data as LocalSpaceNode;
   if (!space) {
     return <p className="text-sm text-muted-foreground">Not found</p>;
   }

@@ -10,18 +10,20 @@ export const MentionNodeView = ({ node }: NodeViewProps) => {
   const workspace = useWorkspace();
 
   const target = node.attrs.target;
-  const { data } = useQuery({
-    type: 'user_get',
+  const userGetQuery = useQuery({
+    type: 'user.get',
     userId: target,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  const name = data?.name ?? 'Unknown';
+  const user = userGetQuery.data;
+  const name = user?.name ?? 'Unknown';
+  const avatar = user?.avatar;
 
   return (
     <NodeViewWrapper data-id={node.attrs.id} className={defaultClasses.mention}>
-      <Avatar size="small" id={target} name={name} avatar={data?.avatar} />
+      <Avatar size="small" id={target} name={name} avatar={avatar} />
       <span role="presentation">{name}</span>
     </NodeViewWrapper>
   );

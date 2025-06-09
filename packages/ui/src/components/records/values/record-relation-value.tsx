@@ -47,7 +47,7 @@ export const RecordRelationValue = ({
   const relationIds = record.getRelationValue(field) ?? [];
   const results = useQueries(
     relationIds.map((id) => ({
-      type: 'node_get',
+      type: 'node.get',
       nodeId: id,
       accountId: workspace.accountId,
       workspaceId: workspace.id,

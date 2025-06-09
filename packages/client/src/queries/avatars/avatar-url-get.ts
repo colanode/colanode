@@ -1,5 +1,5 @@
 export type AvatarUrlGetQueryInput = {
-  type: 'avatar_url_get';
+  type: 'avatar.url.get';
   accountId: string;
   avatarId: string;
 };
@@ -10,7 +10,7 @@ export type AvatarUrlGetQueryOutput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    avatar_url_get: {
+    'avatar.url.get': {
       input: AvatarUrlGetQueryInput;
       output: AvatarUrlGetQueryOutput;
     };

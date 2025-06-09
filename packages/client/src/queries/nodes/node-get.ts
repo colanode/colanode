@@ -1,7 +1,7 @@
 import { LocalNode } from '@colanode/client/types/nodes';
 
 export type NodeGetQueryInput = {
-  type: 'node_get';
+  type: 'node.get';
   nodeId: string;
   accountId: string;
   workspaceId: string;
@@ -9,7 +9,7 @@ export type NodeGetQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    node_get: {
+    'node.get': {
       input: NodeGetQueryInput;
       output: LocalNode | null;
     };

@@ -1,13 +1,13 @@
 import { Workspace } from '@colanode/client/types/workspaces';
 
 export type WorkspaceListQueryInput = {
-  type: 'workspace_list';
+  type: 'workspace.list';
   accountId: string;
 };
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    workspace_list: {
+    'workspace.list': {
       input: WorkspaceListQueryInput;
       output: Workspace[];
     };

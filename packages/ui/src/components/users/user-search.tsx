@@ -22,8 +22,8 @@ export const UserSearch = ({ exclude, onSelect }: UserSearchProps) => {
   const workspace = useWorkspace();
 
   const [query, setQuery] = React.useState('');
-  const { data } = useQuery({
-    type: 'user_search',
+  const userSearchQuery = useQuery({
+    type: 'user.search',
     searchQuery: query,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
@@ -41,7 +41,7 @@ export const UserSearch = ({ exclude, onSelect }: UserSearchProps) => {
       <CommandEmpty>No user found.</CommandEmpty>
       <CommandList>
         <CommandGroup className="h-min">
-          {data?.map((user) => (
+          {userSearchQuery.data?.map((user) => (
             <CommandItem
               key={user.id}
               onSelect={() => {

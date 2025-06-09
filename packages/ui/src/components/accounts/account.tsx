@@ -17,28 +17,28 @@ export const Account = ({ account }: AccountProps) => {
   const [openLogout, setOpenLogout] = React.useState(false);
   const [openCreateWorkspace, setOpenCreateWorkspace] = React.useState(false);
 
-  const { data: metadata, isPending: isPendingMetadata } = useQuery({
-    type: 'account_metadata_list',
+  const accountMetadataListQuery = useQuery({
+    type: 'account.metadata.list',
     accountId: account.id,
   });
 
-  const { data: workspaces, isPending: isPendingWorkspaces } = useQuery({
-    type: 'workspace_list',
+  const workspaceListQuery = useQuery({
+    type: 'workspace.list',
     accountId: account.id,
   });
 
-  if (isPendingMetadata || isPendingWorkspaces) {
+  if (accountMetadataListQuery.isPending || workspaceListQuery.isPending) {
     return null;
   }
 
-  const workspaceMetadata = metadata?.find(
+  const workspaceMetadata = accountMetadataListQuery.data?.find(
     (metadata) => metadata.key === 'workspace'
   );
 
   const workspace =
-    workspaces?.find(
+    workspaceListQuery.data?.find(
       (workspace) => workspace.id === workspaceMetadata?.value
-    ) || workspaces?.[0];
+    ) || workspaceListQuery.data?.[0];
 
   const handleWorkspaceCreateSuccess = (id: string) => {
     setOpenCreateWorkspace(false);
@@ -51,7 +51,7 @@ export const Account = ({ account }: AccountProps) => {
   };
 
   const handleWorkspaceCreateCancel =
-    (workspaces?.length || 0) > 0
+    (workspaceListQuery.data?.length || 0) > 0
       ? () => setOpenCreateWorkspace(false)
       : undefined;
 

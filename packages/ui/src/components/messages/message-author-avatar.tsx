@@ -13,22 +13,23 @@ export const MessageAuthorAvatar = ({
   className,
 }: MessageAuthorAvatarProps) => {
   const workspace = useWorkspace();
-  const { data } = useQuery({
-    type: 'user_get',
+  const userGetQuery = useQuery({
+    type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     userId: message.createdBy,
   });
 
-  if (!data) {
+  if (userGetQuery.isPending || !userGetQuery.data) {
     return null;
   }
 
+  const user = userGetQuery.data;
   return (
     <Avatar
-      id={data.id}
-      name={data.name}
-      avatar={data.avatar}
+      id={user.id}
+      name={user.name}
+      avatar={user.avatar}
       size="medium"
       className={className}
     />

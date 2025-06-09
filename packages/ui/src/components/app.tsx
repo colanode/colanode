@@ -18,12 +18,12 @@ export const App = ({ type }: AppProps) => {
   const [initialized, setInitialized] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
 
-  const { data: metadata, isPending: isPendingMetadata } = useQuery({
-    type: 'app_metadata_list',
+  const appMetadataListQuery = useQuery({
+    type: 'app.metadata.list',
   });
 
-  const { data: accounts, isPending: isPendingAccounts } = useQuery({
-    type: 'account_list',
+  const accountListQuery = useQuery({
+    type: 'account.list',
   });
 
   useEffect(() => {
@@ -32,7 +32,11 @@ export const App = ({ type }: AppProps) => {
     });
   }, []);
 
-  if (!initialized || isPendingMetadata || isPendingAccounts) {
+  if (
+    !initialized ||
+    appMetadataListQuery.isPending ||
+    accountListQuery.isPending
+  ) {
     return (
       <DelayedComponent>
         <AppLoader />
@@ -40,20 +44,23 @@ export const App = ({ type }: AppProps) => {
     );
   }
 
-  const accountMetadata = metadata?.find(
+  const accountMetadata = appMetadataListQuery.data?.find(
     (metadata) => metadata.key === 'account'
   );
 
   const account =
-    accounts?.find((account) => account.id === accountMetadata?.value) ||
-    accounts?.[0];
+    accountListQuery.data?.find(
+      (account) => account.id === accountMetadata?.value
+    ) || accountListQuery.data?.[0];
 
   return (
     <AppContext.Provider
       value={{
         type,
         getMetadata: (key) => {
-          return metadata?.find((metadata) => metadata.key === key)?.value;
+          return appMetadataListQuery.data?.find(
+            (metadata) => metadata.key === key
+          )?.value;
         },
         setMetadata: (key, value) => {
           window.colanode.executeMutation({

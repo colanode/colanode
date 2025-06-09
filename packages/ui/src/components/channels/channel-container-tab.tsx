@@ -17,18 +17,18 @@ export const ChannelContainerTab = ({
   const workspace = useWorkspace();
   const radar = useRadar();
 
-  const { data, isPending } = useQuery({
-    type: 'node_get',
+  const nodeGetQuery = useQuery({
+    type: 'node.get',
     nodeId: channelId,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  if (isPending) {
+  if (nodeGetQuery.isPending) {
     return <p className="text-sm text-muted-foreground">Loading...</p>;
   }
 
-  const channel = data as LocalChannelNode;
+  const channel = nodeGetQuery.data as LocalChannelNode;
   if (!channel) {
     return <p className="text-sm text-muted-foreground">Not found</p>;
   }

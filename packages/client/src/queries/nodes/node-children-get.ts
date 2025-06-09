@@ -2,7 +2,7 @@ import { LocalNode } from '@colanode/client/types/nodes';
 import { NodeType } from '@colanode/core';
 
 export type NodeChildrenGetQueryInput = {
-  type: 'node_children_get';
+  type: 'node.children.get';
   nodeId: string;
   accountId: string;
   workspaceId: string;
@@ -11,7 +11,7 @@ export type NodeChildrenGetQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    node_children_get: {
+    'node.children.get': {
       input: NodeChildrenGetQueryInput;
       output: LocalNode[];
     };

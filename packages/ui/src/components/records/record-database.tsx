@@ -13,23 +13,24 @@ interface RecordDatabaseProps {
 export const RecordDatabase = ({ id, role, children }: RecordDatabaseProps) => {
   const workspace = useWorkspace();
 
-  const { data, isPending } = useQuery({
-    type: 'node_get',
+  const nodeGetQuery = useQuery({
+    type: 'node.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     nodeId: id,
   });
 
-  if (isPending) {
+  if (nodeGetQuery.isPending) {
     return null;
   }
 
-  if (!data) {
+  if (!nodeGetQuery.data) {
     return null;
   }
 
+  const database = nodeGetQuery.data as LocalDatabaseNode;
   return (
-    <Database database={data as LocalDatabaseNode} role={role}>
+    <Database database={database} role={role}>
       {children}
     </Database>
   );

@@ -11,17 +11,17 @@ interface RecordCreatedByValueProps {
 export const RecordCreatedByValue = ({ field }: RecordCreatedByValueProps) => {
   const workspace = useWorkspace();
   const record = useRecord();
-  const { data } = useQuery({
-    type: 'user_get',
+  const userGetQuery = useQuery({
+    type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     userId: record.createdBy,
   });
 
-  const createdBy = data
+  const createdBy = userGetQuery.data
     ? {
-        name: data.name,
-        avatar: data.avatar,
+        name: userGetQuery.data.name,
+        avatar: userGetQuery.data.avatar,
       }
     : {
         name: 'Unknown',

@@ -27,8 +27,8 @@ export const RecordSearch = ({
   const workspace = useWorkspace();
 
   const [query, setQuery] = React.useState('');
-  const { data } = useQuery({
-    type: 'record_search',
+  const recordSearchQuery = useQuery({
+    type: 'record.search',
     searchQuery: query,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
@@ -47,7 +47,7 @@ export const RecordSearch = ({
       <CommandEmpty>No record found.</CommandEmpty>
       <CommandList>
         <CommandGroup className="h-min">
-          {data?.map((record) => (
+          {recordSearchQuery.data?.map((record) => (
             <CommandItem
               key={record.id}
               onSelect={() => {

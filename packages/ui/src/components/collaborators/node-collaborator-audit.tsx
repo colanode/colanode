@@ -13,27 +13,29 @@ export const NodeCollaboratorAudit = ({
   date,
 }: NodeCollaboratorAuditProps) => {
   const workspace = useWorkspace();
-  const { data, isPending } = useQuery({
-    type: 'user_get',
+
+  const userGetQuery = useQuery({
+    type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     userId: collaboratorId,
   });
 
-  if (isPending || !data) {
+  if (userGetQuery.isPending || !userGetQuery.data) {
     return null;
   }
 
+  const user = userGetQuery.data;
   return (
     <div className="flex items-center gap-2 w-full">
       <Avatar
-        id={data.id}
-        name={data.name}
-        avatar={data.avatar}
+        id={user.id}
+        name={user.name}
+        avatar={user.avatar}
         className="size-7"
       />
       <div className="flex flex-col">
-        <span className="font-normal flex-grow">{data.name}</span>
+        <span className="font-normal flex-grow">{user.name}</span>
         <span className="text-xs text-muted-foreground">{timeAgo(date)}</span>
       </div>
     </div>

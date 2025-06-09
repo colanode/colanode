@@ -21,13 +21,13 @@ export function SidebarMenuFooter() {
   const app = useApp();
   const account = useAccount();
   const radar = useRadar();
-
   const [open, setOpen] = React.useState(false);
-  const { data } = useQuery({
-    type: 'account_list',
+
+  const accountListQuery = useQuery({
+    type: 'account.list',
   });
 
-  const accounts = data ?? [];
+  const accounts = accountListQuery.data ?? [];
   const otherAccounts = accounts.filter((a) => a.id !== account.id);
   const accountUnreadStates: Record<string, UnreadState> = {};
   for (const accountItem of otherAccounts) {

@@ -37,15 +37,15 @@ export const NodeCollaboratorSearch = ({
   const [query, setQuery] = React.useState('');
   const [open, setOpen] = React.useState(false);
 
-  const { data } = useQuery({
-    type: 'user_search',
+  const userSearchQuery = useQuery({
+    type: 'user.search',
     searchQuery: query,
     exclude: excluded,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  const users = data ?? [];
+  const users = userSearchQuery.data ?? [];
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>

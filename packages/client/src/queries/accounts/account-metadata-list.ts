@@ -1,13 +1,13 @@
 import { AccountMetadata } from '@colanode/client/types/accounts';
 
 export type AccountMetadataListQueryInput = {
-  type: 'account_metadata_list';
+  type: 'account.metadata.list';
   accountId: string;
 };
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    account_metadata_list: {
+    'account.metadata.list': {
       input: AccountMetadataListQueryInput;
       output: AccountMetadata[];
     };

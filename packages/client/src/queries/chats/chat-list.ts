@@ -1,7 +1,7 @@
 import { LocalChatNode } from '@colanode/client/types/nodes';
 
 export type ChatListQueryInput = {
-  type: 'chat_list';
+  type: 'chat.list';
   page: number;
   count: number;
   accountId: string;
@@ -10,7 +10,7 @@ export type ChatListQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    chat_list: {
+    'chat.list': {
       input: ChatListQueryInput;
       output: LocalChatNode[];
     };

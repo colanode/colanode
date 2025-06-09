@@ -25,18 +25,18 @@ export const useNodeContainer = <T extends LocalNode>(
 ): UseNodeContainerResult<T> => {
   const workspace = useWorkspace();
 
-  const { data, isPending } = useQuery({
-    type: 'node_tree_get',
+  const nodeTreeGetQuery = useQuery({
+    type: 'node.tree.get',
     nodeId: id,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  if (isPending) {
+  if (nodeTreeGetQuery.isPending) {
     return { isPending: true, node: null };
   }
 
-  const nodes = data ?? [];
+  const nodes = nodeTreeGetQuery.data ?? [];
   const node = nodes.find((node) => node.id === id);
 
   if (!node) {

@@ -20,7 +20,7 @@ export const MessageList = () => {
   const inputs: MessageListQueryInput[] = Array.from({
     length: lastPage,
   }).map((_, i) => ({
-    type: 'message_list',
+    type: 'message.list',
     conversationId: conversation.id,
     accountId: workspace.accountId,
     workspaceId: workspace.id,

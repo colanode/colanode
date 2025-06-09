@@ -19,13 +19,13 @@ export const Workspace = ({ workspace }: WorkspaceProps) => {
   const account = useAccount();
   const [openSettings, setOpenSettings] = React.useState(false);
 
-  const { data: metadata, isPending: isPendingMetadata } = useQuery({
-    type: 'workspace_metadata_list',
+  const workspaceMetadataListQuery = useQuery({
+    type: 'workspace.metadata.list',
     accountId: account.id,
     workspaceId: workspace.id,
   });
 
-  if (isPendingMetadata) {
+  if (workspaceMetadataListQuery.isPending) {
     return null;
   }
 
@@ -37,7 +37,9 @@ export const Workspace = ({ workspace }: WorkspaceProps) => {
           setOpenSettings(true);
         },
         getMetadata<K extends WorkspaceMetadataKey>(key: K) {
-          const value = metadata?.find((m) => m.key === key);
+          const value = workspaceMetadataListQuery.data?.find(
+            (m) => m.key === key
+          );
           if (!value) {
             return undefined;
           }

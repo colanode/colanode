@@ -9,15 +9,15 @@ export const SidebarChats = () => {
   const workspace = useWorkspace();
   const layout = useLayout();
 
-  const { data } = useQuery({
-    type: 'chat_list',
+  const chatListQuery = useQuery({
+    type: 'chat.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     page: 0,
     count: 100,
   });
 
-  const chats = data ?? [];
+  const chats = chatListQuery.data ?? [];
 
   return (
     <div className="flex flex-col group/sidebar-chats h-full px-2">

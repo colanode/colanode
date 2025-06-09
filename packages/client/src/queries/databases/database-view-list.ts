@@ -1,7 +1,7 @@
 import { LocalDatabaseViewNode } from '@colanode/client/types/nodes';
 
 export type DatabaseViewListQueryInput = {
-  type: 'database_view_list';
+  type: 'database.view.list';
   accountId: string;
   workspaceId: string;
   databaseId: string;
@@ -9,7 +9,7 @@ export type DatabaseViewListQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    database_view_list: {
+    'database.view.list': {
       input: DatabaseViewListQueryInput;
       output: LocalDatabaseViewNode[];
     };

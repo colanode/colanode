@@ -14,21 +14,21 @@ export const MentionRenderer = ({ node }: MentionRendererProps) => {
   const workspace = useWorkspace();
 
   const target = node.attrs?.target;
-  const { data } = useQuery({
-    type: 'user_get',
+  const userGetQuery = useQuery({
+    type: 'user.get',
     userId: target,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  const name = data?.name ?? 'Unknown';
+  const name = userGetQuery.data?.name ?? 'Unknown';
   return (
     <span className={defaultClasses.mention}>
       <Avatar
         size="small"
         id={target ?? '?'}
         name={name}
-        avatar={data?.avatar}
+        avatar={userGetQuery.data?.avatar}
       />
       <span role="presentation">{name}</span>
     </span>

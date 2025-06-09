@@ -6,11 +6,11 @@ interface RadarProviderProps {
 }
 
 export const RadarProvider = ({ children }: RadarProviderProps) => {
-  const { data } = useQuery({
-    type: 'radar_data_get',
+  const radarDataQuery = useQuery({
+    type: 'radar.data.get',
   });
 
-  const radarData = data ?? {};
+  const radarData = radarDataQuery.data ?? {};
   return (
     <RadarContext.Provider
       value={{

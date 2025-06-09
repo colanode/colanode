@@ -5,7 +5,7 @@ import {
 } from '@colanode/core';
 
 export type RecordListQueryInput = {
-  type: 'record_list';
+  type: 'record.list';
   databaseId: string;
   filters: DatabaseViewFilterAttributes[];
   sorts: DatabaseViewSortAttributes[];
@@ -17,7 +17,7 @@ export type RecordListQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    record_list: {
+    'record.list': {
       input: RecordListQueryInput;
       output: LocalRecordNode[];
     };

@@ -8,8 +8,8 @@ export const SidebarSpaces = () => {
   const canCreateSpace =
     workspace.role !== 'guest' && workspace.role !== 'none';
 
-  const { data } = useQuery({
-    type: 'space_list',
+  const spaceListQuery = useQuery({
+    type: 'space.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     parentId: workspace.id,
@@ -17,7 +17,7 @@ export const SidebarSpaces = () => {
     count: 100,
   });
 
-  const spaces = data ?? [];
+  const spaces = spaceListQuery.data ?? [];
 
   return (
     <div className="flex flex-col group/sidebar-spaces h-full px-2">

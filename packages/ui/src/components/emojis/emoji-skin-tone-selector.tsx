@@ -20,8 +20,8 @@ export const EmojiSkinToneSelector = ({
 }: EmojiSkinToneSelectorProps) => {
   const [open, setOpen] = React.useState<boolean>(false);
 
-  const { data } = useQuery({
-    type: 'emoji_get',
+  const emojiGetQuery = useQuery({
+    type: 'emoji.get',
     id: defaultEmojis.hand,
   });
 
@@ -30,10 +30,11 @@ export const EmojiSkinToneSelector = ({
     onSkinToneChange?.(skinTone);
   };
 
-  if (!data) {
+  if (emojiGetQuery.isPending || !emojiGetQuery.data) {
     return null;
   }
 
+  const emoji = emojiGetQuery.data;
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
@@ -43,13 +44,13 @@ export const EmojiSkinToneSelector = ({
           }`}
         >
           <EmojiElement
-            id={data.skins[skinTone || 0]?.id ?? ''}
+            id={emoji.skins[skinTone || 0]?.id ?? ''}
             className="h-full w-full"
           />
         </button>
       </PopoverTrigger>
       <PopoverContent className="p-2 w-50">
-        {data.skins.map((skin, idx) => (
+        {emoji.skins.map((skin, idx) => (
           <button
             key={`skin-selector-${skin}`}
             className={`h-6 w-6 p-1 hover:bg-gray-100 ${

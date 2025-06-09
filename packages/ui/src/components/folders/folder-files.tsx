@@ -31,7 +31,7 @@ export const FolderFiles = ({
   const inputs: FileListQueryInput[] = Array.from({
     length: lastPage,
   }).map((_, i) => ({
-    type: 'file_list',
+    type: 'file.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     parentId: id,

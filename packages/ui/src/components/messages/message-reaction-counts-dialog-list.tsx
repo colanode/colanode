@@ -24,7 +24,7 @@ export const MessageReactionCountsDialogList = ({
   const inputs: NodeReactionListQueryInput[] = Array.from({
     length: lastPage,
   }).map((_, i) => ({
-    type: 'node_reaction_list',
+    type: 'node.reaction.list',
     nodeId: message.id,
     reaction: reactionCount.reaction,
     accountId: workspace.accountId,
@@ -43,7 +43,7 @@ export const MessageReactionCountsDialogList = ({
 
   const results = useQueries(
     userIds.map((userId) => ({
-      type: 'user_get',
+      type: 'user.get',
       accountId: workspace.accountId,
       workspaceId: workspace.id,
       userId,

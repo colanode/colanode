@@ -1,12 +1,12 @@
 import { AppMetadata } from '@colanode/client/types/apps';
 
 export type AppMetadataListQueryInput = {
-  type: 'app_metadata_list';
+  type: 'app.metadata.list';
 };
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    app_metadata_list: {
+    'app.metadata.list': {
       input: AppMetadataListQueryInput;
       output: AppMetadata[];
     };

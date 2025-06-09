@@ -1,7 +1,7 @@
 import { NodeReaction } from '@colanode/client/types/nodes';
 
 export type NodeReactionListQueryInput = {
-  type: 'node_reaction_list';
+  type: 'node.reaction.list';
   nodeId: string;
   reaction: string;
   accountId: string;
@@ -12,7 +12,7 @@ export type NodeReactionListQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    node_reaction_list: {
+    'node.reaction.list': {
       input: NodeReactionListQueryInput;
       output: NodeReaction[];
     };

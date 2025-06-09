@@ -12,18 +12,18 @@ export const FileBlock = ({ id }: FileBlockProps) => {
   const workspace = useWorkspace();
   const layout = useLayout();
 
-  const { data } = useQuery({
-    type: 'node_get',
+  const nodeGetQuery = useQuery({
+    type: 'node.get',
     nodeId: id,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  if (!data) {
+  if (nodeGetQuery.isPending || !nodeGetQuery.data) {
     return null;
   }
 
-  const file = data as LocalFileNode;
+  const file = nodeGetQuery.data as LocalFileNode;
 
   return (
     <div

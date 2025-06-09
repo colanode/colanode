@@ -10,18 +10,18 @@ interface PageContainerTabProps {
 export const PageContainerTab = ({ pageId }: PageContainerTabProps) => {
   const workspace = useWorkspace();
 
-  const { data, isPending } = useQuery({
-    type: 'node_get',
+  const nodeGetQuery = useQuery({
+    type: 'node.get',
     nodeId: pageId,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  if (isPending) {
+  if (nodeGetQuery.isPending) {
     return <p className="text-sm text-muted-foreground">Loading...</p>;
   }
 
-  const page = data as LocalPageNode;
+  const page = nodeGetQuery.data as LocalPageNode;
   if (!page) {
     return <p className="text-sm text-muted-foreground">Not found</p>;
   }

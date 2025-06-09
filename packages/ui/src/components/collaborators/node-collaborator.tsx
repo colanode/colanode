@@ -26,24 +26,25 @@ export const NodeCollaborator = ({
   const workspace = useWorkspace();
   const { mutate } = useMutation();
 
-  const { data } = useQuery({
-    type: 'user_get',
+  const userGetQuery = useQuery({
+    type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     userId: collaboratorId,
   });
 
-  if (!data) {
+  if (userGetQuery.isPending || !userGetQuery.data) {
     return null;
   }
 
+  const user = userGetQuery.data;
   return (
     <div className="flex items-center justify-between space-x-3">
       <div className="flex items-center space-x-3">
-        <Avatar id={data.id} name={data.name} avatar={data.avatar} />
+        <Avatar id={user.id} name={user.name} avatar={user.avatar} />
         <div className="flex-grow">
-          <p className="text-sm font-medium leading-none">{data.name}</p>
-          <p className="text-sm text-muted-foreground">{data.email}</p>
+          <p className="text-sm font-medium leading-none">{user.name}</p>
+          <p className="text-sm text-muted-foreground">{user.email}</p>
         </div>
       </div>
       <div className="flex flex-row items-center gap-1">

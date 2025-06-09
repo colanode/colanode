@@ -12,31 +12,31 @@ interface FileThumbnailProps {
 export const FileThumbnail = ({ file, className }: FileThumbnailProps) => {
   const workspace = useWorkspace();
 
-  const { data } = useQuery({
-    type: 'file_state_get',
+  const fileStateGetQuery = useQuery({
+    type: 'file.state.get',
     id: file.id,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  const { data: urlData } = useQuery(
+  const fileUrlGetQuery = useQuery(
     {
-      type: 'file_url_get',
+      type: 'file.url.get',
       id: file.id,
       extension: file.attributes.extension,
       accountId: workspace.accountId,
       workspaceId: workspace.id,
     },
     {
-      enabled: data?.downloadProgress === 100,
+      enabled: fileStateGetQuery.data?.downloadProgress === 100,
     }
   );
 
-  const url = urlData?.url;
+  const url = fileUrlGetQuery.data?.url;
 
   if (
     file.attributes.subtype === 'image' &&
-    data?.downloadProgress === 100 &&
+    fileStateGetQuery.data?.downloadProgress === 100 &&
     url
   ) {
     return (

@@ -1,7 +1,7 @@
 import { DocumentUpdate } from '@colanode/client/types/documents';
 
 export type DocumentUpdatesListQueryInput = {
-  type: 'document_updates_list';
+  type: 'document.updates.list';
   documentId: string;
   accountId: string;
   workspaceId: string;
@@ -9,7 +9,7 @@ export type DocumentUpdatesListQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    document_updates_list: {
+    'document.updates.list': {
       input: DocumentUpdatesListQueryInput;
       output: DocumentUpdate[];
     };

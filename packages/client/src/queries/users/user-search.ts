@@ -1,7 +1,7 @@
 import { User } from '@colanode/client/types/users';
 
 export type UserSearchQueryInput = {
-  type: 'user_search';
+  type: 'user.search';
   searchQuery: string;
   accountId: string;
   workspaceId: string;
@@ -10,7 +10,7 @@ export type UserSearchQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    user_search: {
+    'user.search': {
       input: UserSearchQueryInput;
       output: User[];
     };

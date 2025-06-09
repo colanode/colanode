@@ -12,7 +12,7 @@ export const AvatarImage = ({ avatar, size, className }: AvatarProps) => {
 
   const { data, isPending } = useQuery(
     {
-      type: 'avatar_url_get',
+      type: 'avatar.url.get',
       accountId: account.id,
       avatarId: avatar!,
     },

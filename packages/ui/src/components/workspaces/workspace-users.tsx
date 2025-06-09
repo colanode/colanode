@@ -21,7 +21,7 @@ export const WorkspaceUsers = () => {
   const inputs: UserListQueryInput[] = Array.from({
     length: lastPage,
   }).map((_, i) => ({
-    type: 'user_list',
+    type: 'user.list',
     page: i + 1,
     count: USERS_PER_PAGE,
     accountId: workspace.accountId,

@@ -1,7 +1,7 @@
 import { Emoji } from '@colanode/client/types/emojis';
 
 export type EmojiListQueryInput = {
-  type: 'emoji_list';
+  type: 'emoji.list';
   category: string;
   page: number;
   count: number;
@@ -9,7 +9,7 @@ export type EmojiListQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    emoji_list: {
+    'emoji.list': {
       input: EmojiListQueryInput;
       output: Emoji[];
     };

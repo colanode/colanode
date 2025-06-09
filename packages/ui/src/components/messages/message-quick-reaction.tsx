@@ -10,12 +10,12 @@ export const MessageQuickReaction = ({
   emoji,
   onClick,
 }: MessageQuickReactionProps) => {
-  const { data } = useQuery({
-    type: 'emoji_get',
+  const emojiGetQuery = useQuery({
+    type: 'emoji.get',
     id: emoji,
   });
 
-  const skinId = data?.skins[0]?.id;
+  const skinId = emojiGetQuery.data?.skins[0]?.id;
   if (!skinId) {
     return null;
   }

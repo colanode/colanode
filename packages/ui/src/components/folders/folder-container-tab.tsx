@@ -10,18 +10,18 @@ interface FolderContainerTabProps {
 export const FolderContainerTab = ({ folderId }: FolderContainerTabProps) => {
   const workspace = useWorkspace();
 
-  const { data, isPending } = useQuery({
-    type: 'node_get',
+  const nodeGetQuery = useQuery({
+    type: 'node.get',
     nodeId: folderId,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  if (isPending) {
+  if (nodeGetQuery.isPending) {
     return <p className="text-sm text-muted-foreground">Loading...</p>;
   }
 
-  const folder = data as LocalFolderNode;
+  const folder = nodeGetQuery.data as LocalFolderNode;
   if (!folder) {
     return <p className="text-sm text-muted-foreground">Not found</p>;
   }

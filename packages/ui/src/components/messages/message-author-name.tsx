@@ -13,16 +13,18 @@ export const MessageAuthorName = ({
   className,
 }: MessageAuthorNameProps) => {
   const workspace = useWorkspace();
-  const { data } = useQuery({
-    type: 'user_get',
+
+  const userGetQuery = useQuery({
+    type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     userId: message.createdBy,
   });
 
-  if (!data) {
+  if (userGetQuery.isPending || !userGetQuery.data) {
     return null;
   }
 
-  return <span className={cn('font-medium', className)}>{data.name}</span>;
+  const user = userGetQuery.data;
+  return <span className={cn('font-medium', className)}>{user.name}</span>;
 };

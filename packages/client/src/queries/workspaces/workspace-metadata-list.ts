@@ -1,14 +1,14 @@
 import { WorkspaceMetadata } from '@colanode/client/types/workspaces';
 
 export type WorkspaceMetadataListQueryInput = {
-  type: 'workspace_metadata_list';
+  type: 'workspace.metadata.list';
   accountId: string;
   workspaceId: string;
 };
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    workspace_metadata_list: {
+    'workspace.metadata.list': {
       input: WorkspaceMetadataListQueryInput;
       output: WorkspaceMetadata[];
     };

@@ -10,14 +10,18 @@ interface RecordContainerTabProps {
 export const RecordContainerTab = ({ recordId }: RecordContainerTabProps) => {
   const workspace = useWorkspace();
 
-  const { data: node } = useQuery({
-    type: 'node_get',
+  const nodeGetQuery = useQuery({
+    type: 'node.get',
     nodeId: recordId,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  const record = node as LocalRecordNode;
+  if (nodeGetQuery.isPending) {
+    return <p className="text-sm text-muted-foreground">Loading...</p>;
+  }
+
+  const record = nodeGetQuery.data as LocalRecordNode;
   if (!record) {
     return <p>Not found</p>;
   }

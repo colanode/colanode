@@ -15,33 +15,33 @@ interface FilePreviewProps {
 export const FilePreview = ({ file }: FilePreviewProps) => {
   const workspace = useWorkspace();
 
-  const { data, isPending } = useQuery({
-    type: 'file_state_get',
+  const fileStateQuery = useQuery({
+    type: 'file.state.get',
     id: file.id,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  const { data: urlData } = useQuery(
+  const fileUrlGetQuery = useQuery(
     {
-      type: 'file_url_get',
+      type: 'file.url.get',
       id: file.id,
       extension: file.attributes.extension,
       accountId: workspace.accountId,
       workspaceId: workspace.id,
     },
     {
-      enabled: data?.downloadProgress === 100,
+      enabled: fileStateQuery.data?.downloadProgress === 100,
     }
   );
 
-  if (isPending) {
+  if (fileStateQuery.isPending || fileUrlGetQuery.isPending) {
     return null;
   }
 
-  const url = urlData?.url;
-  if (data?.downloadProgress !== 100 || !url) {
-    return <FileDownload file={file} state={data} />;
+  const url = fileUrlGetQuery.data?.url;
+  if (fileStateQuery.data?.downloadProgress !== 100 || !url) {
+    return <FileDownload file={file} state={fileStateQuery.data} />;
   }
 
   return match(file.attributes.subtype)

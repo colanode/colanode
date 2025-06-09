@@ -1,12 +1,12 @@
 import { EmojiCategory } from '@colanode/client/types/emojis';
 
 export type EmojiCategoryListQueryInput = {
-  type: 'emoji_category_list';
+  type: 'emoji.category.list';
 };
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    emoji_category_list: {
+    'emoji.category.list': {
       input: EmojiCategoryListQueryInput;
       output: EmojiCategory[];
     };

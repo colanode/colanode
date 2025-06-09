@@ -1,7 +1,7 @@
 import { Icon } from '@colanode/client/types/icons';
 
 export type IconListQueryInput = {
-  type: 'icon_list';
+  type: 'icon.list';
   category: string;
   page: number;
   count: number;
@@ -9,7 +9,7 @@ export type IconListQueryInput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    icon_list: {
+    'icon.list': {
       input: IconListQueryInput;
       output: Icon[];
     };

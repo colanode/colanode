@@ -1,13 +1,13 @@
 import { Emoji } from '@colanode/client/types/emojis';
 
 export type EmojiGetBySkinIdQueryInput = {
-  type: 'emoji_get_by_skin_id';
+  type: 'emoji.get.by.skin.id';
   id: string;
 };
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    emoji_get_by_skin_id: {
+    'emoji.get.by.skin.id': {
       input: EmojiGetBySkinIdQueryInput;
       output: Emoji | null;
     };

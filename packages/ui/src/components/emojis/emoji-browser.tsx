@@ -9,11 +9,11 @@ import { useQuery } from '@colanode/ui/hooks/use-query';
 const EMOJIS_PER_ROW = 10;
 
 export const EmojiBrowser = () => {
-  const { data } = useQuery({
-    type: 'emoji_category_list',
+  const emojiCategoryListQuery = useQuery({
+    type: 'emoji.category.list',
   });
 
-  const categories = data ?? [];
+  const categories = emojiCategoryListQuery.data ?? [];
   const rowDataArray = React.useMemo<EmojiPickerRowData[]>(() => {
     const rows: EmojiPickerRowData[] = [];
 

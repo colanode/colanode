@@ -1,5 +1,5 @@
 export type FileUrlGetQueryInput = {
-  type: 'file_url_get';
+  type: 'file.url.get';
   id: string;
   extension: string;
   accountId: string;
@@ -12,7 +12,7 @@ export type FileUrlGetQueryOutput = {
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    file_url_get: {
+    'file.url.get': {
       input: FileUrlGetQueryInput;
       output: FileUrlGetQueryOutput;
     };

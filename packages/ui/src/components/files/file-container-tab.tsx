@@ -10,18 +10,18 @@ interface FileContainerTabProps {
 export const FileContainerTab = ({ fileId }: FileContainerTabProps) => {
   const workspace = useWorkspace();
 
-  const { data, isPending } = useQuery({
-    type: 'node_get',
+  const nodeGetQuery = useQuery({
+    type: 'node.get',
     nodeId: fileId,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  if (isPending) {
+  if (nodeGetQuery.isPending) {
     return <p className="text-sm text-muted-foreground">Loading...</p>;
   }
 
-  const file = data as LocalFileNode;
+  const file = nodeGetQuery.data as LocalFileNode;
   if (!file) {
     return <p className="text-sm text-muted-foreground">Not found</p>;
   }

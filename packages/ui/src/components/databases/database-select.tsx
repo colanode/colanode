@@ -28,13 +28,14 @@ interface DatabaseSelectProps {
 export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
   const workspace = useWorkspace();
   const [open, setOpen] = React.useState(false);
-  const { data } = useQuery({
-    type: 'database_list',
+
+  const databaseListQuery = useQuery({
+    type: 'database.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  const databases = data ?? [];
+  const databases = databaseListQuery.data ?? [];
   const selectedDatabase = id
     ? databases.find((database) => database.id === id)
     : undefined;

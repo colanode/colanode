@@ -1,14 +1,14 @@
 import { Emoji } from '@colanode/client/types/emojis';
 
 export type EmojiSearchQueryInput = {
-  type: 'emoji_search';
+  type: 'emoji.search';
   query: string;
   count: number;
 };
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    emoji_search: {
+    'emoji.search': {
       input: EmojiSearchQueryInput;
       output: Emoji[];
     };

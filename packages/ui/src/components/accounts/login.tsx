@@ -2,15 +2,15 @@ import { LoginForm } from '@colanode/ui/components/accounts/login-form';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 
 export const Login = () => {
-  const { data: accounts, isPending: isPendingAccounts } = useQuery({
-    type: 'account_list',
+  const accountListQuery = useQuery({
+    type: 'account.list',
   });
 
-  const { data: servers, isPending: isPendingServers } = useQuery({
-    type: 'server_list',
+  const serverListQuery = useQuery({
+    type: 'server.list',
   });
 
-  if (isPendingAccounts || isPendingServers) {
+  if (accountListQuery.isPending || serverListQuery.isPending) {
     return null;
   }
 
@@ -29,7 +29,10 @@ export const Login = () => {
               Use one of the following methods to login
             </p>
           </div>
-          <LoginForm accounts={accounts ?? []} servers={servers ?? []} />
+          <LoginForm
+            accounts={accountListQuery.data ?? []}
+            servers={serverListQuery.data ?? []}
+          />
         </div>
       </div>
     </div>

@@ -11,13 +11,15 @@ interface ServerProviderProps {
 }
 
 export const ServerProvider = ({ domain, children }: ServerProviderProps) => {
-  const { data, isPending } = useQuery({
-    type: 'server_list',
+  const serverListQuery = useQuery({
+    type: 'server.list',
   });
 
-  const server = data?.find((server) => server.domain === domain);
+  const server = serverListQuery.data?.find(
+    (server) => server.domain === domain
+  );
 
-  if (isPending) {
+  if (serverListQuery.isPending) {
     return null;
   }
 

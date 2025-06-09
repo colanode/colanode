@@ -22,12 +22,12 @@ export const SidebarMenuHeader = () => {
   const radar = useRadar();
 
   const [open, setOpen] = React.useState(false);
-  const { data } = useQuery({
-    type: 'workspace_list',
+  const workspaceListQuery = useQuery({
+    type: 'workspace.list',
     accountId: account.id,
   });
 
-  const workspaces = data ?? [];
+  const workspaces = workspaceListQuery.data ?? [];
   const otherWorkspaces = workspaces.filter((w) => w.id !== workspace.id);
   const otherWorkspaceStates = otherWorkspaces.map((w) =>
     radar.getWorkspaceState(w.accountId, w.id)

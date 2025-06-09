@@ -23,17 +23,18 @@ export const ChatSidebarItem = ({ chat }: ChatSidebarItemProps) => {
       (id) => id !== workspace.userId
     ) ?? '';
 
-  const { data, isPending } = useQuery({
-    type: 'user_get',
+  const userGetQuery = useQuery({
+    type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     userId,
   });
 
-  if (isPending || !data) {
+  if (userGetQuery.isPending || !userGetQuery.data) {
     return null;
   }
 
+  const user = userGetQuery.data;
   const unreadState = radar.getNodeState(
     workspace.accountId,
     workspace.id,
@@ -55,9 +56,9 @@ export const ChatSidebarItem = ({ chat }: ChatSidebarItemProps) => {
       )}
     >
       <Avatar
-        id={data.id}
-        avatar={data.avatar}
-        name={data.name}
+        id={user.id}
+        avatar={user.avatar}
+        name={user.name}
         className="h-5 w-5"
       />
       <span
@@ -66,7 +67,7 @@ export const ChatSidebarItem = ({ chat }: ChatSidebarItemProps) => {
           !isActive && unreadState.hasUnread && 'font-semibold'
         )}
       >
-        {data.name ?? 'Unnamed'}
+        {user.name ?? 'Unnamed'}
       </span>
       {!isActive && (
         <UnreadBadge

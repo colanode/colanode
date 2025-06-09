@@ -1,6 +1,7 @@
 import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewWrapper } from '@tiptap/react';
 
+import { LocalDatabaseNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -11,8 +12,8 @@ export const DatabaseNodeView = ({ node }: NodeViewProps) => {
   const layout = useLayout();
 
   const id = node.attrs.id;
-  const { data } = useQuery({
-    type: 'node_get',
+  const nodeGetQuery = useQuery({
+    type: 'node.get',
     nodeId: id,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
@@ -22,12 +23,17 @@ export const DatabaseNodeView = ({ node }: NodeViewProps) => {
     return null;
   }
 
-  if (data?.attributes.type !== 'database') {
+  if (nodeGetQuery.isPending) {
     return null;
   }
 
-  const name = data.attributes.name ?? 'Unnamed';
-  const avatar = data?.attributes.avatar;
+  const database = nodeGetQuery.data as LocalDatabaseNode;
+  if (!database) {
+    return null;
+  }
+
+  const name = database.attributes.name ?? 'Unnamed';
+  const avatar = database.attributes.avatar;
 
   return (
     <NodeViewWrapper

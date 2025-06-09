@@ -1,3 +1,4 @@
+import { LocalChatNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useRadar } from '@colanode/ui/contexts/radar';
@@ -16,28 +17,30 @@ export const ChatContainerTab = ({
   const workspace = useWorkspace();
   const radar = useRadar();
 
-  const { data: chat, isPending: isChatPending } = useQuery({
-    type: 'node_get',
+  const nodeGetQuery = useQuery({
+    type: 'node.get',
     nodeId: chatId,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
   });
 
-  const userId =
-    chat && chat.type === 'chat'
-      ? (Object.keys(chat.attributes.collaborators).find(
-          (id) => id !== workspace.userId
-        ) ?? '')
-      : '';
+  const chat = nodeGetQuery.data as LocalChatNode;
+  const userId = chat
+    ? (Object.keys(chat.attributes.collaborators).find(
+        (id) => id !== workspace.userId
+      ) ?? '')
+    : '';
 
-  const { data: user, isPending: isUserPending } = useQuery({
-    type: 'user_get',
+  const userGetQuery = useQuery({
+    type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     userId,
   });
 
-  if (isChatPending || isUserPending) {
+  const user = userGetQuery.data;
+
+  if (nodeGetQuery.isPending || userGetQuery.isPending) {
     return <p className="text-sm text-muted-foreground">Loading...</p>;
   }
 

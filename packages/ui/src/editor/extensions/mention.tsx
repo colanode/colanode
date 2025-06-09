@@ -282,7 +282,7 @@ export const MentionExtension = Node.create<MentionOptions>({
             const { accountId, workspaceId } = this.options.context;
             window.colanode
               .executeQuery({
-                type: 'user_search',
+                type: 'user.search',
                 accountId,
                 workspaceId,
                 searchQuery: query,

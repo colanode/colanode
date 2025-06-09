@@ -24,7 +24,7 @@ export const useRecordsQuery = (
   const inputs: RecordListQueryInput[] = Array.from({
     length: lastPage,
   }).map((_, i) => ({
-    type: 'record_list',
+    type: 'record.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     databaseId: database.id,

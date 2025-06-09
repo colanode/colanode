@@ -6,13 +6,13 @@ interface IconSearchProps {
 }
 
 export const IconSearch = ({ query }: IconSearchProps) => {
-  const { data } = useQuery({
-    type: 'icon_search',
+  const iconSearchQuery = useQuery({
+    type: 'icon.search',
     query,
     count: 100,
   });
 
-  const icons = data ?? [];
+  const icons = iconSearchQuery.data ?? [];
 
   return (
     <div className="grid w-full min-w-full grid-cols-10 gap-1">

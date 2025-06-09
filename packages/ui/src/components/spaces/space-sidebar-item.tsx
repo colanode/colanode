@@ -44,15 +44,17 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const workspace = useWorkspace();
   const layout = useLayout();
 
-  const { data } = useQuery({
-    type: 'node_children_get',
+  const nodeChildrenGetQuery = useQuery({
+    type: 'node.children.get',
     nodeId: space.id,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     types: ['page', 'channel', 'database', 'folder'],
   });
 
-  const children = (data ?? []).toSorted((a, b) => compareString(a.id, b.id));
+  const children =
+    nodeChildrenGetQuery.data?.toSorted((a, b) => compareString(a.id, b.id)) ??
+    [];
 
   const [openCreatePage, setOpenCreatePage] = React.useState(false);
   const [openCreateChannel, setOpenCreateChannel] = React.useState(false);

@@ -17,26 +17,26 @@ export const ChatBreadcrumbItem = ({ chat }: ChatBreadcrumbItemProps) => {
         ) ?? '')
       : '';
 
-  const { data: user } = useQuery({
-    type: 'user_get',
+  const userGetQuery = useQuery({
+    type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     userId,
   });
 
-  if (!user) {
+  if (userGetQuery.isPending || !userGetQuery.data) {
     return null;
   }
 
   return (
     <div className="flex items-center space-x-2">
       <Avatar
-        id={user.id}
-        name={user.name}
-        avatar={user.avatar}
+        id={userGetQuery.data.id}
+        name={userGetQuery.data.name}
+        avatar={userGetQuery.data.avatar}
         className="size-4"
       />
-      <span>{user.name}</span>
+      <span>{userGetQuery.data.name}</span>
     </div>
   );
 };
