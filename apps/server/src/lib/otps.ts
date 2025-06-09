@@ -39,7 +39,7 @@ export const getOtpRedisKey = (id: string): string => {
   return `otp:${id}`;
 };
 
-export const generateOtpCode = async (): Promise<string> => {
+export const generateOtpCode = (): string => {
   let otp = '';
 
   for (let i = 0; i < OTP_LENGTH; i++) {

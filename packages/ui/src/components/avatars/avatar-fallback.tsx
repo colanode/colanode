@@ -3,6 +3,7 @@ import {
   getColorForId,
   getDefaultNodeAvatar,
   getAvatarSizeClasses,
+  AvatarSize,
 } from '@colanode/ui/lib/avatars';
 import { cn } from '@colanode/ui/lib/utils';
 
@@ -11,7 +12,7 @@ import { Avatar } from './avatar';
 interface AvatarFallbackProps {
   id: string;
   name?: string | null;
-  size?: 'small' | 'medium' | 'large' | 'extra-large';
+  size?: AvatarSize;
   className?: string;
 }
 
