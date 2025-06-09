@@ -157,6 +157,7 @@ apps/desktop/assets/icons.db
 apps/desktop/assets/emojis.svg
 apps/desktop/assets/icons.svg
 apps/desktop/assets/fonts/neotrax.otf
+apps/desktop/assets/colanode-logo-black.png
 
 # Ignore web assets
 apps/web/public/assets/emojis.db

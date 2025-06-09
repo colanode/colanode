@@ -2,13 +2,17 @@ import fs from 'fs';
 import path from 'path';
 
 const ASSETS_DIR = path.resolve('assets');
-const EMOJIS_DB_PATH = path.resolve(ASSETS_DIR, 'emojis.db');
-const EMOJIS_MIN_DB_PATH = path.resolve(ASSETS_DIR, 'emojis.min.db');
-const EMOJI_SVG_PATH = path.resolve(ASSETS_DIR, 'emojis.svg');
+const IMAGES_DIR = path.resolve(ASSETS_DIR, 'images');
 
-const ICONS_DB_PATH = path.resolve(ASSETS_DIR, 'icons.db');
-const ICONS_MIN_DB_PATH = path.resolve(ASSETS_DIR, 'icons.min.db');
-const ICONS_SVG_PATH = path.resolve(ASSETS_DIR, 'icons.svg');
+const EMOJIS_DIR = path.resolve(ASSETS_DIR, 'emojis');
+const EMOJIS_DB_PATH = path.resolve(EMOJIS_DIR, 'emojis.db');
+const EMOJIS_MIN_DB_PATH = path.resolve(EMOJIS_DIR, 'emojis.min.db');
+const EMOJI_SVG_PATH = path.resolve(EMOJIS_DIR, 'emojis.svg');
+
+const ICONS_DIR = path.resolve(ASSETS_DIR, 'icons');
+const ICONS_DB_PATH = path.resolve(ICONS_DIR, 'icons.db');
+const ICONS_MIN_DB_PATH = path.resolve(ICONS_DIR, 'icons.min.db');
+const ICONS_SVG_PATH = path.resolve(ICONS_DIR, 'icons.svg');
 
 const NEOTRAX_FONT_NAME = 'neotrax.otf';
 const FONTS_DIR = path.resolve(ASSETS_DIR, 'fonts');
@@ -57,13 +61,18 @@ const execute = () => {
   ]);
 
   copyFile(
-    path.resolve(ASSETS_DIR, 'colanode-logo-black-192.png'),
+    path.resolve(IMAGES_DIR, 'colanode-logo-black-192.png'),
     path.resolve(WEB_ASSETS_DIR, 'colanode-logo-black-192.png')
   );
 
   copyFile(
-    path.resolve(ASSETS_DIR, 'colanode-logo-black-512.png'),
+    path.resolve(IMAGES_DIR, 'colanode-logo-black-512.png'),
     path.resolve(WEB_ASSETS_DIR, 'colanode-logo-black-512.png')
+  );
+
+  copyFile(
+    path.resolve(IMAGES_DIR, 'colanode-logo-black.png'),
+    path.resolve(DESKTOP_ASSETS_DIR, 'colanode-logo-black.png')
   );
 };
 

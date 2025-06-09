@@ -71,9 +71,11 @@ const GITHUB_DOMAIN = 'https://github.com';
 const WORK_DIR_PATH = path.resolve('src', 'emojis', 'temp');
 
 const ASSETS_DIR_PATH = path.resolve('..', 'assets');
-const DATABASE_PATH = path.resolve(ASSETS_DIR_PATH, 'emojis.db');
-const MIN_DATABASE_PATH = path.resolve(ASSETS_DIR_PATH, 'emojis.min.db');
-const SPRITE_PATH = path.resolve(ASSETS_DIR_PATH, 'emojis.svg');
+const EMOJIS_DIR_PATH = path.resolve(ASSETS_DIR_PATH, 'emojis');
+
+const DATABASE_PATH = path.resolve(EMOJIS_DIR_PATH, 'emojis.db');
+const MIN_DATABASE_PATH = path.resolve(EMOJIS_DIR_PATH, 'emojis.min.db');
+const SPRITE_PATH = path.resolve(EMOJIS_DIR_PATH, 'emojis.svg');
 
 const EMOJI_MART_REPO = 'missive/emoji-mart';
 const EMOJI_MART_TAG = '5.6.0';
