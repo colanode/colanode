@@ -56,7 +56,7 @@ export class AvatarUrlGetQueryHandler
     input: AvatarUrlGetQueryInput
   ): Promise<ChangeCheckResult<AvatarUrlGetQueryInput>> {
     if (
-      event.type === 'avatar_downloaded' &&
+      event.type === 'avatar.downloaded' &&
       event.accountId === input.accountId &&
       event.avatarId === input.avatarId
     ) {

@@ -67,7 +67,7 @@ export class NodeInteractionService {
     }
 
     eventBus.publish({
-      type: 'node_interaction_updated',
+      type: 'node.interaction.updated',
       accountId: this.workspace.accountId,
       workspaceId: this.workspace.id,
       nodeInteraction: mapNodeInteraction(upsertedNodeInteraction),

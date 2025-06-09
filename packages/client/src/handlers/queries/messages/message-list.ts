@@ -25,7 +25,7 @@ export class MessageListQueryHandler
     output: LocalMessageNode[]
   ): Promise<ChangeCheckResult<MessageListQueryInput>> {
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -36,7 +36,7 @@ export class MessageListQueryHandler
     }
 
     if (
-      event.type === 'node_created' &&
+      event.type === 'node.created' &&
       event.node.type === 'message' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
@@ -51,7 +51,7 @@ export class MessageListQueryHandler
     }
 
     if (
-      event.type === 'node_updated' &&
+      event.type === 'node.updated' &&
       event.node.type === 'message' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
@@ -74,7 +74,7 @@ export class MessageListQueryHandler
     }
 
     if (
-      event.type === 'node_deleted' &&
+      event.type === 'node.deleted' &&
       event.node.type === 'message' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&

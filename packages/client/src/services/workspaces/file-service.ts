@@ -163,7 +163,7 @@ export class FileService {
     }
 
     eventBus.publish({
-      type: 'file_state_updated',
+      type: 'file.state.updated',
       accountId: this.workspace.accountId,
       workspaceId: this.workspace.id,
       fileState: mapFileState(createdFileState),
@@ -235,7 +235,7 @@ export class FileService {
 
       if (updatedFileState) {
         eventBus.publish({
-          type: 'file_state_updated',
+          type: 'file.state.updated',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           fileState: mapFileState(updatedFileState),
@@ -275,7 +275,7 @@ export class FileService {
 
       if (updatedFileState) {
         eventBus.publish({
-          type: 'file_state_updated',
+          type: 'file.state.updated',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           fileState: mapFileState(updatedFileState),
@@ -319,7 +319,7 @@ export class FileService {
 
       if (finalFileState) {
         eventBus.publish({
-          type: 'file_state_updated',
+          type: 'file.state.updated',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           fileState: mapFileState(finalFileState),
@@ -339,7 +339,7 @@ export class FileService {
 
       if (updatedFileState) {
         eventBus.publish({
-          type: 'file_state_updated',
+          type: 'file.state.updated',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           fileState: mapFileState(updatedFileState),
@@ -391,7 +391,7 @@ export class FileService {
 
       if (updatedFileState) {
         eventBus.publish({
-          type: 'file_state_updated',
+          type: 'file.state.updated',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           fileState: mapFileState(updatedFileState),
@@ -434,7 +434,7 @@ export class FileService {
 
       if (updatedFileState) {
         eventBus.publish({
-          type: 'file_state_updated',
+          type: 'file.state.updated',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           fileState: mapFileState(updatedFileState),
@@ -465,7 +465,7 @@ export class FileService {
             }
 
             eventBus.publish({
-              type: 'file_state_updated',
+              type: 'file.state.updated',
               accountId: this.workspace.accountId,
               workspaceId: this.workspace.id,
               fileState: mapFileState(updatedFileState),
@@ -490,7 +490,7 @@ export class FileService {
 
       if (updatedFileState) {
         eventBus.publish({
-          type: 'file_state_updated',
+          type: 'file.state.updated',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           fileState: mapFileState(updatedFileState),
@@ -506,7 +506,7 @@ export class FileService {
 
       if (updatedFileState) {
         eventBus.publish({
-          type: 'file_state_updated',
+          type: 'file.state.updated',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           fileState: mapFileState(updatedFileState),

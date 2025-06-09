@@ -32,7 +32,7 @@ export class AccountMetadataListQueryHandler
     output: AccountMetadata[]
   ): Promise<ChangeCheckResult<AccountMetadataListQueryInput>> {
     if (
-      event.type === 'account_created' &&
+      event.type === 'account.created' &&
       event.account.id === input.accountId
     ) {
       const result = await this.handleQuery(input);
@@ -43,7 +43,7 @@ export class AccountMetadataListQueryHandler
     }
 
     if (
-      event.type === 'account_deleted' &&
+      event.type === 'account.deleted' &&
       event.account.id === input.accountId
     ) {
       return {
@@ -53,7 +53,7 @@ export class AccountMetadataListQueryHandler
     }
 
     if (
-      event.type === 'account_metadata_saved' &&
+      event.type === 'account.metadata.updated' &&
       event.accountId === input.accountId
     ) {
       const newOutput = [
@@ -68,7 +68,7 @@ export class AccountMetadataListQueryHandler
     }
 
     if (
-      event.type === 'account_metadata_deleted' &&
+      event.type === 'account.metadata.deleted' &&
       event.accountId === input.accountId
     ) {
       const newOutput = output.filter(

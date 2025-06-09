@@ -117,7 +117,7 @@ export class NodeMarkSeenMutationHandler
     workspace.mutations.triggerSync();
 
     eventBus.publish({
-      type: 'node_interaction_updated',
+      type: 'node.interaction.updated',
       accountId: workspace.accountId,
       workspaceId: workspace.id,
       nodeInteraction: mapNodeInteraction(createdInteraction),

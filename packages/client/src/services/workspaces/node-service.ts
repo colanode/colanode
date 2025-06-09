@@ -198,7 +198,7 @@ export class NodeService {
     await this.downloadNodeAvatar(node.attributes);
 
     eventBus.publish({
-      type: 'node_created',
+      type: 'node.created',
       accountId: this.workspace.accountId,
       workspaceId: this.workspace.id,
       node,
@@ -206,7 +206,7 @@ export class NodeService {
 
     for (const createdNodeReference of createdNodeReferences) {
       eventBus.publish({
-        type: 'node_reference_created',
+        type: 'node.reference.created',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeReference: mapNodeReference(createdNodeReference),
@@ -391,7 +391,7 @@ export class NodeService {
       await this.downloadNodeAvatar(node.attributes);
 
       eventBus.publish({
-        type: 'node_updated',
+        type: 'node.updated',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         node,
@@ -406,7 +406,7 @@ export class NodeService {
 
     for (const createdNodeReference of createdNodeReferences) {
       eventBus.publish({
-        type: 'node_reference_created',
+        type: 'node.reference.created',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeReference: mapNodeReference(createdNodeReference),
@@ -415,7 +415,7 @@ export class NodeService {
 
     for (const deletedNodeReference of deletedNodeReferences) {
       eventBus.publish({
-        type: 'node_reference_deleted',
+        type: 'node.reference.deleted',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeReference: mapNodeReference(deletedNodeReference),
@@ -499,7 +499,7 @@ export class NodeService {
       debug(`Deleted node ${deletedNode.id} with type ${deletedNode.type}`);
 
       eventBus.publish({
-        type: 'node_deleted',
+        type: 'node.deleted',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         node: mapNode(deletedNode),
@@ -622,7 +622,7 @@ export class NodeService {
     await this.downloadNodeAvatar(node.attributes);
 
     eventBus.publish({
-      type: 'node_created',
+      type: 'node.created',
       accountId: this.workspace.accountId,
       workspaceId: this.workspace.id,
       node,
@@ -630,7 +630,7 @@ export class NodeService {
 
     for (const createdNodeReference of createdNodeReferences) {
       eventBus.publish({
-        type: 'node_reference_created',
+        type: 'node.reference.created',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeReference: mapNodeReference(createdNodeReference),
@@ -775,7 +775,7 @@ export class NodeService {
     await this.downloadNodeAvatar(node.attributes);
 
     eventBus.publish({
-      type: 'node_updated',
+      type: 'node.updated',
       accountId: this.workspace.accountId,
       workspaceId: this.workspace.id,
       node,
@@ -783,7 +783,7 @@ export class NodeService {
 
     for (const createdNodeReference of createdNodeReferences) {
       eventBus.publish({
-        type: 'node_reference_created',
+        type: 'node.reference.created',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeReference: mapNodeReference(createdNodeReference),
@@ -792,7 +792,7 @@ export class NodeService {
 
     for (const deletedNodeReference of deletedNodeReferences) {
       eventBus.publish({
-        type: 'node_reference_deleted',
+        type: 'node.reference.deleted',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeReference: mapNodeReference(deletedNodeReference),
@@ -838,7 +838,7 @@ export class NodeService {
     }
 
     eventBus.publish({
-      type: 'node_deleted',
+      type: 'node.deleted',
       accountId: this.workspace.accountId,
       workspaceId: this.workspace.id,
       node: mapNode(deletedNode),
@@ -846,7 +846,7 @@ export class NodeService {
 
     for (const deletedCollaboration of deletedCollaborations) {
       eventBus.publish({
-        type: 'collaboration_deleted',
+        type: 'collaboration.deleted',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeId: deletedCollaboration.node_id,
@@ -884,7 +884,7 @@ export class NodeService {
     }
 
     eventBus.publish({
-      type: 'node_deleted',
+      type: 'node.deleted',
       accountId: this.workspace.accountId,
       workspaceId: this.workspace.id,
       node: mapNode(deletedNode),
@@ -892,7 +892,7 @@ export class NodeService {
 
     for (const deletedCollaboration of deletedCollaborations) {
       eventBus.publish({
-        type: 'collaboration_deleted',
+        type: 'collaboration.deleted',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeId: deletedCollaboration.node_id,
@@ -1015,7 +1015,7 @@ export class NodeService {
 
     if (updatedNode) {
       eventBus.publish({
-        type: 'node_updated',
+        type: 'node.updated',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         node: mapNode(updatedNode),
@@ -1023,7 +1023,7 @@ export class NodeService {
 
       for (const createdNodeReference of createdNodeReferences) {
         eventBus.publish({
-          type: 'node_reference_created',
+          type: 'node.reference.created',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           nodeReference: mapNodeReference(createdNodeReference),
@@ -1032,7 +1032,7 @@ export class NodeService {
 
       for (const deletedNodeReference of deletedNodeReferences) {
         eventBus.publish({
-          type: 'node_reference_deleted',
+          type: 'node.reference.deleted',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           nodeReference: mapNodeReference(deletedNodeReference),
@@ -1109,7 +1109,7 @@ export class NodeService {
 
     if (createdNode) {
       eventBus.publish({
-        type: 'node_created',
+        type: 'node.created',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         node: mapNode(createdNode),

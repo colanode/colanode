@@ -79,7 +79,7 @@ export class AppService {
     );
 
     this.eventSubscriptionId = eventBus.subscribe((event) => {
-      if (event.type === 'account_deleted') {
+      if (event.type === 'account.deleted') {
         this.accounts.delete(event.account.id);
       }
     });
@@ -210,7 +210,7 @@ export class AppService {
     const serverService = await this.initServer(server);
 
     eventBus.publish({
-      type: 'server_created',
+      type: 'server.created',
       server,
     });
 

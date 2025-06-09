@@ -73,7 +73,7 @@ export class WorkspaceCreateMutationHandler
       await account.initWorkspace(workspace);
 
       eventBus.publish({
-        type: 'workspace_created',
+        type: 'workspace.created',
         workspace: workspace,
       });
 

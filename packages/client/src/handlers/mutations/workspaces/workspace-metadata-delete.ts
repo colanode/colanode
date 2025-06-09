@@ -28,7 +28,7 @@ export class WorkspaceMetadataDeleteMutationHandler
     }
 
     eventBus.publish({
-      type: 'workspace_metadata_deleted',
+      type: 'workspace.metadata.deleted',
       accountId: input.accountId,
       workspaceId: input.workspaceId,
       metadata: mapWorkspaceMetadata(deletedMetadata),

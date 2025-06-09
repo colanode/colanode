@@ -24,13 +24,13 @@ export class ServerListQueryHandler
     _: ServerListQueryInput,
     output: Server[]
   ): Promise<ChangeCheckResult<ServerListQueryInput>> {
-    if (event.type === 'server_created') {
+    if (event.type === 'server.created') {
       const newServers = [...output, event.server];
       return {
         hasChanges: true,
         result: newServers,
       };
-    } else if (event.type === 'server_updated') {
+    } else if (event.type === 'server.updated') {
       const newServers = output.map((server) =>
         server.domain === event.server.domain ? event.server : server
       );

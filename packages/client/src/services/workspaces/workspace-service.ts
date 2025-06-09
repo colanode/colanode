@@ -148,7 +148,7 @@ export class WorkspaceService {
         .execute();
 
       eventBus.publish({
-        type: 'workspace_deleted',
+        type: 'workspace.deleted',
         workspace: this.workspace,
       });
     } catch (error) {

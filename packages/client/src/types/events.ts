@@ -22,227 +22,227 @@ import {
 import { Message } from '@colanode/core';
 
 export type UserCreatedEvent = {
-  type: 'user_created';
+  type: 'user.created';
   accountId: string;
   workspaceId: string;
   user: User;
 };
 
 export type UserUpdatedEvent = {
-  type: 'user_updated';
+  type: 'user.updated';
   accountId: string;
   workspaceId: string;
   user: User;
 };
 
 export type UserDeletedEvent = {
-  type: 'user_deleted';
+  type: 'user.deleted';
   accountId: string;
   workspaceId: string;
   user: User;
 };
 
 export type NodeCreatedEvent = {
-  type: 'node_created';
+  type: 'node.created';
   accountId: string;
   workspaceId: string;
   node: LocalNode;
 };
 
 export type NodeUpdatedEvent = {
-  type: 'node_updated';
+  type: 'node.updated';
   accountId: string;
   workspaceId: string;
   node: LocalNode;
 };
 
 export type NodeDeletedEvent = {
-  type: 'node_deleted';
+  type: 'node.deleted';
   accountId: string;
   workspaceId: string;
   node: LocalNode;
 };
 
 export type NodeInteractionUpdatedEvent = {
-  type: 'node_interaction_updated';
+  type: 'node.interaction.updated';
   accountId: string;
   workspaceId: string;
   nodeInteraction: NodeInteraction;
 };
 
 export type NodeReactionCreatedEvent = {
-  type: 'node_reaction_created';
+  type: 'node.reaction.created';
   accountId: string;
   workspaceId: string;
   nodeReaction: NodeReaction;
 };
 
 export type NodeReactionDeletedEvent = {
-  type: 'node_reaction_deleted';
+  type: 'node.reaction.deleted';
   accountId: string;
   workspaceId: string;
   nodeReaction: NodeReaction;
 };
 
 export type FileStateUpdatedEvent = {
-  type: 'file_state_updated';
+  type: 'file.state.updated';
   accountId: string;
   workspaceId: string;
   fileState: FileState;
 };
 
 export type AccountCreatedEvent = {
-  type: 'account_created';
+  type: 'account.created';
   account: Account;
 };
 
 export type AccountUpdatedEvent = {
-  type: 'account_updated';
+  type: 'account.updated';
   account: Account;
 };
 
 export type AccountDeletedEvent = {
-  type: 'account_deleted';
+  type: 'account.deleted';
   account: Account;
 };
 
 export type WorkspaceCreatedEvent = {
-  type: 'workspace_created';
+  type: 'workspace.created';
   workspace: Workspace;
 };
 
 export type WorkspaceUpdatedEvent = {
-  type: 'workspace_updated';
+  type: 'workspace.updated';
   workspace: Workspace;
 };
 
 export type WorkspaceDeletedEvent = {
-  type: 'workspace_deleted';
+  type: 'workspace.deleted';
   workspace: Workspace;
 };
 
 export type ServerCreatedEvent = {
-  type: 'server_created';
+  type: 'server.created';
   server: Server;
 };
 
 export type ServerUpdatedEvent = {
-  type: 'server_updated';
+  type: 'server.updated';
   server: Server;
 };
 
 export type QueryResultUpdatedEvent = {
-  type: 'query_result_updated';
+  type: 'query.result.updated';
   id: string;
   result: unknown;
 };
 
 export type RadarDataUpdatedEvent = {
-  type: 'radar_data_updated';
+  type: 'radar.data.updated';
 };
 
 export type CollaborationCreatedEvent = {
-  type: 'collaboration_created';
+  type: 'collaboration.created';
   accountId: string;
   workspaceId: string;
   nodeId: string;
 };
 
 export type CollaborationDeletedEvent = {
-  type: 'collaboration_deleted';
+  type: 'collaboration.deleted';
   accountId: string;
   workspaceId: string;
   nodeId: string;
 };
 
 export type ServerAvailabilityChangedEvent = {
-  type: 'server_availability_changed';
+  type: 'server.availability.changed';
   server: Server;
   isAvailable: boolean;
 };
 
 export type AccountConnectionOpenedEvent = {
-  type: 'account_connection_opened';
+  type: 'account.connection.opened';
   accountId: string;
 };
 
 export type AccountConnectionClosedEvent = {
-  type: 'account_connection_closed';
+  type: 'account.connection.closed';
   accountId: string;
 };
 
-export type AccountConnectionMessageEvent = {
-  type: 'account_connection_message';
+export type AccountConnectionMessageReceivedEvent = {
+  type: 'account.connection.message.received';
   accountId: string;
   message: Message;
 };
 
-export type AppMetadataSavedEvent = {
-  type: 'app_metadata_saved';
+export type AppMetadataUpdatedEvent = {
+  type: 'app.metadata.updated';
   metadata: AppMetadata;
 };
 
 export type AppMetadataDeletedEvent = {
-  type: 'app_metadata_deleted';
+  type: 'app.metadata.deleted';
   metadata: AppMetadata;
 };
 
-export type AccountMetadataSavedEvent = {
-  type: 'account_metadata_saved';
+export type AccountMetadataUpdatedEvent = {
+  type: 'account.metadata.updated';
   accountId: string;
   metadata: AccountMetadata;
 };
 
 export type AccountMetadataDeletedEvent = {
-  type: 'account_metadata_deleted';
+  type: 'account.metadata.deleted';
   accountId: string;
   metadata: AccountMetadata;
 };
 
-export type WorkspaceMetadataSavedEvent = {
-  type: 'workspace_metadata_saved';
+export type WorkspaceMetadataUpdatedEvent = {
+  type: 'workspace.metadata.updated';
   accountId: string;
   workspaceId: string;
   metadata: WorkspaceMetadata;
 };
 
 export type WorkspaceMetadataDeletedEvent = {
-  type: 'workspace_metadata_deleted';
+  type: 'workspace.metadata.deleted';
   accountId: string;
   workspaceId: string;
   metadata: WorkspaceMetadata;
 };
 
 export type DocumentUpdatedEvent = {
-  type: 'document_updated';
+  type: 'document.updated';
   accountId: string;
   workspaceId: string;
   document: Document;
 };
 
 export type DocumentDeletedEvent = {
-  type: 'document_deleted';
+  type: 'document.deleted';
   accountId: string;
   workspaceId: string;
   documentId: string;
 };
 
 export type DocumentStateUpdatedEvent = {
-  type: 'document_state_updated';
+  type: 'document.state.updated';
   accountId: string;
   workspaceId: string;
   documentState: DocumentState;
 };
 
 export type DocumentUpdateCreatedEvent = {
-  type: 'document_update_created';
+  type: 'document.update.created';
   accountId: string;
   workspaceId: string;
   documentUpdate: DocumentUpdate;
 };
 
 export type DocumentUpdateDeletedEvent = {
-  type: 'document_update_deleted';
+  type: 'document.update.deleted';
   accountId: string;
   workspaceId: string;
   documentId: string;
@@ -250,35 +250,35 @@ export type DocumentUpdateDeletedEvent = {
 };
 
 export type NodeReferenceCreatedEvent = {
-  type: 'node_reference_created';
+  type: 'node.reference.created';
   accountId: string;
   workspaceId: string;
   nodeReference: NodeReference;
 };
 
 export type NodeReferenceDeletedEvent = {
-  type: 'node_reference_deleted';
+  type: 'node.reference.deleted';
   accountId: string;
   workspaceId: string;
   nodeReference: NodeReference;
 };
 
 export type NodeCounterUpdatedEvent = {
-  type: 'node_counter_updated';
+  type: 'node.counter.updated';
   accountId: string;
   workspaceId: string;
   counter: NodeCounter;
 };
 
 export type NodeCounterDeletedEvent = {
-  type: 'node_counter_deleted';
+  type: 'node.counter.deleted';
   accountId: string;
   workspaceId: string;
   counter: NodeCounter;
 };
 
 export type AvatarDownloadedEvent = {
-  type: 'avatar_downloaded';
+  type: 'avatar.downloaded';
   accountId: string;
   avatarId: string;
 };
@@ -309,12 +309,12 @@ export type Event =
   | CollaborationDeletedEvent
   | AccountConnectionOpenedEvent
   | AccountConnectionClosedEvent
-  | AccountConnectionMessageEvent
-  | AppMetadataSavedEvent
+  | AccountConnectionMessageReceivedEvent
+  | AppMetadataUpdatedEvent
   | AppMetadataDeletedEvent
-  | AccountMetadataSavedEvent
+  | AccountMetadataUpdatedEvent
   | AccountMetadataDeletedEvent
-  | WorkspaceMetadataSavedEvent
+  | WorkspaceMetadataUpdatedEvent
   | WorkspaceMetadataDeletedEvent
   | DocumentUpdatedEvent
   | DocumentDeletedEvent

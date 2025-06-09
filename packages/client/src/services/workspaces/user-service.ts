@@ -58,7 +58,7 @@ export class UserService {
 
     if (createdUser) {
       eventBus.publish({
-        type: 'user_created',
+        type: 'user.created',
         accountId: this.workspace.account.id,
         workspaceId: this.workspace.id,
         user: mapUser(createdUser),
@@ -112,7 +112,7 @@ export class UserService {
 
     if (createdUser) {
       eventBus.publish({
-        type: 'user_created',
+        type: 'user.created',
         accountId: this.workspace.account.id,
         workspaceId: this.workspace.id,
         user: mapUser(createdUser),

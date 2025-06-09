@@ -51,9 +51,9 @@ export type NodeReference = {
 };
 
 export type NodeCounterType =
-  | 'unread_mentions'
-  | 'unread_messages'
-  | 'unread_important_messages';
+  | 'unread.mentions'
+  | 'unread.messages.silent'
+  | 'unread.messages.important';
 
 export type NodeCounter = {
   nodeId: string;

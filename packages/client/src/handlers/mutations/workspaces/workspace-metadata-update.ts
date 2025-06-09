@@ -3,20 +3,20 @@ import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapWorkspaceMetadata } from '@colanode/client/lib/mappers';
 import { MutationHandler } from '@colanode/client/lib/types';
 import {
-  WorkspaceMetadataUpsertMutationInput,
-  WorkspaceMetadataUpsertMutationOutput,
-} from '@colanode/client/mutations/workspaces/workspace-metadata-upsert';
+  WorkspaceMetadataUpdateMutationInput,
+  WorkspaceMetadataUpdateMutationOutput,
+} from '@colanode/client/mutations/workspaces/workspace-metadata-update';
 
-export class WorkspaceMetadataUpsertMutationHandler
+export class WorkspaceMetadataUpdateMutationHandler
   extends WorkspaceMutationHandlerBase
-  implements MutationHandler<WorkspaceMetadataUpsertMutationInput>
+  implements MutationHandler<WorkspaceMetadataUpdateMutationInput>
 {
   async handleMutation(
-    input: WorkspaceMetadataUpsertMutationInput
-  ): Promise<WorkspaceMetadataUpsertMutationOutput> {
+    input: WorkspaceMetadataUpdateMutationInput
+  ): Promise<WorkspaceMetadataUpdateMutationOutput> {
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
 
-    const upsertedMetadata = await workspace.database
+    const updatedMetadata = await workspace.database
       .insertInto('metadata')
       .returningAll()
       .values({
@@ -32,17 +32,17 @@ export class WorkspaceMetadataUpsertMutationHandler
       )
       .executeTakeFirst();
 
-    if (!upsertedMetadata) {
+    if (!updatedMetadata) {
       return {
         success: false,
       };
     }
 
     eventBus.publish({
-      type: 'workspace_metadata_saved',
+      type: 'workspace.metadata.updated',
       accountId: input.accountId,
       workspaceId: input.workspaceId,
-      metadata: mapWorkspaceMetadata(upsertedMetadata),
+      metadata: mapWorkspaceMetadata(updatedMetadata),
     });
 
     return {

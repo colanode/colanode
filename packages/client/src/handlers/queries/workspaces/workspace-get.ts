@@ -32,7 +32,7 @@ export class WorkspaceGetQueryHandler
     _: Workspace | null
   ): Promise<ChangeCheckResult<WorkspaceGetQueryInput>> {
     if (
-      event.type === 'workspace_created' &&
+      event.type === 'workspace.created' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -43,7 +43,7 @@ export class WorkspaceGetQueryHandler
     }
 
     if (
-      event.type === 'workspace_updated' &&
+      event.type === 'workspace.updated' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -54,7 +54,7 @@ export class WorkspaceGetQueryHandler
     }
 
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {

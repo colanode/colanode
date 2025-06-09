@@ -16,11 +16,11 @@ export class AppBadge {
     }
 
     eventBus.subscribe((event) => {
-      if (event.type === 'radar_data_updated') {
+      if (event.type === 'radar.data.updated') {
         this.checkBadge();
-      } else if (event.type === 'workspace_deleted') {
+      } else if (event.type === 'workspace.deleted') {
         this.checkBadge();
-      } else if (event.type === 'account_deleted') {
+      } else if (event.type === 'account.deleted') {
         this.checkBadge();
       }
     });

@@ -23,7 +23,7 @@ export class NodeChildrenGetQueryHandler
     output: LocalNode[]
   ): Promise<ChangeCheckResult<NodeChildrenGetQueryInput>> {
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -34,7 +34,7 @@ export class NodeChildrenGetQueryHandler
     }
 
     if (
-      event.type === 'node_created' &&
+      event.type === 'node.created' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.parentId === input.nodeId &&
@@ -48,7 +48,7 @@ export class NodeChildrenGetQueryHandler
     }
 
     if (
-      event.type === 'node_updated' &&
+      event.type === 'node.updated' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.parentId === input.nodeId &&
@@ -68,7 +68,7 @@ export class NodeChildrenGetQueryHandler
     }
 
     if (
-      event.type === 'node_deleted' &&
+      event.type === 'node.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.parentId === input.nodeId &&

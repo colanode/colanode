@@ -87,7 +87,7 @@ export class FileDownloadMutationHandler
     workspace.files.triggerDownloads();
 
     eventBus.publish({
-      type: 'file_state_updated',
+      type: 'file.state.updated',
       accountId: workspace.accountId,
       workspaceId: workspace.id,
       fileState: mapFileState(updatedFileState),

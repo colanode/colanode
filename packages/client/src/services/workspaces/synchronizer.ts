@@ -56,17 +56,17 @@ export class Synchronizer<TInput extends SynchronizerInput> {
 
     this.eventSubscriptionId = eventBus.subscribe((event) => {
       if (
-        event.type === 'account_connection_message' &&
+        event.type === 'account.connection.message.received' &&
         event.accountId === this.workspace.account.id
       ) {
         this.handleMessage(event.message);
       } else if (
-        event.type === 'account_connection_opened' &&
+        event.type === 'account.connection.opened' &&
         event.accountId === this.workspace.account.id
       ) {
         this.eventLoop.trigger();
       } else if (
-        event.type === 'account_connection_closed' &&
+        event.type === 'account.connection.closed' &&
         event.accountId === this.workspace.account.id
       ) {
         this.eventLoop.stop();

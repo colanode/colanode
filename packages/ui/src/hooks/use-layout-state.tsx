@@ -26,7 +26,7 @@ export const useLayoutState = () => {
 
   const [leftContainerMetadata, setLeftContainerMetadata] =
     useState<ContainerMetadata>(
-      workspace.getMetadata('left_container')?.value ?? {
+      workspace.getMetadata('container.left')?.value ?? {
         tabs: [],
       }
     );
@@ -34,7 +34,7 @@ export const useLayoutState = () => {
   const replaceLeftContainerMetadata = useCallback(
     (metadata: ContainerMetadata) => {
       setLeftContainerMetadata(metadata);
-      workspace.setMetadata('left_container', {
+      workspace.setMetadata('container.left', {
         ...metadata,
       });
     },
@@ -43,7 +43,7 @@ export const useLayoutState = () => {
 
   const [rightContainerMetadata, setRightContainerMetadata] =
     useState<ContainerMetadata>(
-      workspace.getMetadata('right_container')?.value ?? {
+      workspace.getMetadata('container.right')?.value ?? {
         tabs: [],
         width: percentToNumber(windowSize.width, 40),
       }
@@ -52,7 +52,7 @@ export const useLayoutState = () => {
   const replaceRightContainerMetadata = useCallback(
     (metadata: ContainerMetadata) => {
       setRightContainerMetadata(metadata);
-      workspace.setMetadata('right_container', {
+      workspace.setMetadata('container.right', {
         ...metadata,
       });
     },
@@ -96,7 +96,7 @@ export const useLayoutState = () => {
         width,
       });
 
-      workspace.setMetadata('right_container', {
+      workspace.setMetadata('container.right', {
         ...rightContainerMetadata,
         width,
       });

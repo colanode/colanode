@@ -32,7 +32,7 @@ export class DocumentStateGetQueryHandler
     _: DocumentState | null
   ): Promise<ChangeCheckResult<DocumentStateGetQueryInput>> {
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -43,7 +43,7 @@ export class DocumentStateGetQueryHandler
     }
 
     if (
-      event.type === 'document_state_updated' &&
+      event.type === 'document.state.updated' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.documentState.id === input.documentId
@@ -55,7 +55,7 @@ export class DocumentStateGetQueryHandler
     }
 
     if (
-      event.type === 'node_deleted' &&
+      event.type === 'node.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.id === input.documentId
@@ -67,7 +67,7 @@ export class DocumentStateGetQueryHandler
     }
 
     if (
-      event.type === 'node_created' &&
+      event.type === 'node.created' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.id === input.documentId

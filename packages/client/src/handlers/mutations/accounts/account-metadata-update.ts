@@ -1,14 +1,14 @@
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { mapAppMetadata } from '@colanode/client/lib/mappers';
+import { mapAccountMetadata } from '@colanode/client/lib/mappers';
 import { MutationHandler } from '@colanode/client/lib/types';
 import {
-  AppMetadataUpsertMutationInput,
-  AppMetadataUpsertMutationOutput,
-} from '@colanode/client/mutations/apps/app-metadata-upsert';
+  AccountMetadataUpdateMutationInput,
+  AccountMetadataUpdateMutationOutput,
+} from '@colanode/client/mutations/accounts/account-metadata-update';
 import { AppService } from '@colanode/client/services/app-service';
 
-export class AppMetadataUpsertMutationHandler
-  implements MutationHandler<AppMetadataUpsertMutationInput>
+export class AccountMetadataUpdateMutationHandler
+  implements MutationHandler<AccountMetadataUpdateMutationInput>
 {
   private readonly app: AppService;
 
@@ -16,10 +16,18 @@ export class AppMetadataUpsertMutationHandler
     this.app = appService;
   }
 
-  async handleMutation(
-    input: AppMetadataUpsertMutationInput
-  ): Promise<AppMetadataUpsertMutationOutput> {
-    const upsertedMetadata = await this.app.database
+  public async handleMutation(
+    input: AccountMetadataUpdateMutationInput
+  ): Promise<AccountMetadataUpdateMutationOutput> {
+    const account = this.app.getAccount(input.accountId);
+
+    if (!account) {
+      return {
+        success: false,
+      };
+    }
+
+    const updatedMetadata = await account.database
       .insertInto('metadata')
       .returningAll()
       .values({
@@ -35,15 +43,16 @@ export class AppMetadataUpsertMutationHandler
       )
       .executeTakeFirst();
 
-    if (!upsertedMetadata) {
+    if (!updatedMetadata) {
       return {
         success: false,
       };
     }
 
     eventBus.publish({
-      type: 'app_metadata_saved',
-      metadata: mapAppMetadata(upsertedMetadata),
+      type: 'account.metadata.updated',
+      accountId: input.accountId,
+      metadata: mapAccountMetadata(updatedMetadata),
     });
 
     return {

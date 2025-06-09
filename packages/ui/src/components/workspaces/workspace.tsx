@@ -55,7 +55,7 @@ export const Workspace = ({ workspace }: WorkspaceProps) => {
           value: WorkspaceMetadataMap[K]['value']
         ) {
           window.colanode.executeMutation({
-            type: 'workspace.metadata.upsert',
+            type: 'workspace.metadata.update',
             accountId: account.id,
             workspaceId: workspace.id,
             key,

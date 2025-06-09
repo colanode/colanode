@@ -4,7 +4,7 @@ import { AppService } from '@colanode/client/services';
 
 import { AccountLogoutMutationHandler } from './accounts/account-logout';
 import { AccountMetadataDeleteMutationHandler } from './accounts/account-metadata-delete';
-import { AccountMetadataUpsertMutationHandler } from './accounts/account-metadata-upsert';
+import { AccountMetadataUpdateMutationHandler } from './accounts/account-metadata-update';
 import { AccountUpdateMutationHandler } from './accounts/account-update';
 import { EmailLoginMutationHandler } from './accounts/email-login';
 import { EmailPasswordResetCompleteMutationHandler } from './accounts/email-password-reset-complete';
@@ -12,7 +12,7 @@ import { EmailPasswordResetInitMutationHandler } from './accounts/email-password
 import { EmailRegisterMutationHandler } from './accounts/email-register';
 import { EmailVerifyMutationHandler } from './accounts/email-verify';
 import { AppMetadataDeleteMutationHandler } from './apps/app-metadata-delete';
-import { AppMetadataUpsertMutationHandler } from './apps/app-metadata-upsert';
+import { AppMetadataUpdateMutationHandler } from './apps/app-metadata-update';
 import { AvatarUploadMutationHandler } from './avatars/avatar-upload';
 import { ChannelCreateMutationHandler } from './channels/channel-create';
 import { ChannelDeleteMutationHandler } from './channels/channel-delete';
@@ -68,7 +68,7 @@ import { UsersCreateMutationHandler } from './users/users-create';
 import { WorkspaceCreateMutationHandler } from './workspaces/workspace-create';
 import { WorkspaceDeleteMutationHandler } from './workspaces/workspace-delete';
 import { WorkspaceMetadataDeleteMutationHandler } from './workspaces/workspace-metadata-delete';
-import { WorkspaceMetadataUpsertMutationHandler } from './workspaces/workspace-metadata-upsert';
+import { WorkspaceMetadataUpdateMutationHandler } from './workspaces/workspace-metadata-update';
 import { WorkspaceUpdateMutationHandler } from './workspaces/workspace-update';
 
 export type MutationHandlerMap = {
@@ -137,16 +137,16 @@ export const buildMutationHandlerMap = (
     'page.update': new PageUpdateMutationHandler(app),
     'folder.update': new FolderUpdateMutationHandler(app),
     'database.update': new DatabaseUpdateMutationHandler(app),
-    'workspace.metadata.upsert': new WorkspaceMetadataUpsertMutationHandler(
+    'workspace.metadata.update': new WorkspaceMetadataUpdateMutationHandler(
       app
     ),
     'workspace.metadata.delete': new WorkspaceMetadataDeleteMutationHandler(
       app
     ),
     'document.update': new DocumentUpdateMutationHandler(app),
-    'app.metadata.upsert': new AppMetadataUpsertMutationHandler(app),
+    'app.metadata.update': new AppMetadataUpdateMutationHandler(app),
     'app.metadata.delete': new AppMetadataDeleteMutationHandler(app),
-    'account.metadata.upsert': new AccountMetadataUpsertMutationHandler(app),
+    'account.metadata.update': new AccountMetadataUpdateMutationHandler(app),
     'account.metadata.delete': new AccountMetadataDeleteMutationHandler(app),
     'email.password.reset.init': new EmailPasswordResetInitMutationHandler(app),
     'email.password.reset.complete':

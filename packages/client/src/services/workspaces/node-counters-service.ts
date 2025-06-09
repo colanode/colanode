@@ -63,11 +63,11 @@ export class NodeCountersService {
         const parentIdType = getIdType(node.parent_id);
         const types: NodeCounterType[] = [];
         if (isMentioned) {
-          types.push('unread_mentions');
+          types.push('unread.mentions');
         } else if (parentIdType === IdType.Channel) {
-          types.push('unread_messages');
+          types.push('unread.messages.silent');
         } else if (parentIdType === IdType.Chat) {
-          types.push('unread_important_messages');
+          types.push('unread.messages.important');
         }
 
         if (types.length > 0) {
@@ -79,7 +79,7 @@ export class NodeCountersService {
     if (counters) {
       for (const counter of counters) {
         eventBus.publish({
-          type: 'node_counter_updated',
+          type: 'node.counter.updated',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           counter: {
@@ -111,7 +111,7 @@ export class NodeCountersService {
     if (counters) {
       for (const counter of counters) {
         eventBus.publish({
-          type: 'node_counter_deleted',
+          type: 'node.counter.deleted',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           counter: {
@@ -178,11 +178,11 @@ export class NodeCountersService {
         const types: NodeCounterType[] = [];
 
         if (isMentioned) {
-          types.push('unread_mentions');
+          types.push('unread.mentions');
         } else if (parentIdType === IdType.Channel) {
-          types.push('unread_messages');
+          types.push('unread.messages.silent');
         } else if (parentIdType === IdType.Chat) {
-          types.push('unread_important_messages');
+          types.push('unread.messages.important');
         }
 
         if (types.length > 0) {
@@ -194,7 +194,7 @@ export class NodeCountersService {
     if (counters) {
       for (const counter of counters) {
         eventBus.publish({
-          type: 'node_counter_updated',
+          type: 'node.counter.updated',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           counter: {

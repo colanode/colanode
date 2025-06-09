@@ -50,7 +50,7 @@ const createWindow = async () => {
   await app.migrate();
 
   // Create the browser window.
-  let windowSize = (await app.metadata.get('window_size'))?.value;
+  let windowSize = (await app.metadata.get('window.size'))?.value;
   const mainWindow = new BrowserWindow({
     width: windowSize?.width ?? 1200,
     height: windowSize?.height ?? 800,
@@ -76,7 +76,7 @@ const createWindow = async () => {
       fullscreen: false,
     };
 
-    app.metadata.set('window_size', windowSize);
+    app.metadata.set('window.size', windowSize);
   });
 
   mainWindow.on('enter-full-screen', () => {
@@ -86,7 +86,7 @@ const createWindow = async () => {
       fullscreen: true,
     };
 
-    app.metadata.set('window_size', windowSize);
+    app.metadata.set('window.size', windowSize);
   });
 
   mainWindow.on('leave-full-screen', () => {
@@ -96,7 +96,7 @@ const createWindow = async () => {
       fullscreen: false,
     };
 
-    app.metadata.set('window_size', windowSize);
+    app.metadata.set('window.size', windowSize);
   });
 
   // and load the index.html of the app.
@@ -114,7 +114,7 @@ const createWindow = async () => {
   }
 
   const subscriptionId = eventBus.subscribe((event) => {
-    if (event.type === 'query_result_updated') {
+    if (event.type === 'query.result.updated') {
       mainWindow.webContents.send('event', event);
     }
   });

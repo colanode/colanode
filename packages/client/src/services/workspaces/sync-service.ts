@@ -83,13 +83,13 @@ export class SyncService {
 
   private handleEvent(event: Event): void {
     if (
-      event.type === 'collaboration_created' &&
+      event.type === 'collaboration.created' &&
       event.accountId === this.workspace.accountId &&
       event.workspaceId === this.workspace.id
     ) {
       this.initRootSynchronizers(event.nodeId);
     } else if (
-      event.type === 'collaboration_deleted' &&
+      event.type === 'collaboration.deleted' &&
       event.accountId === this.workspace.accountId &&
       event.workspaceId === this.workspace.id
     ) {

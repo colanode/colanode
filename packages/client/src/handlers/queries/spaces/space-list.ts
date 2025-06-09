@@ -23,7 +23,7 @@ export class SpaceListQueryHandler
     output: LocalSpaceNode[]
   ): Promise<ChangeCheckResult<SpaceListQueryInput>> {
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -34,7 +34,7 @@ export class SpaceListQueryHandler
     }
 
     if (
-      event.type === 'node_created' &&
+      event.type === 'node.created' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.type === 'space'
@@ -47,7 +47,7 @@ export class SpaceListQueryHandler
     }
 
     if (
-      event.type === 'node_updated' &&
+      event.type === 'node.updated' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.type === 'space'
@@ -66,7 +66,7 @@ export class SpaceListQueryHandler
     }
 
     if (
-      event.type === 'node_deleted' &&
+      event.type === 'node.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.type === 'space'

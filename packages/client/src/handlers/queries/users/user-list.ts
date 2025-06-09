@@ -21,7 +21,7 @@ export class UserListQueryHandler
     output: User[]
   ): Promise<ChangeCheckResult<UserListQueryInput>> {
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -32,7 +32,7 @@ export class UserListQueryHandler
     }
 
     if (
-      event.type === 'user_created' &&
+      event.type === 'user.created' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId
     ) {
@@ -44,7 +44,7 @@ export class UserListQueryHandler
     }
 
     if (
-      event.type === 'user_updated' &&
+      event.type === 'user.updated' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId
     ) {
@@ -65,7 +65,7 @@ export class UserListQueryHandler
     }
 
     if (
-      event.type === 'user_deleted' &&
+      event.type === 'user.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId
     ) {

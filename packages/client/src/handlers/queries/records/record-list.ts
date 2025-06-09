@@ -43,7 +43,7 @@ export class RecordListQueryHandler
     output: LocalRecordNode[]
   ): Promise<ChangeCheckResult<RecordListQueryInput>> {
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -54,7 +54,7 @@ export class RecordListQueryHandler
     }
 
     if (
-      event.type === 'node_created' &&
+      event.type === 'node.created' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.type === 'record'
@@ -67,7 +67,7 @@ export class RecordListQueryHandler
     }
 
     if (
-      event.type === 'node_updated' &&
+      event.type === 'node.updated' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId
     ) {
@@ -112,7 +112,7 @@ export class RecordListQueryHandler
     }
 
     if (
-      event.type === 'node_deleted' &&
+      event.type === 'node.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId
     ) {

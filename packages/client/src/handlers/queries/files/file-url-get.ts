@@ -27,7 +27,7 @@ export class FileUrlGetQueryHandler
     _: FileUrlGetQueryOutput
   ): Promise<ChangeCheckResult<FileUrlGetQueryInput>> {
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -40,7 +40,7 @@ export class FileUrlGetQueryHandler
     }
 
     if (
-      event.type === 'file_state_updated' &&
+      event.type === 'file.state.updated' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.fileState.id === input.id
@@ -53,7 +53,7 @@ export class FileUrlGetQueryHandler
     }
 
     if (
-      event.type === 'node_deleted' &&
+      event.type === 'node.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.id === input.id
@@ -67,7 +67,7 @@ export class FileUrlGetQueryHandler
     }
 
     if (
-      event.type === 'node_created' &&
+      event.type === 'node.created' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.id === input.id

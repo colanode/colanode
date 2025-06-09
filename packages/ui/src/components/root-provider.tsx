@@ -29,7 +29,7 @@ interface RootProviderProps {
 export const RootProvider = ({ type }: RootProviderProps) => {
   React.useEffect(() => {
     const id = window.eventBus.subscribe((event: Event) => {
-      if (event.type === 'query_result_updated') {
+      if (event.type === 'query.result.updated') {
         const result = event.result;
         const queryId = event.id;
 

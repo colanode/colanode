@@ -31,7 +31,7 @@ export class AccountGetQueryHandler
     input: AccountGetQueryInput
   ): Promise<ChangeCheckResult<AccountGetQueryInput>> {
     if (
-      event.type === 'account_created' &&
+      event.type === 'account.created' &&
       event.account.id === input.accountId
     ) {
       return {
@@ -41,7 +41,7 @@ export class AccountGetQueryHandler
     }
 
     if (
-      event.type === 'account_updated' &&
+      event.type === 'account.updated' &&
       event.account.id === input.accountId
     ) {
       return {
@@ -51,7 +51,7 @@ export class AccountGetQueryHandler
     }
 
     if (
-      event.type === 'account_deleted' &&
+      event.type === 'account.deleted' &&
       event.account.id === input.accountId
     ) {
       return {

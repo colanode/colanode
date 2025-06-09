@@ -32,7 +32,7 @@ export class AppMetadataDeleteMutationHandler
     }
 
     eventBus.publish({
-      type: 'app_metadata_deleted',
+      type: 'app.metadata.deleted',
       metadata: mapAppMetadata(deletedMetadata),
     });
 

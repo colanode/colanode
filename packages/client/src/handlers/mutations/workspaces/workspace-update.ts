@@ -77,7 +77,7 @@ export class WorkspaceUpdateMutationHandler
       workspaceService.updateWorkspace(workspace);
 
       eventBus.publish({
-        type: 'workspace_updated',
+        type: 'workspace.updated',
         workspace: workspace,
       });
 

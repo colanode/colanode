@@ -30,7 +30,7 @@ export class WorkspaceMetadataListQueryHandler
     output: WorkspaceMetadata[]
   ): Promise<ChangeCheckResult<WorkspaceMetadataListQueryInput>> {
     if (
-      event.type === 'workspace_created' &&
+      event.type === 'workspace.created' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -42,7 +42,7 @@ export class WorkspaceMetadataListQueryHandler
     }
 
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -53,7 +53,7 @@ export class WorkspaceMetadataListQueryHandler
     }
 
     if (
-      event.type === 'workspace_metadata_saved' &&
+      event.type === 'workspace.metadata.updated' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId
     ) {
@@ -69,7 +69,7 @@ export class WorkspaceMetadataListQueryHandler
     }
 
     if (
-      event.type === 'workspace_metadata_deleted' &&
+      event.type === 'workspace.metadata.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId
     ) {

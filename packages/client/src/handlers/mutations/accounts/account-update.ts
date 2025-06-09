@@ -65,7 +65,7 @@ export class AccountUpdateMutationHandler
       accountService.updateAccount(account);
 
       eventBus.publish({
-        type: 'account_updated',
+        type: 'account.updated',
         account,
       });
 

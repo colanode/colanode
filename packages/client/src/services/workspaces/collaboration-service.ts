@@ -87,14 +87,14 @@ export class CollaborationService {
         .execute();
 
       eventBus.publish({
-        type: 'collaboration_deleted',
+        type: 'collaboration.deleted',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeId: collaboration.nodeId,
       });
     } else {
       eventBus.publish({
-        type: 'collaboration_created',
+        type: 'collaboration.created',
         nodeId: collaboration.nodeId,
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,

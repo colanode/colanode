@@ -21,7 +21,7 @@ export class NodeTreeGetQueryHandler
     output: LocalNode[]
   ): Promise<ChangeCheckResult<NodeTreeGetQueryInput>> {
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -32,7 +32,7 @@ export class NodeTreeGetQueryHandler
     }
 
     if (
-      event.type === 'node_created' &&
+      event.type === 'node.created' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.id === input.nodeId
@@ -45,7 +45,7 @@ export class NodeTreeGetQueryHandler
     }
 
     if (
-      event.type === 'node_updated' &&
+      event.type === 'node.updated' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId
     ) {
@@ -60,7 +60,7 @@ export class NodeTreeGetQueryHandler
     }
 
     if (
-      event.type === 'node_deleted' &&
+      event.type === 'node.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId
     ) {

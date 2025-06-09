@@ -40,7 +40,7 @@ export class AccountMetadataDeleteMutationHandler
     }
 
     eventBus.publish({
-      type: 'account_metadata_deleted',
+      type: 'account.metadata.deleted',
       accountId: input.accountId,
       metadata: mapAccountMetadata(deletedMetadata),
     });

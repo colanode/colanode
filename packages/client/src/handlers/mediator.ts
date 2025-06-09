@@ -44,7 +44,7 @@ export class Mediator {
     this.mutationHandlerMap = buildMutationHandlerMap(app);
 
     eventBus.subscribe((event: Event) => {
-      if (event.type === 'query_result_updated') {
+      if (event.type === 'query.result.updated') {
         return;
       }
 
@@ -161,7 +161,7 @@ export class Mediator {
       });
 
       eventBus.publish({
-        type: 'query_result_updated',
+        type: 'query.result.updated',
         id,
         result,
       });

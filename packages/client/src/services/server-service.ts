@@ -73,7 +73,7 @@ export class ServerService {
     const isAvailable = newState.isAvailable;
     if (wasAvailable !== isAvailable) {
       eventBus.publish({
-        type: 'server_availability_changed',
+        type: 'server.availability.changed',
         server: this.server,
         isAvailable,
       });
@@ -104,7 +104,7 @@ export class ServerService {
 
       if (updatedServer) {
         eventBus.publish({
-          type: 'server_updated',
+          type: 'server.updated',
           server: mapServer(updatedServer),
         });
       }

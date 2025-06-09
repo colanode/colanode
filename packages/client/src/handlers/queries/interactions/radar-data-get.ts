@@ -29,11 +29,11 @@ export class RadarDataGetQueryHandler
     ___: RadarDataGetQueryOutput
   ): Promise<ChangeCheckResult<RadarDataGetQueryInput>> {
     const shouldUpdate =
-      event.type === 'radar_data_updated' ||
-      event.type === 'workspace_created' ||
-      event.type === 'workspace_deleted' ||
-      event.type === 'account_created' ||
-      event.type === 'account_deleted';
+      event.type === 'radar.data.updated' ||
+      event.type === 'workspace.created' ||
+      event.type === 'workspace.deleted' ||
+      event.type === 'account.created' ||
+      event.type === 'account.deleted';
 
     if (shouldUpdate) {
       const data = this.getRadarData();

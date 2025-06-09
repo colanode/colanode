@@ -38,14 +38,14 @@ export type WorkspaceSidebarMetadata = {
 };
 
 export type WorkspaceLeftContainerMetadata = {
-  key: 'left_container';
+  key: 'container.left';
   value: ContainerMetadata;
   createdAt: string;
   updatedAt: string | null;
 };
 
 export type WorkspaceRightContainerMetadata = {
-  key: 'right_container';
+  key: 'container.right';
   value: ContainerMetadata;
   createdAt: string;
   updatedAt: string | null;
@@ -60,6 +60,6 @@ export type WorkspaceMetadataKey = WorkspaceMetadata['key'];
 
 export type WorkspaceMetadataMap = {
   sidebar: WorkspaceSidebarMetadata;
-  right_container: WorkspaceRightContainerMetadata;
-  left_container: WorkspaceLeftContainerMetadata;
+  'container.right': WorkspaceRightContainerMetadata;
+  'container.left': WorkspaceLeftContainerMetadata;
 };

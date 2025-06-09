@@ -42,7 +42,7 @@ export abstract class AccountMutationHandlerBase {
     const accountService = await this.app.initAccount(account);
 
     eventBus.publish({
-      type: 'account_created',
+      type: 'account.created',
       account: account,
     });
 
@@ -74,7 +74,7 @@ export abstract class AccountMutationHandlerBase {
 
       await accountService.initWorkspace(mapWorkspace(createdWorkspace));
       eventBus.publish({
-        type: 'workspace_created',
+        type: 'workspace.created',
         workspace: mapWorkspace(createdWorkspace),
       });
     }

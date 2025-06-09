@@ -20,7 +20,7 @@ export class NodeReactionsListQueryHandler
     _: NodeReaction[]
   ): Promise<ChangeCheckResult<NodeReactionListQueryInput>> {
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -31,7 +31,7 @@ export class NodeReactionsListQueryHandler
     }
 
     if (
-      event.type === 'node_reaction_created' &&
+      event.type === 'node.reaction.created' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.nodeReaction.nodeId === input.nodeId
@@ -45,7 +45,7 @@ export class NodeReactionsListQueryHandler
     }
 
     if (
-      event.type === 'node_reaction_deleted' &&
+      event.type === 'node.reaction.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.nodeReaction.nodeId === input.nodeId
@@ -59,7 +59,7 @@ export class NodeReactionsListQueryHandler
     }
 
     if (
-      event.type === 'node_created' &&
+      event.type === 'node.created' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.id === input.nodeId
@@ -73,7 +73,7 @@ export class NodeReactionsListQueryHandler
     }
 
     if (
-      event.type === 'node_deleted' &&
+      event.type === 'node.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.id === input.nodeId

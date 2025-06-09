@@ -64,7 +64,7 @@ export const App = ({ type }: AppProps) => {
         },
         setMetadata: (key, value) => {
           window.colanode.executeMutation({
-            type: 'app.metadata.upsert',
+            type: 'app.metadata.update',
             key,
             value,
           });
@@ -80,7 +80,7 @@ export const App = ({ type }: AppProps) => {
         openAccount: (id: string) => {
           setOpenLogin(false);
           window.colanode.executeMutation({
-            type: 'app.metadata.upsert',
+            type: 'app.metadata.update',
             key: 'account',
             value: id,
           });

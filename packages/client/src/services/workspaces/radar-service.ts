@@ -40,12 +40,12 @@ export class RadarService {
           continue;
         }
 
-        if (type === 'unread_messages') {
+        if (type === 'unread.messages.silent') {
           hasUnread = true;
-        } else if (type === 'unread_important_messages') {
+        } else if (type === 'unread.messages.important') {
           hasUnread = true;
           unreadCount += count;
-        } else if (type === 'unread_mentions') {
+        } else if (type === 'unread.mentions') {
           hasUnread = true;
           unreadCount += count;
         }
@@ -88,9 +88,9 @@ export class RadarService {
   }
 
   private async handleEvent(event: Event) {
-    if (event.type === 'node_counter_updated') {
+    if (event.type === 'node.counter.updated') {
       this.handleNodeCounterUpdated(event);
-    } else if (event.type === 'node_counter_deleted') {
+    } else if (event.type === 'node.counter.deleted') {
       this.handleNodeCounterDeleted(event);
     }
   }
@@ -119,7 +119,7 @@ export class RadarService {
 
     nodeCounters.set(event.counter.type, event.counter.count);
     eventBus.publish({
-      type: 'radar_data_updated',
+      type: 'radar.data.updated',
     });
   }
 
@@ -142,7 +142,7 @@ export class RadarService {
 
     nodeCounter.delete(event.counter.type);
     eventBus.publish({
-      type: 'radar_data_updated',
+      type: 'radar.data.updated',
     });
   }
 }

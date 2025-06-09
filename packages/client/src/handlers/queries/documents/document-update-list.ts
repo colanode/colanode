@@ -32,7 +32,7 @@ export class DocumentUpdatesListQueryHandler
     output: DocumentUpdate[]
   ): Promise<ChangeCheckResult<DocumentUpdatesListQueryInput>> {
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
       event.workspace.id === input.workspaceId
     ) {
@@ -43,7 +43,7 @@ export class DocumentUpdatesListQueryHandler
     }
 
     if (
-      event.type === 'document_update_created' &&
+      event.type === 'document.update.created' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.documentUpdate.documentId === input.documentId
@@ -56,7 +56,7 @@ export class DocumentUpdatesListQueryHandler
     }
 
     if (
-      event.type === 'document_update_deleted' &&
+      event.type === 'document.update.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.documentId === input.documentId
@@ -70,7 +70,7 @@ export class DocumentUpdatesListQueryHandler
     }
 
     if (
-      event.type === 'node_deleted' &&
+      event.type === 'node.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.id === input.documentId
@@ -82,7 +82,7 @@ export class DocumentUpdatesListQueryHandler
     }
 
     if (
-      event.type === 'node_created' &&
+      event.type === 'node.created' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
       event.node.id === input.documentId

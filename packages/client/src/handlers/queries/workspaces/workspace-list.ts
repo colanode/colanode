@@ -28,7 +28,7 @@ export class WorkspaceListQueryHandler
     output: Workspace[]
   ): Promise<ChangeCheckResult<WorkspaceListQueryInput>> {
     if (
-      event.type === 'workspace_created' &&
+      event.type === 'workspace.created' &&
       event.workspace.accountId === input.accountId
     ) {
       const newWorkspaces = [...output, event.workspace];
@@ -39,7 +39,7 @@ export class WorkspaceListQueryHandler
     }
 
     if (
-      event.type === 'workspace_updated' &&
+      event.type === 'workspace.updated' &&
       event.workspace.accountId === input.accountId
     ) {
       const updatedWorkspaces = output.map((workspace) => {
@@ -56,7 +56,7 @@ export class WorkspaceListQueryHandler
     }
 
     if (
-      event.type === 'workspace_deleted' &&
+      event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId
     ) {
       const activeWorkspaces = output.filter(

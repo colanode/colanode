@@ -69,7 +69,7 @@ export class MetadataService {
     }
 
     eventBus.publish({
-      type: 'app_metadata_saved',
+      type: 'app.metadata.updated',
       metadata: mapAppMetadata(createdMetadata),
     });
   }
@@ -88,7 +88,7 @@ export class MetadataService {
     }
 
     eventBus.publish({
-      type: 'app_metadata_deleted',
+      type: 'app.metadata.deleted',
       metadata: mapAppMetadata(deletedMetadata),
     });
   }

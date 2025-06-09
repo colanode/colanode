@@ -25,7 +25,7 @@ export class AccountListQueryHandler
     _: AccountListQueryInput,
     output: Account[]
   ): Promise<ChangeCheckResult<AccountListQueryInput>> {
-    if (event.type === 'account_created') {
+    if (event.type === 'account.created') {
       const newAccounts = [...output, event.account];
       return {
         hasChanges: true,
@@ -33,7 +33,7 @@ export class AccountListQueryHandler
       };
     }
 
-    if (event.type === 'account_updated') {
+    if (event.type === 'account.updated') {
       const updatedAccounts = [...output].map((account) => {
         if (account.id === event.account.id) {
           return event.account;
@@ -47,7 +47,7 @@ export class AccountListQueryHandler
       };
     }
 
-    if (event.type === 'account_deleted') {
+    if (event.type === 'account.deleted') {
       const activeAccounts = [...output].filter(
         (account) => account.id !== event.account.id
       );

@@ -33,7 +33,7 @@ export class AccountSocket {
 
     this.eventSubscriptionId = eventBus.subscribe((event) => {
       if (
-        event.type === 'server_availability_changed' &&
+        event.type === 'server.availability.changed' &&
         event.server.domain === this.account.server.domain
       ) {
         this.eventLoop.trigger();
@@ -75,7 +75,7 @@ export class AccountSocket {
       );
 
       eventBus.publish({
-        type: 'account_connection_message',
+        type: 'account.connection.message.received',
         accountId: this.account.id,
         message,
       });
@@ -86,7 +86,7 @@ export class AccountSocket {
 
       this.backoffCalculator.reset();
       eventBus.publish({
-        type: 'account_connection_opened',
+        type: 'account.connection.opened',
         accountId: this.account.id,
       });
     };
@@ -95,7 +95,7 @@ export class AccountSocket {
       debug(`Socket connection for account ${this.account.id} errored`);
       this.backoffCalculator.increaseError();
       eventBus.publish({
-        type: 'account_connection_closed',
+        type: 'account.connection.closed',
         accountId: this.account.id,
       });
     };
@@ -104,7 +104,7 @@ export class AccountSocket {
       debug(`Socket connection for account ${this.account.id} closed`);
       this.backoffCalculator.increaseError();
       eventBus.publish({
-        type: 'account_connection_closed',
+        type: 'account.connection.closed',
         accountId: this.account.id,
       });
     };

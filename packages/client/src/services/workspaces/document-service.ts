@@ -219,7 +219,7 @@ export class DocumentService {
 
     if (createdDocument) {
       eventBus.publish({
-        type: 'document_updated',
+        type: 'document.updated',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         document: mapDocument(createdDocument),
@@ -228,7 +228,7 @@ export class DocumentService {
 
     if (createdUpdate) {
       eventBus.publish({
-        type: 'document_update_created',
+        type: 'document.update.created',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         documentUpdate: mapDocumentUpdate(createdUpdate),
@@ -237,7 +237,7 @@ export class DocumentService {
 
     for (const createdNodeReference of createdNodeReferences) {
       eventBus.publish({
-        type: 'node_reference_created',
+        type: 'node.reference.created',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeReference: mapNodeReference(createdNodeReference),
@@ -385,7 +385,7 @@ export class DocumentService {
 
     if (updatedDocument) {
       eventBus.publish({
-        type: 'document_updated',
+        type: 'document.updated',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         document: mapDocument(updatedDocument),
@@ -394,7 +394,7 @@ export class DocumentService {
 
     if (createdUpdate) {
       eventBus.publish({
-        type: 'document_update_created',
+        type: 'document.update.created',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         documentUpdate: mapDocumentUpdate(createdUpdate),
@@ -403,7 +403,7 @@ export class DocumentService {
 
     for (const createdNodeReference of createdNodeReferences) {
       eventBus.publish({
-        type: 'node_reference_created',
+        type: 'node.reference.created',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeReference: mapNodeReference(createdNodeReference),
@@ -412,7 +412,7 @@ export class DocumentService {
 
     for (const deletedNodeReference of deletedNodeReferences) {
       eventBus.publish({
-        type: 'node_reference_deleted',
+        type: 'node.reference.deleted',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeReference: mapNodeReference(deletedNodeReference),
@@ -500,7 +500,7 @@ export class DocumentService {
         .executeTakeFirst();
 
       eventBus.publish({
-        type: 'document_deleted',
+        type: 'document.deleted',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         documentId: data.documentId,
@@ -589,7 +589,7 @@ export class DocumentService {
 
     if (updatedDocument) {
       eventBus.publish({
-        type: 'document_updated',
+        type: 'document.updated',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         document: mapDocument(updatedDocument),
@@ -598,7 +598,7 @@ export class DocumentService {
 
     if (deletedUpdate) {
       eventBus.publish({
-        type: 'document_update_deleted',
+        type: 'document.update.deleted',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         documentId: data.documentId,
@@ -608,7 +608,7 @@ export class DocumentService {
 
     for (const createdNodeReference of createdNodeReferences) {
       eventBus.publish({
-        type: 'node_reference_created',
+        type: 'node.reference.created',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeReference: mapNodeReference(createdNodeReference),
@@ -617,7 +617,7 @@ export class DocumentService {
 
     for (const deletedNodeReference of deletedNodeReferences) {
       eventBus.publish({
-        type: 'node_reference_deleted',
+        type: 'node.reference.deleted',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         nodeReference: mapNodeReference(deletedNodeReference),
@@ -783,7 +783,7 @@ export class DocumentService {
       }
 
       eventBus.publish({
-        type: 'document_updated',
+        type: 'document.updated',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         document: mapDocument(updatedDocument),
@@ -791,7 +791,7 @@ export class DocumentService {
 
       if (upsertedState) {
         eventBus.publish({
-          type: 'document_state_updated',
+          type: 'document.state.updated',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           documentState: mapDocumentState(upsertedState),
@@ -801,7 +801,7 @@ export class DocumentService {
       if (deletedUpdates) {
         for (const update of deletedUpdates) {
           eventBus.publish({
-            type: 'document_update_deleted',
+            type: 'document.update.deleted',
             accountId: this.workspace.accountId,
             workspaceId: this.workspace.id,
             documentId: data.documentId,
@@ -812,7 +812,7 @@ export class DocumentService {
 
       for (const createdNodeReference of createdNodeReferences) {
         eventBus.publish({
-          type: 'node_reference_created',
+          type: 'node.reference.created',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           nodeReference: mapNodeReference(createdNodeReference),
@@ -821,7 +821,7 @@ export class DocumentService {
 
       for (const deletedNodeReference of deletedNodeReferences) {
         eventBus.publish({
-          type: 'node_reference_deleted',
+          type: 'node.reference.deleted',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           nodeReference: mapNodeReference(deletedNodeReference),
@@ -887,7 +887,7 @@ export class DocumentService {
       }
 
       eventBus.publish({
-        type: 'document_updated',
+        type: 'document.updated',
         accountId: this.workspace.accountId,
         workspaceId: this.workspace.id,
         document: mapDocument(createdDocument),
@@ -895,7 +895,7 @@ export class DocumentService {
 
       for (const createdNodeReference of createdNodeReferences) {
         eventBus.publish({
-          type: 'node_reference_created',
+          type: 'node.reference.created',
           accountId: this.workspace.accountId,
           workspaceId: this.workspace.id,
           nodeReference: mapNodeReference(createdNodeReference),

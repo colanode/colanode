@@ -69,13 +69,13 @@ export class AccountService {
 
     this.eventSubscriptionId = eventBus.subscribe((event) => {
       if (
-        event.type === 'server_availability_changed' &&
+        event.type === 'server.availability.changed' &&
         event.server.domain === this.server.domain &&
         event.isAvailable
       ) {
         this.eventLoop.trigger();
       } else if (
-        event.type === 'account_connection_message' &&
+        event.type === 'account.connection.message.received' &&
         event.accountId === this.account.id
       ) {
         this.handleMessage(event.message);
@@ -167,7 +167,7 @@ export class AccountService {
       await this.app.fs.delete(accountPath);
 
       eventBus.publish({
-        type: 'account_deleted',
+        type: 'account.deleted',
         account: this.account,
       });
     } catch (error) {
@@ -211,7 +211,7 @@ export class AccountService {
       await this.app.fs.writeFile(avatarPath, avatarBytes);
 
       eventBus.publish({
-        type: 'avatar_downloaded',
+        type: 'avatar.downloaded',
         accountId: this.account.id,
         avatarId: avatar,
       });
@@ -316,7 +316,7 @@ export class AccountService {
       this.updateAccount(account);
 
       eventBus.publish({
-        type: 'account_updated',
+        type: 'account.updated',
         account,
       });
 
@@ -353,7 +353,7 @@ export class AccountService {
           await this.initWorkspace(mappedWorkspace);
 
           eventBus.publish({
-            type: 'workspace_created',
+            type: 'workspace.created',
             workspace: mappedWorkspace,
           });
         } else {
@@ -380,7 +380,7 @@ export class AccountService {
             }
 
             eventBus.publish({
-              type: 'workspace_updated',
+              type: 'workspace.updated',
               workspace: mappedWorkspace,
             });
           }

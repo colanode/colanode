@@ -14,7 +14,7 @@ interface SidebarMenuProps {
 export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
   const app = useApp();
   const platform = app.getMetadata('platform');
-  const windowSize = app.getMetadata('window_size');
+  const windowSize = app.getMetadata('window.size');
   const showMacOsPlaceholder = platform === 'darwin' && !windowSize?.fullscreen;
 
   return (

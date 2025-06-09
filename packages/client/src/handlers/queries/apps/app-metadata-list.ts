@@ -31,7 +31,7 @@ export class AppMetadataListQueryHandler
     _: AppMetadataListQueryInput,
     output: AppMetadata[]
   ): Promise<ChangeCheckResult<AppMetadataListQueryInput>> {
-    if (event.type === 'app_metadata_saved') {
+    if (event.type === 'app.metadata.updated') {
       const newOutput = [
         ...output.filter((metadata) => metadata.key !== event.metadata.key),
         event.metadata,
@@ -43,7 +43,7 @@ export class AppMetadataListQueryHandler
       };
     }
 
-    if (event.type === 'app_metadata_deleted') {
+    if (event.type === 'app.metadata.deleted') {
       const newOutput = output.filter(
         (metadata) => metadata.key !== event.metadata.key
       );

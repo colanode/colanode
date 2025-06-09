@@ -21,7 +21,7 @@ export type AppVersionMetadata = {
 };
 
 export type AppWindowSizeMetadata = {
-  key: 'window_size';
+  key: 'window.size';
   value: WindowSize;
   createdAt: string;
   updatedAt: string | null;
@@ -45,6 +45,6 @@ export type AppMetadataKey = AppMetadata['key'];
 export type AppMetadataMap = {
   platform: AppPlatformMetadata;
   version: AppVersionMetadata;
-  window_size: AppWindowSizeMetadata;
+  'window.size': AppWindowSizeMetadata;
   account: AppAccountMetadata;
 };
