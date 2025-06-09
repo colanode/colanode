@@ -12,13 +12,12 @@
   "dependencies": {
     "@colanode/client": "*",
     "@colanode/ui": "*",
-    "@sqlite.org/sqlite-wasm": "^3.49.2-build1",
+    "@sqlite.org/sqlite-wasm": "^3.50.1-build1",
     "comlink": "^4.4.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
+    "@vitejs/plugin-react": "^4.5.1",
     "autoprefixer": "^10.4.21",
-    "typescript": "^5.7.2",
     "vite": "^6.1.0",
     "vite-plugin-pwa": "^1.0.0"
   }

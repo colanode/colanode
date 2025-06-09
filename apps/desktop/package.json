@@ -29,22 +29,16 @@
     "@electron/rebuild": "^4.0.1",
     "@types/better-sqlite3": "^7.6.13",
     "@types/electron-squirrel-startup": "^1.0.2",
-    "@types/react": "^18.3.22",
-    "@types/react-dom": "^18.3.7",
     "autoprefixer": "^10.4.21",
-    "electron": "^36.2.1",
-    "tailwindcss": "^3.4.17",
+    "electron": "^36.4.0",
     "vite": "^6.3.5"
   },
   "dependencies": {
-    "@colanode/core": "*",
     "@colanode/client": "*",
+    "@colanode/core": "*",
     "@colanode/ui": "*",
     "better-sqlite3": "^11.10.0",
     "electron-squirrel-startup": "^1.0.1",
-    "kysely": "^0.28.2",
-    "react": "^18.3.1",
-    "react-dom": "^18.3.1",
     "update-electron-app": "^3.1.1"
   }
 }
