@@ -20,7 +20,7 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
-import { app } from '@colanode/desktop/main/app-service';
+import { app, appBadge } from '@colanode/desktop/main/app-service';
 import {
   handleAssetRequest,
   handleFileRequest,
@@ -176,6 +176,7 @@ electronApp.on('activate', () => {
 // code. You can also put them in separate files and import them here.
 ipcMain.handle('init', async () => {
   await app.init();
+  appBadge.init();
 });
 
 ipcMain.handle(

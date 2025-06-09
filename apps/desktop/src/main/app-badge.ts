@@ -1,14 +1,16 @@
-import { app } from 'electron';
+import { app as electronApp } from 'electron';
 
 import { eventBus } from '@colanode/client/lib';
 import { AppService } from '@colanode/client/services';
 
-export class NotificationService {
-  private readonly appService: AppService;
+export class AppBadge {
+  private readonly app: AppService;
 
-  constructor(appService: AppService) {
-    this.appService = appService;
+  constructor(app: AppService) {
+    this.app = app;
+  }
 
+  public init() {
     if (process.platform !== 'darwin') {
       return;
     }
@@ -24,14 +26,14 @@ export class NotificationService {
     });
   }
 
-  public checkBadge() {
+  private checkBadge() {
     if (process.platform !== 'darwin') {
       return;
     }
 
-    const accounts = this.appService.getAccounts();
+    const accounts = this.app.getAccounts();
     if (accounts.length === 0) {
-      app?.dock?.setBadge('');
+      electronApp?.dock?.setBadge('');
       return;
     }
 
@@ -49,11 +51,11 @@ export class NotificationService {
     }
 
     if (unreadCount > 0) {
-      app?.dock?.setBadge(unreadCount.toString());
+      electronApp?.dock?.setBadge(unreadCount.toString());
     } else if (hasUnread) {
-      app?.dock?.setBadge('·');
+      electronApp?.dock?.setBadge('·');
     } else {
-      app?.dock?.setBadge('');
+      electronApp?.dock?.setBadge('');
     }
   }
 }
