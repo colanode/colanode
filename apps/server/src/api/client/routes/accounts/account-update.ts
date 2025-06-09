@@ -97,14 +97,14 @@ export const accountUpdateRoute: FastifyPluginCallbackZod = (
       }
 
       eventBus.publish({
-        type: 'account_updated',
+        type: 'account.updated',
         accountId: account.id,
       });
 
       if (updatedUsers.length > 0) {
         for (const user of updatedUsers) {
           eventBus.publish({
-            type: 'user_updated',
+            type: 'user.updated',
             userId: user.id,
             accountId: account.id,
             workspaceId: user.workspace_id,

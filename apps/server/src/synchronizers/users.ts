@@ -82,7 +82,7 @@ export class UserSynchronizer extends BaseSynchronizer<SyncUsersInput> {
     }));
 
     return {
-      type: 'synchronizer_output',
+      type: 'synchronizer.output',
       userId: this.user.userId,
       id: this.id,
       items: items.map((item) => ({
@@ -94,14 +94,14 @@ export class UserSynchronizer extends BaseSynchronizer<SyncUsersInput> {
 
   private shouldFetch(event: Event) {
     if (
-      event.type === 'user_created' &&
+      event.type === 'user.created' &&
       event.workspaceId === this.user.workspaceId
     ) {
       return true;
     }
 
     if (
-      event.type === 'user_updated' &&
+      event.type === 'user.updated' &&
       event.workspaceId === this.user.workspaceId
     ) {
       return true;

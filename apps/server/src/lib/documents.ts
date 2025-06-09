@@ -94,13 +94,13 @@ export const createDocument = async (
   }
 
   eventBus.publish({
-    type: 'document_updated',
+    type: 'document.updated',
     documentId: input.nodeId,
     workspaceId: input.workspaceId,
   });
 
   eventBus.publish({
-    type: 'document_update_created',
+    type: 'document.update.created',
     documentId: input.nodeId,
     rootId: node.root_id,
     workspaceId: input.workspaceId,
@@ -263,13 +263,13 @@ const tryUpdateDocumentFromMutation = async (
     }
 
     eventBus.publish({
-      type: 'document_updated',
+      type: 'document.updated',
       documentId: mutation.documentId,
       workspaceId: user.workspace_id,
     });
 
     eventBus.publish({
-      type: 'document_update_created',
+      type: 'document.update.created',
       documentId: mutation.documentId,
       rootId: node.root_id,
       workspaceId: user.workspace_id,

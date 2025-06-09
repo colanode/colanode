@@ -92,7 +92,7 @@ export class Synchronizer<TInput extends SynchronizerInput> {
   }
 
   private handleMessage(message: Message) {
-    if (message.type === 'synchronizer_output' && message.id === this.id) {
+    if (message.type === 'synchronizer.output' && message.id === this.id) {
       this.sync(message as SynchronizerOutputMessage<TInput>);
     }
   }
@@ -140,7 +140,7 @@ export class Synchronizer<TInput extends SynchronizerInput> {
 
     const message: SynchronizerInputMessage = {
       id: this.id,
-      type: 'synchronizer_input',
+      type: 'synchronizer.input',
       userId: this.workspace.userId,
       input: this.input,
       cursor: this.cursor.toString(),

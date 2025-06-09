@@ -1,5 +1,5 @@
 export type SyncNodeReactionsInput = {
-  type: 'node_reactions';
+  type: 'node.reactions';
   rootId: string;
 };
 
@@ -16,7 +16,7 @@ export type SyncNodeReactionData = {
 
 declare module '@colanode/core' {
   interface SynchronizerMap {
-    node_reactions: {
+    'node.reactions': {
       input: SyncNodeReactionsInput;
       data: SyncNodeReactionData;
     };

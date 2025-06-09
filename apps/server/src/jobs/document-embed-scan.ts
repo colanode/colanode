@@ -1,5 +1,6 @@
 import { extractDocumentText } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
+import { JobHandler } from '@colanode/server/jobs';
 import {
   fetchEmbeddingCursor,
   scheduleDocumentEmbedding,
@@ -9,19 +10,21 @@ import { config } from '@colanode/server/lib/config';
 
 const BATCH_SIZE = 100;
 
-export type CheckDocumentEmbeddingsInput = {
-  type: 'check_document_embeddings';
+export type DocumentEmbedScanInput = {
+  type: 'document.embed.scan';
 };
 
 declare module '@colanode/server/jobs' {
   interface JobMap {
-    check_document_embeddings: {
-      input: CheckDocumentEmbeddingsInput;
+    'document.embed.scan': {
+      input: DocumentEmbedScanInput;
     };
   }
 }
 
-export const checkDocumentEmbeddingsHandler = async () => {
+export const documentEmbedScanHandler: JobHandler<
+  DocumentEmbedScanInput
+> = async () => {
   if (!config.ai.enabled) {
     return;
   }

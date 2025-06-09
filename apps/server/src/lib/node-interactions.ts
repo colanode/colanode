@@ -81,7 +81,7 @@ export const markNodeAsSeen = async (
   }
 
   eventBus.publish({
-    type: 'node_interaction_updated',
+    type: 'node.interaction.updated',
     nodeId: createdInteraction.node_id,
     collaboratorId: createdInteraction.collaborator_id,
     rootId: createdInteraction.root_id,
@@ -162,7 +162,7 @@ export const markNodeAsOpened = async (
   }
 
   eventBus.publish({
-    type: 'node_interaction_updated',
+    type: 'node.interaction.updated',
     nodeId: createdInteraction.node_id,
     collaboratorId: createdInteraction.collaborator_id,
     rootId: createdInteraction.root_id,

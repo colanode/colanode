@@ -82,7 +82,7 @@ export class DocumentUpdateSynchronizer extends BaseSynchronizer<SyncDocumentUpd
     );
 
     return {
-      type: 'synchronizer_output',
+      type: 'synchronizer.output',
       userId: this.user.userId,
       id: this.id,
       items: items.map((item) => ({
@@ -94,7 +94,7 @@ export class DocumentUpdateSynchronizer extends BaseSynchronizer<SyncDocumentUpd
 
   private shouldFetch(event: Event) {
     if (
-      event.type === 'document_update_created' &&
+      event.type === 'document.update.created' &&
       event.rootId === this.input.rootId
     ) {
       return true;

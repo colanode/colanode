@@ -1,5 +1,5 @@
 export type SyncNodeTombstonesInput = {
-  type: 'node_tombstones';
+  type: 'node.tombstones';
   rootId: string;
 };
 
@@ -14,7 +14,7 @@ export type SyncNodeTombstoneData = {
 
 declare module '@colanode/core' {
   interface SynchronizerMap {
-    node_tombstones: {
+    'node.tombstones': {
       input: SyncNodeTombstonesInput;
       data: SyncNodeTombstoneData;
     };

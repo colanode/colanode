@@ -80,7 +80,7 @@ export class NodeReactionSynchronizer extends BaseSynchronizer<SyncNodeReactions
     );
 
     return {
-      type: 'synchronizer_output',
+      type: 'synchronizer.output',
       userId: this.user.userId,
       id: this.id,
       items: items.map((item) => ({
@@ -92,14 +92,14 @@ export class NodeReactionSynchronizer extends BaseSynchronizer<SyncNodeReactions
 
   private shouldFetch(event: Event) {
     if (
-      event.type === 'node_reaction_created' &&
+      event.type === 'node.reaction.created' &&
       event.rootId === this.input.rootId
     ) {
       return true;
     }
 
     if (
-      event.type === 'node_reaction_deleted' &&
+      event.type === 'node.reaction.deleted' &&
       event.rootId === this.input.rootId
     ) {
       return true;

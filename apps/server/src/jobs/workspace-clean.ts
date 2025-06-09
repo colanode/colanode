@@ -6,22 +6,22 @@ import { deleteFile } from '@colanode/server/lib/files';
 const BATCH_SIZE = 500;
 const debug = createDebugger('server:job:clean-workspace-data');
 
-export type CleanWorkspaceDataInput = {
-  type: 'clean_workspace_data';
+export type WorkspaceCleanInput = {
+  type: 'workspace.clean';
   workspaceId: string;
 };
 
 declare module '@colanode/server/jobs' {
   interface JobMap {
-    clean_workspace_data: {
-      input: CleanWorkspaceDataInput;
+    'workspace.clean': {
+      input: WorkspaceCleanInput;
     };
   }
 }
 
-export const cleanWorkspaceDataHandler: JobHandler<
-  CleanWorkspaceDataInput
-> = async (input) => {
+export const workspaceCleanHandler: JobHandler<WorkspaceCleanInput> = async (
+  input
+) => {
   debug(`Cleaning workspace data for ${input.workspaceId}`);
 
   try {

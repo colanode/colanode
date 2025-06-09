@@ -69,7 +69,7 @@ export const createNodeReaction = async (
   }
 
   eventBus.publish({
-    type: 'node_reaction_created',
+    type: 'node.reaction.created',
     nodeId: createdNodeReaction.node_id,
     collaboratorId: createdNodeReaction.collaborator_id,
     rootId: createdNodeReaction.root_id,
@@ -129,7 +129,7 @@ export const deleteNodeReaction = async (
   }
 
   eventBus.publish({
-    type: 'node_reaction_deleted',
+    type: 'node.reaction.deleted',
     nodeId: mutation.data.nodeId,
     collaboratorId: user.id,
     rootId: node.root_id,

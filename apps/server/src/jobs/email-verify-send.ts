@@ -1,22 +1,22 @@
 import { JobHandler } from '@colanode/server/jobs';
 import { sendEmailVerifyEmail } from '@colanode/server/lib/accounts';
 
-export type SendEmailVerifyEmailInput = {
-  type: 'send_email_verify_email';
+export type EmailVerifySendInput = {
+  type: 'email.verify.send';
   otpId: string;
 };
 
 declare module '@colanode/server/jobs' {
   interface JobMap {
-    send_email_verify_email: {
-      input: SendEmailVerifyEmailInput;
+    'email.verify.send': {
+      input: EmailVerifySendInput;
     };
   }
 }
 
-export const sendEmailVerifyEmailHandler: JobHandler<
-  SendEmailVerifyEmailInput
-> = async (input) => {
+export const emailVerifySendHandler: JobHandler<EmailVerifySendInput> = async (
+  input
+) => {
   const { otpId } = input;
   await sendEmailVerifyEmail(otpId);
 };

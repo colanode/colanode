@@ -13,8 +13,8 @@ import { config } from '@colanode/server/lib/config';
 import { fetchNode, createNode } from '@colanode/server/lib/nodes';
 import { Citation } from '@colanode/server/types/assistant';
 
-export type AssistantResponseInput = {
-  type: 'assistant_response';
+export type AssistantRespondInput = {
+  type: 'assistant.respond';
   messageId: string;
   workspaceId: string;
   selectedContextNodeIds?: string[];
@@ -22,14 +22,14 @@ export type AssistantResponseInput = {
 
 declare module '@colanode/server/jobs' {
   interface JobMap {
-    assistant_response: {
-      input: AssistantResponseInput;
+    'assistant.respond': {
+      input: AssistantRespondInput;
     };
   }
 }
 
-export const assistantResponseHandler: JobHandler<
-  AssistantResponseInput
+export const assistantRespondHandler: JobHandler<
+  AssistantRespondInput
 > = async (input) => {
   const { messageId, workspaceId, selectedContextNodeIds } = input;
   console.log('Starting assistant response handler', {

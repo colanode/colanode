@@ -81,7 +81,7 @@ export class NodeInteractionSynchronizer extends BaseSynchronizer<SyncNodeIntera
     );
 
     return {
-      type: 'synchronizer_output',
+      type: 'synchronizer.output',
       userId: this.user.userId,
       id: this.id,
       items: items.map((item) => ({
@@ -93,7 +93,7 @@ export class NodeInteractionSynchronizer extends BaseSynchronizer<SyncNodeIntera
 
   private shouldFetch(event: Event) {
     if (
-      event.type === 'node_interaction_updated' &&
+      event.type === 'node.interaction.updated' &&
       event.rootId === this.input.rootId
     ) {
       return true;

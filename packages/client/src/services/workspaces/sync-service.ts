@@ -159,31 +159,31 @@ export class SyncService {
     const rootSynchronizers = {
       nodeUpdates: new Synchronizer(
         this.workspace,
-        { type: 'nodes_updates', rootId },
+        { type: 'nodes.updates', rootId },
         `${rootId}_nodes_updates`,
         this.syncHandlers.nodeUpdates
       ),
       nodeInteractions: new Synchronizer(
         this.workspace,
-        { type: 'node_interactions', rootId },
+        { type: 'node.interactions', rootId },
         `${rootId}_node_interactions`,
         this.syncHandlers.nodeInteractions
       ),
       nodeReactions: new Synchronizer(
         this.workspace,
-        { type: 'node_reactions', rootId },
+        { type: 'node.reactions', rootId },
         `${rootId}_node_reactions`,
         this.syncHandlers.nodeReactions
       ),
       nodeTombstones: new Synchronizer(
         this.workspace,
-        { type: 'node_tombstones', rootId },
+        { type: 'node.tombstones', rootId },
         `${rootId}_node_tombstones`,
         this.syncHandlers.nodeTombstones
       ),
       documentUpdates: new Synchronizer(
         this.workspace,
-        { type: 'document_updates', rootId },
+        { type: 'document.updates', rootId },
         `${rootId}_document_updates`,
         this.syncHandlers.documentUpdates
       ),

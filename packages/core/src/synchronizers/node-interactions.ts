@@ -1,5 +1,5 @@
 export type SyncNodeInteractionsInput = {
-  type: 'node_interactions';
+  type: 'node.interactions';
   rootId: string;
 };
 
@@ -17,7 +17,7 @@ export type SyncNodeInteractionData = {
 
 declare module '@colanode/core' {
   interface SynchronizerMap {
-    node_interactions: {
+    'node.interactions': {
       input: SyncNodeInteractionsInput;
       data: SyncNodeInteractionData;
     };

@@ -185,7 +185,7 @@ export const createNode = async (input: CreateNodeInput): Promise<boolean> => {
       });
 
     eventBus.publish({
-      type: 'node_created',
+      type: 'node.created',
       nodeId: input.nodeId,
       rootId: input.rootId,
       workspaceId: input.workspaceId,
@@ -193,7 +193,7 @@ export const createNode = async (input: CreateNodeInput): Promise<boolean> => {
 
     for (const createdCollaboration of createdCollaborations) {
       eventBus.publish({
-        type: 'collaboration_created',
+        type: 'collaboration.created',
         collaboratorId: createdCollaboration.collaborator_id,
         nodeId: input.nodeId,
         workspaceId: input.workspaceId,
@@ -317,7 +317,7 @@ export const tryUpdateNode = async (
       });
 
     eventBus.publish({
-      type: 'node_updated',
+      type: 'node.updated',
       nodeId: input.nodeId,
       rootId: node.root_id,
       workspaceId: input.workspaceId,
@@ -325,7 +325,7 @@ export const tryUpdateNode = async (
 
     for (const createdCollaboration of createdCollaborations) {
       eventBus.publish({
-        type: 'collaboration_created',
+        type: 'collaboration.created',
         collaboratorId: createdCollaboration.collaborator_id,
         nodeId: input.nodeId,
         workspaceId: input.workspaceId,
@@ -334,7 +334,7 @@ export const tryUpdateNode = async (
 
     for (const updatedCollaboration of updatedCollaborations) {
       eventBus.publish({
-        type: 'collaboration_updated',
+        type: 'collaboration.updated',
         collaboratorId: updatedCollaboration.collaborator_id,
         nodeId: input.nodeId,
         workspaceId: input.workspaceId,
@@ -453,7 +453,7 @@ export const createNodeFromMutation = async (
       });
 
     eventBus.publish({
-      type: 'node_created',
+      type: 'node.created',
       nodeId: mutation.nodeId,
       rootId,
       workspaceId: user.workspace_id,
@@ -461,7 +461,7 @@ export const createNodeFromMutation = async (
 
     for (const createdCollaboration of createdCollaborations) {
       eventBus.publish({
-        type: 'collaboration_created',
+        type: 'collaboration.created',
         collaboratorId: createdCollaboration.collaborator_id,
         nodeId: mutation.nodeId,
         workspaceId: user.workspace_id,
@@ -609,7 +609,7 @@ const tryUpdateNodeFromMutation = async (
       });
 
     eventBus.publish({
-      type: 'node_updated',
+      type: 'node.updated',
       nodeId: mutation.nodeId,
       rootId: node.root_id,
       workspaceId: user.workspace_id,
@@ -617,7 +617,7 @@ const tryUpdateNodeFromMutation = async (
 
     for (const createdCollaboration of createdCollaborations) {
       eventBus.publish({
-        type: 'collaboration_created',
+        type: 'collaboration.created',
         collaboratorId: createdCollaboration.collaborator_id,
         nodeId: mutation.nodeId,
         workspaceId: user.workspace_id,
@@ -626,7 +626,7 @@ const tryUpdateNodeFromMutation = async (
 
     for (const updatedCollaboration of updatedCollaborations) {
       eventBus.publish({
-        type: 'collaboration_updated',
+        type: 'collaboration.updated',
         collaboratorId: updatedCollaboration.collaborator_id,
         nodeId: mutation.nodeId,
         workspaceId: user.workspace_id,
@@ -721,14 +721,14 @@ export const deleteNodeFromMutation = async (
   }
 
   eventBus.publish({
-    type: 'node_deleted',
+    type: 'node.deleted',
     nodeId: mutation.nodeId,
     rootId: node.root_id,
     workspaceId: user.workspace_id,
   });
 
   await jobService.addJob({
-    type: 'clean_node_data',
+    type: 'node.clean',
     nodeId: mutation.nodeId,
     workspaceId: user.workspace_id,
     userId: user.id,

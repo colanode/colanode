@@ -136,12 +136,12 @@ export const createWorkspace = async (
   }
 
   eventBus.publish({
-    type: 'workspace_created',
+    type: 'workspace.created',
     workspaceId: workspaceId,
   });
 
   eventBus.publish({
-    type: 'user_created',
+    type: 'user.created',
     userId: userId,
     workspaceId: workspaceId,
     accountId: account.id,

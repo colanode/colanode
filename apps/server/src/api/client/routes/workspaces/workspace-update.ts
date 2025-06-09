@@ -64,7 +64,7 @@ export const workspaceUpdateRoute: FastifyPluginCallbackZod = (
       }
 
       eventBus.publish({
-        type: 'workspace_updated',
+        type: 'workspace.updated',
         workspaceId: updatedWorkspace.id,
       });
 

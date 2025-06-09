@@ -1,21 +1,21 @@
 import { JobHandler } from '@colanode/server/jobs';
 import { sendEmailPasswordResetEmail } from '@colanode/server/lib/accounts';
 
-export type SendEmailPasswordResetEmailInput = {
-  type: 'send_email_password_reset_email';
+export type EmailPasswordResetSendInput = {
+  type: 'email.password.reset.send';
   otpId: string;
 };
 
 declare module '@colanode/server/jobs' {
   interface JobMap {
-    send_email_password_reset_email: {
-      input: SendEmailPasswordResetEmailInput;
+    'email.password.reset.send': {
+      input: EmailPasswordResetSendInput;
     };
   }
 }
 
-export const sendEmailPasswordResetEmailHandler: JobHandler<
-  SendEmailPasswordResetEmailInput
+export const emailPasswordResetSendHandler: JobHandler<
+  EmailPasswordResetSendInput
 > = async (input) => {
   const { otpId } = input;
   await sendEmailPasswordResetEmail(otpId);

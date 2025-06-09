@@ -8,8 +8,8 @@ import { deleteFile } from '@colanode/server/lib/files';
 const BATCH_SIZE = 100;
 const debug = createDebugger('server:job:clean-node-data');
 
-export type CleanNodeDataInput = {
-  type: 'clean_node_data';
+export type NodeCleanInput = {
+  type: 'node.clean';
   nodeId: string;
   workspaceId: string;
   userId: string;
@@ -17,15 +17,13 @@ export type CleanNodeDataInput = {
 
 declare module '@colanode/server/jobs' {
   interface JobMap {
-    clean_node_data: {
-      input: CleanNodeDataInput;
+    'node.clean': {
+      input: NodeCleanInput;
     };
   }
 }
 
-export const cleanNodeDataHandler: JobHandler<CleanNodeDataInput> = async (
-  input
-) => {
+export const nodeCleanHandler: JobHandler<NodeCleanInput> = async (input) => {
   debug(`Cleaning node data for ${input.nodeId}`);
 
   await cleanNodeRelations([input.nodeId]);
@@ -97,7 +95,7 @@ const cleanDescendants = async (nodeId: string, userId: string) => {
 
     for (const node of nodes) {
       eventBus.publish({
-        type: 'node_deleted',
+        type: 'node.deleted',
         nodeId: node.id,
         rootId: node.root_id,
         workspaceId: node.workspace_id,

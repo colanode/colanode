@@ -1,7 +1,7 @@
 import { UpdateMergeMetadata } from '@colanode/core/types/crdt';
 
 export type SyncDocumentUpdatesInput = {
-  type: 'document_updates';
+  type: 'document.updates';
   rootId: string;
 };
 
@@ -17,7 +17,7 @@ export type SyncDocumentUpdateData = {
 
 declare module '@colanode/core' {
   interface SynchronizerMap {
-    document_updates: {
+    'document.updates': {
       input: SyncDocumentUpdatesInput;
       data: SyncDocumentUpdateData;
     };

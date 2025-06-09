@@ -1,5 +1,6 @@
 import { getNodeModel } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
+import { JobHandler } from '@colanode/server/jobs';
 import {
   fetchEmbeddingCursor,
   scheduleNodeEmbedding,
@@ -9,19 +10,21 @@ import { config } from '@colanode/server/lib/config';
 
 const BATCH_SIZE = 100;
 
-export type CheckNodeEmbeddingsInput = {
-  type: 'check_node_embeddings';
+export type NodeEmbedScanInput = {
+  type: 'node.embed.scan';
 };
 
 declare module '@colanode/server/jobs' {
   interface JobMap {
-    check_node_embeddings: {
-      input: CheckNodeEmbeddingsInput;
+    'node.embed.scan': {
+      input: NodeEmbedScanInput;
     };
   }
 }
 
-export const checkNodeEmbeddingsHandler = async () => {
+export const nodeEmbedScanHandler: JobHandler<
+  NodeEmbedScanInput
+> = async () => {
   if (!config.ai.enabled) {
     return;
   }

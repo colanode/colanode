@@ -4,27 +4,25 @@ import { sql } from 'kysely';
 import { getNodeModel } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { CreateNodeEmbedding } from '@colanode/server/data/schema';
+import { JobHandler } from '@colanode/server/jobs';
 import { chunkText } from '@colanode/server/lib/ai/chunking';
 import { config } from '@colanode/server/lib/config';
 import { fetchNode } from '@colanode/server/lib/nodes';
 
-export type EmbedNodeInput = {
-  type: 'embed_node';
+export type NodeEmbedInput = {
+  type: 'node.embed';
   nodeId: string;
 };
 
 declare module '@colanode/server/jobs' {
   interface JobMap {
-    embed_node: {
-      input: EmbedNodeInput;
+    'node.embed': {
+      input: NodeEmbedInput;
     };
   }
 }
 
-export const embedNodeHandler = async (input: {
-  type: 'embed_node';
-  nodeId: string;
-}) => {
+export const nodeEmbedHandler: JobHandler<NodeEmbedInput> = async (input) => {
   if (!config.ai.enabled) {
     return;
   }

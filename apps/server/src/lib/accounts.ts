@@ -158,7 +158,7 @@ export const buildLoginVerifyOutput = async (
 
   await saveOtp(id, otp);
   await jobService.addJob({
-    type: 'send_email_verify_email',
+    type: 'email.verify.send',
     otpId: id,
   });
 

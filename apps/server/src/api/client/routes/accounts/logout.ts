@@ -22,7 +22,7 @@ export const logoutRoute: FastifyPluginCallbackZod = (instance, _, done) => {
         .execute();
 
       eventBus.publish({
-        type: 'device_deleted',
+        type: 'device.deleted',
         accountId: account.id,
         deviceId: account.deviceId,
       });

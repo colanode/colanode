@@ -88,25 +88,25 @@ export class SocketConnection {
       `Socket message, account:${this.context.accountId}, device:${this.context.deviceId}, type:${message.type}`
     );
 
-    if (message.type === 'synchronizer_input') {
+    if (message.type === 'synchronizer.input') {
       this.handleSynchronizerInput(message);
     }
   }
 
   public async handleEvent(event: Event) {
-    if (event.type === 'account_updated') {
+    if (event.type === 'account.updated') {
       this.handleAccountUpdatedEvent(event);
-    } else if (event.type === 'workspace_updated') {
+    } else if (event.type === 'workspace.updated') {
       this.handleWorkspaceUpdatedEvent(event);
-    } else if (event.type === 'workspace_deleted') {
+    } else if (event.type === 'workspace.deleted') {
       this.handleWorkspaceDeletedEvent(event);
-    } else if (event.type === 'collaboration_created') {
+    } else if (event.type === 'collaboration.created') {
       this.handleCollaborationCreatedEvent(event);
-    } else if (event.type === 'collaboration_updated') {
+    } else if (event.type === 'collaboration.updated') {
       this.handleCollaborationUpdatedEvent(event);
-    } else if (event.type === 'user_created') {
+    } else if (event.type === 'user.created') {
       this.handleUserCreatedEvent(event);
-    } else if (event.type === 'user_updated') {
+    } else if (event.type === 'user.updated') {
       this.handleUserUpdatedEvent(event);
     }
 
@@ -155,7 +155,7 @@ export class SocketConnection {
         message.input,
         cursor
       );
-    } else if (message.input.type === 'nodes_updates') {
+    } else if (message.input.type === 'nodes.updates') {
       if (!user.rootIds.has(message.input.rootId)) {
         return null;
       }
@@ -166,21 +166,21 @@ export class SocketConnection {
         message.input,
         cursor
       );
-    } else if (message.input.type === 'node_reactions') {
+    } else if (message.input.type === 'node.reactions') {
       return new NodeReactionSynchronizer(
         message.id,
         user.user,
         message.input,
         cursor
       );
-    } else if (message.input.type === 'node_interactions') {
+    } else if (message.input.type === 'node.interactions') {
       return new NodeInteractionSynchronizer(
         message.id,
         user.user,
         message.input,
         cursor
       );
-    } else if (message.input.type === 'node_tombstones') {
+    } else if (message.input.type === 'node.tombstones') {
       if (!user.rootIds.has(message.input.rootId)) {
         return null;
       }
@@ -191,7 +191,7 @@ export class SocketConnection {
         message.input,
         cursor
       );
-    } else if (message.input.type === 'document_updates') {
+    } else if (message.input.type === 'document.updates') {
       if (!user.rootIds.has(message.input.rootId)) {
         return null;
       }
@@ -290,7 +290,7 @@ export class SocketConnection {
     }
 
     this.sendMessage({
-      type: 'account_updated',
+      type: 'account.updated',
       accountId: this.context.accountId,
     });
   }
@@ -305,7 +305,7 @@ export class SocketConnection {
     }
 
     this.sendMessage({
-      type: 'workspace_updated',
+      type: 'workspace.updated',
       workspaceId: event.workspaceId,
     });
   }
@@ -320,7 +320,7 @@ export class SocketConnection {
     }
 
     this.sendMessage({
-      type: 'workspace_deleted',
+      type: 'workspace.deleted',
       accountId: this.context.accountId,
     });
   }
@@ -362,7 +362,7 @@ export class SocketConnection {
     }
 
     this.sendMessage({
-      type: 'user_created',
+      type: 'user.created',
       accountId: event.accountId,
       workspaceId: event.workspaceId,
       userId: event.userId,
@@ -375,7 +375,7 @@ export class SocketConnection {
     }
 
     this.sendMessage({
-      type: 'user_updated',
+      type: 'user.updated',
       accountId: event.accountId,
       userId: event.userId,
     });

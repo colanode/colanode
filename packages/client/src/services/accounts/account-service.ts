@@ -259,11 +259,11 @@ export class AccountService {
 
   private handleMessage(message: Message): void {
     if (
-      message.type === 'account_updated' ||
-      message.type === 'workspace_deleted' ||
-      message.type === 'workspace_updated' ||
-      message.type === 'user_created' ||
-      message.type === 'user_updated'
+      message.type === 'account.updated' ||
+      message.type === 'workspace.deleted' ||
+      message.type === 'workspace.updated' ||
+      message.type === 'user.created' ||
+      message.type === 'user.updated'
     ) {
       this.eventLoop.trigger();
     }

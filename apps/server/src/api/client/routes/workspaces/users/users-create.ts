@@ -125,7 +125,7 @@ export const usersCreateRoute: FastifyPluginCallbackZod = (
         }
 
         eventBus.publish({
-          type: 'user_created',
+          type: 'user.created',
           accountId: account.id,
           userId: userId,
           workspaceId: workspaceId,

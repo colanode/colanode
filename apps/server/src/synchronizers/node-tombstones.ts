@@ -78,7 +78,7 @@ export class NodeTombstoneSynchronizer extends BaseSynchronizer<SyncNodeTombston
     );
 
     return {
-      type: 'synchronizer_output',
+      type: 'synchronizer.output',
       userId: this.user.userId,
       id: this.id,
       items: items.map((item) => ({
@@ -89,7 +89,7 @@ export class NodeTombstoneSynchronizer extends BaseSynchronizer<SyncNodeTombston
   }
 
   private shouldFetch(event: Event) {
-    if (event.type === 'node_deleted' && event.rootId === this.input.rootId) {
+    if (event.type === 'node.deleted' && event.rootId === this.input.rootId) {
       return true;
     }
 

@@ -48,11 +48,11 @@ export const workspaceDeleteRoute: FastifyPluginCallbackZod = (
 
       await jobService.addJob(
         {
-          type: 'clean_workspace_data',
+          type: 'workspace.clean',
           workspaceId: workspaceId,
         },
         {
-          jobId: `clean_workspace_data_${workspaceId}`,
+          jobId: `workspace.clean.${workspaceId}`,
           attempts: 5,
           backoff: {
             type: 'exponential',
@@ -70,7 +70,7 @@ export const workspaceDeleteRoute: FastifyPluginCallbackZod = (
       }
 
       eventBus.publish({
-        type: 'workspace_deleted',
+        type: 'workspace.deleted',
         workspaceId: workspaceId,
       });
 

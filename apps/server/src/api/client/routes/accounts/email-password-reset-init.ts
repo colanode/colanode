@@ -77,7 +77,7 @@ export const emailPasswordResetInitRoute: FastifyPluginCallbackZod = (
 
       await saveOtp(id, otp);
       await jobService.addJob({
-        type: 'send_email_password_reset_email',
+        type: 'email.password.reset.send',
         otpId: id,
       });
 

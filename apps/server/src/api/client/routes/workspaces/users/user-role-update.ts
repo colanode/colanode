@@ -79,7 +79,7 @@ export const userRoleUpdateRoute: FastifyPluginCallbackZod = (
       }
 
       eventBus.publish({
-        type: 'user_updated',
+        type: 'user.updated',
         userId: userToUpdate.id,
         accountId: userToUpdate.account_id,
         workspaceId: userToUpdate.workspace_id,

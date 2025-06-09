@@ -82,7 +82,7 @@ export class CollaborationSynchronizer extends BaseSynchronizer<SyncCollaboratio
     );
 
     return {
-      type: 'synchronizer_output',
+      type: 'synchronizer.output',
       userId: this.user.userId,
       id: this.id,
       items: items.map((item) => ({
@@ -94,7 +94,7 @@ export class CollaborationSynchronizer extends BaseSynchronizer<SyncCollaboratio
 
   private shouldFetch(event: Event) {
     if (
-      event.type === 'collaboration_created' &&
+      event.type === 'collaboration.created' &&
       event.workspaceId === this.user.workspaceId &&
       event.collaboratorId === this.user.userId
     ) {
@@ -102,7 +102,7 @@ export class CollaborationSynchronizer extends BaseSynchronizer<SyncCollaboratio
     }
 
     if (
-      event.type === 'collaboration_updated' &&
+      event.type === 'collaboration.updated' &&
       event.workspaceId === this.user.workspaceId &&
       event.collaboratorId === this.user.userId
     ) {
