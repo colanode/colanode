@@ -2,11 +2,14 @@ import {
   SynchronizerOutputMessage,
   SyncNodeReactionsInput,
   SyncNodeReactionData,
+  createDebugger,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { SelectNodeReaction } from '@colanode/server/data/schema';
 import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
 import { Event } from '@colanode/server/types/events';
+
+const debug = createDebugger('node-reaction-synchronizer');
 
 export class NodeReactionSynchronizer extends BaseSynchronizer<SyncNodeReactionsInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncNodeReactionsInput> | null> {
@@ -39,17 +42,25 @@ export class NodeReactionSynchronizer extends BaseSynchronizer<SyncNodeReactions
     }
 
     this.status = 'fetching';
-    const nodeReactions = await database
-      .selectFrom('node_reactions')
-      .selectAll()
-      .where('root_id', '=', this.input.rootId)
-      .where('revision', '>', this.cursor)
-      .orderBy('revision', 'asc')
-      .limit(20)
-      .execute();
 
-    this.status = 'pending';
-    return nodeReactions;
+    try {
+      const nodeReactions = await database
+        .selectFrom('node_reactions')
+        .selectAll()
+        .where('root_id', '=', this.input.rootId)
+        .where('revision', '>', this.cursor)
+        .orderBy('revision', 'asc')
+        .limit(20)
+        .execute();
+
+      return nodeReactions;
+    } catch (error) {
+      debug('Error fetching node reactions for sync', error);
+    } finally {
+      this.status = 'pending';
+    }
+
+    return [];
   }
 
   private buildMessage(

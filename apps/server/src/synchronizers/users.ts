@@ -2,11 +2,14 @@ import {
   SynchronizerOutputMessage,
   SyncUserData,
   SyncUsersInput,
+  createDebugger,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { SelectUser } from '@colanode/server/data/schema';
 import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
 import { Event } from '@colanode/server/types/events';
+
+const debug = createDebugger('user-synchronizer');
 
 export class UserSynchronizer extends BaseSynchronizer<SyncUsersInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncUsersInput> | null> {
@@ -39,17 +42,25 @@ export class UserSynchronizer extends BaseSynchronizer<SyncUsersInput> {
     }
 
     this.status = 'fetching';
-    const users = await database
-      .selectFrom('users')
-      .selectAll()
-      .where('workspace_id', '=', this.user.workspaceId)
-      .where('revision', '>', this.cursor)
-      .orderBy('revision', 'asc')
-      .limit(50)
-      .execute();
 
-    this.status = 'pending';
-    return users;
+    try {
+      const users = await database
+        .selectFrom('users')
+        .selectAll()
+        .where('workspace_id', '=', this.user.workspaceId)
+        .where('revision', '>', this.cursor)
+        .orderBy('revision', 'asc')
+        .limit(50)
+        .execute();
+
+      return users;
+    } catch (error) {
+      debug('Error fetching users for sync', error);
+    } finally {
+      this.status = 'pending';
+    }
+
+    return [];
   }
 
   private buildMessage(

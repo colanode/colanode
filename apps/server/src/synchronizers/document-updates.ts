@@ -2,12 +2,15 @@ import {
   SynchronizerOutputMessage,
   SyncDocumentUpdatesInput,
   SyncDocumentUpdateData,
+  createDebugger,
 } from '@colanode/core';
 import { encodeState } from '@colanode/crdt';
 import { database } from '@colanode/server/data/database';
 import { SelectDocumentUpdate } from '@colanode/server/data/schema';
 import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
 import { Event } from '@colanode/server/types/events';
+
+const debug = createDebugger('document-update-synchronizer');
 
 export class DocumentUpdateSynchronizer extends BaseSynchronizer<SyncDocumentUpdatesInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncDocumentUpdatesInput> | null> {
@@ -40,17 +43,25 @@ export class DocumentUpdateSynchronizer extends BaseSynchronizer<SyncDocumentUpd
     }
 
     this.status = 'fetching';
-    const documentUpdates = await database
-      .selectFrom('document_updates')
-      .selectAll()
-      .where('root_id', '=', this.input.rootId)
-      .where('revision', '>', this.cursor)
-      .orderBy('revision', 'asc')
-      .limit(20)
-      .execute();
 
-    this.status = 'pending';
-    return documentUpdates;
+    try {
+      const documentUpdates = await database
+        .selectFrom('document_updates')
+        .selectAll()
+        .where('root_id', '=', this.input.rootId)
+        .where('revision', '>', this.cursor)
+        .orderBy('revision', 'asc')
+        .limit(20)
+        .execute();
+
+      return documentUpdates;
+    } catch (error) {
+      debug('Error fetching document updates for sync', error);
+    } finally {
+      this.status = 'pending';
+    }
+
+    return [];
   }
 
   private buildMessage(

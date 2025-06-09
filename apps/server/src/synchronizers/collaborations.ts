@@ -2,11 +2,14 @@ import {
   SynchronizerOutputMessage,
   SyncCollaborationsInput,
   SyncCollaborationData,
+  createDebugger,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { SelectCollaboration } from '@colanode/server/data/schema';
 import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
 import { Event } from '@colanode/server/types/events';
+
+const debug = createDebugger('collaboration-synchronizer');
 
 export class CollaborationSynchronizer extends BaseSynchronizer<SyncCollaborationsInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncCollaborationsInput> | null> {
@@ -39,17 +42,24 @@ export class CollaborationSynchronizer extends BaseSynchronizer<SyncCollaboratio
     }
 
     this.status = 'fetching';
-    const collaborations = await database
-      .selectFrom('collaborations')
-      .selectAll()
-      .where('collaborator_id', '=', this.user.userId)
-      .where('revision', '>', this.cursor)
-      .orderBy('revision', 'asc')
-      .limit(50)
-      .execute();
+    try {
+      const collaborations = await database
+        .selectFrom('collaborations')
+        .selectAll()
+        .where('collaborator_id', '=', this.user.userId)
+        .where('revision', '>', this.cursor)
+        .orderBy('revision', 'asc')
+        .limit(50)
+        .execute();
 
-    this.status = 'pending';
-    return collaborations;
+      return collaborations;
+    } catch (error) {
+      debug('Error fetching collaborations for sync', error);
+    } finally {
+      this.status = 'pending';
+    }
+
+    return [];
   }
 
   private buildMessage(
