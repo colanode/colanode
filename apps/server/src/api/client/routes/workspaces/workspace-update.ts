@@ -17,7 +17,7 @@ export const workspaceUpdateRoute: FastifyPluginCallbackZod = (
   done
 ) => {
   instance.route({
-    method: 'PUT',
+    method: 'PATCH',
     url: '/',
     schema: {
       params: z.object({

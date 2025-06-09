@@ -1,5 +1,4 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
-import { z } from 'zod';
 
 import {
   accountUpdateInputSchema,
@@ -17,12 +16,9 @@ export const accountUpdateRoute: FastifyPluginCallbackZod = (
   done
 ) => {
   instance.route({
-    method: 'PUT',
-    url: '/:accountId',
+    method: 'PATCH',
+    url: '/',
     schema: {
-      params: z.object({
-        accountId: z.string(),
-      }),
       body: accountUpdateInputSchema,
       response: {
         200: accountUpdateOutputSchema,
@@ -32,16 +28,7 @@ export const accountUpdateRoute: FastifyPluginCallbackZod = (
       },
     },
     handler: async (request, reply) => {
-      const accountId = request.params.accountId;
       const input = request.body;
-
-      if (accountId !== request.account.id) {
-        return reply.code(400).send({
-          code: ApiErrorCode.AccountMismatch,
-          message:
-            'The provided account id does not match the account id in the token. Make sure you are using the correct account token.',
-        });
-      }
 
       const account = await database
         .selectFrom('accounts')

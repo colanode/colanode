@@ -42,8 +42,14 @@ export const accountSyncRoute: FastifyPluginCallbackZod = (
       }
 
       const device = await database
-        .selectFrom('devices')
-        .selectAll()
+        .updateTable('devices')
+        .returningAll()
+        .set({
+          synced_at: new Date(),
+          ip: request.client.ip,
+          platform: request.client.platform,
+          version: request.client.version,
+        })
         .where('id', '=', request.account.deviceId)
         .executeTakeFirst();
 
@@ -53,17 +59,6 @@ export const accountSyncRoute: FastifyPluginCallbackZod = (
           message: 'Device not found. Check your token.',
         });
       }
-
-      await database
-        .updateTable('devices')
-        .set({
-          synced_at: new Date(),
-          ip: request.client.ip,
-          platform: request.client.platform,
-          version: request.client.version,
-        })
-        .where('id', '=', device.id)
-        .execute();
 
       const workspaceOutputs: WorkspaceOutput[] = [];
       const users = await database
