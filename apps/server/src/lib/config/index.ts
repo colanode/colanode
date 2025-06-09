@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { accountConfigSchema, readAccountConfigVariables } from './account';
 import { aiConfigSchema, readAiConfigVariables } from './ai';
@@ -39,8 +39,8 @@ const readConfigVariables = (): Configuration => {
   } catch (error) {
     if (error instanceof z.ZodError) {
       console.error('Configuration validation error:');
-      error.errors.forEach((err) => {
-        console.error(`- ${err.path.join('.')}: ${err.message}`);
+      error.issues.forEach((issue) => {
+        console.error(`- ${issue.path.join('.')}: ${issue.message}`);
       });
     } else {
       console.error('Configuration validation error:', error);

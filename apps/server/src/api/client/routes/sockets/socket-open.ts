@@ -1,5 +1,5 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { apiErrorOutputSchema } from '@colanode/core';
 import { socketService } from '@colanode/server/services/socket-service';

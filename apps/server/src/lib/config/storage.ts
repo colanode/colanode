@@ -1,12 +1,12 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const storageConfigSchema = z.object({
   type: z.literal('s3'),
-  endpoint: z.string({ required_error: 'S3_ENDPOINT is required' }),
-  accessKey: z.string({ required_error: 'S3_ACCESS_KEY is required' }),
-  secretKey: z.string({ required_error: 'S3_SECRET_KEY is required' }),
-  bucketName: z.string({ required_error: 'S3_BUCKET_NAME is required' }),
-  region: z.string({ required_error: 'S3_REGION is required' }),
+  endpoint: z.string({ error: 'S3_ENDPOINT is required' }),
+  accessKey: z.string({ error: 'S3_ACCESS_KEY is required' }),
+  secretKey: z.string({ error: 'S3_SECRET_KEY is required' }),
+  bucketName: z.string({ error: 'S3_BUCKET_NAME is required' }),
+  region: z.string({ error: 'S3_REGION is required' }),
 });
 
 export type StorageConfig = z.infer<typeof storageConfigSchema>;

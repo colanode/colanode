@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { hasWorkspaceRole } from '@colanode/core/lib/permissions';
 import { NodeModel, nodeRoleEnum } from '@colanode/core/registry/nodes/core';

@@ -2,7 +2,7 @@ import { Readable } from 'stream';
 
 import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { ApiErrorCode } from '@colanode/core';
 import { s3Client } from '@colanode/server/data/storage';

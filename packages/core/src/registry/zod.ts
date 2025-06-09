@@ -1,28 +1,7 @@
-import {
-  INVALID,
-  OK,
-  ParseInput,
-  ParseReturnType,
-  ZodType,
-  ZodTypeDef,
-} from 'zod';
+import { z } from 'zod/v4';
 
-export class ZodText extends ZodType<string, ZodTypeDef, string> {
+export class ZodText extends z.ZodString {
   constructor() {
-    super({
-      description: 'Text',
-    });
-  }
-
-  _parse(input: ParseInput): ParseReturnType<string> {
-    if (typeof input.data !== 'string') {
-      return INVALID;
-    }
-
-    return OK(input.data);
-  }
-
-  static create(): ZodText {
-    return new ZodText();
+    super(z.string());
   }
 }

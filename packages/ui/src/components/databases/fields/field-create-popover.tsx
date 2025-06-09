@@ -3,7 +3,7 @@ import { Plus } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import * as z from 'zod';
+import { z } from 'zod/v4';
 
 import { DatabaseSelect } from '@colanode/ui/components/databases/database-select';
 import { FieldTypeSelect } from '@colanode/ui/components/databases/fields/field-type-select';

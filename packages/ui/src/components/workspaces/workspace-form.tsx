@@ -3,7 +3,7 @@ import { Upload } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { generateId, IdType } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';

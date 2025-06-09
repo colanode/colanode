@@ -1,22 +1,22 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const smtpConfigSchema = z.discriminatedUnion('enabled', [
   z.object({
     enabled: z.literal(true),
     host: z.string({
-      required_error: 'SMTP_HOST is required when SMTP is enabled',
+      error: 'SMTP_HOST is required when SMTP is enabled',
     }),
     port: z.coerce.number().default(587),
     secure: z.boolean().default(false),
     user: z.string({
-      required_error: 'SMTP_USER is required when SMTP is enabled',
+      error: 'SMTP_USER is required when SMTP is enabled',
     }),
     password: z.string({
-      required_error: 'SMTP_PASSWORD is required when SMTP is enabled',
+      error: 'SMTP_PASSWORD is required when SMTP is enabled',
     }),
     from: z.object({
       email: z.string({
-        required_error: 'SMTP_EMAIL_FROM is required when SMTP is enabled',
+        error: 'SMTP_EMAIL_FROM is required when SMTP is enabled',
       }),
       name: z.string().default('Colanode'),
     }),

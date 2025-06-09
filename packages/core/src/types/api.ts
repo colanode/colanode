@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export enum ApiHeader {
   ClientType = 'colanode-client-type',
@@ -58,7 +58,7 @@ export enum ApiErrorCode {
 
 export const apiErrorOutputSchema = z.object({
   message: z.string(),
-  code: z.nativeEnum(ApiErrorCode),
+  code: z.enum(ApiErrorCode),
 });
 
 export type ApiErrorOutput = z.infer<typeof apiErrorOutputSchema>;

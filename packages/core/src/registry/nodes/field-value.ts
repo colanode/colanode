@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { ZodText } from '@colanode/core';
 
@@ -32,7 +32,7 @@ export type NumberFieldValue = z.infer<typeof numberFieldValueSchema>;
 
 export const textFieldValueSchema = z.object({
   type: z.literal('text'),
-  value: ZodText.create(),
+  value: new ZodText(),
 });
 
 export type TextFieldValue = z.infer<typeof textFieldValueSchema>;

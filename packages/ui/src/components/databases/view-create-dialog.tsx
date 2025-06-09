@@ -3,7 +3,7 @@ import { Calendar, Columns, Table } from 'lucide-react';
 import React from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { FieldAttributes, FieldType } from '@colanode/core';
 import { FieldSelect } from '@colanode/ui/components/databases/fields/field-select';

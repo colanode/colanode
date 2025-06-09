@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { extractNodeRole } from '@colanode/core/lib/nodes';
 import { hasNodeRole } from '@colanode/core/lib/permissions';
@@ -91,9 +91,7 @@ export const recordModel: NodeModel = {
 
     const texts: string[] = [];
     for (const field of Object.values(attributes.fields)) {
-      if (field.type === 'text') {
-        texts.push(field.value);
-      } else if (field.type === 'string') {
+      if (field.type === 'string') {
         texts.push(field.value);
       }
     }

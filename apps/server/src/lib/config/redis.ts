@@ -1,7 +1,7 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const redisConfigSchema = z.object({
-  url: z.string({ required_error: 'REDIS_URL is required' }),
+  url: z.string({ error: 'REDIS_URL is required' }),
   db: z.coerce.number().default(0),
   jobs: z.object({
     name: z.string().optional().default('jobs'),

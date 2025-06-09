@@ -1,8 +1,8 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export const postgresConfigSchema = z.object({
   url: z.string({
-    required_error:
+    error:
       'POSTGRES_URL is required (e.g. postgres://postgres:postgres@localhost:5432/postgres)',
   }),
   ssl: z.object({

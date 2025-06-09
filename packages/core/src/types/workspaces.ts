@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export enum WorkspaceStatus {
   Active = 1,
@@ -80,7 +80,7 @@ export const userOutputSchema = z.object({
   createdAt: z.string(),
   updatedAt: z.string().nullable().optional(),
   revision: z.string(),
-  status: z.nativeEnum(UserStatus),
+  status: z.enum(UserStatus),
 });
 
 export type UserOutput = z.infer<typeof userOutputSchema>;

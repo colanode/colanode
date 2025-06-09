@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 export enum MutationStatus {
   OK = 200,
@@ -12,7 +12,7 @@ export enum MutationStatus {
   INTERNAL_SERVER_ERROR = 500,
 }
 
-export const mutationStatusSchema = z.nativeEnum(MutationStatus);
+export const mutationStatusSchema = z.enum(MutationStatus);
 
 export const syncMutationResultSchema = z.object({
   id: z.string(),

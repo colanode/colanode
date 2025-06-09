@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 
 import { workspaceOutputSchema } from '@colanode/core/types/workspaces';
 
@@ -33,20 +33,20 @@ export const accountUpdateOutputSchema = z.object({
 export type AccountUpdateOutput = z.infer<typeof accountUpdateOutputSchema>;
 
 export const emailRegisterInputSchema = z.object({
-  name: z.string({ required_error: 'Name is required' }),
-  email: z.string({ required_error: 'Email is required' }).email({
+  name: z.string({ error: 'Name is required' }),
+  email: z.string({ error: 'Email is required' }).email({
     message: 'Invalid email address',
   }),
-  password: z.string({ required_error: 'Password is required' }),
+  password: z.string({ error: 'Password is required' }),
 });
 
 export type EmailRegisterInput = z.infer<typeof emailRegisterInputSchema>;
 
 export const emailLoginInputSchema = z.object({
-  email: z.string({ required_error: 'Email is required' }).email({
+  email: z.string({ error: 'Email is required' }).email({
     message: 'Invalid email address',
   }),
-  password: z.string({ required_error: 'Password is required' }),
+  password: z.string({ error: 'Password is required' }),
 });
 
 export type EmailLoginInput = z.infer<typeof emailLoginInputSchema>;

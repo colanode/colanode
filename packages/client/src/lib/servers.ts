@@ -10,5 +10,5 @@ export const isServerOutdated = (version: string) => {
     return true;
   }
 
-  return semver.gte(parsedVersion, '2.2.0');
+  return semver.gte(parsedVersion, '0.2.0');
 };
