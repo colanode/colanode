@@ -5,8 +5,8 @@ import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
   UserRoleUpdateMutationInput,
   UserRoleUpdateMutationOutput,
-} from '@colanode/client/mutations/workspaces/workspace-user-role-update';
-import { UserRoleUpdateInput, UserRoleUpdateOutput } from '@colanode/core';
+} from '@colanode/client/mutations/users/user-role-update';
+import { UserOutput, UserRoleUpdateInput } from '@colanode/core';
 
 export class UserRoleUpdateMutationHandler
   extends WorkspaceMutationHandlerBase
@@ -22,11 +22,13 @@ export class UserRoleUpdateMutationHandler
         role: input.role,
       };
 
-      await workspace.account.client
-        .put(`v1/workspaces/${workspace.id}/users/${input.userId}`, {
+      const output = await workspace.account.client
+        .patch(`v1/workspaces/${workspace.id}/users/${input.userId}/role`, {
           json: body,
         })
-        .json<UserRoleUpdateOutput>();
+        .json<UserOutput>();
+
+      await workspace.users.upsert(output);
 
       return {
         success: true,

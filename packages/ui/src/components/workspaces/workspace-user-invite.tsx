@@ -82,11 +82,13 @@ export const WorkspaceUserInvite = ({
 
             mutate({
               input: {
-                type: 'users_invite',
-                emails: emails,
+                type: 'users_create',
+                users: emails.map((email) => ({
+                  email,
+                  role: 'collaborator',
+                })),
                 accountId: workspace.accountId,
                 workspaceId: workspace.id,
-                role: 'collaborator',
               },
               onSuccess() {
                 setEmails([]);

@@ -3,35 +3,36 @@ import { parseApiError } from '@colanode/client/lib/ky';
 import { MutationHandler } from '@colanode/client/lib/types';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
-  UsersInviteMutationInput,
-  UsersInviteMutationOutput,
-} from '@colanode/client/mutations/workspaces/workspace-users-invite';
-import { UsersInviteInput, UsersInviteOutput } from '@colanode/core';
+  UsersCreateMutationInput,
+  UsersCreateMutationOutput,
+} from '@colanode/client/mutations/users/users-create';
+import { UsersCreateInput, UsersCreateOutput } from '@colanode/core';
 
-export class UsersInviteMutationHandler
+export class UsersCreateMutationHandler
   extends WorkspaceMutationHandlerBase
-  implements MutationHandler<UsersInviteMutationInput>
+  implements MutationHandler<UsersCreateMutationInput>
 {
   async handleMutation(
-    input: UsersInviteMutationInput
-  ): Promise<UsersInviteMutationOutput> {
+    input: UsersCreateMutationInput
+  ): Promise<UsersCreateMutationOutput> {
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
 
     try {
-      const body: UsersInviteInput = {
-        emails: input.emails,
-        role: input.role,
+      const body: UsersCreateInput = {
+        users: input.users,
       };
 
-      await workspace.account.client
+      const output = await workspace.account.client
         .post(`v1/workspaces/${workspace.id}/users`, {
           json: body,
         })
-        .json<UsersInviteOutput>();
+        .json<UsersCreateOutput>();
 
-      return {
-        success: true,
-      };
+      for (const user of output.users) {
+        await workspace.users.upsert(user);
+      }
+
+      return output;
     } catch (error) {
       const apiError = await parseApiError(error);
       throw new MutationError(MutationErrorCode.ApiError, apiError.message);

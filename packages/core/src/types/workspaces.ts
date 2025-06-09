@@ -56,34 +56,51 @@ export const workspaceUpdateInputSchema = z.object({
 
 export type WorkspaceUpdateInput = z.infer<typeof workspaceUpdateInputSchema>;
 
-export const usersInviteInputSchema = z.object({
-  emails: z.array(z.string().email()),
+export const userCreateInputSchema = z.object({
+  email: z.string().email(),
   role: workspaceRoleSchema,
 });
 
-export type UsersInviteInput = z.infer<typeof usersInviteInputSchema>;
+export type UserCreateInput = z.infer<typeof userCreateInputSchema>;
 
-export const userInviteResultSchema = z.object({
+export const usersCreateInputSchema = z.object({
+  users: z.array(userCreateInputSchema),
+});
+
+export type UsersCreateInput = z.infer<typeof usersCreateInputSchema>;
+
+export const userOutputSchema = z.object({
+  id: z.string(),
   email: z.string().email(),
-  result: z.enum(['success', 'error', 'exists']),
+  name: z.string(),
+  avatar: z.string().nullable().optional(),
+  role: workspaceRoleSchema,
+  customName: z.string().nullable().optional(),
+  customAvatar: z.string().nullable().optional(),
+  createdAt: z.string(),
+  updatedAt: z.string().nullable().optional(),
+  revision: z.string(),
+  status: z.nativeEnum(UserStatus),
 });
 
-export type UserInviteResult = z.infer<typeof userInviteResultSchema>;
+export type UserOutput = z.infer<typeof userOutputSchema>;
 
-export const usersInviteOutputSchema = z.object({
-  results: z.array(userInviteResultSchema),
+export const userCreateErrorOutputSchema = z.object({
+  email: z.string().email(),
+  error: z.string(),
 });
 
-export type UsersInviteOutput = z.infer<typeof usersInviteOutputSchema>;
+export type UserCreateErrorOutput = z.infer<typeof userCreateErrorOutputSchema>;
+
+export const usersCreateOutputSchema = z.object({
+  users: z.array(userOutputSchema),
+  errors: z.array(userCreateErrorOutputSchema),
+});
+
+export type UsersCreateOutput = z.infer<typeof usersCreateOutputSchema>;
 
 export const userRoleUpdateInputSchema = z.object({
   role: workspaceRoleSchema,
 });
 
 export type UserRoleUpdateInput = z.infer<typeof userRoleUpdateInputSchema>;
-
-export const userRoleUpdateOutputSchema = z.object({
-  success: z.boolean(),
-});
-
-export type UserRoleUpdateOutput = z.infer<typeof userRoleUpdateOutputSchema>;

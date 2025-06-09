@@ -11,7 +11,7 @@ const corsCallback: FastifyPluginCallback = (fastify, _, done) => {
 
   fastify.register(cors, {
     origin,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     credentials: true,
     maxAge: config.server.cors.maxAge,
   });

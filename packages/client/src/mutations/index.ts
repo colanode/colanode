@@ -64,8 +64,8 @@ export * from './workspaces/workspace-delete';
 export * from './workspaces/workspace-metadata-delete';
 export * from './workspaces/workspace-metadata-save';
 export * from './workspaces/workspace-update';
-export * from './workspaces/workspace-user-role-update';
-export * from './workspaces/workspace-users-invite';
+export * from './users/user-role-update';
+export * from './users/users-create';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MutationMap {}

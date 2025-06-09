@@ -64,7 +64,7 @@ import { SpaceDeleteMutationHandler } from './spaces/space-delete';
 import { SpaceDescriptionUpdateMutationHandler } from './spaces/space-description-update';
 import { SpaceNameUpdateMutationHandler } from './spaces/space-name-update';
 import { UserRoleUpdateMutationHandler } from './users/user-role-update';
-import { UsersInviteMutationHandler } from './users/users-invite';
+import { UsersCreateMutationHandler } from './users/users-create';
 import { WorkspaceCreateMutationHandler } from './workspaces/workspace-create';
 import { WorkspaceDeleteMutationHandler } from './workspaces/workspace-delete';
 import { WorkspaceMetadataDeleteMutationHandler } from './workspaces/workspace-metadata-delete';
@@ -117,7 +117,7 @@ export const buildMutationHandlerMap = (
     space_create: new SpaceCreateMutationHandler(app),
     space_delete: new SpaceDeleteMutationHandler(app),
     user_role_update: new UserRoleUpdateMutationHandler(app),
-    users_invite: new UsersInviteMutationHandler(app),
+    users_create: new UsersCreateMutationHandler(app),
     workspace_create: new WorkspaceCreateMutationHandler(app),
     workspace_update: new WorkspaceUpdateMutationHandler(app),
     avatar_upload: new AvatarUploadMutationHandler(app),

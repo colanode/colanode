@@ -7,9 +7,9 @@ import {
   apiErrorOutputSchema,
   generateId,
   IdType,
-  UserInviteResult,
-  usersInviteInputSchema,
-  usersInviteOutputSchema,
+  usersCreateInputSchema,
+  UsersCreateOutput,
+  usersCreateOutputSchema,
   UserStatus,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
@@ -18,7 +18,7 @@ import { config } from '@colanode/server/lib/config';
 import { eventBus } from '@colanode/server/lib/event-bus';
 import { getNameFromEmail } from '@colanode/server/lib/utils';
 
-export const userCreateRoute: FastifyPluginCallbackZod = (
+export const usersCreateRoute: FastifyPluginCallbackZod = (
   instance,
   _,
   done
@@ -30,9 +30,9 @@ export const userCreateRoute: FastifyPluginCallbackZod = (
       params: z.object({
         workspaceId: z.string(),
       }),
-      body: usersInviteInputSchema,
+      body: usersCreateInputSchema,
       response: {
-        200: usersInviteOutputSchema,
+        200: usersCreateOutputSchema,
         400: apiErrorOutputSchema,
         403: apiErrorOutputSchema,
         404: apiErrorOutputSchema,
@@ -43,7 +43,7 @@ export const userCreateRoute: FastifyPluginCallbackZod = (
       const input = request.body;
       const user = request.user;
 
-      if (!input.emails || input.emails.length === 0) {
+      if (!input.users || input.users.length === 0) {
         return reply.code(400).send({
           code: ApiErrorCode.UserEmailRequired,
           message: 'User email is required.',
@@ -57,13 +57,17 @@ export const userCreateRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const results: UserInviteResult[] = [];
-      for (const email of input.emails) {
-        const account = await getOrCreateAccount(email);
+      const output: UsersCreateOutput = {
+        users: [],
+        errors: [],
+      };
+
+      for (const user of input.users) {
+        const account = await getOrCreateAccount(user.email);
         if (!account) {
-          results.push({
-            email: email,
-            result: 'error',
+          output.errors.push({
+            email: user.email,
+            error: 'Account not found or could not be created.',
           });
           continue;
         }
@@ -76,9 +80,18 @@ export const userCreateRoute: FastifyPluginCallbackZod = (
           .executeTakeFirst();
 
         if (existingUser) {
-          results.push({
-            email: email,
-            result: 'exists',
+          output.users.push({
+            id: existingUser.id,
+            email: existingUser.email,
+            name: existingUser.name,
+            avatar: existingUser.avatar,
+            role: existingUser.role,
+            customName: existingUser.custom_name,
+            customAvatar: existingUser.custom_avatar,
+            createdAt: existingUser.created_at.toISOString(),
+            updatedAt: existingUser.updated_at?.toISOString() ?? null,
+            revision: existingUser.revision,
+            status: existingUser.status,
           });
           continue;
         }
@@ -91,7 +104,7 @@ export const userCreateRoute: FastifyPluginCallbackZod = (
             id: userId,
             account_id: account.id,
             workspace_id: workspaceId,
-            role: input.role,
+            role: user.role,
             name: account.name,
             email: account.email,
             avatar: account.avatar,
@@ -104,9 +117,9 @@ export const userCreateRoute: FastifyPluginCallbackZod = (
           .executeTakeFirst();
 
         if (!newUser) {
-          results.push({
-            email: email,
-            result: 'error',
+          output.errors.push({
+            email: user.email,
+            error: 'User could not be created.',
           });
           continue;
         }
@@ -118,13 +131,22 @@ export const userCreateRoute: FastifyPluginCallbackZod = (
           workspaceId: workspaceId,
         });
 
-        results.push({
-          email: email,
-          result: 'success',
+        output.users.push({
+          id: newUser.id,
+          email: newUser.email,
+          name: newUser.name,
+          avatar: newUser.avatar,
+          role: newUser.role,
+          customName: newUser.custom_name,
+          customAvatar: newUser.custom_avatar,
+          createdAt: newUser.created_at.toISOString(),
+          updatedAt: newUser.updated_at?.toISOString() ?? null,
+          revision: newUser.revision,
+          status: newUser.status,
         });
       }
 
-      return { results };
+      return output;
     },
   });
 
