@@ -1,20 +1,20 @@
 import { AppMetadataKey, AppMetadataMap } from '@colanode/client/types/apps';
 
-export type AppMetadataSaveMutationInput = {
-  type: 'app_metadata_save';
+export type AppMetadataUpsertMutationInput = {
+  type: 'app.metadata.upsert';
   key: AppMetadataKey;
   value: AppMetadataMap[AppMetadataKey]['value'];
 };
 
-export type AppMetadataSaveMutationOutput = {
+export type AppMetadataUpsertMutationOutput = {
   success: boolean;
 };
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    app_metadata_save: {
-      input: AppMetadataSaveMutationInput;
-      output: AppMetadataSaveMutationOutput;
+    'app.metadata.upsert': {
+      input: AppMetadataUpsertMutationInput;
+      output: AppMetadataUpsertMutationOutput;
     };
   }
 }

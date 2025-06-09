@@ -1,7 +1,7 @@
 import { LoginOutput } from '@colanode/core';
 
 export type EmailLoginMutationInput = {
-  type: 'email_login';
+  type: 'email.login';
   server: string;
   email: string;
   password: string;
@@ -9,7 +9,7 @@ export type EmailLoginMutationInput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    email_login: {
+    'email.login': {
       input: EmailLoginMutationInput;
       output: LoginOutput;
     };

@@ -37,7 +37,7 @@ export const FileDownload = ({ file, state }: FileDownloadProps) => {
             e.preventDefault();
 
             const result = await window.colanode.executeMutation({
-              type: 'file_download',
+              type: 'file.download',
               accountId: workspace.accountId,
               workspaceId: workspace.id,
               fileId: file.id,

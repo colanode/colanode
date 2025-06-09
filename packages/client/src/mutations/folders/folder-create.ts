@@ -1,5 +1,5 @@
 export type FolderCreateMutationInput = {
-  type: 'folder_create';
+  type: 'folder.create';
   accountId: string;
   workspaceId: string;
   parentId: string;
@@ -14,7 +14,7 @@ export type FolderCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    folder_create: {
+    'folder.create': {
       input: FolderCreateMutationInput;
       output: FolderCreateMutationOutput;
     };

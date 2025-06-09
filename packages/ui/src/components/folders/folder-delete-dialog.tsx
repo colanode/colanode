@@ -50,7 +50,7 @@ export const FolderDeleteDialog = ({
             onClick={() => {
               mutate({
                 input: {
-                  type: 'folder_delete',
+                  type: 'folder.delete',
                   folderId: folderId,
                   accountId: workspace.accountId,
                   workspaceId: workspace.id,

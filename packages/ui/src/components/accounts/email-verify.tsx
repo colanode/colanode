@@ -54,7 +54,7 @@ export const EmailVerify = ({
 
     mutate({
       input: {
-        type: 'email_verify',
+        type: 'email.verify',
         otp: values.otp,
         server: server.domain,
         id,

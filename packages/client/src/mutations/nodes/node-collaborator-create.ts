@@ -1,5 +1,5 @@
 export type NodeCollaboratorCreateMutationInput = {
-  type: 'node_collaborator_create';
+  type: 'node.collaborator.create';
   accountId: string;
   workspaceId: string;
   nodeId: string;
@@ -13,7 +13,7 @@ export type NodeCollaboratorCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    node_collaborator_create: {
+    'node.collaborator.create': {
       input: NodeCollaboratorCreateMutationInput;
       output: NodeCollaboratorCreateMutationOutput;
     };

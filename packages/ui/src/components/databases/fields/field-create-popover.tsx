@@ -75,7 +75,7 @@ export const FieldCreatePopover = () => {
   const handleSubmit = (values: z.infer<typeof formSchema>) => {
     mutate({
       input: {
-        type: 'field_create',
+        type: 'field.create',
         databaseId: database.id,
         name: values.name,
         fieldType: values.type,

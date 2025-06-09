@@ -57,14 +57,14 @@ export const App = ({ type }: AppProps) => {
         },
         setMetadata: (key, value) => {
           window.colanode.executeMutation({
-            type: 'app_metadata_save',
+            type: 'app.metadata.upsert',
             key,
             value,
           });
         },
         deleteMetadata: (key: string) => {
           window.colanode.executeMutation({
-            type: 'app_metadata_delete',
+            type: 'app.metadata.delete',
             key,
           });
         },
@@ -73,7 +73,7 @@ export const App = ({ type }: AppProps) => {
         openAccount: (id: string) => {
           setOpenLogin(false);
           window.colanode.executeMutation({
-            type: 'app_metadata_save',
+            type: 'app.metadata.upsert',
             key: 'account',
             value: id,
           });

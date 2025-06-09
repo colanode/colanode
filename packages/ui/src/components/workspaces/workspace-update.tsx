@@ -20,7 +20,7 @@ export const WorkspaceUpdate = () => {
       onSubmit={(values) => {
         mutate({
           input: {
-            type: 'workspace_update',
+            type: 'workspace.update',
             id: workspace.id,
             accountId: workspace.accountId,
             name: values.name,

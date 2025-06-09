@@ -58,7 +58,7 @@ export const DatabaseUpdateDialog = ({
 
             mutate({
               input: {
-                type: 'database_update',
+                type: 'database.update',
                 databaseId: database.id,
                 name: values.name,
                 avatar: values.avatar,

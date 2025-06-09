@@ -1,5 +1,5 @@
 export type WorkspaceMetadataDeleteMutationInput = {
-  type: 'workspace_metadata_delete';
+  type: 'workspace.metadata.delete';
   accountId: string;
   workspaceId: string;
   key: string;
@@ -11,7 +11,7 @@ export type WorkspaceMetadataDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    workspace_metadata_delete: {
+    'workspace.metadata.delete': {
       input: WorkspaceMetadataDeleteMutationInput;
       output: WorkspaceMetadataDeleteMutationOutput;
     };

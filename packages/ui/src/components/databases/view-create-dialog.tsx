@@ -125,7 +125,7 @@ export const ViewCreateDialog = ({
 
     mutate({
       input: {
-        type: 'view_create',
+        type: 'view.create',
         viewType: values.type,
         databaseId: database.id,
         name: values.name,

@@ -4,7 +4,7 @@ import { AppService } from '@colanode/client/services';
 
 import { AccountLogoutMutationHandler } from './accounts/account-logout';
 import { AccountMetadataDeleteMutationHandler } from './accounts/account-metadata-delete';
-import { AccountMetadataSaveMutationHandler } from './accounts/account-metadata-save';
+import { AccountMetadataUpsertMutationHandler } from './accounts/account-metadata-upsert';
 import { AccountUpdateMutationHandler } from './accounts/account-update';
 import { EmailLoginMutationHandler } from './accounts/email-login';
 import { EmailPasswordResetCompleteMutationHandler } from './accounts/email-password-reset-complete';
@@ -12,7 +12,7 @@ import { EmailPasswordResetInitMutationHandler } from './accounts/email-password
 import { EmailRegisterMutationHandler } from './accounts/email-register';
 import { EmailVerifyMutationHandler } from './accounts/email-verify';
 import { AppMetadataDeleteMutationHandler } from './apps/app-metadata-delete';
-import { AppMetadataSaveMutationHandler } from './apps/app-metadata-save';
+import { AppMetadataUpsertMutationHandler } from './apps/app-metadata-upsert';
 import { AvatarUploadMutationHandler } from './avatars/avatar-upload';
 import { ChannelCreateMutationHandler } from './channels/channel-create';
 import { ChannelDeleteMutationHandler } from './channels/channel-delete';
@@ -68,7 +68,7 @@ import { UsersCreateMutationHandler } from './users/users-create';
 import { WorkspaceCreateMutationHandler } from './workspaces/workspace-create';
 import { WorkspaceDeleteMutationHandler } from './workspaces/workspace-delete';
 import { WorkspaceMetadataDeleteMutationHandler } from './workspaces/workspace-metadata-delete';
-import { WorkspaceMetadataSaveMutationHandler } from './workspaces/workspace-metadata-save';
+import { WorkspaceMetadataUpsertMutationHandler } from './workspaces/workspace-metadata-upsert';
 import { WorkspaceUpdateMutationHandler } from './workspaces/workspace-update';
 
 export type MutationHandlerMap = {
@@ -79,74 +79,78 @@ export const buildMutationHandlerMap = (
   app: AppService
 ): MutationHandlerMap => {
   return {
-    email_login: new EmailLoginMutationHandler(app),
-    email_register: new EmailRegisterMutationHandler(app),
-    email_verify: new EmailVerifyMutationHandler(app),
-    view_create: new ViewCreateMutationHandler(app),
-    channel_create: new ChannelCreateMutationHandler(app),
-    channel_delete: new ChannelDeleteMutationHandler(app),
-    chat_create: new ChatCreateMutationHandler(app),
-    database_create: new DatabaseCreateMutationHandler(app),
-    database_delete: new DatabaseDeleteMutationHandler(app),
-    field_create: new FieldCreateMutationHandler(app),
-    field_delete: new FieldDeleteMutationHandler(app),
-    field_name_update: new FieldNameUpdateMutationHandler(app),
-    message_create: new MessageCreateMutationHandler(app),
-    file_delete: new FileDeleteMutationHandler(app),
-    folder_delete: new FolderDeleteMutationHandler(app),
-    node_collaborator_create: new NodeCollaboratorCreateMutationHandler(app),
-    node_collaborator_delete: new NodeCollaboratorDeleteMutationHandler(app),
-    node_collaborator_update: new NodeCollaboratorUpdateMutationHandler(app),
-    node_mark_opened: new NodeMarkOpenedMutationHandler(app),
-    node_mark_seen: new NodeMarkSeenMutationHandler(app),
-    page_create: new PageCreateMutationHandler(app),
-    page_delete: new PageDeleteMutationHandler(app),
-    node_reaction_create: new NodeReactionCreateMutationHandler(app),
-    node_reaction_delete: new NodeReactionDeleteMutationHandler(app),
-    message_delete: new MessageDeleteMutationHandler(app),
-    record_create: new RecordCreateMutationHandler(app),
-    record_delete: new RecordDeleteMutationHandler(app),
-    record_avatar_update: new RecordAvatarUpdateMutationHandler(app),
-    record_name_update: new RecordNameUpdateMutationHandler(app),
-    record_field_value_delete: new RecordFieldValueDeleteMutationHandler(app),
-    record_field_value_set: new RecordFieldValueSetMutationHandler(app),
-    select_option_create: new SelectOptionCreateMutationHandler(app),
-    select_option_delete: new SelectOptionDeleteMutationHandler(app),
-    select_option_update: new SelectOptionUpdateMutationHandler(app),
-    server_create: new ServerCreateMutationHandler(app),
-    space_create: new SpaceCreateMutationHandler(app),
-    space_delete: new SpaceDeleteMutationHandler(app),
-    user_role_update: new UserRoleUpdateMutationHandler(app),
-    users_create: new UsersCreateMutationHandler(app),
-    workspace_create: new WorkspaceCreateMutationHandler(app),
-    workspace_update: new WorkspaceUpdateMutationHandler(app),
-    avatar_upload: new AvatarUploadMutationHandler(app),
-    account_logout: new AccountLogoutMutationHandler(app),
-    folder_create: new FolderCreateMutationHandler(app),
-    file_create: new FileCreateMutationHandler(app),
-    file_download: new FileDownloadMutationHandler(app),
-    file_save_temp: new FileSaveTempMutationHandler(app),
-    space_avatar_update: new SpaceAvatarUpdateMutationHandler(app),
-    space_description_update: new SpaceDescriptionUpdateMutationHandler(app),
-    space_name_update: new SpaceNameUpdateMutationHandler(app),
-    account_update: new AccountUpdateMutationHandler(app),
-    view_update: new ViewUpdateMutationHandler(app),
-    view_delete: new ViewDeleteMutationHandler(app),
-    view_name_update: new ViewNameUpdateMutationHandler(app),
-    channel_update: new ChannelUpdateMutationHandler(app),
-    page_update: new PageUpdateMutationHandler(app),
-    folder_update: new FolderUpdateMutationHandler(app),
-    database_update: new DatabaseUpdateMutationHandler(app),
-    workspace_metadata_save: new WorkspaceMetadataSaveMutationHandler(app),
-    workspace_metadata_delete: new WorkspaceMetadataDeleteMutationHandler(app),
-    document_update: new DocumentUpdateMutationHandler(app),
-    app_metadata_save: new AppMetadataSaveMutationHandler(app),
-    app_metadata_delete: new AppMetadataDeleteMutationHandler(app),
-    account_metadata_save: new AccountMetadataSaveMutationHandler(app),
-    account_metadata_delete: new AccountMetadataDeleteMutationHandler(app),
-    email_password_reset_init: new EmailPasswordResetInitMutationHandler(app),
-    email_password_reset_complete:
+    'email.login': new EmailLoginMutationHandler(app),
+    'email.register': new EmailRegisterMutationHandler(app),
+    'email.verify': new EmailVerifyMutationHandler(app),
+    'view.create': new ViewCreateMutationHandler(app),
+    'channel.create': new ChannelCreateMutationHandler(app),
+    'channel.delete': new ChannelDeleteMutationHandler(app),
+    'chat.create': new ChatCreateMutationHandler(app),
+    'database.create': new DatabaseCreateMutationHandler(app),
+    'database.delete': new DatabaseDeleteMutationHandler(app),
+    'field.create': new FieldCreateMutationHandler(app),
+    'field.delete': new FieldDeleteMutationHandler(app),
+    'field.name.update': new FieldNameUpdateMutationHandler(app),
+    'message.create': new MessageCreateMutationHandler(app),
+    'file.delete': new FileDeleteMutationHandler(app),
+    'folder.delete': new FolderDeleteMutationHandler(app),
+    'node.collaborator.create': new NodeCollaboratorCreateMutationHandler(app),
+    'node.collaborator.delete': new NodeCollaboratorDeleteMutationHandler(app),
+    'node.collaborator.update': new NodeCollaboratorUpdateMutationHandler(app),
+    'node.mark.opened': new NodeMarkOpenedMutationHandler(app),
+    'node.mark.seen': new NodeMarkSeenMutationHandler(app),
+    'page.create': new PageCreateMutationHandler(app),
+    'page.delete': new PageDeleteMutationHandler(app),
+    'node.reaction.create': new NodeReactionCreateMutationHandler(app),
+    'node.reaction.delete': new NodeReactionDeleteMutationHandler(app),
+    'message.delete': new MessageDeleteMutationHandler(app),
+    'record.create': new RecordCreateMutationHandler(app),
+    'record.delete': new RecordDeleteMutationHandler(app),
+    'record.avatar.update': new RecordAvatarUpdateMutationHandler(app),
+    'record.name.update': new RecordNameUpdateMutationHandler(app),
+    'record.field.value.delete': new RecordFieldValueDeleteMutationHandler(app),
+    'record.field.value.set': new RecordFieldValueSetMutationHandler(app),
+    'select.option.create': new SelectOptionCreateMutationHandler(app),
+    'select.option.delete': new SelectOptionDeleteMutationHandler(app),
+    'select.option.update': new SelectOptionUpdateMutationHandler(app),
+    'server.create': new ServerCreateMutationHandler(app),
+    'space.create': new SpaceCreateMutationHandler(app),
+    'space.delete': new SpaceDeleteMutationHandler(app),
+    'user.role.update': new UserRoleUpdateMutationHandler(app),
+    'users.create': new UsersCreateMutationHandler(app),
+    'workspace.create': new WorkspaceCreateMutationHandler(app),
+    'workspace.update': new WorkspaceUpdateMutationHandler(app),
+    'avatar.upload': new AvatarUploadMutationHandler(app),
+    'account.logout': new AccountLogoutMutationHandler(app),
+    'folder.create': new FolderCreateMutationHandler(app),
+    'file.create': new FileCreateMutationHandler(app),
+    'file.download': new FileDownloadMutationHandler(app),
+    'file.save.temp': new FileSaveTempMutationHandler(app),
+    'space.avatar.update': new SpaceAvatarUpdateMutationHandler(app),
+    'space.description.update': new SpaceDescriptionUpdateMutationHandler(app),
+    'space.name.update': new SpaceNameUpdateMutationHandler(app),
+    'account.update': new AccountUpdateMutationHandler(app),
+    'view.update': new ViewUpdateMutationHandler(app),
+    'view.delete': new ViewDeleteMutationHandler(app),
+    'view.name.update': new ViewNameUpdateMutationHandler(app),
+    'channel.update': new ChannelUpdateMutationHandler(app),
+    'page.update': new PageUpdateMutationHandler(app),
+    'folder.update': new FolderUpdateMutationHandler(app),
+    'database.update': new DatabaseUpdateMutationHandler(app),
+    'workspace.metadata.upsert': new WorkspaceMetadataUpsertMutationHandler(
+      app
+    ),
+    'workspace.metadata.delete': new WorkspaceMetadataDeleteMutationHandler(
+      app
+    ),
+    'document.update': new DocumentUpdateMutationHandler(app),
+    'app.metadata.upsert': new AppMetadataUpsertMutationHandler(app),
+    'app.metadata.delete': new AppMetadataDeleteMutationHandler(app),
+    'account.metadata.upsert': new AccountMetadataUpsertMutationHandler(app),
+    'account.metadata.delete': new AccountMetadataDeleteMutationHandler(app),
+    'email.password.reset.init': new EmailPasswordResetInitMutationHandler(app),
+    'email.password.reset.complete':
       new EmailPasswordResetCompleteMutationHandler(app),
-    workspace_delete: new WorkspaceDeleteMutationHandler(app),
+    'workspace.delete': new WorkspaceDeleteMutationHandler(app),
   };
 };

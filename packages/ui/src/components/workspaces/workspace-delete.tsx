@@ -64,7 +64,7 @@ export const WorkspaceDelete = ({ onDeleted }: WorkspaceDeleteProps) => {
               onClick={() => {
                 mutate({
                   input: {
-                    type: 'workspace_delete',
+                    type: 'workspace.delete',
                     accountId: workspace.accountId,
                     workspaceId: workspace.id,
                   },

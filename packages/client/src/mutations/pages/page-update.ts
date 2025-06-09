@@ -1,5 +1,5 @@
 export type PageUpdateMutationInput = {
-  type: 'page_update';
+  type: 'page.update';
   accountId: string;
   workspaceId: string;
   pageId: string;
@@ -13,7 +13,7 @@ export type PageUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    page_update: {
+    'page.update': {
       input: PageUpdateMutationInput;
       output: PageUpdateMutationOutput;
     };

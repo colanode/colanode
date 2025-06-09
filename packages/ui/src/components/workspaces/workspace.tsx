@@ -53,7 +53,7 @@ export const Workspace = ({ workspace }: WorkspaceProps) => {
           value: WorkspaceMetadataMap[K]['value']
         ) {
           window.colanode.executeMutation({
-            type: 'workspace_metadata_save',
+            type: 'workspace.metadata.upsert',
             accountId: account.id,
             workspaceId: workspace.id,
             key,
@@ -62,7 +62,7 @@ export const Workspace = ({ workspace }: WorkspaceProps) => {
         },
         deleteMetadata(key: string) {
           window.colanode.executeMutation({
-            type: 'workspace_metadata_delete',
+            type: 'workspace.metadata.delete',
             accountId: account.id,
             workspaceId: workspace.id,
             key,

@@ -46,7 +46,7 @@ export const EmailLogin = ({
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     mutate({
       input: {
-        type: 'email_login',
+        type: 'email.login',
         email: values.email,
         password: values.password,
         server: server.domain,

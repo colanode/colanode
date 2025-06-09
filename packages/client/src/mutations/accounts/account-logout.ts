@@ -1,5 +1,5 @@
 export type AccountLogoutMutationInput = {
-  type: 'account_logout';
+  type: 'account.logout';
   accountId: string;
 };
 
@@ -9,7 +9,7 @@ export type AccountLogoutMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    account_logout: {
+    'account.logout': {
       input: AccountLogoutMutationInput;
       output: AccountLogoutMutationOutput;
     };

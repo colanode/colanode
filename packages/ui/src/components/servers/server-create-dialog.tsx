@@ -60,7 +60,7 @@ export const ServerCreateDialog = ({
             onClick={() => {
               mutate({
                 input: {
-                  type: 'server_create',
+                  type: 'server.create',
                   domain,
                 },
                 onSuccess(output) {

@@ -58,7 +58,7 @@ export const ChannelUpdateDialog = ({
 
             mutate({
               input: {
-                type: 'channel_update',
+                type: 'channel.update',
                 channelId: channel.id,
                 name: values.name,
                 avatar: values.avatar,

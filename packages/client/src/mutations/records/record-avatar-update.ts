@@ -1,5 +1,5 @@
 export type RecordAvatarUpdateMutationInput = {
-  type: 'record_avatar_update';
+  type: 'record.avatar.update';
   accountId: string;
   workspaceId: string;
   recordId: string;
@@ -12,7 +12,7 @@ export type RecordAvatarUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    record_avatar_update: {
+    'record.avatar.update': {
       input: RecordAvatarUpdateMutationInput;
       output: RecordAvatarUpdateMutationOutput;
     };

@@ -90,7 +90,7 @@ export const WorkspaceForm = ({
 
                   mutate({
                     input: {
-                      type: 'avatar_upload',
+                      type: 'avatar.upload',
                       accountId: account.id,
                       file,
                     },

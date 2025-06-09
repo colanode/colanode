@@ -78,7 +78,7 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
       result.files.forEach((file) => {
         window.colanode
           .executeMutation({
-            type: 'file_create',
+            type: 'file.create',
             accountId: workspace.accountId,
             workspaceId: workspace.id,
             file,

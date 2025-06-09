@@ -1,5 +1,5 @@
 export type NodeReactionDeleteMutationInput = {
-  type: 'node_reaction_delete';
+  type: 'node.reaction.delete';
   accountId: string;
   workspaceId: string;
   nodeId: string;
@@ -12,7 +12,7 @@ export type NodeReactionDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    node_reaction_delete: {
+    'node.reaction.delete': {
       input: NodeReactionDeleteMutationInput;
       output: NodeReactionDeleteMutationOutput;
     };

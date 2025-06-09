@@ -1,5 +1,5 @@
 export type SelectOptionUpdateMutationInput = {
-  type: 'select_option_update';
+  type: 'select.option.update';
   accountId: string;
   workspaceId: string;
   databaseId: string;
@@ -15,7 +15,7 @@ export type SelectOptionUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    select_option_update: {
+    'select.option.update': {
       input: SelectOptionUpdateMutationInput;
       output: SelectOptionUpdateMutationOutput;
     };

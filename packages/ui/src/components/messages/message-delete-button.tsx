@@ -50,7 +50,7 @@ export const MessageDeleteButton = ({ id }: MessageDeleteButtonProps) => {
               onClick={() => {
                 mutate({
                   input: {
-                    type: 'message_delete',
+                    type: 'message.delete',
                     messageId: id,
                     accountId: workspace.accountId,
                     workspaceId: workspace.id,

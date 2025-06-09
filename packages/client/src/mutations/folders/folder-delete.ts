@@ -1,5 +1,5 @@
 export type FolderDeleteMutationInput = {
-  type: 'folder_delete';
+  type: 'folder.delete';
   accountId: string;
   workspaceId: string;
   folderId: string;
@@ -11,7 +11,7 @@ export type FolderDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    folder_delete: {
+    'folder.delete': {
       input: FolderDeleteMutationInput;
       output: FolderDeleteMutationOutput;
     };

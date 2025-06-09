@@ -54,7 +54,7 @@ export const FolderCreateDialog = ({
 
             mutate({
               input: {
-                type: 'folder_create',
+                type: 'folder.create',
                 parentId: spaceId,
                 name: values.name,
                 avatar: values.avatar,

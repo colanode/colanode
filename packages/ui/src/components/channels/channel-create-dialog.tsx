@@ -54,7 +54,7 @@ export const ChannelCreateDialog = ({
 
             mutate({
               input: {
-                type: 'channel_create',
+                type: 'channel.create',
                 spaceId: spaceId,
                 name: values.name,
                 avatar: values.avatar,

@@ -58,7 +58,7 @@ export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     mutate({
       input: {
-        type: 'email_register',
+        type: 'email.register',
         name: values.name,
         email: values.email,
         password: values.password,

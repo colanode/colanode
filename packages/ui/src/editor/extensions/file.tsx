@@ -49,7 +49,7 @@ export const FileNode = Node.create<FileNodeOptions>({
         return ({ editor, tr }) => {
           (async () => {
             const fileCreateResult = await window.colanode.executeMutation({
-              type: 'file_create',
+              type: 'file.create',
               file,
               accountId: options.context.accountId,
               workspaceId: options.context.workspaceId,

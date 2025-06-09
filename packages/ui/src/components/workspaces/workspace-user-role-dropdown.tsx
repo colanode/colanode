@@ -102,7 +102,7 @@ export const WorkspaceUserRoleDropdown = ({
 
                 mutate({
                   input: {
-                    type: 'user_role_update',
+                    type: 'user.role.update',
                     accountId: workspace.accountId,
                     workspaceId: workspace.id,
                     userId: userId,

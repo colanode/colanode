@@ -1,5 +1,5 @@
 export type ViewCreateMutationInput = {
-  type: 'view_create';
+  type: 'view.create';
   accountId: string;
   workspaceId: string;
   databaseId: string;
@@ -14,7 +14,7 @@ export type ViewCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    view_create: {
+    'view.create': {
       input: ViewCreateMutationInput;
       output: ViewCreateMutationOutput;
     };

@@ -16,7 +16,7 @@ export const FolderCommand: EditorCommand = {
 
     const { accountId, workspaceId, documentId } = context;
     const output = await window.colanode.executeMutation({
-      type: 'folder_create',
+      type: 'folder.create',
       name: 'Untitled',
       avatar: null,
       accountId,

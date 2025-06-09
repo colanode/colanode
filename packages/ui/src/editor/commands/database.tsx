@@ -16,7 +16,7 @@ export const DatabaseCommand: EditorCommand = {
 
     const { accountId, workspaceId, documentId } = context;
     const output = await window.colanode.executeMutation({
-      type: 'database_create',
+      type: 'database.create',
       name: 'Untitled',
       accountId,
       workspaceId,

@@ -114,7 +114,7 @@ export const SelectFieldOptions = ({
 
                 mutate({
                   input: {
-                    type: 'select_option_create',
+                    type: 'select.option.create',
                     databaseId: database.id,
                     fieldId: field.id,
                     name: inputValue.trim(),

@@ -1,5 +1,5 @@
 export type FolderUpdateMutationInput = {
-  type: 'folder_update';
+  type: 'folder.update';
   accountId: string;
   workspaceId: string;
   folderId: string;
@@ -13,7 +13,7 @@ export type FolderUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    folder_update: {
+    'folder.update': {
       input: FolderUpdateMutationInput;
       output: FolderUpdateMutationOutput;
     };

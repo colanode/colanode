@@ -1,5 +1,5 @@
 export type ChatCreateMutationInput = {
-  type: 'chat_create';
+  type: 'chat.create';
   accountId: string;
   workspaceId: string;
   userId: string;
@@ -11,7 +11,7 @@ export type ChatCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    chat_create: {
+    'chat.create': {
       input: ChatCreateMutationInput;
       output: ChatCreateMutationOutput;
     };

@@ -1,5 +1,5 @@
 export type WorkspaceUpdateMutationInput = {
-  type: 'workspace_update';
+  type: 'workspace.update';
   id: string;
   name: string;
   description: string;
@@ -13,7 +13,7 @@ export type WorkspaceUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    workspace_update: {
+    'workspace.update': {
       input: WorkspaceUpdateMutationInput;
       output: WorkspaceUpdateMutationOutput;
     };

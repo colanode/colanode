@@ -1,5 +1,5 @@
 export type EmailPasswordResetCompleteMutationInput = {
-  type: 'email_password_reset_complete';
+  type: 'email.password.reset.complete';
   server: string;
   id: string;
   otp: string;
@@ -12,7 +12,7 @@ export type EmailPasswordResetCompleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    email_password_reset_complete: {
+    'email.password.reset.complete': {
       input: EmailPasswordResetCompleteMutationInput;
       output: EmailPasswordResetCompleteMutationOutput;
     };

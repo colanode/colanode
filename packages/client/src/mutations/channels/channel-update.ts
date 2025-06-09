@@ -1,5 +1,5 @@
 export type ChannelUpdateMutationInput = {
-  type: 'channel_update';
+  type: 'channel.update';
   accountId: string;
   workspaceId: string;
   channelId: string;
@@ -13,7 +13,7 @@ export type ChannelUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    channel_update: {
+    'channel.update': {
       input: ChannelUpdateMutationInput;
       output: ChannelUpdateMutationOutput;
     };

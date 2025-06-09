@@ -1,5 +1,5 @@
 export type DatabaseDeleteMutationInput = {
-  type: 'database_delete';
+  type: 'database.delete';
   accountId: string;
   workspaceId: string;
   databaseId: string;
@@ -11,7 +11,7 @@ export type DatabaseDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    database_delete: {
+    'database.delete': {
       input: DatabaseDeleteMutationInput;
       output: DatabaseDeleteMutationOutput;
     };

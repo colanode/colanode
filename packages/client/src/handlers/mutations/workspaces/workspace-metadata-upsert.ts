@@ -3,19 +3,20 @@ import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapWorkspaceMetadata } from '@colanode/client/lib/mappers';
 import { MutationHandler } from '@colanode/client/lib/types';
 import {
-  WorkspaceMetadataSaveMutationInput,
-  WorkspaceMetadataSaveMutationOutput,
-} from '@colanode/client/mutations/workspaces/workspace-metadata-save';
+  WorkspaceMetadataUpsertMutationInput,
+  WorkspaceMetadataUpsertMutationOutput,
+} from '@colanode/client/mutations/workspaces/workspace-metadata-upsert';
 
-export class WorkspaceMetadataSaveMutationHandler
+export class WorkspaceMetadataUpsertMutationHandler
   extends WorkspaceMutationHandlerBase
-  implements MutationHandler<WorkspaceMetadataSaveMutationInput>
+  implements MutationHandler<WorkspaceMetadataUpsertMutationInput>
 {
   async handleMutation(
-    input: WorkspaceMetadataSaveMutationInput
-  ): Promise<WorkspaceMetadataSaveMutationOutput> {
+    input: WorkspaceMetadataUpsertMutationInput
+  ): Promise<WorkspaceMetadataUpsertMutationOutput> {
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
-    const createdMetadata = await workspace.database
+
+    const upsertedMetadata = await workspace.database
       .insertInto('metadata')
       .returningAll()
       .values({
@@ -31,7 +32,7 @@ export class WorkspaceMetadataSaveMutationHandler
       )
       .executeTakeFirst();
 
-    if (!createdMetadata) {
+    if (!upsertedMetadata) {
       return {
         success: false,
       };
@@ -41,7 +42,7 @@ export class WorkspaceMetadataSaveMutationHandler
       type: 'workspace_metadata_saved',
       accountId: input.accountId,
       workspaceId: input.workspaceId,
-      metadata: mapWorkspaceMetadata(createdMetadata),
+      metadata: mapWorkspaceMetadata(upsertedMetadata),
     });
 
     return {

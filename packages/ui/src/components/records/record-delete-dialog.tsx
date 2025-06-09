@@ -50,7 +50,7 @@ export const RecordDeleteDialog = ({
             onClick={() => {
               mutate({
                 input: {
-                  type: 'record_delete',
+                  type: 'record.delete',
                   recordId: recordId,
                   accountId: workspace.accountId,
                   workspaceId: workspace.id,

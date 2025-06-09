@@ -52,7 +52,7 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
 
     updateAccount({
       input: {
-        type: 'account_update',
+        type: 'account.update',
         id: account.id,
         name: values.name,
         avatar: values.avatar,
@@ -90,7 +90,7 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
 
                   uploadAvatar({
                     input: {
-                      type: 'avatar_upload',
+                      type: 'avatar.upload',
                       accountId: account.id,
                       file,
                     },

@@ -1,5 +1,5 @@
 export type FileDownloadMutationInput = {
-  type: 'file_download';
+  type: 'file.download';
   accountId: string;
   workspaceId: string;
   fileId: string;
@@ -11,7 +11,7 @@ export type FileDownloadMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    file_download: {
+    'file.download': {
       input: FileDownloadMutationInput;
       output: FileDownloadMutationOutput;
     };

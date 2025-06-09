@@ -3,22 +3,22 @@ import {
   AccountMetadataMap,
 } from '@colanode/client/types/accounts';
 
-export type AccountMetadataSaveMutationInput = {
-  type: 'account_metadata_save';
+export type AccountMetadataUpsertMutationInput = {
+  type: 'account.metadata.upsert';
   accountId: string;
   key: AccountMetadataKey;
   value: AccountMetadataMap[AccountMetadataKey]['value'];
 };
 
-export type AccountMetadataSaveMutationOutput = {
+export type AccountMetadataUpsertMutationOutput = {
   success: boolean;
 };
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    account_metadata_save: {
-      input: AccountMetadataSaveMutationInput;
-      output: AccountMetadataSaveMutationOutput;
+    'account.metadata.upsert': {
+      input: AccountMetadataUpsertMutationInput;
+      output: AccountMetadataUpsertMutationOutput;
     };
   }
 }

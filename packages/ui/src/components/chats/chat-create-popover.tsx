@@ -31,7 +31,7 @@ export const ChatCreatePopover = () => {
 
             mutate({
               input: {
-                type: 'chat_create',
+                type: 'chat.create',
                 accountId: workspace.accountId,
                 workspaceId: workspace.id,
                 userId: user.id,

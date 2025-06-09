@@ -1,5 +1,5 @@
 export type FileSaveTempMutationInput = {
-  type: 'file_save_temp';
+  type: 'file.save.temp';
   accountId: string;
   workspaceId: string;
   name: string;
@@ -12,7 +12,7 @@ export type FileSaveTempMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    file_save_temp: {
+    'file.save.temp': {
       input: FileSaveTempMutationInput;
       output: FileSaveTempMutationOutput;
     };

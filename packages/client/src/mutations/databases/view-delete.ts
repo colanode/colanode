@@ -1,5 +1,5 @@
 export type ViewDeleteMutationInput = {
-  type: 'view_delete';
+  type: 'view.delete';
   accountId: string;
   workspaceId: string;
   viewId: string;
@@ -11,7 +11,7 @@ export type ViewDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    view_delete: {
+    'view.delete': {
       input: ViewDeleteMutationInput;
       output: ViewDeleteMutationOutput;
     };

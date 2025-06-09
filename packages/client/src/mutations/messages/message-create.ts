@@ -1,7 +1,7 @@
 import { JSONContent } from '@tiptap/core';
 
 export type MessageCreateMutationInput = {
-  type: 'message_create';
+  type: 'message.create';
   accountId: string;
   workspaceId: string;
   parentId: string;
@@ -15,7 +15,7 @@ export type MessageCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    message_create: {
+    'message.create': {
       input: MessageCreateMutationInput;
       output: MessageCreateMutationOutput;
     };

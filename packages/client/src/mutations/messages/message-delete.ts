@@ -1,5 +1,5 @@
 export type MessageDeleteMutationInput = {
-  type: 'message_delete';
+  type: 'message.delete';
   accountId: string;
   workspaceId: string;
   messageId: string;
@@ -11,7 +11,7 @@ export type MessageDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    message_delete: {
+    'message.delete': {
       input: MessageDeleteMutationInput;
       output: MessageDeleteMutationOutput;
     };

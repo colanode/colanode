@@ -1,5 +1,5 @@
 export type NodeCollaboratorDeleteMutationInput = {
-  type: 'node_collaborator_delete';
+  type: 'node.collaborator.delete';
   accountId: string;
   workspaceId: string;
   nodeId: string;
@@ -12,7 +12,7 @@ export type NodeCollaboratorDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    node_collaborator_delete: {
+    'node.collaborator.delete': {
       input: NodeCollaboratorDeleteMutationInput;
       output: NodeCollaboratorDeleteMutationOutput;
     };

@@ -1,5 +1,5 @@
 export type NodeReactionCreateMutationInput = {
-  type: 'node_reaction_create';
+  type: 'node.reaction.create';
   accountId: string;
   workspaceId: string;
   nodeId: string;
@@ -12,7 +12,7 @@ export type NodeReactionCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    node_reaction_create: {
+    'node.reaction.create': {
       input: NodeReactionCreateMutationInput;
       output: NodeReactionCreateMutationOutput;
     };

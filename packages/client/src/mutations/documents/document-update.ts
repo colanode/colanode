@@ -1,5 +1,5 @@
 export type DocumentUpdateMutationInput = {
-  type: 'document_update';
+  type: 'document.update';
   accountId: string;
   workspaceId: string;
   documentId: string;
@@ -12,7 +12,7 @@ export type DocumentUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    document_update: {
+    'document.update': {
       input: DocumentUpdateMutationInput;
       output: DocumentUpdateMutationOutput;
     };

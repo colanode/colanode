@@ -146,7 +146,7 @@ export const DocumentEditor = ({
         }
 
         const result = await window.colanode.executeMutation({
-          type: 'document_update',
+          type: 'document.update',
           accountId: workspace.accountId,
           workspaceId: workspace.id,
           documentId: node.id,

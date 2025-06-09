@@ -42,7 +42,7 @@ export const EmailPasswordResetInit = ({
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     mutate({
       input: {
-        type: 'email_password_reset_init',
+        type: 'email.password.reset.init',
         email: values.email,
         server: server.domain,
       },

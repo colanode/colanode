@@ -82,7 +82,7 @@ export const WorkspaceUserInvite = ({
 
             mutate({
               input: {
-                type: 'users_create',
+                type: 'users.create',
                 users: emails.map((email) => ({
                   email,
                   role: 'collaborator',

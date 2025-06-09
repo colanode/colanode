@@ -1,7 +1,7 @@
 import { WorkspaceRole } from '@colanode/core';
 
 export type UserRoleUpdateMutationInput = {
-  type: 'user_role_update';
+  type: 'user.role.update';
   accountId: string;
   workspaceId: string;
   userId: string;
@@ -14,7 +14,7 @@ export type UserRoleUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    user_role_update: {
+    'user.role.update': {
       input: UserRoleUpdateMutationInput;
       output: UserRoleUpdateMutationOutput;
     };

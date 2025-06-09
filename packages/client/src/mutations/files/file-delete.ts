@@ -1,5 +1,5 @@
 export type FileDeleteMutationInput = {
-  type: 'file_delete';
+  type: 'file.delete';
   accountId: string;
   workspaceId: string;
   fileId: string;
@@ -11,7 +11,7 @@ export type FileDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    file_delete: {
+    'file.delete': {
       input: FileDeleteMutationInput;
       output: FileDeleteMutationOutput;
     };

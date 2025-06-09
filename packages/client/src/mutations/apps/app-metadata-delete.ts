@@ -1,5 +1,5 @@
 export type AppMetadataDeleteMutationInput = {
-  type: 'app_metadata_delete';
+  type: 'app.metadata.delete';
   key: string;
 };
 
@@ -9,7 +9,7 @@ export type AppMetadataDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    app_metadata_delete: {
+    'app.metadata.delete': {
       input: AppMetadataDeleteMutationInput;
       output: AppMetadataDeleteMutationOutput;
     };

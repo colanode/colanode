@@ -1,5 +1,5 @@
 export type SelectOptionDeleteMutationInput = {
-  type: 'select_option_delete';
+  type: 'select.option.delete';
   accountId: string;
   workspaceId: string;
   databaseId: string;
@@ -13,7 +13,7 @@ export type SelectOptionDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    select_option_delete: {
+    'select.option.delete': {
       input: SelectOptionDeleteMutationInput;
       output: SelectOptionDeleteMutationOutput;
     };

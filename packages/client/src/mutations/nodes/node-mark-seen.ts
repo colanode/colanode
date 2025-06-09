@@ -1,5 +1,5 @@
 export type NodeMarkSeenMutationInput = {
-  type: 'node_mark_seen';
+  type: 'node.mark.seen';
   accountId: string;
   workspaceId: string;
   nodeId: string;
@@ -11,7 +11,7 @@ export type NodeMarkSeenMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    node_mark_seen: {
+    'node.mark.seen': {
       input: NodeMarkSeenMutationInput;
       output: NodeMarkSeenMutationOutput;
     };

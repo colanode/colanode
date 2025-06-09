@@ -70,7 +70,7 @@ export const EmailPasswordResetComplete = ({
 
     mutate({
       input: {
-        type: 'email_password_reset_complete',
+        type: 'email.password.reset.complete',
         otp: values.otp,
         password: values.password,
         server: server.domain,

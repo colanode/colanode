@@ -50,7 +50,7 @@ export const NodeCollaboratorCreate = ({
 
             mutate({
               input: {
-                type: 'node_collaborator_create',
+                type: 'node.collaborator.create',
                 nodeId,
                 collaboratorIds: users.map((user) => user.id),
                 role: role,

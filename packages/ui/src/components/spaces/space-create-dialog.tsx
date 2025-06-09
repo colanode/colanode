@@ -67,7 +67,7 @@ export const SpaceCreateDialog = ({
 
     mutate({
       input: {
-        type: 'space_create',
+        type: 'space.create',
         name: values.name,
         description: values.description,
         accountId: workspace.accountId,

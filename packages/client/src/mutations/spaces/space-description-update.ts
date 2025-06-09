@@ -1,5 +1,5 @@
 export type SpaceDescriptionUpdateMutationInput = {
-  type: 'space_description_update';
+  type: 'space.description.update';
   accountId: string;
   workspaceId: string;
   spaceId: string;
@@ -12,7 +12,7 @@ export type SpaceDescriptionUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    space_description_update: {
+    'space.description.update': {
       input: SpaceDescriptionUpdateMutationInput;
       output: SpaceDescriptionUpdateMutationOutput;
     };

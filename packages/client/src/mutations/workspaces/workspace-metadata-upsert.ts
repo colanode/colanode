@@ -3,23 +3,23 @@ import {
   WorkspaceMetadataKey,
 } from '@colanode/client/types/workspaces';
 
-export type WorkspaceMetadataSaveMutationInput = {
-  type: 'workspace_metadata_save';
+export type WorkspaceMetadataUpsertMutationInput = {
+  type: 'workspace.metadata.upsert';
   accountId: string;
   workspaceId: string;
   key: WorkspaceMetadataKey;
   value: WorkspaceMetadataMap[WorkspaceMetadataKey]['value'];
 };
 
-export type WorkspaceMetadataSaveMutationOutput = {
+export type WorkspaceMetadataUpsertMutationOutput = {
   success: boolean;
 };
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    workspace_metadata_save: {
-      input: WorkspaceMetadataSaveMutationInput;
-      output: WorkspaceMetadataSaveMutationOutput;
+    'workspace.metadata.upsert': {
+      input: WorkspaceMetadataUpsertMutationInput;
+      output: WorkspaceMetadataUpsertMutationOutput;
     };
   }
 }

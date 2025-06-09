@@ -1,7 +1,7 @@
 import { FieldType } from '@colanode/core';
 
 export type FieldCreateMutationInput = {
-  type: 'field_create';
+  type: 'field.create';
   accountId: string;
   workspaceId: string;
   databaseId: string;
@@ -16,7 +16,7 @@ export type FieldCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    field_create: {
+    'field.create': {
       input: FieldCreateMutationInput;
       output: FieldCreateMutationOutput;
     };

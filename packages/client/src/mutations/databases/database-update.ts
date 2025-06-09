@@ -1,5 +1,5 @@
 export type DatabaseUpdateMutationInput = {
-  type: 'database_update';
+  type: 'database.update';
   accountId: string;
   workspaceId: string;
   databaseId: string;
@@ -13,7 +13,7 @@ export type DatabaseUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    database_update: {
+    'database.update': {
       input: DatabaseUpdateMutationInput;
       output: DatabaseUpdateMutationOutput;
     };

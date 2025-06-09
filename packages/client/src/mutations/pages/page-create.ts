@@ -1,5 +1,5 @@
 export type PageCreateMutationInput = {
-  type: 'page_create';
+  type: 'page.create';
   accountId: string;
   workspaceId: string;
   parentId: string;
@@ -13,7 +13,7 @@ export type PageCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    page_create: {
+    'page.create': {
       input: PageCreateMutationInput;
       output: PageCreateMutationOutput;
     };

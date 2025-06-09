@@ -71,7 +71,7 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
 
     mutate({
       input: {
-        type: 'record_name_update',
+        type: 'record.name.update',
         name: newName,
         recordId: record.id,
         accountId: workspace.accountId,

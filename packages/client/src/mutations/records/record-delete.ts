@@ -1,5 +1,5 @@
 export type RecordDeleteMutationInput = {
-  type: 'record_delete';
+  type: 'record.delete';
   accountId: string;
   workspaceId: string;
   recordId: string;
@@ -11,7 +11,7 @@ export type RecordDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    record_delete: {
+    'record.delete': {
       input: RecordDeleteMutationInput;
       output: RecordDeleteMutationOutput;
     };

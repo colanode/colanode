@@ -66,7 +66,7 @@ export const MessageReactionCounts = ({
                 if (hasReacted) {
                   mutate({
                     input: {
-                      type: 'node_reaction_delete',
+                      type: 'node.reaction.delete',
                       nodeId: message.id,
                       accountId: workspace.accountId,
                       workspaceId: workspace.id,
@@ -80,7 +80,7 @@ export const MessageReactionCounts = ({
                 } else {
                   mutate({
                     input: {
-                      type: 'node_reaction_create',
+                      type: 'node.reaction.create',
                       nodeId: message.id,
                       accountId: workspace.accountId,
                       workspaceId: workspace.id,

@@ -67,7 +67,7 @@ export const MessageCreate = React.forwardRef<MessageCreateRefProps>(
 
       mutate({
         input: {
-          type: 'message_create',
+          type: 'message.create',
           parentId: conversation.id,
           content: content,
           accountId: workspace.accountId,

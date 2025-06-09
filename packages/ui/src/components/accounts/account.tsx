@@ -43,7 +43,7 @@ export const Account = ({ account }: AccountProps) => {
   const handleWorkspaceCreateSuccess = (id: string) => {
     setOpenCreateWorkspace(false);
     window.colanode.executeMutation({
-      type: 'account_metadata_save',
+      type: 'account.metadata.upsert',
       accountId: account.id,
       key: 'workspace',
       value: id,
@@ -65,7 +65,7 @@ export const Account = ({ account }: AccountProps) => {
         openWorkspace: (id) => {
           setOpenCreateWorkspace(false);
           window.colanode.executeMutation({
-            type: 'account_metadata_save',
+            type: 'account.metadata.upsert',
             accountId: account.id,
             key: 'workspace',
             value: id,

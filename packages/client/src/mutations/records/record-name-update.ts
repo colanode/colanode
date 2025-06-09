@@ -1,5 +1,5 @@
 export type RecordNameUpdateMutationInput = {
-  type: 'record_name_update';
+  type: 'record.name.update';
   accountId: string;
   workspaceId: string;
   recordId: string;
@@ -12,7 +12,7 @@ export type RecordNameUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    record_name_update: {
+    'record.name.update': {
       input: RecordNameUpdateMutationInput;
       output: RecordNameUpdateMutationOutput;
     };

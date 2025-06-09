@@ -5,7 +5,7 @@ import {
 } from '@colanode/core';
 
 export type UsersCreateMutationInput = {
-  type: 'users_create';
+  type: 'users.create';
   workspaceId: string;
   accountId: string;
   users: UserCreateInput[];
@@ -18,7 +18,7 @@ export type UsersCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    users_create: {
+    'users.create': {
       input: UsersCreateMutationInput;
       output: UsersCreateMutationOutput;
     };

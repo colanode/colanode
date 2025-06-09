@@ -16,7 +16,7 @@ export const PageCommand: EditorCommand = {
 
     const { accountId, workspaceId, documentId } = context;
     const output = await window.colanode.executeMutation({
-      type: 'page_create',
+      type: 'page.create',
       name: 'Untitled',
       accountId,
       workspaceId,

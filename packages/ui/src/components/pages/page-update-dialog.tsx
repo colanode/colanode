@@ -56,7 +56,7 @@ export const PageUpdateDialog = ({
 
             mutate({
               input: {
-                type: 'page_update',
+                type: 'page.update',
                 pageId: page.id,
                 name: values.name,
                 avatar: values.avatar,

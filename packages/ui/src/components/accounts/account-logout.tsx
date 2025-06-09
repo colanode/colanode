@@ -46,7 +46,7 @@ export const AccountLogout = ({ onCancel, onLogout }: AccountLogoutProps) => {
             onClick={async () => {
               mutate({
                 input: {
-                  type: 'account_logout',
+                  type: 'account.logout',
                   accountId: account.id,
                 },
                 onSuccess() {

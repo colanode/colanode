@@ -1,7 +1,7 @@
 import { FieldValue } from '@colanode/core';
 
 export type RecordFieldValueSetMutationInput = {
-  type: 'record_field_value_set';
+  type: 'record.field.value.set';
   accountId: string;
   workspaceId: string;
   recordId: string;
@@ -15,7 +15,7 @@ export type RecordFieldValueSetMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    record_field_value_set: {
+    'record.field.value.set': {
       input: RecordFieldValueSetMutationInput;
       output: RecordFieldValueSetMutationOutput;
     };

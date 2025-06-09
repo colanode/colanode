@@ -1,5 +1,5 @@
 export type NodeMarkOpenedMutationInput = {
-  type: 'node_mark_opened';
+  type: 'node.mark.opened';
   accountId: string;
   workspaceId: string;
   nodeId: string;
@@ -11,7 +11,7 @@ export type NodeMarkOpenedMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    node_mark_opened: {
+    'node.mark.opened': {
       input: NodeMarkOpenedMutationInput;
       output: NodeMarkOpenedMutationOutput;
     };

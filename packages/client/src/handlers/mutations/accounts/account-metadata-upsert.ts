@@ -2,13 +2,13 @@ import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapAccountMetadata } from '@colanode/client/lib/mappers';
 import { MutationHandler } from '@colanode/client/lib/types';
 import {
-  AccountMetadataSaveMutationInput,
-  AccountMetadataSaveMutationOutput,
-} from '@colanode/client/mutations/accounts/account-metadata-save';
+  AccountMetadataUpsertMutationInput,
+  AccountMetadataUpsertMutationOutput,
+} from '@colanode/client/mutations/accounts/account-metadata-upsert';
 import { AppService } from '@colanode/client/services/app-service';
 
-export class AccountMetadataSaveMutationHandler
-  implements MutationHandler<AccountMetadataSaveMutationInput>
+export class AccountMetadataUpsertMutationHandler
+  implements MutationHandler<AccountMetadataUpsertMutationInput>
 {
   private readonly app: AppService;
 
@@ -17,8 +17,8 @@ export class AccountMetadataSaveMutationHandler
   }
 
   async handleMutation(
-    input: AccountMetadataSaveMutationInput
-  ): Promise<AccountMetadataSaveMutationOutput> {
+    input: AccountMetadataUpsertMutationInput
+  ): Promise<AccountMetadataUpsertMutationOutput> {
     const account = this.app.getAccount(input.accountId);
 
     if (!account) {
@@ -27,7 +27,7 @@ export class AccountMetadataSaveMutationHandler
       };
     }
 
-    const createdMetadata = await account.database
+    const upsertedMetadata = await account.database
       .insertInto('metadata')
       .returningAll()
       .values({
@@ -43,7 +43,7 @@ export class AccountMetadataSaveMutationHandler
       )
       .executeTakeFirst();
 
-    if (!createdMetadata) {
+    if (!upsertedMetadata) {
       return {
         success: false,
       };
@@ -52,7 +52,7 @@ export class AccountMetadataSaveMutationHandler
     eventBus.publish({
       type: 'account_metadata_saved',
       accountId: input.accountId,
-      metadata: mapAccountMetadata(createdMetadata),
+      metadata: mapAccountMetadata(upsertedMetadata),
     });
 
     return {

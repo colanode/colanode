@@ -1,5 +1,5 @@
 export type SelectOptionCreateMutationInput = {
-  type: 'select_option_create';
+  type: 'select.option.create';
   accountId: string;
   workspaceId: string;
   databaseId: string;
@@ -14,7 +14,7 @@ export type SelectOptionCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    select_option_create: {
+    'select.option.create': {
       input: SelectOptionCreateMutationInput;
       output: SelectOptionCreateMutationOutput;
     };

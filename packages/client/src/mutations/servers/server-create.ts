@@ -1,7 +1,7 @@
 import { Server } from '@colanode/client/types/servers';
 
 export type ServerCreateMutationInput = {
-  type: 'server_create';
+  type: 'server.create';
   domain: string;
 };
 
@@ -11,7 +11,7 @@ export type ServerCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    server_create: {
+    'server.create': {
       input: ServerCreateMutationInput;
       output: ServerCreateMutationOutput;
     };

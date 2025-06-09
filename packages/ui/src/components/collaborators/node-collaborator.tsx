@@ -53,7 +53,7 @@ export const NodeCollaborator = ({
           onChange={(newRole) => {
             mutate({
               input: {
-                type: 'node_collaborator_update',
+                type: 'node.collaborator.update',
                 nodeId: nodeId,
                 collaboratorId: collaboratorId,
                 role: newRole,
@@ -72,7 +72,7 @@ export const NodeCollaborator = ({
             onClick={() => {
               mutate({
                 input: {
-                  type: 'node_collaborator_delete',
+                  type: 'node.collaborator.delete',
                   nodeId: nodeId,
                   collaboratorId: collaboratorId,
                   accountId: workspace.accountId,

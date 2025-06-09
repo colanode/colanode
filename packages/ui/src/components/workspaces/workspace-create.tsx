@@ -28,7 +28,7 @@ export const WorkspaceCreate = ({
           onSubmit={(values) => {
             mutate({
               input: {
-                type: 'workspace_create',
+                type: 'workspace.create',
                 name: values.name,
                 description: values.description,
                 accountId: account.id,

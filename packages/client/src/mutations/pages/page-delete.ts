@@ -1,5 +1,5 @@
 export type PageDeleteMutationInput = {
-  type: 'page_delete';
+  type: 'page.delete';
   accountId: string;
   workspaceId: string;
   pageId: string;
@@ -11,7 +11,7 @@ export type PageDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    page_delete: {
+    'page.delete': {
       input: PageDeleteMutationInput;
       output: PageDeleteMutationOutput;
     };

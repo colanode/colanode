@@ -1,5 +1,5 @@
 export type SpaceCreateMutationInput = {
-  type: 'space_create';
+  type: 'space.create';
   accountId: string;
   workspaceId: string;
   name: string;
@@ -12,7 +12,7 @@ export type SpaceCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    space_create: {
+    'space.create': {
       input: SpaceCreateMutationInput;
       output: SpaceCreateMutationOutput;
     };

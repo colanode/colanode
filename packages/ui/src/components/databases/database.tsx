@@ -30,7 +30,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
           if (!canEdit) return;
 
           const result = await window.colanode.executeMutation({
-            type: 'field_create',
+            type: 'field.create',
             databaseId: database.id,
             name,
             fieldType: type,
@@ -46,7 +46,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
           if (!canEdit) return;
 
           const result = await window.colanode.executeMutation({
-            type: 'field_name_update',
+            type: 'field.name.update',
             databaseId: database.id,
             fieldId: id,
             name,
@@ -62,7 +62,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
           if (!canEdit) return;
 
           const result = await window.colanode.executeMutation({
-            type: 'field_delete',
+            type: 'field.delete',
             databaseId: database.id,
             fieldId: id,
             accountId: workspace.accountId,
@@ -77,7 +77,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
           if (!canEdit) return;
 
           const result = await window.colanode.executeMutation({
-            type: 'select_option_create',
+            type: 'select.option.create',
             databaseId: database.id,
             fieldId,
             name,
@@ -94,7 +94,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
           if (!canEdit) return;
 
           const result = await window.colanode.executeMutation({
-            type: 'select_option_update',
+            type: 'select.option.update',
             databaseId: database.id,
             fieldId,
             optionId: attributes.id,
@@ -112,7 +112,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
           if (!canEdit) return;
 
           const result = await window.colanode.executeMutation({
-            type: 'select_option_delete',
+            type: 'select.option.delete',
             databaseId: database.id,
             fieldId,
             optionId,

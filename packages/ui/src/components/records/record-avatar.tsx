@@ -34,7 +34,7 @@ export const RecordAvatar = () => {
 
         mutate({
           input: {
-            type: 'record_avatar_update',
+            type: 'record.avatar.update',
             recordId: record.id,
             avatar,
             accountId: workspace.accountId,

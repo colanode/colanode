@@ -40,7 +40,7 @@ export const MessageActions = ({ message }: MessageActionsProps) => {
 
       mutate({
         input: {
-          type: 'node_reaction_create',
+          type: 'node.reaction.create',
           nodeId: message.id,
           accountId: workspace.accountId,
           workspaceId: workspace.id,
@@ -90,7 +90,7 @@ export const MessageActions = ({ message }: MessageActionsProps) => {
 
             mutate({
               input: {
-                type: 'node_reaction_create',
+                type: 'node.reaction.create',
                 nodeId: message.id,
                 accountId: workspace.accountId,
                 workspaceId: workspace.id,

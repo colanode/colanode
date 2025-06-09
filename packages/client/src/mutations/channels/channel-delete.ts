@@ -1,5 +1,5 @@
 export type ChannelDeleteMutationInput = {
-  type: 'channel_delete';
+  type: 'channel.delete';
   accountId: string;
   workspaceId: string;
   channelId: string;
@@ -11,7 +11,7 @@ export type ChannelDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    channel_delete: {
+    'channel.delete': {
       input: ChannelDeleteMutationInput;
       output: ChannelDeleteMutationOutput;
     };

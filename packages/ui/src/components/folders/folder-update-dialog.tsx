@@ -56,7 +56,7 @@ export const FolderUpdateDialog = ({
 
             mutate({
               input: {
-                type: 'folder_update',
+                type: 'folder.update',
                 folderId: folder.id,
                 name: values.name,
                 avatar: values.avatar,

@@ -1,5 +1,5 @@
 export type ChannelCreateMutationInput = {
-  type: 'channel_create';
+  type: 'channel.create';
   accountId: string;
   workspaceId: string;
   spaceId: string;
@@ -13,7 +13,7 @@ export type ChannelCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    channel_create: {
+    'channel.create': {
       input: ChannelCreateMutationInput;
       output: ChannelCreateMutationOutput;
     };

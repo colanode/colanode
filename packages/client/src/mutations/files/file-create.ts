@@ -1,7 +1,7 @@
 import { TempFile } from '@colanode/client/types';
 
 export type FileCreateMutationInput = {
-  type: 'file_create';
+  type: 'file.create';
   accountId: string;
   workspaceId: string;
   parentId: string;
@@ -14,7 +14,7 @@ export type FileCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    file_create: {
+    'file.create': {
       input: FileCreateMutationInput;
       output: FileCreateMutationOutput;
     };

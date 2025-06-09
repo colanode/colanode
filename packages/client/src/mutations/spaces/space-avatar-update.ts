@@ -1,5 +1,5 @@
 export type SpaceAvatarUpdateMutationInput = {
-  type: 'space_avatar_update';
+  type: 'space.avatar.update';
   accountId: string;
   workspaceId: string;
   spaceId: string;
@@ -12,7 +12,7 @@ export type SpaceAvatarUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    space_avatar_update: {
+    'space.avatar.update': {
       input: SpaceAvatarUpdateMutationInput;
       output: SpaceAvatarUpdateMutationOutput;
     };

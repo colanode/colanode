@@ -72,7 +72,7 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
 
             mutate({
               input: {
-                type: 'avatar_upload',
+                type: 'avatar.upload',
                 accountId: account.id,
                 file,
               },

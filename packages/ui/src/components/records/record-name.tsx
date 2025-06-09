@@ -39,7 +39,7 @@ export const RecordName = () => {
 
         mutate({
           input: {
-            type: 'record_name_update',
+            type: 'record.name.update',
             recordId: record.id,
             name: value,
             accountId: workspace.accountId,

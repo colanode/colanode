@@ -1,7 +1,7 @@
 import { TempFile } from '@colanode/client/types';
 
 export type AvatarUploadMutationInput = {
-  type: 'avatar_upload';
+  type: 'avatar.upload';
   accountId: string;
   file: TempFile;
 };
@@ -12,7 +12,7 @@ export type AvatarUploadMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    avatar_upload: {
+    'avatar.upload': {
       input: AvatarUploadMutationInput;
       output: AvatarUploadMutationOutput;
     };

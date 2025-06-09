@@ -48,7 +48,7 @@ export const FileDeleteDialog = ({
             onClick={() => {
               mutate({
                 input: {
-                  type: 'file_delete',
+                  type: 'file.delete',
                   fileId: fileId,
                   accountId: workspace.accountId,
                   workspaceId: workspace.id,

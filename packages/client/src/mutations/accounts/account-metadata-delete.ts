@@ -1,5 +1,5 @@
 export type AccountMetadataDeleteMutationInput = {
-  type: 'account_metadata_delete';
+  type: 'account.metadata.delete';
   accountId: string;
   key: string;
 };
@@ -10,7 +10,7 @@ export type AccountMetadataDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    account_metadata_delete: {
+    'account.metadata.delete': {
       input: AccountMetadataDeleteMutationInput;
       output: AccountMetadataDeleteMutationOutput;
     };

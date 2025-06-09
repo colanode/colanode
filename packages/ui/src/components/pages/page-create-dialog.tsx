@@ -54,7 +54,7 @@ export const PageCreateDialog = ({
 
             mutate({
               input: {
-                type: 'page_create',
+                type: 'page.create',
                 parentId: spaceId,
                 name: values.name,
                 avatar: values.avatar,

@@ -1,5 +1,5 @@
 export type FieldDeleteMutationInput = {
-  type: 'field_delete';
+  type: 'field.delete';
   accountId: string;
   workspaceId: string;
   databaseId: string;
@@ -12,7 +12,7 @@ export type FieldDeleteMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    field_delete: {
+    'field.delete': {
       input: FieldDeleteMutationInput;
       output: FieldDeleteMutationOutput;
     };

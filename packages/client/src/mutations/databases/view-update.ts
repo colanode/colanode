@@ -1,7 +1,7 @@
 import { DatabaseViewAttributes } from '@colanode/core';
 
 export type ViewUpdateMutationInput = {
-  type: 'view_update';
+  type: 'view.update';
   accountId: string;
   workspaceId: string;
   viewId: string;
@@ -14,7 +14,7 @@ export type ViewUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    view_update: {
+    'view.update': {
       input: ViewUpdateMutationInput;
       output: ViewUpdateMutationOutput;
     };

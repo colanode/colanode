@@ -70,7 +70,7 @@ export const RadarProvider = ({ children }: RadarProviderProps) => {
         },
         markNodeAsSeen: (accountId, workspaceId, nodeId) => {
           window.colanode.executeMutation({
-            type: 'node_mark_seen',
+            type: 'node.mark.seen',
             nodeId,
             accountId,
             workspaceId,
@@ -78,7 +78,7 @@ export const RadarProvider = ({ children }: RadarProviderProps) => {
         },
         markNodeAsOpened: (accountId, workspaceId, nodeId) => {
           window.colanode.executeMutation({
-            type: 'node_mark_opened',
+            type: 'node.mark.opened',
             nodeId,
             accountId,
             workspaceId,

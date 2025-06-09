@@ -22,7 +22,7 @@ export const FileCommand: EditorCommand = {
     if (result.type === 'success') {
       result.files.forEach(async (file) => {
         const output = await window.colanode.executeMutation({
-          type: 'file_create',
+          type: 'file.create',
           file,
           accountId,
           workspaceId,

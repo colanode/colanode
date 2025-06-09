@@ -1,5 +1,5 @@
 export type DatabaseCreateMutationInput = {
-  type: 'database_create';
+  type: 'database.create';
   accountId: string;
   workspaceId: string;
   parentId: string;
@@ -13,7 +13,7 @@ export type DatabaseCreateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    database_create: {
+    'database.create': {
       input: DatabaseCreateMutationInput;
       output: DatabaseCreateMutationOutput;
     };

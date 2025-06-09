@@ -36,7 +36,7 @@ export const RecordProvider = ({
         canEdit,
         updateFieldValue: async (field, value) => {
           const result = await window.colanode.executeMutation({
-            type: 'record_field_value_set',
+            type: 'record.field.value.set',
             recordId: record.id,
             fieldId: field.id,
             value,
@@ -50,7 +50,7 @@ export const RecordProvider = ({
         },
         removeFieldValue: async (field) => {
           const result = await window.colanode.executeMutation({
-            type: 'record_field_value_delete',
+            type: 'record.field.value.delete',
             recordId: record.id,
             fieldId: field.id,
             accountId: workspace.accountId,

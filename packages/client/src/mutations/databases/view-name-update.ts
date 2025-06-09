@@ -1,5 +1,5 @@
 export type ViewNameUpdateMutationInput = {
-  type: 'view_name_update';
+  type: 'view.name.update';
   accountId: string;
   workspaceId: string;
   databaseId: string;
@@ -13,7 +13,7 @@ export type ViewNameUpdateMutationOutput = {
 
 declare module '@colanode/client/mutations' {
   interface MutationMap {
-    view_name_update: {
+    'view.name.update': {
       input: ViewNameUpdateMutationInput;
       output: ViewNameUpdateMutationOutput;
     };

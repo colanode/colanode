@@ -26,7 +26,7 @@ export const SpaceGeneralTab = ({ space, readonly }: SpaceGeneralTabProps) => {
           onUpdate={(avatar) => {
             mutate({
               input: {
-                type: 'space_avatar_update',
+                type: 'space.avatar.update',
                 spaceId: space.id,
                 avatar,
                 accountId: workspace.accountId,
@@ -44,7 +44,7 @@ export const SpaceGeneralTab = ({ space, readonly }: SpaceGeneralTabProps) => {
           onUpdate={(name) => {
             mutate({
               input: {
-                type: 'space_name_update',
+                type: 'space.name.update',
                 spaceId: space.id,
                 name,
                 accountId: workspace.accountId,
@@ -65,7 +65,7 @@ export const SpaceGeneralTab = ({ space, readonly }: SpaceGeneralTabProps) => {
           onUpdate={(description) => {
             mutate({
               input: {
-                type: 'space_description_update',
+                type: 'space.description.update',
                 spaceId: space.id,
                 description,
                 accountId: workspace.accountId,

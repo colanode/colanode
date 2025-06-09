@@ -54,7 +54,7 @@ export const ViewDeleteDialog = ({
             onClick={() => {
               mutate({
                 input: {
-                  type: 'view_delete',
+                  type: 'view.delete',
                   viewId: id,
                   databaseId: database.id,
                   accountId: workspace.accountId,
