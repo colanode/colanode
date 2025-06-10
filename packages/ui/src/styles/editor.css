@@ -1,5 +1,5 @@
 .ProseMirror {
-  @apply p-0;
+  padding: 0;
 }
 
 .ProseMirror .is-editor-empty:first-child::before {

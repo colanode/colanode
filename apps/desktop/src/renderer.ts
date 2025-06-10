@@ -1,1 +1,1 @@
-import './renderer/root';
+import './root';

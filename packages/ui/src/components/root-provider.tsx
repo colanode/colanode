@@ -1,5 +1,3 @@
-import '@colanode/ui/styles/index.css';
-
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
@@ -7,7 +5,7 @@ import { DndProvider } from 'react-dnd';
 import { AppType, Event } from '@colanode/client/types';
 import { App } from '@colanode/ui/components/app';
 import { FontLoader } from '@colanode/ui/components/font-loader';
-import { Toaster } from '@colanode/ui/components/ui/toaster';
+import { Toaster } from '@colanode/ui/components/ui/sonner';
 import { TooltipProvider } from '@colanode/ui/components/ui/tooltip';
 import { HTML5Backend } from '@colanode/ui/lib/dnd-backend';
 

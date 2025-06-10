@@ -19,7 +19,7 @@
   },
   "description": "",
   "devDependencies": {
-    "@types/node": "^22.15.30",
+    "@types/node": "^24.0.0",
     "@types/nodemailer": "^6.4.17",
     "@types/pg": "^8.15.4",
     "@types/ws": "^8.18.1",
