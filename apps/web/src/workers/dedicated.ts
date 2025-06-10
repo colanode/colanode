@@ -5,9 +5,6 @@ import { MutationInput, MutationResult } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
 import { AppMeta, AppService } from '@colanode/client/services';
 import { extractFileSubtype, generateId, IdType } from '@colanode/core';
-import { WebFileSystem } from '@colanode/web/services/file-system';
-import { WebKyselyService } from '@colanode/web/services/kysely-service';
-import { WebPathService } from '@colanode/web/services/path-service';
 import {
   BroadcastMessage,
   BroadcastMutationMessage,
@@ -16,7 +13,10 @@ import {
   BroadcastQueryUnsubscribeMessage,
   ColanodeWorkerApi,
   PendingPromise,
-} from '@colanode/web/workers/types';
+} from '@colanode/web/lib/types';
+import { WebFileSystem } from '@colanode/web/services/file-system';
+import { WebKyselyService } from '@colanode/web/services/kysely-service';
+import { WebPathService } from '@colanode/web/services/path-service';
 
 const windowId = generateId(IdType.Window);
 const pendingPromises = new Map<string, PendingPromise>();
