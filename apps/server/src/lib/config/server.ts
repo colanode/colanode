@@ -11,6 +11,7 @@ export const serverConfigSchema = z.object({
   name: z.string().default('Colanode Server'),
   avatar: z.string().optional(),
   mode: serverModeSchema.default('standalone'),
+  pathPrefix: z.string().optional(),
   cors: z.object({
     origin: z.string().default('https://app.colanode.com'),
     maxAge: z.number().default(7200),
@@ -26,6 +27,7 @@ export const readServerConfigVariables = () => {
     name: process.env.SERVER_NAME,
     avatar: process.env.SERVER_AVATAR,
     mode: process.env.SERVER_MODE,
+    pathPrefix: process.env.SERVER_PATH_PREFIX,
     cors: {
       origin: process.env.SERVER_CORS_ORIGIN,
       maxAge: process.env.SERVER_CORS_MAX_AGE,

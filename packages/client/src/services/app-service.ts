@@ -21,7 +21,7 @@ import { MetadataService } from '@colanode/client/services/metadata-service';
 import { PathService } from '@colanode/client/services/path-service';
 import { ServerService } from '@colanode/client/services/server-service';
 import { Account } from '@colanode/client/types/accounts';
-import { Server } from '@colanode/client/types/servers';
+import { Server, ServerAttributes } from '@colanode/client/types/servers';
 import { ApiErrorCode, ApiHeader, build, createDebugger } from '@colanode/core';
 
 const debug = createDebugger('desktop:service:app');
@@ -101,7 +101,7 @@ export class AppService {
 
     const versionMetadata = await this.metadata.get('version');
     const version = semver.parse(versionMetadata?.value);
-    if (version && semver.lt(version, '0.1.0')) {
+    if (version && semver.lt(version, '0.2.0')) {
       await this.deleteAllData();
     }
 
@@ -179,21 +179,27 @@ export class AppService {
     return serverService;
   }
 
-  public async createServer(domain: string): Promise<ServerService | null> {
+  public async createServer(url: URL): Promise<ServerService | null> {
+    const domain = url.host;
     if (this.servers.has(domain)) {
       return this.servers.get(domain)!;
     }
 
-    const config = await ServerService.fetchServerConfig(domain);
+    const config = await ServerService.fetchServerConfig(url);
     if (!config) {
       return null;
     }
+
+    const attributes: ServerAttributes = {
+      pathPrefix: config.pathPrefix,
+      insecure: url.protocol === 'http:',
+    };
 
     const createdServer = await this.database
       .insertInto('servers')
       .values({
         domain,
-        attributes: JSON.stringify(config.attributes),
+        attributes: JSON.stringify(attributes),
         avatar: config.avatar,
         name: config.name,
         version: config.version,

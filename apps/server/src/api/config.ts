@@ -6,7 +6,7 @@ import { config } from '@colanode/server/lib/config';
 export const configGetRoute: FastifyPluginCallbackZod = (instance, _, done) => {
   instance.route({
     method: 'GET',
-    url: '/',
+    url: '/config',
     schema: {
       response: {
         200: serverConfigSchema,
@@ -19,7 +19,7 @@ export const configGetRoute: FastifyPluginCallbackZod = (instance, _, done) => {
         version: config.server.version,
         sha: config.server.sha,
         ip: request.client.ip,
-        attributes: {},
+        pathPrefix: config.server.pathPrefix,
       };
 
       return output;

@@ -25,6 +25,7 @@ export class ServerService {
   private eventLoop: EventLoop;
 
   public readonly server: Server;
+  public readonly configUrl: string;
   public readonly socketBaseUrl: string;
   public readonly httpBaseUrl: string;
   public readonly isOutdated: boolean;
@@ -32,8 +33,9 @@ export class ServerService {
   constructor(app: AppService, server: Server) {
     this.app = app;
     this.server = server;
-    this.socketBaseUrl = ServerService.buildSocketUrl(server.domain);
-    this.httpBaseUrl = ServerService.buildHttpBaseUrl(server.domain);
+    this.configUrl = this.buildConfigUrl();
+    this.socketBaseUrl = this.buildSocketBaseUrl();
+    this.httpBaseUrl = this.buildHttpBaseUrl();
     this.isOutdated = isServerOutdated(server.version);
 
     this.eventLoop = new EventLoop(
@@ -57,7 +59,7 @@ export class ServerService {
   }
 
   private async sync() {
-    const config = await ServerService.fetchServerConfig(this.server.domain);
+    const config = await ServerService.fetchServerConfig(this.configUrl);
     const existingState = this.state;
 
     const newState: ServerState = {
@@ -89,7 +91,6 @@ export class ServerService {
         .returningAll()
         .set({
           synced_at: new Date().toISOString(),
-          attributes: JSON.stringify(config.attributes),
           avatar: config.avatar,
           name: config.name,
           version: config.version,
@@ -97,7 +98,6 @@ export class ServerService {
         .where('domain', '=', this.server.domain)
         .executeTakeFirst();
 
-      this.server.attributes = config.attributes;
       this.server.avatar = config.avatar;
       this.server.name = config.name;
       this.server.version = config.version;
@@ -111,26 +111,39 @@ export class ServerService {
     }
   }
 
-  public static async fetchServerConfig(domain: string) {
-    const baseUrl = this.buildHttpBaseUrl(domain);
-    const configUrl = `${baseUrl}/v1/config`;
+  public static async fetchServerConfig(configUrl: URL | string) {
     try {
       const response = await ky.get(configUrl).json<ServerConfig>();
       return response;
     } catch (error) {
-      debug(`Server ${domain} is unavailable. ${error}`);
+      debug(
+        `Server with config URL ${configUrl.toString()} is unavailable. ${error}`
+      );
     }
 
     return null;
   }
 
-  private static buildHttpBaseUrl(domain: string) {
-    const protocol = domain.startsWith('localhost:') ? 'http' : 'https';
-    return `${protocol}://${domain}/client`;
+  private buildConfigUrl() {
+    const protocol = this.server.attributes.insecure ? 'http' : 'https';
+    return this.buildBaseUrl(protocol) + '/config';
   }
 
-  private static buildSocketUrl(domain: string) {
-    const protocol = domain.startsWith('localhost:') ? 'ws' : 'wss';
-    return `${protocol}://${domain}/client`;
+  private buildHttpBaseUrl() {
+    const protocol = this.server.attributes.insecure ? 'http' : 'https';
+    return this.buildBaseUrl(protocol) + '/client';
+  }
+
+  private buildSocketBaseUrl() {
+    const protocol = this.server.attributes.insecure ? 'ws' : 'wss';
+    return this.buildBaseUrl(protocol) + '/client';
+  }
+
+  private buildBaseUrl(protocol: string) {
+    const prefix = this.server.attributes.pathPrefix
+      ? `/${this.server.attributes.pathPrefix}`
+      : '';
+
+    return `${protocol}://${this.server.domain}${prefix}`;
   }
 }

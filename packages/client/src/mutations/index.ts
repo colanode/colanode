@@ -117,7 +117,7 @@ export enum MutationErrorCode {
   SpaceCreateForbidden = 'space_create_forbidden',
   SpaceCreateFailed = 'space_create_failed',
   ServerAlreadyExists = 'server_already_exists',
-  ServerDomainInvalid = 'server_domain_invalid',
+  ServerUrlInvalid = 'server_url_invalid',
   ServerInitFailed = 'server_init_failed',
   ChannelNotFound = 'channel_not_found',
   ChannelUpdateForbidden = 'channel_update_forbidden',

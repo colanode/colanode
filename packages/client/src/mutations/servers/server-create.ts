@@ -2,7 +2,7 @@ import { Server } from '@colanode/client/types/servers';
 
 export type ServerCreateMutationInput = {
   type: 'server.create';
-  domain: string;
+  url: string;
 };
 
 export type ServerCreateMutationOutput = {

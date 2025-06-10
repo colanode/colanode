@@ -18,12 +18,13 @@ export class ServerCreateMutationHandler
   async handleMutation(
     input: ServerCreateMutationInput
   ): Promise<ServerCreateMutationOutput> {
-    const domain = parseDomain(input.domain);
-    const server = await this.app.createServer(domain);
+    const url = buildUrl(input.url);
+
+    const server = await this.app.createServer(url);
     if (server === null) {
       throw new MutationError(
         MutationErrorCode.ServerInitFailed,
-        'Could not fetch server configuration. Please make sure the domain is correct.'
+        'There was an error initializing the server. Please make sure the URL is correct and the server is running.'
       );
     }
 
@@ -33,20 +34,14 @@ export class ServerCreateMutationHandler
   }
 }
 
-const parseDomain = (domain: string): string => {
+const buildUrl = (urlString: string): URL => {
   try {
-    const lowerCaseDomain = domain.toLowerCase();
-    const urlString = lowerCaseDomain.startsWith('http')
-      ? lowerCaseDomain
-      : `http://${lowerCaseDomain}`;
-
     const url = new URL(urlString);
-    return url.host; // host includes domain + port if present
+    return url;
   } catch {
-    // If not a valid URL, treat as domain directly
     throw new MutationError(
-      MutationErrorCode.ServerDomainInvalid,
-      'The provided domain is not valid. Please make sure it is a valid server domain.'
+      MutationErrorCode.ServerUrlInvalid,
+      'The provided URL is not valid. Please make sure it is a valid server URL.'
     );
   }
 };

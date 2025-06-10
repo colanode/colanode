@@ -27,7 +27,7 @@ export const ServerCreateDialog = ({
 }: ServerCreateDialogProps) => {
   const [open, setOpen] = useState(true);
   const { mutate, isPending } = useMutation();
-  const [domain, setDomain] = useState('');
+  const [url, setUrl] = useState('');
 
   return (
     <Dialog
@@ -43,11 +43,11 @@ export const ServerCreateDialog = ({
           <DialogDescription>Add a custom server to login to</DialogDescription>
         </DialogHeader>
         <div className="flex-grow space-y-2 py-2 pb-4">
-          <Label>Server Domain</Label>
+          <Label>Server URL</Label>
           <Input
-            placeholder="us.colanode.com"
-            value={domain}
-            onChange={(e) => setDomain(e.target.value)}
+            placeholder="https://us.colanode.com/config"
+            value={url}
+            onChange={(e) => setUrl(e.target.value)}
           />
         </div>
         <DialogFooter>
@@ -61,7 +61,7 @@ export const ServerCreateDialog = ({
               mutate({
                 input: {
                   type: 'server.create',
-                  domain,
+                  url,
                 },
                 onSuccess(output) {
                   onCreate(output.server);

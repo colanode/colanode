@@ -1,0 +1,257 @@
+<!doctype html>
+<html>
+  <head>
+    <title>Colanode Server</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        background-color: white;
+        color: #111;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .container {
+        text-align: left;
+        padding: 2rem;
+        max-width: 600px;
+        width: 90%;
+      }
+
+      .server-name {
+        font-size: 28px;
+        font-weight: 600;
+        margin: 0 0 16px 0;
+        color: #111;
+        text-align: center;
+      }
+
+      .welcome-text {
+        font-size: 15px;
+        font-weight: 400;
+        color: #333;
+        margin: 0 0 32px 0;
+        text-align: center;
+      }
+
+      .server-description {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #666;
+        margin: 0 0 8px 0;
+      }
+
+      .server-steps {
+        text-align: left;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #666;
+        margin: 0 0 8px 0;
+        padding-left: 1.5em;
+      }
+
+      .server-steps li {
+        margin-bottom: 4px;
+      }
+
+      .copy-container {
+        position: relative;
+        width: 100%;
+        margin: 24px auto 0;
+      }
+
+      .url-input {
+        width: 100%;
+        padding: 12px;
+        font-size: 14px;
+        font-family:
+          'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier,
+          monospace;
+        border: 1px solid #e5e5e5;
+        border-radius: 8px;
+        background-color: white;
+        color: #111;
+        box-sizing: border-box;
+      }
+
+      .url-input:focus {
+        outline: none;
+        border-color: #111;
+      }
+
+      .copy-button {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 8px;
+        color: #666;
+        transition: color 0.2s;
+        display: flex;
+        align-items: center;
+      }
+
+      .copy-button:hover {
+        color: #111;
+      }
+
+      .copy-success {
+        position: fixed;
+        bottom: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: #111;
+        color: white;
+        padding: 12px 24px;
+        border-radius: 8px;
+        font-size: 14px;
+        opacity: 0;
+        transition: opacity 0.2s;
+      }
+
+      .footer {
+        margin-top: 80px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        font-size: 12px;
+      }
+
+      .footer-info {
+        display: grid;
+        grid-template-columns: repeat(3, auto);
+        gap: 32px;
+      }
+
+      .footer-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .footer-label {
+        color: #999;
+      }
+
+      .footer-value {
+        color: #111;
+        font-weight: 500;
+      }
+
+      .footer a {
+        color: #111;
+        text-decoration: none;
+        font-weight: 500;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <h1 class="server-name">{{name}}</h1>
+      <p class="welcome-text">Welcome to your Colanode server</p>
+      <p class="server-description">To sign in:</p>
+      <ol class="server-steps">
+        <li>Copy the link below</li>
+        <li>
+          In the Colanode app (web or desktop), tap the Server dropdown on the
+          login screen and choose 'Add server'
+        </li>
+        <li>Paste the link, save, and continue to log in</li>
+      </ol>
+      <p class="server-description">Now you can start using Colanode.</p>
+      <div>
+        <div class="copy-container">
+          <input
+            type="text"
+            class="url-input"
+            readonly
+            value="{{url}}"
+            id="serverUrl"
+          />
+          <button
+            class="copy-button"
+            onclick="copyToClipboard()"
+            title="Copy to clipboard"
+          >
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 16 16"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+            >
+              <rect
+                x="6"
+                y="6"
+                width="8.5"
+                height="8.5"
+                rx="1.5"
+                ry="1.5"
+              ></rect>
+              <path
+                d="M3.5 10H2.5a1 1 0 0 1-1-1V2.5a1 1 0 0 1 1-1h6.5a1 1 0 0 1 1 1v1"
+              ></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+      <footer class="footer">
+        <div class="footer-info">
+          <div class="footer-item">
+            <span class="footer-label">Version</span>
+            <span class="footer-value">{{version}}</span>
+          </div>
+          <div class="footer-item">
+            <span class="footer-label">Build</span>
+            <span class="footer-value">{{sha}}</span>
+          </div>
+          <div class="footer-item">
+            <span class="footer-label">Source</span>
+            <a
+              href="https://github.com/colanode/colanode"
+              target="_blank"
+              rel="noopener"
+              class="footer-value"
+              >github.com/colanode/colanode</a
+            >
+          </div>
+        </div>
+      </footer>
+    </div>
+    <div class="copy-success" id="copySuccess">Copied to clipboard</div>
+
+    <script>
+      function copyToClipboard() {
+        const urlInput = document.getElementById('serverUrl');
+        const successNotification = document.getElementById('copySuccess');
+
+        urlInput.select();
+        document.execCommand('copy');
+
+        // Show success notification
+        successNotification.style.opacity = '1';
+
+        // Hide notification after 2 seconds
+        setTimeout(() => {
+          successNotification.style.opacity = '0';
+        }, 2000);
+      }
+    </script>
+  </body>
+</html>
