@@ -72,7 +72,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
         <div>
           <div className="flex w-full min-w-0 flex-row items-center hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8">
             <CollapsibleTrigger asChild>
-              <button className="group/space-button flex items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm flex-1">
+              <button className="group/space-button flex items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm flex-1 cursor-pointer">
                 <Avatar
                   id={space.id}
                   avatar={space.attributes.avatar}
@@ -149,7 +149,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
                 >
                   <div
                     className={cn(
-                      'text-sm flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground',
+                      'text-sm flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer',
                       layout.activeTab === child.id &&
                         'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
                     )}

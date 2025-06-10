@@ -82,7 +82,7 @@ export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Name" {...field} />
+                <Input placeholder="Name" {...field} autoComplete="name" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -94,7 +94,7 @@ export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input placeholder="Email" {...field} />
+                <Input placeholder="Email" {...field} autoComplete="email" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -106,7 +106,12 @@ export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input type="password" placeholder="Password" {...field} />
+                <Input
+                  type="password"
+                  placeholder="Password"
+                  {...field}
+                  autoComplete="new-password"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -122,6 +127,7 @@ export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
                   type="password"
                   placeholder="Confirm Password"
                   {...field}
+                  autoComplete="new-password"
                 />
               </FormControl>
               <FormMessage />

@@ -113,7 +113,7 @@ export const ContainerTabTrigger = ({
           .otherwise(() => null)}
       </div>
       <div
-        className="opacity-0 group-hover/tab:opacity-100 group-data-[state=active]/tab:opacity-100 transition-opacity duration-200 flex-shrink-0"
+        className="opacity-0 group-hover/tab:opacity-100 group-data-[state=active]/tab:opacity-100 transition-opacity duration-200 flex-shrink-0 cursor-pointer"
         onClick={() => onClose()}
       >
         <X className="size-4 text-muted-foreground hover:text-primary" />

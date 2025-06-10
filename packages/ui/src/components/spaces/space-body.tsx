@@ -28,7 +28,7 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
       defaultValue="general"
       className="grid h-full max-h-full grid-cols-[200px_minmax(0,1fr)] overflow-hidden gap-4"
     >
-      <TabsList className="flex h-full max-h-full flex-col items-start justify-start gap-1 rounded-none bg-white">
+      <TabsList className="flex w-full flex-col items-start justify-start gap-1 rounded-none bg-white">
         <TabsTrigger
           key={`tab-trigger-general`}
           className="w-full justify-start p-2 hover:bg-gray-50"

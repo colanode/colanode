@@ -40,7 +40,7 @@ export const AccountSettingsDialog = ({
           defaultValue="info"
           className="grid h-full max-h-full grid-cols-[240px_minmax(0,1fr)] overflow-hidden"
         >
-          <TabsList className="flex h-full max-h-full flex-col items-start justify-start gap-1 rounded-none border-r border-r-gray-100 bg-white pr-3">
+          <TabsList className="flex w-full max-h-full flex-col items-start justify-start gap-1 rounded-none border-r border-r-gray-100 bg-white pr-3">
             <div className="mb-1 flex h-10 w-full items-center justify-between bg-gray-50 p-1 text-foreground/80">
               <div className="flex items-center gap-2">
                 <Avatar
@@ -49,7 +49,7 @@ export const AccountSettingsDialog = ({
                   avatar={account.avatar}
                   size="small"
                 />
-                <span>{account.name}</span>
+                <span className="truncate font-semibold">{account.name}</span>
               </div>
             </div>
             <TabsTrigger

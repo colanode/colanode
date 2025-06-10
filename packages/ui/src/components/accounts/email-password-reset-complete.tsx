@@ -109,7 +109,12 @@ export const EmailPasswordResetComplete = ({
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <Input type="password" placeholder="New Password" {...field} />
+                <Input
+                  type="password"
+                  placeholder="New Password"
+                  {...field}
+                  autoComplete="new-password"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -125,6 +130,7 @@ export const EmailPasswordResetComplete = ({
                   type="password"
                   placeholder="Confirm Password"
                   {...field}
+                  autoComplete="new-password"
                 />
               </FormControl>
               <FormMessage />

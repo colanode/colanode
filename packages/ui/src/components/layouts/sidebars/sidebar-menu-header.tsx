@@ -41,7 +41,7 @@ export const SidebarMenuHeader = () => {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex w-full items-center justify-center relative">
+        <button className="flex w-full items-center justify-center relative cursor-pointer outline-none">
           <Avatar
             id={workspace.id}
             avatar={workspace.avatar}

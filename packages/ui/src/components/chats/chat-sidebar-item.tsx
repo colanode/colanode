@@ -51,7 +51,7 @@ export const ChatSidebarItem = ({ chat }: ChatSidebarItemProps) => {
         }
       }}
       className={cn(
-        'flex w-full items-center',
+        'flex w-full items-center cursor-pointer',
         isActive && 'bg-sidebar-accent'
       )}
     >

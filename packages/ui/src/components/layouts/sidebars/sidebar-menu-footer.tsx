@@ -46,7 +46,7 @@ export function SidebarMenuFooter() {
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex w-full items-center justify-center relative mb-2">
+        <button className="flex w-full items-center justify-center relative mb-2 cursor-pointer outline-none">
           <Avatar
             id={account.id}
             name={account.name}

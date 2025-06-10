@@ -17,7 +17,7 @@ export const PageSidebarItem = ({ page }: PageSidebarItemProps) => {
     <button
       key={page.id}
       className={cn(
-        'flex w-full items-center',
+        'flex w-full items-center cursor-pointer',
         isActive && 'bg-sidebar-accent'
       )}
     >
