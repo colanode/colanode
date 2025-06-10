@@ -53,7 +53,7 @@ export const RecordUrlValue = ({ field, readOnly }: RecordUrlValueProps) => {
         )}
       >
         <a
-          className="text-blue-500 underline hover:cursor-pointer hover:text-blue-600 text-ellipsis w-full overflow-hidden whitespace-nowrap"
+          className="text-blue-500 underline cursor-pointer hover:text-blue-600 text-ellipsis w-full overflow-hidden whitespace-nowrap"
           onClick={() => {
             if (!canOpen) return;
 

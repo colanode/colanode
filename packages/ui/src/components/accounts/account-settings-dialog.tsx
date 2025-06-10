@@ -54,7 +54,7 @@ export const AccountSettingsDialog = ({
             </div>
             <TabsTrigger
               key={`tab-trigger-info`}
-              className="w-full justify-start p-2 hover:bg-gray-50"
+              className="w-full justify-start p-2 hover:bg-gray-50 cursor-pointer"
               value="info"
             >
               <Info className="mr-2 size-4" />
@@ -62,7 +62,7 @@ export const AccountSettingsDialog = ({
             </TabsTrigger>
             <TabsTrigger
               key={`tab-trigger-delete`}
-              className="w-full justify-start p-2 hover:bg-gray-50"
+              className="w-full justify-start p-2 hover:bg-gray-50 cursor-pointer"
               value="delete"
             >
               <Trash2 className="mr-2 size-4" />

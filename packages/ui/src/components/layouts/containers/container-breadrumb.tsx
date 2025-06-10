@@ -51,7 +51,7 @@ export const ContainerBreadcrumb = ({
             <Fragment key={item.id}>
               {!isFirst && <BreadcrumbSeparator />}
               <BreadcrumbItem
-                className="hover:cursor-pointer hover:text-foreground"
+                className="cursor-pointer hover:text-foreground"
                 onClick={() => {
                   layout.openLeft(item.id);
                 }}
@@ -75,7 +75,7 @@ export const ContainerBreadcrumb = ({
                                 layout.openLeft(ellipsisItem.id);
                               }}
                             >
-                              <BreadcrumbItem className="hover:cursor-pointer hover:text-foreground">
+                              <BreadcrumbItem className="cursor-pointer hover:text-foreground">
                                 <ContainerBreadcrumbItem node={ellipsisItem} />
                               </BreadcrumbItem>
                             </DropdownMenuItem>

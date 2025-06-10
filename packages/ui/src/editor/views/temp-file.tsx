@@ -26,7 +26,7 @@ export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
     >
       <div className="group/temp-file relative">
         <button
-          className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-white opacity-0 shadow-md transition-opacity group-hover/temp-file:opacity-100"
+          className="absolute right-2 top-2 flex h-4 w-4 items-center justify-center rounded-full bg-white opacity-0 shadow-md transition-opacity group-hover/temp-file:opacity-100 cursor-pointer"
           onClick={deleteNode}
         >
           <X className="size-4" />

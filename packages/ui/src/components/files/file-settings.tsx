@@ -36,7 +36,7 @@ export const FileSettings = ({ file, role }: FileSettingsProps) => {
             Duplicate
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 cursor-pointer"
             onClick={() => {
               if (!canDelete) {
                 return;

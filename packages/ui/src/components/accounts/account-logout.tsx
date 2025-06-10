@@ -43,6 +43,7 @@ export const AccountLogout = ({ onCancel, onLogout }: AccountLogoutProps) => {
           <Button
             variant="destructive"
             disabled={isPending}
+            className="cursor-pointer"
             onClick={async () => {
               mutate({
                 input: {

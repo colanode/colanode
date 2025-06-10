@@ -40,7 +40,7 @@ export const RecordSettings = ({ record, role }: RecordSettingsProps) => {
             Duplicate
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 cursor-pointer"
             onClick={() => {
               if (!canDelete) {
                 return;

@@ -31,7 +31,7 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
       <TabsList className="flex w-full flex-col items-start justify-start gap-1 rounded-none bg-white">
         <TabsTrigger
           key={`tab-trigger-general`}
-          className="w-full justify-start p-2 hover:bg-gray-50"
+          className="w-full justify-start p-2 hover:bg-gray-50 cursor-pointer"
           value="general"
         >
           <Info className="mr-2 size-4" />
@@ -39,7 +39,7 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
         </TabsTrigger>
         <TabsTrigger
           key={`tab-trigger-collaborators`}
-          className="w-full justify-start p-2 hover:bg-gray-50"
+          className="w-full justify-start p-2 hover:bg-gray-50 cursor-pointer"
           value="collaborators"
         >
           <Users className="mr-2 size-4" />
@@ -48,7 +48,7 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
         {canDelete && (
           <TabsTrigger
             key={`tab-trigger-delete`}
-            className="w-full justify-start p-2 hover:bg-gray-50"
+            className="w-full justify-start p-2 hover:bg-gray-50 cursor-pointer"
             value="delete"
           >
             <Trash2 className="mr-2 size-4" />

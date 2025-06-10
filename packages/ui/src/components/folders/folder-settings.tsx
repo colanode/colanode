@@ -37,7 +37,7 @@ export const FolderSettings = ({ folder, role }: FolderSettingsProps) => {
           <DropdownMenuLabel>{folder.attributes.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 cursor-pointer"
             onClick={() => {
               if (!canEdit) {
                 return;
@@ -51,7 +51,7 @@ export const FolderSettings = ({ folder, role }: FolderSettingsProps) => {
             Rename
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 cursor-pointer"
             disabled={!canEdit}
             onClick={() => {
               if (!canEdit) {
@@ -69,7 +69,7 @@ export const FolderSettings = ({ folder, role }: FolderSettingsProps) => {
             Duplicate
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 cursor-pointer"
             onClick={() => {
               if (!canDelete) {
                 return;

@@ -34,7 +34,7 @@ export const SidebarChats = () => {
           <button
             key={item.id}
             className={cn(
-              'px-2 flex w-full items-center gap-2 overflow-hidden rounded-md text-left text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7',
+              'px-2 flex w-full items-center gap-2 overflow-hidden rounded-md text-left text-sm hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-7 cursor-pointer',
               layout.activeTab === item.id &&
                 'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
             )}

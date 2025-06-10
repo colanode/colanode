@@ -83,7 +83,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
             }}
           />
           <p
-            className="text-center text-sm text-muted-foreground hover:cursor-pointer hover:underline"
+            className="text-center text-sm text-muted-foreground cursor-pointer hover:underline"
             onClick={() => {
               setPanel({
                 type: 'register',
@@ -111,7 +111,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
             }}
           />
           <p
-            className="text-center text-sm text-muted-foreground hover:cursor-pointer hover:underline"
+            className="text-center text-sm text-muted-foreground cursor-pointer hover:underline"
             onClick={() => {
               setPanel({
                 type: 'login',
@@ -136,7 +136,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
             }}
           />
           <p
-            className="text-center text-sm text-muted-foreground hover:cursor-pointer hover:underline"
+            className="text-center text-sm text-muted-foreground cursor-pointer hover:underline"
             onClick={() => {
               setPanel({
                 type: 'login',
@@ -161,7 +161,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
             }}
           />
           <p
-            className="text-center text-sm text-muted-foreground hover:cursor-pointer hover:underline"
+            className="text-center text-sm text-muted-foreground cursor-pointer hover:underline"
             onClick={() => {
               setPanel({
                 type: 'login',
@@ -181,7 +181,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
             expiresAt={panel.expiresAt}
           />
           <p
-            className="text-center text-sm text-muted-foreground hover:cursor-pointer hover:underline"
+            className="text-center text-sm text-muted-foreground cursor-pointer hover:underline"
             onClick={() => {
               setPanel({
                 type: 'login',
@@ -197,7 +197,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
         <Fragment>
           <Separator className="w-full" />
           <p
-            className="text-center text-sm text-muted-foreground hover:cursor-pointer hover:underline"
+            className="text-center text-sm text-muted-foreground cursor-pointer hover:underline"
             onClick={() => {
               app.closeLogin();
             }}

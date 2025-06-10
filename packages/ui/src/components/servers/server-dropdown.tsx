@@ -39,7 +39,7 @@ export const ServerDropdown = ({
         }}
       >
         <DropdownMenuTrigger asChild>
-          <div className="flex w-full flex-grow flex-row items-center gap-3 rounded-md border border-input p-2 hover:cursor-pointer hover:bg-gray-100">
+          <div className="flex w-full flex-grow flex-row items-center gap-3 rounded-md border border-input p-2 cursor-pointer hover:bg-gray-100">
             <ServerAvatar
               url={value.avatar}
               name={value.name}
@@ -61,7 +61,7 @@ export const ServerDropdown = ({
                   onChange(server);
                 }
               }}
-              className="flex w-full flex-grow flex-row items-center gap-3 rounded-md border-b border-input p-2 hover:cursor-pointer hover:bg-gray-100"
+              className="flex w-full flex-grow flex-row items-center gap-3 rounded-md border-b border-input p-2 cursor-pointer hover:bg-gray-100"
             >
               <ServerAvatar
                 url={server.avatar}

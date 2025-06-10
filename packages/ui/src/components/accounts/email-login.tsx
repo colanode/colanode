@@ -93,7 +93,7 @@ export const EmailLogin = ({
           )}
         />
         <p
-          className="text-xs text-muted-foreground hover:cursor-pointer hover:underline w-full text-right"
+          className="text-xs text-muted-foreground cursor-pointer hover:underline w-full text-right"
           onClick={onForgotPassword}
         >
           Forgot password?

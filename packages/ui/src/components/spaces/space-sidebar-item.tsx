@@ -85,7 +85,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
             </CollapsibleTrigger>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="text-muted-foreground opacity-0 transition-opacity group-hover/sidebar-space:opacity-100 flex items-center justify-center p-0 mr-1 size-4 focus-visible:outline-none focus-visible:ring-0">
+                <button className="text-muted-foreground opacity-0 transition-opacity group-hover/sidebar-space:opacity-100 flex items-center justify-center p-0 mr-1 size-4 focus-visible:outline-none focus-visible:ring-0 cursor-pointer">
                   <Ellipsis />
                 </button>
               </DropdownMenuTrigger>
@@ -94,42 +94,48 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
                   {space.attributes.name ?? 'Unnamed'}
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onSelect={() => setOpenCreatePage(true)}>
-                  <div className="flex flex-row items-center gap-2">
-                    <StickyNote className="size-4" />
-                    <span>Add page</span>
-                  </div>
+                <DropdownMenuItem
+                  onSelect={() => setOpenCreatePage(true)}
+                  className="flex flex-row items-center gap-2 cursor-pointer"
+                >
+                  <StickyNote className="size-4" />
+                  <span>Add page</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setOpenCreateChannel(true)}>
-                  <div className="flex flex-row items-center gap-2">
-                    <MessageCircle className="size-4" />
-                    <span>Add channel</span>
-                  </div>
+                <DropdownMenuItem
+                  onSelect={() => setOpenCreateChannel(true)}
+                  className="flex flex-row items-center gap-2 cursor-pointer"
+                >
+                  <MessageCircle className="size-4" />
+                  <span>Add channel</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setOpenCreateDatabase(true)}>
-                  <div className="flex flex-row items-center gap-2">
-                    <Database className="size-4" />
-                    <span>Add database</span>
-                  </div>
+                <DropdownMenuItem
+                  onSelect={() => setOpenCreateDatabase(true)}
+                  className="flex flex-row items-center gap-2 cursor-pointer"
+                >
+                  <Database className="size-4" />
+                  <span>Add database</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setOpenCreateFolder(true)}>
-                  <div className="flex flex-row items-center gap-2">
-                    <Folder className="size-4" />
-                    <span>Add folder</span>
-                  </div>
+                <DropdownMenuItem
+                  onSelect={() => setOpenCreateFolder(true)}
+                  className="flex flex-row items-center gap-2 cursor-pointer"
+                >
+                  <Folder className="size-4" />
+                  <span>Add folder</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => layout.previewLeft(space.id)}>
-                  <div className="flex flex-row items-center gap-2">
-                    <Settings className="size-4" />
-                    <span>Settings</span>
-                  </div>
+                <DropdownMenuItem
+                  onClick={() => layout.previewLeft(space.id)}
+                  className="flex flex-row items-center gap-2 cursor-pointer"
+                >
+                  <Settings className="size-4" />
+                  <span>Settings</span>
                 </DropdownMenuItem>
-                <DropdownMenuItem onClick={() => layout.previewLeft(space.id)}>
-                  <div className="flex flex-row items-center gap-2">
-                    <Plus className="size-4" />
-                    <span>Add collaborators</span>
-                  </div>
+                <DropdownMenuItem
+                  onClick={() => layout.previewLeft(space.id)}
+                  className="flex flex-row items-center gap-2 cursor-pointer"
+                >
+                  <Plus className="size-4" />
+                  <span>Add collaborators</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>

@@ -76,7 +76,7 @@ export const SidebarMenuHeader = () => {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="gap-2 p-2"
+          className="gap-2 p-2 cursor-pointer"
           onClick={() => {
             workspace.openSettings();
           }}
@@ -100,7 +100,7 @@ export const SidebarMenuHeader = () => {
               return (
                 <DropdownMenuItem
                   key={workspaceItem.id}
-                  className="p-0"
+                  className="p-0 cursor-pointer"
                   onClick={() => {
                     account.openWorkspace(workspaceItem.id);
                   }}
@@ -131,7 +131,7 @@ export const SidebarMenuHeader = () => {
         )}
         <DropdownMenuSeparator className="my-1" />
         <DropdownMenuItem
-          className="gap-2 p-2 text-muted-foreground hover:text-foreground"
+          className="gap-2 p-2 text-muted-foreground hover:text-foreground cursor-pointer"
           onClick={() => {
             account.openWorkspaceCreate();
           }}

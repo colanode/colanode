@@ -94,7 +94,7 @@ export const ColorButton = ({
       <PopoverTrigger>
         <span
           className={cn(
-            'flex h-8 w-8 items-center justify-center rounded-md hover:cursor-pointer hover:bg-gray-100',
+            'flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-gray-100',
             activeHighlight?.bgClass ?? 'bg-white'
           )}
         >

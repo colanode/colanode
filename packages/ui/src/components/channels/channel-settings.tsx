@@ -37,7 +37,7 @@ export const ChannelSettings = ({ channel, role }: ChannelSettingsProps) => {
           <DropdownMenuLabel>{channel.attributes.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 cursor-pointer"
             onClick={() => {
               if (!canEdit) {
                 return;
@@ -51,7 +51,7 @@ export const ChannelSettings = ({ channel, role }: ChannelSettingsProps) => {
             Rename
           </DropdownMenuItem>
           <DropdownMenuItem
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 cursor-pointer"
             disabled={!canEdit}
             onClick={() => {
               if (!canEdit) {
@@ -64,7 +64,10 @@ export const ChannelSettings = ({ channel, role }: ChannelSettingsProps) => {
             <Image className="size-4" />
             Update icon
           </DropdownMenuItem>
-          <DropdownMenuItem className="flex items-center gap-2" disabled>
+          <DropdownMenuItem
+            className="flex items-center gap-2 cursor-pointer"
+            disabled
+          >
             <Copy className="size-4" />
             Duplicate
           </DropdownMenuItem>

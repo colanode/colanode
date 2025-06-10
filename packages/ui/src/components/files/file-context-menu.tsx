@@ -38,7 +38,7 @@ export const FileContextMenu = ({ id, children }: FileContextMenuProps) => {
           </ContextMenuItem>
           <ContextMenuItem
             onClick={() => setOpenDelete(true)}
-            className="flex items-center gap-x-2 pl-2 text-red-500"
+            className="flex items-center gap-x-2 pl-2 text-red-500 cursor-pointer"
           >
             <ContextMenuShortcut className="ml-0">
               <Trash2 className="size-4 text-red-500" />

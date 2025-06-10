@@ -27,13 +27,14 @@ export const ViewSortRow = ({ sort, field }: ViewSortProps) => {
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <div className="flex flex-grow flex-row items-center gap-1 rounded-md p-1 font-semibold hover:cursor-pointer hover:bg-gray-100">
+          <div className="flex flex-grow flex-row items-center gap-1 rounded-md p-1 font-semibold cursor-pointer hover:bg-gray-100">
             <p>{sort.direction === 'asc' ? 'Ascending' : 'Descending'}</p>
             <ChevronDown className="h-4 w-4 text-muted-foreground" />
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem
+            className="cursor-pointer"
             onClick={() => {
               view.updateSort(sort.id, {
                 ...sort,
@@ -44,6 +45,7 @@ export const ViewSortRow = ({ sort, field }: ViewSortProps) => {
             <p>Ascending</p>
           </DropdownMenuItem>
           <DropdownMenuItem
+            className="cursor-pointer"
             onClick={() => {
               view.updateSort(sort.id, {
                 ...sort,

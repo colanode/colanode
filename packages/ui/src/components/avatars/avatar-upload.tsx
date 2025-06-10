@@ -52,7 +52,7 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
       </form>
       <Button
         type="button"
-        className="w-full"
+        className="w-full cursor-pointer"
         variant="outline"
         disabled={isPending}
         onClick={async () => {

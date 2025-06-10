@@ -35,7 +35,7 @@ export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
       <PopoverTrigger>
         <span
           className={cn(
-            'flex h-8 w-8 items-center justify-center rounded-md hover:cursor-pointer hover:bg-gray-100',
+            'flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-gray-100',
             editor.isActive('link') ? 'bg-gray-100' : 'bg-white'
           )}
         >
@@ -65,7 +65,7 @@ export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
           {editor.getAttributes('link').href ? (
             <button
               type="button"
-              className="flex h-8 w-8 items-center justify-center rounded-md hover:cursor-pointer hover:bg-gray-100"
+              className="flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-gray-100"
               onClick={(e) => {
                 e.preventDefault();
                 editor.chain().focus().unsetLink().run();
@@ -77,7 +77,7 @@ export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
           ) : (
             <button
               type="submit"
-              className="flex h-8 w-8 items-center justify-center rounded-md hover:cursor-pointer hover:bg-gray-100"
+              className="flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-gray-100"
             >
               <Check className="size-4" />
             </button>

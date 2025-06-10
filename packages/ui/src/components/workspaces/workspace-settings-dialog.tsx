@@ -62,7 +62,7 @@ export const WorkspaceSettingsDialog = ({
             </div>
             <TabsTrigger
               key="tab-trigger-info"
-              className="w-full justify-start p-2 hover:bg-gray-50"
+              className="w-full justify-start p-2 hover:bg-gray-50 cursor-pointer"
               value="info"
             >
               <Info className="mr-2 size-4" />
@@ -70,7 +70,7 @@ export const WorkspaceSettingsDialog = ({
             </TabsTrigger>
             <TabsTrigger
               key="tab-trigger-users"
-              className="w-full justify-start p-2 hover:bg-gray-50"
+              className="w-full justify-start p-2 hover:bg-gray-50 cursor-pointer"
               value="users"
             >
               <Users className="mr-2 size-4" />
@@ -79,7 +79,7 @@ export const WorkspaceSettingsDialog = ({
             {canDelete && (
               <TabsTrigger
                 key="tab-trigger-delete"
-                className="w-full justify-start p-2 hover:bg-gray-50"
+                className="w-full justify-start p-2 hover:bg-gray-50 cursor-pointer"
                 value="delete"
               >
                 <Trash2 className="mr-2 size-4" />

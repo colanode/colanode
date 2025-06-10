@@ -14,7 +14,7 @@ export const SidebarMenuIcon = ({
   return (
     <div
       className={cn(
-        'w-10 h-10 flex items-center justify-center hover:cursor-pointer hover:bg-gray-200 rounded-md',
+        'w-10 h-10 flex items-center justify-center cursor-pointer hover:bg-gray-200 rounded-md',
         isActive ? 'bg-gray-200' : ''
       )}
       onClick={onClick}

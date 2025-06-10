@@ -82,7 +82,7 @@ export function SidebarMenuFooter() {
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
-          className="gap-2 p-2"
+          className="gap-2 p-2 cursor-pointer"
           onClick={() => {
             account.openSettings();
           }}
@@ -91,7 +91,7 @@ export function SidebarMenuFooter() {
           <p className="font-medium">Settings</p>
         </DropdownMenuItem>
         <DropdownMenuItem
-          className="gap-2 p-2"
+          className="gap-2 p-2 cursor-pointer"
           onClick={() => {
             account.openLogout();
           }}

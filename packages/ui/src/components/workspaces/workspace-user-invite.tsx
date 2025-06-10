@@ -39,7 +39,7 @@ export const WorkspaceUserInvite = ({
             >
               <span>{email}</span>
               <X
-                className="size-3 text-muted-foreground hover:cursor-pointer hover:text-primary"
+                className="size-3 text-muted-foreground cursor-pointer hover:text-primary"
                 onClick={() => {
                   setEmails((emails) => emails.filter((e) => e !== email));
                 }}
