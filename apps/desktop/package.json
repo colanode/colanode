@@ -12,7 +12,7 @@
     "make": "electron-forge make",
     "publish": "electron-forge publish",
     "lint": "eslint --ext .ts,.tsx src",
-    "rebuild": "electron-rebuild"
+    "postinstall": "electron-rebuild"
   },
   "devDependencies": {
     "@electron-forge/cli": "^7.8.1",
