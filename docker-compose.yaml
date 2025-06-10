@@ -92,6 +92,11 @@ services:
       # Possible values for SERVER_MODE: 'standalone', 'cluster'
       SERVER_MODE: 'standalone'
 
+      # Optional custom path prefix for the server.
+      # Add a plain text without any slashes. For example if you set 'colanode'
+      # the URL 'https://localhost:3000/config' will be: 'https://localhost:3000/colanode/config'
+      # SERVER_PATH_PREFIX: 'colanode'
+
       # Optional CORS Configuration. By default the server is accessible from 'https://app.colanode.com'.
       # You can change this to allow custom origins (use comma to separate multiple origins) or '*' to allow all origins.
       # SERVER_CORS_ORIGIN: 'https://app.colanode.com'
