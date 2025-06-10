@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { match } from 'ts-pattern';
 
 import { FileListQueryInput } from '@colanode/client/queries';
@@ -27,7 +27,7 @@ export const FolderFiles = ({
   const workspace = useWorkspace();
   const layout = useLayout();
 
-  const [lastPage] = React.useState<number>(1);
+  const [lastPage] = useState<number>(1);
   const inputs: FileListQueryInput[] = Array.from({
     length: lastPage,
   }).map((_, i) => ({

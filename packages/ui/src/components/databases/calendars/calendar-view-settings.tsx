@@ -1,5 +1,5 @@
 import { Eye, EyeOff, Trash2 } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { AvatarPopover } from '@colanode/ui/components/avatars/avatar-popover';
 import { FieldDeleteDialog } from '@colanode/ui/components/databases/fields/field-delete-dialog';
@@ -28,12 +28,12 @@ export const CalendarViewSettings = () => {
   const database = useDatabase();
   const view = useDatabaseView();
 
-  const [open, setOpen] = React.useState(false);
-  const [openDelete, setOpenDelete] = React.useState(false);
-  const [deleteFieldId, setDeleteFieldId] = React.useState<string | null>(null);
+  const [open, setOpen] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
+  const [deleteFieldId, setDeleteFieldId] = useState<string | null>(null);
 
   return (
-    <React.Fragment>
+    <Fragment>
       <Popover open={open} onOpenChange={setOpen}>
         <PopoverTrigger>
           <ViewSettingsButton />
@@ -148,7 +148,7 @@ export const CalendarViewSettings = () => {
             })}
           </div>
           {database.canEdit && (
-            <React.Fragment>
+            <Fragment>
               <Separator />
               <div className="flex flex-col gap-2 text-sm">
                 <p className="my-1 font-semibold">Settings</p>
@@ -163,7 +163,7 @@ export const CalendarViewSettings = () => {
                   <span>Delete view</span>
                 </div>
               </div>
-            </React.Fragment>
+            </Fragment>
           )}
         </PopoverContent>
       </Popover>
@@ -185,6 +185,6 @@ export const CalendarViewSettings = () => {
           onOpenChange={setOpenDelete}
         />
       )}
-    </React.Fragment>
+    </Fragment>
   );
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 
 import { LocalNode } from '@colanode/client/types';
 import { ContainerBreadcrumbItem } from '@colanode/ui/components/layouts/containers/container-breadcrumb-item';
@@ -48,7 +48,7 @@ export const ContainerBreadcrumb = ({
           const isFirst = index === 0;
 
           return (
-            <React.Fragment key={item.id}>
+            <Fragment key={item.id}>
               {!isFirst && <BreadcrumbSeparator />}
               <BreadcrumbItem
                 className="hover:cursor-pointer hover:text-foreground"
@@ -59,7 +59,7 @@ export const ContainerBreadcrumb = ({
                 <ContainerBreadcrumbItem node={item} />
               </BreadcrumbItem>
               {showEllipsis && isFirst && (
-                <React.Fragment>
+                <Fragment>
                   <BreadcrumbSeparator />
                   <BreadcrumbItem>
                     <DropdownMenu>
@@ -84,9 +84,9 @@ export const ContainerBreadcrumb = ({
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </BreadcrumbItem>
-                </React.Fragment>
+                </Fragment>
               )}
-            </React.Fragment>
+            </Fragment>
           );
         })}
       </BreadcrumbList>

@@ -1,5 +1,5 @@
 import { Copy, Settings, Trash2 } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { LocalRecordNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
@@ -22,12 +22,12 @@ interface RecordSettingsProps {
 
 export const RecordSettings = ({ record, role }: RecordSettingsProps) => {
   const workspace = useWorkspace();
-  const [showDeleteDialog, setShowDeleteModal] = React.useState(false);
+  const [showDeleteDialog, setShowDeleteModal] = useState(false);
   const canDelete =
     record.createdBy === workspace.userId || hasNodeRole(role, 'editor');
 
   return (
-    <React.Fragment>
+    <Fragment>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Settings className="size-4 cursor-pointer text-muted-foreground hover:text-foreground" />
@@ -62,7 +62,7 @@ export const RecordSettings = ({ record, role }: RecordSettingsProps) => {
             />
           </DropdownMenuItem>
           {record.updatedBy && record.updatedAt && (
-            <React.Fragment>
+            <Fragment>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Last updated by</DropdownMenuLabel>
               <DropdownMenuItem>
@@ -71,7 +71,7 @@ export const RecordSettings = ({ record, role }: RecordSettingsProps) => {
                   date={record.updatedAt}
                 />
               </DropdownMenuItem>
-            </React.Fragment>
+            </Fragment>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -80,6 +80,6 @@ export const RecordSettings = ({ record, role }: RecordSettingsProps) => {
         open={showDeleteDialog}
         onOpenChange={setShowDeleteModal}
       />
-    </React.Fragment>
+    </Fragment>
   );
 };

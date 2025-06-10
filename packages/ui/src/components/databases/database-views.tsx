@@ -1,5 +1,5 @@
 import * as ScrollAreaPrimitive from '@radix-ui/react-scroll-area';
-import React from 'react';
+import { useEffect, useState } from 'react';
 
 import { View } from '@colanode/ui/components/databases/view';
 import { ScrollBar } from '@colanode/ui/components/ui/scroll-area';
@@ -11,7 +11,7 @@ import { useQuery } from '@colanode/ui/hooks/use-query';
 export const DatabaseViews = () => {
   const workspace = useWorkspace();
   const database = useDatabase();
-  const [activeViewId, setActiveViewId] = React.useState<string | null>(null);
+  const [activeViewId, setActiveViewId] = useState<string | null>(null);
 
   const databaseViewListQuery = useQuery({
     type: 'database.view.list',
@@ -23,7 +23,7 @@ export const DatabaseViews = () => {
   const views = databaseViewListQuery.data ?? [];
   const activeView = views.find((view) => view.id === activeViewId);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (views.length > 0 && !views.some((view) => view.id === activeViewId)) {
       setActiveViewId(views[0]?.id ?? null);
     }

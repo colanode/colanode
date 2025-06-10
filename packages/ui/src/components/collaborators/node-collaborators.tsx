@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 
 import { Node, NodeRole, extractNodeName, hasNodeRole } from '@colanode/core';
 import { NodeCollaborator } from '@colanode/ui/components/collaborators/node-collaborator';
@@ -32,19 +32,19 @@ export const NodeCollaborators = ({
   return (
     <div className="flex flex-col gap-2">
       {canAddCollaborator && (
-        <React.Fragment>
+        <Fragment>
           <NodeCollaboratorCreate
             nodeId={node.id}
             existingCollaborators={directCollaboratorIds}
           />
           <Separator />
-        </React.Fragment>
+        </Fragment>
       )}
       <div className="space-y-3">
         <h4 className="text-sm font-medium">Direct access</h4>
         <div className="flex flex-col gap-3">
           {directCollaborators.length > 0 ? (
-            <React.Fragment>
+            <Fragment>
               {directCollaborators.map((collaborator) => {
                 // you can edit only if you have admin access
                 // and there is at least one more admin
@@ -71,7 +71,7 @@ export const NodeCollaborators = ({
                   />
                 );
               })}
-            </React.Fragment>
+            </Fragment>
           ) : (
             <span className="text-xs text-muted-foreground">
               No direct access.

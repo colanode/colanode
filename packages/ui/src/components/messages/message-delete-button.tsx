@@ -1,5 +1,5 @@
 import { Trash2 } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -23,10 +23,10 @@ interface MessageDeleteButtonProps {
 export const MessageDeleteButton = ({ id }: MessageDeleteButtonProps) => {
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
-  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   return (
-    <React.Fragment>
+    <Fragment>
       <Trash2
         className="size-4 cursor-pointer"
         onClick={() => setShowDeleteModal(true)}
@@ -70,6 +70,6 @@ export const MessageDeleteButton = ({ id }: MessageDeleteButtonProps) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </React.Fragment>
+    </Fragment>
   );
 };

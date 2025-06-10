@@ -1,4 +1,4 @@
-import React from 'react';
+import { useRef } from 'react';
 import { useDrag } from 'react-dnd';
 
 import { SelectFieldAttributes, SelectOptionAttributes } from '@colanode/core';
@@ -41,7 +41,7 @@ export const BoardViewRecordCard = () => {
     },
   });
 
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const dragRef = drag(buttonRef);
   const name = record.name;
   const hasName = name !== null && name !== '';

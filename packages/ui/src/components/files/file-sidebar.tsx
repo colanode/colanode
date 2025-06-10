@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 
 import { LocalFileNode } from '@colanode/client/types';
 import { formatBytes, formatDate } from '@colanode/core';
@@ -33,7 +33,7 @@ export const FileSidebar = ({ file }: FileSidebarProps) => {
   const user = userGetQuery.data ?? null;
 
   return (
-    <React.Fragment>
+    <Fragment>
       <div className="flex items-center gap-x-4 p-2">
         <FileThumbnail
           file={file}
@@ -68,6 +68,6 @@ export const FileSidebar = ({ file }: FileSidebarProps) => {
           </div>
         )}
       </div>
-    </React.Fragment>
+    </Fragment>
   );
 };

@@ -14,7 +14,13 @@ import {
   type SuggestionKeyDownProps,
   type SuggestionProps,
 } from '@tiptap/suggestion';
-import React from 'react';
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from 'react';
 
 import { EditorContext, User } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
@@ -39,7 +45,7 @@ const CommandList = ({
   range: Range;
   props: SuggestionProps<User>;
 }) => {
-  const [selectedIndex, setSelectedIndex] = React.useState(0);
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const { refs, floatingStyles } = useFloating({
     placement: 'bottom-start',
@@ -48,7 +54,7 @@ const CommandList = ({
     strategy: 'fixed',
   });
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     if (props.clientRect) {
       refs.setPositionReference({
         getBoundingClientRect: () => props.clientRect?.() || new DOMRect(),
@@ -56,7 +62,7 @@ const CommandList = ({
     }
   }, [props.clientRect, refs]);
 
-  const selectItem = React.useCallback(
+  const selectItem = useCallback(
     (index: number) => {
       const item = items[index];
       if (item) {
@@ -66,7 +72,7 @@ const CommandList = ({
     [command, items, range]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (navigationKeys.includes(e.key)) {
         e.preventDefault();
@@ -93,13 +99,13 @@ const CommandList = ({
     };
   }, [items, selectedIndex, setSelectedIndex, selectItem]);
 
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedIndex(0);
   }, [items]);
 
-  const commandListContainer = React.useRef<HTMLDivElement>(null);
+  const commandListContainer = useRef<HTMLDivElement>(null);
 
-  React.useLayoutEffect(() => {
+  useLayoutEffect(() => {
     const container = commandListContainer?.current;
 
     const item = container?.children[selectedIndex] as HTMLElement;

@@ -1,5 +1,5 @@
 import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { LocalFolderNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
@@ -21,14 +21,14 @@ interface FolderSettingsProps {
 }
 
 export const FolderSettings = ({ folder, role }: FolderSettingsProps) => {
-  const [showUpdateDialog, setShowUpdateDialog] = React.useState(false);
-  const [showDeleteDialog, setShowDeleteModal] = React.useState(false);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteModal] = useState(false);
 
   const canEdit = hasNodeRole(role, 'editor');
   const canDelete = hasNodeRole(role, 'editor');
 
   return (
-    <React.Fragment>
+    <Fragment>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Settings className="size-4 cursor-pointer text-muted-foreground hover:text-foreground" />
@@ -91,7 +91,7 @@ export const FolderSettings = ({ folder, role }: FolderSettingsProps) => {
             />
           </DropdownMenuItem>
           {folder.updatedBy && folder.updatedAt && (
-            <React.Fragment>
+            <Fragment>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Last updated by</DropdownMenuLabel>
               <DropdownMenuItem>
@@ -100,7 +100,7 @@ export const FolderSettings = ({ folder, role }: FolderSettingsProps) => {
                   date={folder.updatedAt}
                 />
               </DropdownMenuItem>
-            </React.Fragment>
+            </Fragment>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -115,6 +115,6 @@ export const FolderSettings = ({ folder, role }: FolderSettingsProps) => {
         open={showUpdateDialog}
         onOpenChange={setShowUpdateDialog}
       />
-    </React.Fragment>
+    </Fragment>
   );
 };

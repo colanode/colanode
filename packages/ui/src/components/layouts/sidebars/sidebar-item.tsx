@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { LocalNode } from '@colanode/client/types';
 import { ChannelSidebarItem } from '@colanode/ui/components/channels/channel-sidebar-item';
 import { ChatSidebarItem } from '@colanode/ui/components/chats/chat-sidebar-item';

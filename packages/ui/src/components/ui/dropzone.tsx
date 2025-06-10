@@ -1,5 +1,5 @@
 import { Upload } from 'lucide-react';
-import React from 'react';
+import { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 import { NativeTypes } from 'react-dnd-html5-backend';
 
@@ -20,7 +20,7 @@ const Dropzone = ({ text, children, onDrop }: DropzoneProps) => {
       canDrop: monitor.canDrop(),
     }),
   });
-  const divRef = React.useRef<HTMLDivElement>(null);
+  const divRef = useRef<HTMLDivElement>(null);
   const dropRef = drop(divRef);
 
   const isActive = canDrop && isOver;

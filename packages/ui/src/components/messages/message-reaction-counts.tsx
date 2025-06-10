@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { LocalMessageNode } from '@colanode/client/types';
@@ -18,7 +18,7 @@ export const MessageReactionCounts = ({
   message,
 }: MessageReactionCountsProps) => {
   const workspace = useWorkspace();
-  const [openDialog, setOpenDialog] = React.useState(false);
+  const [openDialog, setOpenDialog] = useState(false);
 
   const { mutate, isPending } = useMutation();
 

@@ -1,5 +1,5 @@
 import { Check, Plus, X } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -40,8 +40,8 @@ export const SelectFieldOptions = ({
 
   const selectOptions = Object.values(field.options ?? {});
 
-  const [inputValue, setInputValue] = React.useState('');
-  const [color, setColor] = React.useState(getRandomSelectOptionColor());
+  const [inputValue, setInputValue] = useState('');
+  const [color, setColor] = useState(getRandomSelectOptionColor());
   const showNewOption =
     database.canEdit &&
     allowAdd &&
@@ -74,10 +74,10 @@ export const SelectFieldOptions = ({
                 </div>
                 <div className="flex flex-row items-center gap-2">
                   {isSelected ? (
-                    <React.Fragment>
+                    <Fragment>
                       <Check className="size-4 group-hover:hidden" />
                       <X className="hidden size-4 group-hover:block" />
-                    </React.Fragment>
+                    </Fragment>
                   ) : (
                     <Plus className="hidden size-4 group-hover:block" />
                   )}

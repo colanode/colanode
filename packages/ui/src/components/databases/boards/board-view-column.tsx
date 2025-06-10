@@ -1,4 +1,4 @@
-import React from 'react';
+import { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { SelectFieldAttributes, SelectOptionAttributes } from '@colanode/core';
@@ -24,7 +24,7 @@ export const BoardViewColumn = ({ field, option }: BoardViewColumnProps) => {
     }),
   });
 
-  const divRef = React.useRef<HTMLDivElement>(null);
+  const divRef = useRef<HTMLDivElement>(null);
   const dropRef = drop(divRef);
 
   const lightClass = getSelectOptionLightColorClass(option.color ?? 'gray');

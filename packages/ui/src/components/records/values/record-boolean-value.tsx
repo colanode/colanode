@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 
 import { BooleanFieldAttributes } from '@colanode/core';
 import { Checkbox } from '@colanode/ui/components/ui/checkbox';
@@ -15,11 +15,9 @@ export const RecordBooleanValue = ({
 }: RecordBooleanValueProps) => {
   const record = useRecord();
 
-  const [input, setInput] = React.useState<boolean>(
-    record.getBooleanValue(field)
-  );
+  const [input, setInput] = useState<boolean>(record.getBooleanValue(field));
 
-  React.useEffect(() => {
+  useEffect(() => {
     setInput(record.getBooleanValue(field));
   }, [record.localRevision]);
 

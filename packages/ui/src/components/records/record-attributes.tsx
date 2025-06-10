@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 
 import { RecordAvatar } from '@colanode/ui/components/records/record-avatar';
 import { RecordField } from '@colanode/ui/components/records/record-field';
@@ -19,7 +19,7 @@ export const RecordAttributes = () => {
         {database.fields
           .sort((a, b) => a.index.localeCompare(b.index))
           .map((field) => (
-            <React.Fragment key={field.id}>
+            <Fragment key={field.id}>
               <div className="flex flex-row gap-2 h-8">
                 <div className="w-60 max-w-60">
                   <RecordField field={field} />
@@ -28,7 +28,7 @@ export const RecordAttributes = () => {
                   <RecordFieldValue field={field} />
                 </div>
               </div>
-            </React.Fragment>
+            </Fragment>
           ))}
       </div>
     </div>

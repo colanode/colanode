@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 
 import { ViewFilters } from '@colanode/ui/components/databases/search/view-filters';
 import { ViewSorts } from '@colanode/ui/components/databases/search/view-sorts';
@@ -15,10 +15,10 @@ export const ViewSearchBar = () => {
   return (
     <div className="mt-3 flex flex-row items-center gap-2">
       {view.sorts.length > 0 && (
-        <React.Fragment>
+        <Fragment>
           <ViewSorts />
           <Separator orientation="vertical" className="mx-1 h-4" />
-        </React.Fragment>
+        </Fragment>
       )}
       <ViewFilters />
     </div>

@@ -7,7 +7,7 @@ import {
   useEditor,
 } from '@tiptap/react';
 import { debounce, isEqual } from 'lodash-es';
-import React from 'react';
+import { Fragment, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -107,11 +107,11 @@ export const DocumentEditor = ({
 }: DocumentEditorProps) => {
   const workspace = useWorkspace();
 
-  const hasPendingChanges = React.useRef(false);
-  const revisionRef = React.useRef(state?.revision ?? 0);
-  const ydocRef = React.useRef<YDoc>(buildYDoc(state, updates));
+  const hasPendingChanges = useRef(false);
+  const revisionRef = useRef(state?.revision ?? 0);
+  const ydocRef = useRef<YDoc>(buildYDoc(state, updates));
 
-  const debouncedSave = React.useMemo(
+  const debouncedSave = useMemo(
     () =>
       debounce(async (content: JSONContent) => {
         const beforeContent = ydocRef.current.getObject<RichTextContent>();
@@ -255,7 +255,7 @@ export const DocumentEditor = ({
     [node.id]
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!editor) {
       return;
     }
@@ -295,10 +295,10 @@ export const DocumentEditor = ({
   return (
     <div className="min-h-[500px]">
       {editor && canEdit && (
-        <React.Fragment>
+        <Fragment>
           <ToolbarMenu editor={editor} />
           <ActionMenu editor={editor} />
-        </React.Fragment>
+        </Fragment>
       )}
       <EditorContent editor={editor} />
     </div>

@@ -1,4 +1,4 @@
-import React from 'react';
+import { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { ContainerTab } from '@colanode/client/types';
@@ -38,7 +38,7 @@ export const ContainerTabs = ({
     }),
   });
 
-  const buttonRef = React.useRef<HTMLDivElement>(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
   const dragDropRef = dropRef(buttonRef);
 
   return (

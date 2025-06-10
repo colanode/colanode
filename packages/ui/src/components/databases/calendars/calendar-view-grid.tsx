@@ -1,5 +1,5 @@
-import { ChevronLeft, ChevronRight } from 'lucide-react';
-import React from 'react';
+import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState } from 'react';
 import { DayPicker, DayProps } from 'react-day-picker';
 
 import {
@@ -26,7 +26,7 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
   const database = useDatabase();
   const view = useDatabaseView();
 
-  const [month, setMonth] = React.useState(new Date());
+  const [month, setMonth] = useState(new Date());
   const { first, last } = getDisplayedDates(month);
 
   const filters: DatabaseViewFilterAttributes[] = [
@@ -82,19 +82,28 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
         ),
       }}
       components={{
-        IconLeft: ({ ...props }) => (
-          <ChevronLeft className="size-4" {...props} />
-        ),
-        IconRight: ({ ...props }) => (
-          <ChevronRight className="size-4" {...props} />
-        ),
+        Chevron: ({ className, orientation, ...props }) => {
+          if (orientation === 'left') {
+            return (
+              <ChevronLeft className={cn('size-4', className)} {...props} />
+            );
+          }
+
+          if (orientation === 'right') {
+            return (
+              <ChevronRight className={cn('size-4', className)} {...props} />
+            );
+          }
+
+          return <ChevronDown className={cn('size-4', className)} {...props} />;
+        },
         Day: (props: DayProps) => {
           const filter: DatabaseViewFilterAttributes = {
             id: 'calendar_filter',
             type: 'field',
             fieldId: field.id,
             operator: 'is_equal_to',
-            value: props.date.toISOString(),
+            value: props.day.date.toISOString(),
           };
 
           const dayRecords = filterRecords(
@@ -106,7 +115,7 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
 
           const canCreate =
             (field.type === 'created_at' &&
-              isSameDay(props.date, new Date())) ||
+              isSameDay(props.day.date, new Date())) ||
             field.type === 'date';
 
           const onCreate =
@@ -116,8 +125,8 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
 
           return (
             <CalendarViewDay
-              date={toUTCDate(props.date)}
-              month={props.displayMonth}
+              date={toUTCDate(props.day.date)}
+              month={props.day.displayMonth}
               records={dayRecords}
               onCreate={onCreate}
             />

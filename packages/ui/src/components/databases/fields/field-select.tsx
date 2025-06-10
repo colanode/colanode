@@ -1,5 +1,5 @@
 import { Check, ChevronDown } from 'lucide-react';
-import React from 'react';
+import { useState } from 'react';
 
 import { FieldAttributes, FieldType } from '@colanode/core';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
@@ -26,7 +26,7 @@ interface FieldSelectProps {
 }
 
 export const FieldSelect = ({ fields, value, onChange }: FieldSelectProps) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const selectedField = fields.find((field) => field.id === value);
 
   return (

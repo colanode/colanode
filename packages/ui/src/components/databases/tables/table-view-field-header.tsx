@@ -1,6 +1,6 @@
 import { ArrowDownAz, ArrowDownZa, EyeOff, Filter, Trash2 } from 'lucide-react';
 import { Resizable } from 're-resizable';
-import React from 'react';
+import { Fragment, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
 import { ViewField } from '@colanode/client/types';
@@ -28,8 +28,8 @@ export const TableViewFieldHeader = ({
   const database = useDatabase();
   const view = useDatabaseView();
 
-  const [openPopover, setOpenPopover] = React.useState(false);
-  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+  const [openPopover, setOpenPopover] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   const [, dragRef] = useDrag<ViewField>({
     type: 'table-field-header',
@@ -57,14 +57,14 @@ export const TableViewFieldHeader = ({
     }),
   });
 
-  const divRef = React.useRef<HTMLDivElement>(null);
+  const divRef = useRef<HTMLDivElement>(null);
   const dragDropRef = dragRef(dropRef(divRef));
 
   const canFilter = isFilterableField(viewField.field);
   const canSort = isSortableField(viewField.field);
 
   return (
-    <React.Fragment>
+    <Fragment>
       <Resizable
         defaultSize={{
           width: `${viewField.width}px`,
@@ -119,7 +119,7 @@ export const TableViewFieldHeader = ({
             <FieldRenameInput field={viewField.field} />
             <Separator />
             {canSort && (
-              <React.Fragment>
+              <Fragment>
                 <div
                   className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
                   onClick={() => {
@@ -141,7 +141,7 @@ export const TableViewFieldHeader = ({
                   <ArrowDownZa className="size-4" />
                   <span>Sort descending</span>
                 </div>
-              </React.Fragment>
+              </Fragment>
             )}
             {canFilter && (
               <div
@@ -188,6 +188,6 @@ export const TableViewFieldHeader = ({
           onOpenChange={setShowDeleteDialog}
         />
       )}
-    </React.Fragment>
+    </Fragment>
   );
 };

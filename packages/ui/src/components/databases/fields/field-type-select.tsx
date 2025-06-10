@@ -1,5 +1,5 @@
 import { Check, ChevronsUpDown } from 'lucide-react';
-import React from 'react';
+import { useState } from 'react';
 
 import { FieldType } from '@colanode/core';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
@@ -93,7 +93,7 @@ interface FieldTypeSelectProps {
 }
 
 export const FieldTypeSelect = ({ type, onChange }: FieldTypeSelectProps) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>

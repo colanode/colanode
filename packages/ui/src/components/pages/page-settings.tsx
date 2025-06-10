@@ -1,5 +1,5 @@
 import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { LocalPageNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
@@ -21,14 +21,14 @@ interface PageSettingsProps {
 }
 
 export const PageSettings = ({ page, role }: PageSettingsProps) => {
-  const [showUpdateDialog, setShowUpdateDialog] = React.useState(false);
-  const [showDeleteDialog, setShowDeleteModal] = React.useState(false);
+  const [showUpdateDialog, setShowUpdateDialog] = useState(false);
+  const [showDeleteDialog, setShowDeleteModal] = useState(false);
 
   const canEdit = hasNodeRole(role, 'editor');
   const canDelete = hasNodeRole(role, 'editor');
 
   return (
-    <React.Fragment>
+    <Fragment>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Settings className="size-4 cursor-pointer text-muted-foreground hover:text-foreground" />
@@ -91,7 +91,7 @@ export const PageSettings = ({ page, role }: PageSettingsProps) => {
             />
           </DropdownMenuItem>
           {page.updatedBy && page.updatedAt && (
-            <React.Fragment>
+            <Fragment>
               <DropdownMenuSeparator />
               <DropdownMenuLabel>Last updated by</DropdownMenuLabel>
               <DropdownMenuItem>
@@ -100,7 +100,7 @@ export const PageSettings = ({ page, role }: PageSettingsProps) => {
                   date={page.updatedAt}
                 />
               </DropdownMenuItem>
-            </React.Fragment>
+            </Fragment>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
@@ -115,6 +115,6 @@ export const PageSettings = ({ page, role }: PageSettingsProps) => {
         open={showUpdateDialog}
         onOpenChange={setShowUpdateDialog}
       />
-    </React.Fragment>
+    </Fragment>
   );
 };

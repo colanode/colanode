@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useRef } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { NodeRole, hasNodeRole } from '@colanode/core';
@@ -24,16 +24,16 @@ export const Conversation = ({
 }: ConversationProps) => {
   const workspace = useWorkspace();
 
-  const viewportRef = React.useRef<HTMLDivElement>(null);
-  const containerRef = React.useRef<HTMLDivElement>(null);
-  const observerRef = React.useRef<ResizeObserver | null>(null);
-  const scrollPositionRef = React.useRef<number>(0);
-  const bottomRef = React.useRef<HTMLDivElement>(null);
-  const bottomVisibleRef = React.useRef<boolean>(false);
-  const shouldScrollToBottomRef = React.useRef<boolean>(true);
-  const messageCreateRef = React.useRef<MessageCreateRefProps>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const observerRef = useRef<ResizeObserver | null>(null);
+  const scrollPositionRef = useRef<number>(0);
+  const bottomRef = useRef<HTMLDivElement>(null);
+  const bottomVisibleRef = useRef<boolean>(false);
+  const shouldScrollToBottomRef = useRef<boolean>(true);
+  const messageCreateRef = useRef<MessageCreateRefProps>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (bottomRef.current && scrollPositionRef.current == 0) {
       bottomRef.current.scrollIntoView();
     }

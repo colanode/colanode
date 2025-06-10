@@ -3,7 +3,7 @@ import '@colanode/ui/styles/highlight.css';
 import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewContent, NodeViewWrapper } from '@tiptap/react';
 import { Check, ChevronDown, Clipboard } from 'lucide-react';
-import React from 'react';
+import { useState } from 'react';
 
 import {
   Command,
@@ -30,8 +30,8 @@ export const CodeBlockNodeView = ({
   const languageItem = languages.find((item) => item.code === language);
   const code = node.textContent ?? '';
 
-  const [copied, setCopied] = React.useState(false);
-  const [open, setOpen] = React.useState(false);
+  const [copied, setCopied] = useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <NodeViewWrapper

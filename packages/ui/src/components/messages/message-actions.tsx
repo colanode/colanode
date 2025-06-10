@@ -1,5 +1,5 @@
 import { MessagesSquare, Reply } from 'lucide-react';
-import React from 'react';
+import { useCallback } from 'react';
 import { toast } from 'sonner';
 
 import { LocalMessageNode } from '@colanode/client/types';
@@ -32,7 +32,7 @@ export const MessageActions = ({ message }: MessageActionsProps) => {
   const canDelete = conversation.canDeleteMessage(message);
   const canReplyInThread = false;
 
-  const handleReactionClick = React.useCallback(
+  const handleReactionClick = useCallback(
     (reaction: string) => {
       if (isPending) {
         return;

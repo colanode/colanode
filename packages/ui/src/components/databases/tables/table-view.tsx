@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 
 import { ViewFilterButton } from '@colanode/ui/components/databases/search/view-filter-button';
 import { ViewSearchBar } from '@colanode/ui/components/databases/search/view-search-bar';
@@ -11,7 +11,7 @@ import { ViewTabs } from '@colanode/ui/components/databases/view-tabs';
 
 export const TableView = () => {
   return (
-    <React.Fragment>
+    <Fragment>
       <div className="flex flex-row justify-between border-b">
         <ViewTabs />
         <div className="invisible flex flex-row items-center justify-end group-hover/database:visible">
@@ -26,6 +26,6 @@ export const TableView = () => {
         <TableViewBody />
         <TableViewRecordCreateRow />
       </div>
-    </React.Fragment>
+    </Fragment>
   );
 };

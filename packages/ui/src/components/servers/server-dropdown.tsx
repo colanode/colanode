@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { Server } from '@colanode/client/types';
 import { ServerAvatar } from '@colanode/ui/components/servers/server-avatar';
@@ -25,11 +25,11 @@ export const ServerDropdown = ({
   servers,
   readonly = false,
 }: ServerDropdownProps) => {
-  const [open, setOpen] = React.useState(false);
-  const [openCreate, setOpenCreate] = React.useState(false);
+  const [open, setOpen] = useState(false);
+  const [openCreate, setOpenCreate] = useState(false);
 
   return (
-    <React.Fragment>
+    <Fragment>
       <DropdownMenu
         open={open}
         onOpenChange={(openValue) => {
@@ -94,6 +94,6 @@ export const ServerDropdown = ({
           }}
         />
       )}
-    </React.Fragment>
+    </Fragment>
   );
 };

@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import React from 'react';
+import { useState } from 'react';
 
 import { User } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
@@ -34,8 +34,8 @@ export const NodeCollaboratorSearch = ({
 }: NodeCollaboratorSearchProps) => {
   const workspace = useWorkspace();
 
-  const [query, setQuery] = React.useState('');
-  const [open, setOpen] = React.useState(false);
+  const [query, setQuery] = useState('');
+  const [open, setOpen] = useState(false);
 
   const userSearchQuery = useQuery({
     type: 'user.search',

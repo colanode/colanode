@@ -1,5 +1,5 @@
 import { Bell, Check, Plus, Settings } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import {
@@ -21,7 +21,7 @@ export const SidebarMenuHeader = () => {
   const account = useAccount();
   const radar = useRadar();
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const workspaceListQuery = useQuery({
     type: 'workspace.list',
     accountId: account.id,
@@ -89,7 +89,7 @@ export const SidebarMenuHeader = () => {
           <p className="font-medium">Notifications</p>
         </DropdownMenuItem>
         {otherWorkspaces.length > 0 && (
-          <React.Fragment>
+          <Fragment>
             <DropdownMenuSeparator />
             <DropdownMenuLabel className="mb-1">Workspaces</DropdownMenuLabel>
             {workspaces.map((workspaceItem) => {
@@ -127,7 +127,7 @@ export const SidebarMenuHeader = () => {
                 </DropdownMenuItem>
               );
             })}
-          </React.Fragment>
+          </Fragment>
         )}
         <DropdownMenuSeparator className="my-1" />
         <DropdownMenuItem

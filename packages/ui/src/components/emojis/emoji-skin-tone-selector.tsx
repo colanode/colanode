@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 
 import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
 import {
@@ -18,7 +18,7 @@ export const EmojiSkinToneSelector = ({
   skinTone,
   onSkinToneChange,
 }: EmojiSkinToneSelectorProps) => {
-  const [open, setOpen] = React.useState<boolean>(false);
+  const [open, setOpen] = useState<boolean>(false);
 
   const emojiGetQuery = useQuery({
     type: 'emoji.get',

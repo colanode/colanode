@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import React from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { Workspace } from '@colanode/client/types';
@@ -17,8 +17,8 @@ export const WorkspaceUserInvite = ({
 }: WorkspaceUserInviteProps) => {
   const { mutate, isPending } = useMutation();
 
-  const [input, setInput] = React.useState('');
-  const [emails, setEmails] = React.useState<string[]>([]);
+  const [input, setInput] = useState('');
+  const [emails, setEmails] = useState<string[]>([]);
 
   return (
     <div className="flex flex-col space-y-2">

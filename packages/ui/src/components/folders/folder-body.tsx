@@ -6,7 +6,7 @@ import {
   List,
   Upload,
 } from 'lucide-react';
-import React from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { LocalFolderNode, FolderLayoutType } from '@colanode/client/types';
@@ -66,7 +66,7 @@ interface FolderBodyProps {
 export const FolderBody = ({ folder }: FolderBodyProps) => {
   const workspace = useWorkspace();
 
-  const [layout, setLayout] = React.useState<FolderLayoutType>('grid');
+  const [layout, setLayout] = useState<FolderLayoutType>('grid');
 
   const currentLayout =
     folderLayouts.find((l) => l.value === layout) ?? folderLayouts[0];

@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 
 import { LocalRecordNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
@@ -26,7 +26,7 @@ export const RecordSearch = ({
 }: RecordSearchProps) => {
   const workspace = useWorkspace();
 
-  const [query, setQuery] = React.useState('');
+  const [query, setQuery] = useState('');
   const recordSearchQuery = useQuery({
     type: 'record.search',
     searchQuery: query,

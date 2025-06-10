@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 
 import { Emoji } from '@colanode/client/types';
 import { EmojiBrowser } from '@colanode/ui/components/emojis/emoji-browser';
@@ -11,8 +11,8 @@ interface EmojiPickerProps {
 }
 
 export const EmojiPicker = ({ onPick }: EmojiPickerProps) => {
-  const [query, setQuery] = React.useState('');
-  const [skinTone, setSkinTone] = React.useState(0);
+  const [query, setQuery] = useState('');
+  const [skinTone, setSkinTone] = useState(0);
 
   return (
     <div className="flex flex-col gap-1 p-1">

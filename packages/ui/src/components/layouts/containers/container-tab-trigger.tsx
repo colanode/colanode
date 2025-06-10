@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import React from 'react';
+import { useRef } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 import { match } from 'ts-pattern';
 
@@ -58,7 +58,7 @@ export const ContainerTabTrigger = ({
     }),
   });
 
-  const buttonRef = React.useRef<HTMLButtonElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const dragDropRef = dragRef(dropRef(buttonRef));
 
   return (

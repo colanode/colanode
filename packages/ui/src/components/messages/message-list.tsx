@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment, useEffect, useRef, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { MessageListQueryInput } from '@colanode/client/queries';
@@ -14,8 +14,8 @@ export const MessageList = () => {
   const workspace = useWorkspace();
   const conversation = useConversation();
 
-  const lastMessageId = React.useRef<string | null>(null);
-  const [lastPage, setLastPage] = React.useState<number>(1);
+  const lastMessageId = useRef<string | null>(null);
+  const [lastPage, setLastPage] = useState<number>(1);
 
   const inputs: MessageListQueryInput[] = Array.from({
     length: lastPage,
@@ -38,7 +38,7 @@ export const MessageList = () => {
   const hasMore =
     !isPending && messages.length === lastPage * MESSAGES_PER_PAGE;
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (messages.length > 0) {
       const lastMessage = messages[messages.length - 1];
       if (!lastMessage) {
@@ -53,7 +53,7 @@ export const MessageList = () => {
   }, [messages]);
 
   return (
-    <React.Fragment>
+    <Fragment>
       <InView
         rootMargin="200px"
         onChange={(inView) => {
@@ -74,7 +74,7 @@ export const MessageList = () => {
           currentMessageDate.getDate() !== previousMessageDate.getDate();
 
         return (
-          <React.Fragment key={message.id}>
+          <Fragment key={message.id}>
             {showDate && (
               <div className="relative flex items-center py-1">
                 <div className="flex-grow border-t border-gray-100" />
@@ -85,9 +85,9 @@ export const MessageList = () => {
               </div>
             )}
             <Message message={message} previousMessage={previousMessage} />
-          </React.Fragment>
+          </Fragment>
         );
       })}
-    </React.Fragment>
+    </Fragment>
   );
 };

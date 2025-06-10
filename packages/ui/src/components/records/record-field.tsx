@@ -1,5 +1,5 @@
 import { Trash2 } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { FieldAttributes } from '@colanode/core';
 import { FieldDeleteDialog } from '@colanode/ui/components/databases/fields/field-delete-dialog';
@@ -19,10 +19,10 @@ interface RecordFieldProps {
 
 export const RecordField = ({ field }: RecordFieldProps) => {
   const database = useDatabase();
-  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 
   return (
-    <React.Fragment>
+    <Fragment>
       <Popover modal={true}>
         <PopoverTrigger asChild>
           <div className="flex h-8 w-full cursor-pointer flex-row items-center gap-1 p-1 text-sm hover:bg-gray-50">
@@ -53,6 +53,6 @@ export const RecordField = ({ field }: RecordFieldProps) => {
           onOpenChange={setShowDeleteDialog}
         />
       )}
-    </React.Fragment>
+    </Fragment>
   );
 };

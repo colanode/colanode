@@ -1,4 +1,4 @@
-import React from 'react';
+import { ReactNode } from 'react';
 import { toast } from 'sonner';
 
 import { LocalDatabaseNode } from '@colanode/client/types';
@@ -9,7 +9,7 @@ import { useWorkspace } from '@colanode/ui/contexts/workspace';
 interface DatabaseProps {
   database: LocalDatabaseNode;
   role: NodeRole;
-  children: React.ReactNode;
+  children: ReactNode;
 }
 
 export const Database = ({ database, role, children }: DatabaseProps) => {

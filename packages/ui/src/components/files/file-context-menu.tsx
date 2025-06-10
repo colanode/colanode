@@ -1,5 +1,5 @@
 import { Folder, Trash2 } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { FileDeleteDialog } from '@colanode/ui/components/files/file-delete-dialog';
 import {
@@ -18,10 +18,10 @@ interface FileContextMenuProps {
 
 export const FileContextMenu = ({ id, children }: FileContextMenuProps) => {
   const layout = useLayout();
-  const [openDelete, setOpenDelete] = React.useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
 
   return (
-    <React.Fragment>
+    <Fragment>
       <ContextMenu>
         <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
         <ContextMenuContent className="w-64">
@@ -52,6 +52,6 @@ export const FileContextMenu = ({ id, children }: FileContextMenuProps) => {
         open={openDelete}
         onOpenChange={setOpenDelete}
       />
-    </React.Fragment>
+    </Fragment>
   );
 };

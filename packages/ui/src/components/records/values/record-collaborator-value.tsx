@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { User } from '@colanode/client/types';
 import { CollaboratorFieldAttributes } from '@colanode/core';
@@ -42,7 +42,7 @@ export const RecordCollaboratorValue = ({
   const workspace = useWorkspace();
   const record = useRecord();
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const collaboratorIds = record.getCollaboratorValue(field) ?? [];
   const results = useQueries(
@@ -85,7 +85,7 @@ export const RecordCollaboratorValue = ({
       <PopoverContent className="w-80 p-1">
         <div className="flex flex-col flex-wrap gap-2 p-2">
           {collaborators.length > 0 ? (
-            <React.Fragment>
+            <Fragment>
               {collaborators.map((collaborator) => (
                 <div
                   key={collaborator.id}
@@ -127,7 +127,7 @@ export const RecordCollaboratorValue = ({
                 </div>
               ))}
               <Separator className="w-full my-2" />
-            </React.Fragment>
+            </Fragment>
           ) : (
             <p className="text-sm text-muted-foreground">No collaborators</p>
           )}

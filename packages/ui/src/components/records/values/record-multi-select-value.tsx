@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 
 import { MultiSelectFieldAttributes } from '@colanode/core';
 import { SelectFieldOptions } from '@colanode/ui/components/databases/fields/select-field-options';
@@ -21,12 +21,12 @@ export const RecordMultiSelectValue = ({
 }: RecordMultiSelectValueProps) => {
   const record = useRecord();
 
-  const [open, setOpen] = React.useState(false);
-  const [selectedValues, setSelectedValues] = React.useState(
+  const [open, setOpen] = useState(false);
+  const [selectedValues, setSelectedValues] = useState(
     record.getMultiSelectValue(field)
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedValues(record.getMultiSelectValue(field));
   }, [record.localRevision]);
 

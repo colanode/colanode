@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 
 import {
   WorkspaceMetadataKey,
@@ -17,7 +17,7 @@ interface WorkspaceProps {
 
 export const Workspace = ({ workspace }: WorkspaceProps) => {
   const account = useAccount();
-  const [openSettings, setOpenSettings] = React.useState(false);
+  const [openSettings, setOpenSettings] = useState(false);
 
   const workspaceMetadataListQuery = useQuery({
     type: 'workspace.metadata.list',

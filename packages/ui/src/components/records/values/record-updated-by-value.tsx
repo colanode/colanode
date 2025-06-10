@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 
 import { UpdatedByFieldAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
@@ -39,7 +39,7 @@ export const RecordUpdatedByValue = ({ field }: RecordUpdatedByValueProps) => {
       data-field={field.id}
     >
       {updatedBy && (
-        <React.Fragment>
+        <Fragment>
           <Avatar
             id={record.updatedBy!}
             name={updatedBy.name}
@@ -47,7 +47,7 @@ export const RecordUpdatedByValue = ({ field }: RecordUpdatedByValueProps) => {
             size="small"
           />
           <p>{updatedBy.name}</p>
-        </React.Fragment>
+        </Fragment>
       )}
     </div>
   );

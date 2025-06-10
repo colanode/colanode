@@ -1,6 +1,6 @@
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { Info, Trash2, Users } from 'lucide-react';
-import React from 'react';
+import { useState } from 'react';
 import { match } from 'ts-pattern';
 
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
@@ -35,7 +35,7 @@ export const WorkspaceSettingsDialog = ({
   onOpenChange,
 }: WorkspaceSettingsDialogProps) => {
   const workspace = useWorkspace();
-  const [tab, setTab] = React.useState<'info' | 'users' | 'delete'>('info');
+  const [tab, setTab] = useState<'info' | 'users' | 'delete'>('info');
 
   if (!workspace) {
     return null;

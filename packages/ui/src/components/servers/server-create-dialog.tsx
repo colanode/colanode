@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { Server } from '@colanode/client/types';
@@ -25,9 +25,9 @@ export const ServerCreateDialog = ({
   onCancel,
   onCreate,
 }: ServerCreateDialogProps) => {
-  const [open, setOpen] = React.useState(true);
+  const [open, setOpen] = useState(true);
   const { mutate, isPending } = useMutation();
-  const [domain, setDomain] = React.useState('');
+  const [domain, setDomain] = useState('');
 
   return (
     <Dialog

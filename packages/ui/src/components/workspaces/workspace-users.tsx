@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { UserListQueryInput } from '@colanode/client/queries';
@@ -16,7 +16,7 @@ const USERS_PER_PAGE = 50;
 export const WorkspaceUsers = () => {
   const workspace = useWorkspace();
   const canEditUsers = workspace.role === 'owner' || workspace.role === 'admin';
-  const [lastPage, setLastPage] = React.useState<number>(1);
+  const [lastPage, setLastPage] = useState<number>(1);
 
   const inputs: UserListQueryInput[] = Array.from({
     length: lastPage,
@@ -36,10 +36,10 @@ export const WorkspaceUsers = () => {
   return (
     <div className="flex flex-col space-y-4">
       {canEditUsers && (
-        <React.Fragment>
+        <Fragment>
           <WorkspaceUserInvite workspace={workspace} />
           <Separator />
-        </React.Fragment>
+        </Fragment>
       )}
       <div>
         <p>Users</p>

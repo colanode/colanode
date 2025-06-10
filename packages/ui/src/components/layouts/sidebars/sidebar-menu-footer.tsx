@@ -1,5 +1,5 @@
 import { Check, LogOut, Plus, Settings } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { UnreadState } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
@@ -21,7 +21,7 @@ export function SidebarMenuFooter() {
   const app = useApp();
   const account = useAccount();
   const radar = useRadar();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const accountListQuery = useQuery({
     type: 'account.list',
@@ -100,7 +100,7 @@ export function SidebarMenuFooter() {
           <p className="font-medium">Logout</p>
         </DropdownMenuItem>
         {otherAccounts.length > 0 && (
-          <React.Fragment>
+          <Fragment>
             <DropdownMenuSeparator />
             <DropdownMenuLabel className="mb-1">Accounts</DropdownMenuLabel>
             {accounts.map((accountItem) => {
@@ -154,7 +154,7 @@ export function SidebarMenuFooter() {
                 </DropdownMenuItem>
               );
             })}
-          </React.Fragment>
+          </Fragment>
         )}
 
         <DropdownMenuSeparator className="my-1" />

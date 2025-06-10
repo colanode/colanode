@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import {
@@ -27,7 +27,7 @@ export const ViewFilterAddPopover = ({
   const database = useDatabase();
   const view = useDatabaseView();
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const fieldsWithoutFilters = database.fields.filter(
     (field) =>
       !view.filters.some(

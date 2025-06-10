@@ -1,4 +1,4 @@
-import React from 'react';
+import { useCallback, useState } from 'react';
 
 import { RecordListQueryInput } from '@colanode/client/queries';
 import {
@@ -19,7 +19,7 @@ export const useRecordsQuery = (
   const workspace = useWorkspace();
   const database = useDatabase();
 
-  const [lastPage, setLastPage] = React.useState<number>(1);
+  const [lastPage, setLastPage] = useState<number>(1);
 
   const inputs: RecordListQueryInput[] = Array.from({
     length: lastPage,
@@ -41,7 +41,7 @@ export const useRecordsQuery = (
   const hasMore =
     !isPending && records.length === lastPage * (count ?? RECORDS_PER_PAGE);
 
-  const loadMore = React.useCallback(() => {
+  const loadMore = useCallback(() => {
     if (hasMore && !isPending) {
       setLastPage(lastPage + 1);
     }

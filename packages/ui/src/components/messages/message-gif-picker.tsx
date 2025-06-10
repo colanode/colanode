@@ -1,5 +1,5 @@
 import { ImagePlay } from 'lucide-react';
-import React from 'react';
+import { useState } from 'react';
 
 import {
   Popover,
@@ -8,7 +8,7 @@ import {
 } from '@colanode/ui/components/ui/popover';
 
 export const MessageGifPicker = () => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>

@@ -1,7 +1,7 @@
 import type { JSONContent } from '@tiptap/core';
 import { EditorContent, useEditor } from '@tiptap/react';
 import isHotkey from 'is-hotkey';
-import React from 'react';
+import { forwardRef, Fragment, useImperativeHandle } from 'react';
 
 import { TempFile } from '@colanode/client/types';
 import {
@@ -44,7 +44,7 @@ export interface MessageEditorRefProps {
   addTempFile: (file: TempFile) => void;
 }
 
-export const MessageEditor = React.forwardRef<
+export const MessageEditor = forwardRef<
   MessageEditorRefProps,
   MessageEditorProps
 >((props, ref) => {
@@ -99,7 +99,7 @@ export const MessageEditor = React.forwardRef<
     [props.conversationId]
   );
 
-  React.useImperativeHandle(ref, () => ({
+  useImperativeHandle(ref, () => ({
     focus: () => {
       if (editor == null) {
         return;
@@ -129,7 +129,7 @@ export const MessageEditor = React.forwardRef<
   }
 
   return (
-    <React.Fragment>
+    <Fragment>
       <ToolbarMenu editor={editor} />
       <EditorContent
         editor={editor}
@@ -152,7 +152,7 @@ export const MessageEditor = React.forwardRef<
           return false;
         }}
       />
-    </React.Fragment>
+    </Fragment>
   );
 });
 

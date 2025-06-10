@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState, Fragment } from 'react';
 
 import { Account, Server } from '@colanode/client/types';
 import { EmailLogin } from '@colanode/ui/components/accounts/email-login';
@@ -48,8 +48,8 @@ type PanelState =
 
 export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
   const app = useApp();
-  const [server, setServer] = React.useState<Server>(servers[0]!);
-  const [panel, setPanel] = React.useState<PanelState>({
+  const [server, setServer] = useState<Server>(servers[0]!);
+  const [panel, setPanel] = useState<PanelState>({
     type: 'login',
   });
 
@@ -62,7 +62,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
         readonly={panel.type === 'verify'}
       />
       {panel.type === 'login' && (
-        <React.Fragment>
+        <Fragment>
           <EmailLogin
             server={server}
             onSuccess={(output) => {
@@ -92,10 +92,10 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
           >
             No account yet? Register
           </p>
-        </React.Fragment>
+        </Fragment>
       )}
       {panel.type === 'register' && (
-        <React.Fragment>
+        <Fragment>
           <EmailRegister
             server={server}
             onSuccess={(output) => {
@@ -120,11 +120,11 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
           >
             Already have an account? Login
           </p>
-        </React.Fragment>
+        </Fragment>
       )}
 
       {panel.type === 'verify' && (
-        <React.Fragment>
+        <Fragment>
           <EmailVerify
             server={server}
             id={panel.id}
@@ -145,11 +145,11 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
           >
             Back to login
           </p>
-        </React.Fragment>
+        </Fragment>
       )}
 
       {panel.type === 'password_reset_init' && (
-        <React.Fragment>
+        <Fragment>
           <EmailPasswordResetInit
             server={server}
             onSuccess={(output) => {
@@ -170,11 +170,11 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
           >
             Back to login
           </p>
-        </React.Fragment>
+        </Fragment>
       )}
 
       {panel.type === 'password_reset_complete' && (
-        <React.Fragment>
+        <Fragment>
           <EmailPasswordResetComplete
             server={server}
             id={panel.id}
@@ -190,11 +190,11 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
           >
             Back to login
           </p>
-        </React.Fragment>
+        </Fragment>
       )}
 
       {accounts.length > 0 && (
-        <React.Fragment>
+        <Fragment>
           <Separator className="w-full" />
           <p
             className="text-center text-sm text-muted-foreground hover:cursor-pointer hover:underline"
@@ -204,7 +204,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
           >
             Cancel
           </p>
-        </React.Fragment>
+        </Fragment>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import { SmilePlus } from 'lucide-react';
-import React from 'react';
+import { useState } from 'react';
 
 import { EmojiPicker } from '@colanode/ui/components/emojis/emoji-picker';
 import {
@@ -15,7 +15,7 @@ interface MessageReactionProps {
 export const MessageReactionCreatePopover = ({
   onReactionClick,
 }: MessageReactionProps) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>

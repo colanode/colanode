@@ -1,4 +1,4 @@
-import React from 'react';
+import { useEffect, useState } from 'react';
 
 import { SelectFieldAttributes } from '@colanode/core';
 import { SelectFieldOptions } from '@colanode/ui/components/databases/fields/select-field-options';
@@ -21,12 +21,12 @@ export const RecordSelectValue = ({
 }: RecordSelectValueProps) => {
   const record = useRecord();
 
-  const [open, setOpen] = React.useState(false);
-  const [selectedValue, setSelectedValue] = React.useState(
+  const [open, setOpen] = useState(false);
+  const [selectedValue, setSelectedValue] = useState(
     record.getSelectValue(field)
   );
 
-  React.useEffect(() => {
+  useEffect(() => {
     setSelectedValue(record.getSelectValue(field));
   }, [record.localRevision]);
 

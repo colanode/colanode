@@ -8,7 +8,7 @@ import {
   Settings,
   StickyNote,
 } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { LocalSpaceNode } from '@colanode/client/types';
 import { compareString } from '@colanode/core';
@@ -56,13 +56,13 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
     nodeChildrenGetQuery.data?.toSorted((a, b) => compareString(a.id, b.id)) ??
     [];
 
-  const [openCreatePage, setOpenCreatePage] = React.useState(false);
-  const [openCreateChannel, setOpenCreateChannel] = React.useState(false);
-  const [openCreateDatabase, setOpenCreateDatabase] = React.useState(false);
-  const [openCreateFolder, setOpenCreateFolder] = React.useState(false);
+  const [openCreatePage, setOpenCreatePage] = useState(false);
+  const [openCreateChannel, setOpenCreateChannel] = useState(false);
+  const [openCreateDatabase, setOpenCreateDatabase] = useState(false);
+  const [openCreateFolder, setOpenCreateFolder] = useState(false);
 
   return (
-    <React.Fragment>
+    <Fragment>
       <Collapsible
         key={space.id}
         asChild
@@ -190,6 +190,6 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
           onOpenChange={setOpenCreateFolder}
         />
       )}
-    </React.Fragment>
+    </Fragment>
   );
 };

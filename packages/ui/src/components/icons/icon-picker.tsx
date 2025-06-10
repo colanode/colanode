@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 
 import { Icon } from '@colanode/client/types';
 import { IconBrowser } from '@colanode/ui/components/icons/icon-browser';
@@ -10,7 +10,7 @@ interface IconPickerProps {
 }
 
 export const IconPicker = ({ onPick }: IconPickerProps) => {
-  const [query, setQuery] = React.useState('');
+  const [query, setQuery] = useState('');
 
   return (
     <IconPickerContext.Provider value={{ onPick }}>

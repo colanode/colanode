@@ -1,5 +1,5 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import React from 'react';
+import { useMemo, useRef } from 'react';
 
 import { IconPickerRowData } from '@colanode/client/types';
 import { IconBrowserCategory } from '@colanode/ui/components/icons/icon-browser-category';
@@ -14,7 +14,7 @@ export const IconBrowser = () => {
   });
 
   const categories = iconCategoryListQuery.data ?? [];
-  const rowDataArray = React.useMemo<IconPickerRowData[]>(() => {
+  const rowDataArray = useMemo<IconPickerRowData[]>(() => {
     const rows: IconPickerRowData[] = [];
 
     for (const category of categories) {
@@ -39,7 +39,7 @@ export const IconBrowser = () => {
     return rows;
   }, [categories]);
 
-  const parentRef = React.useRef(null);
+  const parentRef = useRef(null);
 
   const virtualizer = useVirtualizer({
     count: rowDataArray.length,

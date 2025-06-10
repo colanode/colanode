@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { User } from '@colanode/client/types';
@@ -22,8 +22,8 @@ export const NodeCollaboratorCreate = ({
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
-  const [users, setUsers] = React.useState<User[]>([]);
-  const [role, setRole] = React.useState<NodeRole>('editor');
+  const [users, setUsers] = useState<User[]>([]);
+  const [role, setRole] = useState<NodeRole>('editor');
 
   return (
     <div className="flex flex-col gap-2">

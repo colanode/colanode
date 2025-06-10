@@ -1,5 +1,5 @@
 import { SquarePen } from 'lucide-react';
-import React from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -17,7 +17,7 @@ export const ChatCreatePopover = () => {
   const { mutate, isPending } = useMutation();
   const layout = useLayout();
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>

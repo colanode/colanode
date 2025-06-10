@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -23,7 +23,7 @@ export const WorkspaceDelete = ({ onDeleted }: WorkspaceDeleteProps) => {
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
-  const [showDeleteModal, setShowDeleteModal] = React.useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   return (
     <div className="flex flex-col gap-4">

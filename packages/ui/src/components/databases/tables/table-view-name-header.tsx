@@ -1,6 +1,6 @@
 import { ArrowDownAz, ArrowDownZa, Filter, Type } from 'lucide-react';
 import { Resizable } from 're-resizable';
-import React from 'react';
+import { Fragment, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { Input } from '@colanode/ui/components/ui/input';
@@ -28,6 +28,9 @@ export const TableViewNameHeader = () => {
       canDrop: monitor.canDrop(),
     }),
   });
+
+  const divRef = useRef<HTMLDivElement>(null);
+  const dropDivRef = dropRef(divRef);
 
   return (
     <Resizable
@@ -71,7 +74,7 @@ export const TableViewNameHeader = () => {
                 ? 'border-r-2 border-blue-300'
                 : 'border-r'
             )}
-            ref={dropRef}
+            ref={dropDivRef as React.Ref<HTMLDivElement>}
           >
             <Type className="size-4" />
             <p>Name</p>
@@ -89,7 +92,7 @@ export const TableViewNameHeader = () => {
           </div>
           <Separator />
           {database.canEdit && (
-            <React.Fragment>
+            <Fragment>
               <div
                 className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
                 onClick={() => {
@@ -119,7 +122,7 @@ export const TableViewNameHeader = () => {
                 <ArrowDownZa className="size-4" />
                 <span>Sort descending</span>
               </div>
-            </React.Fragment>
+            </Fragment>
           )}
           <div className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100">
             <Filter className="size-4" />

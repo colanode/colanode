@@ -1,6 +1,6 @@
 import { JSONContent } from '@tiptap/core';
 import { Clipboard } from 'lucide-react';
-import React from 'react';
+import { useState } from 'react';
 
 import { defaultClasses } from '@colanode/ui/editor/classes';
 import { highlightCode, languages } from '@colanode/ui/lib/lowlight';
@@ -16,7 +16,7 @@ export const CodeBlockRenderer = ({
 }: CodeBlockRendererProps) => {
   const language = node.attributes.language;
 
-  const [copied, setCopied] = React.useState(false);
+  const [copied, setCopied] = useState(false);
 
   const code = node.attributes.content?.[0].text ?? '';
   if (!code) {

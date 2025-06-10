@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 
 import { User } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
@@ -21,7 +21,7 @@ interface UserSearchProps {
 export const UserSearch = ({ exclude, onSelect }: UserSearchProps) => {
   const workspace = useWorkspace();
 
-  const [query, setQuery] = React.useState('');
+  const [query, setQuery] = useState('');
   const userSearchQuery = useQuery({
     type: 'user.search',
     searchQuery: query,

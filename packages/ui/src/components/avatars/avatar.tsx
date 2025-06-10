@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { getIdType, IdType } from '@colanode/core';
 import { AvatarFallback } from '@colanode/ui/components/avatars/avatar-fallback';
 import { AvatarImage } from '@colanode/ui/components/avatars/avatar-image';

@@ -1,4 +1,4 @@
-import React from 'react';
+import { useRef } from 'react';
 
 import { useFolder } from '@colanode/ui/contexts/folder';
 import { cn } from '@colanode/ui/lib/utils';
@@ -11,7 +11,7 @@ interface GridItemProps {
 export const GridItem = ({ id, children }: GridItemProps) => {
   const folder = useFolder();
 
-  const ref = React.useRef<HTMLDivElement>(null);
+  const ref = useRef<HTMLDivElement>(null);
   const selected = false;
 
   return (

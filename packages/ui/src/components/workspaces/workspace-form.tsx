@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Upload } from 'lucide-react';
-import React from 'react';
+import { useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
@@ -51,7 +51,7 @@ export const WorkspaceForm = ({
 }: WorkspaceFormProps) => {
   const account = useAccount();
 
-  const id = React.useRef(generateId(IdType.Workspace));
+  const id = useRef(generateId(IdType.Workspace));
   const { mutate, isPending } = useMutation();
 
   const form = useForm<formSchemaType>({

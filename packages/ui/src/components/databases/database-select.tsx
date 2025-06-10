@@ -1,5 +1,5 @@
 import { Check, ChevronsUpDown } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -27,7 +27,7 @@ interface DatabaseSelectProps {
 
 export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
   const workspace = useWorkspace();
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const databaseListQuery = useQuery({
     type: 'database.list',
@@ -51,7 +51,7 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
           className="w-full justify-between p-2"
         >
           {selectedDatabase ? (
-            <React.Fragment>
+            <Fragment>
               <span className="flex flex-row items-center gap-1">
                 <Avatar
                   id={selectedDatabase.id}
@@ -61,7 +61,7 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
                 />
                 {selectedDatabase.attributes.name}
               </span>
-            </React.Fragment>
+            </Fragment>
           ) : (
             <span>Select database...</span>
           )}

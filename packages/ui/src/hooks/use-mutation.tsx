@@ -1,4 +1,4 @@
-import React from 'react';
+import { useCallback, useState } from 'react';
 
 import {
   MutationError,
@@ -15,9 +15,9 @@ interface MutationOptions<T extends MutationInput> {
 }
 
 export const useMutation = () => {
-  const [isPending, setIsPending] = React.useState(false);
+  const [isPending, setIsPending] = useState(false);
 
-  const mutate = React.useCallback(
+  const mutate = useCallback(
     async <T extends MutationInput>(options: MutationOptions<T>) => {
       setIsPending(true);
       try {

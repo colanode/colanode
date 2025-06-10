@@ -1,7 +1,7 @@
 import '@colanode/ui/styles/index.css';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import React from 'react';
+import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 
 import { AppType, Event } from '@colanode/client/types';
@@ -27,7 +27,7 @@ interface RootProviderProps {
 }
 
 export const RootProvider = ({ type }: RootProviderProps) => {
-  React.useEffect(() => {
+  useEffect(() => {
     const id = window.eventBus.subscribe((event: Event) => {
       if (event.type === 'query.result.updated') {
         const result = event.result;

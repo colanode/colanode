@@ -1,5 +1,5 @@
 import { useVirtualizer } from '@tanstack/react-virtual';
-import React from 'react';
+import { useMemo, useRef } from 'react';
 
 import { EmojiPickerRowData } from '@colanode/client/types';
 import { EmojiBrowserCategory } from '@colanode/ui/components/emojis/emoji-browser-category';
@@ -14,7 +14,7 @@ export const EmojiBrowser = () => {
   });
 
   const categories = emojiCategoryListQuery.data ?? [];
-  const rowDataArray = React.useMemo<EmojiPickerRowData[]>(() => {
+  const rowDataArray = useMemo<EmojiPickerRowData[]>(() => {
     const rows: EmojiPickerRowData[] = [];
 
     for (const category of categories) {
@@ -39,7 +39,7 @@ export const EmojiBrowser = () => {
     return rows;
   }, [categories]);
 
-  const parentRef = React.useRef(null);
+  const parentRef = useRef(null);
 
   const virtualizer = useVirtualizer({
     count: rowDataArray.length,

@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { RecordNode, RelationFieldAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
@@ -42,7 +42,7 @@ export const RecordRelationValue = ({
   const workspace = useWorkspace();
   const record = useRecord();
 
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
 
   const relationIds = record.getRelationValue(field) ?? [];
   const results = useQueries(
@@ -86,7 +86,7 @@ export const RecordRelationValue = ({
       <PopoverContent className="w-80 p-1">
         <div className="flex flex-col flex-wrap gap-2 p-2">
           {relations.length > 0 ? (
-            <React.Fragment>
+            <Fragment>
               {relations.map((relation) => (
                 <div
                   key={relation.id}
@@ -117,7 +117,7 @@ export const RecordRelationValue = ({
                 </div>
               ))}
               <Separator className="w-full my-2" />
-            </React.Fragment>
+            </Fragment>
           ) : (
             <p className="text-sm text-muted-foreground">No relations</p>
           )}

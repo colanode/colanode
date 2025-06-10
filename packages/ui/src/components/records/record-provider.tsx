@@ -1,4 +1,3 @@
-import React from 'react';
 import { toast } from 'sonner';
 
 import { LocalRecordNode } from '@colanode/client/types';

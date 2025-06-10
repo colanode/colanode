@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 
 import { CalendarViewGrid } from '@colanode/ui/components/databases/calendars/calendar-view-grid';
 import { CalendarViewSettings } from '@colanode/ui/components/databases/calendars/calendar-view-settings';
@@ -22,7 +22,7 @@ export const CalendarView = () => {
   }
 
   return (
-    <React.Fragment>
+    <Fragment>
       <div className="flex flex-row justify-between border-b">
         <ViewTabs />
         <div className="invisible flex flex-row items-center justify-end group-hover/database:visible">
@@ -35,6 +35,6 @@ export const CalendarView = () => {
       <div className="mt-2 w-full min-w-full max-w-full overflow-auto pr-5">
         <CalendarViewGrid field={groupByField} />
       </div>
-    </React.Fragment>
+    </Fragment>
   );
 };

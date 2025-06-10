@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment } from 'react';
 
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
 import { BoardViewSettings } from '@colanode/ui/components/databases/boards/board-view-settings';
@@ -23,7 +23,7 @@ export const BoardView = () => {
       : [];
 
   return (
-    <React.Fragment>
+    <Fragment>
       <div className="flex flex-row justify-between border-b">
         <ViewTabs />
         <div className="invisible flex flex-row items-center justify-end group-hover/database:visible">
@@ -46,6 +46,6 @@ export const BoardView = () => {
             );
           })}
       </div>
-    </React.Fragment>
+    </Fragment>
   );
 };

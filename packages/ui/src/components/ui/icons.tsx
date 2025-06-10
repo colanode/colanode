@@ -1,5 +1,3 @@
-import React from 'react';
-
 type IconProps = React.HTMLAttributes<SVGElement>;
 
 const GoogleIcon = (props: IconProps) => {

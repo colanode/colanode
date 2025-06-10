@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 
 import { toUTCDate } from '@colanode/core';
 import { Calendar } from '@colanode/ui/components/ui/calendar';
@@ -24,7 +24,7 @@ export const DatePicker = ({
   placeholder,
   readonly,
 }: DatePickerProps) => {
-  const [open, setOpen] = React.useState(false);
+  const [open, setOpen] = useState(false);
   const dateObj = value ? new Date(value) : undefined;
   const placeHolderText = placeholder ?? '';
 

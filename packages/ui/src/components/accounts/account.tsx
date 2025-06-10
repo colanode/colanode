@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 
 import { Account as AccountType } from '@colanode/client/types';
 import { AccountLogout } from '@colanode/ui/components/accounts/account-logout';
@@ -13,9 +13,9 @@ interface AccountProps {
 }
 
 export const Account = ({ account }: AccountProps) => {
-  const [openSettings, setOpenSettings] = React.useState(false);
-  const [openLogout, setOpenLogout] = React.useState(false);
-  const [openCreateWorkspace, setOpenCreateWorkspace] = React.useState(false);
+  const [openSettings, setOpenSettings] = useState(false);
+  const [openLogout, setOpenLogout] = useState(false);
+  const [openCreateWorkspace, setOpenCreateWorkspace] = useState(false);
 
   const accountMetadataListQuery = useQuery({
     type: 'account.metadata.list',

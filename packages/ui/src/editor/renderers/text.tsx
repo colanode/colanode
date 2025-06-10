@@ -1,10 +1,10 @@
 import { JSONContent } from '@tiptap/core';
-import React from 'react';
+import { Fragment } from 'react';
 
 interface TextRendererProps {
   node: JSONContent;
 }
 
 export const TextRenderer = ({ node }: TextRendererProps) => {
-  return <React.Fragment>{node.text ?? ''}</React.Fragment>;
+  return <Fragment>{node.text ?? ''}</Fragment>;
 };

@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { NodeReactionListQueryInput } from '@colanode/client/queries';
@@ -20,7 +20,7 @@ export const MessageReactionCountsDialogList = ({
 }: MessageReactionCountsDialogListProps) => {
   const workspace = useWorkspace();
 
-  const [lastPage, setLastPage] = React.useState<number>(1);
+  const [lastPage, setLastPage] = useState<number>(1);
   const inputs: NodeReactionListQueryInput[] = Array.from({
     length: lastPage,
   }).map((_, i) => ({

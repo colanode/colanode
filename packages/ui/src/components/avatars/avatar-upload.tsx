@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@colanode/ui/components/ui/button';
@@ -15,7 +15,7 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
   const account = useAccount();
   const { mutate, isPending } = useMutation();
 
-  const [url, setUrl] = React.useState<string | undefined>(undefined);
+  const [url, setUrl] = useState<string | undefined>(undefined);
 
   const handleSubmit = async (_: string) => {
     // TODO

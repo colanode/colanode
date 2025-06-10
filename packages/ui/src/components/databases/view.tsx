@@ -1,4 +1,4 @@
-import React from 'react';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { match } from 'ts-pattern';
 
@@ -51,11 +51,9 @@ export const View = ({ view }: ViewProps) => {
     .filter((field) => field.display)
     .sort((a, b) => compareString(a.index, b.index));
 
-  const [isSearchBarOpened, setIsSearchBarOpened] = React.useState(false);
-  const [isSortsOpened, setIsSortsOpened] = React.useState(false);
-  const [openedFieldFilters, setOpenedFieldFilters] = React.useState<string[]>(
-    []
-  );
+  const [isSearchBarOpened, setIsSearchBarOpened] = useState(false);
+  const [isSortsOpened, setIsSortsOpened] = useState(false);
+  const [openedFieldFilters, setOpenedFieldFilters] = useState<string[]>([]);
 
   return (
     <DatabaseViewContext.Provider

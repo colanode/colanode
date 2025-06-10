@@ -1,5 +1,5 @@
 import { JSONContent } from '@tiptap/core';
-import React from 'react';
+import { Fragment } from 'react';
 
 import { defaultClasses } from '@colanode/ui/editor/classes';
 
@@ -9,7 +9,7 @@ interface MarkRendererProps {
 }
 
 export const MarkRenderer = ({ node, children }: MarkRendererProps) => {
-  let result = <React.Fragment>{children}</React.Fragment>;
+  let result = <Fragment>{children}</Fragment>;
 
   if (node.marks && node.marks.length > 0) {
     node.marks.forEach((mark) => {

@@ -1,5 +1,5 @@
 import { JSONContent } from '@tiptap/core';
-import React from 'react';
+import { Fragment } from 'react';
 
 import { NodeRenderer } from '@colanode/ui/editor/renderers/node';
 
@@ -17,7 +17,7 @@ export const NodeChildrenRenderer = ({
   }
 
   return (
-    <React.Fragment>
+    <Fragment>
       {node.content.map((nodeChild, index) => (
         <NodeRenderer
           node={nodeChild}
@@ -25,6 +25,6 @@ export const NodeChildrenRenderer = ({
           key={`${keyPrefix}-${index}`}
         />
       ))}
-    </React.Fragment>
+    </Fragment>
   );
 };

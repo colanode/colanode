@@ -1,4 +1,4 @@
-import React from 'react';
+import { Fragment, useEffect, useState } from 'react';
 
 interface DelayedComponentProps {
   children: React.ReactNode;
@@ -6,9 +6,9 @@ interface DelayedComponentProps {
 }
 
 const DelayedComponent = ({ children, delay }: DelayedComponentProps) => {
-  const [shouldRender, setShouldRender] = React.useState(false);
+  const [shouldRender, setShouldRender] = useState(false);
 
-  React.useEffect(() => {
+  useEffect(() => {
     const timer = setTimeout(() => {
       setShouldRender(true);
     }, delay ?? 100);
@@ -16,7 +16,7 @@ const DelayedComponent = ({ children, delay }: DelayedComponentProps) => {
     return () => clearTimeout(timer);
   }, [delay]);
 
-  return shouldRender ? <React.Fragment>{children}</React.Fragment> : null;
+  return shouldRender ? <Fragment>{children}</Fragment> : null;
 };
 
 DelayedComponent.displayName = 'DelayedComponent';

@@ -1,5 +1,5 @@
 import { Ellipsis, Trash2 } from 'lucide-react';
-import React from 'react';
+import { Fragment, useState } from 'react';
 
 import { SelectOptionAttributes } from '@colanode/core';
 import { SelectOptionDeleteDialog } from '@colanode/ui/components/databases/fields/select-option-delete-dialog';
@@ -26,11 +26,11 @@ export const SelectOptionSettingsPopover = ({
 }: SelectOptionSettingsPopoverProps) => {
   const database = useDatabase();
 
-  const [openSetttingsPopover, setOpenSetttingsPopover] = React.useState(false);
-  const [openDeleteDialog, setOpenDeleteDialog] = React.useState(false);
+  const [openSetttingsPopover, setOpenSetttingsPopover] = useState(false);
+  const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
 
   return (
-    <React.Fragment>
+    <Fragment>
       <Popover
         modal={true}
         open={openSetttingsPopover}
@@ -91,6 +91,6 @@ export const SelectOptionSettingsPopover = ({
         fieldId={fieldId}
         optionId={option.id}
       />
-    </React.Fragment>
+    </Fragment>
   );
 };
