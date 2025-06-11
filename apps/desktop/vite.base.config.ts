@@ -1,3 +1,5 @@
+/// <reference types="./forge.env.d.ts" />
+
 import { builtinModules } from 'node:module';
 import type { AddressInfo } from 'node:net';
 import path from 'path';
@@ -75,7 +77,7 @@ export function getBuildDefine(env: ConfigEnv<'build'>) {
       };
       return { ...acc, ...def };
     },
-    {} as Record<string, any>
+    {} as Record<string, string | undefined>
   );
 
   return define;

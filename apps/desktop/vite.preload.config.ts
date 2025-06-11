@@ -1,3 +1,5 @@
+/// <reference types="./forge.env.d.ts" />
+
 import path from 'path';
 
 import type { ConfigEnv, UserConfig } from 'vite';

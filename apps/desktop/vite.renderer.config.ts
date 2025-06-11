@@ -1,3 +1,5 @@
+/// <reference types="./forge.env.d.ts" />
+
 import path from 'path';
 
 import type { ConfigEnv, UserConfig } from 'vite';
@@ -20,7 +22,6 @@ export default defineConfig((env) => {
     },
     plugins: [pluginExposeRenderer(name)],
     resolve: {
-      preserveSymlinks: true,
       alias: {
         '@colanode/desktop': path.resolve(__dirname, './src'),
         '@colanode/core': path.resolve(__dirname, '../../packages/core/src'),
