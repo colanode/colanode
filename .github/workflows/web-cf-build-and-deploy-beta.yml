@@ -1,4 +1,4 @@
-name: Web - Build and deploy beta
+name: Web - Build and deploy beta to Cloudflare
 
 on:
   push:
