@@ -14,7 +14,7 @@ export const serverConfigSchema = z.object({
   pathPrefix: z.string().optional(),
   cors: z.object({
     origin: z.string().default('https://app.colanode.com'),
-    maxAge: z.number().default(7200),
+    maxAge: z.coerce.number().default(7200),
   }),
 });
 

@@ -1,4 +1,4 @@
-FROM node:22-alpine
+FROM node:22-alpine AS build
 
 WORKDIR /app
 
@@ -11,7 +11,9 @@ COPY ../../scripts scripts
 # Copy all package.json files first
 COPY ../../packages/core/package.json packages/core/package.json
 COPY ../../packages/crdt/package.json packages/crdt/package.json
-COPY ../../apps/server/package.json apps/server/package.json
+COPY ../../packages/client/package.json packages/client/package.json
+COPY ../../packages/ui/package.json packages/ui/package.json
+COPY ../../apps/web/package.json apps/web/package.json
 
 # Install dependencies
 RUN npm ci
@@ -19,17 +21,24 @@ RUN npm ci
 # Copy source files
 COPY ../../packages/core packages/core
 COPY ../../packages/crdt packages/crdt
-COPY ../../apps/server apps/server
+COPY ../../packages/client packages/client
+COPY ../../packages/ui packages/ui
+COPY ../../apps/web apps/web
 COPY ../../tsconfig.base.json ./
 
 # Build packages
 RUN npm run build -w @colanode/core && \
     npm run build -w @colanode/crdt && \
-    npm run build -w @colanode/server && \
+    npm run build -w @colanode/client && \
+    npm run build -w @colanode/ui && \
+    npm run build -w @colanode/web && \
     npm prune --production
 
-ENV NODE_ENV=production
 
-EXPOSE 3000
+FROM nginx:1.27-alpine
 
-CMD ["node", "apps/server/dist/index.js"]
+COPY --from=build /app/apps/web/dist /usr/share/nginx/html
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]

@@ -1,4 +1,4 @@
-name: Mark server docker image as latest
+name: Mark web docker image as latest
 
 on:
   release:
@@ -6,7 +6,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  SERVER_IMAGE_NAME: colanode/server
 
 jobs:
   tag-latest:
@@ -25,9 +24,9 @@ jobs:
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
       - name: Pull version image
-        run: docker pull ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:${{ env.VERSION }}
+        run: docker pull ${{ env.REGISTRY }}/${{ vars.WEB_IMAGE_NAME }}:${{ env.VERSION }}
 
       - name: Tag and push as latest
         run: |
-          docker tag ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:${{ env.VERSION }} ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:latest
-          docker push ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:latest
+          docker tag ${{ env.REGISTRY }}/${{ vars.WEB_IMAGE_NAME }}:${{ env.VERSION }} ${{ env.REGISTRY }}/${{ vars.WEB_IMAGE_NAME }}:latest
+          docker push ${{ env.REGISTRY }}/${{ vars.WEB_IMAGE_NAME }}:latest

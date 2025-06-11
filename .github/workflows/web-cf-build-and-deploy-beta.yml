@@ -1,4 +1,4 @@
-name: Build and deploy web app to Cloudflare
+name: Build and deploy beta web app to Cloudflare
 
 on:
   push:
@@ -63,7 +63,7 @@ jobs:
         run: |
           cat > wrangler.jsonc << EOF
           {
-            "name": "${{ secrets.CLOUDFLARE_WORKER_NAME }}",
+            "name": "${{ secrets.CLOUDFLARE_WORKER_NAME_BETA }}",
             "compatibility_date": "2025-05-28",
             "assets": {
               "directory": "./dist",

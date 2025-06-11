@@ -84,7 +84,6 @@ services:
       # General Node/Server Config
       # ───────────────────────────────────────────────────────────────
       NODE_ENV: production
-      PORT: 3000
 
       # The server requires a name and avatar URL which will be displayed in the desktop app login screen.
       SERVER_NAME: 'Colanode Local'
@@ -185,6 +184,15 @@ services:
 
     ports:
       - '3000:3000'
+    networks:
+      - colanode_network
+
+  web:
+    image: ghcr.io/colanode/web:latest
+    container_name: colanode_web
+    restart: always
+    ports:
+      - '4000:80'
     networks:
       - colanode_network
 

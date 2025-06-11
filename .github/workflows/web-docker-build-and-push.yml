@@ -7,7 +7,6 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  SERVER_IMAGE_NAME: colanode/server
 
 jobs:
   build:
@@ -47,15 +46,15 @@ jobs:
           };
           EOF
 
-      - name: Build and push Colanode server image
+      - name: Build and push Colanode web image
         uses: docker/build-push-action@v5
         with:
           context: .
-          file: ./apps/server/Dockerfile
+          file: ./apps/web/Dockerfile
           push: true
           platforms: linux/amd64,linux/arm64
           tags: |
-            ${{ env.REGISTRY }}/${{ env.SERVER_IMAGE_NAME }}:${{ env.VERSION }}
+            ${{ env.REGISTRY }}/${{ vars.WEB_IMAGE_NAME }}:${{ env.VERSION }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.revision=${{ github.sha }}

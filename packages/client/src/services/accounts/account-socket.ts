@@ -66,7 +66,7 @@ export class AccountSocket {
       `${this.account.server.socketBaseUrl}/v1/sockets/${response.id}`
     );
 
-    this.socket.onmessage = async (event) => {
+    this.socket.onmessage = async (event: WebSocket.MessageEvent) => {
       const data: string = event.data.toString();
       const message: Message = JSON.parse(data);
 
