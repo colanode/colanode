@@ -146,7 +146,7 @@ export class NodeService {
           .returningAll()
           .values({
             id: generateId(IdType.Mutation),
-            type: 'create_node',
+            type: 'node.create',
             data: JSON.stringify(mutationData),
             created_at: createdAt,
             retries: 0,
@@ -345,7 +345,7 @@ export class NodeService {
         .returningAll()
         .values({
           id: generateId(IdType.Mutation),
-          type: 'update_node',
+          type: 'node.update',
           data: JSON.stringify(mutationData),
           created_at: updatedAt,
           retries: 0,
@@ -485,7 +485,7 @@ export class NodeService {
           .returningAll()
           .values({
             id: generateId(IdType.Mutation),
-            type: 'delete_node',
+            type: 'node.delete',
             data: JSON.stringify(deleteMutationData),
             created_at: new Date().toISOString(),
             retries: 0,

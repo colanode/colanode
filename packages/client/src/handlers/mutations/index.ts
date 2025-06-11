@@ -44,8 +44,8 @@ import { MessageDeleteMutationHandler } from './messages/message-delete';
 import { NodeCollaboratorCreateMutationHandler } from './nodes/node-collaborator-create';
 import { NodeCollaboratorDeleteMutationHandler } from './nodes/node-collaborator-delete';
 import { NodeCollaboratorUpdateMutationHandler } from './nodes/node-collaborator-update';
-import { NodeMarkOpenedMutationHandler } from './nodes/node-mark-opened';
-import { NodeMarkSeenMutationHandler } from './nodes/node-mark-seen';
+import { NodeInteractionOpenedMutationHandler } from './nodes/node-interaction-opened';
+import { NodeInteractionSeenMutationHandler } from './nodes/node-interaction-seen';
 import { NodeReactionCreateMutationHandler } from './nodes/node-reaction-create';
 import { NodeReactionDeleteMutationHandler } from './nodes/node-reaction-delete';
 import { PageCreateMutationHandler } from './pages/page-create';
@@ -97,8 +97,8 @@ export const buildMutationHandlerMap = (
     'node.collaborator.create': new NodeCollaboratorCreateMutationHandler(app),
     'node.collaborator.delete': new NodeCollaboratorDeleteMutationHandler(app),
     'node.collaborator.update': new NodeCollaboratorUpdateMutationHandler(app),
-    'node.mark.opened': new NodeMarkOpenedMutationHandler(app),
-    'node.mark.seen': new NodeMarkSeenMutationHandler(app),
+    'node.interaction.opened': new NodeInteractionOpenedMutationHandler(app),
+    'node.interaction.seen': new NodeInteractionSeenMutationHandler(app),
     'page.create': new PageCreateMutationHandler(app),
     'page.delete': new PageDeleteMutationHandler(app),
     'node.reaction.create': new NodeReactionCreateMutationHandler(app),

@@ -100,7 +100,7 @@ export class NodeReactionService {
         const mutation: CreateNodeReactionMutation = {
           id: generateId(IdType.Mutation),
           createdAt: new Date().toISOString(),
-          type: 'create_node_reaction',
+          type: 'node.reaction.create',
           data: {
             nodeId,
             reaction,
@@ -179,7 +179,7 @@ export class NodeReactionService {
         const mutation: DeleteNodeReactionMutation = {
           id: generateId(IdType.Mutation),
           createdAt: new Date().toISOString(),
-          type: 'delete_node_reaction',
+          type: 'node.reaction.delete',
           data: {
             nodeId,
             reaction,

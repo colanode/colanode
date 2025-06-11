@@ -1,8 +1,8 @@
 import {
   extractNodeRole,
   hasNodeRole,
-  MarkNodeOpenedMutation,
-  MarkNodeSeenMutation,
+  NodeInteractionOpenedMutation,
+  NodeInteractionSeenMutation,
   MutationStatus,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
@@ -12,7 +12,7 @@ import { mapNode } from '@colanode/server/lib/nodes';
 
 export const markNodeAsSeen = async (
   user: SelectUser,
-  mutation: MarkNodeSeenMutation
+  mutation: NodeInteractionSeenMutation
 ): Promise<MutationStatus> => {
   const node = await database
     .selectFrom('nodes')
@@ -93,7 +93,7 @@ export const markNodeAsSeen = async (
 
 export const markNodeAsOpened = async (
   user: SelectUser,
-  mutation: MarkNodeOpenedMutation
+  mutation: NodeInteractionOpenedMutation
 ): Promise<MutationStatus> => {
   const node = await database
     .selectFrom('nodes')

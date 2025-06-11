@@ -180,7 +180,7 @@ export class DocumentService {
         .returningAll()
         .values({
           id: generateId(IdType.Mutation),
-          type: 'update_document',
+          type: 'document.update',
           data: JSON.stringify({
             documentId: id,
             updateId: updateId,
@@ -346,7 +346,7 @@ export class DocumentService {
         .returningAll()
         .values({
           id: generateId(IdType.Mutation),
-          type: 'update_document',
+          type: 'document.update',
           data: JSON.stringify(mutationData),
           created_at: updatedAt,
           retries: 0,

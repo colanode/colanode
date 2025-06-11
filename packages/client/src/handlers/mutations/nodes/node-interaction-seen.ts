@@ -4,18 +4,22 @@ import { mapNodeInteraction } from '@colanode/client/lib/mappers';
 import { MutationHandler } from '@colanode/client/lib/types';
 import { fetchNode } from '@colanode/client/lib/utils';
 import {
-  NodeMarkSeenMutationInput,
-  NodeMarkSeenMutationOutput,
-} from '@colanode/client/mutations/nodes/node-mark-seen';
-import { MarkNodeSeenMutation, generateId, IdType } from '@colanode/core';
+  NodeInteractionSeenMutationInput,
+  NodeInteractionSeenMutationOutput,
+} from '@colanode/client/mutations/nodes/node-interaction-seen';
+import {
+  NodeInteractionSeenMutation,
+  generateId,
+  IdType,
+} from '@colanode/core';
 
-export class NodeMarkSeenMutationHandler
+export class NodeInteractionSeenMutationHandler
   extends WorkspaceMutationHandlerBase
-  implements MutationHandler<NodeMarkSeenMutationInput>
+  implements MutationHandler<NodeInteractionSeenMutationInput>
 {
   async handleMutation(
-    input: NodeMarkSeenMutationInput
-  ): Promise<NodeMarkSeenMutationOutput> {
+    input: NodeInteractionSeenMutationInput
+  ): Promise<NodeInteractionSeenMutationOutput> {
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
 
     const node = await fetchNode(workspace.database, input.nodeId);
@@ -76,10 +80,10 @@ export class NodeMarkSeenMutationHandler
           throw new Error('Failed to create node interaction');
         }
 
-        const mutation: MarkNodeSeenMutation = {
+        const mutation: NodeInteractionSeenMutation = {
           id: generateId(IdType.Mutation),
           createdAt: new Date().toISOString(),
-          type: 'mark_node_seen',
+          type: 'node.interaction.seen',
           data: {
             nodeId: input.nodeId,
             collaboratorId: workspace.userId,

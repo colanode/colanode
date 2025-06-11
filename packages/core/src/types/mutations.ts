@@ -52,7 +52,7 @@ export type CreateNodeMutationData = z.infer<
 >;
 
 export const createNodeMutationSchema = mutationBaseSchema.extend({
-  type: z.literal('create_node'),
+  type: z.literal('node.create'),
   data: createNodeMutationDataSchema,
 });
 
@@ -70,7 +70,7 @@ export type UpdateNodeMutationData = z.infer<
 >;
 
 export const updateNodeMutationSchema = mutationBaseSchema.extend({
-  type: z.literal('update_node'),
+  type: z.literal('node.update'),
   data: updateNodeMutationDataSchema,
 });
 
@@ -87,7 +87,7 @@ export type DeleteNodeMutationData = z.infer<
 >;
 
 export const deleteNodeMutationSchema = mutationBaseSchema.extend({
-  type: z.literal('delete_node'),
+  type: z.literal('node.delete'),
   data: deleteNodeMutationDataSchema,
 });
 
@@ -105,7 +105,7 @@ export type CreateNodeReactionMutationData = z.infer<
 >;
 
 export const createNodeReactionMutationSchema = mutationBaseSchema.extend({
-  type: z.literal('create_node_reaction'),
+  type: z.literal('node.reaction.create'),
   data: createNodeReactionMutationDataSchema,
 });
 
@@ -125,7 +125,7 @@ export type DeleteNodeReactionMutationData = z.infer<
 >;
 
 export const deleteNodeReactionMutationSchema = mutationBaseSchema.extend({
-  type: z.literal('delete_node_reaction'),
+  type: z.literal('node.reaction.delete'),
   data: deleteNodeReactionMutationDataSchema,
 });
 
@@ -133,40 +133,42 @@ export type DeleteNodeReactionMutation = z.infer<
   typeof deleteNodeReactionMutationSchema
 >;
 
-export const markNodeSeenMutationDataSchema = z.object({
+export const nodeInteractionSeenMutationDataSchema = z.object({
   nodeId: z.string(),
   collaboratorId: z.string(),
   seenAt: z.string(),
 });
 
-export type MarkNodeSeenMutationData = z.infer<
-  typeof markNodeSeenMutationDataSchema
+export type NodeInteractionSeenMutationData = z.infer<
+  typeof nodeInteractionSeenMutationDataSchema
 >;
 
-export const markNodeSeenMutationSchema = mutationBaseSchema.extend({
-  type: z.literal('mark_node_seen'),
-  data: markNodeSeenMutationDataSchema,
+export const nodeInteractionSeenMutationSchema = mutationBaseSchema.extend({
+  type: z.literal('node.interaction.seen'),
+  data: nodeInteractionSeenMutationDataSchema,
 });
 
-export type MarkNodeSeenMutation = z.infer<typeof markNodeSeenMutationSchema>;
+export type NodeInteractionSeenMutation = z.infer<
+  typeof nodeInteractionSeenMutationSchema
+>;
 
-export const markNodeOpenedMutationDataSchema = z.object({
+export const nodeInteractionOpenedMutationDataSchema = z.object({
   nodeId: z.string(),
   collaboratorId: z.string(),
   openedAt: z.string(),
 });
 
-export type MarkNodeOpenedMutationData = z.infer<
-  typeof markNodeOpenedMutationDataSchema
+export type NodeInteractionOpenedMutationData = z.infer<
+  typeof nodeInteractionOpenedMutationDataSchema
 >;
 
-export const markNodeOpenedMutationSchema = mutationBaseSchema.extend({
-  type: z.literal('mark_node_opened'),
-  data: markNodeOpenedMutationDataSchema,
+export const nodeInteractionOpenedMutationSchema = mutationBaseSchema.extend({
+  type: z.literal('node.interaction.opened'),
+  data: nodeInteractionOpenedMutationDataSchema,
 });
 
-export type MarkNodeOpenedMutation = z.infer<
-  typeof markNodeOpenedMutationSchema
+export type NodeInteractionOpenedMutation = z.infer<
+  typeof nodeInteractionOpenedMutationSchema
 >;
 
 export const updateDocumentMutationDataSchema = z.object({
@@ -181,7 +183,7 @@ export type UpdateDocumentMutationData = z.infer<
 >;
 
 export const updateDocumentMutationSchema = mutationBaseSchema.extend({
-  type: z.literal('update_document'),
+  type: z.literal('document.update'),
   data: updateDocumentMutationDataSchema,
 });
 
@@ -195,8 +197,8 @@ export const mutationSchema = z.discriminatedUnion('type', [
   deleteNodeMutationSchema,
   createNodeReactionMutationSchema,
   deleteNodeReactionMutationSchema,
-  markNodeSeenMutationSchema,
-  markNodeOpenedMutationSchema,
+  nodeInteractionSeenMutationSchema,
+  nodeInteractionOpenedMutationSchema,
   updateDocumentMutationSchema,
 ]);
 

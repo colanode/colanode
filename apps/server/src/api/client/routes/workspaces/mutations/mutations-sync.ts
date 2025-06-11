@@ -64,21 +64,21 @@ const handleMutation = async (
   user: SelectUser,
   mutation: Mutation
 ): Promise<MutationStatus> => {
-  if (mutation.type === 'create_node') {
+  if (mutation.type === 'node.create') {
     return await createNodeFromMutation(user, mutation.data);
-  } else if (mutation.type === 'update_node') {
+  } else if (mutation.type === 'node.update') {
     return await updateNodeFromMutation(user, mutation.data);
-  } else if (mutation.type === 'delete_node') {
+  } else if (mutation.type === 'node.delete') {
     return await deleteNodeFromMutation(user, mutation.data);
-  } else if (mutation.type === 'create_node_reaction') {
+  } else if (mutation.type === 'node.reaction.create') {
     return await createNodeReaction(user, mutation);
-  } else if (mutation.type === 'delete_node_reaction') {
+  } else if (mutation.type === 'node.reaction.delete') {
     return await deleteNodeReaction(user, mutation);
-  } else if (mutation.type === 'mark_node_seen') {
+  } else if (mutation.type === 'node.interaction.seen') {
     return await markNodeAsSeen(user, mutation);
-  } else if (mutation.type === 'mark_node_opened') {
+  } else if (mutation.type === 'node.interaction.opened') {
     return await markNodeAsOpened(user, mutation);
-  } else if (mutation.type === 'update_document') {
+  } else if (mutation.type === 'document.update') {
     return await updateDocumentFromMutation(user, mutation.data);
   } else {
     return MutationStatus.METHOD_NOT_ALLOWED;
