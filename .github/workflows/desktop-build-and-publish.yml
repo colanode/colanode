@@ -38,8 +38,10 @@ jobs:
           echo "VERSION=$version" >> $env:GITHUB_ENV
 
       - name: Set version and commit SHA into build.ts
+        shell: pwsh
         run: |
-          cat <<EOF > ./packages/core/src/types/build.ts
+          $content = @'
+
           // This file is auto-generated during CI/CD
           const VERSION = "${{ env.VERSION }}";
           const SHA = "${{ github.sha }}";
@@ -48,7 +50,9 @@ jobs:
               version: VERSION,
               sha: SHA
           };
-          EOF
+
+          '@
+          Set-Content -Path "./packages/core/src/types/build.ts" -Value $content
 
       - name: Decode certificate
         run: |
@@ -112,6 +116,19 @@ jobs:
 
       - name: Extract version from tag
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Set version and commit SHA into build.ts
+        run: |
+          cat <<EOF > ./packages/core/src/types/build.ts
+          // This file is auto-generated during CI/CD
+          const VERSION = "${{ env.VERSION }}";
+          const SHA = "${{ github.sha }}";
+
+          export const build = {
+              version: VERSION,
+              sha: SHA
+          };
+          EOF
 
       - name: Decode and Import macOS Certificate
         run: |
