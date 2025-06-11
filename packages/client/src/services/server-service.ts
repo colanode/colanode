@@ -23,12 +23,12 @@ export class ServerService {
 
   private state: ServerState | null = null;
   private eventLoop: EventLoop;
+  private isOutdated: boolean;
 
   public readonly server: Server;
   public readonly configUrl: string;
   public readonly socketBaseUrl: string;
   public readonly httpBaseUrl: string;
-  public readonly isOutdated: boolean;
 
   constructor(app: AppService, server: Server) {
     this.app = app;
@@ -101,6 +101,7 @@ export class ServerService {
       this.server.avatar = config.avatar;
       this.server.name = config.name;
       this.server.version = config.version;
+      this.isOutdated = isServerOutdated(config.version);
 
       if (updatedServer) {
         eventBus.publish({
