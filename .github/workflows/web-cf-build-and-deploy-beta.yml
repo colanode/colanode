@@ -1,4 +1,4 @@
-name: Build and deploy beta web app to Cloudflare
+name: Web - Build and deploy beta
 
 on:
   push:
@@ -18,8 +18,7 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
-      - name: Get the version
-        id: get_version
+      - name: Extract version from tag
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
       - name: Set version and commit SHA into build.ts
@@ -72,7 +71,7 @@ jobs:
           }
           EOF
 
-      - name: Deploy
+      - name: Deploy to Cloudflare
         uses: cloudflare/wrangler-action@v3
         with:
           workingDirectory: ./apps/web

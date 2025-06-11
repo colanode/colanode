@@ -1,4 +1,4 @@
-name: Build and publish desktop app
+name: Desktop - Build and publish electron app
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-electron-cache-
 
-      - name: Set VERSION
+      - name: Extract version from tag
         shell: pwsh
         run: |
           $version = $env:GITHUB_REF -replace '^refs/tags/v',''
@@ -110,7 +110,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-electron-cache-
 
-      - name: Set VERSION
+      - name: Extract version from tag
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
       - name: Decode and Import macOS Certificate

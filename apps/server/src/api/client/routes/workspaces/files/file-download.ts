@@ -85,7 +85,7 @@ export const fileDownloadRoute: FastifyPluginCallbackZod = (
       }
 
       const command = new GetObjectCommand({
-        Bucket: config.storage.bucketName,
+        Bucket: config.storage.bucket,
         Key: upload.path,
       });
 

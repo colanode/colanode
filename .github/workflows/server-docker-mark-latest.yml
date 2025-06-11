@@ -1,4 +1,4 @@
-name: Mark server docker image as latest
+name: Server - Mark docker image as latest
 
 on:
   release:
@@ -12,6 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
       - name: Log in to GitHub Container Registry
         uses: docker/login-action@v3
         with:
@@ -19,14 +22,9 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get the version
-        id: get_version
+      - name: Extract version from tag
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
-      - name: Pull version image
-        run: docker pull ${{ env.REGISTRY }}/${{ vars.SERVER_IMAGE_NAME }}:${{ env.VERSION }}
-
-      - name: Tag and push as latest
+      - name: Tag as latest the version image
         run: |
-          docker tag ${{ env.REGISTRY }}/${{ vars.SERVER_IMAGE_NAME }}:${{ env.VERSION }} ${{ env.REGISTRY }}/${{ vars.SERVER_IMAGE_NAME }}:latest
-          docker push ${{ env.REGISTRY }}/${{ vars.SERVER_IMAGE_NAME }}:latest
+          docker buildx imagetools create --tag ${{ env.REGISTRY }}/${{ vars.SERVER_IMAGE_NAME }}:latest ${{ env.REGISTRY }}/${{ vars.SERVER_IMAGE_NAME }}:${{ env.VERSION }}

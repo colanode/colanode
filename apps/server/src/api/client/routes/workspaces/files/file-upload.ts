@@ -107,7 +107,7 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
 
       const stream = request.raw;
       const uploadCommand = new PutObjectCommand({
-        Bucket: config.storage.bucketName,
+        Bucket: config.storage.bucket,
         Key: path,
         Body: stream,
         ContentType: file.attributes.mimeType,

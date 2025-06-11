@@ -21,7 +21,7 @@ Built for both individuals and teams, Colanode adapts to your needs, whether you
 
 ## How it works
 
-Colanode includes a desktop app and a self-hosted server. You can connect to multiple servers with a single app, each containing one or more **workspaces** for different teams or projects. After logging in, you pick a workspace to start collaborating—sending messages, editing pages, or updating database records.
+Colanode includes a client app (web or desktop) and a self-hosted server. You can connect to multiple servers with a single app, each containing one or more **workspaces** for different teams or projects. After logging in, you pick a workspace to start collaborating—sending messages, editing pages, or updating database records.
 
 ### Local-first workflow
 
@@ -33,12 +33,14 @@ Colanode relies on **Conflict-free Replicated Data Types (CRDTs)** - powered by 
 
 ## Get started for free
 
-To begin using Colanode, **download the official desktop app** from the [website](https://colanode.com/downloads). Once installed, you can connect to any Colanode server—including our free beta cloud servers:
+The easiest way to start using Colanode is through our **web app**, accessible instantly at [app.colanode.com](https://app.colanode.com). Simply log in to get started immediately, without any installation. _Please note, the web app is currently in early preview and under testing; you may encounter bugs or compatibility issues in certain browsers._
+
+For optimal performance, you can install our **desktop app**, available from our [downloads page](https://colanode.com/downloads). Both the web and desktop apps allow you to connect to any of our free beta cloud servers:
 
 - **Colanode Cloud (EU)** – hosted in Europe.
 - **Colanode Cloud (US)** – hosted in the United States.
 
-Both cloud servers are currently in beta and free to use; pricing will be announced soon.
+Both cloud servers are currently available in beta and free to use; pricing details will be announced soon.
 
 ### Self-host with Docker
 

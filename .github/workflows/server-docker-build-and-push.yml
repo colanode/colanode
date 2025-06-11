@@ -1,4 +1,4 @@
-name: Build and push server docker image
+name: Server - Build and push docker image
 
 on:
   push:
@@ -29,8 +29,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Get the version
-        id: get_version
+      - name: Extract version from tag
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
       - name: Set version and commit SHA into build.ts

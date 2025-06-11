@@ -71,7 +71,7 @@ export const avatarUploadRoute: FastifyPluginCallbackZod = (
 
         const avatarId = generateId(IdType.Avatar);
         const command = new PutObjectCommand({
-          Bucket: config.storage.bucketName,
+          Bucket: config.storage.bucket,
           Key: `avatars/${avatarId}.jpeg`,
           Body: jpegBuffer,
           ContentType: 'image/jpeg',

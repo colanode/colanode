@@ -25,7 +25,7 @@ export const avatarDownloadRoute: FastifyPluginCallbackZod = (
       try {
         const avatarId = request.params.avatarId;
         const command = new GetObjectCommand({
-          Bucket: config.storage.bucketName,
+          Bucket: config.storage.bucket,
           Key: `avatars/${avatarId}.jpeg`,
         });
 
