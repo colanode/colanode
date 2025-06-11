@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
-import { Server } from '@colanode/client/types';
 import { LoginOutput } from '@colanode/core';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -24,7 +23,7 @@ const formSchema = z.object({
 });
 
 interface EmailLoginProps {
-  server: Server;
+  server: string;
   onSuccess: (output: LoginOutput) => void;
   onForgotPassword: () => void;
 }
@@ -49,7 +48,7 @@ export const EmailLogin = ({
         type: 'email.login',
         email: values.email,
         password: values.password,
-        server: server.domain,
+        server,
       },
       onSuccess(output) {
         onSuccess(output);

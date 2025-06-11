@@ -131,6 +131,11 @@ export type ServerUpdatedEvent = {
   server: Server;
 };
 
+export type ServerDeletedEvent = {
+  type: 'server.deleted';
+  server: Server;
+};
+
 export type QueryResultUpdatedEvent = {
   type: 'query.result.updated';
   id: string;
@@ -301,10 +306,11 @@ export type Event =
   | WorkspaceDeletedEvent
   | ServerCreatedEvent
   | ServerUpdatedEvent
+  | ServerDeletedEvent
+  | ServerAvailabilityChangedEvent
   | FileStateUpdatedEvent
   | QueryResultUpdatedEvent
   | RadarDataUpdatedEvent
-  | ServerAvailabilityChangedEvent
   | CollaborationCreatedEvent
   | CollaborationDeletedEvent
   | AccountConnectionOpenedEvent

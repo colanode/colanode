@@ -223,6 +223,34 @@ export class AppService {
     return serverService;
   }
 
+  public async deleteServer(domain: string): Promise<void> {
+    const server = this.servers.get(domain);
+    if (!server) {
+      return;
+    }
+
+    for (const account of this.accounts.values()) {
+      if (account.server.domain === domain) {
+        await account.logout();
+      }
+    }
+
+    const deletedServer = await this.database
+      .deleteFrom('servers')
+      .returningAll()
+      .where('domain', '=', domain)
+      .executeTakeFirst();
+
+    this.servers.delete(domain);
+
+    if (deletedServer) {
+      eventBus.publish({
+        type: 'server.deleted',
+        server: mapServer(deletedServer),
+      });
+    }
+  }
+
   public triggerCleanup(): void {
     this.cleanupEventLoop.trigger();
   }
@@ -253,7 +281,21 @@ export class AppService {
 
     for (const deletedToken of deletedTokens) {
       const server = this.servers.get(deletedToken.domain);
-      if (!server || !server.isAvailable) {
+      if (!server) {
+        debug(
+          `Server ${deletedToken.domain} not found, skipping token ${deletedToken.token} for account ${deletedToken.account_id}`
+        );
+
+        await this.database
+          .deleteFrom('deleted_tokens')
+          .where('token', '=', deletedToken.token)
+          .where('account_id', '=', deletedToken.account_id)
+          .execute();
+
+        continue;
+      }
+
+      if (!server.isAvailable) {
         debug(
           `Server ${deletedToken.domain} is not available for logging out account ${deletedToken.account_id}`
         );

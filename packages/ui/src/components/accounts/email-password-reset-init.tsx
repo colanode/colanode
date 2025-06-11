@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
-import { Server } from '@colanode/client/types';
 import { EmailPasswordResetInitOutput } from '@colanode/core';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -23,7 +22,7 @@ const formSchema = z.object({
 });
 
 interface EmailPasswordResetInitProps {
-  server: Server;
+  server: string;
   onSuccess: (output: EmailPasswordResetInitOutput) => void;
 }
 
@@ -44,7 +43,7 @@ export const EmailPasswordResetInit = ({
       input: {
         type: 'email.password.reset.init',
         email: values.email,
-        server: server.domain,
+        server,
       },
       onSuccess(output) {
         onSuccess(output);

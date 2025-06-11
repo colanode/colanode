@@ -58,6 +58,7 @@ import { RecordFieldValueDeleteMutationHandler } from './records/record-field-va
 import { RecordFieldValueSetMutationHandler } from './records/record-field-value-set';
 import { RecordNameUpdateMutationHandler } from './records/record-name-update';
 import { ServerCreateMutationHandler } from './servers/server-create';
+import { ServerDeleteMutationHandler } from './servers/server-delete';
 import { SpaceAvatarUpdateMutationHandler } from './spaces/space-avatar-update';
 import { SpaceCreateMutationHandler } from './spaces/space-create';
 import { SpaceDeleteMutationHandler } from './spaces/space-delete';
@@ -114,6 +115,7 @@ export const buildMutationHandlerMap = (
     'select.option.delete': new SelectOptionDeleteMutationHandler(app),
     'select.option.update': new SelectOptionUpdateMutationHandler(app),
     'server.create': new ServerCreateMutationHandler(app),
+    'server.delete': new ServerDeleteMutationHandler(app),
     'space.create': new SpaceCreateMutationHandler(app),
     'space.delete': new SpaceDeleteMutationHandler(app),
     'user.role.update': new UserRoleUpdateMutationHandler(app),

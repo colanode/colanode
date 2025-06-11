@@ -65,6 +65,7 @@ export const ServerCreateDialog = ({
                 },
                 onSuccess(output) {
                   onCreate(output.server);
+                  toast.success('Server added successfully');
                 },
                 onError(error) {
                   toast.error(error.message);

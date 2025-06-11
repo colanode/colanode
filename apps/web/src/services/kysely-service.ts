@@ -139,7 +139,11 @@ class SqliteWasmDriver implements Driver {
   }
 
   async destroy(): Promise<void> {
-    this.database?.close();
+    try {
+      this.database?.close();
+    } catch {
+      // Ignore errors
+    }
   }
 
   private buildImportDbPath(): string {

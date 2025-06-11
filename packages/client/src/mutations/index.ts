@@ -54,6 +54,7 @@ export * from './records/record-field-value-delete';
 export * from './records/record-field-value-set';
 export * from './records/record-name-update';
 export * from './servers/server-create';
+export * from './servers/server-delete';
 export * from './spaces/space-avatar-update';
 export * from './spaces/space-create';
 export * from './spaces/space-delete';
@@ -116,7 +117,7 @@ export enum MutationErrorCode {
   SpaceUpdateFailed = 'space_update_failed',
   SpaceCreateForbidden = 'space_create_forbidden',
   SpaceCreateFailed = 'space_create_failed',
-  ServerAlreadyExists = 'server_already_exists',
+  ServerDeleteForbidden = 'server_delete_forbidden',
   ServerUrlInvalid = 'server_url_invalid',
   ServerInitFailed = 'server_init_failed',
   ChannelNotFound = 'channel_not_found',

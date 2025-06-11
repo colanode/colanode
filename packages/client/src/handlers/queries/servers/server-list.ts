@@ -38,6 +38,14 @@ export class ServerListQueryHandler
         hasChanges: true,
         result: newServers,
       };
+    } else if (event.type === 'server.deleted') {
+      const newServers = output.filter(
+        (server) => server.domain !== event.server.domain
+      );
+      return {
+        hasChanges: true,
+        result: newServers,
+      };
     }
 
     return {

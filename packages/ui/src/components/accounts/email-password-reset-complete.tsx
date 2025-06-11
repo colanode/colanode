@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
-import { Server } from '@colanode/client/types';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   Form,
@@ -39,7 +38,7 @@ const formSchema = z
   });
 
 interface EmailPasswordResetCompleteProps {
-  server: Server;
+  server: string;
   id: string;
   expiresAt: Date;
 }
@@ -73,7 +72,7 @@ export const EmailPasswordResetComplete = ({
         type: 'email.password.reset.complete',
         otp: values.otp,
         password: values.password,
-        server: server.domain,
+        server,
         id: id,
       },
       onSuccess() {

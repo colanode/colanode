@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
-import { Server } from '@colanode/client/types';
 import { LoginOutput } from '@colanode/core';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -24,7 +23,7 @@ const formSchema = z.object({
 });
 
 interface EmailVerifyProps {
-  server: Server;
+  server: string;
   id: string;
   expiresAt: Date;
   onSuccess: (output: LoginOutput) => void;
@@ -56,7 +55,7 @@ export const EmailVerify = ({
       input: {
         type: 'email.verify',
         otp: values.otp,
-        server: server.domain,
+        server,
         id,
       },
       onSuccess(output) {

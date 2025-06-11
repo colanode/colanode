@@ -1,4 +1,4 @@
-import { useState, Fragment } from 'react';
+import { useState, Fragment, useEffect } from 'react';
 
 import { Account, Server } from '@colanode/client/types';
 import { EmailLogin } from '@colanode/ui/components/accounts/email-login';
@@ -48,10 +48,20 @@ type PanelState =
 
 export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
   const app = useApp();
-  const [server, setServer] = useState<Server>(servers[0]!);
+  const [server, setServer] = useState<string | null>(
+    servers[0]?.domain ?? null
+  );
   const [panel, setPanel] = useState<PanelState>({
     type: 'login',
   });
+
+  useEffect(() => {
+    const serverExists =
+      server !== null && servers.some((s) => s.domain === server);
+    if (!serverExists && servers.length > 0) {
+      setServer(servers[0]!.domain);
+    }
+  }, [server, servers]);
 
   return (
     <div className="flex flex-col gap-4">
@@ -61,7 +71,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
         servers={servers}
         readonly={panel.type === 'verify'}
       />
-      {panel.type === 'login' && (
+      {server && panel.type === 'login' && (
         <Fragment>
           <EmailLogin
             server={server}
@@ -94,7 +104,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
           </p>
         </Fragment>
       )}
-      {panel.type === 'register' && (
+      {server && panel.type === 'register' && (
         <Fragment>
           <EmailRegister
             server={server}
@@ -123,7 +133,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
         </Fragment>
       )}
 
-      {panel.type === 'verify' && (
+      {server && panel.type === 'verify' && (
         <Fragment>
           <EmailVerify
             server={server}
@@ -148,7 +158,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
         </Fragment>
       )}
 
-      {panel.type === 'password_reset_init' && (
+      {server && panel.type === 'password_reset_init' && (
         <Fragment>
           <EmailPasswordResetInit
             server={server}
@@ -173,7 +183,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
         </Fragment>
       )}
 
-      {panel.type === 'password_reset_complete' && (
+      {server && panel.type === 'password_reset_complete' && (
         <Fragment>
           <EmailPasswordResetComplete
             server={server}
