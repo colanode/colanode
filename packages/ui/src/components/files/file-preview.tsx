@@ -22,6 +22,8 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
     workspaceId: workspace.id,
   });
 
+  const shouldFetchFileUrl = fileStateQuery.data?.downloadProgress === 100;
+
   const fileUrlGetQuery = useQuery(
     {
       type: 'file.url.get',
@@ -31,11 +33,14 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
       workspaceId: workspace.id,
     },
     {
-      enabled: fileStateQuery.data?.downloadProgress === 100,
+      enabled: shouldFetchFileUrl,
     }
   );
 
-  if (fileStateQuery.isPending || fileUrlGetQuery.isPending) {
+  if (
+    fileStateQuery.isPending ||
+    (shouldFetchFileUrl && fileUrlGetQuery.isPending)
+  ) {
     return null;
   }
 

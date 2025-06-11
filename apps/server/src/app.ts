@@ -17,6 +17,7 @@ const debug = createDebugger('server:app');
 export const initApp = () => {
   const server = fastify({
     bodyLimit: 10 * 1024 * 1024, // 10MB
+    trustProxy: true,
   });
 
   server.register(errorHandler);

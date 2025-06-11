@@ -18,14 +18,11 @@ export const useQuery = <T extends QueryInput>(
   const inputJson = JSON.stringify(input);
   const hash = sha256(inputJson);
 
-  const { data, isPending } = useTanstackQuery({
+  const result = useTanstackQuery({
     queryKey: [hash],
     queryFn: () => window.colanode.executeQueryAndSubscribe(hash, input),
     ...options,
   });
 
-  return {
-    isPending,
-    data,
-  };
+  return result;
 };

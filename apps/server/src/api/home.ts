@@ -9,7 +9,9 @@ export const homeRoute: FastifyPluginCallback = (instance, _, done) => {
     url: '/',
     handler: async (request, reply) => {
       const port =
-        request.port != 80 && request.port != 443 ? `:${request.port}` : '';
+        request.port && request.port != 80 && request.port != 443
+          ? `:${request.port}`
+          : '';
 
       const prefix = config.server.pathPrefix
         ? `/${config.server.pathPrefix}`
