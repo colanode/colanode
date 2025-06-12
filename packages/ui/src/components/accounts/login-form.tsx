@@ -2,7 +2,7 @@ import { HouseIcon } from 'lucide-react';
 import { useState, Fragment, useEffect } from 'react';
 import { match } from 'ts-pattern';
 
-import { Account, Server } from '@colanode/client/types';
+import { Account, ServerDetails } from '@colanode/client/types';
 import { EmailLogin } from '@colanode/ui/components/accounts/email-login';
 import { EmailPasswordResetComplete } from '@colanode/ui/components/accounts/email-password-reset-complete';
 import { EmailPasswordResetInit } from '@colanode/ui/components/accounts/email-password-reset-init';
@@ -17,7 +17,7 @@ import { isFeatureSupported } from '@colanode/ui/lib/features';
 
 interface LoginFormProps {
   accounts: Account[];
-  servers: Server[];
+  servers: ServerDetails[];
 }
 
 type LoginPanelState = {
@@ -53,25 +53,32 @@ type PanelState =
 
 export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
   const app = useApp();
-  const [server, setServer] = useState<Server | null>(servers[0] ?? null);
+
+  const [serverDomain, setServerDomain] = useState<string | null>(
+    servers[0]?.domain ?? null
+  );
   const [panel, setPanel] = useState<PanelState>({
     type: 'login',
   });
 
   useEffect(() => {
     const serverExists =
-      server !== null && servers.some((s) => s.domain === server.domain);
+      serverDomain !== null && servers.some((s) => s.domain === serverDomain);
     if (!serverExists && servers.length > 0) {
-      setServer(servers[0]!);
+      setServerDomain(servers[0]!.domain);
     }
-  }, [server, servers]);
+  }, [serverDomain, servers]);
+
+  const server = serverDomain
+    ? servers.find((s) => s.domain === serverDomain)
+    : null;
 
   return (
     <div className="flex flex-col gap-4">
       <ServerDropdown
-        value={server}
-        onChange={(server) => {
-          setServer(server);
+        value={serverDomain}
+        onChange={(serverDomain) => {
+          setServerDomain(serverDomain);
         }}
         servers={servers}
         readonly={panel.type === 'verify'}

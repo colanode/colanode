@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
-import { Server, ServerDetails } from '@colanode/client/types';
+import { ServerDetails } from '@colanode/client/types';
 import { ServerAvatar } from '@colanode/ui/components/servers/server-avatar';
 import { ServerCreateDialog } from '@colanode/ui/components/servers/server-create-dialog';
 import { ServerDeleteDialog } from '@colanode/ui/components/servers/server-delete-dialog';
@@ -20,8 +20,8 @@ import {
 } from '@colanode/ui/components/ui/dropdown-menu';
 
 interface ServerDropdownProps {
-  value: Server | null;
-  onChange: (server: Server) => void;
+  value: string | null;
+  onChange: (server: string) => void;
   servers: ServerDetails[];
   readonly?: boolean;
 }
@@ -37,6 +37,9 @@ export const ServerDropdown = ({
   const [settingsDomain, setSettingsDomain] = useState<string | null>(null);
   const [deleteDomain, setDeleteDomain] = useState<string | null>(null);
 
+  const server = value
+    ? servers.find((server) => server.domain === value)
+    : null;
   const settingsServer = servers.find(
     (server) => server.domain === settingsDomain
   );
@@ -54,21 +57,21 @@ export const ServerDropdown = ({
       >
         <DropdownMenuTrigger asChild>
           <div className="flex w-full flex-grow flex-row items-center gap-3 rounded-md border border-input p-2 cursor-pointer hover:bg-gray-100">
-            {value ? (
+            {server ? (
               <ServerAvatar
-                url={value.avatar}
-                name={value.name}
+                url={server.avatar}
+                name={server.name}
                 className="size-8 rounded-md"
               />
             ) : (
               <ServerOffIcon className="size-8 text-muted-foreground rounded-md" />
             )}
             <div className="flex-grow">
-              {value ? (
+              {server ? (
                 <Fragment>
-                  <p className="flex-grow font-semibold">{value.name}</p>
+                  <p className="flex-grow font-semibold">{server.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {value.domain}
+                    {server.domain}
                   </p>
                 </Fragment>
               ) : (
@@ -85,8 +88,8 @@ export const ServerDropdown = ({
             <DropdownMenuItem
               key={server.domain}
               onSelect={() => {
-                if (value?.domain !== server.domain) {
-                  onChange(server);
+                if (value !== server.domain) {
+                  onChange(server.domain);
                 }
               }}
               className="group/server flex w-full flex-grow flex-row items-center gap-3 rounded-md border-b border-input p-2 cursor-pointer hover:bg-gray-100"

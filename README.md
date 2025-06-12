@@ -48,7 +48,7 @@ If you prefer to host your own Colanode server, simply use the Docker Compose fi
 
 - **Postgres** with the **pgvector** extension.
 - **Redis** (any Redis-compatible service will work, e.g., Valkey).
-- **S3-compatible storage** (supporting basic file operations and presigned URLs).
+- **S3-compatible storage** (supporting basic file operations: PUT, GET, DELETE).
 - **Colanode server API**, provided as a Docker image.
 
 All required environment variables for the Colanode server can be found in the docker-compose file.

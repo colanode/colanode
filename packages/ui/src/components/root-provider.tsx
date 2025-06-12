@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { DndProvider } from 'react-dnd';
 
 import { AppType, Event } from '@colanode/client/types';
+import { build } from '@colanode/core';
 import { App } from '@colanode/ui/components/app';
 import { FontLoader } from '@colanode/ui/components/font-loader';
 import { Toaster } from '@colanode/ui/components/ui/sonner';
@@ -26,6 +27,8 @@ interface RootProviderProps {
 
 export const RootProvider = ({ type }: RootProviderProps) => {
   useEffect(() => {
+    console.log(`Colanode | Version: ${build.version} | SHA: ${build.sha}`);
+
     const id = window.eventBus.subscribe((event: Event) => {
       if (event.type === 'query.result.updated') {
         const result = event.result;
