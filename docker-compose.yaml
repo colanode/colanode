@@ -96,9 +96,9 @@ services:
       # the URL 'https://localhost:3000/config' will be: 'https://localhost:3000/colanode/config'
       # SERVER_PATH_PREFIX: 'colanode'
 
-      # Optional CORS Configuration. By default the server is accessible from 'https://app.colanode.com'.
+      # Optional CORS Configuration. By default the server is accessible from 'http://localhost:4000'.
       # You can change this to allow custom origins (use comma to separate multiple origins) or '*' to allow all origins.
-      # SERVER_CORS_ORIGIN: 'https://app.colanode.com'
+      # SERVER_CORS_ORIGIN: 'http://localhost:4000'
       # SERVER_CORS_MAX_AGE: '7200'
 
       # ───────────────────────────────────────────────────────────────

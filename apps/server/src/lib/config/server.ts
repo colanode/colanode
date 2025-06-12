@@ -13,7 +13,7 @@ export const serverConfigSchema = z.object({
   mode: serverModeSchema.default('standalone'),
   pathPrefix: z.string().optional(),
   cors: z.object({
-    origin: z.string().default('https://app.colanode.com'),
+    origin: z.string().default('http://localhost:4000'),
     maxAge: z.coerce.number().default(7200),
   }),
 });
