@@ -6,7 +6,7 @@ export const ServerUpgradeRequired = () => {
   const server = useServer();
 
   return (
-    <div className="min-w-screen flex h-full min-h-screen w-full items-center justify-center">
+    <div className="flex h-full w-full items-center justify-center">
       <div className="flex flex-col items-center gap-8 text-center w-128">
         <CircleFadingArrowUp className="h-10 w-10 text-gray-800" />
         <h2 className="text-4xl text-gray-800">Server upgrade required</h2>

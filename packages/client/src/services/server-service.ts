@@ -6,24 +6,21 @@ import { EventLoop } from '@colanode/client/lib/event-loop';
 import { mapServer } from '@colanode/client/lib/mappers';
 import { isServerOutdated } from '@colanode/client/lib/servers';
 import { AppService } from '@colanode/client/services/app-service';
-import { Server, ServerAttributes } from '@colanode/client/types/servers';
+import {
+  Server,
+  ServerAttributes,
+  ServerState,
+} from '@colanode/client/types/servers';
 import { createDebugger, ServerConfig } from '@colanode/core';
-
-type ServerState = {
-  isAvailable: boolean;
-  lastCheckedAt: Date;
-  lastCheckedSuccessfullyAt: Date | null;
-  count: number;
-};
 
 const debug = createDebugger('desktop:service:server');
 
 export class ServerService {
   private readonly app: AppService;
+  private readonly eventLoop: EventLoop;
 
-  private state: ServerState | null = null;
-  private eventLoop: EventLoop;
-  private isOutdated: boolean;
+  public state: ServerState | null = null;
+  public isOutdated: boolean;
 
   public readonly server: Server;
   public readonly configUrl: string;
@@ -88,6 +85,7 @@ export class ServerService {
     if (config) {
       const attributes: ServerAttributes = {
         ...this.server.attributes,
+        sha: config.sha,
         account: config.account?.google.enabled
           ? {
               google: {

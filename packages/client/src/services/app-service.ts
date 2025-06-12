@@ -117,6 +117,10 @@ export class AppService {
     return Array.from(this.accounts.values());
   }
 
+  public getServers(): ServerService[] {
+    return Array.from(this.servers.values());
+  }
+
   public getServer(domain: string): ServerService | null {
     return this.servers.get(domain) ?? null;
   }
@@ -191,6 +195,7 @@ export class AppService {
     }
 
     const attributes: ServerAttributes = {
+      sha: config.sha,
       pathPrefix: config.pathPrefix,
       insecure: url.protocol === 'http:',
       account: config.account?.google.enabled

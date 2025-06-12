@@ -21,7 +21,7 @@ export const createServersTable: Migration = {
           name: 'Colanode Cloud (EU)',
           avatar: 'https://colanode.com/assets/flags/eu.svg',
           attributes: '{}',
-          version: '0.1.0',
+          version: '0.2.0',
           created_at: new Date().toISOString(),
         },
         {
@@ -29,7 +29,7 @@ export const createServersTable: Migration = {
           name: 'Colanode Cloud (US)',
           avatar: 'https://colanode.com/assets/flags/us.svg',
           attributes: '{}',
-          version: '0.1.0',
+          version: '0.2.0',
           created_at: new Date().toISOString(),
         },
       ])

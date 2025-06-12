@@ -3,12 +3,15 @@ import { Resizable } from 're-resizable';
 import { ContainerBlank } from '@colanode/ui/components/layouts/containers/container-blank';
 import { ContainerTabs } from '@colanode/ui/components/layouts/containers/container-tabs';
 import { Sidebar } from '@colanode/ui/components/layouts/sidebars/sidebar';
+import { ServerUpgradeRequired } from '@colanode/ui/components/servers/server-upgrade-required';
 import { LayoutContext } from '@colanode/ui/contexts/layout';
+import { useServer } from '@colanode/ui/contexts/server';
 import { useLayoutState } from '@colanode/ui/hooks/use-layout-state';
 import { useWindowSize } from '@colanode/ui/hooks/use-window-size';
 import { percentToNumber } from '@colanode/ui/lib/utils';
 
 export const Layout = () => {
+  const server = useServer();
   const windowSize = useWindowSize();
 
   const {
@@ -35,10 +38,11 @@ export const Layout = () => {
     handleMoveRight,
   } = useLayoutState();
 
-  const shouldDisplayLeft = leftContainerMetadata.tabs.length > 0;
+  const shouldDisplayLeft =
+    !server.isOutdated && leftContainerMetadata.tabs.length > 0;
 
   const shouldDisplayRight =
-    shouldDisplayLeft && rightContainerMetadata.tabs.length > 0;
+    !server.isOutdated && rightContainerMetadata.tabs.length > 0;
 
   return (
     <LayoutContext.Provider
@@ -150,7 +154,10 @@ export const Layout = () => {
             />
           </Resizable>
         )}
-        {!shouldDisplayLeft && !shouldDisplayRight && <ContainerBlank />}
+        {!server.isOutdated && !shouldDisplayLeft && !shouldDisplayRight && (
+          <ContainerBlank />
+        )}
+        {server.isOutdated && <ServerUpgradeRequired />}
       </div>
     </LayoutContext.Provider>
   );

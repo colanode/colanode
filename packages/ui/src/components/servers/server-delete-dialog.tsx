@@ -1,5 +1,6 @@
 import { toast } from 'sonner';
 
+import { ServerDetails } from '@colanode/client/types';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -16,11 +17,11 @@ import { useMutation } from '@colanode/ui/hooks/use-mutation';
 interface ServerDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  domain: string;
+  server: ServerDetails;
 }
 
 export const ServerDeleteDialog = ({
-  domain,
+  server,
   open,
   onOpenChange,
 }: ServerDeleteDialogProps) => {
@@ -32,7 +33,7 @@ export const ServerDeleteDialog = ({
         <AlertDialogHeader>
           <AlertDialogTitle>
             Are you sure you want delete the server{' '}
-            <span className="font-bold">&quot;{domain}&quot;</span>?
+            <span className="font-bold">&quot;{server.domain}&quot;</span>?
           </AlertDialogTitle>
           <AlertDialogDescription>
             Deleting the server will remove all accounts connected to it. You
@@ -48,7 +49,7 @@ export const ServerDeleteDialog = ({
               mutate({
                 input: {
                   type: 'server.delete',
-                  domain,
+                  domain: server.domain,
                 },
                 onSuccess() {
                   onOpenChange(false);
