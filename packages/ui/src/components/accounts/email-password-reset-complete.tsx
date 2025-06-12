@@ -14,7 +14,9 @@ import {
   FormMessage,
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
+import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useServer } from '@colanode/ui/contexts/server';
 import { useCountdown } from '@colanode/ui/hooks/use-countdown';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -38,17 +40,19 @@ const formSchema = z
   });
 
 interface EmailPasswordResetCompleteProps {
-  server: string;
   id: string;
   expiresAt: Date;
+  onBack: () => void;
 }
 
 export const EmailPasswordResetComplete = ({
-  server,
   id,
   expiresAt,
+  onBack,
 }: EmailPasswordResetCompleteProps) => {
+  const server = useServer();
   const { mutate, isPending } = useMutation();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -72,7 +76,7 @@ export const EmailPasswordResetComplete = ({
         type: 'email.password.reset.complete',
         otp: values.otp,
         password: values.password,
-        server,
+        server: server.domain,
         id: id,
       },
       onSuccess() {
@@ -107,13 +111,9 @@ export const EmailPasswordResetComplete = ({
           name="password"
           render={({ field }) => (
             <FormItem>
+              <Label htmlFor="password">New Password</Label>
               <FormControl>
-                <Input
-                  type="password"
-                  placeholder="New Password"
-                  {...field}
-                  autoComplete="new-password"
-                />
+                <Input type="password" {...field} autoComplete="new-password" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -124,13 +124,9 @@ export const EmailPasswordResetComplete = ({
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
+              <Label htmlFor="confirmPassword">Confirm New Password</Label>
               <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Confirm Password"
-                  {...field}
-                  autoComplete="new-password"
-                />
+                <Input type="password" {...field} autoComplete="new-password" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -141,8 +137,9 @@ export const EmailPasswordResetComplete = ({
           name="otp"
           render={({ field }) => (
             <FormItem>
+              <Label htmlFor="otp">Code</Label>
               <FormControl>
-                <Input placeholder="Code" {...field} />
+                <Input placeholder="123456" {...field} />
               </FormControl>
               <FormMessage />
               <p className="text-xs text-muted-foreground w-full text-center">
@@ -158,11 +155,19 @@ export const EmailPasswordResetComplete = ({
           disabled={isPending}
         >
           {isPending ? (
-            <Spinner className="mr-2 size-4" />
+            <Spinner className="mr-1 size-4" />
           ) : (
-            <Lock className="mr-2 size-4" />
+            <Lock className="mr-1 size-4" />
           )}
           Reset password
+        </Button>
+        <Button
+          variant="link"
+          className="w-full text-muted-foreground"
+          onClick={onBack}
+          type="button"
+        >
+          Back to login
         </Button>
       </form>
     </Form>

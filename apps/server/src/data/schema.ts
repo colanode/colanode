@@ -16,6 +16,7 @@ import {
   DocumentContent,
   UpdateMergeMetadata,
 } from '@colanode/core';
+import { AccountAttributes } from '@colanode/server/types/accounts';
 
 interface AccountTable {
   id: ColumnType<string, string, never>;
@@ -23,7 +24,11 @@ interface AccountTable {
   email: ColumnType<string, string, never>;
   avatar: ColumnType<string | null, string | null, string | null>;
   password: ColumnType<string | null, string | null, string | null>;
-  attrs: ColumnType<string | null, string | null, string | null>;
+  attributes: JSONColumnType<
+    AccountAttributes | null,
+    string | null,
+    string | null
+  >;
   created_at: ColumnType<Date, Date, never>;
   updated_at: ColumnType<Date | null, Date | null, Date>;
   status: ColumnType<number, number, number>;

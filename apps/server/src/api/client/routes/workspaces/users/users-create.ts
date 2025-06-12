@@ -174,7 +174,7 @@ const getOrCreateAccount = async (
       name: getNameFromEmail(email),
       email: email,
       avatar: null,
-      attrs: null,
+      attributes: null,
       password: null,
       status: AccountStatus.Pending,
       created_at: new Date(),

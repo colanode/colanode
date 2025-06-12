@@ -11,6 +11,7 @@ import { EmailPasswordResetCompleteMutationHandler } from './accounts/email-pass
 import { EmailPasswordResetInitMutationHandler } from './accounts/email-password-reset-init';
 import { EmailRegisterMutationHandler } from './accounts/email-register';
 import { EmailVerifyMutationHandler } from './accounts/email-verify';
+import { GoogleLoginMutationHandler } from './accounts/google-login';
 import { AppMetadataDeleteMutationHandler } from './apps/app-metadata-delete';
 import { AppMetadataUpdateMutationHandler } from './apps/app-metadata-update';
 import { AvatarUploadMutationHandler } from './avatars/avatar-upload';
@@ -83,6 +84,7 @@ export const buildMutationHandlerMap = (
     'email.login': new EmailLoginMutationHandler(app),
     'email.register': new EmailRegisterMutationHandler(app),
     'email.verify': new EmailVerifyMutationHandler(app),
+    'google.login': new GoogleLoginMutationHandler(app),
     'view.create': new ViewCreateMutationHandler(app),
     'channel.create': new ChannelCreateMutationHandler(app),
     'channel.delete': new ChannelDeleteMutationHandler(app),

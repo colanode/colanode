@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
 import { LoginOutput } from '@colanode/core';
+import { GoogleLogin } from '@colanode/ui/components/accounts/google-login';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   Form,
@@ -14,7 +15,9 @@ import {
   FormMessage,
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
+import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useServer } from '@colanode/ui/contexts/server';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 const formSchema = z
@@ -38,12 +41,14 @@ const formSchema = z
   });
 
 interface EmailRegisterProps {
-  server: string;
   onSuccess: (output: LoginOutput) => void;
+  onLogin: () => void;
 }
 
-export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
+export const EmailRegister = ({ onSuccess, onLogin }: EmailRegisterProps) => {
+  const server = useServer();
   const { mutate, isPending } = useMutation();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -61,7 +66,7 @@ export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
         name: values.name,
         email: values.email,
         password: values.password,
-        server,
+        server: server.domain,
       },
       onSuccess(output) {
         onSuccess(output);
@@ -74,14 +79,15 @@ export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="name"
           render={({ field }) => (
             <FormItem>
+              <Label htmlFor="name">Name</Label>
               <FormControl>
-                <Input placeholder="Name" {...field} autoComplete="name" />
+                <Input placeholder="John Doe" {...field} autoComplete="name" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -92,8 +98,13 @@ export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
           name="email"
           render={({ field }) => (
             <FormItem>
+              <Label htmlFor="email">Email</Label>
               <FormControl>
-                <Input placeholder="Email" {...field} autoComplete="email" />
+                <Input
+                  placeholder="hi@example.com"
+                  {...field}
+                  autoComplete="email"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,13 +115,9 @@ export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
           name="password"
           render={({ field }) => (
             <FormItem>
+              <Label htmlFor="password">Password</Label>
               <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Password"
-                  {...field}
-                  autoComplete="new-password"
-                />
+                <Input type="password" {...field} autoComplete="new-password" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -121,13 +128,9 @@ export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
+              <Label htmlFor="confirmPassword">Confirm Password</Label>
               <FormControl>
-                <Input
-                  type="password"
-                  placeholder="Confirm Password"
-                  {...field}
-                  autoComplete="new-password"
-                />
+                <Input type="password" {...field} autoComplete="new-password" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -140,11 +143,20 @@ export const EmailRegister = ({ server, onSuccess }: EmailRegisterProps) => {
           disabled={isPending}
         >
           {isPending ? (
-            <Spinner className="mr-2 size-4" />
+            <Spinner className="mr-1 size-4" />
           ) : (
-            <Mail className="mr-2 size-4" />
+            <Mail className="mr-1 size-4" />
           )}
           Register
+        </Button>
+        <GoogleLogin context="register" onSuccess={onSuccess} />
+        <Button
+          variant="link"
+          className="w-full text-muted-foreground"
+          onClick={onLogin}
+          type="button"
+        >
+          Already have an account? Login
         </Button>
       </form>
     </Form>

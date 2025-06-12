@@ -14,7 +14,9 @@ import {
   FormMessage,
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
+import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useServer } from '@colanode/ui/contexts/server';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 const formSchema = z.object({
@@ -22,15 +24,17 @@ const formSchema = z.object({
 });
 
 interface EmailPasswordResetInitProps {
-  server: string;
   onSuccess: (output: EmailPasswordResetInitOutput) => void;
+  onBack: () => void;
 }
 
 export const EmailPasswordResetInit = ({
-  server,
   onSuccess,
+  onBack,
 }: EmailPasswordResetInitProps) => {
+  const server = useServer();
   const { mutate, isPending } = useMutation();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,7 +47,7 @@ export const EmailPasswordResetInit = ({
       input: {
         type: 'email.password.reset.init',
         email: values.email,
-        server,
+        server: server.domain,
       },
       onSuccess(output) {
         onSuccess(output);
@@ -62,8 +66,9 @@ export const EmailPasswordResetInit = ({
           name="email"
           render={({ field }) => (
             <FormItem>
+              <Label htmlFor="email">Email</Label>
               <FormControl>
-                <Input placeholder="Email" {...field} />
+                <Input placeholder="hi@example.com" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -76,11 +81,19 @@ export const EmailPasswordResetInit = ({
           disabled={isPending}
         >
           {isPending ? (
-            <Spinner className="mr-2 size-4" />
+            <Spinner className="mr-1 size-4" />
           ) : (
-            <Mail className="mr-2 size-4" />
+            <Mail className="mr-1 size-4" />
           )}
           Reset password
+        </Button>
+        <Button
+          variant="link"
+          className="w-full text-muted-foreground"
+          onClick={onBack}
+          type="button"
+        >
+          Back to login
         </Button>
       </form>
     </Form>

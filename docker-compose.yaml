@@ -107,7 +107,11 @@ services:
       # Possible values for ACCOUNT_VERIFICATION_TYPE: 'automatic', 'manual', 'email'
       ACCOUNT_VERIFICATION_TYPE: 'automatic'
       ACCOUNT_OTP_TIMEOUT: '600' # in seconds
-      ACCOUNT_ALLOW_GOOGLE_LOGIN: 'false'
+
+      # If you want to enable Google login, you need to set the following variables:
+      # ACCOUNT_GOOGLE_ENABLED: 'true'
+      # ACCOUNT_GOOGLE_CLIENT_ID: 'your_google_client_id'
+      # ACCOUNT_GOOGLE_CLIENT_SECRET: 'your_google_client_secret'
 
       # ───────────────────────────────────────────────────────────────
       # User Configuration

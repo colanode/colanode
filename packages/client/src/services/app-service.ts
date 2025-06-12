@@ -193,6 +193,14 @@ export class AppService {
     const attributes: ServerAttributes = {
       pathPrefix: config.pathPrefix,
       insecure: url.protocol === 'http:',
+      account: config.account?.google.enabled
+        ? {
+            google: {
+              enabled: config.account.google.enabled,
+              clientId: config.account.google.clientId,
+            },
+          }
+        : undefined,
     };
 
     const createdServer = await this.database

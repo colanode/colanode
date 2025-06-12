@@ -20,6 +20,7 @@ import { createVectorExtension } from './00017-create-vector-extension';
 import { createNodeEmbeddingsTable } from './00018-create-node-embeddings-table';
 import { createDocumentEmbeddingsTable } from './00019-create-document-embeddings-table';
 import { alterDevicesPlatformColumn } from './00020-alter-devices-platform-column';
+import { renameAccountAttributesColumn } from './00021-rename-account-attributes-column';
 
 export const databaseMigrations: Record<string, Migration> = {
   '00001_create_accounts_table': createAccountsTable,
@@ -42,4 +43,5 @@ export const databaseMigrations: Record<string, Migration> = {
   '00018_create_node_embeddings_table': createNodeEmbeddingsTable,
   '00019_create_document_embeddings_table': createDocumentEmbeddingsTable,
   '00020_alter_devices_platform_column': alterDevicesPlatformColumn,
+  '00021_rename_account_attributes_column': renameAccountAttributesColumn,
 };

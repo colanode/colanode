@@ -127,18 +127,7 @@ export type EmailPasswordResetCompleteOutput = z.infer<
 >;
 
 export const googleLoginInputSchema = z.object({
-  access_token: z.string(),
-  token_type: z.string(),
-  expires_in: z.number(),
+  code: z.string(),
 });
 
 export type GoogleLoginInput = z.infer<typeof googleLoginInputSchema>;
-
-export const googleUserInfoSchema = z.object({
-  id: z.string(),
-  email: z.string().email(),
-  name: z.string(),
-  picture: z.string(),
-});
-
-export type GoogleUserInfo = z.infer<typeof googleUserInfoSchema>;

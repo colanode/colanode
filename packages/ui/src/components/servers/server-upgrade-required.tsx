@@ -1,6 +1,6 @@
 import { CircleFadingArrowUp } from 'lucide-react';
 
-import { useServer } from '@colanode/ui/contexts';
+import { useServer } from '@colanode/ui/contexts/server';
 
 export const ServerUpgradeRequired = () => {
   const server = useServer();

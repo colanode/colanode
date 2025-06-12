@@ -6,7 +6,7 @@ import { EventLoop } from '@colanode/client/lib/event-loop';
 import { mapServer } from '@colanode/client/lib/mappers';
 import { isServerOutdated } from '@colanode/client/lib/servers';
 import { AppService } from '@colanode/client/services/app-service';
-import { Server } from '@colanode/client/types/servers';
+import { Server, ServerAttributes } from '@colanode/client/types/servers';
 import { createDebugger, ServerConfig } from '@colanode/core';
 
 type ServerState = {
@@ -86,6 +86,18 @@ export class ServerService {
     );
 
     if (config) {
+      const attributes: ServerAttributes = {
+        ...this.server.attributes,
+        account: config.account?.google.enabled
+          ? {
+              google: {
+                enabled: config.account.google.enabled,
+                clientId: config.account.google.clientId,
+              },
+            }
+          : undefined,
+      };
+
       const updatedServer = await this.app.database
         .updateTable('servers')
         .returningAll()
@@ -94,6 +106,7 @@ export class ServerService {
           avatar: config.avatar,
           name: config.name,
           version: config.version,
+          attributes: JSON.stringify(attributes),
         })
         .where('domain', '=', this.server.domain)
         .executeTakeFirst();
@@ -101,6 +114,7 @@ export class ServerService {
       this.server.avatar = config.avatar;
       this.server.name = config.name;
       this.server.version = config.version;
+      this.server.attributes = attributes;
       this.isOutdated = isServerOutdated(config.version);
 
       if (updatedServer) {

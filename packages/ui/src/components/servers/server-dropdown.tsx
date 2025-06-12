@@ -15,8 +15,8 @@ import {
 } from '@colanode/ui/components/ui/dropdown-menu';
 
 interface ServerDropdownProps {
-  value: string | null;
-  onChange: (server: string) => void;
+  value: Server | null;
+  onChange: (server: Server) => void;
   servers: Server[];
   readonly?: boolean;
 }
@@ -31,8 +31,6 @@ export const ServerDropdown = ({
   const [openCreate, setOpenCreate] = useState(false);
   const [deleteDomain, setDeleteDomain] = useState<string | null>(null);
 
-  const server = servers.find((server) => server.domain === value);
-
   return (
     <Fragment>
       <DropdownMenu
@@ -45,21 +43,21 @@ export const ServerDropdown = ({
       >
         <DropdownMenuTrigger asChild>
           <div className="flex w-full flex-grow flex-row items-center gap-3 rounded-md border border-input p-2 cursor-pointer hover:bg-gray-100">
-            {server ? (
+            {value ? (
               <ServerAvatar
-                url={server.avatar}
-                name={server.name}
+                url={value.avatar}
+                name={value.name}
                 className="size-8 rounded-md"
               />
             ) : (
               <ServerOffIcon className="size-8 text-muted-foreground rounded-md" />
             )}
             <div className="flex-grow">
-              {server ? (
+              {value ? (
                 <Fragment>
-                  <p className="flex-grow font-semibold">{server.name}</p>
+                  <p className="flex-grow font-semibold">{value.name}</p>
                   <p className="text-xs text-muted-foreground">
-                    {server.domain}
+                    {value.domain}
                   </p>
                 </Fragment>
               ) : (
@@ -78,8 +76,8 @@ export const ServerDropdown = ({
               <DropdownMenuItem
                 key={server.domain}
                 onSelect={() => {
-                  if (value !== server.domain) {
-                    onChange(server.domain);
+                  if (value?.domain !== server.domain) {
+                    onChange(server);
                   }
                 }}
                 className="group/server flex w-full flex-grow flex-row items-center gap-3 rounded-md border-b border-input p-2 cursor-pointer hover:bg-gray-100"

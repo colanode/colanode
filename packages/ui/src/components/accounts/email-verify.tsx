@@ -14,7 +14,9 @@ import {
   FormMessage,
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
+import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useServer } from '@colanode/ui/contexts/server';
 import { useCountdown } from '@colanode/ui/hooks/use-countdown';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -23,19 +25,21 @@ const formSchema = z.object({
 });
 
 interface EmailVerifyProps {
-  server: string;
   id: string;
   expiresAt: Date;
   onSuccess: (output: LoginOutput) => void;
+  onBack: () => void;
 }
 
 export const EmailVerify = ({
-  server,
   id,
   expiresAt,
   onSuccess,
+  onBack,
 }: EmailVerifyProps) => {
+  const server = useServer();
   const { mutate, isPending } = useMutation();
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -55,7 +59,7 @@ export const EmailVerify = ({
       input: {
         type: 'email.verify',
         otp: values.otp,
-        server,
+        server: server.domain,
         id,
       },
       onSuccess(output) {
@@ -69,22 +73,25 @@ export const EmailVerify = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-3">
+      <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
           name="otp"
           render={({ field }) => (
-            <FormItem className="space-y-3">
-              <p className="text-sm text-muted-foreground w-full text-center">
-                Write the code you received in your email
-              </p>
+            <FormItem>
+              <Label htmlFor="otp">Code</Label>
               <FormControl>
-                <Input placeholder="Code" {...field} />
+                <Input placeholder="123456" {...field} />
               </FormControl>
               <FormMessage />
-              <p className="text-xs text-muted-foreground w-full text-center">
-                {formattedTime}
-              </p>
+              <div className="flex flex-col items-center gap-1">
+                <p className="text-sm text-muted-foreground w-full text-center">
+                  We sent a verification code to your email.
+                </p>
+                <p className="text-xs text-muted-foreground w-full text-center">
+                  {formattedTime}
+                </p>
+              </div>
             </FormItem>
           )}
         />
@@ -95,11 +102,19 @@ export const EmailVerify = ({
           disabled={isPending || remainingSeconds <= 0}
         >
           {isPending ? (
-            <Spinner className="mr-2 size-4" />
+            <Spinner className="mr-1 size-4" />
           ) : (
-            <Mail className="mr-2 size-4" />
+            <Mail className="mr-1 size-4" />
           )}
           Confirm
+        </Button>
+        <Button
+          variant="link"
+          className="w-full text-muted-foreground"
+          onClick={onBack}
+          type="button"
+        >
+          Back to login
         </Button>
       </form>
     </Form>

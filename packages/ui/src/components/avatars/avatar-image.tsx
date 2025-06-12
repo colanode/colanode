@@ -1,7 +1,7 @@
 import { useState } from 'react';
 
 import { AvatarFallback } from '@colanode/ui/components/avatars/avatar-fallback';
-import { useAccount } from '@colanode/ui/contexts';
+import { useAccount } from '@colanode/ui/contexts/account';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 import { AvatarProps, getAvatarSizeClasses } from '@colanode/ui/lib/avatars';
 import { cn } from '@colanode/ui/lib/utils';
