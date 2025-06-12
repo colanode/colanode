@@ -24,6 +24,11 @@ import { AccountAttributes } from '@colanode/server/types/accounts';
 
 const GoogleUserInfoUrl = 'https://www.googleapis.com/oauth2/v1/userinfo';
 const GoogleTokenUrl = 'https://oauth2.googleapis.com/token';
+
+// While implementing this I was getting significant latencies from Google responses
+// and I thought that was normal, therefore I set the timeout to 10 seconds.
+// Later that day, I realized that Google was experiencing a large outage (https://status.cloud.google.com/incidents/ow5i3PPK96RduMcb1SsW)
+// and now I decided to keep it at 10 seconds as a memory.
 const GoogleRequestTimeout = 1000 * 10;
 
 interface GoogleTokenResponse {
