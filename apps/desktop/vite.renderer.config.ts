@@ -2,6 +2,7 @@
 
 import path from 'path';
 
+import react from '@vitejs/plugin-react';
 import type { ConfigEnv, UserConfig } from 'vite';
 import { defineConfig } from 'vite';
 
@@ -20,7 +21,7 @@ export default defineConfig((env) => {
     build: {
       outDir: `.vite/renderer/${name}`,
     },
-    plugins: [pluginExposeRenderer(name)],
+    plugins: [react(), pluginExposeRenderer(name)],
     resolve: {
       alias: {
         '@colanode/desktop': path.resolve(__dirname, './src'),

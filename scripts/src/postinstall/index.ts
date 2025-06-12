@@ -74,6 +74,16 @@ const execute = () => {
     path.resolve(IMAGES_DIR, 'colanode-logo-black.png'),
     path.resolve(DESKTOP_ASSETS_DIR, 'colanode-logo-black.png')
   );
+
+  copyFile(
+    path.resolve(IMAGES_DIR, 'colanode-logo-black.ico'),
+    path.resolve(DESKTOP_ASSETS_DIR, 'colanode-logo-black.ico')
+  );
+
+  copyFile(
+    path.resolve(IMAGES_DIR, 'colanode-logo-black.icns'),
+    path.resolve(DESKTOP_ASSETS_DIR, 'colanode-logo-black.icns')
+  );
 };
 
 execute();
