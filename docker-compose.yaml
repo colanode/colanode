@@ -150,6 +150,7 @@ services:
       STORAGE_S3_SECRET_KEY: 'your_minio_password'
       STORAGE_S3_BUCKET: 'colanode-avatars'
       STORAGE_S3_REGION: 'us-east-1'
+      STORAGE_S3_FORCE_PATH_STYLE: 'true'
 
       # ───────────────────────────────────────────────────────────────
       # SMTP configuration
