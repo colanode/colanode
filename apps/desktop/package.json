@@ -39,6 +39,7 @@
     "@colanode/core": "*",
     "@colanode/ui": "*",
     "better-sqlite3": "^11.10.0",
+    "bufferutil": "^4.0.9",
     "electron-squirrel-startup": "^1.0.1",
     "update-electron-app": "^3.1.1",
     "utf-8-validate": "^6.0.5",
