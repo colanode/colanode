@@ -23,19 +23,40 @@ By consolidating emojis from [Emoji Mart](https://github.com/missive/emoji-mart)
 
 3. **Process & Generate**
 
-   - Initializes or updates an `emojis.db` SQLite database in `src/emojis/`.
+   The script creates two database files and an SVG sprite:
+
+   **Full Database (`emojis.db`)**:
+
+   - Initializes or updates an `emojis.db` SQLite database in `../assets/emojis/`.
    - Creates (or reuses) the following tables:
      - **categories** (stores category info like name, display order, etc.)
-     - **emojis** (stores each emoji’s core data, such as code, name, tags, emoticons, etc.)
-     - **emoji_svgs** (stores each emoji skin’s SVG image as a BLOB)
+     - **emojis** (stores each emoji's core data, such as code, name, tags, emoticons, etc.)
+     - **emoji_svgs** (stores each emoji skin's SVG image as a BLOB)
      - **emoji_search** (FTS table for search queries across emoji names, tags, etc.)
+   - Stores each emoji skin's SVG data as a BLOB in the `emoji_svgs` table.
+
+   **Minimal Database (`emojis.min.db`)**:
+
+   - Creates a lightweight version of the database without storing SVG data as BLOBs.
+   - Contains the same tables as the full database, except:
+     - **emoji_skins** (references emoji skins without storing SVG data)
+     - No `emoji_svgs` table (SVG data is available via the sprite instead)
+   - Used in web app for emoji listing and search, because of some browser limitations on using the full database.
+
+   **SVG Sprite (`emojis.svg`)**:
+
+   - Generates a comprehensive SVG sprite containing all emoji skins as symbols.
+   - Each emoji skin is accessible via its unique skin ID as a symbol reference.
+   - Used in web app for emoji rendering, because of some browser limitations on using the full database.
+
+   **Additional Processing**:
+
    - Merges any existing data so as not to overwrite or lose previously assigned IDs. This ensures emojis already in use retain consistent IDs in the Colanode app.
-   - Stores each emoji skin’s SVG data as a BLOB in a separate `emoji_svgs` table.
    - Maintains a full-text search (`emoji_search`) table for easy querying by name or tags.
 
 4. **Cleanup**
    - Removes the temporary working directory once processing is complete.
-   - Leaves you with a fully updated `emojis.db` containing all the emoji data and SVG images.
+   - Leaves you with updated `emojis.db`, `emojis.min.db`, and `emojis.svg` files containing all the emoji data and assets.
 
 ## Usage
 
@@ -51,11 +72,15 @@ By consolidating emojis from [Emoji Mart](https://github.com/missive/emoji-mart)
    npm run generate:emojis
    ```
 
-Once the script completes, you’ll have a fresh `emojis.db` file that contains all relevant emoji metadata (IDs, categories, tags, etc.) and their corresponding SVG assets.
+Once the script completes, you'll have:
+
+- A full `emojis.db` file with all emoji metadata and SVG data as BLOBs
+- A minimal `emojis.min.db` file with metadata only (no SVG BLOBs)
+- An `emojis.svg` sprite file containing all emoji graphics as symbols
 
 ## Notes on Licensing
 
 While **Colanode** is open source under its own [license terms](../../../LICENSE) (in the root of the monorepo), the emojis retrieved from **Emoji Mart** and **Twemoji** are subject to their respective licenses. Please review their repositories for details:
 
 - [missive/emoji-mart](https://github.com/missive/emoji-mart)
-- [jdecked/twemoji (originally Twitter’s Twemoji)](https://github.com/jdecked/twemoji)
+- [jdecked/twemoji (originally Twitter's Twemoji)](https://github.com/jdecked/twemoji)

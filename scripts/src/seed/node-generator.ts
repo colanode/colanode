@@ -1,3 +1,5 @@
+import { faker } from '@faker-js/faker';
+
 import {
   Block,
   generateId,
@@ -26,7 +28,6 @@ import {
   recordModel,
 } from '@colanode/core';
 import { encodeState, YDoc } from '@colanode/crdt';
-import { faker } from '@faker-js/faker';
 
 import { User } from './types';
 
@@ -881,7 +882,7 @@ export class NodeGenerator {
 
     return {
       id: generateId(IdType.Mutation),
-      type: 'create_node',
+      type: 'node.create',
       data: data,
       createdAt: new Date().toISOString(),
     };
@@ -906,7 +907,7 @@ export class NodeGenerator {
 
     return {
       id: generateId(IdType.Mutation),
-      type: 'update_document',
+      type: 'document.update',
       data: data,
       createdAt: new Date().toISOString(),
     };
