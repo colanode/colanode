@@ -17,9 +17,9 @@
     "coverage": "vitest run --coverage "
   },
   "devDependencies": {
-    "@tailwindcss/postcss": "^4.1.8",
+    "@tailwindcss/postcss": "^4.1.10",
     "@types/is-hotkey": "^0.1.10",
-    "@types/react": "^19.1.6",
+    "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
     "tailwindcss": "^4.1.8",
     "tw-animate-css": "^1.3.4"
@@ -44,7 +44,7 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@react-oauth/google": "^0.12.2",
-    "@tanstack/react-query": "^5.80.6",
+    "@tanstack/react-query": "^5.80.7",
     "@tanstack/react-virtual": "^3.13.10",
     "@tiptap/extension-blockquote": "^2.14.0",
     "@tiptap/extension-bold": "^2.14.0",
@@ -73,7 +73,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "is-hotkey": "^0.2.0",
-    "lucide-react": "^0.513.0",
+    "lucide-react": "^0.515.0",
     "re-resizable": "^6.11.2",
     "react": "^19.1.0",
     "react-day-picker": "^9.7.0",
@@ -83,9 +83,9 @@
     "react-hook-form": "^7.57.0",
     "react-intersection-observer": "^9.16.0",
     "sonner": "^2.0.5",
-    "tailwind-merge": "^3.3.0",
+    "tailwind-merge": "^3.3.1",
     "tiptap-extension-auto-joiner": "^0.1.3",
     "ts-pattern": "^5.7.1",
-    "zod": "^3.25.57"
+    "zod": "^3.25.64"
   }
 }

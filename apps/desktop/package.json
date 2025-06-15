@@ -8,6 +8,7 @@
   "main": ".vite/build/main.js",
   "scripts": {
     "dev": "DEBUG=colanode:* electron-forge start",
+    "dev:win": "set DEBUG=colanode:* & electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "publish": "electron-forge publish",
@@ -27,7 +28,7 @@
     "@electron-forge/publisher-github": "^7.8.1",
     "@electron/fuses": "^1.8.0",
     "@electron/rebuild": "^4.0.1",
-    "@tailwindcss/postcss": "^4.1.8",
+    "@tailwindcss/postcss": "^4.1.10",
     "@types/better-sqlite3": "^7.6.13",
     "@types/electron-squirrel-startup": "^1.0.2",
     "@vitejs/plugin-react": "^4.5.2",
