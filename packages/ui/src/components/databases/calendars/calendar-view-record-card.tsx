@@ -15,13 +15,13 @@ export const CalendarViewRecordCard = () => {
     <div
       role="presentation"
       key={record.id}
-      className="animate-fade-in flex justify-start items-start cursor-pointer flex-col gap-1 rounded-md border p-2 hover:bg-gray-50"
+      className="animate-fade-in flex justify-start items-start cursor-pointer flex-col gap-1 rounded-md border p-1 pl-2 hover:bg-gray-50"
       onClick={() => {
         layout.previewLeft(record.id, true);
       }}
     >
       <p className={hasName ? '' : 'text-muted-foreground'}>
-        {name ?? 'Unnamed'}
+        {hasName ? name : 'Unnamed'}
       </p>
       {view.fields.length > 0 && (
         <div className="flex flex-col gap-1 mt-2">

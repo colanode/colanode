@@ -10,27 +10,24 @@ import { cn } from '@colanode/ui/lib/utils';
 
 interface CalendarViewDayProps {
   date: Date;
-  month: Date;
   records: LocalRecordNode[];
+  isOutside: boolean;
   onCreate?: () => void;
 }
 
 export const CalendarViewDay = ({
   date,
-  month,
   records,
+  isOutside,
   onCreate,
 }: CalendarViewDayProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
 
   const isToday = isSameDay(date, new Date());
-  const dateMonth = date.getMonth();
-  const displayMonth = month.getMonth();
-  const isOutside = dateMonth !== displayMonth;
 
   return (
-    <div className="animate-fade-in group/calendar-day flex h-full w-full flex-col gap-1">
+    <div className="animate-fade-in group/calendar-day flex w-full flex-col gap-1 h-40 p-2 border-r first:border-l border-gray-100 overflow-auto">
       <div
         className={cn(
           'flex w-full justify-end text-sm',

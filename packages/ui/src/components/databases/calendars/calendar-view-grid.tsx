@@ -1,6 +1,6 @@
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
-import { DayPicker, DayProps } from 'react-day-picker';
+import { DayPicker, DayProps, getDefaultClassNames } from 'react-day-picker';
 
 import {
   FieldAttributes,
@@ -25,6 +25,8 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
   const view = useDatabaseView();
+
+  const defaultClassNames = getDefaultClassNames();
 
   const [month, setMonth] = useState(new Date());
   const { first, last } = getDisplayedDates(month);
@@ -57,29 +59,86 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
       onMonthChange={(month) => {
         setMonth(month);
       }}
+      formatters={{
+        formatMonthDropdown: (date) =>
+          date.toLocaleString('default', { month: 'short' }),
+      }}
       classNames={{
-        months:
-          'flex flex-col sm:flex-row space-y-4 sm:space-x-4 sm:space-y-0 w-full',
-        month: 'space-y-4 w-full',
-        caption: 'flex justify-center pt-1 relative items-center',
-        caption_label: 'text-sm font-medium',
-        nav: 'space-x-1 flex items-center',
-        nav_button: cn(
-          buttonVariants({ variant: 'outline' }),
-          'h-7 w-7 bg-transparent p-0 opacity-50 hover:opacity-100'
+        root: cn('w-full', defaultClassNames.root),
+        months: cn(
+          'flex gap-4 flex-col md:flex-row relative w-full',
+          defaultClassNames.months
         ),
-        nav_button_previous: 'absolute left-1',
-        nav_button_next: 'absolute right-1',
-        table: 'w-full border-collapse space-y-1',
-        head_row: 'flex flex-row mb-2',
-        head_cell:
-          'text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem]',
-        row: 'flex flex-row w-full border-b first:border-t',
-        cell: cn(
-          'relative flex-1 h-40 p-2 text-right text-sm focus-within:relative focus-within:z-20 [&:has([aria-selected])]:bg-accent',
-          '[&:has([aria-selected])]:rounded-md',
-          'border-r first:border-l border-gray-100 overflow-auto'
+        month: cn('flex flex-col w-full gap-4', defaultClassNames.month),
+        nav: cn(
+          'flex items-center gap-1 w-full absolute top-0 inset-x-0 justify-between',
+          defaultClassNames.nav
         ),
+        button_previous: cn(
+          buttonVariants({ variant: 'ghost' }),
+          'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none',
+          defaultClassNames.button_previous
+        ),
+        button_next: cn(
+          buttonVariants({ variant: 'ghost' }),
+          'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none',
+          defaultClassNames.button_next
+        ),
+        month_caption: cn(
+          'flex items-center justify-center h-(--cell-size) w-full px-(--cell-size)',
+          defaultClassNames.month_caption
+        ),
+        dropdowns: cn(
+          'w-full flex items-center text-sm font-medium justify-center h-(--cell-size) gap-1.5',
+          defaultClassNames.dropdowns
+        ),
+        dropdown_root: cn(
+          'relative has-focus:border-ring border border-input shadow-xs has-focus:ring-ring/50 has-focus:ring-[3px] rounded-md',
+          defaultClassNames.dropdown_root
+        ),
+        dropdown: cn('absolute inset-0 opacity-0', defaultClassNames.dropdown),
+        caption_label: cn(
+          'select-none font-medium',
+          'rounded-md pl-2 pr-1 flex items-center gap-1 text-sm h-8 [&>svg]:text-muted-foreground [&>svg]:size-3.5',
+          defaultClassNames.caption_label
+        ),
+        table: 'w-full border-collapse',
+        weekdays: cn('flex', defaultClassNames.weekdays),
+        weekday: cn(
+          'text-muted-foreground rounded-md flex-1 font-normal text-[0.8rem] select-none',
+          defaultClassNames.weekday
+        ),
+        week: cn(
+          'flex w-full mt-2 border-b first:border-t border-gray-100',
+          defaultClassNames.week
+        ),
+        week_number_header: cn(
+          'select-none w-(--cell-size)',
+          defaultClassNames.week_number_header
+        ),
+        week_number: cn(
+          'text-[0.8rem] select-none text-muted-foreground',
+          defaultClassNames.week_number
+        ),
+        range_start: cn(
+          'rounded-l-md bg-accent',
+          defaultClassNames.range_start
+        ),
+        range_middle: cn('rounded-none', defaultClassNames.range_middle),
+        range_end: cn('rounded-r-md bg-accent', defaultClassNames.range_end),
+        today: cn(
+          'bg-accent text-accent-foreground rounded-md data-[selected=true]:rounded-none',
+          defaultClassNames.today
+        ),
+        outside: cn(
+          'text-muted-foreground aria-selected:text-muted-foreground',
+          defaultClassNames.outside
+        ),
+        disabled: cn(
+          'text-muted-foreground opacity-50',
+          defaultClassNames.disabled
+        ),
+        hidden: cn('invisible', defaultClassNames.hidden),
       }}
       components={{
         Chevron: ({ className, orientation, ...props }) => {
@@ -126,9 +185,9 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
           return (
             <CalendarViewDay
               date={toUTCDate(props.day.date)}
-              month={props.day.displayMonth}
               records={dayRecords}
               onCreate={onCreate}
+              isOutside={props.day.outside}
             />
           );
         },
