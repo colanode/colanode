@@ -8,6 +8,9 @@ COPY package.json package-lock.json ./
 # Copy scripts
 COPY ../../scripts scripts
 
+# Copy assets
+COPY ../../assets assets
+
 # Copy all package.json files first
 COPY ../../packages/core/package.json packages/core/package.json
 COPY ../../packages/crdt/package.json packages/crdt/package.json
