@@ -36,7 +36,7 @@ export const SelectOptionSettingsPopover = ({
         open={openSetttingsPopover}
         onOpenChange={setOpenSetttingsPopover}
       >
-        <PopoverTrigger asChild>
+        <PopoverTrigger className="flex cursor-pointer items-center justify-center">
           <Ellipsis className="size-4" />
         </PopoverTrigger>
         <PopoverContent className="ml-1 flex w-72 flex-col gap-1 p-2 text-sm">
