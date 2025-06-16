@@ -130,7 +130,10 @@ export const FieldTypeSelect = ({ type, onChange }: FieldTypeSelectProps) => {
                   }}
                 >
                   <div className="flex w-full flex-row items-center gap-2">
-                    <FieldIcon type={fieldType.type} className="size-4" />
+                    <FieldIcon
+                      type={fieldType.type}
+                      className="size-4 text-foreground"
+                    />
                     <p>{fieldType.name}</p>
                     <Check
                       className={cn(
