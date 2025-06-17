@@ -6,7 +6,7 @@ import { useQuery } from '@colanode/ui/hooks/use-query';
 import { AvatarProps, getAvatarSizeClasses } from '@colanode/ui/lib/avatars';
 import { cn } from '@colanode/ui/lib/utils';
 
-export const AvatarImage = ({ avatar, size, className }: AvatarProps) => {
+export const AvatarImage = (props: AvatarProps) => {
   const account = useAccount();
   const [failed, setFailed] = useState(false);
 
@@ -14,30 +14,25 @@ export const AvatarImage = ({ avatar, size, className }: AvatarProps) => {
     {
       type: 'avatar.url.get',
       accountId: account.id,
-      avatarId: avatar!,
+      avatarId: props.avatar!,
     },
     {
-      enabled: !!avatar,
+      enabled: !!props.avatar,
     }
   );
 
-  if (!avatar) {
-    return null;
-  }
-
   const url = data?.url;
   if (failed || !url || isPending) {
-    const avatarSize = size || 'medium';
-    return <AvatarFallback id={avatar} size={avatarSize} className={className} />;
+    return <AvatarFallback {...props} />;
   }
 
   return (
     <img
       src={url}
       className={cn(
-        getAvatarSizeClasses(size),
+        getAvatarSizeClasses(props.size),
         'object-cover rounded',
-        className
+        props.className
       )}
       alt={'Custom Avatar'}
       onError={() => setFailed(true)}
