@@ -2,6 +2,7 @@ import { net } from 'electron';
 import path from 'path';
 
 import { app } from '@colanode/desktop/main/app-service';
+import { DesktopFileSystem } from '@colanode/desktop/main/file-system';
 
 export const handleAssetRequest = async (
   request: Request
@@ -56,7 +57,8 @@ export const handleAssetRequest = async (
 export const handleFileRequest = async (
   request: Request
 ): Promise<Response> => {
-  const url = request.url.replace('local-file://', '');
-  const fileUrl = `file://${url}`;
-  return net.fetch(fileUrl);
+  return net.fetch(`file://${DesktopFileSystem.win32PathPreUrl(
+      request.url.replace('local-file://', '')
+    )}`
+  );
 };

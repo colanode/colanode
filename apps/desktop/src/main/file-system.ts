@@ -1,4 +1,5 @@
 import fs from 'fs';
+import os from 'os';
 import { Writable } from 'stream';
 
 import {
@@ -57,6 +58,22 @@ export class DesktopFileSystem implements FileSystem {
   }
 
   public async url(path: string): Promise<string> {
-    return `local-file://${path}`;
+    return `local-file://${DesktopFileSystem.win32PathPreUrl(path)}`;
+  }
+
+  public static win32PathPreUrl(path: string): string {
+    if (os.platform() === 'win32') {
+      let urlPath = path;
+      let filePathPrefix = "";
+
+      urlPath = urlPath.replace(/\\/g, '/');
+      if (/^[a-zA-Z]:/.test(urlPath)) {
+        filePathPrefix = '/';
+      }
+
+      return `${filePathPrefix}${urlPath}`;
+    }
+
+    return path;
   }
 }
