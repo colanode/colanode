@@ -27,7 +27,8 @@ export const AvatarImage = ({ avatar, size, className }: AvatarProps) => {
 
   const url = data?.url;
   if (failed || !url || isPending) {
-    return <AvatarFallback id={avatar} size={size} className={className} />;
+    const avatarSize = size || 'medium';
+    return <AvatarFallback id={avatar} size={avatarSize} className={className} />;
   }
 
   return (
