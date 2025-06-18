@@ -1,6 +1,13 @@
-<p align="center">
-  <img alt="Colanode cover" src="assets/images/colanode-cover-black.png">
-</p>
+<div align="center">
+<img alt="Colanode cover" src="assets/images/colanode-cover-black.png">
+<p></p>
+<a target="_blank" href="https://opensource.org/licenses/Apache-2.0" style="background:none">
+    <img src="https://img.shields.io/badge/Licene-Apache_2.0-blue" style="height: 22px;" />
+</a>
+<a target="_blank" href="https://discord.gg/29fXUxAe" style="background:none">
+    <img alt="" src="https://img.shields.io/badge/Discord-Colanode-%235865F2" style="height: 22px;" />
+</a>
+</div>
 
 # Colanode
 
