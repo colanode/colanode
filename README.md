@@ -7,6 +7,9 @@
 <a target="_blank" href="https://discord.gg/29fXUxAe" style="background:none">
     <img alt="" src="https://img.shields.io/badge/Discord-Colanode-%235865F2" style="height: 22px;" />
 </a>
+<a href="https://x.com/colanode" target="_blank">
+  <img alt="" src="https://img.shields.io/twitter/follow/colanode.svg?style=social&label=Follow" style="height: 22px;" />
+</a>
 </div>
 
 # Colanode
