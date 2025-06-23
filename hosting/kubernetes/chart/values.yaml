@@ -110,7 +110,7 @@ colanode:
     # Core settings
     NODE_ENV: production
     PORT: 3000
-    SERVER_NAME: 'Colanode K8s'
+    SERVER_NAME: 'Colanode Kubernetes'
     SERVER_AVATAR: ''
     SERVER_MODE: 'standalone'
 
@@ -140,21 +140,13 @@ colanode:
     REDIS_JOBS_QUEUE_PREFIX: 'colanode'
     REDIS_EVENTS_CHANNEL: 'events'
 
-    # S3 storage for avatars
-    S3_AVATARS_ENDPOINT: 'http://{{ .Release.Name }}-minio:9000'
-    S3_AVATARS_ACCESS_KEY: 'minioadmin'
-    S3_AVATARS_SECRET_KEY: '$(MINIO_ROOT_PASSWORD)'
-    S3_AVATARS_BUCKET_NAME: 'colanode-avatars'
-    S3_AVATARS_REGION: 'us-east-1'
-    S3_AVATARS_FORCE_PATH_STYLE: 'true'
-
     # S3 storage for files
-    S3_FILES_ENDPOINT: 'http://{{ .Release.Name }}-minio:9000'
-    S3_FILES_ACCESS_KEY: 'minioadmin'
-    S3_FILES_SECRET_KEY: '$(MINIO_ROOT_PASSWORD)'
-    S3_FILES_BUCKET_NAME: 'colanode-files'
-    S3_FILES_REGION: 'us-east-1'
-    S3_FILES_FORCE_PATH_STYLE: 'true'
+    STORAGE_S3_ENDPOINT: 'http://{{ .Release.Name }}-minio:9000'
+    STORAGE_S3_ACCESS_KEY: 'minioadmin'
+    STORAGE_S3_SECRET_KEY: '$(MINIO_ROOT_PASSWORD)'
+    STORAGE_S3_BUCKET: 'colanode'
+    STORAGE_S3_REGION: 'us-east-1'
+    STORAGE_S3_FORCE_PATH_STYLE: 'true'
 
     # Email configuration
     SMTP_ENABLED: 'false'
@@ -180,7 +172,7 @@ postgresql:
   enabled: true
   image:
     registry: ghcr.io
-    repository: colanode/postgres-pgvector
+    repository: colanode/postgresql
     tag: '17'
     pullPolicy: Always
 
@@ -228,7 +220,7 @@ minio:
   service:
     type: ClusterIP
   # Create default buckets for Colanode
-  defaultBuckets: 'colanode-avatars,colanode-files'
+  defaultBuckets: 'colanode'
   extraArgs:
     - '--console-address'
     - ':9001'

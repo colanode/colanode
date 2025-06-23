@@ -1,10 +1,11 @@
-name: build-postgres-pgvector
+name: Build and push custom postgresql docker image
+
 on:
   push:
     branches: [main]
     paths:
-      - 'hosting/k8s/postgres-pgvector/**'
-      - '.github/workflows/build-pgvector-image.yml'
+      - 'hosting/postgresql/**'
+      - '.github/workflows/postgres-docker-build-and-push.yml'
 
 jobs:
   build:
@@ -20,9 +21,10 @@ jobs:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Build & push
         uses: docker/build-push-action@v5
         with:
-          context: ./hosting/k8s/postgres-pgvector
+          context: ./hosting/postgresql
           push: true
-          tags: ghcr.io/${{ github.repository_owner }}/postgres-pgvector:17
+          tags: ghcr.io/${{ github.repository_owner }}/postgresql:17

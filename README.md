@@ -44,14 +44,14 @@ Both cloud servers are currently available in beta and free to use; pricing deta
 
 ### Self-host with Docker
 
-If you prefer to host your own Colanode server, check out the [`hosting/`](hosting/) folder which contains the Docker Compose file and deployment configurations. For Kubernetes deployments, see the [`hosting/k8s/`](hosting/k8s/) folder which includes Helm charts and additional documentation. Here's what you need to run Colanode yourself:
+If you prefer to host your own Colanode server, check out the [`hosting/`](hosting/) folder which contains the Docker Compose file and deployment configurations. For Kubernetes deployments, see the [`hosting/kubernetes/`](hosting/kubernetes/) folder which includes Helm charts and additional documentation. Here's what you need to run Colanode yourself:
 
 - **Postgres** with the **pgvector** extension.
 - **Redis** (any Redis-compatible service will work, e.g., Valkey).
 - **S3-compatible storage** (supporting basic file operations: PUT, GET, DELETE).
 - **Colanode server API**, provided as a Docker image.
 
-All required environment variables for the Colanode server can be found in the [`hosting/docker-compose.yml`](hosting/docker-compose.yml) file or [`hosting/k8s/README.md`](hosting/k8s/README.md) for Kubernetes deployments.
+All required environment variables for the Colanode server can be found in the [`hosting/docker/docker-compose.yml`](hosting/docker/docker-compose.yml) file or [`hosting/kubernetes/README.md`](hosting/kubernetes/README.md) for Kubernetes deployments.
 
 ## License
 

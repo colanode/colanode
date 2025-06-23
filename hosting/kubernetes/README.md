@@ -23,20 +23,20 @@ This chart deploys a complete Colanode instance with all required dependencies:
 
 ```bash
 # Add the chart repository (if publishing to a Helm repo)
-helm repo add colanode https://static.colanode.com/colanode-static/hosting/charts
+helm repo add colanode https://static.colanode.com/hosting/kubernetes/chart
 
 # Install with default values
 helm install my-colanode colanode/colanode
 
 # Or install from local chart
-helm install my-colanode ./hosting/k8s/charts/colanode
+helm install my-colanode ./hosting/kubernetes/chart
 ```
 
 ### Custom Installation
 
 ```bash
 # Install with custom values
-helm install my-colanode ./hosting/k8s/charts/colanode \
+helm install my-colanode ./hosting/kubernetes/chart \
   --set colanode.ingress.hosts[0].host=colanode.example.com \
   --set colanode.config.SERVER_NAME="My Colanode Instance"
 ```
@@ -102,14 +102,6 @@ helm uninstall my-colanode
 
 To modify the chart:
 
-1. Edit values in `/hosting/k8s/charts/colanode/values.yaml`
-2. Update templates in `/hosting/k8s/charts/colanode/templates/`
+1. Edit values in `/hosting/kubernetes/chart/values.yaml`
+2. Update templates in `/hosting/kubernetes/chart/templates/`
 3. Test with `helm template` or `helm install --dry-run`
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit issues and pull requests.
-
-## License
-
-This project is open source. Please check the main Colanode repository for license details.
