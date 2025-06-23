@@ -21,6 +21,11 @@ import { createNodeEmbeddingsTable } from './00018-create-node-embeddings-table'
 import { createDocumentEmbeddingsTable } from './00019-create-document-embeddings-table';
 import { alterDevicesPlatformColumn } from './00020-alter-devices-platform-column';
 import { renameAccountAttributesColumn } from './00021-rename-account-attributes-column';
+import { createCountersTable } from './00022-create-counters-table';
+import { createWorkspaceUserCounterTriggers } from './00023-create-workspace-user-counter-triggers';
+import { createWorkspaceNodeCounterTriggers } from './00024-create-workspace-node-counter-triggers';
+import { createWorkspaceUploadCounterTriggers } from './00025-create-workspace-upload-counter-triggers';
+import { createUserUploadCounterTriggers } from './00026-create-user-upload-counter-triggers';
 
 export const databaseMigrations: Record<string, Migration> = {
   '00001_create_accounts_table': createAccountsTable,
@@ -44,4 +49,12 @@ export const databaseMigrations: Record<string, Migration> = {
   '00019_create_document_embeddings_table': createDocumentEmbeddingsTable,
   '00020_alter_devices_platform_column': alterDevicesPlatformColumn,
   '00021_rename_account_attributes_column': renameAccountAttributesColumn,
+  '00022_create_counters_table': createCountersTable,
+  '00023_create_workspace_user_counter_triggers':
+    createWorkspaceUserCounterTriggers,
+  '00024_create_workspace_node_counter_triggers':
+    createWorkspaceNodeCounterTriggers,
+  '00025_create_workspace_upload_counter_triggers':
+    createWorkspaceUploadCounterTriggers,
+  '00026_create_user_upload_counter_triggers': createUserUploadCounterTriggers,
 };

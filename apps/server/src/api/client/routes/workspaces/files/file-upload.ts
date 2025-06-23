@@ -13,6 +13,7 @@ import {
 import { database } from '@colanode/server/data/database';
 import { s3Client } from '@colanode/server/data/storage';
 import { config } from '@colanode/server/lib/config';
+import { fetchCounter } from '@colanode/server/lib/counters';
 import { buildFilePath } from '@colanode/server/lib/files';
 import { mapNode, updateNode } from '@colanode/server/lib/nodes';
 
@@ -87,16 +88,12 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const storageUsedRow = await database
-        .selectFrom('uploads')
-        .select(({ fn }) => [fn.sum('size').as('storage_used')])
-        .where('created_by', '=', request.user.id)
-        .executeTakeFirst();
+      const storageUsed = await fetchCounter(
+        database,
+        `${user.id}.storage.used`
+      );
 
-      const storageUsed = BigInt(storageUsedRow?.storage_used ?? 0);
-      const storageLimit = BigInt(user.storage_limit);
-
-      if (storageUsed >= storageLimit) {
+      if (storageUsed >= BigInt(user.storage_limit)) {
         return reply.code(400).send({
           code: ApiErrorCode.FileUploadInitFailed,
           message: 'You have reached the maximum storage limit.',

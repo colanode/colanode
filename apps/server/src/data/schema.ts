@@ -298,6 +298,13 @@ export type SelectDocumentEmbedding = Selectable<DocumentEmbeddingTable>;
 export type CreateDocumentEmbedding = Insertable<DocumentEmbeddingTable>;
 export type UpdateDocumentEmbedding = Updateable<DocumentEmbeddingTable>;
 
+interface CounterTable {
+  key: ColumnType<string, string, never>;
+  value: ColumnType<string, string, string>;
+  created_at: ColumnType<Date, Date, never>;
+  updated_at: ColumnType<Date | null, Date | null, Date | null>;
+}
+
 export interface DatabaseSchema {
   accounts: AccountTable;
   devices: DeviceTable;
@@ -315,4 +322,5 @@ export interface DatabaseSchema {
   uploads: UploadTable;
   node_embeddings: NodeEmbeddingTable;
   document_embeddings: DocumentEmbeddingTable;
+  counters: CounterTable;
 }
