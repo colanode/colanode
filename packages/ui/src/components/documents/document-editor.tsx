@@ -345,8 +345,6 @@ export const DocumentEditor = ({
     if (!result.success) {
       toast.error(result.error.message);
     }
-
-    console.log('undo', update);
   }, [node.id, editor]);
 
   const redo = useCallback(async () => {
@@ -381,8 +379,6 @@ export const DocumentEditor = ({
     if (!result.success) {
       toast.error(result.error.message);
     }
-
-    console.log('redo', update);
   }, [node.id, editor]);
 
   return (
