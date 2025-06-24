@@ -15,11 +15,18 @@ export const decodeState = (state: string) => {
   return toUint8Array(state);
 };
 
+const ORIGIN = 'this';
+
 export class YDoc {
   private readonly doc: Y.Doc;
+  private readonly undoManager: Y.UndoManager;
 
   constructor(state?: Uint8Array | string | Uint8Array[] | string[]) {
     this.doc = new Y.Doc();
+    this.undoManager = new Y.UndoManager(this.doc, {
+      trackedOrigins: new Set([ORIGIN]),
+    });
+
     if (state) {
       if (Array.isArray(state)) {
         for (const update of state) {
@@ -65,7 +72,7 @@ export class YDoc {
       if (!parseResult.success) {
         throw new Error('Invalid object', parseResult.error);
       }
-    });
+    }, ORIGIN);
 
     this.doc.off('update', onUpdateCallback);
 
@@ -80,6 +87,58 @@ export class YDoc {
     const update = updates[0];
     if (!update) {
       throw new Error('No update found');
+    }
+
+    return update;
+  }
+
+  public undo(): Uint8Array | null {
+    const updates: Uint8Array[] = [];
+    const onUpdateCallback: (update: Uint8Array) => void = (update) => {
+      updates.push(update);
+    };
+
+    this.doc.on('update', onUpdateCallback);
+    this.undoManager.undo();
+    this.doc.off('update', onUpdateCallback);
+
+    if (updates.length === 0) {
+      return null;
+    }
+
+    if (updates.length > 1) {
+      throw new Error('Invalid number of updates');
+    }
+
+    const update = updates[0];
+    if (!update) {
+      return null;
+    }
+
+    return update;
+  }
+
+  public redo(): Uint8Array | null {
+    const updates: Uint8Array[] = [];
+    const onUpdateCallback: (update: Uint8Array) => void = (update) => {
+      updates.push(update);
+    };
+
+    this.doc.on('update', onUpdateCallback);
+    this.undoManager.redo();
+    this.doc.off('update', onUpdateCallback);
+
+    if (updates.length === 0) {
+      return null;
+    }
+
+    if (updates.length > 1) {
+      throw new Error('Invalid number of updates');
+    }
+
+    const update = updates[0];
+    if (!update) {
+      return null;
     }
 
     return update;

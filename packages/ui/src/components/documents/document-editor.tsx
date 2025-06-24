@@ -7,7 +7,7 @@ import {
   useEditor,
 } from '@tiptap/react';
 import { debounce, isEqual } from 'lodash-es';
-import { Fragment, useEffect, useMemo, useRef } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -237,6 +237,23 @@ export const DocumentEditor = ({
             'prose-lg prose-stone dark:prose-invert prose-headings:font-title font-default focus:outline-none max-w-full',
           spellCheck: 'false',
         },
+        handleKeyDown: (_, event) => {
+          if (event.key === 'z' && event.metaKey && !event.shiftKey) {
+            event.preventDefault();
+            undo();
+            return true;
+          }
+          if (event.key === 'z' && event.metaKey && event.shiftKey) {
+            event.preventDefault();
+            redo();
+            return true;
+          }
+          if (event.key === 'y' && event.metaKey) {
+            event.preventDefault();
+            redo();
+            return true;
+          }
+        },
       },
       content: buildEditorContent(
         node.id,
@@ -272,15 +289,19 @@ export const DocumentEditor = ({
       return;
     }
 
-    const newYDoc = buildYDoc(state, updates);
-    const afterContent = newYDoc.getObject<RichTextContent>();
     const beforeContent = ydocRef.current.getObject<RichTextContent>();
+
+    ydocRef.current.applyUpdate(state.state);
+    for (const update of updates) {
+      ydocRef.current.applyUpdate(update.data);
+    }
+
+    const afterContent = ydocRef.current.getObject<RichTextContent>();
 
     if (isEqual(afterContent, beforeContent)) {
       return;
     }
 
-    ydocRef.current = newYDoc;
     const editorContent = buildEditorContent(node.id, afterContent);
     revisionRef.current = state.revision;
 
@@ -291,6 +312,78 @@ export const DocumentEditor = ({
       restoreRelativeSelection(editor, relativeSelection);
     }
   }, [state, updates, editor]);
+
+  const undo = useCallback(async () => {
+    if (!editor) {
+      return;
+    }
+
+    const beforeContent = ydocRef.current.getObject<RichTextContent>();
+    const update = ydocRef.current.undo();
+
+    if (!update) {
+      return;
+    }
+
+    const afterContent = ydocRef.current.getObject<RichTextContent>();
+
+    if (isEqual(beforeContent, afterContent)) {
+      return;
+    }
+
+    const editorContent = buildEditorContent(node.id, afterContent);
+    editor.chain().setContent(editorContent).run();
+
+    const result = await window.colanode.executeMutation({
+      type: 'document.update',
+      accountId: workspace.accountId,
+      workspaceId: workspace.id,
+      documentId: node.id,
+      update,
+    });
+
+    if (!result.success) {
+      toast.error(result.error.message);
+    }
+
+    console.log('undo', update);
+  }, [node.id, editor]);
+
+  const redo = useCallback(async () => {
+    if (!editor) {
+      return;
+    }
+
+    const beforeContent = ydocRef.current.getObject<RichTextContent>();
+    const update = ydocRef.current.redo();
+
+    if (!update) {
+      return;
+    }
+
+    const afterContent = ydocRef.current.getObject<RichTextContent>();
+
+    if (isEqual(beforeContent, afterContent)) {
+      return;
+    }
+
+    const editorContent = buildEditorContent(node.id, afterContent);
+    editor.chain().setContent(editorContent).run();
+
+    const result = await window.colanode.executeMutation({
+      type: 'document.update',
+      accountId: workspace.accountId,
+      workspaceId: workspace.id,
+      documentId: node.id,
+      update,
+    });
+
+    if (!result.success) {
+      toast.error(result.error.message);
+    }
+
+    console.log('redo', update);
+  }, [node.id, editor]);
 
   return (
     <div className="min-h-[500px]">
