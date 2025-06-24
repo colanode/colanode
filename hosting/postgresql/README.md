@@ -1,9 +1,9 @@
 # PostgreSQL with pgvector
 
-This directory contains a Dockerfile that builds a custom PostgreSQL image based on Bitnami's PostgreSQL image. The purpose of this custom image is for deploying PostgreSQL using Helm charts in Kubernetes environments.
+Custom PostgreSQL image with pgvector extension for Colanode's vector search capabilities.
 
-## Features
+## Why Custom Image?
 
-- **Base Image**: Built on Bitnami PostgreSQL for enhanced security and enterprise features
-- **pgvector Extension**: Integrated with pgvector extension for vector similarity search capabilities
-- **Helm Chart Ready**: Designed specifically for deployment via Helm charts in Kubernetes clusters
+The default Bitnami PostgreSQL image used by our Helm chart dependency doesn't include pgvector. This custom image builds on the same base image Bitnami uses but adds the pgvector extension.
+
+See the [Helm chart documentation](../kubernetes/README.md) for deployment details.

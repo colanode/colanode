@@ -42,7 +42,7 @@ For optimal performance, you can install our **desktop app**, available from our
 
 Both cloud servers are currently available in beta and free to use; pricing details will be announced soon.
 
-### Self-host with Docker
+### Self-host
 
 If you prefer to host your own Colanode server, check out the [`hosting/`](hosting/) folder which contains the Docker Compose file and deployment configurations. For Kubernetes deployments, see the [`hosting/kubernetes/`](hosting/kubernetes/) folder which includes Helm charts and additional documentation. Here's what you need to run Colanode yourself:
 

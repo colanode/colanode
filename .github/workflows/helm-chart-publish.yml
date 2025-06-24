@@ -44,7 +44,7 @@ jobs:
         working-directory: dist
         run: |
           helm repo index . \
-            --url "$S3_ENDPOINT/${{ secrets.S3_BUCKET }}/hosting/kubernetes/chart" \
+            --url "https://static.colanode.com/hosting/kubernetes/chart" \
             $(test -f index.yaml && echo "--merge index.yaml")
 
       - name: Upload chart and index to S3
