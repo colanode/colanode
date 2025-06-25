@@ -68,39 +68,6 @@ colanode:
   # -- Resource requests and limits (empty by default for flexibility)
   resources: {}
 
-  # -- Liveness probe configuration
-  livenessProbe:
-    httpGet:
-      path: /health
-      port: http
-    initialDelaySeconds: 20
-    periodSeconds: 10
-    timeoutSeconds: 5
-    failureThreshold: 3
-    successThreshold: 1
-
-  # -- Readiness probe configuration
-  readinessProbe:
-    httpGet:
-      path: /health
-      port: http
-    initialDelaySeconds: 20
-    periodSeconds: 10
-    timeoutSeconds: 5
-    failureThreshold: 2
-    successThreshold: 1
-
-  # -- Startup probe configuration - waits for dependencies to be ready
-  startupProbe:
-    httpGet:
-      path: /health
-      port: http
-    initialDelaySeconds: 30
-    periodSeconds: 10
-    timeoutSeconds: 5
-    failureThreshold: 12
-    successThreshold: 1
-
   # -- Horizontal Pod Autoscaler (disabled by default for simplicity)
   autoscaling:
     enabled: false

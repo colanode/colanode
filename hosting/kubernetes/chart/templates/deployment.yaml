@@ -38,11 +38,5 @@ spec:
               protocol: TCP
           env:
             {{- include "colanode.serverEnvVars" . | nindent 12 }}
-          startupProbe:
-            {{- toYaml .Values.colanode.startupProbe | nindent 12 }}
-          livenessProbe:
-            {{- toYaml .Values.colanode.livenessProbe | nindent 12 }}
-          readinessProbe:
-            {{- toYaml .Values.colanode.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.colanode.resources | nindent 12 }}
