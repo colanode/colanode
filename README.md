@@ -61,7 +61,7 @@ If you prefer to host your own Colanode server, check out the [`hosting/`](hosti
 - **S3-compatible storage** (supporting basic file operations: PUT, GET, DELETE).
 - **Colanode server API**, provided as a Docker image.
 
-All required environment variables for the Colanode server can be found in the [`hosting/docker/docker-compose.yml`](hosting/docker/docker-compose.yml) file or [`hosting/kubernetes/README.md`](hosting/kubernetes/README.md) for Kubernetes deployments.
+All required environment variables for the Colanode server can be found in the [`hosting/docker/docker-compose.yaml`](hosting/docker/docker-compose.yaml) file or [`hosting/kubernetes/README.md`](hosting/kubernetes/README.md) for Kubernetes deployments.
 
 ## License
 
