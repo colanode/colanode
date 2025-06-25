@@ -68,6 +68,42 @@ class JobService {
         }
       );
     }
+
+    if (config.jobs.nodeUpdatesMerge.enabled) {
+      this.jobQueue.upsertJobScheduler(
+        'node.updates.merge',
+        { pattern: config.jobs.nodeUpdatesMerge.cron },
+        {
+          name: 'node.updates.merge',
+          data: { type: 'node.updates.merge' } as JobInput,
+          opts: {
+            backoff: 3,
+            attempts: 3,
+            removeOnFail: 100,
+          },
+        }
+      );
+    } else {
+      this.jobQueue.removeJobScheduler('node.updates.merge');
+    }
+
+    if (config.jobs.documentUpdatesMerge.enabled) {
+      this.jobQueue.upsertJobScheduler(
+        'document.updates.merge',
+        { pattern: config.jobs.documentUpdatesMerge.cron },
+        {
+          name: 'document.updates.merge',
+          data: { type: 'document.updates.merge' } as JobInput,
+          opts: {
+            backoff: 3,
+            attempts: 3,
+            removeOnFail: 100,
+          },
+        }
+      );
+    } else {
+      this.jobQueue.removeJobScheduler('document.updates.merge');
+    }
   }
 
   public async initWorker() {

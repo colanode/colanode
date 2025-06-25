@@ -15,6 +15,10 @@ export const decodeState = (state: string) => {
   return toUint8Array(state);
 };
 
+export const mergeUpdates = (updates: Uint8Array[]) => {
+  return Y.mergeUpdates(updates);
+};
+
 const ORIGIN = 'this';
 
 export class YDoc {

@@ -2,6 +2,7 @@ import { z } from 'zod/v4';
 
 import { accountConfigSchema, readAccountConfigVariables } from './account';
 import { aiConfigSchema, readAiConfigVariables } from './ai';
+import { jobsConfigSchema, readJobsConfigVariables } from './jobs';
 import { postgresConfigSchema, readPostgresConfigVariables } from './postgres';
 import { readRedisConfigVariables, redisConfigSchema } from './redis';
 import { readServerConfigVariables, serverConfigSchema } from './server';
@@ -18,6 +19,7 @@ const configSchema = z.object({
   storage: storageConfigSchema,
   smtp: smtpConfigSchema,
   ai: aiConfigSchema,
+  jobs: jobsConfigSchema,
 });
 
 export type Configuration = z.infer<typeof configSchema>;
@@ -33,6 +35,7 @@ const readConfigVariables = (): Configuration => {
       storage: readStorageConfigVariables(),
       smtp: readSmtpConfigVariables(),
       ai: readAiConfigVariables(),
+      jobs: readJobsConfigVariables(),
     };
 
     return configSchema.parse(input);
