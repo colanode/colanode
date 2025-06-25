@@ -17,9 +17,9 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.10",
-    "@vitejs/plugin-react": "^4.5.1",
+    "@vitejs/plugin-react": "^4.6.0",
     "tailwindcss": "^4.1.8",
-    "vite": "^6.3.5",
+    "vite": "^7.0.0",
     "vite-plugin-pwa": "^1.0.0"
   }
 }

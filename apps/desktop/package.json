@@ -31,15 +31,15 @@
     "@tailwindcss/postcss": "^4.1.10",
     "@types/better-sqlite3": "^7.6.13",
     "@types/electron-squirrel-startup": "^1.0.2",
-    "@vitejs/plugin-react": "^4.5.2",
-    "electron": "^36.4.0",
-    "vite": "^6.3.5"
+    "@vitejs/plugin-react": "^4.6.0",
+    "electron": "^37.0.0",
+    "vite": "^7.0.0"
   },
   "dependencies": {
     "@colanode/client": "*",
     "@colanode/core": "*",
     "@colanode/ui": "*",
-    "better-sqlite3": "^11.10.0",
+    "better-sqlite3": "^12.1.1",
     "bufferutil": "^4.0.9",
     "electron-squirrel-startup": "^1.0.1",
     "update-electron-app": "^3.1.1",

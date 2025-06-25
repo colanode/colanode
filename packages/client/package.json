@@ -25,7 +25,7 @@
   },
   "dependencies": {
     "@tiptap/core": "^2.14.0",
-    "@tiptap/pm": "^2.14.0",
+    "@tiptap/pm": "^2.22.3",
     "async-lock": "^1.4.1",
     "file-type": "^21.0.0",
     "isomorphic-ws": "^5.0.0",
