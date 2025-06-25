@@ -1,4 +1,4 @@
-name: Build and push custom postgresql docker image
+name: Hosting - Build and push custom Postgresql docker image
 
 on:
   push:

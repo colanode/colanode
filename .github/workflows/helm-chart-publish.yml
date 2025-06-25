@@ -1,4 +1,4 @@
-name: Publish Helm chart to static.colanode.com
+name: Hosting - Publish Helm chart to static.colanode.com
 
 on:
   push:
