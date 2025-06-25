@@ -19,6 +19,7 @@ export const WorkspaceUserInvite = ({
 
   const [input, setInput] = useState('');
   const [emails, setEmails] = useState<string[]>([]);
+  const isInputValidEmail = isValidEmail(input);
 
   return (
     <div className="flex flex-col space-y-2">
@@ -49,7 +50,7 @@ export const WorkspaceUserInvite = ({
           <input
             value={input}
             className="flex-grow px-1 focus-visible:outline-none"
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => setInput(e.target.value.trim())}
             placeholder="Enter email addresses"
             onKeyUp={(e) => {
               if (e.key === 'Enter') {
@@ -74,16 +75,21 @@ export const WorkspaceUserInvite = ({
         <Button
           variant="outline"
           className="w-32"
-          disabled={isPending || emails.length == 0}
+          disabled={isPending || (emails.length == 0 && !isInputValidEmail)}
           onClick={() => {
             if (isPending) {
               return;
             }
 
+            const emailsToInvite = [...emails];
+            if (isInputValidEmail && !emails.includes(input)) {
+              emailsToInvite.push(input);
+            }
+
             mutate({
               input: {
                 type: 'users.create',
-                users: emails.map((email) => ({
+                users: emailsToInvite.map((email) => ({
                   email,
                   role: 'collaborator',
                 })),
