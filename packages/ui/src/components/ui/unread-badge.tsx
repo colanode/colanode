@@ -15,7 +15,7 @@ export const UnreadBadge = ({ count, unread, className }: UnreadBadgeProps) => {
     return (
       <span
         className={cn(
-          'mr-1 rounded-md px-1 py-0.5 text-xs bg-red-400 text-white',
+          'rounded-md px-1.5 py-0.5 text-xs bg-red-400 text-white',
           className
         )}
       >

@@ -17,35 +17,37 @@ export const WorkspaceCreate = ({
   const { mutate, isPending } = useMutation();
 
   return (
-    <div className="container flex flex-row justify-center">
-      <div className="w-full max-w-[700px]">
-        <div className="flex flex-row justify-center py-8">
-          <h1 className="text-center text-4xl font-bold leading-tight tracking-tighter lg:leading-[1.1]">
-            Setup your workspace
-          </h1>
+    <div className="flex flex-row justify-center w-full">
+      <div className="container flex flex-row justify-center">
+        <div className="w-full max-w-[700px]">
+          <div className="flex flex-row justify-center py-8">
+            <h1 className="text-center text-4xl font-bold leading-tight tracking-tighter lg:leading-[1.1]">
+              Setup your workspace
+            </h1>
+          </div>
+          <WorkspaceForm
+            onSubmit={(values) => {
+              mutate({
+                input: {
+                  type: 'workspace.create',
+                  name: values.name,
+                  description: values.description,
+                  accountId: account.id,
+                  avatar: values.avatar ?? null,
+                },
+                onSuccess(output) {
+                  onSuccess(output.id);
+                },
+                onError(error) {
+                  toast.error(error.message);
+                },
+              });
+            }}
+            isSaving={isPending}
+            onCancel={onCancel}
+            saveText="Create"
+          />
         </div>
-        <WorkspaceForm
-          onSubmit={(values) => {
-            mutate({
-              input: {
-                type: 'workspace.create',
-                name: values.name,
-                description: values.description,
-                accountId: account.id,
-                avatar: values.avatar ?? null,
-              },
-              onSuccess(output) {
-                onSuccess(output.id);
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
-            });
-          }}
-          isSaving={isPending}
-          onCancel={onCancel}
-          saveText="Create"
-        />
       </div>
     </div>
   );

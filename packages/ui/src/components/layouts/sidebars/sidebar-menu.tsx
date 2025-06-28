@@ -5,6 +5,8 @@ import { SidebarMenuFooter } from '@colanode/ui/components/layouts/sidebars/side
 import { SidebarMenuHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-header';
 import { SidebarMenuIcon } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-icon';
 import { useApp } from '@colanode/ui/contexts/app';
+import { useRadar } from '@colanode/ui/contexts/radar';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 interface SidebarMenuProps {
   value: SidebarMenuType;
@@ -13,9 +15,18 @@ interface SidebarMenuProps {
 
 export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
   const app = useApp();
+  const workspace = useWorkspace();
+  const radar = useRadar();
+
   const platform = app.getMetadata('platform');
   const windowSize = app.getMetadata('window.size');
   const showMacOsPlaceholder = platform === 'darwin' && !windowSize?.fullscreen;
+
+  const chatsState = radar.getChatsState(workspace.accountId, workspace.id);
+  const channelsState = radar.getChannelsState(
+    workspace.accountId,
+    workspace.id
+  );
 
   return (
     <div className="flex flex-col h-full w-[65px] min-w-[65px] items-center bg-slate-100">
@@ -36,6 +47,7 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
             onChange('chats');
           }}
           isActive={value === 'chats'}
+          unreadState={chatsState}
         />
         <SidebarMenuIcon
           icon={LayoutGrid}
@@ -43,6 +55,7 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
             onChange('spaces');
           }}
           isActive={value === 'spaces'}
+          unreadState={channelsState}
         />
       </div>
       <SidebarMenuFooter />

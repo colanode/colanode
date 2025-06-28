@@ -13,6 +13,8 @@ interface RadarContext {
     workspaceId: string,
     nodeId: string
   ) => UnreadState;
+  getChatsState: (accountId: string, workspaceId: string) => UnreadState;
+  getChannelsState: (accountId: string, workspaceId: string) => UnreadState;
   markNodeAsSeen: (
     accountId: string,
     workspaceId: string,
