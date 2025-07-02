@@ -1,11 +1,12 @@
-import { match } from 'ts-pattern';
+import { useEffect } from 'react';
 
-import { LocalFileNode } from '@colanode/client/types';
-import { FileDownload } from '@colanode/ui/components/files/file-download';
+import { DownloadStatus, LocalFileNode } from '@colanode/client/types';
+import { FileDownloadProgress } from '@colanode/ui/components/files/file-download-progress';
+import { FileNoPreview } from '@colanode/ui/components/files/file-no-preview';
 import { FilePreviewImage } from '@colanode/ui/components/files/previews/file-preview-image';
-import { FilePreviewOther } from '@colanode/ui/components/files/previews/file-preview-other';
 import { FilePreviewVideo } from '@colanode/ui/components/files/previews/file-preview-video';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface FilePreviewProps {
@@ -14,6 +15,7 @@ interface FilePreviewProps {
 
 export const FilePreview = ({ file }: FilePreviewProps) => {
   const workspace = useWorkspace();
+  const mutation = useMutation();
 
   const fileStateQuery = useQuery({
     type: 'file.state.get',
@@ -22,37 +24,56 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
     workspaceId: workspace.id,
   });
 
-  const shouldFetchFileUrl = fileStateQuery.data?.downloadProgress === 100;
+  const isDownloading =
+    fileStateQuery.data?.downloadStatus === DownloadStatus.Pending;
+  const isDownloaded =
+    fileStateQuery.data?.downloadStatus === DownloadStatus.Completed;
 
-  const fileUrlGetQuery = useQuery(
-    {
-      type: 'file.url.get',
-      id: file.id,
-      extension: file.attributes.extension,
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
-    },
-    {
-      enabled: shouldFetchFileUrl,
+  useEffect(() => {
+    if (!fileStateQuery.isPending && !isDownloaded && !isDownloading) {
+      mutation.mutate({
+        input: {
+          type: 'file.download',
+          accountId: workspace.accountId,
+          workspaceId: workspace.id,
+          fileId: file.id,
+          path: null,
+        },
+        onError: (error) => {
+          console.error('Failed to start file download:', error.message);
+        },
+      });
     }
-  );
+  }, [
+    fileStateQuery.isPending,
+    isDownloaded,
+    isDownloading,
+    mutation,
+    workspace.accountId,
+    workspace.id,
+    file.id,
+  ]);
 
-  if (
-    fileStateQuery.isPending ||
-    (shouldFetchFileUrl && fileUrlGetQuery.isPending)
-  ) {
+  if (fileStateQuery.isPending) {
     return null;
   }
 
-  const url = fileUrlGetQuery.data?.url;
-  if (fileStateQuery.data?.downloadProgress !== 100 || !url) {
-    return <FileDownload file={file} state={fileStateQuery.data} />;
+  if (isDownloading) {
+    return <FileDownloadProgress state={fileStateQuery.data} />;
   }
 
-  return match(file.attributes.subtype)
-    .with('image', () => (
-      <FilePreviewImage url={url} name={file.attributes.name} />
-    ))
-    .with('video', () => <FilePreviewVideo url={url} />)
-    .otherwise(() => <FilePreviewOther mimeType={file.attributes.mimeType} />);
+  const url = fileStateQuery.data?.url;
+  if (!url) {
+    return <FileNoPreview mimeType={file.attributes.mimeType} />;
+  }
+
+  if (file.attributes.subtype === 'image') {
+    return <FilePreviewImage url={url} name={file.attributes.name} />;
+  }
+
+  if (file.attributes.subtype === 'video') {
+    return <FilePreviewVideo url={url} />;
+  }
+
+  return <FileNoPreview mimeType={file.attributes.mimeType} />;
 };

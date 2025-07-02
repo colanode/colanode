@@ -1,3 +1,4 @@
+import { LocalFileNode } from '@colanode/client/types';
 import { FileSubtype } from '@colanode/core';
 
 export type OpenFileDialogOptions = {
@@ -29,6 +30,7 @@ export type FileState = {
   uploadRetries: number | null;
   uploadStartedAt: string | null;
   uploadCompletedAt: string | null;
+  url: string | null;
 };
 
 export enum DownloadStatus {
@@ -44,3 +46,19 @@ export enum UploadStatus {
   Completed = 2,
   Failed = 3,
 }
+
+export enum SaveStatus {
+  Active = 1,
+  Completed = 2,
+  Failed = 3,
+}
+
+export type FileSaveState = {
+  id: string;
+  file: LocalFileNode;
+  status: SaveStatus;
+  startedAt: string;
+  completedAt: string | null;
+  path: string;
+  progress: number;
+};

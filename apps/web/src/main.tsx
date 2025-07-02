@@ -40,6 +40,10 @@ const initializeApp = async () => {
     openExternalUrl: async (url) => {
       window.open(url, '_blank');
     },
+    showItemInFolder: async () => {
+      // No-op on web
+    },
+    showFileSaveDialog: async () => undefined,
   };
 
   window.eventBus = eventBus;

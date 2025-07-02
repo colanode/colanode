@@ -1,9 +1,10 @@
 import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
-import { mapFileState } from '@colanode/client/lib/mappers';
+import { mapFileState, mapNode } from '@colanode/client/lib/mappers';
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
 import { FileStateGetQueryInput } from '@colanode/client/queries/files/file-state-get';
+import { LocalFileNode } from '@colanode/client/types';
 import { Event } from '@colanode/client/types/events';
-import { FileState } from '@colanode/client/types/files';
+import { DownloadStatus, FileState } from '@colanode/client/types/files';
 
 export class FileStateGetQueryHandler
   extends WorkspaceQueryHandlerBase
@@ -79,6 +80,17 @@ export class FileStateGetQueryHandler
   ): Promise<FileState | null> {
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
 
+    const node = await workspace.database
+      .selectFrom('nodes')
+      .selectAll()
+      .where('id', '=', input.id)
+      .executeTakeFirst();
+
+    if (!node) {
+      return null;
+    }
+
+    const file = mapNode(node) as LocalFileNode;
     const fileState = await workspace.database
       .selectFrom('file_states')
       .selectAll()
@@ -89,6 +101,21 @@ export class FileStateGetQueryHandler
       return null;
     }
 
-    return mapFileState(fileState);
+    let url: string | null = null;
+    if (fileState.download_status === DownloadStatus.Completed) {
+      const filePath = this.app.path.workspaceFile(
+        input.accountId,
+        input.workspaceId,
+        input.id,
+        file.attributes.extension
+      );
+
+      const exists = await this.app.fs.exists(filePath);
+      if (exists) {
+        url = await this.app.fs.url(filePath);
+      }
+    }
+
+    return mapFileState(fileState, url);
   }
 }

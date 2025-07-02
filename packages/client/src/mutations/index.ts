@@ -32,7 +32,7 @@ export * from './documents/document-update';
 export * from './files/file-create';
 export * from './files/file-delete';
 export * from './files/file-download';
-export * from './files/file-save-temp';
+export * from './files/file-save';
 export * from './folders/folder-create';
 export * from './folders/folder-delete';
 export * from './folders/folder-update';

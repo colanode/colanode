@@ -8,6 +8,7 @@ import { getIdType, IdType } from '@colanode/core';
 import { ChannelContainerTab } from '@colanode/ui/components/channels/channel-container-tab';
 import { ChatContainerTab } from '@colanode/ui/components/chats/chat-container-tab';
 import { DatabaseContainerTab } from '@colanode/ui/components/databases/database-container-tab';
+import { DownloadsContainerTab } from '@colanode/ui/components/downloads/downloads-container-tab';
 import { FileContainerTab } from '@colanode/ui/components/files/file-container-tab';
 import { FolderContainerTab } from '@colanode/ui/components/folders/folder-container-tab';
 import { MessageContainerTab } from '@colanode/ui/components/messages/message-container-tab';
@@ -23,6 +24,31 @@ interface ContainerTabTriggerProps {
   onOpen: () => void;
   onMove: (before: string | null) => void;
 }
+
+const ContainerTabTriggerContent = ({ tab }: { tab: ContainerTab }) => {
+  if (tab.path === 'downloads') {
+    return <DownloadsContainerTab />;
+  }
+
+  return match(getIdType(tab.path))
+    .with(IdType.Space, () => <SpaceContainerTab spaceId={tab.path} />)
+    .with(IdType.Channel, () => (
+      <ChannelContainerTab
+        channelId={tab.path}
+        isActive={tab.active ?? false}
+      />
+    ))
+    .with(IdType.Page, () => <PageContainerTab pageId={tab.path} />)
+    .with(IdType.Database, () => <DatabaseContainerTab databaseId={tab.path} />)
+    .with(IdType.Record, () => <RecordContainerTab recordId={tab.path} />)
+    .with(IdType.Chat, () => (
+      <ChatContainerTab chatId={tab.path} isActive={tab.active ?? false} />
+    ))
+    .with(IdType.Folder, () => <FolderContainerTab folderId={tab.path} />)
+    .with(IdType.File, () => <FileContainerTab fileId={tab.path} />)
+    .with(IdType.Message, () => <MessageContainerTab messageId={tab.path} />)
+    .otherwise(() => null);
+};
 
 export const ContainerTabTrigger = ({
   tab,
@@ -83,34 +109,10 @@ export const ContainerTabTrigger = ({
           onOpen();
         }
       }}
-      ref={dragDropRef as React.LegacyRef<HTMLButtonElement>}
+      ref={dragDropRef as React.RefAttributes<HTMLButtonElement>['ref']}
     >
       <div className="overflow-hidden truncate">
-        {match(getIdType(tab.path))
-          .with(IdType.Space, () => <SpaceContainerTab spaceId={tab.path} />)
-          .with(IdType.Channel, () => (
-            <ChannelContainerTab
-              channelId={tab.path}
-              isActive={tab.active ?? false}
-            />
-          ))
-          .with(IdType.Page, () => <PageContainerTab pageId={tab.path} />)
-          .with(IdType.Database, () => (
-            <DatabaseContainerTab databaseId={tab.path} />
-          ))
-          .with(IdType.Record, () => <RecordContainerTab recordId={tab.path} />)
-          .with(IdType.Chat, () => (
-            <ChatContainerTab
-              chatId={tab.path}
-              isActive={tab.active ?? false}
-            />
-          ))
-          .with(IdType.Folder, () => <FolderContainerTab folderId={tab.path} />)
-          .with(IdType.File, () => <FileContainerTab fileId={tab.path} />)
-          .with(IdType.Message, () => (
-            <MessageContainerTab messageId={tab.path} />
-          ))
-          .otherwise(() => null)}
+        <ContainerTabTriggerContent tab={tab} />
       </div>
       <div
         className="opacity-0 group-hover/tab:opacity-100 group-data-[state=active]/tab:opacity-100 transition-opacity duration-200 flex-shrink-0 cursor-pointer"

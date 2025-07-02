@@ -187,7 +187,10 @@ export const mapNodeInteraction = (
   };
 };
 
-export const mapFileState = (row: SelectFileState): FileState => {
+export const mapFileState = (
+  row: SelectFileState,
+  url: string | null
+): FileState => {
   return {
     id: row.id,
     version: row.version,
@@ -201,6 +204,7 @@ export const mapFileState = (row: SelectFileState): FileState => {
     uploadRetries: row.upload_retries,
     uploadStartedAt: row.upload_started_at,
     uploadCompletedAt: row.upload_completed_at,
+    url,
   };
 };
 

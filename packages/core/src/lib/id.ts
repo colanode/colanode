@@ -40,6 +40,7 @@ export enum IdType {
   Window = 'wi',
   TempFile = 'tf',
   Socket = 'sk',
+  Save = 'sv',
 }
 
 export const generateId = (type: IdType): string => {

@@ -4,8 +4,8 @@ import { X } from 'lucide-react';
 import { match } from 'ts-pattern';
 
 import { TempFile } from '@colanode/client/types';
+import { FileNoPreview } from '@colanode/ui/components/files/file-no-preview';
 import { FilePreviewImage } from '@colanode/ui/components/files/previews/file-preview-image';
-import { FilePreviewOther } from '@colanode/ui/components/files/previews/file-preview-other';
 import { FilePreviewVideo } from '@colanode/ui/components/files/previews/file-preview-video';
 
 export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
@@ -34,8 +34,9 @@ export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
         {match(type)
           .with('image', () => <FilePreviewImage url={file.url} name={name} />)
           .with('video', () => <FilePreviewVideo url={file.url} />)
-          .with('other', () => <FilePreviewOther mimeType={mimeType} />)
-          .otherwise(() => null)}
+          .otherwise(() => (
+            <FileNoPreview mimeType={mimeType} />
+          ))}
       </div>
     </NodeViewWrapper>
   );

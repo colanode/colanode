@@ -5,6 +5,7 @@ import {
   protocol,
   shell,
   globalShortcut,
+  dialog,
 } from 'electron';
 
 import started from 'electron-squirrel-startup';
@@ -251,3 +252,22 @@ ipcMain.handle(
 ipcMain.handle('open-external-url', (_, url: string) => {
   shell.openExternal(url);
 });
+
+ipcMain.handle('show-item-in-folder', (_, path: string) => {
+  shell.showItemInFolder(path);
+});
+
+ipcMain.handle(
+  'show-file-save-dialog',
+  async (_, { name }: { name: string }) => {
+    const result = await dialog.showSaveDialog({
+      defaultPath: name,
+    });
+
+    if (result.canceled) {
+      return undefined;
+    }
+
+    return result.filePath;
+  }
+);

@@ -19,29 +19,14 @@ export const FileThumbnail = ({ file, className }: FileThumbnailProps) => {
     workspaceId: workspace.id,
   });
 
-  const fileUrlGetQuery = useQuery(
-    {
-      type: 'file.url.get',
-      id: file.id,
-      extension: file.attributes.extension,
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
-    },
-    {
-      enabled: fileStateGetQuery.data?.downloadProgress === 100,
-    }
-  );
-
-  const url = fileUrlGetQuery.data?.url;
-
   if (
     file.attributes.subtype === 'image' &&
     fileStateGetQuery.data?.downloadProgress === 100 &&
-    url
+    fileStateGetQuery.data?.url
   ) {
     return (
       <img
-        src={url}
+        src={fileStateGetQuery.data?.url}
         alt={file.attributes.name}
         className={cn('object-contain object-center', className)}
       />

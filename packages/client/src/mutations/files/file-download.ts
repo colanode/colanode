@@ -3,6 +3,7 @@ export type FileDownloadMutationInput = {
   accountId: string;
   workspaceId: string;
   fileId: string;
+  path: string | null;
 };
 
 export type FileDownloadMutationOutput = {

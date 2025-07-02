@@ -55,6 +55,14 @@ contextBridge.exposeInMainWorld('colanode', {
   openExternalUrl: async (url: string) => {
     return ipcRenderer.invoke('open-external-url', url);
   },
+
+  showItemInFolder: async (path: string) => {
+    return ipcRenderer.invoke('show-item-in-folder', path);
+  },
+
+  showFileSaveDialog: async ({ name }: { name: string }) => {
+    return ipcRenderer.invoke('show-file-save-dialog', { name });
+  },
 });
 
 contextBridge.exposeInMainWorld('eventBus', {

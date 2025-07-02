@@ -90,7 +90,7 @@ export class FileDownloadMutationHandler
       type: 'file.state.updated',
       accountId: workspace.accountId,
       workspaceId: workspace.id,
-      fileState: mapFileState(updatedFileState),
+      fileState: mapFileState(updatedFileState, null),
     });
 
     return {
