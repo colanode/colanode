@@ -18,7 +18,6 @@ interface PageContainerProps {
 
 export const PageContainer = ({ pageId }: PageContainerProps) => {
   const data = useNodeContainer<LocalPageNode>(pageId);
-
   useNodeRadar(data.node);
 
   if (data.isPending) {

@@ -10,6 +10,7 @@ import {
   ContainerSettings,
 } from '@colanode/ui/components/ui/container';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
+import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
 
 interface FileContainerProps {
   fileId: string;
@@ -17,6 +18,7 @@ interface FileContainerProps {
 
 export const FileContainer = ({ fileId }: FileContainerProps) => {
   const data = useNodeContainer<LocalFileNode>(fileId);
+  useNodeRadar(data.node);
 
   if (data.isPending) {
     return null;

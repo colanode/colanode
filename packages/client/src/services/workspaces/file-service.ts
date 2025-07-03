@@ -68,9 +68,9 @@ export class FileService {
     );
 
     this.cleanupEventLoop = new EventLoop(
-      ms('10 minutes'),
       ms('5 minutes'),
-      this.cleanDeletedFiles.bind(this)
+      ms('1 minute'),
+      this.cleanupFiles.bind(this)
     );
 
     this.uploadsEventLoop.start();
@@ -562,38 +562,6 @@ export class FileService {
     }
   }
 
-  public async cleanDeletedFiles(): Promise<void> {
-    debug(`Checking deleted files for workspace ${this.workspace.id}`);
-
-    const fsFiles = await this.app.fs.listFiles(this.filesDir);
-    while (fsFiles.length > 0) {
-      const batch = fsFiles.splice(0, 100);
-      const fileIdMap: Record<string, string> = {};
-
-      for (const file of batch) {
-        const id = this.app.path.filename(file);
-        fileIdMap[id] = file;
-      }
-
-      const fileIds = Object.keys(fileIdMap);
-      const fileStates = await this.workspace.database
-        .selectFrom('file_states')
-        .select(['id'])
-        .where('id', 'in', fileIds)
-        .execute();
-
-      for (const fileId of fileIds) {
-        const fileState = fileStates.find((f) => f.id === fileId);
-        if (fileState) {
-          continue;
-        }
-
-        const filePath = this.app.path.join(this.filesDir, fileIdMap[fileId]!);
-        await this.app.fs.delete(filePath);
-      }
-    }
-  }
-
   private buildFilePath(id: string, extension: string): string {
     return this.app.path.join(this.filesDir, `${id}${extension}`);
   }
@@ -688,6 +656,175 @@ export class FileService {
         workspaceId: this.workspace.id,
         fileSave: save,
       });
+    }
+  }
+
+  private async cleanupFiles(): Promise<void> {
+    await this.cleanDeletedFiles();
+    await this.cleanOldDownloadedFiles();
+  }
+
+  private async cleanDeletedFiles(): Promise<void> {
+    debug(`Checking deleted files for workspace ${this.workspace.id}`);
+
+    const fsFiles = await this.app.fs.listFiles(this.filesDir);
+    while (fsFiles.length > 0) {
+      const batch = fsFiles.splice(0, 100);
+      const fileIdMap: Record<string, string> = {};
+
+      for (const file of batch) {
+        const id = this.app.path.filename(file);
+        fileIdMap[id] = file;
+      }
+
+      const fileIds = Object.keys(fileIdMap);
+      const fileStates = await this.workspace.database
+        .selectFrom('file_states')
+        .select(['id'])
+        .where('id', 'in', fileIds)
+        .execute();
+
+      for (const fileId of fileIds) {
+        const fileState = fileStates.find((f) => f.id === fileId);
+        if (fileState) {
+          continue;
+        }
+
+        const filePath = this.app.path.join(this.filesDir, fileIdMap[fileId]!);
+        await this.app.fs.delete(filePath);
+      }
+    }
+  }
+
+  private async cleanOldDownloadedFiles(): Promise<void> {
+    debug(`Cleaning old downloaded files for workspace ${this.workspace.id}`);
+
+    const sevenDaysAgo = new Date(Date.now() - ms('7 days')).toISOString();
+    let lastId = '';
+    const batchSize = 100;
+
+    let hasMoreFiles = true;
+    while (hasMoreFiles) {
+      let query = this.workspace.database
+        .selectFrom('file_states')
+        .select(['id', 'upload_status', 'download_completed_at'])
+        .where('download_status', '=', DownloadStatus.Completed)
+        .where('download_progress', '=', 100)
+        .where('download_completed_at', '<', sevenDaysAgo)
+        .orderBy('id', 'asc')
+        .limit(batchSize);
+
+      if (lastId) {
+        query = query.where('id', '>', lastId);
+      }
+
+      const fileStates = await query.execute();
+
+      if (fileStates.length === 0) {
+        hasMoreFiles = false;
+        continue;
+      }
+
+      const fileIds = fileStates.map((f) => f.id);
+
+      const fileInteractions = await this.workspace.database
+        .selectFrom('node_interactions')
+        .select(['node_id', 'last_opened_at'])
+        .where('node_id', 'in', fileIds)
+        .where('collaborator_id', '=', this.workspace.userId)
+        .execute();
+
+      const nodes = await this.workspace.database
+        .selectFrom('nodes')
+        .select(['id', 'attributes'])
+        .where('id', 'in', fileIds)
+        .execute();
+
+      const interactionMap = new Map(
+        fileInteractions.map((fi) => [fi.node_id, fi.last_opened_at])
+      );
+      const nodeMap = new Map(nodes.map((n) => [n.id, n.attributes]));
+
+      for (const fileState of fileStates) {
+        try {
+          const lastOpenedAt = interactionMap.get(fileState.id);
+          const shouldDelete = !lastOpenedAt || lastOpenedAt < sevenDaysAgo;
+
+          if (!shouldDelete) {
+            continue;
+          }
+
+          const nodeAttributes = nodeMap.get(fileState.id);
+          if (!nodeAttributes) {
+            continue;
+          }
+
+          const attributes = JSON.parse(nodeAttributes);
+          if (attributes.type !== 'file' || !attributes.extension) {
+            continue;
+          }
+
+          const filePath = this.buildFilePath(
+            fileState.id,
+            attributes.extension
+          );
+
+          const exists = await this.app.fs.exists(filePath);
+          if (!exists) {
+            continue;
+          }
+
+          debug(`Deleting old downloaded file: ${fileState.id}`);
+          await this.app.fs.delete(filePath);
+
+          if (
+            fileState.upload_status !== null &&
+            fileState.upload_status !== UploadStatus.None
+          ) {
+            const updatedFileState = await this.workspace.database
+              .updateTable('file_states')
+              .returningAll()
+              .set({
+                download_status: DownloadStatus.None,
+                download_progress: 0,
+                download_completed_at: null,
+              })
+              .where('id', '=', fileState.id)
+              .executeTakeFirst();
+
+            if (updatedFileState) {
+              eventBus.publish({
+                type: 'file.state.updated',
+                accountId: this.workspace.accountId,
+                workspaceId: this.workspace.id,
+                fileState: mapFileState(updatedFileState, null),
+              });
+            }
+          } else {
+            const deleted = await this.workspace.database
+              .deleteFrom('file_states')
+              .returningAll()
+              .where('id', '=', fileState.id)
+              .executeTakeFirst();
+
+            if (deleted) {
+              eventBus.publish({
+                type: 'file.state.deleted',
+                accountId: this.workspace.accountId,
+                workspaceId: this.workspace.id,
+                fileId: fileState.id,
+              });
+            }
+          }
+        } catch {
+          continue;
+        }
+      }
+
+      lastId = fileStates[fileStates.length - 1]!.id;
+      if (fileStates.length < batchSize) {
+        hasMoreFiles = false;
+      }
     }
   }
 }

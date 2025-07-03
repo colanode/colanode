@@ -4,7 +4,7 @@ import { Node } from '@colanode/core';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
-export const useNodeRadar = (node: Node | null) => {
+export const useNodeRadar = (node: Node | null | undefined) => {
   const workspace = useWorkspace();
   const radar = useRadar();
 

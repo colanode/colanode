@@ -46,6 +46,18 @@ export class FileStateGetQueryHandler
     }
 
     if (
+      event.type === 'file.state.deleted' &&
+      event.accountId === input.accountId &&
+      event.workspaceId === input.workspaceId &&
+      event.fileId === input.id
+    ) {
+      return {
+        hasChanges: true,
+        result: null,
+      };
+    }
+
+    if (
       event.type === 'node.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&

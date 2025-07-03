@@ -91,6 +91,13 @@ export type FileStateUpdatedEvent = {
   fileState: FileState;
 };
 
+export type FileStateDeletedEvent = {
+  type: 'file.state.deleted';
+  accountId: string;
+  workspaceId: string;
+  fileId: string;
+};
+
 export type FileSaveUpdatedEvent = {
   type: 'file.save.updated';
   accountId: string;
@@ -316,6 +323,7 @@ export type Event =
   | ServerDeletedEvent
   | ServerAvailabilityChangedEvent
   | FileStateUpdatedEvent
+  | FileStateDeletedEvent
   | FileSaveUpdatedEvent
   | QueryResultUpdatedEvent
   | RadarDataUpdatedEvent
