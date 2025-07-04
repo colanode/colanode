@@ -28,22 +28,22 @@
     "@electron-forge/publisher-github": "^7.8.1",
     "@electron/fuses": "^1.8.0",
     "@electron/rebuild": "^4.0.1",
-    "@tailwindcss/postcss": "^4.1.10",
+    "@tailwindcss/postcss": "^4.1.11",
     "@types/better-sqlite3": "^7.6.13",
     "@types/electron-squirrel-startup": "^1.0.2",
     "@vitejs/plugin-react": "^4.6.0",
-    "electron": "^37.0.0",
-    "vite": "^7.0.0"
+    "electron": "^37.2.0",
+    "vite": "^7.0.2"
   },
   "dependencies": {
     "@colanode/client": "*",
     "@colanode/core": "*",
     "@colanode/ui": "*",
-    "better-sqlite3": "^12.1.1",
+    "better-sqlite3": "^12.2.0",
     "bufferutil": "^4.0.9",
     "electron-squirrel-startup": "^1.0.1",
     "update-electron-app": "^3.1.1",
     "utf-8-validate": "^6.0.5",
-    "ws": "^8.18.2"
+    "ws": "^8.18.3"
   }
 }
