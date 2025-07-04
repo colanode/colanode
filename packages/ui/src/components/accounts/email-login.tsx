@@ -103,6 +103,7 @@ export const EmailLogin = ({
                   type="password"
                   {...field}
                   autoComplete="current-password"
+                  placeholder="********"
                 />
               </FormControl>
               <FormMessage />

@@ -117,7 +117,12 @@ export const EmailRegister = ({ onSuccess, onLogin }: EmailRegisterProps) => {
             <FormItem>
               <Label htmlFor="password">Password</Label>
               <FormControl>
-                <Input type="password" {...field} autoComplete="new-password" />
+                <Input
+                  type="password"
+                  {...field}
+                  autoComplete="new-password"
+                  placeholder="********"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>

@@ -113,7 +113,12 @@ export const EmailPasswordResetComplete = ({
             <FormItem>
               <Label htmlFor="password">New Password</Label>
               <FormControl>
-                <Input type="password" {...field} autoComplete="new-password" />
+                <Input
+                  type="password"
+                  {...field}
+                  autoComplete="new-password"
+                  placeholder="********"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -126,7 +131,12 @@ export const EmailPasswordResetComplete = ({
             <FormItem>
               <Label htmlFor="confirmPassword">Confirm New Password</Label>
               <FormControl>
-                <Input type="password" {...field} autoComplete="new-password" />
+                <Input
+                  type="password"
+                  {...field}
+                  autoComplete="new-password"
+                  placeholder="********"
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
