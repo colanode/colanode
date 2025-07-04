@@ -63,6 +63,60 @@ If you prefer to host your own Colanode server, check out the [`hosting/`](hosti
 
 All required environment variables for the Colanode server can be found in the [`hosting/docker/docker-compose.yaml`](hosting/docker/docker-compose.yaml) file or [`hosting/kubernetes/README.md`](hosting/kubernetes/README.md) for Kubernetes deployments.
 
+### Running locally
+
+To run Colanode locally in development mode:
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/colanode/colanode.git
+   cd colanode
+   ```
+
+2. Install dependencies at the project root:
+
+   ```bash
+   npm install
+   ```
+
+3. Start the apps you want to run locally:
+
+   **Server**
+
+   ```bash
+   cd apps/server
+
+   # Copy the environment variable template and adjust values as needed
+   cp .env.example .env
+
+   npm run dev
+   ```
+
+   To spin up the local dependencies (Postgres, Redis, Minio & Mail server) with Docker Compose, run this from
+   the project root:
+
+   ```bash
+   docker compose -f hosting/docker/docker-compose.yaml up -d
+   ```
+
+   The compose file includes a `server` service. When you want to run the API locally with `npm run dev`, comment
+   out (or override) that service so only the supporting services are started.
+
+   **Web**
+
+   ```bash
+   cd apps/web
+   npm run dev
+   ```
+
+   **Desktop**
+
+   ```bash
+   cd apps/desktop
+   npm run dev
+   ```
+
 ## License
 
 Colanode is released under the [Apache 2.0 License](LICENSE).
