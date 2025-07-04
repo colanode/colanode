@@ -3,6 +3,7 @@ import { useEffect } from 'react';
 import { DownloadStatus, LocalFileNode } from '@colanode/client/types';
 import { FileDownloadProgress } from '@colanode/ui/components/files/file-download-progress';
 import { FileNoPreview } from '@colanode/ui/components/files/file-no-preview';
+import { FilePreviewAudio } from '@colanode/ui/components/files/previews/file-preview-audio';
 import { FilePreviewImage } from '@colanode/ui/components/files/previews/file-preview-image';
 import { FilePreviewVideo } from '@colanode/ui/components/files/previews/file-preview-video';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -73,6 +74,10 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
 
   if (file.attributes.subtype === 'video') {
     return <FilePreviewVideo url={url} />;
+  }
+
+  if (file.attributes.subtype === 'audio') {
+    return <FilePreviewAudio url={url} name={file.attributes.name} />;
   }
 
   return <FileNoPreview mimeType={file.attributes.mimeType} />;

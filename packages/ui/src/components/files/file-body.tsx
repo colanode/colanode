@@ -10,7 +10,9 @@ interface FileBodyProps {
 
 export const FileBody = ({ file }: FileBodyProps) => {
   const canPreview =
-    file.attributes.subtype === 'image' || file.attributes.subtype === 'video';
+    file.attributes.subtype === 'image' ||
+    file.attributes.subtype === 'video' ||
+    file.attributes.subtype === 'audio';
 
   return (
     <div className="flex h-full max-h-full w-full flex-row items-center gap-2">
