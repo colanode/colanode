@@ -1,5 +1,7 @@
+import { Type } from 'lucide-react';
 import { useState } from 'react';
 
+import { SpecialId } from '@colanode/core';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import {
   Command,
@@ -35,6 +37,10 @@ export const ViewFilterAddPopover = ({
       )
   );
 
+  const isFilteredByName = view.filters.some(
+    (filter) => filter.type === 'field' && filter.fieldId === SpecialId.Name
+  );
+
   if (fieldsWithoutFilters.length === 0) {
     return null;
   }
@@ -48,6 +54,20 @@ export const ViewFilterAddPopover = ({
           <CommandEmpty>No field found.</CommandEmpty>
           <CommandList>
             <CommandGroup className="h-min">
+              {!isFilteredByName && (
+                <CommandItem
+                  key={SpecialId.Name}
+                  onSelect={() => {
+                    view.initFieldFilter(SpecialId.Name);
+                    setOpen(false);
+                  }}
+                >
+                  <div className="flex w-full flex-row items-center gap-2">
+                    <Type className="size-4" />
+                    <p>{database.nameField?.name ?? 'Name'}</p>
+                  </div>
+                </CommandItem>
+              )}
               {fieldsWithoutFilters.map((field) => (
                 <CommandItem
                   key={field.id}

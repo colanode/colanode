@@ -24,7 +24,22 @@ import {
   DatabaseViewFilterAttributes,
   DatabaseViewSortAttributes,
   MultiSelectFieldAttributes,
+  SpecialId,
 } from '@colanode/core';
+
+type SqliteOperator =
+  | '='
+  | '!='
+  | '>'
+  | '<'
+  | '>='
+  | '<='
+  | 'LIKE'
+  | 'NOT LIKE'
+  | 'IS'
+  | 'IS NOT'
+  | 'IN'
+  | 'NOT IN';
 
 export class RecordListQueryHandler
   extends WorkspaceQueryHandlerBase
@@ -214,6 +229,10 @@ export class RecordListQueryHandler
       return null;
     }
 
+    if (filter.fieldId === SpecialId.Name) {
+      return this.buildNameFilterQuery(filter);
+    }
+
     const field = fields[filter.fieldId];
     if (!field) {
       return null;
@@ -251,16 +270,62 @@ export class RecordListQueryHandler
     }
   };
 
+  private buildNameFilterQuery = (
+    filter: DatabaseViewFieldFilterAttributes
+  ): string | null => {
+    if (filter.operator === 'is_empty') {
+      return this.buildAttributeFilterQuery('name', 'IS', 'NULL');
+    }
+
+    if (filter.operator === 'is_not_empty') {
+      return this.buildAttributeFilterQuery('name', 'IS NOT', 'NULL');
+    }
+
+    if (filter.value === null) {
+      return null;
+    }
+
+    if (typeof filter.value !== 'string') {
+      return null;
+    }
+
+    const value = filter.value as string;
+    if (!value || value.length === 0) {
+      return null;
+    }
+
+    switch (filter.operator) {
+      case 'is_equal_to':
+        return this.buildAttributeFilterQuery('name', '=', `'${value}'`);
+      case 'is_not_equal_to':
+        return this.buildAttributeFilterQuery('name', '!=', `'${value}'`);
+      case 'contains':
+        return this.buildAttributeFilterQuery('name', 'LIKE', `'%${value}%'`);
+      case 'does_not_contain':
+        return this.buildAttributeFilterQuery(
+          'name',
+          'NOT LIKE',
+          `'%${value}%'`
+        );
+      case 'starts_with':
+        return this.buildAttributeFilterQuery('name', 'LIKE', `'${value}%'`);
+      case 'ends_with':
+        return this.buildAttributeFilterQuery('name', 'LIKE', `'%${value}'`);
+      default:
+        return null;
+    }
+  };
+
   private buildBooleanFilterQuery = (
     filter: DatabaseViewFieldFilterAttributes,
     field: BooleanFieldAttributes
   ): string | null => {
     if (filter.operator === 'is_true') {
-      return `json_extract(n.attributes, '$.fields.${field.id}.value') = true`;
+      return this.buildFieldFilterQuery(field.id, '=', 'true');
     }
 
     if (filter.operator === 'is_false') {
-      return `(json_extract(n.attributes, '$.fields.${field.id}.value') = false OR json_extract(n.attributes, '$.fields.${field.id}.value') IS NULL)`;
+      return `(${this.buildFieldFilterQuery(field.id, '=', 'false')} OR ${this.buildFieldFilterQuery(field.id, 'IS', 'NULL')})`;
     }
 
     return null;
@@ -271,11 +336,11 @@ export class RecordListQueryHandler
     field: NumberFieldAttributes
   ): string | null => {
     if (filter.operator === 'is_empty') {
-      return this.buildIsEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS', 'NULL');
     }
 
     if (filter.operator === 'is_not_empty') {
-      return this.buildIsNotEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS NOT', 'NULL');
     }
 
     if (filter.value === null) {
@@ -287,36 +352,26 @@ export class RecordListQueryHandler
     }
 
     const value = filter.value as number;
-    let operator: string | null;
-
-    switch (filter.operator) {
-      case 'is_equal_to':
-        operator = '=';
-        break;
-      case 'is_not_equal_to':
-        operator = '!=';
-        break;
-      case 'is_greater_than':
-        operator = '>';
-        break;
-      case 'is_less_than':
-        operator = '<';
-        break;
-      case 'is_greater_than_or_equal_to':
-        operator = '>=';
-        break;
-      case 'is_less_than_or_equal_to':
-        operator = '<=';
-        break;
-      default:
-        return null;
-    }
-
-    if (operator === null) {
+    if (isNaN(value)) {
       return null;
     }
 
-    return `json_extract(n.attributes, '$.fields.${field.id}.value') ${operator} ${value}`;
+    switch (filter.operator) {
+      case 'is_equal_to':
+        return this.buildFieldFilterQuery(field.id, '=', value.toString());
+      case 'is_not_equal_to':
+        return this.buildFieldFilterQuery(field.id, '!=', value.toString());
+      case 'is_greater_than':
+        return this.buildFieldFilterQuery(field.id, '>', value.toString());
+      case 'is_less_than':
+        return this.buildFieldFilterQuery(field.id, '<', value.toString());
+      case 'is_greater_than_or_equal_to':
+        return this.buildFieldFilterQuery(field.id, '>=', value.toString());
+      case 'is_less_than_or_equal_to':
+        return this.buildFieldFilterQuery(field.id, '<=', value.toString());
+      default:
+        return null;
+    }
   };
 
   private buildTextFilterQuery = (
@@ -324,11 +379,11 @@ export class RecordListQueryHandler
     field: TextFieldAttributes
   ): string | null => {
     if (filter.operator === 'is_empty') {
-      return this.buildIsEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS', 'NULL');
     }
 
     if (filter.operator === 'is_not_empty') {
-      return this.buildIsNotEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS NOT', 'NULL');
     }
 
     if (filter.value === null) {
@@ -340,41 +395,26 @@ export class RecordListQueryHandler
     }
 
     const value = filter.value as string;
-    let operator: string | null;
-    let formattedValue = value;
-
-    switch (filter.operator) {
-      case 'is_equal_to':
-        operator = '=';
-        break;
-      case 'is_not_equal_to':
-        operator = '!=';
-        break;
-      case 'contains':
-        operator = 'LIKE';
-        formattedValue = `%${value}%`;
-        break;
-      case 'does_not_contain':
-        operator = 'NOT LIKE';
-        formattedValue = `%${value}%`;
-        break;
-      case 'starts_with':
-        operator = 'LIKE';
-        formattedValue = `${value}%`;
-        break;
-      case 'ends_with':
-        operator = 'LIKE';
-        formattedValue = `%${value}`;
-        break;
-      default:
-        return null;
-    }
-
-    if (operator === null) {
+    if (!value || value.length === 0) {
       return null;
     }
 
-    return `json_extract(n.attributes, '$.fields.${field.id}.value') ${operator} '${formattedValue}'`;
+    switch (filter.operator) {
+      case 'is_equal_to':
+        return this.buildFieldFilterQuery(field.id, '=', `'${value}'`);
+      case 'is_not_equal_to':
+        return this.buildFieldFilterQuery(field.id, '!=', `'${value}'`);
+      case 'contains':
+        return this.buildFieldFilterQuery(field.id, 'LIKE', `'%${value}%'`);
+      case 'does_not_contain':
+        return this.buildFieldFilterQuery(field.id, 'NOT LIKE', `'%${value}%'`);
+      case 'starts_with':
+        return this.buildFieldFilterQuery(field.id, 'LIKE', `'${value}%'`);
+      case 'ends_with':
+        return this.buildFieldFilterQuery(field.id, 'LIKE', `'%${value}'`);
+      default:
+        return null;
+    }
   };
 
   private buildEmailFilterQuery = (
@@ -382,11 +422,11 @@ export class RecordListQueryHandler
     field: EmailFieldAttributes
   ): string | null => {
     if (filter.operator === 'is_empty') {
-      return this.buildIsEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS', 'NULL');
     }
 
     if (filter.operator === 'is_not_empty') {
-      return this.buildIsNotEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS NOT', 'NULL');
     }
 
     if (filter.value === null) {
@@ -398,41 +438,26 @@ export class RecordListQueryHandler
     }
 
     const value = filter.value as string;
-    let operator: string | null;
-    let formattedValue = value;
-
-    switch (filter.operator) {
-      case 'is_equal_to':
-        operator = '=';
-        break;
-      case 'is_not_equal_to':
-        operator = '!=';
-        break;
-      case 'contains':
-        operator = 'LIKE';
-        formattedValue = `%${value}%`;
-        break;
-      case 'does_not_contain':
-        operator = 'NOT LIKE';
-        formattedValue = `%${value}%`;
-        break;
-      case 'starts_with':
-        operator = 'LIKE';
-        formattedValue = `${value}%`;
-        break;
-      case 'ends_with':
-        operator = 'LIKE';
-        formattedValue = `%${value}`;
-        break;
-      default:
-        return null;
-    }
-
-    if (operator === null) {
+    if (!value || value.length === 0) {
       return null;
     }
 
-    return `json_extract(n.attributes, '$.fields.${field.id}.value') ${operator} '${formattedValue}'`;
+    switch (filter.operator) {
+      case 'is_equal_to':
+        return this.buildFieldFilterQuery(field.id, '=', `'${value}'`);
+      case 'is_not_equal_to':
+        return this.buildFieldFilterQuery(field.id, '!=', `'${value}'`);
+      case 'contains':
+        return this.buildFieldFilterQuery(field.id, 'LIKE', `'%${value}%'`);
+      case 'does_not_contain':
+        return this.buildFieldFilterQuery(field.id, 'NOT LIKE', `'%${value}%'`);
+      case 'starts_with':
+        return this.buildFieldFilterQuery(field.id, 'LIKE', `'${value}%'`);
+      case 'ends_with':
+        return this.buildFieldFilterQuery(field.id, 'LIKE', `'%${value}'`);
+      default:
+        return null;
+    }
   };
 
   private buildPhoneFilterQuery = (
@@ -440,11 +465,11 @@ export class RecordListQueryHandler
     field: PhoneFieldAttributes
   ): string | null => {
     if (filter.operator === 'is_empty') {
-      return this.buildIsEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS', 'NULL');
     }
 
     if (filter.operator === 'is_not_empty') {
-      return this.buildIsNotEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS NOT', 'NULL');
     }
 
     if (filter.value === null) {
@@ -456,41 +481,26 @@ export class RecordListQueryHandler
     }
 
     const value = filter.value as string;
-    let operator: string | null;
-    let formattedValue = value;
-
-    switch (filter.operator) {
-      case 'is_equal_to':
-        operator = '=';
-        break;
-      case 'is_not_equal_to':
-        operator = '!=';
-        break;
-      case 'contains':
-        operator = 'LIKE';
-        formattedValue = `%${value}%`;
-        break;
-      case 'does_not_contain':
-        operator = 'NOT LIKE';
-        formattedValue = `%${value}%`;
-        break;
-      case 'starts_with':
-        operator = 'LIKE';
-        formattedValue = `${value}%`;
-        break;
-      case 'ends_with':
-        operator = 'LIKE';
-        formattedValue = `%${value}`;
-        break;
-      default:
-        return null;
-    }
-
-    if (operator === null) {
+    if (!value || value.length === 0) {
       return null;
     }
 
-    return `json_extract(n.attributes, '$.fields.${field.id}.value') ${operator} '${formattedValue}'`;
+    switch (filter.operator) {
+      case 'is_equal_to':
+        return this.buildFieldFilterQuery(field.id, '=', `'${value}'`);
+      case 'is_not_equal_to':
+        return this.buildFieldFilterQuery(field.id, '!=', `'${value}'`);
+      case 'contains':
+        return this.buildFieldFilterQuery(field.id, 'LIKE', `'%${value}%'`);
+      case 'does_not_contain':
+        return this.buildFieldFilterQuery(field.id, 'NOT LIKE', `'%${value}%'`);
+      case 'starts_with':
+        return this.buildFieldFilterQuery(field.id, 'LIKE', `'${value}%'`);
+      case 'ends_with':
+        return this.buildFieldFilterQuery(field.id, 'LIKE', `'%${value}'`);
+      default:
+        return null;
+    }
   };
 
   private buildUrlFilterQuery = (
@@ -498,11 +508,11 @@ export class RecordListQueryHandler
     field: UrlFieldAttributes
   ): string | null => {
     if (filter.operator === 'is_empty') {
-      return this.buildIsEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS', 'NULL');
     }
 
     if (filter.operator === 'is_not_empty') {
-      return this.buildIsNotEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS NOT', 'NULL');
     }
 
     if (filter.value === null) {
@@ -514,41 +524,26 @@ export class RecordListQueryHandler
     }
 
     const value = filter.value as string;
-    let operator: string | null;
-    let formattedValue = value;
-
-    switch (filter.operator) {
-      case 'is_equal_to':
-        operator = '=';
-        break;
-      case 'is_not_equal_to':
-        operator = '!=';
-        break;
-      case 'contains':
-        operator = 'LIKE';
-        formattedValue = `%${value}%`;
-        break;
-      case 'does_not_contain':
-        operator = 'NOT LIKE';
-        formattedValue = `%${value}%`;
-        break;
-      case 'starts_with':
-        operator = 'LIKE';
-        formattedValue = `${value}%`;
-        break;
-      case 'ends_with':
-        operator = 'LIKE';
-        formattedValue = `%${value}`;
-        break;
-      default:
-        return null;
-    }
-
-    if (operator === null) {
+    if (!value || value.length === 0) {
       return null;
     }
 
-    return `json_extract(n.attributes, '$.fields.${field.id}.value') ${operator} '${formattedValue}'`;
+    switch (filter.operator) {
+      case 'is_equal_to':
+        return this.buildFieldFilterQuery(field.id, '=', `'${value}'`);
+      case 'is_not_equal_to':
+        return this.buildFieldFilterQuery(field.id, '!=', `'${value}'`);
+      case 'contains':
+        return this.buildFieldFilterQuery(field.id, 'LIKE', `'%${value}%'`);
+      case 'does_not_contain':
+        return this.buildFieldFilterQuery(field.id, 'NOT LIKE', `'%${value}%'`);
+      case 'starts_with':
+        return this.buildFieldFilterQuery(field.id, 'LIKE', `'${value}%'`);
+      case 'ends_with':
+        return this.buildFieldFilterQuery(field.id, 'LIKE', `'%${value}'`);
+      default:
+        return null;
+    }
   };
 
   private buildSelectFilterQuery = (
@@ -556,11 +551,11 @@ export class RecordListQueryHandler
     field: SelectFieldAttributes
   ): string | null => {
     if (filter.operator === 'is_empty') {
-      return this.buildIsEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS', 'NULL');
     }
 
     if (filter.operator === 'is_not_empty') {
-      return this.buildIsNotEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS NOT', 'NULL');
     }
 
     if (!isStringArray(filter.value)) {
@@ -574,9 +569,9 @@ export class RecordListQueryHandler
     const values = this.joinIds(filter.value);
     switch (filter.operator) {
       case 'is_in':
-        return `json_extract(n.attributes, '$.fields.${field.id}.value') IN (${values})`;
+        return this.buildFieldFilterQuery(field.id, 'IN', `(${values})`);
       case 'is_not_in':
-        return `json_extract(n.attributes, '$.fields.${field.id}.value') NOT IN (${values})`;
+        return this.buildFieldFilterQuery(field.id, 'NOT IN', `(${values})`);
       default:
         return null;
     }
@@ -618,11 +613,11 @@ export class RecordListQueryHandler
     field: DateFieldAttributes
   ): string | null => {
     if (filter.operator === 'is_empty') {
-      return this.buildIsEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS', 'NULL');
     }
 
     if (filter.operator === 'is_not_empty') {
-      return this.buildIsNotEmptyFilterQuery(field.id);
+      return this.buildFieldFilterQuery(field.id, 'IS NOT', 'NULL');
     }
 
     if (filter.value === null) {
@@ -639,36 +634,23 @@ export class RecordListQueryHandler
     }
 
     const dateString = date.toISOString().split('T')[0];
-    let operator: string | null;
 
     switch (filter.operator) {
       case 'is_equal_to':
-        operator = '=';
-        break;
+        return this.buildFieldFilterQuery(field.id, '=', `'${dateString}'`);
       case 'is_not_equal_to':
-        operator = '!=';
-        break;
+        return this.buildFieldFilterQuery(field.id, '!=', `'${dateString}'`);
       case 'is_on_or_after':
-        operator = '>=';
-        break;
+        return this.buildFieldFilterQuery(field.id, '>=', `'${dateString}'`);
       case 'is_on_or_before':
-        operator = '<=';
-        break;
+        return this.buildFieldFilterQuery(field.id, '<=', `'${dateString}'`);
       case 'is_after':
-        operator = '>';
-        break;
+        return this.buildFieldFilterQuery(field.id, '>', `'${dateString}'`);
       case 'is_before':
-        operator = '<';
-        break;
+        return this.buildFieldFilterQuery(field.id, '<', `'${dateString}'`);
       default:
         return null;
     }
-
-    if (operator === null) {
-      return null;
-    }
-
-    return `DATE(json_extract(n.attributes, '$.fields.${field.id}.value')) ${operator} '${dateString}'`;
   };
 
   private buildCreatedAtFilterQuery = (
@@ -676,11 +658,11 @@ export class RecordListQueryHandler
     _: CreatedAtFieldAttributes
   ): string | null => {
     if (filter.operator === 'is_empty') {
-      return `n.created_at IS NULL`;
+      return this.buildAttributeFilterQuery('created_at', 'IS', 'NULL');
     }
 
     if (filter.operator === 'is_not_empty') {
-      return `n.created_at IS NOT NULL`;
+      return this.buildAttributeFilterQuery('created_at', 'IS NOT', 'NULL');
     }
 
     if (filter.value === null) {
@@ -697,44 +679,67 @@ export class RecordListQueryHandler
     }
 
     const dateString = date.toISOString().split('T')[0];
-    let operator: string | null;
 
     switch (filter.operator) {
       case 'is_equal_to':
-        operator = '=';
-        break;
+        return this.buildAttributeFilterQuery(
+          'created_at',
+          '=',
+          `'${dateString}'`
+        );
       case 'is_not_equal_to':
-        operator = '!=';
-        break;
+        return this.buildAttributeFilterQuery(
+          'created_at',
+          '!=',
+          `'${dateString}'`
+        );
       case 'is_on_or_after':
-        operator = '>=';
-        break;
+        return this.buildAttributeFilterQuery(
+          'created_at',
+          '>=',
+          `'${dateString}'`
+        );
       case 'is_on_or_before':
-        operator = '<=';
-        break;
+        return this.buildAttributeFilterQuery(
+          'created_at',
+          '<=',
+          `'${dateString}'`
+        );
       case 'is_after':
-        operator = '>';
-        break;
+        return this.buildAttributeFilterQuery(
+          'created_at',
+          '>',
+          `'${dateString}'`
+        );
       case 'is_before':
-        operator = '<';
-        break;
+        return this.buildAttributeFilterQuery(
+          'created_at',
+          '<',
+          `'${dateString}'`
+        );
       default:
         return null;
     }
-
-    if (operator === null) {
-      return null;
-    }
-
-    return `DATE(n.created_at) ${operator} '${dateString}'`;
   };
 
-  private buildIsEmptyFilterQuery = (fieldId: string): string => {
-    return `json_extract(n.attributes, '$.fields.${fieldId}.value') IS NULL`;
+  private buildFieldFilterQuery = (
+    fieldId: string,
+    operator: SqliteOperator,
+    value: string
+  ): string => {
+    return this.buildAttributeFilterQuery(
+      `fields.${fieldId}.value`,
+      operator,
+      value
+    );
   };
 
-  private buildIsNotEmptyFilterQuery = (fieldId: string): string => {
-    return `json_extract(n.attributes, '$.fields.${fieldId}.value') IS NOT NULL`;
+  private buildAttributeFilterQuery = (
+    name: string,
+    operator: SqliteOperator,
+    value: string
+  ): string => {
+    return `json_extract(n.attributes, '$.${name}') ${operator} ${value}`;
   };
 
   private joinIds = (ids: string[]): string => {
@@ -755,6 +760,10 @@ export class RecordListQueryHandler
     sort: DatabaseViewSortAttributes,
     fields: Record<string, FieldAttributes>
   ): string | null => {
+    if (sort.fieldId === SpecialId.Name) {
+      return `json_extract(n.attributes, '$.name') ${sort.direction}`;
+    }
+
     const field = fields[sort.fieldId];
     if (!field) {
       return null;

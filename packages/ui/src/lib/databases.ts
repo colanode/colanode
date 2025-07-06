@@ -153,6 +153,33 @@ export interface FieldFilterOperator {
   value: string;
 }
 
+export const nameFieldFilterOperators: FieldFilterOperator[] = [
+  {
+    label: 'Is Equal To',
+    value: 'is_equal_to',
+  },
+  {
+    label: 'Is Not Equal To',
+    value: 'is_not_equal_to',
+  },
+  {
+    label: 'Contains',
+    value: 'contains',
+  },
+  {
+    label: 'Does Not Contain',
+    value: 'does_not_contain',
+  },
+  {
+    label: 'Is Empty',
+    value: 'is_empty',
+  },
+  {
+    label: 'Is Not Empty',
+    value: 'is_not_empty',
+  },
+];
+
 export const booleanFieldFilterOperators: FieldFilterOperator[] = [
   {
     label: 'Is True',

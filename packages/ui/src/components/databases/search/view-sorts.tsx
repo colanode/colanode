@@ -1,7 +1,9 @@
 import { Plus } from 'lucide-react';
 
+import { SpecialId } from '@colanode/core';
 import { ViewSortAddPopover } from '@colanode/ui/components/databases/search/view-sort-add-popover';
-import { ViewSortRow } from '@colanode/ui/components/databases/search/view-sort-row';
+import { ViewSortFieldRow } from '@colanode/ui/components/databases/search/view-sort-field-row';
+import { ViewSortNameRow } from '@colanode/ui/components/databases/search/view-sort-name-row';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   Popover,
@@ -38,12 +40,16 @@ export const ViewSorts = () => {
       </PopoverTrigger>
       <PopoverContent className="flex flex-col gap-2 p-2">
         {view.sorts.map((sort) => {
+          if (sort.fieldId === SpecialId.Name) {
+            return <ViewSortNameRow key={sort.id} sort={sort} />;
+          }
+
           const field = database.fields.find(
             (field) => field.id === sort.fieldId
           );
 
           if (!field) return null;
-          return <ViewSortRow key={sort.id} sort={sort} field={field} />;
+          return <ViewSortFieldRow key={sort.id} sort={sort} field={field} />;
         })}
         <ViewSortAddPopover>
           <button className="flex cursor-pointer flex-row items-center gap-1 rounded-lg p-1 text-sm text-muted-foreground hover:bg-gray-50">

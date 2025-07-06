@@ -9,6 +9,7 @@ import {
   DatabaseViewFieldFilterAttributes,
   DatabaseViewFilterAttributes,
   DatabaseViewSortAttributes,
+  SpecialId,
 } from '@colanode/core';
 import { BoardView } from '@colanode/ui/components/databases/boards/board-view';
 import { CalendarView } from '@colanode/ui/components/databases/calendars/calendar-view';
@@ -67,7 +68,7 @@ export const View = ({ view }: ViewProps) => {
         sorts: Object.values(view.attributes.sorts ?? {}),
         groupBy: view.attributes.groupBy,
         nameWidth: view.attributes.nameWidth ?? getDefaultNameWidth(),
-        isSearchBarOpened,
+        isSearchBarOpened: isSearchBarOpened || openedFieldFilters.length > 0,
         isSortsOpened,
         rename: async (name: string) => {
           if (!database.canEdit) return;
@@ -241,22 +242,35 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const field = database.fields.find((f) => f.id === fieldId);
-          if (!field) {
-            return;
-          }
-
-          const operators = getFieldFilterOperators(field.type);
-          const filter: DatabaseViewFieldFilterAttributes = {
-            type: 'field',
-            id: fieldId,
-            fieldId,
-            operator: operators[0]?.value ?? '',
-          };
-
           const viewAttributes = { ...view.attributes };
           viewAttributes.filters = viewAttributes.filters ?? {};
-          viewAttributes.filters[fieldId] = filter;
+
+          if (fieldId === SpecialId.Name) {
+            const operators = getFieldFilterOperators('text');
+            const filter: DatabaseViewFieldFilterAttributes = {
+              type: 'field',
+              id: fieldId,
+              fieldId,
+              operator: operators[0]?.value ?? 'contains',
+            };
+
+            viewAttributes.filters[fieldId] = filter;
+          } else {
+            const field = database.fields.find((f) => f.id === fieldId);
+            if (!field) {
+              return;
+            }
+
+            const operators = getFieldFilterOperators(field.type);
+            const filter: DatabaseViewFieldFilterAttributes = {
+              type: 'field',
+              id: fieldId,
+              fieldId,
+              operator: operators[0]?.value ?? '',
+            };
+
+            viewAttributes.filters[fieldId] = filter;
+          }
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
@@ -339,20 +353,31 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const field = database.fields.find((f) => f.id === fieldId);
-          if (!field) {
-            return;
-          }
-
-          const sort: DatabaseViewSortAttributes = {
-            id: fieldId,
-            fieldId,
-            direction,
-          };
-
           const viewAttributes = { ...view.attributes };
           viewAttributes.sorts = viewAttributes.sorts ?? {};
-          viewAttributes.sorts[fieldId] = sort;
+
+          if (fieldId === SpecialId.Name) {
+            const sort: DatabaseViewSortAttributes = {
+              id: fieldId,
+              fieldId,
+              direction,
+            };
+
+            viewAttributes.sorts[fieldId] = sort;
+          } else {
+            const field = database.fields.find((f) => f.id === fieldId);
+            if (!field) {
+              return;
+            }
+
+            const sort: DatabaseViewSortAttributes = {
+              id: fieldId,
+              fieldId,
+              direction,
+            };
+
+            viewAttributes.sorts[fieldId] = sort;
+          }
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',

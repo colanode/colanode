@@ -1,8 +1,9 @@
 import { ArrowDownAz, ArrowDownZa, Filter, Type } from 'lucide-react';
 import { Resizable } from 're-resizable';
-import { Fragment, useRef } from 'react';
+import { Fragment, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 
+import { SpecialId } from '@colanode/core';
 import {
   Popover,
   PopoverContent,
@@ -17,6 +18,8 @@ import { cn } from '@colanode/ui/lib/utils';
 export const TableViewNameHeader = () => {
   const database = useDatabase();
   const view = useDatabaseView();
+
+  const [openPopover, setOpenPopover] = useState(false);
 
   const [dropMonitor, dropRef] = useDrop({
     accept: 'table-field-header',
@@ -65,7 +68,7 @@ export const TableViewNameHeader = () => {
         view.resizeName(newWidth);
       }}
     >
-      <Popover modal={true}>
+      <Popover modal={true} open={openPopover} onOpenChange={setOpenPopover}>
         <PopoverTrigger asChild>
           <div
             className={cn(
@@ -97,12 +100,8 @@ export const TableViewNameHeader = () => {
               <div
                 className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
                 onClick={() => {
-                  // eventBus.publish({
-                  //   __typename: 'AddSortEvent',
-                  //   field: viewField.field,
-                  //   viewId: view.id,
-                  //   direction: 'ASC',
-                  // });
+                  view.initFieldSort(SpecialId.Name, 'asc');
+                  setOpenPopover(false);
                 }}
               >
                 <ArrowDownAz className="size-4" />
@@ -112,12 +111,8 @@ export const TableViewNameHeader = () => {
               <div
                 className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
                 onClick={() => {
-                  // eventBus.publish({
-                  //   __typename: 'AddSortEvent',
-                  //   field: viewField.field,
-                  //   viewId: view.id,
-                  //   direction: 'DESC',
-                  // });
+                  view.initFieldSort(SpecialId.Name, 'desc');
+                  setOpenPopover(false);
                 }}
               >
                 <ArrowDownZa className="size-4" />
@@ -125,7 +120,13 @@ export const TableViewNameHeader = () => {
               </div>
             </Fragment>
           )}
-          <div className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100">
+          <div
+            className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
+            onClick={() => {
+              view.initFieldFilter(SpecialId.Name);
+              setOpenPopover(false);
+            }}
+          >
             <Filter className="size-4" />
             <span>Filter</span>
           </div>

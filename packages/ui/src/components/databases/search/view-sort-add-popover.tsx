@@ -1,5 +1,7 @@
+import { Type } from 'lucide-react';
 import { useState } from 'react';
 
+import { SpecialId } from '@colanode/core';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import {
   Command,
@@ -33,6 +35,10 @@ export const ViewSortAddPopover = ({ children }: ViewSortAddPopoverProps) => {
       !view.sorts.some((sort) => sort.fieldId === field.id)
   );
 
+  const isSortedByName = view.sorts.some(
+    (sort) => sort.fieldId === SpecialId.Name
+  );
+
   if (sortableFields.length === 0) {
     return null;
   }
@@ -46,6 +52,20 @@ export const ViewSortAddPopover = ({ children }: ViewSortAddPopoverProps) => {
           <CommandEmpty>No sortable field found.</CommandEmpty>
           <CommandList>
             <CommandGroup className="h-min">
+              {!isSortedByName && (
+                <CommandItem
+                  key={SpecialId.Name}
+                  onSelect={() => {
+                    view.initFieldSort(SpecialId.Name, 'asc');
+                    setOpen(false);
+                  }}
+                >
+                  <div className="flex w-full flex-row items-center gap-2">
+                    <Type className="size-4" />
+                    <p>{database.nameField?.name ?? 'Name'}</p>
+                  </div>
+                </CommandItem>
+              )}
               {sortableFields.map((field) => (
                 <CommandItem
                   key={field.id}

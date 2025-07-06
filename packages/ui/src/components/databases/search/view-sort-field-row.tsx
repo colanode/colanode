@@ -11,12 +11,12 @@ import {
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 
-interface ViewSortProps {
+interface ViewSortFieldRowProps {
   sort: DatabaseViewSortAttributes;
   field: FieldAttributes;
 }
 
-export const ViewSortRow = ({ sort, field }: ViewSortProps) => {
+export const ViewSortFieldRow = ({ sort, field }: ViewSortFieldRowProps) => {
   const view = useDatabaseView();
 
   return (

@@ -43,6 +43,10 @@ export enum IdType {
   Save = 'sv',
 }
 
+export const SpecialId = {
+  Name: 'name',
+};
+
 export const generateId = (type: IdType): string => {
   return ulid().toLowerCase() + type;
 };

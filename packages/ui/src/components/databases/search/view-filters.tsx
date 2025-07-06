@@ -1,11 +1,13 @@
 import { Plus } from 'lucide-react';
 
+import { SpecialId } from '@colanode/core';
 import { ViewBooleanFieldFilter } from '@colanode/ui/components/databases/search/view-boolean-field-filter';
 import { ViewCreatedAtFieldFilter } from '@colanode/ui/components/databases/search/view-created-at-field-fitler';
 import { ViewDateFieldFilter } from '@colanode/ui/components/databases/search/view-date-field-filter';
 import { ViewEmailFieldFilter } from '@colanode/ui/components/databases/search/view-email-field-filter';
 import { ViewFilterAddPopover } from '@colanode/ui/components/databases/search/view-filter-add-popover';
 import { ViewMultiSelectFieldFilter } from '@colanode/ui/components/databases/search/view-multi-select-field-filter';
+import { ViewNameFieldFilter } from '@colanode/ui/components/databases/search/view-name-field-filter';
 import { ViewNumberFieldFilter } from '@colanode/ui/components/databases/search/view-number-field-filter';
 import { ViewPhoneFieldFilter } from '@colanode/ui/components/databases/search/view-phone-field-filter';
 import { ViewSelectFieldFilter } from '@colanode/ui/components/databases/search/view-select-field-filter';
@@ -17,6 +19,7 @@ import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 export const ViewFilters = () => {
   const database = useDatabase();
   const view = useDatabaseView();
+  console.log('view.filters', view.filters);
 
   return (
     <div className="flex flex-row items-center gap-2">
@@ -24,6 +27,10 @@ export const ViewFilters = () => {
         view.filters.map((filter) => {
           if (filter.type === 'group') {
             return null;
+          }
+
+          if (filter.fieldId === SpecialId.Name) {
+            return <ViewNameFieldFilter key={filter.id} filter={filter} />;
           }
 
           const field = database.fields.find(
