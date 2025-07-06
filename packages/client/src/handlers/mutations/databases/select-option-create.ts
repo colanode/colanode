@@ -9,7 +9,7 @@ import {
   compareString,
   DatabaseAttributes,
   generateId,
-  generateNodeIndex,
+  generateFractionalIndex,
   IdType,
 } from '@colanode/core';
 
@@ -49,7 +49,7 @@ export class SelectOptionCreateMutationHandler
           .map((selectOption) => selectOption.index)
           .sort((a, b) => -compareString(a, b))[0];
 
-        const index = generateNodeIndex(maxIndex, null);
+        const index = generateFractionalIndex(maxIndex, null);
 
         field.options[id] = {
           name: input.name,

@@ -12,7 +12,7 @@ import {
   FieldAttributes,
   FieldType,
   generateId,
-  generateNodeIndex,
+  generateFractionalIndex,
   IdType,
 } from '@colanode/core';
 
@@ -54,7 +54,7 @@ export class FieldCreateMutationHandler
           .map((field) => field.index)
           .sort((a, b) => -compareString(a, b))[0];
 
-        const index = generateNodeIndex(maxIndex, null);
+        const index = generateFractionalIndex(maxIndex, null);
 
         const newField: FieldAttributes = {
           id: fieldId,

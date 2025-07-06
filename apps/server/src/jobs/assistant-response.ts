@@ -1,7 +1,7 @@
 import {
   generateId,
   IdType,
-  generateNodeIndex,
+  generateFractionalIndex,
   getNodeModel,
   MessageAttributes,
 } from '@colanode/core';
@@ -128,7 +128,7 @@ const createAndPublishResponse = async (
         id: blockId,
         type: 'paragraph',
         content: [{ type: 'text', text: response, marks: [] }],
-        index: generateNodeIndex(),
+        index: generateFractionalIndex(),
         parentId: id,
       },
       ...(citations?.reduce((acc, citation) => {
@@ -142,7 +142,7 @@ const createAndPublishResponse = async (
               { type: 'text', text: citation.quote, marks: [] },
               { type: 'text', text: citation.sourceId, marks: [] },
             ],
-            index: generateNodeIndex(),
+            index: generateFractionalIndex(),
             parentId: id,
           },
         };

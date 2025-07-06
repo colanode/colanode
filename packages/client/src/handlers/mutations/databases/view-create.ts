@@ -7,7 +7,7 @@ import {
 } from '@colanode/client/mutations/databases/view-create';
 import {
   generateId,
-  generateNodeIndex,
+  generateFractionalIndex,
   IdType,
   DatabaseViewAttributes,
 } from '@colanode/core';
@@ -45,7 +45,7 @@ export class ViewCreateMutationHandler
     const attributes: DatabaseViewAttributes = {
       type: 'database_view',
       name: input.name,
-      index: generateNodeIndex(maxIndex, null),
+      index: generateFractionalIndex(maxIndex, null),
       layout: input.viewType,
       parentId: input.databaseId,
       groupBy: input.groupBy,

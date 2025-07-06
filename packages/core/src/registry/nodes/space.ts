@@ -4,6 +4,13 @@ import { extractNodeRole } from '@colanode/core/lib/nodes';
 import { hasNodeRole, hasWorkspaceRole } from '@colanode/core/lib/permissions';
 import { NodeModel, nodeRoleEnum } from '@colanode/core/registry/nodes/core';
 
+export const spaceChildAttributesSchema = z.object({
+  id: z.string(),
+  index: z.string().optional().nullable(),
+});
+
+export type SpaceChildAttributes = z.infer<typeof spaceChildAttributesSchema>;
+
 export const spaceAttributesSchema = z.object({
   type: z.literal('space'),
   name: z.string(),
@@ -11,6 +18,7 @@ export const spaceAttributesSchema = z.object({
   avatar: z.string().nullable().optional(),
   collaborators: z.record(z.string(), nodeRoleEnum),
   visibility: z.enum(['public', 'private']).default('private'),
+  children: z.record(z.string(), spaceChildAttributesSchema).optional(),
 });
 
 export type SpaceAttributes = z.infer<typeof spaceAttributesSchema>;

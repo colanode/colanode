@@ -1,4 +1,9 @@
-import { Block, IdType, generateId, generateNodeIndex } from '@colanode/core';
+import {
+  Block,
+  IdType,
+  generateId,
+  generateFractionalIndex,
+} from '@colanode/core';
 
 export const generateWelcomePageBlocks = (
   pageId: string
@@ -7,7 +12,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'heading1',
     parentId: pageId,
-    index: generateNodeIndex(),
+    index: generateFractionalIndex(),
     content: [{ type: 'text', text: 'Welcome to the Colanode!' }],
   };
 
@@ -15,7 +20,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'paragraph',
     parentId: pageId,
-    index: generateNodeIndex(headingBlock.index),
+    index: generateFractionalIndex(headingBlock.index),
     content: [
       {
         type: 'text',
@@ -28,7 +33,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'paragraph',
     parentId: pageId,
-    index: generateNodeIndex(colanodeParagraphBlock.index),
+    index: generateFractionalIndex(colanodeParagraphBlock.index),
     content: [
       {
         type: 'text',
@@ -41,7 +46,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'taskList',
     parentId: pageId,
-    index: generateNodeIndex(startTypingParagraphBlock.index),
+    index: generateFractionalIndex(startTypingParagraphBlock.index),
     content: [],
   };
 
@@ -49,7 +54,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'taskItem',
     parentId: taskListBlock.id,
-    index: generateNodeIndex(),
+    index: generateFractionalIndex(),
     attrs: {
       checked: false,
     },
@@ -59,7 +64,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'paragraph',
     parentId: task1Block.id,
-    index: generateNodeIndex(),
+    index: generateFractionalIndex(),
     content: [
       {
         text: 'Type "/" to see the menu of possible content you can add - headings, paragraphs, blockquotes, todos etc.',
@@ -72,7 +77,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'taskItem',
     parentId: taskListBlock.id,
-    index: generateNodeIndex(task1Block.index),
+    index: generateFractionalIndex(task1Block.index),
     attrs: {
       checked: false,
     },
@@ -82,7 +87,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'paragraph',
     parentId: task2Block.id,
-    index: generateNodeIndex(),
+    index: generateFractionalIndex(),
     content: [
       {
         text: 'Highlight any text and use the menu to style your text in different ',
@@ -136,7 +141,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'taskItem',
     parentId: taskListBlock.id,
-    index: generateNodeIndex(task2Block.index),
+    index: generateFractionalIndex(task2Block.index),
     attrs: {
       checked: false,
     },
@@ -146,7 +151,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'paragraph',
     parentId: task3Block.id,
-    index: generateNodeIndex(),
+    index: generateFractionalIndex(),
     content: [
       {
         text: 'Use the drag icon on the left to reorder the content',
@@ -159,7 +164,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'taskItem',
     parentId: taskListBlock.id,
-    index: generateNodeIndex(task3Block.index),
+    index: generateFractionalIndex(task3Block.index),
     attrs: {
       checked: false,
     },
@@ -169,7 +174,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'paragraph',
     parentId: task4Block.id,
-    index: generateNodeIndex(),
+    index: generateFractionalIndex(),
     content: [
       {
         text: "Add subpages, subfolders or databases using the '/' menu",
@@ -182,7 +187,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'heading2',
     parentId: pageId,
-    index: generateNodeIndex(taskListBlock.index),
+    index: generateFractionalIndex(taskListBlock.index),
     content: [{ type: 'text', text: 'What is a Database?' }],
   };
 
@@ -190,7 +195,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'paragraph',
     parentId: pageId,
-    index: generateNodeIndex(databaseHeadingBlock.index),
+    index: generateFractionalIndex(databaseHeadingBlock.index),
     content: [
       {
         text: 'A database in Colanode is like a powerful spreadsheet that combines tables with rich content. You can use databases to organize and view your information in multiple ways - as tables, kanban boards, calendars, or galleries. Each row in the database is a full page that can contain any type of content, and columns act as properties that help you organize and filter your information.',
@@ -203,7 +208,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'paragraph',
     parentId: pageId,
-    index: generateNodeIndex(databaseParagraphBlock.index),
+    index: generateFractionalIndex(databaseParagraphBlock.index),
     content: [
       {
         text: 'You can create a database by using the "/" menu inside an existing page. You can also create a database by clicking the three dots button in the sidebar near the spaces menu.',
@@ -216,14 +221,14 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'blockquote',
     parentId: pageId,
-    index: generateNodeIndex(databaseParagraphBlock2.index),
+    index: generateFractionalIndex(databaseParagraphBlock2.index),
   };
 
   const blockquoteParagraphBlock: Block = {
     id: generateId(IdType.Block),
     type: 'paragraph',
     parentId: blockquoteBlock.id,
-    index: generateNodeIndex(),
+    index: generateFractionalIndex(),
     content: [
       {
         text: 'Every journey starts with a single step. Block by block, you can build your own world.',
@@ -236,7 +241,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'heading2',
     parentId: pageId,
-    index: generateNodeIndex(blockquoteBlock.index),
+    index: generateFractionalIndex(blockquoteBlock.index),
     content: [{ type: 'text', text: 'Follow Us' }],
   };
 
@@ -244,7 +249,7 @@ export const generateWelcomePageBlocks = (
     id: generateId(IdType.Block),
     type: 'paragraph',
     parentId: pageId,
-    index: generateNodeIndex(followUsHeadingBlock.index),
+    index: generateFractionalIndex(followUsHeadingBlock.index),
     content: [
       {
         text: 'Stay updated with our latest developments on ',
@@ -321,7 +326,7 @@ export const generateInitialMessageBlocks = (
     id: generateId(IdType.Block),
     type: 'paragraph',
     parentId: messageId,
-    index: generateNodeIndex(),
+    index: generateFractionalIndex(),
     content: [
       {
         type: 'text',

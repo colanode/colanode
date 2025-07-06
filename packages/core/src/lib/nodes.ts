@@ -54,7 +54,7 @@ export const extractNodeRole = (
   return role;
 };
 
-export const generateNodeIndex = (
+export const generateFractionalIndex = (
   previous?: string | null,
   next?: string | null
 ) => {

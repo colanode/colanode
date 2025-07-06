@@ -61,6 +61,7 @@ import { RecordNameUpdateMutationHandler } from './records/record-name-update';
 import { ServerCreateMutationHandler } from './servers/server-create';
 import { ServerDeleteMutationHandler } from './servers/server-delete';
 import { SpaceAvatarUpdateMutationHandler } from './spaces/space-avatar-update';
+import { SpaceChildMoveMutationHandler } from './spaces/space-child-move';
 import { SpaceCreateMutationHandler } from './spaces/space-create';
 import { SpaceDeleteMutationHandler } from './spaces/space-delete';
 import { SpaceDescriptionUpdateMutationHandler } from './spaces/space-description-update';
@@ -133,6 +134,7 @@ export const buildMutationHandlerMap = (
     'space.avatar.update': new SpaceAvatarUpdateMutationHandler(app),
     'space.description.update': new SpaceDescriptionUpdateMutationHandler(app),
     'space.name.update': new SpaceNameUpdateMutationHandler(app),
+    'space.child.move': new SpaceChildMoveMutationHandler(app),
     'account.update': new AccountUpdateMutationHandler(app),
     'view.update': new ViewUpdateMutationHandler(app),
     'view.delete': new ViewDeleteMutationHandler(app),

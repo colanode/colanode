@@ -7,7 +7,7 @@ import {
 import {
   DatabaseAttributes,
   generateId,
-  generateNodeIndex,
+  generateFractionalIndex,
   IdType,
   DatabaseViewAttributes,
 } from '@colanode/core';
@@ -34,7 +34,7 @@ export class DatabaseCreateMutationHandler
         [fieldId]: {
           id: fieldId,
           type: 'text',
-          index: generateNodeIndex(null, null),
+          index: generateFractionalIndex(null, null),
           name: 'Comment',
         },
       },
@@ -43,7 +43,7 @@ export class DatabaseCreateMutationHandler
     const viewAttributes: DatabaseViewAttributes = {
       type: 'database_view',
       name: 'Default',
-      index: generateNodeIndex(null, null),
+      index: generateFractionalIndex(null, null),
       layout: 'table',
       parentId: databaseId,
     };

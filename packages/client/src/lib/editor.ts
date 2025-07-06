@@ -8,7 +8,7 @@ import {
   compareString,
   EditorNodeTypes,
   generateId,
-  generateNodeIndex,
+  generateFractionalIndex,
   IdType,
   RichTextContent,
 } from '@colanode/core';
@@ -80,7 +80,7 @@ const mapAndPushContentToBlock = (
 
   blocks.push({
     id: id,
-    index: index ?? generateNodeIndex(null, null),
+    index: index ?? generateFractionalIndex(null, null),
     attrs: attrs.length > 0 ? Object.fromEntries(attrs) : undefined,
     parentId: parentId,
     type: content.type,
@@ -237,9 +237,9 @@ const validateBlocksIndexes = (blocks: Block[]) => {
           afterIndex > currentIndex &&
           afterIndex > beforeIndex
         ) {
-          currentBlock.index = generateNodeIndex(beforeIndex, afterIndex);
+          currentBlock.index = generateFractionalIndex(beforeIndex, afterIndex);
         } else {
-          currentBlock.index = generateNodeIndex(beforeIndex, null);
+          currentBlock.index = generateFractionalIndex(beforeIndex, null);
         }
       }
     }

@@ -61,6 +61,7 @@ export * from './spaces/space-create';
 export * from './spaces/space-delete';
 export * from './spaces/space-description-update';
 export * from './spaces/space-name-update';
+export * from './spaces/space-child-move';
 export * from './workspaces/workspace-create';
 export * from './workspaces/workspace-delete';
 export * from './workspaces/workspace-metadata-delete';

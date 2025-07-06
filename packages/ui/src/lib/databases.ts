@@ -4,7 +4,7 @@ import {
   FieldAttributes,
   FieldType,
   FieldValue,
-  generateNodeIndex,
+  generateFractionalIndex,
   isStringArray,
   MultiSelectFieldAttributes,
   SelectFieldAttributes,
@@ -1045,45 +1045,49 @@ export const generateViewFieldIndex = (
       )
     );
 
-  let previousIndex: string | null = null;
-  let nextIndex: string | null = null;
   if (after === 'name') {
-    const lowestIndex = mergedIndexes[0];
-    if (!lowestIndex) {
+    const firstField = mergedIndexes[0];
+    if (!firstField) {
       return null;
     }
 
-    nextIndex = lowestIndex.viewIndex ?? lowestIndex.databaseIndex;
-  } else {
-    const afterFieldArrayIndex = mergedIndexes.findIndex((f) => f.id === after);
-    if (afterFieldArrayIndex === -1) {
-      return null;
-    }
-
-    const afterFieldIndex = mergedIndexes[afterFieldArrayIndex];
-    previousIndex =
-      afterFieldIndex?.viewIndex ?? afterFieldIndex?.databaseIndex ?? null;
-
-    if (afterFieldArrayIndex < mergedIndexes.length) {
-      const nextFieldIndex = mergedIndexes[afterFieldArrayIndex + 1];
-      nextIndex =
-        nextFieldIndex?.viewIndex ?? nextFieldIndex?.databaseIndex ?? null;
-    }
+    const nextIndex = firstField.viewIndex ?? firstField.databaseIndex;
+    return generateFractionalIndex(null, nextIndex);
   }
 
-  let newIndex = generateNodeIndex(previousIndex, nextIndex);
+  const afterFieldArrayIndex = mergedIndexes.findIndex((f) => f.id === after);
+  if (afterFieldArrayIndex === -1) {
+    return null;
+  }
 
-  const lastDatabaseField = mergedIndexes.sort((a, b) =>
-    compareString(a.databaseIndex, b.databaseIndex)
-  )[mergedIndexes.length - 1]!;
+  const afterFieldIndex = mergedIndexes[afterFieldArrayIndex];
+  if (!afterFieldIndex) {
+    return null;
+  }
 
-  const newPotentialFieldIndex = generateNodeIndex(
-    lastDatabaseField.databaseIndex,
+  const previousIndex =
+    afterFieldIndex?.viewIndex ?? afterFieldIndex?.databaseIndex ?? null;
+  let nextIndex: string | null = null;
+
+  if (afterFieldArrayIndex < mergedIndexes.length) {
+    const nextFieldIndex = mergedIndexes[afterFieldArrayIndex + 1];
+    nextIndex =
+      nextFieldIndex?.viewIndex ?? nextFieldIndex?.databaseIndex ?? null;
+  }
+
+  let newIndex = generateFractionalIndex(previousIndex, nextIndex);
+
+  const maxDatabaseIndex = mergedIndexes
+    .map((f) => f.databaseIndex)
+    .sort((a, b) => -compareString(a, b))[0]!;
+
+  const newPotentialFieldIndex = generateFractionalIndex(
+    maxDatabaseIndex,
     null
   );
 
   if (newPotentialFieldIndex === newIndex) {
-    newIndex = generateNodeIndex(previousIndex, newPotentialFieldIndex);
+    newIndex = generateFractionalIndex(previousIndex, newPotentialFieldIndex);
   }
 
   return newIndex;
