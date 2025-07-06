@@ -5,12 +5,21 @@ import { hasNodeRole } from '@colanode/core/lib/permissions';
 import { NodeModel } from '@colanode/core/registry/nodes/core';
 import { fieldAttributesSchema } from '@colanode/core/registry/nodes/field';
 
+export const databaseNameFieldAttributesSchema = z.object({
+  name: z.string().nullable().optional(),
+});
+
+export type DatabaseNameFieldAttributes = z.infer<
+  typeof databaseNameFieldAttributesSchema
+>;
+
 export const databaseAttributesSchema = z.object({
   type: z.literal('database'),
   name: z.string(),
   avatar: z.string().nullable().optional(),
   parentId: z.string(),
   fields: z.record(z.string(), fieldAttributesSchema),
+  nameField: databaseNameFieldAttributesSchema.nullable().optional(),
 });
 
 export type DatabaseAttributes = z.infer<typeof databaseAttributesSchema>;

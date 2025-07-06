@@ -28,6 +28,7 @@ export * from './databases/view-create';
 export * from './databases/view-delete';
 export * from './databases/view-name-update';
 export * from './databases/view-update';
+export * from './databases/database-name-field-update';
 export * from './documents/document-update';
 export * from './files/file-create';
 export * from './files/file-delete';

@@ -21,6 +21,7 @@ import { ChannelUpdateMutationHandler } from './channels/channel-update';
 import { ChatCreateMutationHandler } from './chats/chat-create';
 import { DatabaseCreateMutationHandler } from './databases/database-create';
 import { DatabaseDeleteMutationHandler } from './databases/database-delete';
+import { DatabaseNameFieldUpdateMutationHandler } from './databases/database-name-field-update';
 import { DatabaseUpdateMutationHandler } from './databases/database-update';
 import { FieldCreateMutationHandler } from './databases/field-create';
 import { FieldDeleteMutationHandler } from './databases/field-delete';
@@ -92,6 +93,9 @@ export const buildMutationHandlerMap = (
     'chat.create': new ChatCreateMutationHandler(app),
     'database.create': new DatabaseCreateMutationHandler(app),
     'database.delete': new DatabaseDeleteMutationHandler(app),
+    'database.name.field.update': new DatabaseNameFieldUpdateMutationHandler(
+      app
+    ),
     'field.create': new FieldCreateMutationHandler(app),
     'field.delete': new FieldDeleteMutationHandler(app),
     'field.name.update': new FieldNameUpdateMutationHandler(app),

@@ -3,13 +3,13 @@ import { Resizable } from 're-resizable';
 import { Fragment, useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
-import { Input } from '@colanode/ui/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { Separator } from '@colanode/ui/components/ui/separator';
+import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { cn } from '@colanode/ui/lib/utils';
@@ -77,16 +77,17 @@ export const TableViewNameHeader = () => {
             ref={dropDivRef as React.Ref<HTMLDivElement>}
           >
             <Type className="size-4" />
-            <p>Name</p>
+            <p>{database.nameField?.name ?? 'Name'}</p>
           </div>
         </PopoverTrigger>
         <PopoverContent className="ml-1 flex w-72 flex-col gap-1 p-2 text-sm">
           <div className="p-1">
-            <Input
-              value={'Name'}
-              onChange={(_) => {
-                // setName(e.target.value);
-                // updateName(e.target.value);
+            <SmartTextInput
+              value={database.nameField?.name ?? 'Name'}
+              readOnly={!database.canEdit}
+              onChange={(newName) => {
+                if (newName === database.nameField?.name) return;
+                database.updateNameField(newName);
               }}
             />
           </div>

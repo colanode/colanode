@@ -22,6 +22,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
       value={{
         id: database.id,
         name: database.attributes.name,
+        nameField: database.attributes.nameField,
         role,
         fields: Object.values(database.attributes.fields),
         canEdit,
@@ -49,6 +50,21 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
             type: 'field.name.update',
             databaseId: database.id,
             fieldId: id,
+            name,
+            accountId: workspace.accountId,
+            workspaceId: workspace.id,
+          });
+
+          if (!result.success) {
+            toast.error(result.error.message);
+          }
+        },
+        updateNameField: async (name) => {
+          if (!canEdit) return;
+
+          const result = await window.colanode.executeMutation({
+            type: 'database.name.field.update',
+            databaseId: database.id,
             name,
             accountId: workspace.accountId,
             workspaceId: workspace.id,

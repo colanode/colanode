@@ -1,6 +1,7 @@
 import { createContext, useContext } from 'react';
 
 import {
+  DatabaseNameFieldAttributes,
   FieldAttributes,
   FieldType,
   NodeRole,
@@ -10,12 +11,14 @@ import {
 interface DatabaseContext {
   id: string;
   name: string;
+  nameField: DatabaseNameFieldAttributes | null | undefined;
   fields: FieldAttributes[];
   canEdit: boolean;
   canCreateRecord: boolean;
   role: NodeRole;
   createField: (type: FieldType, name: string) => void;
   renameField: (id: string, name: string) => void;
+  updateNameField: (name: string) => void;
   deleteField: (id: string) => void;
   createSelectOption: (fieldId: string, name: string, color: string) => void;
   updateSelectOption: (
