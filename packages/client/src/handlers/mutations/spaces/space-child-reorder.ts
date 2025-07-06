@@ -4,8 +4,8 @@ import { MutationHandler } from '@colanode/client/lib/types';
 import {
   MutationError,
   MutationErrorCode,
-  SpaceChildMoveMutationInput,
-  SpaceChildMoveMutationOutput,
+  SpaceChildReorderMutationInput,
+  SpaceChildReorderMutationOutput,
 } from '@colanode/client/mutations';
 import {
   compareString,
@@ -19,13 +19,13 @@ interface NodeFractionalIndex {
   customIndex: string | null;
 }
 
-export class SpaceChildMoveMutationHandler
+export class SpaceChildReorderMutationHandler
   extends WorkspaceMutationHandlerBase
-  implements MutationHandler<SpaceChildMoveMutationInput>
+  implements MutationHandler<SpaceChildReorderMutationInput>
 {
   async handleMutation(
-    input: SpaceChildMoveMutationInput
-  ): Promise<SpaceChildMoveMutationOutput> {
+    input: SpaceChildReorderMutationInput
+  ): Promise<SpaceChildReorderMutationOutput> {
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
     const children = await workspace.database
       .selectFrom('nodes')

@@ -59,7 +59,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const handleDragEnd = (childId: string, after: string | null) => {
     mutation.mutate({
       input: {
-        type: 'space.child.move',
+        type: 'space.child.reorder',
         accountId: workspace.accountId,
         workspaceId: workspace.id,
         spaceId: space.id,
