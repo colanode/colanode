@@ -13,11 +13,7 @@ export const sortSpaceChildren = (
   for (const child of sortedById) {
     lastIndex = generateFractionalIndex(lastIndex, null);
     const customIndex = childrenSettings[child.id]?.index;
-    if (customIndex) {
-      indexes[child.id] = customIndex;
-    } else {
-      indexes[child.id] = lastIndex;
-    }
+    indexes[child.id] = customIndex ?? lastIndex;
   }
 
   return sortedById.sort((a, b) => {
