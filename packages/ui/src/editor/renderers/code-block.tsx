@@ -14,7 +14,7 @@ export const CodeBlockRenderer = ({
   node,
   keyPrefix,
 }: CodeBlockRendererProps) => {
-  const language = node.attributes.language;
+  const language = node.attributes?.language;
 
   const [copied, setCopied] = useState(false);
 
@@ -43,11 +43,13 @@ export const CodeBlockRenderer = ({
           <p>{copied ? 'Copied' : 'Copy code'}</p>
         </div>
       </div>
-      {highlight ? (
+      {highlight && highlight.language && highlight.nodes?.length > 0 ? (
         <code
-          className={highlight.language ? `language-${highlight.language}` : ''}
+          className={
+            highlight?.language ? `language-${highlight?.language}` : ''
+          }
         >
-          {highlight.nodes.map((node, index) => (
+          {highlight?.nodes.map((node, index) => (
             <span
               key={`${keyPrefix}-${index}`}
               className={node.classes.join(' ')}
