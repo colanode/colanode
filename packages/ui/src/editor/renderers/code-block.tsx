@@ -14,11 +14,11 @@ export const CodeBlockRenderer = ({
   node,
   keyPrefix,
 }: CodeBlockRendererProps) => {
-  const language = node.attributes?.language;
+  const language = node.attrs?.language;
 
   const [copied, setCopied] = useState(false);
 
-  const code = node.attributes.content?.[0].text ?? '';
+  const code = node.content?.[0]?.text ?? '';
   if (!code) {
     return null;
   }
