@@ -1,10 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod';
-import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
+import { FieldType } from '@colanode/core';
 import { DatabaseSelect } from '@colanode/ui/components/databases/database-select';
 import { FieldTypeSelect } from '@colanode/ui/components/databases/fields/field-type-select';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -28,7 +28,7 @@ import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 const formSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1, { message: 'Name is required' }),
   type: z.union([
     z.literal('boolean'),
     z.literal('collaborator'),
@@ -50,7 +50,17 @@ const formSchema = z.object({
   relationDatabaseId: z.string().optional().nullable(),
 });
 
-export const FieldCreatePopover = () => {
+interface FieldCreatePopoverProps {
+  button: React.ReactNode;
+  onSuccess?: (fieldId: string) => void;
+  types?: FieldType[];
+}
+
+export const FieldCreatePopover = ({
+  button,
+  onSuccess,
+  types,
+}: FieldCreatePopoverProps) => {
   const [open, setOpen] = useState(false);
   const workspace = useWorkspace();
   const database = useDatabase();
@@ -83,9 +93,10 @@ export const FieldCreatePopover = () => {
         workspaceId: workspace.id,
         relationDatabaseId: values.relationDatabaseId,
       },
-      onSuccess: () => {
+      onSuccess: (output) => {
         setOpen(false);
         form.reset();
+        onSuccess?.(output.id);
       },
       onError(error) {
         toast.error(error.message);
@@ -99,9 +110,7 @@ export const FieldCreatePopover = () => {
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
-      <PopoverTrigger>
-        <Plus className="ml-2 size-4 cursor-pointer" />
-      </PopoverTrigger>
+      <PopoverTrigger asChild>{button}</PopoverTrigger>
       <PopoverContent className="mr-5 w-128" side="bottom">
         <Form {...form}>
           <form
@@ -130,8 +139,9 @@ export const FieldCreatePopover = () => {
                     <FormLabel>Field type</FormLabel>
                     <FormControl>
                       <FieldTypeSelect
-                        type={field.value}
+                        value={field.value}
                         onChange={field.onChange}
+                        types={types}
                       />
                     </FormControl>
                   </FormItem>

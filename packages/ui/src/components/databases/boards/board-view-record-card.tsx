@@ -1,43 +1,26 @@
 import { useRef } from 'react';
 import { useDrag } from 'react-dnd';
 
-import { SelectFieldAttributes, SelectOptionAttributes } from '@colanode/core';
+import { FieldValue } from '@colanode/core';
 import { RecordFieldValue } from '@colanode/ui/components/records/record-field-value';
+import { useBoardView } from '@colanode/ui/contexts/board-view';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useRecord } from '@colanode/ui/contexts/record';
 
-interface DragResult {
-  option: SelectOptionAttributes;
-  field: SelectFieldAttributes;
-}
-
 export const BoardViewRecordCard = () => {
   const layout = useLayout();
   const view = useDatabaseView();
+  const boardView = useBoardView();
   const record = useRecord();
 
   const [, drag] = useDrag({
     type: 'board-record',
-    item: { id: record.id },
-    canDrag: () => {
-      return record.canEdit;
-    },
-    end: (_, monitor) => {
-      const dropResult = monitor.getDropResult<DragResult>();
-      if (dropResult != null) {
-        const optionId = dropResult.option.id;
-        const currentFieldValue = record.getSelectValue(dropResult.field);
-
-        if (currentFieldValue === optionId) {
-          return;
-        }
-
-        record.updateFieldValue(dropResult.field, {
-          type: 'string',
-          value: optionId,
-        });
-      }
+    canDrag: () => boardView.canDrag(record),
+    item: record,
+    end: (item, monitor) => {
+      const value = monitor.getDropResult() as { value: FieldValue | null };
+      return boardView.onDragEnd(item, value.value);
     },
   });
 
@@ -48,7 +31,7 @@ export const BoardViewRecordCard = () => {
 
   return (
     <div
-      ref={dragRef as React.LegacyRef<HTMLDivElement>}
+      ref={dragRef as React.Ref<HTMLDivElement>}
       role="presentation"
       key={record.id}
       className="animate-fade-in flex cursor-pointer flex-col gap-1 rounded-md border p-2 text-left hover:bg-gray-50"

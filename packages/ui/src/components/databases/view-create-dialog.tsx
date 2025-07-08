@@ -5,8 +5,6 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
-import { FieldAttributes, FieldType } from '@colanode/core';
-import { FieldSelect } from '@colanode/ui/components/databases/fields/field-select';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   Dialog,
@@ -32,9 +30,8 @@ import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { cn } from '@colanode/ui/lib/utils';
 
 const formSchema = z.object({
-  name: z.string().min(3, 'Name must be at least 3 characters long.'),
+  name: z.string(),
   type: z.enum(['table', 'board', 'calendar']),
-  groupBy: z.string().optional().nullable(),
 });
 
 interface ViewTypeOption {
@@ -61,9 +58,6 @@ const viewTypes: ViewTypeOption[] = [
   },
 ];
 
-const boardGroupFields: FieldType[] = ['select'];
-const calendarGroupFields: FieldType[] = ['date', 'created_at'];
-
 interface ViewCreateDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
@@ -84,18 +78,6 @@ export const ViewCreateDialog = ({
       type: 'table',
     },
   });
-  const type = form.watch('type');
-
-  let groupByFields: FieldAttributes[] | null = null;
-  if (type === 'board') {
-    groupByFields = database.fields.filter((field) =>
-      boardGroupFields.includes(field.type)
-    );
-  } else if (type === 'calendar') {
-    groupByFields = database.fields.filter((field) =>
-      calendarGroupFields.includes(field.type)
-    );
-  }
 
   const handleCancel = () => {
     form.reset();
@@ -107,31 +89,24 @@ export const ViewCreateDialog = ({
       return;
     }
 
-    if (values.type === 'board') {
-      if (!values.groupBy) {
-        toast.error(
-          'You need to specify a group by field to create a board view'
-        );
-        return;
-      }
-    } else if (values.type === 'calendar') {
-      if (!values.groupBy) {
-        toast.error(
-          'You need to specify a group by field to create a calendar view'
-        );
-        return;
-      }
+    const type = viewTypes.find((viewType) => viewType.type === values.type);
+    if (!type) {
+      return;
+    }
+
+    let name = values.name;
+    if (name === '') {
+      name = type.name;
     }
 
     mutate({
       input: {
         type: 'view.create',
-        viewType: values.type,
+        viewType: type.type,
         databaseId: database.id,
-        name: values.name,
+        name: name,
         accountId: workspace.accountId,
         workspaceId: workspace.id,
-        groupBy: values.groupBy ?? null,
       },
       onSuccess() {
         form.reset();
@@ -193,7 +168,6 @@ export const ViewCreateDialog = ({
                         )}
                         onClick={() => {
                           field.onChange(viewType.type);
-                          form.setValue('groupBy', null);
                         }}
                       >
                         <viewType.icon />
@@ -203,25 +177,6 @@ export const ViewCreateDialog = ({
                   </div>
                 )}
               />
-              {groupByFields && (
-                <FormField
-                  control={form.control}
-                  name="groupBy"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Group by</FormLabel>
-                      <FormControl>
-                        <FieldSelect
-                          fields={groupByFields}
-                          value={field.value ?? null}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              )}
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={handleCancel}>

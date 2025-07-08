@@ -88,12 +88,20 @@ const fieldTypes: FieldTypeOption[] = [
 ];
 
 interface FieldTypeSelectProps {
-  type: string | null;
+  value: string | null;
   onChange: (type: FieldType) => void;
+  types?: FieldType[];
 }
 
-export const FieldTypeSelect = ({ type, onChange }: FieldTypeSelectProps) => {
+export const FieldTypeSelect = ({
+  value,
+  onChange,
+  types,
+}: FieldTypeSelectProps) => {
   const [open, setOpen] = useState(false);
+  const filteredFieldTypes = fieldTypes.filter((fieldType) =>
+    types ? types.includes(fieldType.type) : true
+  );
 
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
@@ -106,9 +114,9 @@ export const FieldTypeSelect = ({ type, onChange }: FieldTypeSelectProps) => {
           className="w-full justify-between p-2"
         >
           <span className="flex flex-row items-center gap-1">
-            <FieldIcon type={type as FieldType} className="size-4" />
-            {type
-              ? fieldTypes.find((fieldType) => fieldType.type === type)?.name
+            <FieldIcon type={value as FieldType} className="size-4" />
+            {value
+              ? fieldTypes.find((fieldType) => fieldType.type === value)?.name
               : 'Select field type...'}
           </span>
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
@@ -120,7 +128,7 @@ export const FieldTypeSelect = ({ type, onChange }: FieldTypeSelectProps) => {
           <CommandEmpty>No field type found.</CommandEmpty>
           <CommandList>
             <CommandGroup className="h-min overflow-y-auto">
-              {fieldTypes.map((fieldType) => (
+              {filteredFieldTypes.map((fieldType) => (
                 <CommandItem
                   key={fieldType.type}
                   value={`${fieldType.type} - ${fieldType.name}`}
@@ -138,7 +146,7 @@ export const FieldTypeSelect = ({ type, onChange }: FieldTypeSelectProps) => {
                     <Check
                       className={cn(
                         'ml-auto size-4',
-                        type === fieldType.type ? 'opacity-100' : 'opacity-0'
+                        value === fieldType.type ? 'opacity-100' : 'opacity-0'
                       )}
                     />
                   </div>

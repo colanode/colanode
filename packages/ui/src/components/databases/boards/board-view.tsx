@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 
-import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
+import { BoardViewColumns } from '@colanode/ui/components/databases/boards/board-view-columns';
+import { BoardViewNoGroup } from '@colanode/ui/components/databases/boards/board-view-no-group';
 import { BoardViewSettings } from '@colanode/ui/components/databases/boards/board-view-settings';
 import { ViewFilterButton } from '@colanode/ui/components/databases/search/view-filter-button';
 import { ViewSearchBar } from '@colanode/ui/components/databases/search/view-search-bar';
@@ -17,11 +18,6 @@ export const BoardView = () => {
     (field) => field.id === view.groupBy
   );
 
-  const selectOptions =
-    groupByField && groupByField.type === 'select'
-      ? Object.values(groupByField.options ?? {})
-      : [];
-
   return (
     <Fragment>
       <div className="flex flex-row justify-between border-b">
@@ -34,17 +30,11 @@ export const BoardView = () => {
       </div>
       <ViewSearchBar />
       <div className="mt-2 flex w-full min-w-full max-w-full flex-row gap-2 overflow-auto pr-5">
-        {groupByField &&
-          groupByField.type === 'select' &&
-          selectOptions.map((option) => {
-            return (
-              <BoardViewColumn
-                key={option.id}
-                field={groupByField}
-                option={option}
-              />
-            );
-          })}
+        {groupByField ? (
+          <BoardViewColumns field={groupByField} />
+        ) : (
+          <BoardViewNoGroup />
+        )}
       </div>
     </Fragment>
   );

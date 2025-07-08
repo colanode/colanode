@@ -1,3 +1,5 @@
+import { Plus } from 'lucide-react';
+
 import { FieldCreatePopover } from '@colanode/ui/components/databases/fields/field-create-popover';
 import { TableViewFieldHeader } from '@colanode/ui/components/databases/tables/table-view-field-header';
 import { TableViewNameHeader } from '@colanode/ui/components/databases/tables/table-view-name-header';
@@ -15,7 +17,11 @@ export const TableViewHeader = () => {
       {view.fields.map((field) => {
         return <TableViewFieldHeader viewField={field} key={field.field.id} />;
       })}
-      {database.canEdit && <FieldCreatePopover />}
+      {database.canEdit && (
+        <FieldCreatePopover
+          button={<Plus className="ml-2 size-4 cursor-pointer" />}
+        />
+      )}
     </div>
   );
 };

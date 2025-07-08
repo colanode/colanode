@@ -38,7 +38,7 @@ export const TableViewSettings = () => {
         <PopoverTrigger>
           <ViewSettingsButton />
         </PopoverTrigger>
-        <PopoverContent className="mr-4 flex w-[600px] flex-col gap-1.5 p-2">
+        <PopoverContent className="mr-4 flex w-90 flex-col gap-1.5 p-2">
           <div className="flex flex-row items-center gap-2">
             {database.canEdit ? (
               <AvatarPopover

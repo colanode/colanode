@@ -25,6 +25,7 @@ interface DatabaseViewContext {
   setFieldDisplay: (id: string, display: boolean) => void;
   resizeField: (id: string, width: number) => void;
   resizeName: (width: number) => void;
+  setGroupBy: (fieldId: string | null) => void;
   moveField: (id: string, after: string) => void;
   isFieldFilterOpened: (fieldId: string) => boolean;
   initFieldFilter: (fieldId: string) => void;

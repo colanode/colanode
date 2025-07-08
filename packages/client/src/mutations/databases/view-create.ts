@@ -5,7 +5,6 @@ export type ViewCreateMutationInput = {
   databaseId: string;
   viewType: 'table' | 'board' | 'calendar';
   name: string;
-  groupBy: string | null | undefined;
 };
 
 export type ViewCreateMutationOutput = {

@@ -1,45 +1,45 @@
 import { useRef } from 'react';
 import { useDrop } from 'react-dnd';
 
-import { SelectFieldAttributes, SelectOptionAttributes } from '@colanode/core';
-import { BoardViewColumnHeader } from '@colanode/ui/components/databases/boards/board-view-column-header';
 import { BoardViewColumnRecords } from '@colanode/ui/components/databases/boards/board-view-column-records';
-import { getSelectOptionLightColorClass } from '@colanode/ui/lib/databases';
+import { useBoardView } from '@colanode/ui/contexts/board-view';
 import { cn } from '@colanode/ui/lib/utils';
 
-interface BoardViewColumnProps {
-  field: SelectFieldAttributes;
-  option: SelectOptionAttributes;
-}
+export const BoardViewColumn = () => {
+  const boardView = useBoardView();
 
-export const BoardViewColumn = ({ field, option }: BoardViewColumnProps) => {
-  const [{ isDragging }, drop] = useDrop({
+  const [{ isOver }, drop] = useDrop({
     accept: 'board-record',
-    drop: () => ({
-      option: option,
-      field: field,
-    }),
+    drop: (item) => {
+      const value = boardView.drop(item);
+      return {
+        value,
+      };
+    },
     collect: (monitor) => ({
-      isDragging: monitor.isOver(),
+      isOver: monitor.isOver(),
     }),
+    canDrop: boardView.canDrop,
   });
 
   const divRef = useRef<HTMLDivElement>(null);
   const dropRef = drop(divRef);
 
-  const lightClass = getSelectOptionLightColorClass(option.color ?? 'gray');
   return (
     <div
-      ref={dropRef as React.LegacyRef<HTMLDivElement>}
-      className={cn('min-h-[400px] border-r p-1', isDragging && lightClass)}
+      ref={dropRef as React.Ref<HTMLDivElement>}
+      className={cn(
+        'min-h-[400px] border-r p-1',
+        isOver ? boardView.dragOverClass : ''
+      )}
       style={{
         minWidth: '250px',
         maxWidth: '250px',
         width: '250px',
       }}
     >
-      <BoardViewColumnHeader option={option} />
-      <BoardViewColumnRecords field={field} option={option} />
+      <div className="flex flex-row items-center gap-2">{boardView.header}</div>
+      <BoardViewColumnRecords />
     </div>
   );
 };

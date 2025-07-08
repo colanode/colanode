@@ -192,6 +192,26 @@ export const View = ({ view }: ViewProps) => {
             toast.error(result.error.message);
           }
         },
+        setGroupBy: async (fieldId: string | null) => {
+          if (!database.canEdit) {
+            return;
+          }
+
+          const viewAttributes = { ...view.attributes };
+          viewAttributes.groupBy = fieldId;
+
+          const result = await window.colanode.executeMutation({
+            type: 'view.update',
+            accountId: workspace.accountId,
+            workspaceId: workspace.id,
+            viewId: view.id,
+            view: viewAttributes,
+          });
+
+          if (!result.success) {
+            toast.error(result.error.message);
+          }
+        },
         moveField: async (id: string, after: string) => {
           if (!database.canEdit) {
             return;
