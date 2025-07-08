@@ -9,6 +9,7 @@ const boardGroupFields: FieldType[] = [
   'select',
   'multi_select',
   'collaborator',
+  'created_by',
 ];
 
 export const BoardViewNoGroup = () => {

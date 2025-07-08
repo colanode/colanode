@@ -2,10 +2,7 @@ import { sql } from 'kysely';
 
 import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
 import { mapNode } from '@colanode/client/lib/mappers';
-import {
-  buildFiltersQuery,
-  getValueTypeForField,
-} from '@colanode/client/lib/records';
+import { buildFiltersQuery } from '@colanode/client/lib/records';
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
 import {
   RecordFieldValueCountQueryInput,
@@ -13,7 +10,7 @@ import {
   RecordFieldValueCount,
 } from '@colanode/client/queries/records/record-field-value-count';
 import { Event } from '@colanode/client/types/events';
-import { DatabaseNode, FieldAttributes, FieldValueType } from '@colanode/core';
+import { DatabaseNode, FieldAttributes } from '@colanode/core';
 
 export class RecordFieldValueCountQueryHandler
   extends WorkspaceQueryHandlerBase
@@ -127,18 +124,12 @@ export class RecordFieldValueCountQueryHandler
       return [];
     }
 
-    const valueType = getValueTypeForField(field);
     const filterQuery = buildFiltersQuery(
       input.filters,
       database.attributes.fields
     );
 
-    const queryString = this.buildQuery(
-      input.databaseId,
-      field,
-      valueType,
-      filterQuery
-    );
+    const queryString = this.buildQuery(input.databaseId, field, filterQuery);
 
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
     const query = sql<RecordFieldValueCount>`${sql.raw(queryString)}`.compile(
@@ -152,38 +143,18 @@ export class RecordFieldValueCountQueryHandler
   private buildQuery(
     databaseId: string,
     field: FieldAttributes,
-    valueType: FieldValueType,
     filterQuery: string
   ): string {
-    if (valueType === 'string_array') {
-      return this.buildStringArrayQuery(databaseId, field, filterQuery);
+    switch (field.type) {
+      case 'boolean':
+        return this.buildBooleanQuery(databaseId, field, filterQuery);
+      case 'multi_select':
+      case 'collaborator':
+      case 'relation':
+        return this.buildStringArrayQuery(databaseId, field, filterQuery);
+      default:
+        return this.buildDefaultQuery(databaseId, field, filterQuery);
     }
-
-    if (valueType === 'boolean') {
-      return this.buildBooleanQuery(databaseId, field, filterQuery);
-    }
-
-    return this.buildDefaultQuery(databaseId, field, filterQuery);
-  }
-
-  private buildStringArrayQuery(
-    databaseId: string,
-    field: FieldAttributes,
-    filterQuery: string
-  ): string {
-    return `
-      SELECT 
-        json_each.value as value,
-        COUNT(*) as count
-      FROM nodes n,
-      json_each(${this.buildFieldSelector(field)})
-      WHERE n.parent_id = '${databaseId}' 
-        AND n.type = 'record' 
-        AND ${this.buildFieldSelector(field)} IS NOT NULL
-        ${filterQuery}
-      GROUP BY json_each.value
-      ORDER BY count DESC, value ASC
-    `;
   }
 
   private buildBooleanQuery(
@@ -203,6 +174,26 @@ export class RecordFieldValueCountQueryHandler
         AND n.type = 'record' 
         ${filterQuery}
       GROUP BY value
+      ORDER BY count DESC, value ASC
+    `;
+  }
+
+  private buildStringArrayQuery(
+    databaseId: string,
+    field: FieldAttributes,
+    filterQuery: string
+  ): string {
+    return `
+      SELECT 
+        json_each.value as value,
+        COUNT(*) as count
+      FROM nodes n,
+      json_each(${this.buildFieldSelector(field)})
+      WHERE n.parent_id = '${databaseId}' 
+        AND n.type = 'record' 
+        AND ${this.buildFieldSelector(field)} IS NOT NULL
+        ${filterQuery}
+      GROUP BY json_each.value
       ORDER BY count DESC, value ASC
     `;
   }

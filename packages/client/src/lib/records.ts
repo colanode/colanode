@@ -15,7 +15,6 @@ import {
   DatabaseViewSortAttributes,
   MultiSelectFieldAttributes,
   SpecialId,
-  FieldValueType,
   CollaboratorFieldAttributes,
   CreatedByFieldAttributes,
 } from '@colanode/core';
@@ -164,11 +163,11 @@ const buildCollaboratorFilterQuery = (
   field: CollaboratorFieldAttributes
 ): string | null => {
   if (filter.operator === 'is_empty') {
-    return buildArrayIsEmptyFilterQuery(field.id);
+    return buildFieldArrayIsEmptyFilterQuery(field.id);
   }
 
   if (filter.operator === 'is_not_empty') {
-    return buildArrayIsNotEmptyFilterQuery(field.id);
+    return buildFieldArrayIsNotEmptyFilterQuery(field.id);
   }
 
   if (!isStringArray(filter.value)) {
@@ -181,9 +180,9 @@ const buildCollaboratorFilterQuery = (
 
   switch (filter.operator) {
     case 'is_in':
-      return buildArrayContainsFilterQuery(field.id, filter.value);
+      return buildArrayFieldContainsFilterQuery(field.id, filter.value);
     case 'is_not_in':
-      return buildArrayDoesNotContainFilterQuery(field.id, filter.value);
+      return buildArrayFieldDoesNotContainFilterQuery(field.id, filter.value);
     default:
       return null;
   }
@@ -440,11 +439,11 @@ const buildMultiSelectFilterQuery = (
   field: MultiSelectFieldAttributes
 ): string | null => {
   if (filter.operator === 'is_empty') {
-    return buildArrayIsEmptyFilterQuery(field.id);
+    return buildFieldArrayIsEmptyFilterQuery(field.id);
   }
 
   if (filter.operator === 'is_not_empty') {
-    return buildArrayIsNotEmptyFilterQuery(field.id);
+    return buildFieldArrayIsNotEmptyFilterQuery(field.id);
   }
 
   if (!isStringArray(filter.value)) {
@@ -457,9 +456,9 @@ const buildMultiSelectFilterQuery = (
 
   switch (filter.operator) {
     case 'is_in':
-      return buildArrayContainsFilterQuery(field.id, filter.value);
+      return buildArrayFieldContainsFilterQuery(field.id, filter.value);
     case 'is_not_in':
-      return buildArrayDoesNotContainFilterQuery(field.id, filter.value);
+      return buildArrayFieldDoesNotContainFilterQuery(field.id, filter.value);
     default:
       return null;
   }
@@ -515,11 +514,11 @@ const buildCreatedAtFilterQuery = (
   _: CreatedAtFieldAttributes
 ): string | null => {
   if (filter.operator === 'is_empty') {
-    return buildAttributeFilterQuery('created_at', 'IS', 'NULL');
+    return buildColumnFilterQuery('created_at', 'IS', 'NULL');
   }
 
   if (filter.operator === 'is_not_empty') {
-    return buildAttributeFilterQuery('created_at', 'IS NOT', 'NULL');
+    return buildColumnFilterQuery('created_at', 'IS NOT', 'NULL');
   }
 
   if (filter.value === null) {
@@ -539,17 +538,17 @@ const buildCreatedAtFilterQuery = (
 
   switch (filter.operator) {
     case 'is_equal_to':
-      return buildAttributeFilterQuery('created_at', '=', `'${dateString}'`);
+      return buildColumnFilterQuery('created_at', '=', `'${dateString}'`);
     case 'is_not_equal_to':
-      return buildAttributeFilterQuery('created_at', '!=', `'${dateString}'`);
+      return buildColumnFilterQuery('created_at', '!=', `'${dateString}'`);
     case 'is_on_or_after':
-      return buildAttributeFilterQuery('created_at', '>=', `'${dateString}'`);
+      return buildColumnFilterQuery('created_at', '>=', `'${dateString}'`);
     case 'is_on_or_before':
-      return buildAttributeFilterQuery('created_at', '<=', `'${dateString}'`);
+      return buildColumnFilterQuery('created_at', '<=', `'${dateString}'`);
     case 'is_after':
-      return buildAttributeFilterQuery('created_at', '>', `'${dateString}'`);
+      return buildColumnFilterQuery('created_at', '>', `'${dateString}'`);
     case 'is_before':
-      return buildAttributeFilterQuery('created_at', '<', `'${dateString}'`);
+      return buildColumnFilterQuery('created_at', '<', `'${dateString}'`);
     default:
       return null;
   }
@@ -557,7 +556,7 @@ const buildCreatedAtFilterQuery = (
 
 const buildCreatedByFilterQuery = (
   filter: DatabaseViewFieldFilterAttributes,
-  field: CreatedByFieldAttributes
+  _: CreatedByFieldAttributes
 ): string | null => {
   if (!isStringArray(filter.value)) {
     return null;
@@ -569,9 +568,17 @@ const buildCreatedByFilterQuery = (
 
   switch (filter.operator) {
     case 'is_in':
-      return buildArrayContainsFilterQuery(field.id, filter.value);
+      return buildColumnFilterQuery(
+        'created_by',
+        'IN',
+        `(${joinIds(filter.value)})`
+      );
     case 'is_not_in':
-      return buildArrayDoesNotContainFilterQuery(field.id, filter.value);
+      return buildColumnFilterQuery(
+        'created_by',
+        'NOT IN',
+        `(${joinIds(filter.value)})`
+      );
     default:
       return null;
   }
@@ -586,35 +593,73 @@ const buildFieldFilterQuery = (
 };
 
 const buildAttributeFilterQuery = (
-  name: string,
+  attribute: string,
   operator: SqliteOperator,
   value: string
 ): string => {
-  return `json_extract(n.attributes, '$.${name}') ${operator} ${value}`;
+  return `json_extract(n.attributes, '$.${attribute}') ${operator} ${value}`;
 };
 
-const buildArrayIsEmptyFilterQuery = (fieldId: string): string => {
-  return `json_extract(n.attributes, '$.fields.${fieldId}.value') IS NULL OR json_array_length(json_extract(n.attributes, '$.fields.${fieldId}.value')) = 0`;
+const buildColumnFilterQuery = (
+  column: string,
+  operator: SqliteOperator,
+  value: string
+): string => {
+  return `n.${column} ${operator} ${value}`;
 };
 
-const buildArrayIsNotEmptyFilterQuery = (fieldId: string): string => {
-  return `json_extract(n.attributes, '$.fields.${fieldId}.value') IS NOT NULL AND json_array_length(json_extract(n.attributes, '$.fields.${fieldId}.value')) > 0`;
+const buildFieldArrayIsEmptyFilterQuery = (fieldId: string): string => {
+  return buildAttributeArrayIsEmptyFilterQuery(`fields.${fieldId}.value`);
 };
 
-const buildArrayContainsFilterQuery = (
+const buildAttributeArrayIsEmptyFilterQuery = (attribute: string): string => {
+  return `json_extract(n.attributes, '$.${attribute}') IS NULL OR json_array_length(json_extract(n.attributes, '$.${attribute}')) = 0`;
+};
+
+const buildFieldArrayIsNotEmptyFilterQuery = (fieldId: string): string => {
+  return buildAttributeArrayIsNotEmptyFilterQuery(`fields.${fieldId}.value`);
+};
+
+const buildAttributeArrayIsNotEmptyFilterQuery = (
+  attribute: string
+): string => {
+  return `json_extract(n.attributes, '$.${attribute}') IS NOT NULL AND json_array_length(json_extract(n.attributes, '$.${attribute}')) > 0`;
+};
+
+const buildArrayFieldContainsFilterQuery = (
   fieldId: string,
   value: string[]
 ): string => {
-  const ids = joinIds(value);
-  return `EXISTS (SELECT 1 FROM json_each(json_extract(n.attributes, '$.fields.${fieldId}.value')) WHERE json_each.value IN (${ids}))`;
+  return buildArrayAttributeContainsFilterQuery(
+    `fields.${fieldId}.value`,
+    value
+  );
 };
 
-const buildArrayDoesNotContainFilterQuery = (
-  fieldId: string,
+const buildArrayAttributeContainsFilterQuery = (
+  attribute: string,
   value: string[]
 ): string => {
   const ids = joinIds(value);
-  return `NOT EXISTS (SELECT 1 FROM json_each(json_extract(n.attributes, '$.fields.${fieldId}.value')) WHERE json_each.value IN (${ids}))`;
+  return `EXISTS (SELECT 1 FROM json_each(json_extract(n.attributes, '$.${attribute}')) WHERE json_each.value IN (${ids}))`;
+};
+
+const buildArrayFieldDoesNotContainFilterQuery = (
+  fieldId: string,
+  value: string[]
+): string => {
+  return buildArrayAttributeDoesNotContainFilterQuery(
+    `fields.${fieldId}.value`,
+    value
+  );
+};
+
+const buildArrayAttributeDoesNotContainFilterQuery = (
+  attribute: string,
+  value: string[]
+): string => {
+  const ids = joinIds(value);
+  return `NOT EXISTS (SELECT 1 FROM json_each(json_extract(n.attributes, '$.${attribute}')) WHERE json_each.value IN (${ids}))`;
 };
 
 const joinIds = (ids: string[]): string => {
@@ -653,26 +698,4 @@ const buildSortOrderQuery = (
   }
 
   return `json_extract(n.attributes, '$.fields.${field.id}.value') ${sort.direction}`;
-};
-
-export const getValueTypeForField = (
-  field: FieldAttributes
-): FieldValueType => {
-  if (field.type === 'boolean') {
-    return 'boolean';
-  }
-
-  if (
-    field.type === 'collaborator' ||
-    field.type === 'relation' ||
-    field.type === 'multi_select'
-  ) {
-    return 'string_array';
-  }
-
-  if (field.type === 'number') {
-    return 'number';
-  }
-
-  return 'text';
 };
