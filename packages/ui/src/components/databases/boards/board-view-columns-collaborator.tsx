@@ -1,26 +1,45 @@
+import { CircleAlert, CircleDashed } from 'lucide-react';
 import { toast } from 'sonner';
 
 import {
+  CollaboratorFieldAttributes,
   DatabaseViewFilterAttributes,
   FieldValue,
-  MultiSelectFieldAttributes,
 } from '@colanode/core';
+import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
-import { SelectOptionBadge } from '@colanode/ui/components/databases/fields/select-option-badge';
+import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { BoardViewContext } from '@colanode/ui/contexts/board-view';
+import { useDatabase } from '@colanode/ui/contexts/database';
+import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { getSelectOptionLightColorClass } from '@colanode/ui/lib/databases';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
-interface BoardViewMultiSelectColumnsProps {
-  field: MultiSelectFieldAttributes;
+interface BoardViewColumnsCollaboratorProps {
+  field: CollaboratorFieldAttributes;
 }
 
-export const BoardViewMultiSelectColumns = ({
+export const BoardViewColumnsCollaborator = ({
   field,
-}: BoardViewMultiSelectColumnsProps) => {
+}: BoardViewColumnsCollaboratorProps) => {
   const workspace = useWorkspace();
-  const selectOptions = Object.values(field.options ?? {});
+  const database = useDatabase();
+  const view = useDatabaseView();
 
+  const collaboratorCountQuery = useQuery({
+    type: 'record.field.value.count',
+    databaseId: database.id,
+    filters: view.filters,
+    fieldId: field.id,
+    accountId: workspace.accountId,
+    workspaceId: workspace.id,
+  });
+
+  if (collaboratorCountQuery.isPending) {
+    return null;
+  }
+
+  const collaborators = collaboratorCountQuery.data?.items ?? [];
   const noValueFilter: DatabaseViewFilterAttributes = {
     id: '1',
     type: 'field',
@@ -28,26 +47,20 @@ export const BoardViewMultiSelectColumns = ({
     operator: 'is_empty',
   };
 
-  const noValueDraggingClass = getSelectOptionLightColorClass('gray');
-
   return (
     <>
-      {selectOptions.map((option) => {
+      {collaborators.map((collaborator) => {
         const filter: DatabaseViewFilterAttributes = {
           id: '1',
           type: 'field',
           fieldId: field.id,
           operator: 'is_in',
-          value: [option.id],
+          value: [collaborator.value],
         };
-
-        const draggingClass = getSelectOptionLightColorClass(
-          option.color ?? 'gray'
-        );
 
         return (
           <BoardViewContext.Provider
-            key={option.id}
+            key={collaborator.value}
             value={{
               field,
               filter,
@@ -55,12 +68,14 @@ export const BoardViewMultiSelectColumns = ({
               drop: () => {
                 return {
                   type: 'string_array',
-                  value: [option.id],
+                  value: [collaborator.value],
                 };
               },
-              dragOverClass: draggingClass,
               header: (
-                <SelectOptionBadge name={option.name} color={option.color} />
+                <BoardViewColumnCollaboratorHeader
+                  field={field}
+                  collaborator={collaborator.value}
+                />
               ),
               canDrag: (record) => record.canEdit,
               onDragEnd: async (record, value) => {
@@ -86,7 +101,8 @@ export const BoardViewMultiSelectColumns = ({
                   if (currentValue && currentValue.type === 'string_array') {
                     const newOptions = [
                       ...currentValue.value.filter(
-                        (optionId) => optionId !== option.id
+                        (collaboratorId) =>
+                          collaboratorId !== collaborator.value
                       ),
                       ...newValue.value,
                     ];
@@ -126,9 +142,11 @@ export const BoardViewMultiSelectColumns = ({
             return null;
           },
           header: (
-            <p className="text-sm text-muted-foreground">No {field.name}</p>
+            <BoardViewColumnCollaboratorHeader
+              field={field}
+              collaborator={null}
+            />
           ),
-          dragOverClass: noValueDraggingClass,
           canDrag: () => true,
           onDragEnd: async (record, value) => {
             if (!value) {
@@ -163,5 +181,69 @@ export const BoardViewMultiSelectColumns = ({
         <BoardViewColumn />
       </BoardViewContext.Provider>
     </>
+  );
+};
+
+interface BoardViewColumnCollaboratorHeaderProps {
+  field: CollaboratorFieldAttributes;
+  collaborator: string | null;
+}
+
+const BoardViewColumnCollaboratorHeader = ({
+  field,
+  collaborator,
+}: BoardViewColumnCollaboratorHeaderProps) => {
+  const workspace = useWorkspace();
+
+  const userQuery = useQuery(
+    {
+      type: 'user.get',
+      userId: collaborator ?? '',
+      accountId: workspace.accountId,
+      workspaceId: workspace.id,
+    },
+    {
+      enabled: !!collaborator,
+    }
+  );
+
+  if (!collaborator) {
+    return (
+      <div className="flex flex-row gap-2 items-center">
+        <CircleDashed className="size-5" />
+        <p className="text-muted-foreground">No {field.name}</p>
+      </div>
+    );
+  }
+
+  if (userQuery.isPending) {
+    return (
+      <div className="flex flex-row gap-2 items-center">
+        <Spinner className="size-5" />
+        <p className="text-muted-foreground">Loading...</p>
+      </div>
+    );
+  }
+
+  const user = userQuery.data;
+  if (!user) {
+    return (
+      <div className="flex flex-row gap-2 items-center">
+        <CircleAlert className="size-5" />
+        <p className="text-muted-foreground">Unknown</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex flex-row gap-2 items-center">
+      <Avatar
+        id={user.id}
+        name={user.name}
+        avatar={user.avatar}
+        className="size-5"
+      />
+      <p>{user.name}</p>
+    </div>
   );
 };

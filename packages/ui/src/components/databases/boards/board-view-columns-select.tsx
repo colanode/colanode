@@ -10,13 +10,13 @@ import { BoardViewContext } from '@colanode/ui/contexts/board-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { getSelectOptionLightColorClass } from '@colanode/ui/lib/databases';
 
-interface BoardViewSelectColumnsProps {
+interface BoardViewColumnsSelectProps {
   field: SelectFieldAttributes;
 }
 
-export const BoardViewSelectColumns = ({
+export const BoardViewColumnsSelect = ({
   field,
-}: BoardViewSelectColumnsProps) => {
+}: BoardViewColumnsSelectProps) => {
   const workspace = useWorkspace();
   const selectOptions = Object.values(field.options ?? {});
 

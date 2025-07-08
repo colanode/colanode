@@ -24,14 +24,12 @@ export const BoardViewColumn = () => {
 
   const divRef = useRef<HTMLDivElement>(null);
   const dropRef = drop(divRef);
+  const dragOverClass = boardView.dragOverClass ?? 'bg-gray-50';
 
   return (
     <div
       ref={dropRef as React.Ref<HTMLDivElement>}
-      className={cn(
-        'min-h-[400px] border-r p-1',
-        isOver ? boardView.dragOverClass : ''
-      )}
+      className={cn('min-h-[400px] border-r p-1', isOver ? dragOverClass : '')}
       style={{
         minWidth: '250px',
         maxWidth: '250px',

@@ -5,7 +5,11 @@ import { Button } from '@colanode/ui/components/ui/button';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 
-const boardGroupFields: FieldType[] = ['select', 'multi_select'];
+const boardGroupFields: FieldType[] = [
+  'select',
+  'multi_select',
+  'collaborator',
+];
 
 export const BoardViewNoGroup = () => {
   const database = useDatabase();

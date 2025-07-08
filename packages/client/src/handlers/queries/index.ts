@@ -32,6 +32,7 @@ import { NodeGetQueryHandler } from './nodes/node-get';
 import { NodeReactionsListQueryHandler } from './nodes/node-reaction-list';
 import { NodeReactionsAggregateQueryHandler } from './nodes/node-reactions-aggregate';
 import { NodeTreeGetQueryHandler } from './nodes/node-tree-get';
+import { RecordFieldValueCountQueryHandler } from './records/record-field-value-count';
 import { RecordListQueryHandler } from './records/record-list';
 import { RecordSearchQueryHandler } from './records/record-search';
 import { ServerListQueryHandler } from './servers/server-list';
@@ -58,6 +59,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'node.get': new NodeGetQueryHandler(app),
     'node.tree.get': new NodeTreeGetQueryHandler(app),
     'record.list': new RecordListQueryHandler(app),
+    'record.field.value.count': new RecordFieldValueCountQueryHandler(app),
     'server.list': new ServerListQueryHandler(app),
     'user.search': new UserSearchQueryHandler(app),
     'workspace.list': new WorkspaceListQueryHandler(app),
