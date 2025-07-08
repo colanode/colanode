@@ -17,6 +17,8 @@ import {
   SpecialId,
   CollaboratorFieldAttributes,
   CreatedByFieldAttributes,
+  UpdatedAtFieldAttributes,
+  UpdatedByFieldAttributes,
 } from '@colanode/core';
 
 type SqliteOperator =
@@ -96,6 +98,10 @@ const buildFilterQuery = (
       return buildTextFilterQuery(filter, field);
     case 'url':
       return buildUrlFilterQuery(filter, field);
+    case 'updated_at':
+      return buildUpdatedAtFilterQuery(filter, field);
+    case 'updated_by':
+      return buildUpdatedByFilterQuery(filter, field);
     default:
       return null;
   }
@@ -558,6 +564,14 @@ const buildCreatedByFilterQuery = (
   filter: DatabaseViewFieldFilterAttributes,
   _: CreatedByFieldAttributes
 ): string | null => {
+  if (filter.operator === 'is_empty') {
+    return buildColumnFilterQuery('created_by', 'IS', 'NULL');
+  }
+
+  if (filter.operator === 'is_not_empty') {
+    return buildColumnFilterQuery('created_by', 'IS NOT', 'NULL');
+  }
+
   if (!isStringArray(filter.value)) {
     return null;
   }
@@ -576,6 +590,89 @@ const buildCreatedByFilterQuery = (
     case 'is_not_in':
       return buildColumnFilterQuery(
         'created_by',
+        'NOT IN',
+        `(${joinIds(filter.value)})`
+      );
+    default:
+      return null;
+  }
+};
+
+const buildUpdatedAtFilterQuery = (
+  filter: DatabaseViewFieldFilterAttributes,
+  _: UpdatedAtFieldAttributes
+): string | null => {
+  if (filter.operator === 'is_empty') {
+    return buildColumnFilterQuery('updated_at', 'IS', 'NULL');
+  }
+
+  if (filter.operator === 'is_not_empty') {
+    return buildColumnFilterQuery('updated_at', 'IS NOT', 'NULL');
+  }
+
+  if (filter.value === null) {
+    return null;
+  }
+
+  if (typeof filter.value !== 'string') {
+    return null;
+  }
+
+  const date = new Date(filter.value);
+  if (isNaN(date.getTime())) {
+    return null;
+  }
+
+  const dateString = date.toISOString().split('T')[0];
+
+  switch (filter.operator) {
+    case 'is_equal_to':
+      return buildColumnFilterQuery('updated_at', '=', `'${dateString}'`);
+    case 'is_not_equal_to':
+      return buildColumnFilterQuery('updated_at', '!=', `'${dateString}'`);
+    case 'is_on_or_after':
+      return buildColumnFilterQuery('updated_at', '>=', `'${dateString}'`);
+    case 'is_on_or_before':
+      return buildColumnFilterQuery('updated_at', '<=', `'${dateString}'`);
+    case 'is_after':
+      return buildColumnFilterQuery('updated_at', '>', `'${dateString}'`);
+    case 'is_before':
+      return buildColumnFilterQuery('updated_at', '<', `'${dateString}'`);
+    default:
+      return null;
+  }
+};
+
+const buildUpdatedByFilterQuery = (
+  filter: DatabaseViewFieldFilterAttributes,
+  _: UpdatedByFieldAttributes
+): string | null => {
+  if (filter.operator === 'is_empty') {
+    return buildColumnFilterQuery('updated_by', 'IS', 'NULL');
+  }
+
+  if (filter.operator === 'is_not_empty') {
+    return buildColumnFilterQuery('updated_by', 'IS NOT', 'NULL');
+  }
+
+  if (!isStringArray(filter.value)) {
+    return null;
+  }
+
+  if (filter.value.length === 0) {
+    return null;
+  }
+
+  switch (filter.operator) {
+    case 'is_in':
+      return buildColumnFilterQuery(
+        'updated_by',
+        'IN',
+        `(${joinIds(filter.value)})`
+      );
+    case 'is_not_in':
+      return buildColumnFilterQuery(
+        'updated_by',
         'NOT IN',
         `(${joinIds(filter.value)})`
       );

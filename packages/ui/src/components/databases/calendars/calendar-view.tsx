@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 
 import { CalendarViewGrid } from '@colanode/ui/components/databases/calendars/calendar-view-grid';
+import { CalendarViewNoGroup } from '@colanode/ui/components/databases/calendars/calendar-view-no-group';
 import { CalendarViewSettings } from '@colanode/ui/components/databases/calendars/calendar-view-settings';
 import { ViewFilterButton } from '@colanode/ui/components/databases/search/view-filter-button';
 import { ViewSearchBar } from '@colanode/ui/components/databases/search/view-search-bar';
@@ -17,10 +18,6 @@ export const CalendarView = () => {
     (field) => field.id === view.groupBy
   );
 
-  if (!groupByField) {
-    return null;
-  }
-
   return (
     <Fragment>
       <div className="flex flex-row justify-between border-b">
@@ -33,7 +30,11 @@ export const CalendarView = () => {
       </div>
       <ViewSearchBar />
       <div className="mt-2 w-full min-w-full max-w-full overflow-auto pr-5">
-        <CalendarViewGrid field={groupByField} />
+        {groupByField ? (
+          <CalendarViewGrid field={groupByField} />
+        ) : (
+          <CalendarViewNoGroup />
+        )}
       </div>
     </Fragment>
   );
