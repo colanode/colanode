@@ -226,6 +226,14 @@ export class RecordFieldValueCountQueryHandler
       return `n.created_by`;
     }
 
+    if (field.type === 'updated_at') {
+      return `n.updated_at`;
+    }
+
+    if (field.type === 'updated_by') {
+      return `n.updated_by`;
+    }
+
     return `json_extract(n.attributes, '$.fields.${field.id}.value')`;
   }
 
