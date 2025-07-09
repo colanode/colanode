@@ -37,7 +37,7 @@ export const BoardViewColumnsCreatedBy = ({
     return null;
   }
 
-  const users = createdByCountQuery.data?.items ?? [];
+  const users = createdByCountQuery.data?.values ?? [];
 
   return (
     <>
@@ -62,6 +62,7 @@ export const BoardViewColumnsCreatedBy = ({
                 <BoardViewColumnCreatedByHeader
                   field={field}
                   createdBy={user.value}
+                  count={user.count}
                 />
               ),
               canDrag: () => false,
@@ -79,10 +80,12 @@ export const BoardViewColumnsCreatedBy = ({
 interface BoardViewColumnCreatedByHeaderProps {
   field: CreatedByFieldAttributes;
   createdBy: string;
+  count: number;
 }
 
 const BoardViewColumnCreatedByHeader = ({
   createdBy,
+  count,
 }: BoardViewColumnCreatedByHeaderProps) => {
   const workspace = useWorkspace();
 
@@ -98,6 +101,9 @@ const BoardViewColumnCreatedByHeader = ({
       <div className="flex flex-row gap-2 items-center">
         <Spinner className="size-5" />
         <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground text-sm ml-1">
+          {count.toLocaleString()}
+        </p>
       </div>
     );
   }
@@ -108,6 +114,9 @@ const BoardViewColumnCreatedByHeader = ({
       <div className="flex flex-row gap-2 items-center">
         <CircleAlert className="size-5" />
         <p className="text-muted-foreground">Unknown</p>
+        <p className="text-muted-foreground text-sm ml-1">
+          {count.toLocaleString()}
+        </p>
       </div>
     );
   }
@@ -121,6 +130,9 @@ const BoardViewColumnCreatedByHeader = ({
         className="size-5"
       />
       <p>{user.name}</p>
+      <p className="text-muted-foreground text-sm ml-1">
+        {count.toLocaleString()}
+      </p>
     </div>
   );
 };

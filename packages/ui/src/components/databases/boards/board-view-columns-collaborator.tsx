@@ -39,13 +39,14 @@ export const BoardViewColumnsCollaborator = ({
     return null;
   }
 
-  const collaborators = collaboratorCountQuery.data?.items ?? [];
+  const collaborators = collaboratorCountQuery.data?.values ?? [];
   const noValueFilter: DatabaseViewFilterAttributes = {
     id: '1',
     type: 'field',
     fieldId: field.id,
     operator: 'is_empty',
   };
+  const noValueCount = collaboratorCountQuery.data?.nullCount ?? 0;
 
   return (
     <>
@@ -75,6 +76,7 @@ export const BoardViewColumnsCollaborator = ({
                 <BoardViewColumnCollaboratorHeader
                   field={field}
                   collaborator={collaborator.value}
+                  count={collaborator.count}
                 />
               ),
               canDrag: (record) => record.canEdit,
@@ -145,6 +147,7 @@ export const BoardViewColumnsCollaborator = ({
             <BoardViewColumnCollaboratorHeader
               field={field}
               collaborator={null}
+              count={noValueCount}
             />
           ),
           canDrag: () => true,
@@ -187,11 +190,13 @@ export const BoardViewColumnsCollaborator = ({
 interface BoardViewColumnCollaboratorHeaderProps {
   field: CollaboratorFieldAttributes;
   collaborator: string | null;
+  count: number;
 }
 
 const BoardViewColumnCollaboratorHeader = ({
   field,
   collaborator,
+  count,
 }: BoardViewColumnCollaboratorHeaderProps) => {
   const workspace = useWorkspace();
 
@@ -212,6 +217,9 @@ const BoardViewColumnCollaboratorHeader = ({
       <div className="flex flex-row gap-2 items-center">
         <CircleDashed className="size-5" />
         <p className="text-muted-foreground">No {field.name}</p>
+        <p className="text-muted-foreground text-sm ml-1">
+          {count.toLocaleString()}
+        </p>
       </div>
     );
   }
@@ -221,6 +229,9 @@ const BoardViewColumnCollaboratorHeader = ({
       <div className="flex flex-row gap-2 items-center">
         <Spinner className="size-5" />
         <p className="text-muted-foreground">Loading...</p>
+        <p className="text-muted-foreground text-sm ml-1">
+          {count.toLocaleString()}
+        </p>
       </div>
     );
   }
@@ -231,6 +242,9 @@ const BoardViewColumnCollaboratorHeader = ({
       <div className="flex flex-row gap-2 items-center">
         <CircleAlert className="size-5" />
         <p className="text-muted-foreground">Unknown</p>
+        <p className="text-muted-foreground text-sm ml-1">
+          {count.toLocaleString()}
+        </p>
       </div>
     );
   }
@@ -244,6 +258,9 @@ const BoardViewColumnCollaboratorHeader = ({
         className="size-5"
       />
       <p>{user.name}</p>
+      <p className="text-muted-foreground text-sm ml-1">
+        {count.toLocaleString()}
+      </p>
     </div>
   );
 };

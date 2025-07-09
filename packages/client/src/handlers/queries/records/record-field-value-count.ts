@@ -19,10 +19,8 @@ export class RecordFieldValueCountQueryHandler
   public async handleQuery(
     input: RecordFieldValueCountQueryInput
   ): Promise<RecordFieldValueCountQueryOutput> {
-    const counts = await this.fetchFieldValueCounts(input);
-    return {
-      items: counts,
-    };
+    const result = await this.fetchFieldValueCounts(input);
+    return result;
   }
 
   public async checkForChanges(
@@ -37,7 +35,7 @@ export class RecordFieldValueCountQueryHandler
     ) {
       return {
         hasChanges: true,
-        result: { items: [] },
+        result: { values: [], nullCount: 0 },
       };
     }
 
@@ -88,6 +86,16 @@ export class RecordFieldValueCountQueryHandler
       event.workspaceId === input.workspaceId
     ) {
       if (
+        event.node.type === 'database' &&
+        event.node.id === input.databaseId
+      ) {
+        return {
+          hasChanges: true,
+          result: { values: [], nullCount: 0 },
+        };
+      }
+
+      if (
         event.node.type === 'record' &&
         event.node.attributes.databaseId === input.databaseId
       ) {
@@ -95,16 +103,6 @@ export class RecordFieldValueCountQueryHandler
         return {
           hasChanges: true,
           result: newResult,
-        };
-      }
-
-      if (
-        event.node.type === 'database' &&
-        event.node.id === input.databaseId
-      ) {
-        return {
-          hasChanges: true,
-          result: { items: [] },
         };
       }
     }
@@ -116,12 +114,15 @@ export class RecordFieldValueCountQueryHandler
 
   private async fetchFieldValueCounts(
     input: RecordFieldValueCountQueryInput
-  ): Promise<RecordFieldValueCount[]> {
+  ): Promise<RecordFieldValueCountQueryOutput> {
     const database = await this.fetchDatabase(input);
     const field = database.attributes.fields[input.fieldId];
 
     if (!field) {
-      return [];
+      return {
+        values: [],
+        nullCount: 0,
+      };
     }
 
     const filterQuery = buildFiltersQuery(
@@ -137,7 +138,24 @@ export class RecordFieldValueCountQueryHandler
     );
 
     const result = await workspace.database.executeQuery(query);
-    return result.rows;
+
+    const output: RecordFieldValueCountQueryOutput = {
+      values: [],
+      nullCount: 0,
+    };
+
+    for (const row of result.rows) {
+      if (row.value === 'null') {
+        output.nullCount = row.count;
+      } else {
+        output.values.push({
+          value: row.value,
+          count: row.count,
+        });
+      }
+    }
+
+    return output;
   }
 
   private buildQuery(
@@ -190,10 +208,23 @@ export class RecordFieldValueCountQueryHandler
       FROM nodes n,
       json_each(${this.buildFieldSelector(field)})
       WHERE n.parent_id = '${databaseId}' 
-        AND n.type = 'record' 
-        AND ${this.buildFieldSelector(field)} IS NOT NULL
+        AND n.type = 'record'
         ${filterQuery}
       GROUP BY json_each.value
+      
+      UNION ALL
+      
+      SELECT 
+        'null' as value,
+        COUNT(*) as count
+      FROM nodes n
+      WHERE n.parent_id = '${databaseId}' 
+        AND n.type = 'record'
+        AND (${this.buildFieldSelector(field)} IS NULL 
+             OR ${this.buildFieldSelector(field)} = '[]'
+             OR json_array_length(${this.buildFieldSelector(field)}) = 0)
+        ${filterQuery}
+      
       ORDER BY count DESC, value ASC
     `;
   }
@@ -210,7 +241,6 @@ export class RecordFieldValueCountQueryHandler
       FROM nodes n
       WHERE n.parent_id = '${databaseId}' 
         AND n.type = 'record'
-        AND ${this.buildFieldSelector(field)} IS NOT NULL
         ${filterQuery}
       GROUP BY value
       ORDER BY count DESC, value ASC
