@@ -44,7 +44,7 @@ export const BoardViewColumnsSelect = ({
   };
 
   const selectOptionCount = selectOptionCountQuery.data?.values ?? [];
-  const noValueCount = selectOptionCountQuery.data?.nullCount ?? 0;
+  const noValueCount = selectOptionCountQuery.data?.noValueCount ?? 0;
 
   const noValueDraggingClass = getSelectOptionLightColorClass('gray');
 

@@ -16,7 +16,7 @@ export type RecordFieldValueCount = {
 
 export type RecordFieldValueCountQueryOutput = {
   values: RecordFieldValueCount[];
-  nullCount: number;
+  noValueCount: number;
 };
 
 declare module '@colanode/client/queries' {

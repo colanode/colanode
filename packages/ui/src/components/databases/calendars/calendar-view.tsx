@@ -2,6 +2,7 @@ import { Fragment } from 'react';
 
 import { CalendarViewGrid } from '@colanode/ui/components/databases/calendars/calendar-view-grid';
 import { CalendarViewNoGroup } from '@colanode/ui/components/databases/calendars/calendar-view-no-group';
+import { CalendarViewNoValueCount } from '@colanode/ui/components/databases/calendars/calendar-view-no-value-count';
 import { CalendarViewSettings } from '@colanode/ui/components/databases/calendars/calendar-view-settings';
 import { ViewFilterButton } from '@colanode/ui/components/databases/search/view-filter-button';
 import { ViewSearchBar } from '@colanode/ui/components/databases/search/view-search-bar';
@@ -23,6 +24,7 @@ export const CalendarView = () => {
       <div className="flex flex-row justify-between border-b">
         <ViewTabs />
         <div className="invisible flex flex-row items-center justify-end group-hover/database:visible">
+          {groupByField && <CalendarViewNoValueCount field={groupByField} />}
           <CalendarViewSettings />
           <ViewSortButton />
           <ViewFilterButton />

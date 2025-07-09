@@ -42,7 +42,11 @@ export const CalendarViewDay = ({
             />
           </div>
         )}
-        <p className={isToday ? 'rounded-md bg-red-500 p-0.5 text-white' : ''}>
+        <p
+          className={
+            isToday ? 'rounded-md bg-red-500 py-1 px-2 text-white' : ''
+          }
+        >
           {date.getDate()}
         </p>
       </div>

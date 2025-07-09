@@ -46,7 +46,7 @@ export const BoardViewColumnsCollaborator = ({
     fieldId: field.id,
     operator: 'is_empty',
   };
-  const noValueCount = collaboratorCountQuery.data?.nullCount ?? 0;
+  const noValueCount = collaboratorCountQuery.data?.noValueCount ?? 0;
 
   return (
     <>

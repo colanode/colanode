@@ -35,7 +35,7 @@ export class RecordFieldValueCountQueryHandler
     ) {
       return {
         hasChanges: true,
-        result: { values: [], nullCount: 0 },
+        result: { values: [], noValueCount: 0 },
       };
     }
 
@@ -91,7 +91,7 @@ export class RecordFieldValueCountQueryHandler
       ) {
         return {
           hasChanges: true,
-          result: { values: [], nullCount: 0 },
+          result: { values: [], noValueCount: 0 },
         };
       }
 
@@ -121,7 +121,7 @@ export class RecordFieldValueCountQueryHandler
     if (!field) {
       return {
         values: [],
-        nullCount: 0,
+        noValueCount: 0,
       };
     }
 
@@ -141,12 +141,12 @@ export class RecordFieldValueCountQueryHandler
 
     const output: RecordFieldValueCountQueryOutput = {
       values: [],
-      nullCount: 0,
+      noValueCount: 0,
     };
 
     for (const row of result.rows) {
       if (row.value === 'null') {
-        output.nullCount = row.count;
+        output.noValueCount = row.count;
       } else {
         output.values.push({
           value: row.value,

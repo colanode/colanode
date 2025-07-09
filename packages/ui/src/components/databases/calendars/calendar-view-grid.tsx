@@ -76,12 +76,12 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
         ),
         button_previous: cn(
           buttonVariants({ variant: 'ghost' }),
-          'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none',
+          'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none size-7',
           defaultClassNames.button_previous
         ),
         button_next: cn(
           buttonVariants({ variant: 'ghost' }),
-          'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none',
+          'size-(--cell-size) aria-disabled:opacity-50 p-0 select-none size-7',
           defaultClassNames.button_next
         ),
         month_caption: cn(
