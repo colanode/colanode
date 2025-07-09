@@ -4,6 +4,10 @@
   "version": "1.0.0",
   "author": "Colanode",
   "type": "module",
+  "engines": {
+    "node": ">=20.19.0",
+    "npm": ">=10.0.0"
+  },
   "main": "./dist/index.js",
   "module": "./dist/index.js",
   "files": [
@@ -12,10 +16,11 @@
   ],
   "scripts": {
     "compile": "tsc --noEmit -p tsconfig.json",
-    "build": "npm run compile && tsup-node",
+    "build": "npm run compile && tsup",
     "clean": "del-cli dist isolate tsconfig.tsbuildinfo",
     "lint": "eslint . --max-warnings 0",
-    "dev": "DEBUG=colanode:* tsx watch --env-file .env src/index.ts"
+    "dev": "DEBUG=colanode:* tsx watch --env-file .env src/index.ts",
+    "start": "node dist/index.js"
   },
   "description": "",
   "devDependencies": {

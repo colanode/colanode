@@ -4,6 +4,10 @@
   "description": "Colanode monorepo",
   "version": "1.0.0",
   "private": true,
+  "engines": {
+    "node": ">=20.19.0",
+    "npm": ">=10.0.0"
+  },
   "workspaces": [
     "packages/*",
     "apps/*",
