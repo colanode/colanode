@@ -85,7 +85,6 @@ export class UserSearchQueryHandler
     let queryBuilder = workspace.database
       .selectFrom('users')
       .selectAll()
-      .where('id', '!=', workspace.userId)
       .where('name', 'like', `%${input.searchQuery}%`);
 
     if (exclude.length > 0) {
@@ -102,7 +101,6 @@ export class UserSearchQueryHandler
     const exclude = input.exclude ?? [];
     return workspace.database
       .selectFrom('users')
-      .where('id', '!=', workspace.userId)
       .where('id', 'not in', exclude)
       .selectAll()
       .execute();

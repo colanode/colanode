@@ -115,6 +115,7 @@ export class RecordFieldValueCountQueryHandler
   private async fetchFieldValueCounts(
     input: RecordFieldValueCountQueryInput
   ): Promise<RecordFieldValueCountQueryOutput> {
+    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
     const database = await this.fetchDatabase(input);
     const field = database.attributes.fields[input.fieldId];
 
@@ -127,12 +128,11 @@ export class RecordFieldValueCountQueryHandler
 
     const filterQuery = buildFiltersQuery(
       input.filters,
-      database.attributes.fields
+      database.attributes.fields,
+      workspace.userId
     );
 
     const queryString = this.buildQuery(input.databaseId, field, filterQuery);
-
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
     const query = sql<RecordFieldValueCount>`${sql.raw(queryString)}`.compile(
       workspace.database
     );

@@ -1,11 +1,12 @@
 import { ChevronDown, Trash2 } from 'lucide-react';
 
 import {
-  NumberFieldAttributes,
   DatabaseViewFieldFilterAttributes,
+  UpdatedAtFieldAttributes,
 } from '@colanode/core';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { Button } from '@colanode/ui/components/ui/button';
+import { DatePicker } from '@colanode/ui/components/ui/date-picker';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,12 +18,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
-import { SmartNumberInput } from '@colanode/ui/components/ui/smart-number-input';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
-import { numberFieldFilterOperators } from '@colanode/ui/lib/databases';
+import { updatedAtFieldFilterOperators } from '@colanode/ui/lib/databases';
 
-interface ViewNumberFieldFilterProps {
-  field: NumberFieldAttributes;
+interface ViewUpdatedAtFieldFilterProps {
+  field: UpdatedAtFieldAttributes;
   filter: DatabaseViewFieldFilterAttributes;
 }
 
@@ -30,24 +30,23 @@ const isOperatorWithoutValue = (operator: string) => {
   return operator === 'is_empty' || operator === 'is_not_empty';
 };
 
-export const ViewNumberFieldFilter = ({
+export const ViewUpdatedAtFieldFilter = ({
   field,
   filter,
-}: ViewNumberFieldFilterProps) => {
+}: ViewUpdatedAtFieldFilterProps) => {
   const view = useDatabaseView();
 
   const operator =
-    numberFieldFilterOperators.find(
+    updatedAtFieldFilterOperators.find(
       (operator) => operator.value === filter.operator
-    ) ?? numberFieldFilterOperators[0];
+    ) ?? updatedAtFieldFilterOperators[0];
 
   if (!operator) {
     return null;
   }
 
-  const numberValue = filter.value as number | null;
-
-  const hideInput = isOperatorWithoutValue(operator.value);
+  const dateTextValue = (filter.value as string) ?? null;
+  const dateValue = dateTextValue ? new Date(dateTextValue) : null;
 
   return (
     <Popover
@@ -84,18 +83,18 @@ export const ViewNumberFieldFilter = ({
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              {numberFieldFilterOperators.map((operator) => (
+              {updatedAtFieldFilterOperators.map((operator) => (
                 <DropdownMenuItem
                   key={operator.value}
                   onSelect={() => {
                     const value = isOperatorWithoutValue(operator.value)
                       ? null
-                      : numberValue;
+                      : dateValue?.toISOString();
 
                     view.updateFilter(filter.id, {
                       ...filter,
                       operator: operator.value,
-                      value: value,
+                      value: value ?? null,
                     });
                   }}
                 >
@@ -114,17 +113,24 @@ export const ViewNumberFieldFilter = ({
             <Trash2 className="size-4" />
           </Button>
         </div>
-        {!hideInput && (
-          <SmartNumberInput
-            value={numberValue ?? null}
-            onChange={(value) => {
+        <DatePicker
+          value={dateValue}
+          onChange={(newValue) => {
+            if (newValue === null || newValue === undefined) {
               view.updateFilter(filter.id, {
                 ...filter,
-                value: value,
+                value: null,
               });
-            }}
-          />
-        )}
+            } else {
+              view.updateFilter(filter.id, {
+                ...filter,
+                value: newValue.toISOString(),
+              });
+            }
+          }}
+          placeholder="Select date"
+          className="flex h-full w-full cursor-pointer flex-row items-center gap-1 rounded-md border border-input p-2 text-sm"
+        />
       </PopoverContent>
     </Popover>
   );

@@ -8,6 +8,7 @@ export type EditorCommandProps = {
 };
 
 export type EditorContext = {
+  userId: string;
   documentId: string;
   accountId: string;
   workspaceId: string;

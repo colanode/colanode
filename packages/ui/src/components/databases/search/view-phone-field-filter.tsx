@@ -26,6 +26,10 @@ interface ViewPhoneFieldFilterProps {
   filter: DatabaseViewFieldFilterAttributes;
 }
 
+const isOperatorWithoutValue = (operator: string) => {
+  return operator === 'is_empty' || operator === 'is_not_empty';
+};
+
 export const ViewPhoneFieldFilter = ({
   field,
   filter,
@@ -43,8 +47,7 @@ export const ViewPhoneFieldFilter = ({
 
   const phoneValue = filter.value as string | null;
 
-  const hideInput =
-    operator.value === 'is_empty' || operator.value === 'is_not_empty';
+  const hideInput = isOperatorWithoutValue(operator.value);
 
   return (
     <Popover
@@ -85,11 +88,9 @@ export const ViewPhoneFieldFilter = ({
                 <DropdownMenuItem
                   key={operator.value}
                   onSelect={() => {
-                    const value =
-                      operator.value === 'is_empty' ||
-                      operator.value === 'is_not_empty'
-                        ? null
-                        : phoneValue;
+                    const value = isOperatorWithoutValue(operator.value)
+                      ? null
+                      : phoneValue;
 
                     view.updateFilter(filter.id, {
                       ...filter,

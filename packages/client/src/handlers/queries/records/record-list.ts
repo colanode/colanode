@@ -133,13 +133,14 @@ export class RecordListQueryHandler
   private async fetchRecords(
     input: RecordListQueryInput
   ): Promise<SelectNode[]> {
+    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
     const database = await this.fetchDatabase(input);
     const filterQuery = buildFiltersQuery(
       input.filters,
-      database.attributes.fields
+      database.attributes.fields,
+      workspace.userId
     );
 
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
     const orderByQuery = `ORDER BY ${input.sorts.length > 0 ? buildSortOrdersQuery(input.sorts, database.attributes.fields) : 'n."id" ASC'}`;
     const offset = (input.page - 1) * input.count;
     const query = sql<SelectNode>`

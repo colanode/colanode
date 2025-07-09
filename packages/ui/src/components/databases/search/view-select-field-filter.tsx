@@ -27,6 +27,10 @@ interface ViewSelectFieldFilterProps {
   filter: DatabaseViewFieldFilterAttributes;
 }
 
+const isOperatorWithoutValue = (operator: string) => {
+  return operator === 'is_empty' || operator === 'is_not_empty';
+};
+
 export const ViewSelectFieldFilter = ({
   field,
   filter,
@@ -47,8 +51,7 @@ export const ViewSelectFieldFilter = ({
     selectOptionIds.includes(option.id)
   );
 
-  const hideInput =
-    operator.value === 'is_empty' || operator.value === 'is_not_empty';
+  const hideInput = isOperatorWithoutValue(operator.value);
 
   return (
     <Popover
@@ -89,11 +92,9 @@ export const ViewSelectFieldFilter = ({
                 <DropdownMenuItem
                   key={operator.value}
                   onSelect={() => {
-                    const value =
-                      operator.value === 'is_empty' ||
-                      operator.value === 'is_not_empty'
-                        ? []
-                        : selectOptionIds;
+                    const value = isOperatorWithoutValue(operator.value)
+                      ? []
+                      : selectOptionIds;
 
                     view.updateFilter(filter.id, {
                       ...filter,

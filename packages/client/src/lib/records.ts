@@ -37,14 +37,15 @@ type SqliteOperator =
 
 export const buildFiltersQuery = (
   filters: DatabaseViewFilterAttributes[],
-  fields: Record<string, FieldAttributes>
+  fields: Record<string, FieldAttributes>,
+  userId: string
 ): string => {
   if (filters.length === 0) {
     return '';
   }
 
   const filterQueries = filters
-    .map((filter) => buildFilterQuery(filter, fields))
+    .map((filter) => buildFilterQuery(filter, fields, userId))
     .filter((query) => query !== null);
 
   if (filterQueries.length === 0) {
@@ -56,7 +57,8 @@ export const buildFiltersQuery = (
 
 const buildFilterQuery = (
   filter: DatabaseViewFilterAttributes,
-  fields: Record<string, FieldAttributes>
+  fields: Record<string, FieldAttributes>,
+  userId: string
 ): string | null => {
   if (filter.type === 'group') {
     return null;
@@ -75,11 +77,11 @@ const buildFilterQuery = (
     case 'boolean':
       return buildBooleanFilterQuery(filter, field);
     case 'collaborator':
-      return buildCollaboratorFilterQuery(filter, field);
+      return buildCollaboratorFilterQuery(filter, field, userId);
     case 'created_at':
       return buildCreatedAtFilterQuery(filter, field);
     case 'created_by':
-      return buildCreatedByFilterQuery(filter, field);
+      return buildCreatedByFilterQuery(filter, field, userId);
     case 'date':
       return buildDateFilterQuery(filter, field);
     case 'email':
@@ -101,7 +103,7 @@ const buildFilterQuery = (
     case 'updated_at':
       return buildUpdatedAtFilterQuery(filter, field);
     case 'updated_by':
-      return buildUpdatedByFilterQuery(filter, field);
+      return buildUpdatedByFilterQuery(filter, field, userId);
     default:
       return null;
   }
@@ -166,7 +168,8 @@ const buildBooleanFilterQuery = (
 
 const buildCollaboratorFilterQuery = (
   filter: DatabaseViewFieldFilterAttributes,
-  field: CollaboratorFieldAttributes
+  field: CollaboratorFieldAttributes,
+  userId: string
 ): string | null => {
   if (filter.operator === 'is_empty') {
     return buildFieldArrayIsEmptyFilterQuery(field.id);
@@ -174,6 +177,14 @@ const buildCollaboratorFilterQuery = (
 
   if (filter.operator === 'is_not_empty') {
     return buildFieldArrayIsNotEmptyFilterQuery(field.id);
+  }
+
+  if (filter.operator === 'is_me') {
+    return buildArrayFieldContainsFilterQuery(field.id, [userId]);
+  }
+
+  if (filter.operator === 'is_not_me') {
+    return buildArrayFieldDoesNotContainFilterQuery(field.id, [userId]);
   }
 
   if (!isStringArray(filter.value)) {
@@ -519,14 +530,6 @@ const buildCreatedAtFilterQuery = (
   filter: DatabaseViewFieldFilterAttributes,
   _: CreatedAtFieldAttributes
 ): string | null => {
-  if (filter.operator === 'is_empty') {
-    return buildColumnFilterQuery('created_at', 'IS', 'NULL');
-  }
-
-  if (filter.operator === 'is_not_empty') {
-    return buildColumnFilterQuery('created_at', 'IS NOT', 'NULL');
-  }
-
   if (filter.value === null) {
     return null;
   }
@@ -562,14 +565,15 @@ const buildCreatedAtFilterQuery = (
 
 const buildCreatedByFilterQuery = (
   filter: DatabaseViewFieldFilterAttributes,
-  _: CreatedByFieldAttributes
+  _: CreatedByFieldAttributes,
+  userId: string
 ): string | null => {
-  if (filter.operator === 'is_empty') {
-    return buildColumnFilterQuery('created_by', 'IS', 'NULL');
+  if (filter.operator === 'is_me') {
+    return buildColumnFilterQuery('created_by', '=', `'${userId}'`);
   }
 
-  if (filter.operator === 'is_not_empty') {
-    return buildColumnFilterQuery('created_by', 'IS NOT', 'NULL');
+  if (filter.operator === 'is_not_me') {
+    return buildColumnFilterQuery('created_by', '!=', `'${userId}'`);
   }
 
   if (!isStringArray(filter.value)) {
@@ -645,7 +649,8 @@ const buildUpdatedAtFilterQuery = (
 
 const buildUpdatedByFilterQuery = (
   filter: DatabaseViewFieldFilterAttributes,
-  _: UpdatedByFieldAttributes
+  _: UpdatedByFieldAttributes,
+  userId: string
 ): string | null => {
   if (filter.operator === 'is_empty') {
     return buildColumnFilterQuery('updated_by', 'IS', 'NULL');
@@ -653,6 +658,14 @@ const buildUpdatedByFilterQuery = (
 
   if (filter.operator === 'is_not_empty') {
     return buildColumnFilterQuery('updated_by', 'IS NOT', 'NULL');
+  }
+
+  if (filter.operator === 'is_me') {
+    return buildColumnFilterQuery('updated_by', '=', `'${userId}'`);
+  }
+
+  if (filter.operator === 'is_not_me') {
+    return buildColumnFilterQuery('updated_by', '!=', `'${userId}'`);
   }
 
   if (!isStringArray(filter.value)) {

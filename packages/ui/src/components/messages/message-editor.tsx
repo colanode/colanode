@@ -30,6 +30,7 @@ import {
 import { ToolbarMenu } from '@colanode/ui/editor/menus';
 
 interface MessageEditorProps {
+  userId: string;
   accountId: string;
   workspaceId: string;
   conversationId: string;
@@ -75,6 +76,7 @@ export const MessageEditor = forwardRef<
         FileNode,
         MentionExtension.configure({
           context: {
+            userId: props.userId,
             accountId: props.accountId,
             workspaceId: props.workspaceId,
             documentId: props.conversationId,

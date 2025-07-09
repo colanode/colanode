@@ -19,7 +19,7 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
-import { dateFieldFilterOperators } from '@colanode/ui/lib/databases';
+import { createdAtFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewCreatedAtFieldFilterProps {
   field: CreatedAtFieldAttributes;
@@ -33,9 +33,9 @@ export const ViewCreatedAtFieldFilter = ({
   const view = useDatabaseView();
 
   const operator =
-    dateFieldFilterOperators.find(
+    createdAtFieldFilterOperators.find(
       (operator) => operator.value === filter.operator
-    ) ?? dateFieldFilterOperators[0];
+    ) ?? createdAtFieldFilterOperators[0];
 
   if (!operator) {
     return null;
@@ -79,16 +79,11 @@ export const ViewCreatedAtFieldFilter = ({
               </div>
             </DropdownMenuTrigger>
             <DropdownMenuContent>
-              {dateFieldFilterOperators.map((operator) => (
+              {createdAtFieldFilterOperators.map((operator) => (
                 <DropdownMenuItem
                   key={operator.value}
                   onSelect={() => {
-                    const value =
-                      operator.value === 'is_empty' ||
-                      operator.value === 'is_not_empty'
-                        ? null
-                        : dateValue?.toISOString();
-
+                    const value = dateValue?.toISOString();
                     view.updateFilter(filter.id, {
                       ...filter,
                       operator: operator.value,

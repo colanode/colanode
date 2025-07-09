@@ -285,13 +285,14 @@ export const MentionExtension = Node.create<MentionOptions>({
               return;
             }
 
-            const { accountId, workspaceId } = this.options.context;
+            const { accountId, workspaceId, userId } = this.options.context;
             window.colanode
               .executeQuery({
                 type: 'user.search',
                 accountId,
                 workspaceId,
                 searchQuery: query,
+                exclude: [userId],
               })
               .then((users) => {
                 resolve(users);

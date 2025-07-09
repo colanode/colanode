@@ -26,6 +26,7 @@ export const ChatCreatePopover = () => {
       </PopoverTrigger>
       <PopoverContent className="w-96 p-1">
         <UserSearch
+          exclude={[workspace.userId]}
           onSelect={(user) => {
             if (isPending) return;
 

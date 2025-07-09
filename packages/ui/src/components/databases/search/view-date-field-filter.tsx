@@ -26,6 +26,10 @@ interface ViewDateFieldFilterProps {
   filter: DatabaseViewFieldFilterAttributes;
 }
 
+const isOperatorWithoutValue = (operator: string) => {
+  return operator === 'is_empty' || operator === 'is_not_empty';
+};
+
 export const ViewDateFieldFilter = ({
   field,
   filter,
@@ -44,8 +48,7 @@ export const ViewDateFieldFilter = ({
   const dateTextValue = filter.value as string | null;
   const dateValue = dateTextValue ? new Date(dateTextValue) : null;
 
-  const hideInput =
-    operator.value === 'is_empty' || operator.value === 'is_not_empty';
+  const hideInput = isOperatorWithoutValue(operator.value);
 
   return (
     <Popover
@@ -86,11 +89,9 @@ export const ViewDateFieldFilter = ({
                 <DropdownMenuItem
                   key={operator.value}
                   onSelect={() => {
-                    const value =
-                      operator.value === 'is_empty' ||
-                      operator.value === 'is_not_empty'
-                        ? null
-                        : dateValue?.toISOString();
+                    const value = isOperatorWithoutValue(operator.value)
+                      ? null
+                      : dateValue?.toISOString();
 
                     view.updateFilter(filter.id, {
                       ...filter,

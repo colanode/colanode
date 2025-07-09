@@ -1,5 +1,5 @@
 import { X } from 'lucide-react';
-import { Fragment, useState } from 'react';
+import { useState } from 'react';
 
 import { User } from '@colanode/client/types';
 import { CollaboratorFieldAttributes } from '@colanode/core';
@@ -83,55 +83,51 @@ export const RecordCollaboratorValue = ({
         </div>
       </PopoverTrigger>
       <PopoverContent className="w-80 p-1">
-        <div className="flex flex-col flex-wrap gap-2 p-2">
-          {collaborators.length > 0 ? (
-            <Fragment>
-              {collaborators.map((collaborator) => (
-                <div
-                  key={collaborator.id}
-                  className="flex w-full flex-row items-center gap-2"
-                >
-                  <Avatar
-                    id={collaborator.id}
-                    name={collaborator.name}
-                    avatar={collaborator.avatar}
-                    className="h-7 w-7"
-                  />
-                  <div className="flex flex-grow flex-col">
-                    <p className="text-sm">{collaborator.name}</p>
-                    <p className="text-xs text-muted-foreground">
-                      {collaborator.email}
-                    </p>
-                  </div>
-                  {record.canEdit && !readOnly && (
-                    <X
-                      className="size-4 cursor-pointer"
-                      onClick={() => {
-                        if (!record.canEdit || readOnly) return;
-
-                        const newCollaborators = collaboratorIds.filter(
-                          (id) => id !== collaborator.id
-                        );
-
-                        if (newCollaborators.length === 0) {
-                          record.removeFieldValue(field);
-                        } else {
-                          record.updateFieldValue(field, {
-                            type: 'string_array',
-                            value: newCollaborators,
-                          });
-                        }
-                      }}
-                    />
-                  )}
+        {collaborators.length > 0 && (
+          <div className="flex flex-col flex-wrap gap-2 p-2">
+            {collaborators.map((collaborator) => (
+              <div
+                key={collaborator.id}
+                className="flex w-full flex-row items-center gap-2"
+              >
+                <Avatar
+                  id={collaborator.id}
+                  name={collaborator.name}
+                  avatar={collaborator.avatar}
+                  className="h-7 w-7"
+                />
+                <div className="flex flex-grow flex-col">
+                  <p className="text-sm">{collaborator.name}</p>
+                  <p className="text-xs text-muted-foreground">
+                    {collaborator.email}
+                  </p>
                 </div>
-              ))}
-              <Separator className="w-full my-2" />
-            </Fragment>
-          ) : (
-            <p className="text-sm text-muted-foreground">No collaborators</p>
-          )}
-        </div>
+                {record.canEdit && !readOnly && (
+                  <X
+                    className="size-4 cursor-pointer"
+                    onClick={() => {
+                      if (!record.canEdit || readOnly) return;
+
+                      const newCollaborators = collaboratorIds.filter(
+                        (id) => id !== collaborator.id
+                      );
+
+                      if (newCollaborators.length === 0) {
+                        record.removeFieldValue(field);
+                      } else {
+                        record.updateFieldValue(field, {
+                          type: 'string_array',
+                          value: newCollaborators,
+                        });
+                      }
+                    }}
+                  />
+                )}
+              </div>
+            ))}
+            <Separator className="w-full my-2" />
+          </div>
+        )}
         {record.canEdit && !readOnly && (
           <UserSearch
             exclude={collaboratorIds}

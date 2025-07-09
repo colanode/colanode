@@ -500,6 +500,68 @@ export const urlFieldFilterOperators: FieldFilterOperator[] = [
   },
 ];
 
+export const updatedByFieldFilterOperators: FieldFilterOperator[] = [
+  {
+    label: 'Is Me',
+    value: 'is_me',
+  },
+  {
+    label: 'Is Not Me',
+    value: 'is_not_me',
+  },
+  {
+    label: 'Is In',
+    value: 'is_in',
+  },
+  {
+    label: 'Is Not In',
+    value: 'is_not_in',
+  },
+  {
+    label: 'Is Empty',
+    value: 'is_empty',
+  },
+  {
+    label: 'Is Not Empty',
+    value: 'is_not_empty',
+  },
+];
+
+export const updatedAtFieldFilterOperators: FieldFilterOperator[] = [
+  {
+    label: 'Is Equal To',
+    value: 'is_equal_to',
+  },
+  {
+    label: 'Is Not Equal To',
+    value: 'is_not_equal_to',
+  },
+  {
+    label: 'Is on or after',
+    value: 'is_on_or_after',
+  },
+  {
+    label: 'Is on or before',
+    value: 'is_on_or_before',
+  },
+  {
+    label: 'Is After',
+    value: 'is_after',
+  },
+  {
+    label: 'Is Before',
+    value: 'is_before',
+  },
+  {
+    label: 'Is Empty',
+    value: 'is_empty',
+  },
+  {
+    label: 'Is Not Empty',
+    value: 'is_not_empty',
+  },
+];
+
 export const getFieldFilterOperators = (
   type: FieldType
 ): FieldFilterOperator[] => {
