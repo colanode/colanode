@@ -45,7 +45,7 @@ services:
       - '9000:9000'
       - '9001:9001'
     entrypoint: sh
-    command: -c 'mkdir -p /data/colanode-avatars /data/colanode-files && minio server /data --address ":9000" --console-address ":9001"'
+    command: -c 'mkdir -p /data/colanode && minio server /data --address ":9000" --console-address ":9001"'
     networks:
       - colanode_network
 
