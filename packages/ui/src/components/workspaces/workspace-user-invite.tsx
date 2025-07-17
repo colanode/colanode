@@ -23,14 +23,9 @@ export const WorkspaceUserInvite = ({
 
   return (
     <div className="flex flex-col space-y-2">
-      <div className="flex flex-row items-center gap-2">
-        <div>
-          <p>Invite with email</p>
-          <p className="text-sm text-muted-foreground">
-            Write the email addresses of the people you want to invite
-          </p>
-        </div>
-      </div>
+      <p className="text-sm text-muted-foreground">
+        Write the email addresses of the people you want to invite
+      </p>
       <div className="flex flex-row items-center gap-1">
         <div className="flex h-9 w-full flex-row gap-2 rounded-md border border-input bg-background p-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground">
           {emails.map((email) => (

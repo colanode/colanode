@@ -1,8 +1,6 @@
 import { useState } from 'react';
 
 import { Account as AccountType } from '@colanode/client/types';
-import { AccountLogout } from '@colanode/ui/components/accounts/account-logout';
-import { AccountSettingsDialog } from '@colanode/ui/components/accounts/account-settings-dialog';
 import { Workspace } from '@colanode/ui/components/workspaces/workspace';
 import { WorkspaceCreate } from '@colanode/ui/components/workspaces/workspace-create';
 import { AccountContext } from '@colanode/ui/contexts/account';
@@ -13,8 +11,6 @@ interface AccountProps {
 }
 
 export const Account = ({ account }: AccountProps) => {
-  const [openSettings, setOpenSettings] = useState(false);
-  const [openLogout, setOpenLogout] = useState(false);
   const [openCreateWorkspace, setOpenCreateWorkspace] = useState(false);
 
   const accountMetadataListQuery = useQuery({
@@ -59,8 +55,6 @@ export const Account = ({ account }: AccountProps) => {
     <AccountContext.Provider
       value={{
         ...account,
-        openSettings: () => setOpenSettings(true),
-        openLogout: () => setOpenLogout(true),
         openWorkspaceCreate: () => setOpenCreateWorkspace(true),
         openWorkspace: (id) => {
           setOpenCreateWorkspace(false);
@@ -79,20 +73,6 @@ export const Account = ({ account }: AccountProps) => {
         <WorkspaceCreate
           onSuccess={handleWorkspaceCreateSuccess}
           onCancel={handleWorkspaceCreateCancel}
-        />
-      )}
-      {openSettings && (
-        <AccountSettingsDialog
-          open={true}
-          onOpenChange={() => setOpenSettings(false)}
-        />
-      )}
-      {openLogout && (
-        <AccountLogout
-          onCancel={() => setOpenLogout(false)}
-          onLogout={() => {
-            setOpenLogout(false);
-          }}
         />
       )}
     </AccountContext.Provider>

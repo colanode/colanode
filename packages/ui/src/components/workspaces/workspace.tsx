@@ -1,12 +1,9 @@
-import { useState } from 'react';
-
 import {
   WorkspaceMetadataKey,
   WorkspaceMetadataMap,
   Workspace as WorkspaceType,
 } from '@colanode/client/types';
 import { Layout } from '@colanode/ui/components/layouts/layout';
-import { WorkspaceSettingsDialog } from '@colanode/ui/components/workspaces/workspace-settings-dialog';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
@@ -17,7 +14,6 @@ interface WorkspaceProps {
 
 export const Workspace = ({ workspace }: WorkspaceProps) => {
   const account = useAccount();
-  const [openSettings, setOpenSettings] = useState(false);
 
   const workspaceMetadataListQuery = useQuery({
     type: 'workspace.metadata.list',
@@ -33,9 +29,6 @@ export const Workspace = ({ workspace }: WorkspaceProps) => {
     <WorkspaceContext.Provider
       value={{
         ...workspace,
-        openSettings() {
-          setOpenSettings(true);
-        },
         getMetadata<K extends WorkspaceMetadataKey>(key: K) {
           const value = workspaceMetadataListQuery.data?.find(
             (m) => m.key === key
@@ -73,12 +66,6 @@ export const Workspace = ({ workspace }: WorkspaceProps) => {
       }}
     >
       <Layout key={workspace.id} />
-      {openSettings && (
-        <WorkspaceSettingsDialog
-          open={openSettings}
-          onOpenChange={() => setOpenSettings(false)}
-        />
-      )}
     </WorkspaceContext.Provider>
   );
 };

@@ -1,6 +1,7 @@
 import { SidebarMenuType } from '@colanode/client/types';
 import { SidebarChats } from '@colanode/ui/components/layouts/sidebars/sidebar-chats';
 import { SidebarMenu } from '@colanode/ui/components/layouts/sidebars/sidebar-menu';
+import { SidebarSettings } from '@colanode/ui/components/layouts/sidebars/sidebar-settings';
 import { SidebarSpaces } from '@colanode/ui/components/layouts/sidebars/sidebar-spaces';
 
 interface SidebarProps {
@@ -15,6 +16,7 @@ export const Sidebar = ({ menu, onMenuChange }: SidebarProps) => {
       <div className="min-h-0 flex-grow overflow-auto">
         {menu === 'spaces' && <SidebarSpaces />}
         {menu === 'chats' && <SidebarChats />}
+        {menu === 'settings' && <SidebarSettings />}
       </div>
     </div>
   );

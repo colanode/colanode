@@ -1,5 +1,5 @@
-import { Check, LogOut, Plus, Settings } from 'lucide-react';
-import { Fragment, useState } from 'react';
+import { Check, Plus } from 'lucide-react';
+import { useState } from 'react';
 
 import { UnreadState } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
@@ -66,96 +66,56 @@ export function SidebarMenuFooter() {
         align="end"
         sideOffset={4}
       >
-        <DropdownMenuItem key={account.id} className="p-0">
-          <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-            <Avatar
-              className="h-8 w-8 rounded-lg"
-              id={account.id}
-              name={account.name}
-              avatar={account.avatar}
-            />
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">{account.name}</span>
-              <span className="truncate text-xs">{account.email}</span>
-            </div>
-          </div>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem
-          className="gap-2 p-2 cursor-pointer"
-          onClick={() => {
-            account.openSettings();
-          }}
-        >
-          <Settings className="size-4" />
-          <p className="font-medium">Settings</p>
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          className="gap-2 p-2 cursor-pointer"
-          onClick={() => {
-            account.openLogout();
-          }}
-        >
-          <LogOut className="size-4" />
-          <p className="font-medium">Logout</p>
-        </DropdownMenuItem>
-        {otherAccounts.length > 0 && (
-          <Fragment>
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="mb-1">Accounts</DropdownMenuLabel>
-            {accounts.map((accountItem) => {
-              const state = accountUnreadStates[accountItem.id] ?? {
-                unreadCount: 0,
-                hasUnread: false,
-              };
+        <DropdownMenuLabel className="mb-1">Accounts</DropdownMenuLabel>
+        {accounts.map((accountItem) => {
+          const state = accountUnreadStates[accountItem.id] ?? {
+            unreadCount: 0,
+            hasUnread: false,
+          };
 
-              return (
-                <DropdownMenuItem
-                  key={accountItem.id}
-                  className="p-0"
-                  onClick={() => {
-                    app.openAccount(accountItem.id);
-                  }}
-                >
-                  <AccountContext.Provider
-                    value={{
-                      ...accountItem,
-                      openSettings: () => {},
-                      openLogout: () => {},
-                      openWorkspace: () => {},
-                      openWorkspaceCreate: () => {},
-                    }}
-                  >
-                    <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                      <Avatar
-                        className="h-8 w-8 rounded-lg"
-                        id={accountItem.id}
-                        name={accountItem.name}
-                        avatar={accountItem.avatar}
-                      />
-                      <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">
-                          {accountItem.name}
-                        </span>
-                        <span className="truncate text-xs">
-                          {accountItem.email}
-                        </span>
-                      </div>
-                      {accountItem.id === account.id ? (
-                        <Check className="size-4" />
-                      ) : (
-                        <UnreadBadge
-                          count={state.unreadCount}
-                          unread={state.hasUnread}
-                        />
-                      )}
-                    </div>
-                  </AccountContext.Provider>
-                </DropdownMenuItem>
-              );
-            })}
-          </Fragment>
-        )}
+          return (
+            <DropdownMenuItem
+              key={accountItem.id}
+              className="p-0"
+              onClick={() => {
+                app.openAccount(accountItem.id);
+              }}
+            >
+              <AccountContext.Provider
+                value={{
+                  ...accountItem,
+                  openWorkspace: () => {},
+                  openWorkspaceCreate: () => {},
+                }}
+              >
+                <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                  <Avatar
+                    className="h-8 w-8 rounded-lg"
+                    id={accountItem.id}
+                    name={accountItem.name}
+                    avatar={accountItem.avatar}
+                  />
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">
+                      {accountItem.name}
+                    </span>
+                    <span className="truncate text-xs">
+                      {accountItem.email}
+                    </span>
+                  </div>
+                  {accountItem.id === account.id ? (
+                    <Check className="size-4" />
+                  ) : (
+                    <UnreadBadge
+                      count={state.unreadCount}
+                      unread={state.hasUnread}
+                    />
+                  )}
+                </div>
+              </AccountContext.Provider>
+            </DropdownMenuItem>
+          );
+        })}
 
         <DropdownMenuSeparator className="my-1" />
         <DropdownMenuItem

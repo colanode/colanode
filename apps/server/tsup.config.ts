@@ -1,7 +1,7 @@
-import { defineConfig } from 'tsup';
-
 import fs from 'fs/promises';
 import path from 'path';
+
+import { defineConfig } from 'tsup';
 
 const copyTemplates = async () => {
   const srcDir = path.resolve(__dirname, 'src/templates');

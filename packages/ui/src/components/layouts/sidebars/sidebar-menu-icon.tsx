@@ -7,6 +7,7 @@ interface SidebarMenuIconProps {
   onClick: () => void;
   isActive?: boolean;
   unreadState?: UnreadState;
+  className?: string;
 }
 
 export const SidebarMenuIcon = ({
@@ -14,11 +15,13 @@ export const SidebarMenuIcon = ({
   onClick,
   isActive = false,
   unreadState,
+  className,
 }: SidebarMenuIconProps) => {
   return (
     <div
       className={cn(
         'w-10 h-10 flex items-center justify-center cursor-pointer hover:bg-gray-200 rounded-md relative',
+        className,
         isActive ? 'bg-gray-200' : ''
       )}
       onClick={onClick}

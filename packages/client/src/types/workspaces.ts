@@ -23,7 +23,7 @@ export type ContainerMetadata = {
   width?: number;
 };
 
-export type SidebarMenuType = 'chats' | 'spaces';
+export type SidebarMenuType = 'chats' | 'spaces' | 'settings';
 
 export type SidebarMetadata = {
   menu: SidebarMenuType;
@@ -63,3 +63,14 @@ export type WorkspaceMetadataMap = {
   'container.right': WorkspaceRightContainerMetadata;
   'container.left': WorkspaceLeftContainerMetadata;
 };
+
+export enum SpecialContainerTabPath {
+  Downloads = 'downloads',
+  WorkspaceSettings = 'workspace/settings',
+  WorkspaceUsers = 'workspace/users',
+  WorkspaceDelete = 'workspace/delete',
+  AccountSettings = 'account/settings',
+  AccountLogout = 'account/logout',
+  DesktopSettings = 'desktop/settings',
+  ServerSettings = 'server/settings',
+}

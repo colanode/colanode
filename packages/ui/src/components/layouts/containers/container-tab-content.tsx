@@ -1,11 +1,13 @@
 import { match } from 'ts-pattern';
 
-import { ContainerTab } from '@colanode/client/types';
+import { ContainerTab, SpecialContainerTabPath } from '@colanode/client/types';
 import { getIdType, IdType } from '@colanode/core';
+import { AccountLogout } from '@colanode/ui/components/accounts/account-logout';
+import { AccountSettings } from '@colanode/ui/components/accounts/account-settings';
 import { ChannelContainer } from '@colanode/ui/components/channels/channel-container';
 import { ChatContainer } from '@colanode/ui/components/chats/chat-container';
 import { DatabaseContainer } from '@colanode/ui/components/databases/database-container';
-import { DownloadsList } from '@colanode/ui/components/downloads/downloads-list';
+import { DownloadsContainer } from '@colanode/ui/components/downloads/downloads-container';
 import { FileContainer } from '@colanode/ui/components/files/file-container';
 import { FolderContainer } from '@colanode/ui/components/folders/folder-container';
 import { MessageContainer } from '@colanode/ui/components/messages/message-container';
@@ -13,14 +15,32 @@ import { PageContainer } from '@colanode/ui/components/pages/page-container';
 import { RecordContainer } from '@colanode/ui/components/records/record-container';
 import { SpaceContainer } from '@colanode/ui/components/spaces/space-container';
 import { TabsContent } from '@colanode/ui/components/ui/tabs';
+import { WorkspaceSettings } from '@colanode/ui/components/workspaces/workspace-settings';
+import { WorkspaceUsers } from '@colanode/ui/components/workspaces/workspace-users';
 
 interface ContainerTabContentProps {
   tab: ContainerTab;
 }
 
 const ContainerTabContentBody = ({ tab }: ContainerTabContentProps) => {
-  if (tab.path === 'downloads') {
-    return <DownloadsList />;
+  if (tab.path === SpecialContainerTabPath.Downloads) {
+    return <DownloadsContainer />;
+  }
+
+  if (tab.path === SpecialContainerTabPath.WorkspaceSettings) {
+    return <WorkspaceSettings />;
+  }
+
+  if (tab.path === SpecialContainerTabPath.WorkspaceUsers) {
+    return <WorkspaceUsers />;
+  }
+
+  if (tab.path === SpecialContainerTabPath.AccountSettings) {
+    return <AccountSettings />;
+  }
+
+  if (tab.path === SpecialContainerTabPath.AccountLogout) {
+    return <AccountLogout />;
   }
 
   return match(getIdType(tab.path))

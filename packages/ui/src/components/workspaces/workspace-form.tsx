@@ -175,7 +175,11 @@ export const WorkspaceForm = ({
               </Button>
             )}
 
-            <Button type="submit" disabled={isPending || isSaving}>
+            <Button
+              type="submit"
+              disabled={isPending || isSaving}
+              className="w-20"
+            >
               {isSaving && <Spinner className="mr-1" />}
               {saveText}
             </Button>

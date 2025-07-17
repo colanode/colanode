@@ -1,4 +1,4 @@
-import { LayoutGrid, MessageCircle } from 'lucide-react';
+import { LayoutGrid, MessageCircle, Settings } from 'lucide-react';
 
 import { SidebarMenuType } from '@colanode/client/types';
 import { SidebarMenuFooter } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-footer';
@@ -56,6 +56,14 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
           }}
           isActive={value === 'spaces'}
           unreadState={channelsState}
+        />
+        <SidebarMenuIcon
+          icon={Settings}
+          onClick={() => {
+            onChange('settings');
+          }}
+          isActive={value === 'settings'}
+          className="mt-auto"
         />
       </div>
       <SidebarMenuFooter />

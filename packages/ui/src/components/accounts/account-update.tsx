@@ -162,6 +162,7 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
           <Button
             type="submit"
             disabled={isUpdatingAccount || isUploadingAvatar}
+            className="w-20"
           >
             {isUpdatingAccount && <Spinner className="mr-1" />}
             Save
