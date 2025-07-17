@@ -71,6 +71,4 @@ export enum SpecialContainerTabPath {
   WorkspaceDelete = 'workspace/delete',
   AccountSettings = 'account/settings',
   AccountLogout = 'account/logout',
-  DesktopSettings = 'desktop/settings',
-  ServerSettings = 'server/settings',
 }
