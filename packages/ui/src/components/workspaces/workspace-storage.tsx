@@ -5,13 +5,14 @@ import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 export const WorkspaceStorage = () => {
   const workspace = useWorkspace();
-  const isOwner = workspace.role === 'owner';
+  const canManageStorage =
+    workspace.role === 'owner' || workspace.role === 'admin';
 
   return (
     <Container>
       <ContainerBody className="max-w-4xl space-y-10">
         <UserStorageStats />
-        {isOwner && <WorkspaceStorageStats />}
+        {canManageStorage && <WorkspaceStorageStats />}
       </ContainerBody>
     </Container>
   );

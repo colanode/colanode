@@ -69,6 +69,7 @@ export * from './workspaces/workspace-metadata-delete';
 export * from './workspaces/workspace-metadata-update';
 export * from './workspaces/workspace-update';
 export * from './users/user-role-update';
+export * from './users/user-storage-update';
 export * from './users/users-create';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

@@ -45,7 +45,7 @@ export const workspaceStorageGetRoute: FastifyPluginCallbackZod = (
       const workspaceId = request.params.workspaceId;
       const user = request.user;
 
-      if (user.role !== 'owner') {
+      if (user.role !== 'owner' && user.role !== 'admin') {
         return reply.code(403).send({
           code: ApiErrorCode.UserInviteNoAccess,
           message: 'You do not have access to get workspace storage.',

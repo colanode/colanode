@@ -68,6 +68,7 @@ import { SpaceDeleteMutationHandler } from './spaces/space-delete';
 import { SpaceDescriptionUpdateMutationHandler } from './spaces/space-description-update';
 import { SpaceNameUpdateMutationHandler } from './spaces/space-name-update';
 import { UserRoleUpdateMutationHandler } from './users/user-role-update';
+import { UserStorageUpdateMutationHandler } from './users/user-storage-update';
 import { UsersCreateMutationHandler } from './users/users-create';
 import { WorkspaceCreateMutationHandler } from './workspaces/workspace-create';
 import { WorkspaceDeleteMutationHandler } from './workspaces/workspace-delete';
@@ -162,5 +163,6 @@ export const buildMutationHandlerMap = (
     'email.password.reset.complete':
       new EmailPasswordResetCompleteMutationHandler(app),
     'workspace.delete': new WorkspaceDeleteMutationHandler(app),
+    'user.storage.update': new UserStorageUpdateMutationHandler(app),
   };
 };

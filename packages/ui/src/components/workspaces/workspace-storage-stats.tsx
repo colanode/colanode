@@ -1,6 +1,6 @@
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { StorageStats } from '@colanode/ui/components/workspaces/storage-stats';
-import { WorkspaceStorageUserStats } from '@colanode/ui/components/workspaces/workspace-storage-user-stats';
+import { WorkspaceStorageUserTable } from '@colanode/ui/components/workspaces/workspace-storage-user-table';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 
@@ -36,28 +36,13 @@ export const WorkspaceStorageStats = () => {
         subtypes={data.subtypes}
         isLoading={workspaceStorageGetQuery.isPending}
       />
-      <div className="space-y-6">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Users</h2>
-          <Separator className="mt-3" />
-        </div>
-        <div className="flex flex-col gap-2">
-          {workspaceStorageGetQuery.isPending && (
-            <div className="text-sm text-muted-foreground">
-              Loading users...
-            </div>
-          )}
-          {!workspaceStorageGetQuery.isPending &&
-            data.users.map((user) => (
-              <WorkspaceStorageUserStats
-                key={user.id}
-                id={user.id}
-                used={user.used}
-                limit={user.limit}
-              />
-            ))}
-        </div>
-      </div>
+      <WorkspaceStorageUserTable
+        users={data.users}
+        isLoading={workspaceStorageGetQuery.isPending}
+        onUpdate={() => {
+          workspaceStorageGetQuery.refetch();
+        }}
+      />
     </div>
   );
 };
