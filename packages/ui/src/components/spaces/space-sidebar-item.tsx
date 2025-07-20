@@ -15,8 +15,8 @@ import {
 } from '@colanode/ui/components/ui/collapsible';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 import { sortSpaceChildren } from '@colanode/ui/lib/spaces';
 import { cn } from '@colanode/ui/lib/utils';
 
@@ -32,7 +32,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const role = extractNodeRole(space, workspace.userId);
   const canEdit = role === 'admin';
 
-  const nodeChildrenGetQuery = useQuery({
+  const nodeChildrenGetQuery = useLiveQuery({
     type: 'node.children.get',
     nodeId: space.id,
     accountId: workspace.accountId,

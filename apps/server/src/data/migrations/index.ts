@@ -28,6 +28,8 @@ import { createWorkspaceUploadCounterTriggers } from './00025-create-workspace-u
 import { createUserUploadCounterTriggers } from './00026-create-user-upload-counter-triggers';
 import { removeNodeUpdateRevisionTrigger } from './00027-remove-node-update-revision-trigger';
 import { removeDocumentUpdateRevisionTrigger } from './00028-remove-document-update-revision-trigger';
+import { addWorkspaceStorageLimitColumns } from './00029-add-workspace-storage-limit-columns';
+import { addWorkspaceIndexToUploads } from './00030-add-workspace-index-to-uploads';
 
 export const databaseMigrations: Record<string, Migration> = {
   '00001_create_accounts_table': createAccountsTable,
@@ -62,4 +64,6 @@ export const databaseMigrations: Record<string, Migration> = {
   '00027_remove_node_update_revision_trigger': removeNodeUpdateRevisionTrigger,
   '00028_remove_document_update_revision_trigger':
     removeDocumentUpdateRevisionTrigger,
+  '00029_add_workspace_storage_limit_columns': addWorkspaceStorageLimitColumns,
+  '00030_add_workspace_index_to_uploads': addWorkspaceIndexToUploads,
 };

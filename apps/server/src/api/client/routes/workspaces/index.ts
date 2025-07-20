@@ -5,6 +5,7 @@ import { workspaceAuthenticator } from '@colanode/server/api/client/plugins/work
 
 import { fileRoutes } from './files';
 import { mutationsRoutes } from './mutations';
+import { storageRoutes } from './storage';
 import { userRoutes } from './users';
 import { workspaceCreateRoute } from './workspace-create';
 import { workspaceDeleteRoute } from './workspace-delete';
@@ -27,6 +28,7 @@ export const workspaceRoutes: FastifyPluginCallback = (instance, _, done) => {
       subInstance.register(fileRoutes, { prefix: '/files' });
       subInstance.register(userRoutes, { prefix: '/users' });
       subInstance.register(mutationsRoutes, { prefix: '/mutations' });
+      subInstance.register(storageRoutes, { prefix: '/storage' });
     },
     {
       prefix: '/:workspaceId',

@@ -33,6 +33,7 @@ export enum ApiErrorCode {
   FileOwnerMismatch = 'file_owner_mismatch',
   FileAlreadyUploaded = 'file_already_uploaded',
   FileUploadInitFailed = 'file_upload_init_failed',
+  FileUploadFailed = 'file_upload_failed',
   WorkspaceMismatch = 'workspace_mismatch',
   FileError = 'file_error',
   FileSizeMismatch = 'file_size_mismatch',

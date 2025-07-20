@@ -4,13 +4,13 @@ import { NodeViewWrapper } from '@tiptap/react';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { defaultClasses } from '@colanode/ui/editor/classes';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const MentionNodeView = ({ node }: NodeViewProps) => {
   const workspace = useWorkspace();
 
   const target = node.attrs.target;
-  const userGetQuery = useQuery({
+  const userGetQuery = useLiveQuery({
     type: 'user.get',
     userId: target,
     accountId: workspace.accountId,

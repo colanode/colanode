@@ -7,7 +7,7 @@ import {
 } from '@colanode/core';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQueries } from '@colanode/ui/hooks/use-queries';
+import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 const RECORDS_PER_PAGE = 50;
 
@@ -35,7 +35,7 @@ export const useRecordsQuery = (
     userId: workspace.userId,
   }));
 
-  const result = useQueries(inputs);
+  const result = useLiveQueries(inputs);
   const records = result.flatMap((data) => data.data ?? []);
   const isPending = result.some((data) => data.isPending);
   const hasMore =

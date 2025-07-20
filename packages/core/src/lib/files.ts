@@ -22,30 +22,32 @@ export const extractFileSubtype = (mimeType: string): FileSubtype => {
 
 export const formatBytes = (
   bytes: number | bigint,
-  decimals?: number
+  maxDecimals: number = 2
 ): string => {
-  if (bytes === 0) {
-    return '0 Bytes';
+  const UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'] as const;
+  const BASE = 1024;
+
+  // Work with a bigint internally to stay safe for very large values.
+  let valueBig = typeof bytes === 'bigint' ? bytes : BigInt(bytes);
+  let unitIdx = 0;
+
+  // Find the most suitable unit (stop at YB to avoid overflow).
+  while (valueBig >= BigInt(BASE) && unitIdx < UNITS.length - 1) {
+    valueBig /= BigInt(BASE);
+    unitIdx++;
   }
 
-  const bytesBigInt = BigInt(bytes);
-  const k = BigInt(1024);
-  const dm = decimals || 2;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
+  // Convert the original byte value to a JS number **after** determining the unit,
+  // so it is safely within Number’s range for formatting.
+  const divisor = Math.pow(BASE, unitIdx);
+  const valueNum =
+    (typeof bytes === 'bigint' ? Number(bytes) : bytes) / divisor;
 
-  // Find the largest power of k that's smaller than bytes
-  let i = 0;
-  let reducedBytes = bytesBigInt;
-  while (reducedBytes >= k && i < sizes.length - 1) {
-    reducedBytes = reducedBytes / k;
-    i++;
-  }
+  // Round to the requested precision, then trim superfluous zeros.
+  const rounded = valueNum.toFixed(maxDecimals);
+  const trimmed = rounded.replace(/\.?0+$/, '');
 
-  // Convert to decimal representation with proper precision
-  const factor = Math.pow(10, dm);
-  const value = Number((reducedBytes * BigInt(factor)) / BigInt(factor));
-
-  return `${value.toFixed(dm)} ${sizes[i]}`;
+  return `${trimmed} ${UNITS[unitIdx]}`;
 };
 
 const mimeTypeNames: Record<string, string> = {

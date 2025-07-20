@@ -40,9 +40,11 @@ import { SpaceListQueryHandler } from './spaces/space-list';
 import { UserGetQueryHandler } from './users/user-get';
 import { UserListQueryHandler } from './users/user-list';
 import { UserSearchQueryHandler } from './users/user-search';
+import { UserStorageGetQueryHandler } from './users/user-storage-get';
 import { WorkspaceGetQueryHandler } from './workspaces/workspace-get';
 import { WorkspaceListQueryHandler } from './workspaces/workspace-list';
 import { WorkspaceMetadataListQueryHandler } from './workspaces/workspace-metadata-list';
+import { WorkspaceStorageGetQueryHandler } from './workspaces/workspace-storage-get';
 
 export type QueryHandlerMap = {
   [K in keyof QueryMap]: QueryHandler<QueryMap[K]['input']>;
@@ -81,6 +83,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'database.view.list': new DatabaseViewListQueryHandler(app),
     'record.search': new RecordSearchQueryHandler(app),
     'user.get': new UserGetQueryHandler(app),
+    'user.storage.get': new UserStorageGetQueryHandler(app),
     'file.state.get': new FileStateGetQueryHandler(app),
     'file.download.request.get': new FileDownloadRequestGetQueryHandler(app),
     'file.save.list': new FileSaveListQueryHandler(app),
@@ -91,5 +94,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'document.state.get': new DocumentStateGetQueryHandler(app),
     'document.updates.list': new DocumentUpdatesListQueryHandler(app),
     'account.metadata.list': new AccountMetadataListQueryHandler(app),
+    'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
   };
 };

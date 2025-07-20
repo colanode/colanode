@@ -13,7 +13,7 @@ import { BoardViewContext } from '@colanode/ui/contexts/board-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { getSelectOptionLightColorClass } from '@colanode/ui/lib/databases';
 
 interface BoardViewColumnsMultiSelectProps {
@@ -27,7 +27,7 @@ export const BoardViewColumnsMultiSelect = ({
   const database = useDatabase();
   const view = useDatabaseView();
 
-  const selectOptionCountQuery = useQuery({
+  const selectOptionCountQuery = useLiveQuery({
     type: 'record.field.value.count',
     databaseId: database.id,
     filters: view.filters,

@@ -13,7 +13,7 @@ import {
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQueries } from '@colanode/ui/hooks/use-queries';
+import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 interface RecordRelationValueProps {
   field: RelationFieldAttributes;
@@ -45,7 +45,7 @@ export const RecordRelationValue = ({
   const [open, setOpen] = useState(false);
 
   const relationIds = record.getRelationValue(field) ?? [];
-  const results = useQueries(
+  const results = useLiveQueries(
     relationIds.map((id) => ({
       type: 'node.get',
       nodeId: id,

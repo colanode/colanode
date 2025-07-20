@@ -8,8 +8,8 @@ import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useApp } from '@colanode/ui/contexts/app';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface FileSaveButtonProps {
   file: LocalFileNode;
@@ -22,7 +22,7 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
   const layout = useLayout();
   const [isSaving, setIsSaving] = useState(false);
 
-  const fileStateQuery = useQuery({
+  const fileStateQuery = useLiveQuery({
     type: 'file.state.get',
     id: file.id,
     accountId: workspace.accountId,

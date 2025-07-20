@@ -9,7 +9,7 @@ import { ListLayout } from '@colanode/ui/components/folders/lists/list-layout';
 import { FolderContext } from '@colanode/ui/contexts/folder';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQueries } from '@colanode/ui/hooks/use-queries';
+import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 const FILES_PER_PAGE = 100;
 
@@ -39,7 +39,7 @@ export const FolderFiles = ({
     page: i + 1,
   }));
 
-  const result = useQueries(inputs);
+  const result = useLiveQueries(inputs);
   const files = result.flatMap((data) => data.data ?? []);
 
   return (

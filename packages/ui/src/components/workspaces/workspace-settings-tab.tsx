@@ -1,18 +1,10 @@
-import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { Settings } from 'lucide-react';
 
 export const WorkspaceSettingsTab = () => {
-  const workspace = useWorkspace();
-
   return (
     <div className="flex items-center space-x-2">
-      <Avatar
-        id={workspace.id}
-        name={workspace.name}
-        avatar={workspace.avatar}
-        size="small"
-      />
-      <span>{workspace.name} Settings</span>
+      <Settings className="size-4" />
+      <span>Workspace Settings</span>
     </div>
   );
 };

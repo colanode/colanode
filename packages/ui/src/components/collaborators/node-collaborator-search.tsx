@@ -19,7 +19,7 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface NodeCollaboratorSearchProps {
   excluded: string[];
@@ -37,7 +37,7 @@ export const NodeCollaboratorSearch = ({
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
 
-  const userSearchQuery = useQuery({
+  const userSearchQuery = useLiveQuery({
     type: 'user.search',
     searchQuery: query,
     exclude: excluded,

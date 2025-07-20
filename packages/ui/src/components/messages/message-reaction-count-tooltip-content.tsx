@@ -1,8 +1,8 @@
 import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
 import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQueries } from '@colanode/ui/hooks/use-queries';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface MessageReactionCountTooltipContentProps {
   message: LocalMessageNode;
@@ -15,12 +15,12 @@ export const MessageReactionCountTooltipContent = ({
 }: MessageReactionCountTooltipContentProps) => {
   const workspace = useWorkspace();
 
-  const emojiGetQuery = useQuery({
+  const emojiGetQuery = useLiveQuery({
     type: 'emoji.get.by.skin.id',
     id: reactionCount.reaction,
   });
 
-  const nodeReactionListQuery = useQuery({
+  const nodeReactionListQuery = useLiveQuery({
     type: 'node.reaction.list',
     nodeId: message.id,
     reaction: reactionCount.reaction,
@@ -34,7 +34,7 @@ export const MessageReactionCountTooltipContent = ({
     nodeReactionListQuery.data?.map((reaction) => reaction.collaboratorId) ??
     [];
 
-  const results = useQueries(
+  const results = useLiveQueries(
     userIds.map((userId) => ({
       type: 'user.get',
       accountId: workspace.accountId,

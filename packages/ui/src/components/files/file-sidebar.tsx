@@ -5,7 +5,7 @@ import { formatBytes, formatDate } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface FileSidebarProps {
   file: LocalFileNode;
@@ -23,7 +23,7 @@ const FileMeta = ({ title, value }: { title: string; value: string }) => {
 export const FileSidebar = ({ file }: FileSidebarProps) => {
   const workspace = useWorkspace();
 
-  const userGetQuery = useQuery({
+  const userGetQuery = useLiveQuery({
     type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,

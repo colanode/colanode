@@ -67,6 +67,7 @@ export type WorkspaceMetadataMap = {
 export enum SpecialContainerTabPath {
   Downloads = 'downloads',
   WorkspaceSettings = 'workspace/settings',
+  WorkspaceStorage = 'workspace/storage',
   WorkspaceUsers = 'workspace/users',
   WorkspaceDelete = 'workspace/delete',
   AccountSettings = 'account/settings',

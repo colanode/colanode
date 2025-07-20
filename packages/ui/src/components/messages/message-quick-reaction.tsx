@@ -1,5 +1,5 @@
 import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface MessageQuickReactionProps {
   emoji: string;
@@ -10,7 +10,7 @@ export const MessageQuickReaction = ({
   emoji,
   onClick,
 }: MessageQuickReactionProps) => {
-  const emojiGetQuery = useQuery({
+  const emojiGetQuery = useLiveQuery({
     type: 'emoji.get',
     id: emoji,
   });

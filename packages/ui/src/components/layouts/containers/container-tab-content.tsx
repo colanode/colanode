@@ -16,6 +16,7 @@ import { RecordContainer } from '@colanode/ui/components/records/record-containe
 import { SpaceContainer } from '@colanode/ui/components/spaces/space-container';
 import { TabsContent } from '@colanode/ui/components/ui/tabs';
 import { WorkspaceSettings } from '@colanode/ui/components/workspaces/workspace-settings';
+import { WorkspaceStorage } from '@colanode/ui/components/workspaces/workspace-storage';
 import { WorkspaceUsers } from '@colanode/ui/components/workspaces/workspace-users';
 
 interface ContainerTabContentProps {
@@ -41,6 +42,10 @@ const ContainerTabContentBody = ({ tab }: ContainerTabContentProps) => {
 
   if (tab.path === SpecialContainerTabPath.AccountLogout) {
     return <AccountLogout />;
+  }
+
+  if (tab.path === SpecialContainerTabPath.WorkspaceStorage) {
+    return <WorkspaceStorage />;
   }
 
   return match(getIdType(tab.path))

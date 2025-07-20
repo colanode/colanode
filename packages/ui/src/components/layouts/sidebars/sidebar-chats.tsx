@@ -3,14 +3,14 @@ import { ChatSidebarItem } from '@colanode/ui/components/chats/chat-sidebar-item
 import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 export const SidebarChats = () => {
   const workspace = useWorkspace();
   const layout = useLayout();
 
-  const chatListQuery = useQuery({
+  const chatListQuery = useLiveQuery({
     type: 'chat.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,

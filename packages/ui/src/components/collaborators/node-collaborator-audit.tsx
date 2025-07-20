@@ -1,7 +1,7 @@
 import { timeAgo } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface NodeCollaboratorAuditProps {
   collaboratorId: string;
@@ -14,7 +14,7 @@ export const NodeCollaboratorAudit = ({
 }: NodeCollaboratorAuditProps) => {
   const workspace = useWorkspace();
 
-  const userGetQuery = useQuery({
+  const userGetQuery = useLiveQuery({
     type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,

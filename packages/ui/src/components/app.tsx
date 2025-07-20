@@ -8,7 +8,7 @@ import { RadarProvider } from '@colanode/ui/components/radar-provider';
 import { ServerProvider } from '@colanode/ui/components/servers/server-provider';
 import { DelayedComponent } from '@colanode/ui/components/ui/delayed-component';
 import { AppContext } from '@colanode/ui/contexts/app';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface AppProps {
   type: AppType;
@@ -18,11 +18,11 @@ export const App = ({ type }: AppProps) => {
   const [initialized, setInitialized] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
 
-  const appMetadataListQuery = useQuery({
+  const appMetadataListQuery = useLiveQuery({
     type: 'app.metadata.list',
   });
 
-  const accountListQuery = useQuery({
+  const accountListQuery = useLiveQuery({
     type: 'account.list',
   });
 

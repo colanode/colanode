@@ -2,14 +2,14 @@ import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-
 import { SpaceCreateButton } from '@colanode/ui/components/spaces/space-create-button';
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const SidebarSpaces = () => {
   const workspace = useWorkspace();
   const canCreateSpace =
     workspace.role !== 'guest' && workspace.role !== 'none';
 
-  const spaceListQuery = useQuery({
+  const spaceListQuery = useLiveQuery({
     type: 'space.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,

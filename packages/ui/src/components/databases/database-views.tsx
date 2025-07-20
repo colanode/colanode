@@ -6,14 +6,14 @@ import { ScrollBar } from '@colanode/ui/components/ui/scroll-area';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { DatabaseViewsContext } from '@colanode/ui/contexts/database-views';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const DatabaseViews = () => {
   const workspace = useWorkspace();
   const database = useDatabase();
   const [activeViewId, setActiveViewId] = useState<string | null>(null);
 
-  const databaseViewListQuery = useQuery({
+  const databaseViewListQuery = useLiveQuery({
     type: 'database.view.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,

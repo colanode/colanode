@@ -1,6 +1,6 @@
 import { LocalMessageNode } from '@colanode/client/types';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface MessageAuthorNameProps {
@@ -14,7 +14,7 @@ export const MessageAuthorName = ({
 }: MessageAuthorNameProps) => {
   const workspace = useWorkspace();
 
-  const userGetQuery = useQuery({
+  const userGetQuery = useLiveQuery({
     type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,

@@ -6,7 +6,7 @@ import { compareString } from '@colanode/core';
 import { Message } from '@colanode/ui/components/messages/message';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQueries } from '@colanode/ui/hooks/use-queries';
+import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 const MESSAGES_PER_PAGE = 50;
 
@@ -28,7 +28,7 @@ export const MessageList = () => {
     count: MESSAGES_PER_PAGE,
   }));
 
-  const result = useQueries(inputs);
+  const result = useLiveQueries(inputs);
   const messages = result
     .flatMap((data) => data.data ?? [])
     .sort((a, b) => compareString(a.id, b.id));

@@ -4,12 +4,12 @@ import { useMemo, useRef } from 'react';
 import { EmojiPickerRowData } from '@colanode/client/types';
 import { EmojiBrowserCategory } from '@colanode/ui/components/emojis/emoji-browser-category';
 import { EmojiBrowserItems } from '@colanode/ui/components/emojis/emoji-browser-items';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 const EMOJIS_PER_ROW = 10;
 
 export const EmojiBrowser = () => {
-  const emojiCategoryListQuery = useQuery({
+  const emojiCategoryListQuery = useLiveQuery({
     type: 'emoji.category.list',
   });
 

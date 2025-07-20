@@ -1,12 +1,12 @@
 import { IconPickerItem } from '@colanode/ui/components/icons/icon-picker-item';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface IconSearchProps {
   query: string;
 }
 
 export const IconSearch = ({ query }: IconSearchProps) => {
-  const iconSearchQuery = useQuery({
+  const iconSearchQuery = useLiveQuery({
     type: 'icon.search',
     query,
     count: 100,

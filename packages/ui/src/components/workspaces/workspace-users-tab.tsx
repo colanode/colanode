@@ -1,18 +1,10 @@
-import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { Users } from 'lucide-react';
 
 export const WorkspaceUsersTab = () => {
-  const workspace = useWorkspace();
-
   return (
     <div className="flex items-center space-x-2">
-      <Avatar
-        id={workspace.id}
-        name={workspace.name}
-        avatar={workspace.avatar}
-        size="small"
-      />
-      <span>{workspace.name} Users</span>
+      <Users className="size-4" />
+      <span>Workspace Users</span>
     </div>
   );
 };

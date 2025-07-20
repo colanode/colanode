@@ -11,7 +11,7 @@ import { BoardViewContext } from '@colanode/ui/contexts/board-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface BoardViewColumnsCreatedByProps {
   field: CreatedByFieldAttributes;
@@ -24,7 +24,7 @@ export const BoardViewColumnsCreatedBy = ({
   const database = useDatabase();
   const view = useDatabaseView();
 
-  const createdByCountQuery = useQuery({
+  const createdByCountQuery = useLiveQuery({
     type: 'record.field.value.count',
     databaseId: database.id,
     filters: view.filters,
@@ -89,7 +89,7 @@ const BoardViewColumnCreatedByHeader = ({
 }: BoardViewColumnCreatedByHeaderProps) => {
   const workspace = useWorkspace();
 
-  const userQuery = useQuery({
+  const userQuery = useLiveQuery({
     type: 'user.get',
     userId: createdBy,
     accountId: workspace.accountId,

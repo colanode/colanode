@@ -1,18 +1,10 @@
-import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { useAccount } from '@colanode/ui/contexts/account';
+import { LogOut } from 'lucide-react';
 
 export const AccountLogoutTab = () => {
-  const account = useAccount();
-
   return (
     <div className="flex items-center space-x-2">
-      <Avatar
-        id={account.id}
-        name={account.name}
-        avatar={account.avatar}
-        size="small"
-      />
-      <span>{account.name} Logout</span>
+      <LogOut className="size-4" />
+      <span>Logout</span>
     </div>
   );
 };

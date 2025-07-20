@@ -55,3 +55,12 @@ export const percentToNumber = (total: number, percent: number) =>
 
 export const numberToPercent = (total: number, number: number) =>
   Math.round((number / total) * 100);
+
+export const bigintToPercent = (total: bigint, number: bigint) => {
+  if (total === 0n) {
+    return 0;
+  }
+
+  const result = (number * 100n) / total;
+  return Math.round(Number(result));
+};

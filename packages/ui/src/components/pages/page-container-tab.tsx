@@ -1,7 +1,7 @@
 import { LocalPageNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface PageContainerTabProps {
   pageId: string;
@@ -10,7 +10,7 @@ interface PageContainerTabProps {
 export const PageContainerTab = ({ pageId }: PageContainerTabProps) => {
   const workspace = useWorkspace();
 
-  const nodeGetQuery = useQuery({
+  const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: pageId,
     accountId: workspace.accountId,

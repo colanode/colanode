@@ -19,6 +19,7 @@ import { RecordContainerTab } from '@colanode/ui/components/records/record-conta
 import { SpaceContainerTab } from '@colanode/ui/components/spaces/space-container-tab';
 import { TabsTrigger } from '@colanode/ui/components/ui/tabs';
 import { WorkspaceSettingsTab } from '@colanode/ui/components/workspaces/workspace-settings-tab';
+import { WorkspaceStorageTab } from '@colanode/ui/components/workspaces/workspace-storage-tab';
 import { WorkspaceUsersTab } from '@colanode/ui/components/workspaces/workspace-users-tab';
 import { cn } from '@colanode/ui/lib/utils';
 
@@ -48,6 +49,10 @@ const ContainerTabTriggerContent = ({ tab }: { tab: ContainerTab }) => {
 
   if (tab.path === SpecialContainerTabPath.AccountLogout) {
     return <AccountLogoutTab />;
+  }
+
+  if (tab.path === SpecialContainerTabPath.WorkspaceStorage) {
+    return <WorkspaceStorageTab />;
   }
 
   return match(getIdType(tab.path))

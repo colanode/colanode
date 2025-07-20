@@ -47,6 +47,19 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
       const { workspaceId, fileId } = request.params;
       const user = request.user;
 
+      const workspace = await database
+        .selectFrom('workspaces')
+        .selectAll()
+        .where('id', '=', workspaceId)
+        .executeTakeFirst();
+
+      if (!workspace) {
+        return reply.code(404).send({
+          code: ApiErrorCode.WorkspaceNotFound,
+          message: 'Workspace not found.',
+        });
+      }
+
       const node = await database
         .selectFrom('nodes')
         .selectAll()
@@ -88,16 +101,47 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const storageUsed = await fetchCounter(
+      if (file.attributes.size > BigInt(user.max_file_size)) {
+        return reply.code(400).send({
+          code: ApiErrorCode.FileUploadFailed,
+          message:
+            'The file size exceeds the maximum allowed size for your account.',
+        });
+      }
+
+      if (workspace.max_file_size) {
+        if (file.attributes.size > BigInt(workspace.max_file_size)) {
+          return reply.code(400).send({
+            code: ApiErrorCode.FileUploadFailed,
+            message: 'The file size exceeds the maximum allowed size.',
+          });
+        }
+      }
+
+      const userStorageUsed = await fetchCounter(
         database,
         `${user.id}.storage.used`
       );
 
-      if (storageUsed >= BigInt(user.storage_limit)) {
+      if (userStorageUsed >= BigInt(user.storage_limit)) {
         return reply.code(400).send({
-          code: ApiErrorCode.FileUploadInitFailed,
+          code: ApiErrorCode.FileUploadFailed,
           message: 'You have reached the maximum storage limit.',
         });
+      }
+
+      if (workspace.storage_limit) {
+        const workspaceStorageUsed = await fetchCounter(
+          database,
+          `${workspaceId}.storage.used`
+        );
+
+        if (workspaceStorageUsed >= BigInt(workspace.storage_limit)) {
+          return reply.code(400).send({
+            code: ApiErrorCode.FileUploadFailed,
+            message: 'The workspace has reached the maximum storage limit.',
+          });
+        }
       }
 
       const path = buildFilePath(workspaceId, fileId, file.attributes);

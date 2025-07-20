@@ -10,12 +10,12 @@ import {
   TooltipTrigger,
 } from '@colanode/ui/components/ui/tooltip';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const DownloadsList = () => {
   const workspace = useWorkspace();
 
-  const fileSaveListQuery = useQuery({
+  const fileSaveListQuery = useLiveQuery({
     type: 'file.save.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,

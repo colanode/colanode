@@ -4,7 +4,7 @@ import { UpdatedByFieldAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface RecordUpdatedByValueProps {
   field: UpdatedByFieldAttributes;
@@ -14,7 +14,7 @@ export const RecordUpdatedByValue = ({ field }: RecordUpdatedByValueProps) => {
   const workspace = useWorkspace();
   const record = useRecord();
 
-  const { data } = useQuery(
+  const { data } = useLiveQuery(
     {
       type: 'user.get',
       accountId: workspace.accountId,

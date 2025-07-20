@@ -1,7 +1,7 @@
 import { LocalFileNode } from '@colanode/client/types';
 import { FileIcon } from '@colanode/ui/components/files/file-icon';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface FileThumbnailProps {
@@ -12,7 +12,7 @@ interface FileThumbnailProps {
 export const FileThumbnail = ({ file, className }: FileThumbnailProps) => {
   const workspace = useWorkspace();
 
-  const fileStateGetQuery = useQuery({
+  const fileStateGetQuery = useLiveQuery({
     type: 'file.state.get',
     id: file.id,
     accountId: workspace.accountId,

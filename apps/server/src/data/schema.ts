@@ -69,6 +69,8 @@ interface WorkspaceTable {
   created_by: ColumnType<string, string, never>;
   updated_by: ColumnType<string | null, string | null, string>;
   status: ColumnType<number, number, number>;
+  storage_limit: ColumnType<string | null, string | null, string | null>;
+  max_file_size: ColumnType<string | null, string | null, string | null>;
 }
 
 export type SelectWorkspace = Selectable<WorkspaceTable>;

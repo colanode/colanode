@@ -2,12 +2,12 @@ import { Download } from 'lucide-react';
 
 import { SaveStatus } from '@colanode/client/types';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const DownloadsContainerTab = () => {
   const workspace = useWorkspace();
 
-  const fileSaveListQuery = useQuery({
+  const fileSaveListQuery = useLiveQuery({
     type: 'file.save.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,

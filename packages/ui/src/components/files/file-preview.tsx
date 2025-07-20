@@ -7,8 +7,8 @@ import { FilePreviewAudio } from '@colanode/ui/components/files/previews/file-pr
 import { FilePreviewImage } from '@colanode/ui/components/files/previews/file-preview-image';
 import { FilePreviewVideo } from '@colanode/ui/components/files/previews/file-preview-video';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface FilePreviewProps {
   file: LocalFileNode;
@@ -18,7 +18,7 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
   const workspace = useWorkspace();
   const mutation = useMutation();
 
-  const fileStateQuery = useQuery({
+  const fileStateQuery = useLiveQuery({
     type: 'file.state.get',
     id: file.id,
     accountId: workspace.accountId,
