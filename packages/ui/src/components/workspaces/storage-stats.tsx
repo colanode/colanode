@@ -26,23 +26,13 @@ interface StorageStatsProps {
   usedBytes: bigint;
   limitBytes: bigint | null;
   subtypes: StorageSubtype[];
-  isLoading?: boolean;
 }
 
 export const StorageStats = ({
   usedBytes,
   limitBytes,
   subtypes,
-  isLoading = false,
 }: StorageStatsProps) => {
-  if (isLoading) {
-    return (
-      <div className="text-sm text-muted-foreground">
-        Loading storage data...
-      </div>
-    );
-  }
-
   const usedPercentage = limitBytes
     ? bigintToPercent(limitBytes, usedBytes)
     : 0;

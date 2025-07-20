@@ -26,12 +26,17 @@ export const UserStorageStats = () => {
         <h2 className="text-2xl font-semibold tracking-tight">My storage</h2>
         <Separator className="mt-3" />
       </div>
-      <StorageStats
-        usedBytes={usedBytes}
-        limitBytes={limitBytes}
-        subtypes={data.subtypes}
-        isLoading={userStorageGetQuery.isPending}
-      />
+      {userStorageGetQuery.isPending ? (
+        <div className="text-sm text-muted-foreground">
+          Loading storage data...
+        </div>
+      ) : (
+        <StorageStats
+          usedBytes={usedBytes}
+          limitBytes={limitBytes}
+          subtypes={data.subtypes}
+        />
+      )}
     </div>
   );
 };

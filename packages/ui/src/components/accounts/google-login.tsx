@@ -20,7 +20,6 @@ const GoogleLoginButton = ({ context, onSuccess }: GoogleLoginProps) => {
 
   const login = useGoogleLogin({
     onSuccess: async (response) => {
-      console.log('response', response);
       mutate({
         input: {
           type: 'google.login',

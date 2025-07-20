@@ -133,21 +133,13 @@ const WorkspaceStorageUserRow = ({
 
 interface WorkspaceStorageUserTableProps {
   users: WorkspaceStorageUser[];
-  isLoading: boolean;
   onUpdate: () => void;
 }
 
 export const WorkspaceStorageUserTable = ({
   users,
-  isLoading,
   onUpdate,
 }: WorkspaceStorageUserTableProps) => {
-  if (isLoading) {
-    return (
-      <div className="text-sm text-muted-foreground">Loading users...</div>
-    );
-  }
-
   if (users.length === 0) {
     return <div className="text-sm text-muted-foreground">No users found.</div>;
   }
