@@ -10,6 +10,10 @@ import { readServerConfigVariables, serverConfigSchema } from './server';
 import { readSmtpConfigVariables, smtpConfigSchema } from './smtp';
 import { readStorageConfigVariables, storageConfigSchema } from './storage';
 import { readUserConfigVariables, userConfigSchema } from './user';
+import {
+  readWorkspaceConfigVariables,
+  workspaceConfigSchema,
+} from './workspace';
 
 const configSchema = z.object({
   server: serverConfigSchema,
@@ -22,6 +26,7 @@ const configSchema = z.object({
   ai: aiConfigSchema,
   jobs: jobsConfigSchema,
   logging: loggingConfigSchema,
+  workspace: workspaceConfigSchema,
 });
 
 export type Configuration = z.infer<typeof configSchema>;
@@ -39,6 +44,7 @@ const readConfigVariables = (): Configuration => {
       ai: readAiConfigVariables(),
       jobs: readJobsConfigVariables(),
       logging: readLoggingConfigVariables(),
+      workspace: readWorkspaceConfigVariables(),
     };
 
     return configSchema.parse(input);
