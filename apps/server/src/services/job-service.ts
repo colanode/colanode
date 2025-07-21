@@ -1,10 +1,10 @@
 import { Job, JobsOptions, Queue, Worker } from 'bullmq';
 
-import { createDebugger } from '@colanode/core';
 import { jobHandlerMap, JobHandler, JobInput } from '@colanode/server/jobs';
 import { config } from '@colanode/server/lib/config';
+import { createLogger } from '@colanode/server/lib/logger';
 
-const debug = createDebugger('server:service:job');
+const logger = createLogger('server:service:job');
 
 class JobService {
   private jobQueue: Queue | undefined;
@@ -36,7 +36,7 @@ class JobService {
     });
 
     this.jobQueue.on('error', (error) => {
-      debug(`Job queue error: ${error}`);
+      logger.error(error, `Job queue error`);
     });
 
     if (config.ai.enabled) {
@@ -134,18 +134,18 @@ class JobService {
     if (!handler) {
       if (job.opts.repeat && job.repeatJobKey) {
         await this.jobQueue?.removeJobScheduler(job.repeatJobKey);
-        debug(
+        logger.warn(
           `Removed recurring job ${job.id} with type ${input.type} as no handler was found.`
         );
       }
 
-      debug(`Job ${job.id} with type ${input.type} not found.`);
+      logger.warn(`Job ${job.id} with type ${input.type} not found.`);
       return;
     }
 
     await handler(input);
 
-    debug(`Job ${job.id} with type ${input.type} completed.`);
+    logger.debug(`Job ${job.id} with type ${input.type} completed.`);
   };
 }
 

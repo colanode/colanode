@@ -2,14 +2,14 @@ import {
   SynchronizerOutputMessage,
   SyncUserData,
   SyncUsersInput,
-  createDebugger,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { SelectUser } from '@colanode/server/data/schema';
+import { createLogger } from '@colanode/server/lib/logger';
 import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
 import { Event } from '@colanode/server/types/events';
 
-const debug = createDebugger('user-synchronizer');
+const logger = createLogger('user-synchronizer');
 
 export class UserSynchronizer extends BaseSynchronizer<SyncUsersInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncUsersInput> | null> {
@@ -55,7 +55,7 @@ export class UserSynchronizer extends BaseSynchronizer<SyncUsersInput> {
 
       return users;
     } catch (error) {
-      debug('Error fetching users for sync', error);
+      logger.error(error, 'Error fetching users for sync');
     } finally {
       this.status = 'pending';
     }

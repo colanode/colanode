@@ -1,12 +1,13 @@
-import { createDebugger, UpdateMergeMetadata } from '@colanode/core';
+import { UpdateMergeMetadata } from '@colanode/core';
 import { mergeUpdates } from '@colanode/crdt';
 import { database } from '@colanode/server/data/database';
 import { SelectNodeUpdate } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
 import { config } from '@colanode/server/lib/config';
 import { fetchCounter, setCounter } from '@colanode/server/lib/counters';
+import { createLogger } from '@colanode/server/lib/logger';
 
-const debug = createDebugger('server:job:node-updates-merge');
+const logger = createLogger('server:job:node-updates-merge');
 
 export type NodeUpdatesMergeInput = {
   type: 'node.updates.merge';
@@ -27,7 +28,7 @@ export const nodeUpdatesMergeHandler: JobHandler<
     return;
   }
 
-  debug('Starting node updates merge job');
+  logger.debug('Starting node updates merge job');
 
   const cursor = await fetchCounter(database, 'node.updates.merge.cursor');
 
@@ -56,7 +57,7 @@ export const nodeUpdatesMergeHandler: JobHandler<
       continue;
     }
 
-    debug(`Processing batch of ${updates.length} updates`);
+    logger.debug(`Processing batch of ${updates.length} updates`);
 
     const nodesMap = new Map<string, SelectNodeUpdate[]>();
     for (const update of updates) {
@@ -88,7 +89,7 @@ export const nodeUpdatesMergeHandler: JobHandler<
     }
   }
 
-  debug(
+  logger.debug(
     `Node updates merge job completed. Merged ${mergedGroups} groups, deleted ${deletedUpdates} redundant updates`
   );
 };
@@ -239,7 +240,7 @@ const mergeUpdatesGroup = async (
 
     return true;
   } catch (error) {
-    debug(`Failed to merge updates for node ${nodeId}: ${error}`);
+    logger.error(error, `Failed to merge updates for node ${nodeId}`);
     return false;
   }
 };

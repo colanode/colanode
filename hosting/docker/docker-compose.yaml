@@ -102,6 +102,13 @@ services:
       # SERVER_CORS_MAX_AGE: '7200'
 
       # ───────────────────────────────────────────────────────────────
+      # Logging Configuration
+      # ───────────────────────────────────────────────────────────────
+      # Possible values for LOGGING_LEVEL: 'trace', 'debug', 'info', 'warn', 'error', 'fatal', 'silent'
+      # Default: 'info'
+      # LOGGING_LEVEL: 'debug'
+
+      # ───────────────────────────────────────────────────────────────
       # Account Configuration
       # ───────────────────────────────────────────────────────────────
       # Possible values for ACCOUNT_VERIFICATION_TYPE: 'automatic', 'manual', 'email'

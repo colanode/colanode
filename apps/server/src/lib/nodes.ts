@@ -4,7 +4,6 @@ import {
   CanCreateNodeContext,
   CanDeleteNodeContext,
   CanUpdateAttributesContext,
-  createDebugger,
   CreateNodeMutationData,
   DeleteNodeMutationData,
   extractNodeCollaborators,
@@ -32,6 +31,7 @@ import {
 } from '@colanode/server/lib/collaborations';
 import { eventBus } from '@colanode/server/lib/event-bus';
 import { deleteFile } from '@colanode/server/lib/files';
+import { createLogger } from '@colanode/server/lib/logger';
 import { jobService } from '@colanode/server/services/job-service';
 import {
   ConcurrentUpdateResult,
@@ -39,7 +39,7 @@ import {
   UpdateNodeInput,
 } from '@colanode/server/types/nodes';
 
-const debug = createDebugger('server:lib:nodes');
+const logger = createLogger('server:lib:nodes');
 
 const UPDATE_RETRIES_LIMIT = 10;
 
@@ -204,7 +204,7 @@ export const createNode = async (input: CreateNodeInput): Promise<boolean> => {
 
     return true;
   } catch (error) {
-    debug(`Failed to create node transaction: ${error}`);
+    logger.error(error, `Failed to create node transaction`);
     return false;
   }
 };
@@ -472,7 +472,7 @@ export const createNodeFromMutation = async (
 
     return MutationStatus.CREATED;
   } catch (error) {
-    debug(`Failed to create node transaction: ${error}`);
+    logger.error(error, `Failed to create node transaction`);
     return MutationStatus.INTERNAL_SERVER_ERROR;
   }
 };

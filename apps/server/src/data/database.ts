@@ -9,12 +9,12 @@ import {
 } from 'kysely';
 import pg from 'pg';
 
-import { createDebugger } from '@colanode/core';
 import { databaseMigrations } from '@colanode/server/data/migrations';
 import { DatabaseSchema } from '@colanode/server/data/schema';
 import { config } from '@colanode/server/lib/config';
+import { createLogger } from '@colanode/server/lib/logger';
 
-const debug = createDebugger('server:database');
+const logger = createLogger('server:database');
 
 pg.types.setTypeParser(pg.types.builtins.NUMERIC, (val) => {
   return parseFloat(val);
@@ -51,13 +51,18 @@ export const migrate = async () => {
 
   const result = await migrator.migrateToLatest();
   if (result.error) {
-    debug(`Migration failed, ${result.error}`);
+    logger.error(result.error, 'Migration failed');
   }
 
   if (result.results && result.results.length > 0) {
     for (const r of result.results) {
-      debug(
-        `Migration result: ${r.direction} - ${r.migrationName} - ${r.status} `
+      logger.info(
+        {
+          direction: r.direction,
+          name: r.migrationName,
+          status: r.status,
+        },
+        'Migration result'
       );
     }
   }

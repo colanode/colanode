@@ -2,14 +2,14 @@ import {
   SynchronizerOutputMessage,
   SyncCollaborationsInput,
   SyncCollaborationData,
-  createDebugger,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { SelectCollaboration } from '@colanode/server/data/schema';
+import { createLogger } from '@colanode/server/lib/logger';
 import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
 import { Event } from '@colanode/server/types/events';
 
-const debug = createDebugger('collaboration-synchronizer');
+const logger = createLogger('collaboration-synchronizer');
 
 export class CollaborationSynchronizer extends BaseSynchronizer<SyncCollaborationsInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncCollaborationsInput> | null> {
@@ -54,7 +54,7 @@ export class CollaborationSynchronizer extends BaseSynchronizer<SyncCollaboratio
 
       return collaborations;
     } catch (error) {
-      debug('Error fetching collaborations for sync', error);
+      logger.error(error, 'Error fetching collaborations for sync');
     } finally {
       this.status = 'pending';
     }

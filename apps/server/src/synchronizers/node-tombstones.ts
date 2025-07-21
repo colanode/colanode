@@ -2,14 +2,14 @@ import {
   SynchronizerOutputMessage,
   SyncNodeTombstonesInput,
   SyncNodeTombstoneData,
-  createDebugger,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { SelectNodeTombstone } from '@colanode/server/data/schema';
+import { createLogger } from '@colanode/server/lib/logger';
 import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
 import { Event } from '@colanode/server/types/events';
 
-const debug = createDebugger('node-tombstone-synchronizer');
+const logger = createLogger('node-tombstone-synchronizer');
 
 export class NodeTombstoneSynchronizer extends BaseSynchronizer<SyncNodeTombstonesInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncNodeTombstonesInput> | null> {
@@ -55,7 +55,7 @@ export class NodeTombstoneSynchronizer extends BaseSynchronizer<SyncNodeTombston
 
       return nodeTombstones;
     } catch (error) {
-      debug('Error fetching node tombstones for sync', error);
+      logger.error(error, 'Error fetching node tombstones for sync');
     } finally {
       this.status = 'pending';
     }

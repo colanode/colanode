@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 
-import { createDebugger } from '@colanode/core';
 import { config } from '@colanode/server/lib/config';
+import { createLogger } from '@colanode/server/lib/logger';
 
 interface EmailMessage {
   to: string | string[];
@@ -10,7 +10,7 @@ interface EmailMessage {
   html?: string;
 }
 
-const debug = createDebugger('server:service:email');
+const logger = createLogger('server:service:email');
 
 class EmailService {
   private transporter: nodemailer.Transporter | undefined;
@@ -18,7 +18,7 @@ class EmailService {
 
   public async init() {
     if (!config.smtp.enabled) {
-      debug('SMTP configuration is not set, skipping initialization');
+      logger.debug('SMTP configuration is not set, skipping initialization');
       return;
     }
 
@@ -38,7 +38,7 @@ class EmailService {
 
   public async sendEmail(message: EmailMessage): Promise<void> {
     if (!this.transporter || !this.from) {
-      debug('Email service not initialized, skipping email send');
+      logger.debug('Email service not initialized, skipping email send');
       return;
     }
 

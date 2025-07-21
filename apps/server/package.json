@@ -15,7 +15,7 @@
     "build": "npm run compile && tsup-node",
     "clean": "del-cli dist isolate tsconfig.tsbuildinfo",
     "lint": "eslint . --max-warnings 0",
-    "dev": "DEBUG=colanode:* tsx watch --env-file .env src/index.ts"
+    "dev": "tsx watch --env-file .env src/index.ts"
   },
   "description": "",
   "devDependencies": {
@@ -51,6 +51,7 @@
     "langfuse-langchain": "^3.38.1",
     "nodemailer": "^7.0.4",
     "pg": "^8.16.3",
+    "pino": "^9.7.0",
     "redis": "^5.5.6",
     "sharp": "^0.34.2"
   }
