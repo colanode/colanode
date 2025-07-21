@@ -74,7 +74,6 @@ export const workspaceStorageGetRoute: FastifyPluginCallbackZod = (
           FROM uploads
           WHERE workspace_id = ${workspaceId}
           GROUP BY mime_type
-          ORDER BY total_size DESC
         `.execute(database),
         sql<UserStorageRow>`
           SELECT 
