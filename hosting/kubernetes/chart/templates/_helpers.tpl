@@ -135,6 +135,12 @@ Colanode Server Environment Variables
   value: {{ .Values.colanode.config.SERVER_MODE | quote }}
 
 # ───────────────────────────────────────────────────────────────
+# Logging Configuration
+# ───────────────────────────────────────────────────────────────
+- name: LOGGING_LEVEL
+  value: {{ .Values.colanode.config.LOGGING_LEVEL | quote }}
+
+# ───────────────────────────────────────────────────────────────
 # Account Configuration
 # ───────────────────────────────────────────────────────────────
 - name: ACCOUNT_VERIFICATION_TYPE
@@ -143,6 +149,14 @@ Colanode Server Environment Variables
   value: {{ .Values.colanode.config.ACCOUNT_OTP_TIMEOUT | quote }}
 - name: ACCOUNT_ALLOW_GOOGLE_LOGIN
   value: {{ .Values.colanode.config.ACCOUNT_ALLOW_GOOGLE_LOGIN | quote }}
+
+# ───────────────────────────────────────────────────────────────
+# Workspace Configuration
+# ───────────────────────────────────────────────────────────────
+- name: WORKSPACE_STORAGE_LIMIT
+  value: {{ .Values.colanode.config.WORKSPACE_STORAGE_LIMIT | quote }}
+- name: WORKSPACE_MAX_FILE_SIZE
+  value: {{ .Values.colanode.config.WORKSPACE_MAX_FILE_SIZE | quote }}
 
 # ───────────────────────────────────────────────────────────────
 # User Configuration

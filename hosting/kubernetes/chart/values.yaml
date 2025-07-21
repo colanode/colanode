@@ -80,13 +80,19 @@ colanode:
     SERVER_AVATAR: ''
     SERVER_MODE: 'standalone'
 
-    # Debug logging (uncomment to enable verbose logs)
-    DEBUG: 'colanode:*'
+    # Logging Config
+    # Possible values: 'trace', 'debug', 'info', 'warn', 'error', 'fatal', 'silent'
+    # Defalt is 'info'
+    # LOGGING_LEVEL=info
 
     # Account settings
     ACCOUNT_VERIFICATION_TYPE: 'automatic'
     ACCOUNT_OTP_TIMEOUT: '600' # in seconds
     ACCOUNT_ALLOW_GOOGLE_LOGIN: 'false'
+
+    # Workspace limits. Leave empty for no limits
+    # WORKSPACE_STORAGE_LIMIT: '10737418240' # 10 GB
+    # WORKSPACE_MAX_FILE_SIZE: '104857600' # 100 MB
 
     # User limits
     USER_STORAGE_LIMIT: '10737418240' # 10 GB
