@@ -63,7 +63,7 @@ export const userStorageUpdateRoute: FastifyPluginCallbackZod = (
         .set({
           storage_limit: storageLimit.toString(),
           updated_at: new Date(),
-          updated_by: user.id,
+          updated_by: user.account_id,
         })
         .where('id', '=', userToUpdate.id)
         .executeTakeFirst();

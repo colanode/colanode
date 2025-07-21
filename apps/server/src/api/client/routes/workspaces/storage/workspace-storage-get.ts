@@ -19,7 +19,7 @@ interface WorkspaceStorageAggregateRow {
 interface UserStorageRow {
   id: string;
   storage_limit: string;
-  storage_used: string;
+  storage_used: string | null;
 }
 
 export const workspaceStorageGetRoute: FastifyPluginCallbackZod = (
@@ -108,14 +108,14 @@ export const workspaceStorageGetRoute: FastifyPluginCallbackZod = (
 
       const users = usersWithStorage.rows
         .sort((a, b) => {
-          const aUsed = BigInt(a.storage_used);
-          const bUsed = BigInt(b.storage_used);
+          const aUsed = a.storage_used ? BigInt(a.storage_used) : 0n;
+          const bUsed = b.storage_used ? BigInt(b.storage_used) : 0n;
           return Number(bUsed - aUsed);
         })
         .map((user) => ({
           id: user.id,
-          used: user.storage_used,
-          limit: user.storage_limit || '0',
+          used: user.storage_used ?? '0',
+          limit: user.storage_limit,
         }));
 
       return {

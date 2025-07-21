@@ -66,7 +66,7 @@ export const userRoleUpdateRoute: FastifyPluginCallbackZod = (
           role: input.role,
           status,
           updated_at: new Date(),
-          updated_by: user.id,
+          updated_by: user.account_id,
         })
         .where('id', '=', userToUpdate.id)
         .executeTakeFirst();
