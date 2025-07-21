@@ -1,21 +1,39 @@
 import { FileSubtype, formatBytes } from '@colanode/core';
 import { bigintToPercent } from '@colanode/ui/lib/utils';
 
-const subtypeColors: Record<FileSubtype, string> = {
-  image: 'bg-blue-500',
-  video: 'bg-green-500',
-  audio: 'bg-purple-500',
-  pdf: 'bg-red-500',
-  other: 'bg-gray-500',
-};
+interface SubtypeMetadata {
+  subtype: FileSubtype;
+  color: string;
+  name: string;
+}
 
-const subtypeNames: Record<FileSubtype, string> = {
-  image: 'Images',
-  video: 'Videos',
-  audio: 'Audio',
-  pdf: 'PDFs',
-  other: 'Other Files',
-};
+const subtypeMetadata: SubtypeMetadata[] = [
+  {
+    subtype: 'image',
+    color: 'bg-blue-500',
+    name: 'Images',
+  },
+  {
+    subtype: 'video',
+    color: 'bg-green-500',
+    name: 'Videos',
+  },
+  {
+    subtype: 'audio',
+    color: 'bg-purple-500',
+    name: 'Audio',
+  },
+  {
+    subtype: 'pdf',
+    color: 'bg-red-500',
+    name: 'PDFs',
+  },
+  {
+    subtype: 'other',
+    color: 'bg-gray-500',
+    name: 'Other Files',
+  },
+];
 
 interface StorageSubtype {
   subtype: string;
@@ -57,14 +75,24 @@ export const StorageStats = ({
           }
 
           const percentage = limitBytes ? bigintToPercent(limitBytes, size) : 0;
+          const metadata = subtypeMetadata.find(
+            (m) => m.subtype === subtype.subtype
+          );
+
+          if (!metadata) {
+            return null;
+          }
+
+          const name = metadata.name;
+          const color = metadata.color;
+          const title = `${name}: ${formatBytes(BigInt(subtype.size))}`;
+
           return (
             <div
               key={subtype.subtype}
-              className={
-                subtypeColors[subtype.subtype as keyof typeof subtypeColors]
-              }
+              className={color}
               style={{ width: `${percentage}%` }}
-              title={`${subtypeNames[subtype.subtype as keyof typeof subtypeNames]}: ${formatBytes(BigInt(subtype.size))}`}
+              title={title}
             />
           );
         })}
@@ -77,24 +105,38 @@ export const StorageStats = ({
       </div>
 
       <div className="mb-6 space-y-2">
-        {subtypes.map((subtype) => (
-          <div
-            key={subtype.subtype}
-            className="flex items-center justify-between"
-          >
-            <div className="flex items-center gap-2">
-              <div
-                className={`w-3 h-3 rounded-full ${subtypeColors[subtype.subtype as keyof typeof subtypeColors]}`}
-              />
-              <span className="text-sm">
-                {subtypeNames[subtype.subtype as keyof typeof subtypeNames]}
+        {subtypes.map((subtype) => {
+          const size = BigInt(subtype.size);
+          if (size === BigInt(0)) {
+            return null;
+          }
+
+          const metadata = subtypeMetadata.find(
+            (m) => m.subtype === subtype.subtype
+          );
+
+          if (!metadata) {
+            return null;
+          }
+
+          const name = metadata.name;
+          const color = metadata.color;
+
+          return (
+            <div
+              key={subtype.subtype}
+              className="flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <div className={`w-3 h-3 rounded-full ${color}`} />
+                <span className="text-sm">{name}</span>
+              </div>
+              <span className="text-sm text-muted-foreground">
+                {formatBytes(BigInt(subtype.size))}
               </span>
             </div>
-            <span className="text-sm text-muted-foreground">
-              {formatBytes(BigInt(subtype.size))}
-            </span>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
