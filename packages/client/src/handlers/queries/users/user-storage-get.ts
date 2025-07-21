@@ -45,6 +45,48 @@ export class UserStorageGetQueryHandler
       };
     }
 
+    if (
+      event.type === 'node.created' &&
+      event.accountId === input.accountId &&
+      event.workspaceId === input.workspaceId &&
+      event.node.type === 'file' &&
+      event.node.attributes.status === FileStatus.Ready
+    ) {
+      const output = await this.handleQuery(input);
+      return {
+        hasChanges: true,
+        result: output,
+      };
+    }
+
+    if (
+      event.type === 'node.updated' &&
+      event.accountId === input.accountId &&
+      event.workspaceId === input.workspaceId &&
+      event.node.type === 'file' &&
+      event.node.attributes.status === FileStatus.Ready
+    ) {
+      const output = await this.handleQuery(input);
+      return {
+        hasChanges: true,
+        result: output,
+      };
+    }
+
+    if (
+      event.type === 'node.deleted' &&
+      event.accountId === input.accountId &&
+      event.workspaceId === input.workspaceId &&
+      event.node.type === 'file' &&
+      event.node.attributes.status === FileStatus.Ready
+    ) {
+      const output = await this.handleQuery(input);
+      return {
+        hasChanges: true,
+        result: output,
+      };
+    }
+
     return {
       hasChanges: false,
     };
@@ -71,7 +113,7 @@ export class UserStorageGetQueryHandler
       subtype: FileSubtype;
       size: string;
     }[] = [];
-    let totalUsed = 0n; // Use BigInt
+    let totalUsed = 0n;
 
     for (const row of result.rows) {
       const subtype = (row.subtype as FileSubtype) ?? 'other';
