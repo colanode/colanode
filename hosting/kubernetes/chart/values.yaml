@@ -49,8 +49,7 @@ colanode:
     # -- Ingress controller class name
     className: ''
     # -- Ingress annotations
-    annotations:
-      {}
+    annotations: {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     # -- Ingress hostnames
@@ -123,9 +122,6 @@ colanode:
     # SMTP_PASSWORD: ""
     # SMTP_EMAIL_FROM: ""
     # SMTP_EMAIL_FROM_NAME: "Colanode"
-
-    # AI features (optional)
-    AI_ENABLED: 'false'
 
 global:
   security:

@@ -88,86 +88,90 @@ export type AiConfig = z.infer<typeof aiConfigSchema>;
 
 export const readAiConfigVariables = () => {
   return {
-    enabled: process.env.AI_ENABLED === 'true',
-    nodeEmbeddingDelay: process.env.AI_NODE_EMBEDDING_DELAY,
-    documentEmbeddingDelay: process.env.AI_DOCUMENT_EMBEDDING_DELAY,
-    providers: {
-      openai: {
-        apiKey: process.env.OPENAI_API_KEY,
-        enabled: process.env.OPENAI_ENABLED,
-      },
-      google: {
-        apiKey: process.env.GOOGLE_API_KEY,
-        enabled: process.env.GOOGLE_ENABLED,
-      },
-    },
-    langfuse: {
-      enabled: process.env.LANGFUSE_ENABLED,
-      publicKey: process.env.LANGFUSE_PUBLIC_KEY,
-      secretKey: process.env.LANGFUSE_SECRET_KEY,
-      baseUrl: process.env.LANGFUSE_BASE_URL,
-    },
-    models: {
-      queryRewrite: {
-        provider: process.env.QUERY_REWRITE_PROVIDER,
-        modelName: process.env.QUERY_REWRITE_MODEL,
-        temperature: process.env.QUERY_REWRITE_TEMPERATURE,
-      },
-      response: {
-        provider: process.env.RESPONSE_PROVIDER,
-        modelName: process.env.RESPONSE_MODEL,
-        temperature: process.env.RESPONSE_TEMPERATURE,
-      },
-      rerank: {
-        provider: process.env.RERANK_PROVIDER,
-        modelName: process.env.RERANK_MODEL,
-        temperature: process.env.RERANK_TEMPERATURE,
-      },
-      summarization: {
-        provider: process.env.SUMMARIZATION_PROVIDER,
-        modelName: process.env.SUMMARIZATION_MODEL,
-        temperature: process.env.SUMMARIZATION_TEMPERATURE,
-      },
-      contextEnhancer: {
-        provider: process.env.CHUNK_CONTEXT_PROVIDER,
-        modelName: process.env.CHUNK_CONTEXT_MODEL,
-        temperature: process.env.CHUNK_CONTEXT_TEMPERATURE,
-      },
-      noContext: {
-        provider: process.env.NO_CONTEXT_PROVIDER,
-        modelName: process.env.NO_CONTEXT_MODEL,
-        temperature: process.env.NO_CONTEXT_TEMPERATURE,
-      },
-      intentRecognition: {
-        provider: process.env.INTENT_RECOGNITION_PROVIDER,
-        modelName: process.env.INTENT_RECOGNITION_MODEL,
-        temperature: process.env.INTENT_RECOGNITION_TEMPERATURE,
-      },
-      databaseFilter: {
-        provider: process.env.DATABASE_FILTER_PROVIDER,
-        modelName: process.env.DATABASE_FILTER_MODEL,
-        temperature: process.env.DATABASE_FILTER_TEMPERATURE,
-      },
-    },
-    embedding: {
-      provider: process.env.EMBEDDING_PROVIDER,
-      modelName: process.env.EMBEDDING_MODEL,
-      dimensions: process.env.EMBEDDING_DIMENSIONS,
-      apiKey: process.env.EMBEDDING_API_KEY,
-      batchSize: process.env.EMBEDDING_BATCH_SIZE,
-    },
-    chunking: {
-      defaultChunkSize: process.env.CHUNK_DEFAULT_CHUNK_SIZE,
-      defaultOverlap: process.env.CHUNK_DEFAULT_OVERLAP,
-      enhanceWithContext: process.env.CHUNK_ENHANCE_WITH_CONTEXT,
-    },
-    retrieval: {
-      hybridSearch: {
-        semanticSearchWeight:
-          process.env.RETRIEVAL_HYBRID_SEARCH_SEMANTIC_WEIGHT,
-        keywordSearchWeight: process.env.RETRIEVAL_HYBRID_SEARCH_KEYWORD_WEIGHT,
-        maxResults: process.env.RETRIEVAL_HYBRID_SEARCH_MAX_RESULTS,
-      },
-    },
+    enabled: false,
   };
+
+  // return {
+  //   enabled: process.env.AI_ENABLED === 'true',
+  //   nodeEmbeddingDelay: process.env.AI_NODE_EMBEDDING_DELAY,
+  //   documentEmbeddingDelay: process.env.AI_DOCUMENT_EMBEDDING_DELAY,
+  //   providers: {
+  //     openai: {
+  //       apiKey: process.env.OPENAI_API_KEY,
+  //       enabled: process.env.OPENAI_ENABLED,
+  //     },
+  //     google: {
+  //       apiKey: process.env.GOOGLE_API_KEY,
+  //       enabled: process.env.GOOGLE_ENABLED,
+  //     },
+  //   },
+  //   langfuse: {
+  //     enabled: process.env.LANGFUSE_ENABLED,
+  //     publicKey: process.env.LANGFUSE_PUBLIC_KEY,
+  //     secretKey: process.env.LANGFUSE_SECRET_KEY,
+  //     baseUrl: process.env.LANGFUSE_BASE_URL,
+  //   },
+  //   models: {
+  //     queryRewrite: {
+  //       provider: process.env.QUERY_REWRITE_PROVIDER,
+  //       modelName: process.env.QUERY_REWRITE_MODEL,
+  //       temperature: process.env.QUERY_REWRITE_TEMPERATURE,
+  //     },
+  //     response: {
+  //       provider: process.env.RESPONSE_PROVIDER,
+  //       modelName: process.env.RESPONSE_MODEL,
+  //       temperature: process.env.RESPONSE_TEMPERATURE,
+  //     },
+  //     rerank: {
+  //       provider: process.env.RERANK_PROVIDER,
+  //       modelName: process.env.RERANK_MODEL,
+  //       temperature: process.env.RERANK_TEMPERATURE,
+  //     },
+  //     summarization: {
+  //       provider: process.env.SUMMARIZATION_PROVIDER,
+  //       modelName: process.env.SUMMARIZATION_MODEL,
+  //       temperature: process.env.SUMMARIZATION_TEMPERATURE,
+  //     },
+  //     contextEnhancer: {
+  //       provider: process.env.CHUNK_CONTEXT_PROVIDER,
+  //       modelName: process.env.CHUNK_CONTEXT_MODEL,
+  //       temperature: process.env.CHUNK_CONTEXT_TEMPERATURE,
+  //     },
+  //     noContext: {
+  //       provider: process.env.NO_CONTEXT_PROVIDER,
+  //       modelName: process.env.NO_CONTEXT_MODEL,
+  //       temperature: process.env.NO_CONTEXT_TEMPERATURE,
+  //     },
+  //     intentRecognition: {
+  //       provider: process.env.INTENT_RECOGNITION_PROVIDER,
+  //       modelName: process.env.INTENT_RECOGNITION_MODEL,
+  //       temperature: process.env.INTENT_RECOGNITION_TEMPERATURE,
+  //     },
+  //     databaseFilter: {
+  //       provider: process.env.DATABASE_FILTER_PROVIDER,
+  //       modelName: process.env.DATABASE_FILTER_MODEL,
+  //       temperature: process.env.DATABASE_FILTER_TEMPERATURE,
+  //     },
+  //   },
+  //   embedding: {
+  //     provider: process.env.EMBEDDING_PROVIDER,
+  //     modelName: process.env.EMBEDDING_MODEL,
+  //     dimensions: process.env.EMBEDDING_DIMENSIONS,
+  //     apiKey: process.env.EMBEDDING_API_KEY,
+  //     batchSize: process.env.EMBEDDING_BATCH_SIZE,
+  //   },
+  //   chunking: {
+  //     defaultChunkSize: process.env.CHUNK_DEFAULT_CHUNK_SIZE,
+  //     defaultOverlap: process.env.CHUNK_DEFAULT_OVERLAP,
+  //     enhanceWithContext: process.env.CHUNK_ENHANCE_WITH_CONTEXT,
+  //   },
+  //   retrieval: {
+  //     hybridSearch: {
+  //       semanticSearchWeight:
+  //         process.env.RETRIEVAL_HYBRID_SEARCH_SEMANTIC_WEIGHT,
+  //       keywordSearchWeight: process.env.RETRIEVAL_HYBRID_SEARCH_KEYWORD_WEIGHT,
+  //       maxResults: process.env.RETRIEVAL_HYBRID_SEARCH_MAX_RESULTS,
+  //     },
+  //   },
+  // };
 };

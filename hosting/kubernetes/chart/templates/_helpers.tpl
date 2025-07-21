@@ -270,10 +270,3 @@ Colanode Server Environment Variables
 - name: SMTP_EMAIL_FROM_NAME
   value: {{ .Values.colanode.config.SMTP_EMAIL_FROM_NAME | quote }}
 {{- end }}
-
-# ───────────────────────────────────────────────────────────────
-# AI Configuration
-# ───────────────────────────────────────────────────────────────
-- name: AI_ENABLED
-  value: {{ .Values.colanode.config.AI_ENABLED | quote }}
-{{- end }}
