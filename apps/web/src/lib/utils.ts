@@ -16,3 +16,10 @@ export const isOpfsSupported = async (): Promise<boolean> => {
     return false;
   }
 };
+
+const mobileDeviceRegex =
+  /Android|iPhone|iPad|iPod|Opera Mini|IEMobile|WPDesktop/i;
+
+export const isMobileDevice = (): boolean => {
+  return mobileDeviceRegex.test(navigator.userAgent);
+};
