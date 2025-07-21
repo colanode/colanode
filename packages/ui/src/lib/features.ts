@@ -24,5 +24,5 @@ export const isFeatureSupported = (
     return false;
   }
 
-  return semver.gte(featureVersion, parsedVersion);
+  return semver.gte(parsedVersion, featureVersion);
 };
