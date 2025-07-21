@@ -21,7 +21,7 @@ export const SidebarChats = () => {
   const chats = chatListQuery.data ?? [];
 
   return (
-    <div className="flex flex-col group/sidebar-chats h-full px-2">
+    <div className="flex flex-col group/sidebar h-full px-2">
       <SidebarHeader title="Chats" actions={<ChatCreatePopover />} />
       <div className="flex w-full min-w-0 flex-col gap-1">
         {chats.map((item) => (

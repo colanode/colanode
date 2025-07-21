@@ -21,7 +21,7 @@ export const SidebarSpaces = () => {
   const spaces = spaceListQuery.data ?? [];
 
   return (
-    <div className="flex flex-col group/sidebar-spaces h-full px-2">
+    <div className="flex flex-col group/sidebar h-full px-2">
       <SidebarHeader
         title="Spaces"
         actions={canCreateSpace && <SpaceCreateButton />}

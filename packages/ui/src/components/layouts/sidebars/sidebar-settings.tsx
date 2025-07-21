@@ -7,7 +7,7 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 
 export const SidebarSettings = () => {
   return (
-    <div className="flex flex-col gap-4 h-full px-2">
+    <div className="flex flex-col gap-4 h-full px-2 group/sidebar">
       <div className="flex w-full min-w-0 flex-col gap-1">
         <SidebarHeader title="Workspace settings" />
         <SidebarSettingsItem
