@@ -55,13 +55,13 @@ export const userStorageUpdateRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const storageLimit = BigInt(input.storageLimit);
+      const limit = BigInt(input.limit);
 
       const updatedUser = await database
         .updateTable('users')
         .returningAll()
         .set({
-          storage_limit: storageLimit.toString(),
+          storage_limit: limit.toString(),
           updated_at: new Date(),
           updated_by: user.account_id,
         })

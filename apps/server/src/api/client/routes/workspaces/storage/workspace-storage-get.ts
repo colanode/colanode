@@ -5,6 +5,7 @@ import { z } from 'zod/v4';
 import {
   ApiErrorCode,
   apiErrorOutputSchema,
+  compareString,
   extractFileSubtype,
   FileSubtype,
   workspaceStorageGetOutputSchema,
@@ -110,7 +111,12 @@ export const workspaceStorageGetRoute: FastifyPluginCallbackZod = (
         .sort((a, b) => {
           const aUsed = a.storage_used ? BigInt(a.storage_used) : 0n;
           const bUsed = b.storage_used ? BigInt(b.storage_used) : 0n;
-          return Number(bUsed - aUsed);
+          const diff = Number(aUsed - bUsed);
+          if (diff !== 0) {
+            return -diff;
+          }
+
+          return compareString(a.id, b.id);
         })
         .map((user) => ({
           id: user.id,

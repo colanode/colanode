@@ -118,7 +118,7 @@ const WorkspaceStorageUserRow = ({
       {openUpdateDialog && (
         <WorkspaceStorageUserUpdateDialog
           userId={user.id}
-          storageLimit={user.limit}
+          limit={user.limit}
           open={openUpdateDialog}
           onOpenChange={setOpenUpdateDialog}
           onUpdate={() => {

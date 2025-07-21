@@ -75,12 +75,12 @@ const formatBytes = (bytes: string): string => {
 };
 
 const formSchema = z.object({
-  storageLimitValue: z.string().min(1, 'Storage limit is required'),
+  limit: z.string().min(1, 'Storage limit is required'),
 });
 
 interface WorkspaceStorageUserUpdateDialogProps {
   userId: string;
-  storageLimit: string;
+  limit: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdate: () => void;
@@ -88,7 +88,7 @@ interface WorkspaceStorageUserUpdateDialogProps {
 
 export const WorkspaceStorageUserUpdateDialog = ({
   userId,
-  storageLimit,
+  limit,
   open,
   onOpenChange,
   onUpdate,
@@ -96,11 +96,9 @@ export const WorkspaceStorageUserUpdateDialog = ({
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
-  const initialStorageLimit = convertBytesToUnit(storageLimit);
+  const initialLimit = convertBytesToUnit(limit);
 
-  const [storageLimitUnit, setStorageLimitUnit] = useState(
-    initialStorageLimit.unit
-  );
+  const [limitUnit, setLimitUnit] = useState(initialLimit.unit);
 
   const userQuery = useQuery({
     type: 'user.get',
@@ -116,13 +114,13 @@ export const WorkspaceStorageUserUpdateDialog = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      storageLimitValue: initialStorageLimit.value,
+      limit: initialLimit.value,
     },
   });
 
   const handleCancel = () => {
     form.reset();
-    setStorageLimitUnit(initialStorageLimit.unit);
+    setLimitUnit(initialLimit.unit);
     onOpenChange(false);
   };
 
@@ -132,10 +130,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
     }
 
     const apiValues = {
-      storageLimit: convertUnitToBytes(
-        values.storageLimitValue,
-        storageLimitUnit
-      ),
+      limit: convertUnitToBytes(values.limit, limitUnit),
     };
 
     mutate({
@@ -144,7 +139,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
         accountId: workspace.accountId,
         workspaceId: workspace.id,
         userId,
-        storageLimit: apiValues.storageLimit,
+        limit: apiValues.limit,
       },
       onSuccess: () => {
         toast.success('User storage settings updated');
@@ -157,7 +152,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
     });
   };
 
-  const unit = UNITS.find((u) => u.value === storageLimitUnit);
+  const unit = UNITS.find((u) => u.value === limitUnit);
   const unitLabel = unit?.label ?? 'bytes';
 
   return (
@@ -184,7 +179,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
             <div className="flex-grow space-y-6 py-2 pb-4">
               <FormField
                 control={form.control}
-                name="storageLimitValue"
+                name="limit"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Storage Limit</FormLabel>
@@ -212,11 +207,11 @@ export const WorkspaceStorageUserUpdateDialog = ({
                             {UNITS.map((unit) => (
                               <DropdownMenuItem
                                 key={unit.value}
-                                onClick={() => setStorageLimitUnit(unit.value)}
+                                onClick={() => setLimitUnit(unit.value)}
                                 className="flex items-center justify-between"
                               >
                                 <span>{unit.label}</span>
-                                {storageLimitUnit === unit.value && (
+                                {limitUnit === unit.value && (
                                   <Check className="h-4 w-4" />
                                 )}
                               </DropdownMenuItem>
@@ -228,7 +223,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
                     <div className="text-xs text-muted-foreground">
                       ={' '}
                       {formatBytes(
-                        convertUnitToBytes(field.value || '0', storageLimitUnit)
+                        convertUnitToBytes(field.value || '0', limitUnit)
                       )}{' '}
                       bytes
                     </div>
