@@ -8,7 +8,11 @@ import { DatabaseViewsContext } from '@colanode/ui/contexts/database-views';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
-export const DatabaseViews = () => {
+interface DatabaseViewsProps {
+  inline?: boolean;
+}
+
+export const DatabaseViews = ({ inline = false }: DatabaseViewsProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
   const [activeViewId, setActiveViewId] = useState<string | null>(null);
@@ -31,7 +35,12 @@ export const DatabaseViews = () => {
 
   return (
     <DatabaseViewsContext.Provider
-      value={{ views, activeViewId: activeViewId ?? '', setActiveViewId }}
+      value={{
+        views,
+        activeViewId: activeViewId ?? '',
+        setActiveViewId,
+        inline,
+      }}
     >
       <div className="h-full w-full overflow-y-auto">
         <ScrollAreaPrimitive.Root className="relative overflow-hidden">

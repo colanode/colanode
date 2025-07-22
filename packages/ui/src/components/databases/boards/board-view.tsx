@@ -6,6 +6,7 @@ import { BoardViewSettings } from '@colanode/ui/components/databases/boards/boar
 import { ViewFilterButton } from '@colanode/ui/components/databases/search/view-filter-button';
 import { ViewSearchBar } from '@colanode/ui/components/databases/search/view-search-bar';
 import { ViewSortButton } from '@colanode/ui/components/databases/search/view-sort-button';
+import { ViewFullscreenButton } from '@colanode/ui/components/databases/view-fullscreen-button';
 import { ViewTabs } from '@colanode/ui/components/databases/view-tabs';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
@@ -23,6 +24,7 @@ export const BoardView = () => {
       <div className="flex flex-row justify-between border-b">
         <ViewTabs />
         <div className="invisible flex flex-row items-center justify-end group-hover/database:visible">
+          <ViewFullscreenButton />
           <BoardViewSettings />
           <ViewSortButton />
           <ViewFilterButton />

@@ -27,7 +27,7 @@ export const DatabaseNodeView = ({ node }: NodeViewProps) => {
     return (
       <NodeViewWrapper data-id={node.attrs.id} className="my-4 w-full">
         <Database database={database} role={role}>
-          <DatabaseViews />
+          <DatabaseViews inline />
         </Database>
       </NodeViewWrapper>
     );
