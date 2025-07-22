@@ -1,13 +1,13 @@
-import { Database } from 'lucide-react';
+import { DatabaseZap } from 'lucide-react';
 
 import { EditorCommand } from '@colanode/client/types';
 
-export const DatabaseCommand: EditorCommand = {
-  key: 'database',
-  name: 'Database - Full Page',
-  description: 'Insert a full page database',
-  keywords: ['database', 'full', 'page'],
-  icon: Database,
+export const DatabaseInlineCommand: EditorCommand = {
+  key: 'database-inline',
+  name: 'Database - Inline',
+  description: 'Insert a database inline in the current document',
+  keywords: ['database', 'inline'],
+  icon: DatabaseZap,
   disabled: false,
   async handler({ editor, range, context }) {
     if (context == null) {
@@ -35,6 +35,7 @@ export const DatabaseCommand: EditorCommand = {
         type: 'database',
         attrs: {
           id: output.output.id,
+          inline: true,
         },
       })
       .run();

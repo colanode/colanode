@@ -14,6 +14,9 @@ export const DatabaseNode = Node.create({
       id: {
         default: null,
       },
+      inline: {
+        default: false,
+      },
     };
   },
   renderHTML({ HTMLAttributes }) {

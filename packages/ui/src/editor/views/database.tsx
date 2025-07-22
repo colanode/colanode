@@ -3,33 +3,34 @@ import { NodeViewWrapper } from '@tiptap/react';
 
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { Database } from '@colanode/ui/components/databases/database';
+import { DatabaseViews } from '@colanode/ui/components/databases/database-views';
 import { useLayout } from '@colanode/ui/contexts/layout';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
 
 export const DatabaseNodeView = ({ node }: NodeViewProps) => {
-  const workspace = useWorkspace();
   const layout = useLayout();
 
   const id = node.attrs.id;
-  const nodeGetQuery = useLiveQuery({
-    type: 'node.get',
-    nodeId: id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-  });
+  const data = useNodeContainer<LocalDatabaseNode>(id);
 
-  if (!id) {
+  if (data.isPending) {
     return null;
   }
 
-  if (nodeGetQuery.isPending) {
+  if (!data.node) {
     return null;
   }
 
-  const database = nodeGetQuery.data as LocalDatabaseNode;
-  if (!database) {
-    return null;
+  const { node: database, role } = data;
+  if (node.attrs.inline) {
+    return (
+      <NodeViewWrapper data-id={node.attrs.id} className="my-4 w-full">
+        <Database database={database} role={role}>
+          <DatabaseViews />
+        </Database>
+      </NodeViewWrapper>
+    );
   }
 
   const name = database.attributes.name ?? 'Unnamed';
@@ -38,7 +39,7 @@ export const DatabaseNodeView = ({ node }: NodeViewProps) => {
   return (
     <NodeViewWrapper
       data-id={node.attrs.id}
-      className="my-0.5 flex h-12 w-full cursor-pointer flex-row items-center gap-1 rounded-md bg-gray-50 p-2 hover:bg-gray-100"
+      className="my-0.5 w-full cursor-pointer flex-row items-center gap-1 rounded-md bg-gray-50 p-2 hover:bg-gray-100"
       onClick={() => {
         layout.previewLeft(id, true);
       }}

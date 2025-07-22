@@ -146,7 +146,7 @@ const CommandList = ({
               key={item.key}
               onClick={() => selectItem(index)}
             >
-              <div className="flex size-10 items-center justify-center rounded-md border border-stone-200 bg-white">
+              <div className="flex size-10 min-w-10 items-center justify-center rounded-md border border-stone-200 bg-white">
                 <item.icon className="size-5" />
               </div>
               <div>

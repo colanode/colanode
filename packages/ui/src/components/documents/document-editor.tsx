@@ -39,6 +39,7 @@ import {
   ParagraphCommand,
   TodoCommand,
   DatabaseCommand,
+  DatabaseInlineCommand,
 } from '@colanode/ui/editor/commands';
 import {
   BlockquoteNode,
@@ -211,6 +212,7 @@ export const DocumentEditor = ({
             BulletListCommand,
             CodeBlockCommand,
             OrderedListCommand,
+            DatabaseInlineCommand,
             DatabaseCommand,
             DividerCommand,
             TodoCommand,

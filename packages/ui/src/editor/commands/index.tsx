@@ -3,6 +3,7 @@ import { BlockquoteCommand } from '@colanode/ui/editor/commands/blockquote';
 import { BulletListCommand } from '@colanode/ui/editor/commands/bullet-list';
 import { CodeBlockCommand } from '@colanode/ui/editor/commands/code-block';
 import { DatabaseCommand } from '@colanode/ui/editor/commands/database';
+import { DatabaseInlineCommand } from '@colanode/ui/editor/commands/database-inline';
 import { DividerCommand } from '@colanode/ui/editor/commands/divider';
 import { FileCommand } from '@colanode/ui/editor/commands/file';
 import { FolderCommand } from '@colanode/ui/editor/commands/folder';
@@ -31,4 +32,5 @@ export {
   ParagraphCommand,
   TodoCommand,
   DatabaseCommand,
+  DatabaseInlineCommand,
 };
