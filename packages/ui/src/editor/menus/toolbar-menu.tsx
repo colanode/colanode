@@ -1,9 +1,5 @@
-import {
-  BubbleMenu,
-  type BubbleMenuProps,
-  Editor,
-  isNodeSelection,
-} from '@tiptap/react';
+import { Editor, isNodeSelection } from '@tiptap/react';
+import { BubbleMenu, type BubbleMenuProps } from '@tiptap/react/menus';
 import { Bold, Code, Italic, Strikethrough, Underline } from 'lucide-react';
 import { useState } from 'react';
 
@@ -45,9 +41,11 @@ export const ToolbarMenu = (props: ToolbarMenuProps) => {
 
       return true;
     },
-    tippyOptions: {
-      moveTransition: 'transform 0.15s ease-out',
-      onHidden: () => {
+    options: {
+      strategy: 'absolute',
+      placement: 'top',
+      offset: 8,
+      onHide: () => {
         setIsColorButtonOpen(false);
         setIsLinkButtonOpen(false);
       },
@@ -61,7 +59,7 @@ export const ToolbarMenu = (props: ToolbarMenuProps) => {
   return (
     <BubbleMenu
       {...bubbleMenuProps}
-      className="flex flex-row items-center gap-1 rounded border bg-white p-0.5 shadow-xl"
+      className="flex flex-row items-center gap-1 rounded border bg-white p-0.5 shadow-xl transition-transform duration-150 ease-out"
     >
       <LinkButton
         editor={props.editor}

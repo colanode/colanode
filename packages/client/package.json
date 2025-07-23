@@ -24,8 +24,8 @@
     "coverage": "vitest run --coverage "
   },
   "dependencies": {
-    "@tiptap/core": "^2.24.1",
-    "@tiptap/pm": "^2.24.1",
+    "@tiptap/core": "^3.0.7",
+    "@tiptap/pm": "^3.0.7",
     "async-lock": "^1.4.1",
     "file-type": "^21.0.0",
     "isomorphic-ws": "^5.0.0",

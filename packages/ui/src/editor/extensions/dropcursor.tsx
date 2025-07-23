@@ -1,4 +1,4 @@
-import { Dropcursor } from '@tiptap/extension-dropcursor';
+import { Dropcursor } from '@tiptap/extensions';
 
 export const DropcursorExtension = Dropcursor.configure({
   width: 5,

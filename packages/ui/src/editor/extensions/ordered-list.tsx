@@ -1,4 +1,4 @@
-import { OrderedList } from '@tiptap/extension-ordered-list';
+import { OrderedList } from '@tiptap/extension-list';
 
 import { defaultClasses } from '@colanode/ui/editor/classes';
 

@@ -28,6 +28,14 @@ import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { MentionNodeView } from '@colanode/ui/editor/views';
 import { updateScrollView } from '@colanode/ui/lib/utils';
 
+declare module '@tiptap/core' {
+  interface Storage {
+    mention: {
+      isOpen: boolean;
+    };
+  }
+}
+
 interface MentionOptions {
   context: EditorContext | null;
 }
