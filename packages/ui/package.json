@@ -44,7 +44,7 @@
     "@radix-ui/react-tabs": "^1.1.12",
     "@radix-ui/react-tooltip": "^1.2.7",
     "@react-oauth/google": "^0.12.2",
-    "@tanstack/react-query": "^5.81.5",
+    "@tanstack/react-query": "^5.83.0",
     "@tanstack/react-virtual": "^3.13.12",
     "@tiptap/core": "^3.0.7",
     "@tiptap/extension-blockquote": "^3.0.7",
@@ -71,16 +71,16 @@
     "lucide-react": "^0.525.0",
     "re-resizable": "^6.11.2",
     "react": "^19.1.0",
-    "react-day-picker": "^9.7.0",
+    "react-day-picker": "^9.8.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.1.0",
-    "react-hook-form": "^7.59.0",
+    "react-hook-form": "^7.60.0",
     "react-intersection-observer": "^9.16.0",
     "sonner": "^2.0.6",
     "tailwind-merge": "^3.3.1",
     "tiptap-extension-auto-joiner": "^0.1.3",
     "ts-pattern": "^5.7.1",
-    "zod": "^3.25.72"
+    "zod": "^4.0.5"
   }
 }

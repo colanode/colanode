@@ -31,9 +31,9 @@
     "@tailwindcss/postcss": "^4.1.11",
     "@types/better-sqlite3": "^7.6.13",
     "@types/electron-squirrel-startup": "^1.0.2",
-    "@vitejs/plugin-react": "^4.6.0",
-    "electron": "^37.2.0",
-    "vite": "^7.0.2"
+    "@vitejs/plugin-react": "^4.7.0",
+    "electron": "^37.2.3",
+    "vite": "^7.0.5"
   },
   "dependencies": {
     "@colanode/client": "*",

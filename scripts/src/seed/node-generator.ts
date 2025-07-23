@@ -6,7 +6,7 @@ import {
   IdType,
   NodeAttributes,
   NodeRole,
-  generateNodeIndex,
+  generateFractionalIndex,
   FieldAttributes,
   SelectOptionAttributes,
   DatabaseAttributes,
@@ -220,35 +220,35 @@ export class NodeGenerator {
       id: generateId(IdType.SelectOption),
       name: 'New',
       color: 'gray',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
     };
 
     const activeStatusOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'Active',
       color: 'blue',
-      index: generateNodeIndex(newStatusOption.index),
+      index: generateFractionalIndex(newStatusOption.index),
     };
 
     const toTestStatusOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'To Test',
       color: 'yellow',
-      index: generateNodeIndex(activeStatusOption.index),
+      index: generateFractionalIndex(activeStatusOption.index),
     };
 
     const closedStatusOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'Closed',
       color: 'red',
-      index: generateNodeIndex(toTestStatusOption.index),
+      index: generateFractionalIndex(toTestStatusOption.index),
     };
 
     const statusField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'select',
       name: 'Status',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
       options: {
         [newStatusOption.id]: newStatusOption,
         [activeStatusOption.id]: activeStatusOption,
@@ -261,42 +261,42 @@ export class NodeGenerator {
       id: generateId(IdType.SelectOption),
       name: 'api',
       color: 'blue',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
     };
 
     const devopsTeamSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'devops',
       color: 'green',
-      index: generateNodeIndex(apiTeamSelectOption.index),
+      index: generateFractionalIndex(apiTeamSelectOption.index),
     };
 
     const frontendTeamSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'frontend',
       color: 'purple',
-      index: generateNodeIndex(devopsTeamSelectOption.index),
+      index: generateFractionalIndex(devopsTeamSelectOption.index),
     };
 
     const aiTeamSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'ai',
       color: 'pink',
-      index: generateNodeIndex(frontendTeamSelectOption.index),
+      index: generateFractionalIndex(frontendTeamSelectOption.index),
     };
 
     const otherTeamSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'other',
       color: 'gray',
-      index: generateNodeIndex(aiTeamSelectOption.index),
+      index: generateFractionalIndex(aiTeamSelectOption.index),
     };
 
     const teamsField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'multi_select',
       name: 'Teams',
-      index: generateNodeIndex(statusField.index),
+      index: generateFractionalIndex(statusField.index),
       options: {
         [apiTeamSelectOption.id]: apiTeamSelectOption,
         [devopsTeamSelectOption.id]: devopsTeamSelectOption,
@@ -310,35 +310,35 @@ export class NodeGenerator {
       id: generateId(IdType.Field),
       type: 'collaborator',
       name: 'Assigned',
-      index: generateNodeIndex(teamsField.index),
+      index: generateFractionalIndex(teamsField.index),
     };
 
     const priorityField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'number',
       name: 'Priority',
-      index: generateNodeIndex(assignedField.index),
+      index: generateFractionalIndex(assignedField.index),
     };
 
     const approvedField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'boolean',
       name: 'Approved',
-      index: generateNodeIndex(priorityField.index),
+      index: generateFractionalIndex(priorityField.index),
     };
 
     const releaseDateField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'date',
       name: 'Release Date',
-      index: generateNodeIndex(approvedField.index),
+      index: generateFractionalIndex(approvedField.index),
     };
 
     const commentsField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'text',
       name: 'Comment',
-      index: generateNodeIndex(releaseDateField.index),
+      index: generateFractionalIndex(releaseDateField.index),
     };
 
     const databaseAttributes: NodeAttributes = {
@@ -370,7 +370,7 @@ export class NodeGenerator {
       type: 'database_view',
       layout: 'table',
       name: 'All Tasks',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
       parentId: databaseId,
     };
 
@@ -396,7 +396,7 @@ export class NodeGenerator {
       filters: {
         [activeTasksFilter.id]: activeTasksFilter,
       },
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
       parentId: databaseId,
     };
 
@@ -411,7 +411,7 @@ export class NodeGenerator {
       type: 'database_view',
       layout: 'board',
       name: 'Kanban',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
       parentId: databaseId,
       groupBy: statusField.id,
     };
@@ -433,49 +433,49 @@ export class NodeGenerator {
       id: generateId(IdType.SelectOption),
       name: 'New Lead',
       color: 'gray',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
     };
 
     const contactedStatusOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'Contacted',
       color: 'blue',
-      index: generateNodeIndex(newLeadStatusOption.index),
+      index: generateFractionalIndex(newLeadStatusOption.index),
     };
 
     const qualifiedStatusOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'Qualified',
       color: 'yellow',
-      index: generateNodeIndex(contactedStatusOption.index),
+      index: generateFractionalIndex(contactedStatusOption.index),
     };
 
     const proposalSentStatusOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'Proposal Sent',
       color: 'red',
-      index: generateNodeIndex(qualifiedStatusOption.index),
+      index: generateFractionalIndex(qualifiedStatusOption.index),
     };
 
     const negotiatingStatusOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'Negotiating',
       color: 'orange',
-      index: generateNodeIndex(proposalSentStatusOption.index),
+      index: generateFractionalIndex(proposalSentStatusOption.index),
     };
 
     const convertedStatusOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'Converted',
       color: 'green',
-      index: generateNodeIndex(negotiatingStatusOption.index),
+      index: generateFractionalIndex(negotiatingStatusOption.index),
     };
 
     const statusField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'select',
       name: 'Status',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
       options: {
         [newLeadStatusOption.id]: newLeadStatusOption,
         [contactedStatusOption.id]: contactedStatusOption,
@@ -490,56 +490,56 @@ export class NodeGenerator {
       id: generateId(IdType.SelectOption),
       name: 'Tech',
       color: 'blue',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
     };
 
     const financeSectorSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'Finance',
       color: 'green',
-      index: generateNodeIndex(techSectorSelectOption.index),
+      index: generateFractionalIndex(techSectorSelectOption.index),
     };
 
     const marketingSectorSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'Marketing',
       color: 'purple',
-      index: generateNodeIndex(financeSectorSelectOption.index),
+      index: generateFractionalIndex(financeSectorSelectOption.index),
     };
 
     const salesSectorSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'Sales',
       color: 'pink',
-      index: generateNodeIndex(marketingSectorSelectOption.index),
+      index: generateFractionalIndex(marketingSectorSelectOption.index),
     };
 
     const educationSectorSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'Education',
       color: 'purple',
-      index: generateNodeIndex(salesSectorSelectOption.index),
+      index: generateFractionalIndex(salesSectorSelectOption.index),
     };
 
     const nonprofitSectorSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'Nonprofit',
       color: 'gray',
-      index: generateNodeIndex(educationSectorSelectOption.index),
+      index: generateFractionalIndex(educationSectorSelectOption.index),
     };
 
     const otherSectorSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'other',
       color: 'gray',
-      index: generateNodeIndex(nonprofitSectorSelectOption.index),
+      index: generateFractionalIndex(nonprofitSectorSelectOption.index),
     };
 
     const sectorField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'multi_select',
       name: 'Sector',
-      index: generateNodeIndex(statusField.index),
+      index: generateFractionalIndex(statusField.index),
       options: {
         [techSectorSelectOption.id]: techSectorSelectOption,
         [financeSectorSelectOption.id]: financeSectorSelectOption,
@@ -555,35 +555,35 @@ export class NodeGenerator {
       id: generateId(IdType.Field),
       type: 'collaborator',
       name: 'Assigned',
-      index: generateNodeIndex(sectorField.index),
+      index: generateFractionalIndex(sectorField.index),
     };
 
     const revenueField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'number',
       name: 'Revenue',
-      index: generateNodeIndex(assignedField.index),
+      index: generateFractionalIndex(assignedField.index),
     };
 
     const archivedField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'boolean',
       name: 'Archived',
-      index: generateNodeIndex(revenueField.index),
+      index: generateFractionalIndex(revenueField.index),
     };
 
     const startDateField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'date',
       name: 'Start Date',
-      index: generateNodeIndex(archivedField.index),
+      index: generateFractionalIndex(archivedField.index),
     };
 
     const commentsField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'text',
       name: 'Comment',
-      index: generateNodeIndex(startDateField.index),
+      index: generateFractionalIndex(startDateField.index),
     };
 
     const databaseAttributes: NodeAttributes = {
@@ -615,7 +615,7 @@ export class NodeGenerator {
       type: 'database_view',
       layout: 'table',
       name: 'All Clients',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
       parentId: databaseId,
     };
 
@@ -641,7 +641,7 @@ export class NodeGenerator {
       filters: {
         [activeClientsFilter.id]: activeClientsFilter,
       },
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
       parentId: databaseId,
     };
 
@@ -656,7 +656,7 @@ export class NodeGenerator {
       type: 'database_view',
       layout: 'board',
       name: 'Board',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
       parentId: databaseId,
       groupBy: statusField.id,
     };
@@ -678,49 +678,49 @@ export class NodeGenerator {
       id: generateId(IdType.SelectOption),
       name: 'tech',
       color: 'blue',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
     };
 
     const productTagSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'product',
       color: 'green',
-      index: generateNodeIndex(techTagSelectOption.index),
+      index: generateFractionalIndex(techTagSelectOption.index),
     };
 
     const designTagSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'design (ui/ux)',
       color: 'purple',
-      index: generateNodeIndex(productTagSelectOption.index),
+      index: generateFractionalIndex(productTagSelectOption.index),
     };
 
     const clientTagSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'client',
       color: 'pink',
-      index: generateNodeIndex(designTagSelectOption.index),
+      index: generateFractionalIndex(designTagSelectOption.index),
     };
 
     const hiringSectorSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'hiring',
       color: 'purple',
-      index: generateNodeIndex(clientTagSelectOption.index),
+      index: generateFractionalIndex(clientTagSelectOption.index),
     };
 
     const otherSectorSelectOption: SelectOptionAttributes = {
       id: generateId(IdType.SelectOption),
       name: 'other',
       color: 'gray',
-      index: generateNodeIndex(hiringSectorSelectOption.index),
+      index: generateFractionalIndex(hiringSectorSelectOption.index),
     };
 
     const tagsField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'multi_select',
       name: 'Tags',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
       options: {
         [techTagSelectOption.id]: techTagSelectOption,
         [productTagSelectOption.id]: productTagSelectOption,
@@ -735,14 +735,14 @@ export class NodeGenerator {
       id: generateId(IdType.Field),
       type: 'collaborator',
       name: 'Attendees',
-      index: generateNodeIndex(tagsField.index),
+      index: generateFractionalIndex(tagsField.index),
     };
 
     const dateField: FieldAttributes = {
       id: generateId(IdType.Field),
       type: 'date',
       name: 'Date',
-      index: generateNodeIndex(attendeesField.index),
+      index: generateFractionalIndex(attendeesField.index),
     };
 
     const databaseAttributes: NodeAttributes = {
@@ -769,7 +769,7 @@ export class NodeGenerator {
       type: 'database_view',
       layout: 'calendar',
       name: 'Calendar',
-      index: generateNodeIndex(),
+      index: generateFractionalIndex(),
       parentId: databaseId,
       groupBy: dateField.id,
     };
@@ -785,7 +785,7 @@ export class NodeGenerator {
       type: 'database_view',
       layout: 'table',
       name: 'Table',
-      index: generateNodeIndex(calendarViewAttributes.index),
+      index: generateFractionalIndex(calendarViewAttributes.index),
       parentId: databaseId,
     };
 
@@ -916,7 +916,7 @@ export class NodeGenerator {
   private buildMessageContent(messageId: string): Record<string, Block> {
     const paragraphBlock = this.buildParagraphBlock(
       messageId,
-      generateNodeIndex()
+      generateFractionalIndex()
     );
     return {
       [paragraphBlock.id]: paragraphBlock,
@@ -927,7 +927,7 @@ export class NodeGenerator {
     const nrOfParagraphs = Math.floor(Math.random() * 10) + 1;
     const blocks: Record<string, Block> = {};
     for (let i = 0; i < nrOfParagraphs; i++) {
-      const block = this.buildParagraphBlock(pageId, generateNodeIndex());
+      const block = this.buildParagraphBlock(pageId, generateFractionalIndex());
       blocks[block.id] = block;
     }
 

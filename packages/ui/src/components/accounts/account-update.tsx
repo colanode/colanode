@@ -24,16 +24,14 @@ import { cn } from '@colanode/ui/lib/utils';
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),
   avatar: z.string().optional().nullable(),
-  email: z.string().email('Invalid email address'),
+  email: z.email('Invalid email address'),
 });
-
-type formSchemaType = z.infer<typeof formSchema>;
 
 export const AccountUpdate = ({ account }: { account: Account }) => {
   const { mutate: uploadAvatar, isPending: isUploadingAvatar } = useMutation();
   const { mutate: updateAccount, isPending: isUpdatingAccount } = useMutation();
 
-  const form = useForm<formSchemaType>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: account.name,
@@ -45,7 +43,7 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
   const name = form.watch('name');
   const avatar = form.watch('avatar');
 
-  const onSubmit = (values: formSchemaType) => {
+  const onSubmit = (values: z.output<typeof formSchema>) => {
     if (isUpdatingAccount) {
       return;
     }
