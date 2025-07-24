@@ -1,4 +1,4 @@
-import { Cylinder, LogOut, Settings, Users } from 'lucide-react';
+import { Cylinder, LogOut, Settings, Upload, Users } from 'lucide-react';
 
 import { SpecialContainerTabPath } from '@colanode/client/types';
 import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
@@ -24,6 +24,11 @@ export const SidebarSettings = () => {
           title="Storage"
           icon={Cylinder}
           path={SpecialContainerTabPath.WorkspaceStorage}
+        />
+        <SidebarSettingsItem
+          title="Uploads"
+          icon={Upload}
+          path={SpecialContainerTabPath.WorkspaceUploads}
         />
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">

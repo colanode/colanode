@@ -1,4 +1,5 @@
 import { TempFile } from '@colanode/client/types';
+import { FileSubtype } from '@colanode/core';
 
 export interface FileDialogOptions {
   accept?: string;
@@ -82,4 +83,8 @@ export const openFileDialog = (
     activeDialog = input;
     input.click();
   });
+};
+
+export const canPreviewFile = (subtype: FileSubtype) => {
+  return subtype === 'image' || subtype === 'video' || subtype === 'audio';
 };

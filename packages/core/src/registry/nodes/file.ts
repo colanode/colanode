@@ -3,10 +3,11 @@ import { z } from 'zod/v4';
 import { extractNodeRole } from '@colanode/core/lib/nodes';
 import { hasNodeRole } from '@colanode/core/lib/permissions';
 import { NodeModel } from '@colanode/core/registry/nodes/core';
+import { fileSubtypeSchema } from '@colanode/core/types/files';
 
 export const fileAttributesSchema = z.object({
   type: z.literal('file'),
-  subtype: z.string(),
+  subtype: fileSubtypeSchema,
   parentId: z.string(),
   index: z.string().optional(),
   name: z.string(),

@@ -15,8 +15,9 @@ import { PageContainer } from '@colanode/ui/components/pages/page-container';
 import { RecordContainer } from '@colanode/ui/components/records/record-container';
 import { SpaceContainer } from '@colanode/ui/components/spaces/space-container';
 import { TabsContent } from '@colanode/ui/components/ui/tabs';
+import { WorkspaceStorage } from '@colanode/ui/components/workspaces/storage/workspace-storage';
+import { WorkspaceUploads } from '@colanode/ui/components/workspaces/uploads/workspace-uploads';
 import { WorkspaceSettings } from '@colanode/ui/components/workspaces/workspace-settings';
-import { WorkspaceStorage } from '@colanode/ui/components/workspaces/workspace-storage';
 import { WorkspaceUsers } from '@colanode/ui/components/workspaces/workspace-users';
 
 interface ContainerTabContentProps {
@@ -46,6 +47,10 @@ const ContainerTabContentBody = ({ tab }: ContainerTabContentProps) => {
 
   if (tab.path === SpecialContainerTabPath.WorkspaceStorage) {
     return <WorkspaceStorage />;
+  }
+
+  if (tab.path === SpecialContainerTabPath.WorkspaceUploads) {
+    return <WorkspaceUploads />;
   }
 
   return match(getIdType(tab.path))

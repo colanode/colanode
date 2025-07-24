@@ -23,14 +23,14 @@ const FileMeta = ({ title, value }: { title: string; value: string }) => {
 export const FileSidebar = ({ file }: FileSidebarProps) => {
   const workspace = useWorkspace();
 
-  const userGetQuery = useLiveQuery({
+  const userQuery = useLiveQuery({
     type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     userId: file.createdBy,
   });
 
-  const user = userGetQuery.data ?? null;
+  const user = userQuery.data ?? null;
 
   return (
     <Fragment>

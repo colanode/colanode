@@ -18,8 +18,9 @@ import { PageContainerTab } from '@colanode/ui/components/pages/page-container-t
 import { RecordContainerTab } from '@colanode/ui/components/records/record-container-tab';
 import { SpaceContainerTab } from '@colanode/ui/components/spaces/space-container-tab';
 import { TabsTrigger } from '@colanode/ui/components/ui/tabs';
+import { WorkspaceStorageTab } from '@colanode/ui/components/workspaces/storage/workspace-storage-tab';
+import { WorkspaceUploadsTab } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-tab';
 import { WorkspaceSettingsTab } from '@colanode/ui/components/workspaces/workspace-settings-tab';
-import { WorkspaceStorageTab } from '@colanode/ui/components/workspaces/workspace-storage-tab';
 import { WorkspaceUsersTab } from '@colanode/ui/components/workspaces/workspace-users-tab';
 import { cn } from '@colanode/ui/lib/utils';
 
@@ -53,6 +54,10 @@ const ContainerTabTriggerContent = ({ tab }: { tab: ContainerTab }) => {
 
   if (tab.path === SpecialContainerTabPath.WorkspaceStorage) {
     return <WorkspaceStorageTab />;
+  }
+
+  if (tab.path === SpecialContainerTabPath.WorkspaceUploads) {
+    return <WorkspaceUploadsTab />;
   }
 
   return match(getIdType(tab.path))

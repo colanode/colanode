@@ -4,6 +4,7 @@ import { SidebarMenuType } from '@colanode/client/types';
 import { SidebarMenuFooter } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-footer';
 import { SidebarMenuHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-header';
 import { SidebarMenuIcon } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-icon';
+import { SidebarUploads } from '@colanode/ui/components/layouts/sidebars/sidebar-uploads';
 import { useApp } from '@colanode/ui/contexts/app';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -57,13 +58,14 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
           isActive={value === 'spaces'}
           unreadState={channelsState}
         />
+        <div className="mt-auto" />
+        <SidebarUploads />
         <SidebarMenuIcon
           icon={Settings}
           onClick={() => {
             onChange('settings');
           }}
           isActive={value === 'settings'}
-          className="mt-auto"
         />
       </div>
       <SidebarMenuFooter />

@@ -3,8 +3,8 @@ import { match } from 'ts-pattern';
 
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { StorageStats } from '@colanode/ui/components/workspaces/storage-stats';
-import { WorkspaceStorageUserTable } from '@colanode/ui/components/workspaces/workspace-storage-user-table';
+import { StorageStats } from '@colanode/ui/components/workspaces/storage/storage-stats';
+import { WorkspaceStorageUserTable } from '@colanode/ui/components/workspaces/storage/workspace-storage-user-table';
 import { useServer } from '@colanode/ui/contexts/server';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';

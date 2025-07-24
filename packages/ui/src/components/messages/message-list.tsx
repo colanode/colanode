@@ -61,7 +61,7 @@ export const MessageList = () => {
             setLastPage(lastPage + 1);
           }
         }}
-      ></InView>
+      />
       {messages.map((message, index) => {
         const previousMessage = index > 0 ? messages[index - 1] : null;
 

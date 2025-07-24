@@ -41,6 +41,7 @@ export * from './workspaces/workspace-metadata-list';
 export * from './avatars/avatar-url-get';
 export * from './records/record-field-value-count';
 export * from './workspaces/workspace-storage-get';
+export * from './files/file-uploads-list';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface QueryMap {}

@@ -1,5 +1,5 @@
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { StorageStats } from '@colanode/ui/components/workspaces/storage-stats';
+import { StorageStats } from '@colanode/ui/components/workspaces/storage/storage-stats';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 

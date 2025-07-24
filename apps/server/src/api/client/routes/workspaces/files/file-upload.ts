@@ -103,7 +103,7 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
 
       if (file.attributes.size > BigInt(user.max_file_size)) {
         return reply.code(400).send({
-          code: ApiErrorCode.FileUploadFailed,
+          code: ApiErrorCode.UserMaxFileSizeExceeded,
           message:
             'The file size exceeds the maximum allowed size for your account.',
         });
@@ -112,8 +112,9 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
       if (workspace.max_file_size) {
         if (file.attributes.size > BigInt(workspace.max_file_size)) {
           return reply.code(400).send({
-            code: ApiErrorCode.FileUploadFailed,
-            message: 'The file size exceeds the maximum allowed size.',
+            code: ApiErrorCode.WorkspaceMaxFileSizeExceeded,
+            message:
+              'The file size exceeds the maximum allowed size for this workspace.',
           });
         }
       }
@@ -125,8 +126,9 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
 
       if (userStorageUsed >= BigInt(user.storage_limit)) {
         return reply.code(400).send({
-          code: ApiErrorCode.FileUploadFailed,
-          message: 'You have reached the maximum storage limit.',
+          code: ApiErrorCode.UserStorageLimitExceeded,
+          message:
+            'You have reached the maximum storage limit for your account.',
         });
       }
 
@@ -138,8 +140,9 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
 
         if (workspaceStorageUsed >= BigInt(workspace.storage_limit)) {
           return reply.code(400).send({
-            code: ApiErrorCode.FileUploadFailed,
-            message: 'The workspace has reached the maximum storage limit.',
+            code: ApiErrorCode.WorkspaceStorageLimitExceeded,
+            message:
+              'The workspace has reached the maximum storage limit for this workspace.',
           });
         }
       }

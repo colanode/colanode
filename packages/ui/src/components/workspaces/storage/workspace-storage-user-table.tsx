@@ -12,7 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from '@colanode/ui/components/ui/table';
-import { WorkspaceStorageUserUpdateDialog } from '@colanode/ui/components/workspaces/workspace-storage-user-update-dialog';
+import { WorkspaceStorageUserUpdateDialog } from '@colanode/ui/components/workspaces/storage/workspace-storage-user-update-dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 import { bigintToPercent, cn } from '@colanode/ui/lib/utils';

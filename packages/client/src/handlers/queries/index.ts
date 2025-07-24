@@ -22,6 +22,7 @@ import { FileDownloadRequestGetQueryHandler } from './files/file-download-reques
 import { FileListQueryHandler } from './files/file-list';
 import { FileSaveListQueryHandler } from './files/file-save-list';
 import { FileStateGetQueryHandler } from './files/file-state-get';
+import { FileUploadsListQueryHandler } from './files/file-uploads-list';
 import { IconCategoryListQueryHandler } from './icons/icon-category-list';
 import { IconListQueryHandler } from './icons/icon-list';
 import { IconSearchQueryHandler } from './icons/icon-search';
@@ -95,5 +96,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'document.updates.list': new DocumentUpdatesListQueryHandler(app),
     'account.metadata.list': new AccountMetadataListQueryHandler(app),
     'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
+    'file.uploads.list': new FileUploadsListQueryHandler(app),
   };
 };
