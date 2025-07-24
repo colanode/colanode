@@ -84,7 +84,12 @@ export class FileDownloadMutationHandler
       );
     }
 
-    workspace.files.triggerDownloads();
+    this.app.jobs.addJob({
+      type: 'file.download',
+      accountId: workspace.accountId,
+      workspaceId: workspace.id,
+      fileId: input.fileId,
+    });
 
     eventBus.publish({
       type: 'file.state.updated',

@@ -31,13 +31,6 @@ export type SelectAccount = Selectable<AccountTable>;
 export type CreateAccount = Insertable<AccountTable>;
 export type UpdateAccount = Updateable<AccountTable>;
 
-interface DeletedTokenTable {
-  token: ColumnType<string, string, never>;
-  account_id: ColumnType<string, string, never>;
-  server: ColumnType<string, string, never>;
-  created_at: ColumnType<string, string, string>;
-}
-
 interface AppMetadataTable {
   key: ColumnType<string, string, never>;
   value: ColumnType<string, string, string>;
@@ -49,9 +42,45 @@ export type SelectAppMetadata = Selectable<AppMetadataTable>;
 export type CreateAppMetadata = Insertable<AppMetadataTable>;
 export type UpdateAppMetadata = Updateable<AppMetadataTable>;
 
+export interface JobTableSchema {
+  id: ColumnType<string, string, never>;
+  queue: ColumnType<string, string, never>;
+  input: ColumnType<string, string, string>;
+  options: ColumnType<string | null, string | null, string | null>;
+  status: ColumnType<string, string, string>;
+  retries: ColumnType<number, number, number>;
+  scheduled_at: ColumnType<number, number, number>;
+  deduplication_key: ColumnType<string | null, string | null, string | null>;
+  concurrency_key: ColumnType<string | null, string | null, string | null>;
+  created_at: ColumnType<number, number, number>;
+  updated_at: ColumnType<number, number, number>;
+}
+
+export type SelectJob = Selectable<JobTableSchema>;
+export type InsertJob = Insertable<JobTableSchema>;
+export type UpdateJob = Updateable<JobTableSchema>;
+
+export interface JobScheduleTableSchema {
+  id: ColumnType<string, string, never>;
+  queue: ColumnType<string, string, never>;
+  input: ColumnType<string, string, string>;
+  options: ColumnType<string | null, string | null, string | null>;
+  status: ColumnType<string, string, string>;
+  interval: ColumnType<number, number, number>;
+  next_run_at: ColumnType<number, number, number>;
+  last_run_at: ColumnType<number | null, number | null, number | null>;
+  created_at: ColumnType<number, number, number>;
+  updated_at: ColumnType<number, number, number>;
+}
+
+export type SelectJobSchedule = Selectable<JobScheduleTableSchema>;
+export type InsertJobSchedule = Insertable<JobScheduleTableSchema>;
+export type UpdateJobSchedule = Updateable<JobScheduleTableSchema>;
+
 export interface AppDatabaseSchema {
   servers: ServerTable;
   accounts: AccountTable;
-  deleted_tokens: DeletedTokenTable;
   metadata: AppMetadataTable;
+  jobs: JobTableSchema;
+  job_schedules: JobScheduleTableSchema;
 }

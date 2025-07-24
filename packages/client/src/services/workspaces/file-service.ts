@@ -1,12 +1,8 @@
 import { cloneDeep } from 'lodash-es';
 import ms from 'ms';
 
-import {
-  SelectFileState,
-  SelectNode,
-} from '@colanode/client/databases/workspace';
+import { SelectNode } from '@colanode/client/databases/workspace';
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { EventLoop } from '@colanode/client/lib/event-loop';
 import { mapFileState, mapNode } from '@colanode/client/lib/mappers';
 import { fetchNode, fetchUserStorageUsed } from '@colanode/client/lib/utils';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
@@ -41,10 +37,6 @@ export class FileService {
   private readonly filesDir: string;
   private readonly saves: FileSaveState[] = [];
 
-  private readonly uploadsEventLoop: EventLoop;
-  private readonly downloadsEventLoop: EventLoop;
-  private readonly cleanupEventLoop: EventLoop;
-
   constructor(workspace: WorkspaceService) {
     this.app = workspace.account.app;
     this.workspace = workspace;
@@ -54,28 +46,6 @@ export class FileService {
     );
 
     this.app.fs.makeDirectory(this.filesDir);
-
-    this.uploadsEventLoop = new EventLoop(
-      ms('1 minute'),
-      ms('1 second'),
-      this.uploadFiles.bind(this)
-    );
-
-    this.downloadsEventLoop = new EventLoop(
-      ms('1 minute'),
-      ms('1 second'),
-      this.downloadFiles.bind(this)
-    );
-
-    this.cleanupEventLoop = new EventLoop(
-      ms('5 minutes'),
-      ms('1 minute'),
-      this.cleanupFiles.bind(this)
-    );
-
-    this.uploadsEventLoop.start();
-    this.downloadsEventLoop.start();
-    this.cleanupEventLoop.start();
   }
 
   public async createFile(
@@ -174,7 +144,12 @@ export class FileService {
       fileState: mapFileState(createdFileState, url),
     });
 
-    this.triggerUploads();
+    this.app.jobs.addJob({
+      type: 'file.upload',
+      accountId: this.workspace.accountId,
+      workspaceId: this.workspace.id,
+      fileId: id,
+    });
   }
 
   public saveFile(file: LocalFileNode, path: string): void {
@@ -219,56 +194,30 @@ export class FileService {
     await this.app.fs.delete(filePath);
   }
 
-  public triggerUploads(): void {
-    this.uploadsEventLoop.trigger();
-  }
-
-  public triggerDownloads(): void {
-    this.downloadsEventLoop.trigger();
-  }
-
-  public destroy(): void {
-    this.uploadsEventLoop.stop();
-    this.downloadsEventLoop.stop();
-    this.cleanupEventLoop.stop();
-  }
-
-  private async uploadFiles(): Promise<void> {
-    if (!this.workspace.account.server.isAvailable) {
-      return;
-    }
-
-    debug(`Uploading files for workspace ${this.workspace.id}`);
-
-    const uploads = await this.workspace.database
-      .selectFrom('file_states')
-      .selectAll()
-      .where('upload_status', '=', UploadStatus.Pending)
-      .execute();
-
-    if (uploads.length === 0) {
-      return;
-    }
-
-    for (const upload of uploads) {
-      await this.uploadFile(upload);
-    }
-  }
-
-  private async uploadFile(state: SelectFileState): Promise<void> {
+  public async uploadFile(fileId: string): Promise<boolean> {
     const node = await this.workspace.database
       .selectFrom('nodes')
       .selectAll()
-      .where('id', '=', state.id)
+      .where('id', '=', fileId)
       .executeTakeFirst();
 
     if (!node) {
-      return;
+      return false;
     }
 
     if (node.server_revision === '0') {
       // file is not synced with the server, we need to wait for the sync to complete
-      return;
+      return false;
+    }
+
+    const state = await this.workspace.database
+      .selectFrom('file_states')
+      .selectAll()
+      .where('id', '=', fileId)
+      .executeTakeFirst();
+
+    if (!state) {
+      return false;
     }
 
     const file = mapNode(node) as LocalFileNode;
@@ -280,10 +229,10 @@ export class FileService {
       await this.workspace.database
         .deleteFrom('file_states')
         .returningAll()
-        .where('id', '=', state.id)
+        .where('id', '=', fileId)
         .executeTakeFirst();
 
-      return;
+      return false;
     }
 
     const url = await this.app.fs.url(filePath);
@@ -309,7 +258,7 @@ export class FileService {
         });
       }
 
-      return;
+      return false;
     }
 
     if (file.attributes.status === FileStatus.Ready) {
@@ -333,7 +282,7 @@ export class FileService {
         });
       }
 
-      return;
+      return true;
     }
 
     try {
@@ -371,6 +320,7 @@ export class FileService {
       }
 
       debug(`File ${file.id} uploaded successfully`);
+      return true;
     } catch (error) {
       debug(`Error uploading file ${file.id}: ${error}`);
 
@@ -389,38 +339,30 @@ export class FileService {
           fileState: mapFileState(updatedFileState, url),
         });
       }
+
+      return false;
     }
+
+    return false;
   }
 
-  public async downloadFiles(): Promise<void> {
-    if (!this.workspace.account.server.isAvailable) {
-      return;
-    }
-
-    debug(`Downloading files for workspace ${this.workspace.id}`);
-
-    const downloads = await this.workspace.database
+  public async downloadFile(fileId: string): Promise<boolean> {
+    const state = await this.workspace.database
       .selectFrom('file_states')
       .selectAll()
-      .where('download_status', '=', DownloadStatus.Pending)
-      .execute();
+      .where('id', '=', fileId)
+      .executeTakeFirst();
 
-    if (downloads.length === 0) {
-      return;
+    if (!state) {
+      return false;
     }
 
-    for (const download of downloads) {
-      await this.downloadFile(download);
-    }
-  }
-
-  private async downloadFile(fileState: SelectFileState): Promise<void> {
     if (
-      fileState.download_retries &&
-      fileState.download_retries >= DOWNLOAD_RETRIES_LIMIT
+      state.download_retries &&
+      state.download_retries >= DOWNLOAD_RETRIES_LIMIT
     ) {
       debug(
-        `File ${fileState.id} download retries limit reached, marking as failed`
+        `File ${state.id} download retries limit reached, marking as failed`
       );
 
       const updatedFileState = await this.workspace.database
@@ -428,9 +370,9 @@ export class FileService {
         .returningAll()
         .set({
           download_status: DownloadStatus.Failed,
-          download_retries: fileState.download_retries + 1,
+          download_retries: state.download_retries + 1,
         })
-        .where('id', '=', fileState.id)
+        .where('id', '=', state.id)
         .executeTakeFirst();
 
       if (updatedFileState) {
@@ -442,24 +384,24 @@ export class FileService {
         });
       }
 
-      return;
+      return false;
     }
 
     const node = await this.workspace.database
       .selectFrom('nodes')
       .selectAll()
-      .where('id', '=', fileState.id)
+      .where('id', '=', state.id)
       .executeTakeFirst();
 
     if (!node) {
-      return;
+      return false;
     }
 
     const file = mapNode(node) as LocalFileNode;
 
     if (node.server_revision === '0') {
       // file is not synced with the server, we need to wait for the sync to complete
-      return;
+      return false;
     }
 
     const filePath = this.buildFilePath(file.id, file.attributes.extension);
@@ -475,7 +417,7 @@ export class FileService {
           download_progress: 100,
           download_completed_at: new Date().toISOString(),
         })
-        .where('id', '=', fileState.id)
+        .where('id', '=', state.id)
         .executeTakeFirst();
 
       if (updatedFileState) {
@@ -487,7 +429,7 @@ export class FileService {
         });
       }
 
-      return;
+      return true;
     }
 
     try {
@@ -532,7 +474,7 @@ export class FileService {
           download_progress: 100,
           download_completed_at: new Date().toISOString(),
         })
-        .where('id', '=', fileState.id)
+        .where('id', '=', state.id)
         .executeTakeFirst();
 
       if (updatedFileState) {
@@ -543,12 +485,14 @@ export class FileService {
           fileState: mapFileState(updatedFileState, url),
         });
       }
+
+      return true;
     } catch {
       const updatedFileState = await this.workspace.database
         .updateTable('file_states')
         .returningAll()
         .set((eb) => ({ download_retries: eb('download_retries', '+', 1) }))
-        .where('id', '=', fileState.id)
+        .where('id', '=', state.id)
         .executeTakeFirst();
 
       if (updatedFileState) {
@@ -560,6 +504,8 @@ export class FileService {
         });
       }
     }
+
+    return false;
   }
 
   private buildFilePath(id: string, extension: string): string {
@@ -659,7 +605,7 @@ export class FileService {
     }
   }
 
-  private async cleanupFiles(): Promise<void> {
+  public async cleanupFiles(): Promise<void> {
     await this.cleanDeletedFiles();
     await this.cleanOldDownloadedFiles();
   }

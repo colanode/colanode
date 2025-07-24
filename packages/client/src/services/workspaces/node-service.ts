@@ -213,7 +213,7 @@ export class NodeService {
       });
     }
 
-    this.workspace.mutations.triggerSync();
+    this.workspace.mutations.scheduleSync();
     return createdNode;
   }
 
@@ -401,7 +401,7 @@ export class NodeService {
     }
 
     if (createdMutation) {
-      this.workspace.mutations.triggerSync();
+      this.workspace.mutations.scheduleSync();
     }
 
     for (const createdNodeReference of createdNodeReferences) {
@@ -509,7 +509,7 @@ export class NodeService {
     }
 
     if (createdMutation) {
-      this.workspace.mutations.triggerSync();
+      this.workspace.mutations.scheduleSync();
     }
   }
 

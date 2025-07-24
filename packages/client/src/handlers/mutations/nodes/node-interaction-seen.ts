@@ -118,7 +118,7 @@ export class NodeInteractionSeenMutationHandler
       existingInteraction
     );
 
-    workspace.mutations.triggerSync();
+    workspace.mutations.scheduleSync();
 
     eventBus.publish({
       type: 'node.interaction.updated',

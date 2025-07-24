@@ -122,10 +122,7 @@ export class WorkspaceService {
   public async delete(): Promise<void> {
     try {
       this.database.destroy();
-      this.mutations.destroy();
       this.synchronizer.destroy();
-      this.files.destroy();
-      this.mutations.destroy();
       this.radar.destroy();
 
       const databasePath = this.account.app.path.workspaceDatabase(

@@ -7,7 +7,6 @@ import {
   accountDatabaseMigrations,
 } from '@colanode/client/databases/account';
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { EventLoop } from '@colanode/client/lib/event-loop';
 import { parseApiError } from '@colanode/client/lib/ky';
 import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
 import { AccountSocket } from '@colanode/client/services/accounts/account-socket';
@@ -30,7 +29,6 @@ const debug = createDebugger('desktop:service:account');
 
 export class AccountService {
   private readonly workspaces: Map<string, WorkspaceService> = new Map();
-  private readonly eventLoop: EventLoop;
   private readonly account: Account;
 
   public readonly app: AppService;
@@ -39,6 +37,7 @@ export class AccountService {
 
   public readonly socket: AccountSocket;
   public readonly client: KyInstance;
+  private readonly accountSyncJobScheduleId: string;
   private readonly eventSubscriptionId: string;
 
   constructor(account: Account, server: ServerService, app: AppService) {
@@ -61,24 +60,18 @@ export class AccountService {
       },
     });
 
-    this.eventLoop = new EventLoop(
-      ms('1 minute'),
-      ms('1 second'),
-      this.sync.bind(this)
-    );
-
+    this.accountSyncJobScheduleId = `account.sync.${this.account.id}`;
     this.eventSubscriptionId = eventBus.subscribe((event) => {
       if (
-        event.type === 'server.availability.changed' &&
-        event.server.domain === this.server.domain &&
-        event.isAvailable
-      ) {
-        this.eventLoop.trigger();
-      } else if (
         event.type === 'account.connection.message.received' &&
         event.accountId === this.account.id
       ) {
         this.handleMessage(event.message);
+      } else if (
+        event.type === 'server.availability.changed' &&
+        event.server.domain === this.server.domain
+      ) {
+        this.app.jobs.triggerJobSchedule(this.accountSyncJobScheduleId);
       }
     });
   }
@@ -106,9 +99,16 @@ export class AccountService {
       await this.downloadAvatar(this.account.avatar);
     }
 
-    this.socket.init();
-    this.eventLoop.start();
+    await this.app.jobs.upsertJobSchedule(
+      this.accountSyncJobScheduleId,
+      {
+        type: 'account.sync',
+        accountId: this.account.id,
+      },
+      ms('1 minute')
+    );
 
+    this.socket.init();
     await this.initWorkspaces();
   }
 
@@ -138,15 +138,19 @@ export class AccountService {
           throw new Error('Failed to delete account');
         }
 
-        await tx
-          .insertInto('deleted_tokens')
-          .values({
-            account_id: this.account.id,
+        await this.app.jobs.addJob(
+          {
+            type: 'token.delete',
             token: this.account.token,
             server: this.server.domain,
-            created_at: new Date().toISOString(),
-          })
-          .execute();
+          },
+          {
+            retries: 10,
+            delay: ms('1 second'),
+          }
+        );
+
+        await this.app.jobs.removeJobSchedule(this.accountSyncJobScheduleId);
       });
 
       const workspaces = this.workspaces.values();
@@ -157,7 +161,6 @@ export class AccountService {
 
       this.database.destroy();
       this.socket.close();
-      this.eventLoop.stop();
       eventBus.unsubscribe(this.eventSubscriptionId);
 
       const databasePath = this.app.path.accountDatabase(this.account.id);
@@ -265,11 +268,11 @@ export class AccountService {
       message.type === 'user.created' ||
       message.type === 'user.updated'
     ) {
-      this.eventLoop.trigger();
+      this.app.jobs.triggerJobSchedule(this.accountSyncJobScheduleId);
     }
   }
 
-  private async sync(): Promise<void> {
+  public async sync(): Promise<void> {
     debug(`Syncing account ${this.account.id}`);
 
     if (!this.server.isAvailable) {
@@ -314,6 +317,7 @@ export class AccountService {
       debug(`Updated account ${this.account.email} after sync`);
       const account = mapAccount(updatedAccount);
       this.updateAccount(account);
+      this.socket.checkConnection();
 
       eventBus.publish({
         type: 'account.updated',
