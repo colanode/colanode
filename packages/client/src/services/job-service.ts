@@ -75,8 +75,12 @@ export class JobService {
       return null;
     }
 
-    const now = Date.now();
-    const scheduledAt = opts?.delay ? now + opts.delay : now;
+    const now = new Date();
+    const scheduledAt =
+      opts?.delay && opts.delay > 0
+        ? new Date(now.getTime() + opts.delay)
+        : now;
+
     const concurrencyKey = handler.concurrency?.key?.(input);
 
     if (opts?.deduplication) {
@@ -103,9 +107,9 @@ export class JobService {
           .set({
             input: this.toJSON(input),
             options: this.toJSON(opts),
-            scheduled_at: scheduledAt,
+            scheduled_at: scheduledAt.toISOString(),
             concurrency_key: concurrencyKey || null,
-            updated_at: now,
+            updated_at: now.toISOString(),
           })
           .where('id', '=', existing.id)
           .where('status', '=', 'waiting')
@@ -116,8 +120,8 @@ export class JobService {
       });
 
       if (result) {
-        const timestamp = result.scheduled_at;
-        this.sleepScheduler.updateResolveTimeIfEarlier(JOB_LOOP_ID, timestamp);
+        const date = new Date(result.scheduled_at);
+        this.sleepScheduler.updateResolveTimeIfEarlier(JOB_LOOP_ID, date);
         return result;
       }
     }
@@ -133,17 +137,17 @@ export class JobService {
         options: this.toJSON(opts),
         status: 'waiting',
         retries: 0,
-        scheduled_at: scheduledAt,
+        scheduled_at: scheduledAt.toISOString(),
         deduplication_key: opts?.deduplication?.key || null,
         concurrency_key: concurrencyKey || null,
-        created_at: now,
-        updated_at: now,
+        created_at: now.toISOString(),
+        updated_at: now.toISOString(),
       })
       .executeTakeFirst();
 
     if (job) {
-      const timestamp = job.scheduled_at;
-      this.sleepScheduler.updateResolveTimeIfEarlier(JOB_LOOP_ID, timestamp);
+      const date = new Date(job.scheduled_at);
+      this.sleepScheduler.updateResolveTimeIfEarlier(JOB_LOOP_ID, date);
     }
 
     return job ?? null;
@@ -155,7 +159,9 @@ export class JobService {
     interval: number,
     opts?: JobScheduleOptions
   ): Promise<SelectJobSchedule | null> {
-    const now = Date.now();
+    const now = new Date().toISOString();
+    const nextRunAt = new Date(Date.parse(now) + interval).toISOString();
+
     const schedule = await this.app.database
       .insertInto('job_schedules')
       .returningAll()
@@ -166,7 +172,7 @@ export class JobService {
         options: this.toJSON(opts),
         status: 'active',
         interval: interval,
-        next_run_at: now + interval,
+        next_run_at: nextRunAt,
         created_at: now,
         updated_at: now,
       })
@@ -175,7 +181,7 @@ export class JobService {
           input: this.toJSON(input),
           options: this.toJSON(opts),
           interval: interval,
-          next_run_at: now + interval,
+          next_run_at: nextRunAt,
           updated_at: now,
           status: 'active',
         })
@@ -183,11 +189,8 @@ export class JobService {
       .executeTakeFirst();
 
     if (schedule) {
-      const timestamp = schedule.next_run_at;
-      this.sleepScheduler.updateResolveTimeIfEarlier(
-        SCHEDULE_LOOP_ID,
-        timestamp
-      );
+      const date = new Date(schedule.next_run_at);
+      this.sleepScheduler.updateResolveTimeIfEarlier(SCHEDULE_LOOP_ID, date);
     }
 
     return schedule ?? null;
@@ -225,8 +228,8 @@ export class JobService {
   private async jobLoop() {
     while (!this.stopped) {
       if (this.runningJobs >= MAX_CONCURRENCY) {
-        const timestamp = Date.now() + JOBS_CONCURRENCY_TIMEOUT;
-        await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, timestamp);
+        const date = new Date(Date.now() + JOBS_CONCURRENCY_TIMEOUT);
+        await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, date);
         continue;
       }
 
@@ -240,12 +243,12 @@ export class JobService {
         }
       }
 
-      const now = Date.now();
+      const now = new Date();
       const jobRow = await this.app.database
         .updateTable('jobs')
         .set({
           status: 'active',
-          updated_at: now,
+          updated_at: now.toISOString(),
         })
         .where('id', 'in', (qb) =>
           qb
@@ -253,7 +256,7 @@ export class JobService {
             .select('id')
             .where('queue', '=', this.queue)
             .where('status', '=', 'waiting')
-            .where('scheduled_at', '<=', now)
+            .where('scheduled_at', '<=', now.toISOString())
             .where('concurrency_key', 'not in', Array.from(limitReachedTypes))
             .orderBy('scheduled_at', 'asc')
             .limit(1)
@@ -272,11 +275,11 @@ export class JobService {
           .executeTakeFirst();
 
         if (nextScheduledJob) {
-          const timestamp = nextScheduledJob.scheduled_at;
-          await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, timestamp);
+          const date = new Date(nextScheduledJob.scheduled_at);
+          await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, date);
         } else {
-          const timestamp = now + JOBS_MAX_TIMEOUT;
-          await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, timestamp);
+          const date = new Date(now.getTime() + JOBS_MAX_TIMEOUT);
+          await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, date);
         }
 
         continue;
@@ -292,7 +295,7 @@ export class JobService {
         if (currentCount >= handler.concurrency.limit) {
           await this.app.database
             .updateTable('jobs')
-            .set({ status: 'waiting', updated_at: Date.now() })
+            .set({ status: 'waiting', updated_at: now.toISOString() })
             .where('id', '=', jobRow.id)
             .execute();
           continue;
@@ -307,25 +310,26 @@ export class JobService {
 
   private async scheduleLoop() {
     while (!this.stopped) {
-      const now = Date.now();
+      const now = new Date();
 
       const schedules = await this.app.database
         .selectFrom('job_schedules')
         .selectAll()
         .where('status', '=', 'active')
-        .where('next_run_at', '<=', now)
+        .where('next_run_at', '<=', now.toISOString())
         .execute();
 
       for (const schedule of schedules) {
         try {
           await this.addJobFromSchedule(schedule);
 
+          const nextRunAt = new Date(now.getTime() + schedule.interval);
           await this.app.database
             .updateTable('job_schedules')
             .set({
-              next_run_at: now + schedule.interval,
-              last_run_at: now,
-              updated_at: now,
+              next_run_at: nextRunAt.toISOString(),
+              last_run_at: now.toISOString(),
+              updated_at: now.toISOString(),
             })
             .where('id', '=', schedule.id)
             .execute();
@@ -343,11 +347,11 @@ export class JobService {
         .executeTakeFirst();
 
       if (nextSchedule) {
-        const timestamp = nextSchedule.next_run_at;
-        await this.sleepScheduler.sleepUntil(SCHEDULE_LOOP_ID, timestamp);
+        const date = new Date(nextSchedule.next_run_at);
+        await this.sleepScheduler.sleepUntil(SCHEDULE_LOOP_ID, date);
       } else {
-        const timestamp = now + SCHEDULES_MAX_TIMEOUT;
-        await this.sleepScheduler.sleepUntil(SCHEDULE_LOOP_ID, timestamp);
+        const date = new Date(now.getTime() + SCHEDULES_MAX_TIMEOUT);
+        await this.sleepScheduler.sleepUntil(SCHEDULE_LOOP_ID, date);
       }
     }
   }
@@ -399,12 +403,13 @@ export class JobService {
       const output = await handler.handleJob(job.input);
 
       if (output.type === 'retry') {
+        const retryAt = new Date(Date.now() + output.delay);
         await this.app.database
           .updateTable('jobs')
           .set({
             status: 'waiting',
-            scheduled_at: Date.now() + output.delay,
-            updated_at: Date.now(),
+            scheduled_at: retryAt.toISOString(),
+            updated_at: new Date().toISOString(),
           })
           .where('id', '=', jobRow.id)
           .where('status', '=', 'active')
@@ -421,13 +426,14 @@ export class JobService {
       const retries = jobRow.retries + 1;
       if (options.retries && retries < options.retries) {
         const retryDelay = Math.min(1000 * Math.pow(2, retries), 60000);
+        const retryAt = new Date(Date.now() + retryDelay);
         await this.app.database
           .updateTable('jobs')
           .set({
             status: 'waiting',
             retries,
-            scheduled_at: Date.now() + retryDelay,
-            updated_at: Date.now(),
+            scheduled_at: retryAt.toISOString(),
+            updated_at: new Date().toISOString(),
           })
           .where('id', '=', jobRow.id)
           .execute();

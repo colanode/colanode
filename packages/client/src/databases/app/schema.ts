@@ -49,11 +49,11 @@ export interface JobTableSchema {
   options: ColumnType<string | null, string | null, string | null>;
   status: ColumnType<string, string, string>;
   retries: ColumnType<number, number, number>;
-  scheduled_at: ColumnType<number, number, number>;
+  scheduled_at: ColumnType<string, string, string>;
   deduplication_key: ColumnType<string | null, string | null, string | null>;
   concurrency_key: ColumnType<string | null, string | null, string | null>;
-  created_at: ColumnType<number, number, number>;
-  updated_at: ColumnType<number, number, number>;
+  created_at: ColumnType<string, string, string>;
+  updated_at: ColumnType<string, string, string>;
 }
 
 export type SelectJob = Selectable<JobTableSchema>;
@@ -67,10 +67,10 @@ export interface JobScheduleTableSchema {
   options: ColumnType<string | null, string | null, string | null>;
   status: ColumnType<string, string, string>;
   interval: ColumnType<number, number, number>;
-  next_run_at: ColumnType<number, number, number>;
-  last_run_at: ColumnType<number | null, number | null, number | null>;
-  created_at: ColumnType<number, number, number>;
-  updated_at: ColumnType<number, number, number>;
+  next_run_at: ColumnType<string, string, string>;
+  last_run_at: ColumnType<string | null, string | null, string | null>;
+  created_at: ColumnType<string, string, string>;
+  updated_at: ColumnType<string, string, string>;
 }
 
 export type SelectJobSchedule = Selectable<JobScheduleTableSchema>;

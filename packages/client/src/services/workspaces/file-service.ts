@@ -193,6 +193,10 @@ export class FileService {
   }
 
   public async uploadFile(fileId: string): Promise<boolean | null> {
+    if (!this.workspace.account.server.isAvailable) {
+      return false;
+    }
+
     const upload = await this.workspace.database
       .selectFrom('uploads')
       .selectAll()
@@ -324,6 +328,10 @@ export class FileService {
   }
 
   public async downloadFile(id: string): Promise<boolean | null> {
+    if (!this.workspace.account.server.isAvailable) {
+      return false;
+    }
+
     const download = await this.workspace.database
       .selectFrom('downloads')
       .selectAll()

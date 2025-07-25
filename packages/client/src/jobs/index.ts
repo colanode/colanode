@@ -26,9 +26,9 @@ export type Job = {
   queue: string;
   deduplicationKey?: string;
   concurrencyKey?: string;
-  createdAt: number;
-  updatedAt: number;
-  scheduledAt: number;
+  createdAt: string;
+  updatedAt: string;
+  scheduledAt: string;
 };
 
 export type JobSchedule = {
@@ -37,11 +37,11 @@ export type JobSchedule = {
   options: JobScheduleOptions;
   status: JobScheduleStatus;
   interval: number;
-  nextRunAt: number;
-  lastRunAt?: number;
+  nextRunAt: string;
+  lastRunAt?: string;
   queue: string;
-  createdAt: number;
-  updatedAt: number;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type JobManagerOptions = {

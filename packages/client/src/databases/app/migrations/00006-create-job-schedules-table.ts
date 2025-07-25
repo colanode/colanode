@@ -10,10 +10,10 @@ export const createJobSchedulesTable: Migration = {
       .addColumn('options', 'text')
       .addColumn('status', 'text', (col) => col.notNull().defaultTo('active'))
       .addColumn('interval', 'integer', (col) => col.notNull())
-      .addColumn('next_run_at', 'integer', (col) => col.notNull())
-      .addColumn('last_run_at', 'integer')
-      .addColumn('created_at', 'integer', (col) => col.notNull())
-      .addColumn('updated_at', 'integer', (col) => col.notNull())
+      .addColumn('next_run_at', 'text', (col) => col.notNull())
+      .addColumn('last_run_at', 'text')
+      .addColumn('created_at', 'text', (col) => col.notNull())
+      .addColumn('updated_at', 'text', (col) => col.notNull())
       .execute();
 
     await db.schema

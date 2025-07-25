@@ -47,12 +47,12 @@ export class DownloadListQueryHandler
       event.workspaceId === input.workspaceId
     ) {
       const download = output.find(
-        (download) => download.fileId === event.download.fileId
+        (download) => download.id === event.download.id
       );
 
       if (download) {
         const newResult = output.map((download) => {
-          if (download.fileId === event.download.fileId) {
+          if (download.id === event.download.id) {
             return event.download;
           }
 
@@ -72,7 +72,7 @@ export class DownloadListQueryHandler
       event.workspaceId === input.workspaceId
     ) {
       const download = output.find(
-        (download) => download.fileId === event.download.fileId
+        (download) => download.id === event.download.id
       );
 
       if (!download) {

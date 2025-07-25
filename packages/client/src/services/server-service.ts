@@ -47,14 +47,17 @@ export class ServerService {
   }
 
   public async init(): Promise<void> {
+    const scheduleId = `server.sync.${this.domain}`;
     await this.app.jobs.upsertJobSchedule(
-      `server.sync.${this.domain}`,
+      scheduleId,
       {
         type: 'server.sync',
         server: this.domain,
       },
       ms('1 minute')
     );
+
+    await this.app.jobs.triggerJobSchedule(scheduleId);
   }
 
   public async sync() {

@@ -29,7 +29,7 @@ export class MutationService {
       },
       {
         deduplication: {
-          key: `mutations.sync:${this.workspace.id}`,
+          key: `mutations.sync.${this.workspace.accountId}.${this.workspace.id}`,
           replace: true,
         },
         delay: 500,
@@ -107,7 +107,10 @@ export class MutationService {
         const unsyncedMutationIds: string[] = [];
 
         for (const result of response.results) {
-          if (result.status === MutationStatus.OK) {
+          if (
+            result.status === MutationStatus.OK ||
+            result.status === MutationStatus.CREATED
+          ) {
             syncedMutationIds.push(result.id);
           } else {
             unsyncedMutationIds.push(result.id);

@@ -10,11 +10,11 @@ export const createJobsTable: Migration = {
       .addColumn('options', 'text')
       .addColumn('status', 'text', (col) => col.notNull())
       .addColumn('retries', 'integer', (col) => col.notNull().defaultTo(0))
-      .addColumn('scheduled_at', 'integer', (col) => col.notNull())
+      .addColumn('scheduled_at', 'text', (col) => col.notNull())
       .addColumn('deduplication_key', 'text')
       .addColumn('concurrency_key', 'text')
-      .addColumn('created_at', 'integer', (col) => col.notNull())
-      .addColumn('updated_at', 'integer', (col) => col.notNull())
+      .addColumn('created_at', 'text', (col) => col.notNull())
+      .addColumn('updated_at', 'text', (col) => col.notNull())
       .execute();
 
     await db.schema
