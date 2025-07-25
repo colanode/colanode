@@ -18,6 +18,11 @@ export const EmojiElement = ({ id, className, onClick }: EmojiElementProps) => {
   }
 
   return (
-    <img src={`asset://emojis/${id}`} className={className} onClick={onClick} />
+    <img
+      src={`local://emojis/${id}`}
+      className={className}
+      onClick={onClick}
+      alt={id}
+    />
   );
 };

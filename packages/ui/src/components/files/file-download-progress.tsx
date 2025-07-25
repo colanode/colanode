@@ -1,14 +1,14 @@
-import { Download } from 'lucide-react';
+import { DownloadIcon } from 'lucide-react';
 
-import { FileState } from '@colanode/client/types';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 
 interface FileDownloadProgressProps {
-  state: FileState | null | undefined;
+  progress: number;
 }
 
-export const FileDownloadProgress = ({ state }: FileDownloadProgressProps) => {
-  const progress = state?.downloadProgress || 0;
+export const FileDownloadProgress = ({
+  progress,
+}: FileDownloadProgressProps) => {
   const showProgress = progress > 0;
 
   return (
@@ -17,7 +17,7 @@ export const FileDownloadProgress = ({ state }: FileDownloadProgressProps) => {
         <div className="relative">
           <Spinner className="size-20 text-muted-foreground stroke-1" />
           <div className="absolute inset-0 flex items-center justify-center">
-            <Download className="size-6 animate-pulse" />
+            <DownloadIcon className="size-6 animate-pulse" />
           </div>
         </div>
         <div className="text-center">

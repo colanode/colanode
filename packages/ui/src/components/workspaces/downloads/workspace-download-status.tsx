@@ -1,6 +1,6 @@
 import { Check, X } from 'lucide-react';
 
-import { SaveStatus } from '@colanode/client/types';
+import { DownloadStatus } from '@colanode/client/types';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import {
   Tooltip,
@@ -8,14 +8,17 @@ import {
   TooltipTrigger,
 } from '@colanode/ui/components/ui/tooltip';
 
-interface DownloadStatusProps {
-  status: SaveStatus;
+interface WorkspaceDownloadStatusProps {
+  status: DownloadStatus;
   progress: number;
 }
 
-export const DownloadStatus = ({ status, progress }: DownloadStatusProps) => {
+export const WorkspaceDownloadStatus = ({
+  status,
+  progress,
+}: WorkspaceDownloadStatusProps) => {
   switch (status) {
-    case SaveStatus.Active:
+    case DownloadStatus.Pending:
       return (
         <Tooltip>
           <TooltipTrigger>
@@ -28,7 +31,7 @@ export const DownloadStatus = ({ status, progress }: DownloadStatusProps) => {
           </TooltipContent>
         </Tooltip>
       );
-    case SaveStatus.Completed:
+    case DownloadStatus.Completed:
       return (
         <Tooltip>
           <TooltipTrigger>
@@ -41,7 +44,7 @@ export const DownloadStatus = ({ status, progress }: DownloadStatusProps) => {
           </TooltipContent>
         </Tooltip>
       );
-    case SaveStatus.Failed:
+    case DownloadStatus.Failed:
       return (
         <Tooltip>
           <TooltipTrigger>

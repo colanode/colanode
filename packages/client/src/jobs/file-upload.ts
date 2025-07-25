@@ -31,7 +31,7 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
 
   public readonly concurrency: JobConcurrencyConfig<FileUploadInput> = {
     limit: 1,
-    key: (input: FileUploadInput) => `file.upload:${input.fileId}`,
+    key: (input: FileUploadInput) => `file.upload.${input.fileId}`,
   };
 
   public async handleJob(input: FileUploadInput): Promise<JobOutput> {
@@ -50,7 +50,13 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
     }
 
     const result = await workspace.files.uploadFile(input.fileId);
-    if (!result) {
+    if (result === null) {
+      return {
+        type: 'cancel',
+      };
+    }
+
+    if (result === false) {
       return {
         type: 'retry',
         delay: ms('1 minute'),

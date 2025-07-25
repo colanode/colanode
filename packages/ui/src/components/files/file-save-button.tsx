@@ -2,7 +2,7 @@ import { Download } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import { LocalFileNode } from '@colanode/client/types';
+import { LocalFileNode, SpecialContainerTabPath } from '@colanode/client/types';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useApp } from '@colanode/ui/contexts/app';
@@ -22,8 +22,8 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
   const layout = useLayout();
   const [isSaving, setIsSaving] = useState(false);
 
-  const fileStateQuery = useLiveQuery({
-    type: 'file.state.get',
+  const fileQuery = useLiveQuery({
+    type: 'file.get',
     id: file.id,
     accountId: workspace.accountId,
     workspaceId: workspace.id,
@@ -40,14 +40,14 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
 
     mutation.mutate({
       input: {
-        type: 'file.save',
+        type: 'file.download',
         accountId: workspace.accountId,
         workspaceId: workspace.id,
         fileId: file.id,
         path,
       },
       onSuccess: () => {
-        layout.open('downloads');
+        layout.open(SpecialContainerTabPath.WorkspaceDownloads);
       },
       onError: () => {
         toast.error('Failed to save file');
@@ -56,61 +56,67 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
   };
 
   const handleDownloadWeb = async () => {
-    if (fileStateQuery.isPending) {
+    if (fileQuery.isPending) {
       return;
     }
 
     setIsSaving(true);
 
     try {
-      const url = fileStateQuery.data?.url;
-      if (url) {
-        // the file is already downloaded locally, so we can just trigger a download
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = file.attributes.name;
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } else {
-        // the file is not downloaded locally, so we need to download it
-        const request = await window.colanode.executeQuery({
-          type: 'file.download.request.get',
-          id: file.id,
-          accountId: workspace.accountId,
-          workspaceId: workspace.id,
+      if (fileQuery.data?.path) {
+        const blobUrl = await window.colanode.executeQuery({
+          type: 'blob.url.get',
+          path: fileQuery.data?.path ?? '',
         });
-
-        if (!request) {
-          toast.error('Failed to save file');
-          return;
-        }
-
-        const response = await fetch(request.url, {
-          method: 'GET',
-          headers: request.headers,
-        });
-
-        if (!response.ok) {
-          toast.error('Failed to save file');
-          return;
-        }
-
-        const blob = await response.blob();
-        const blobUrl = URL.createObjectURL(blob);
-
-        const link = document.createElement('a');
-        link.href = blobUrl;
-        link.download = file.attributes.name;
-        link.style.display = 'none';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
 
         if (blobUrl) {
-          URL.revokeObjectURL(blobUrl);
+          // the file is already downloaded locally, so we can just trigger a download
+          const link = document.createElement('a');
+          link.href = blobUrl;
+          link.download = file.attributes.name;
+          link.style.display = 'none';
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+          return;
         }
+      }
+      // the file is not downloaded locally, so we need to download it
+      const request = await window.colanode.executeQuery({
+        type: 'file.download.request.get',
+        id: file.id,
+        accountId: workspace.accountId,
+        workspaceId: workspace.id,
+      });
+
+      if (!request) {
+        toast.error('Failed to save file');
+        return;
+      }
+
+      const response = await fetch(request.url, {
+        method: 'GET',
+        headers: request.headers,
+      });
+
+      if (!response.ok) {
+        toast.error('Failed to save file');
+        return;
+      }
+
+      const downloadBlob = await response.blob();
+      const downloadBlobUrl = URL.createObjectURL(downloadBlob);
+
+      const link = document.createElement('a');
+      link.href = downloadBlobUrl;
+      link.download = file.attributes.name;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      if (downloadBlobUrl) {
+        URL.revokeObjectURL(downloadBlobUrl);
       }
     } catch {
       toast.error('Failed to save file');
@@ -131,7 +137,7 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
     <Button
       variant="outline"
       onClick={handleDownload}
-      disabled={fileStateQuery.isPending || isSaving}
+      disabled={fileQuery.isPending || isSaving}
     >
       {isSaving ? (
         <Spinner className="size-4" />

@@ -1,6 +1,10 @@
 import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
 
-import { DownloadStatus, UploadStatus } from '@colanode/client/types/files';
+import {
+  DownloadStatus,
+  DownloadType,
+  UploadStatus,
+} from '@colanode/client/types/files';
 import { NodeCounterType } from '@colanode/client/types/nodes';
 import {
   MutationType,
@@ -189,37 +193,6 @@ export type SelectDocumentText = Selectable<DocumentTextTable>;
 export type CreateDocumentText = Insertable<DocumentTextTable>;
 export type UpdateDocumentText = Updateable<DocumentTextTable>;
 
-interface FileStateTable {
-  id: ColumnType<string, string, never>;
-  version: ColumnType<string, string, string>;
-  download_status: ColumnType<
-    DownloadStatus | null,
-    DownloadStatus | null,
-    DownloadStatus | null
-  >;
-  download_progress: ColumnType<number | null, number | null, number | null>;
-  download_retries: ColumnType<number | null, number | null, number | null>;
-  download_started_at: ColumnType<string | null, string | null, string | null>;
-  download_completed_at: ColumnType<
-    string | null,
-    string | null,
-    string | null
-  >;
-  upload_status: ColumnType<
-    UploadStatus | null,
-    UploadStatus | null,
-    UploadStatus | null
-  >;
-  upload_progress: ColumnType<number | null, number | null, number | null>;
-  upload_retries: ColumnType<number | null, number | null, number | null>;
-  upload_started_at: ColumnType<string | null, string | null, string | null>;
-  upload_completed_at: ColumnType<string | null, string | null, string | null>;
-}
-
-export type SelectFileState = Selectable<FileStateTable>;
-export type CreateFileState = Insertable<FileStateTable>;
-export type UpdateFileState = Updateable<FileStateTable>;
-
 interface MutationTable {
   id: ColumnType<string, string, never>;
   type: ColumnType<MutationType, MutationType, never>;
@@ -264,6 +237,55 @@ export type SelectWorkspaceMetadata = Selectable<MetadataTable>;
 export type CreateWorkspaceMetadata = Insertable<MetadataTable>;
 export type UpdateWorkspaceMetadata = Updateable<MetadataTable>;
 
+interface FileTable {
+  id: ColumnType<string, string, never>;
+  version: ColumnType<string, string, string>;
+  name: ColumnType<string, string, string>;
+  path: ColumnType<string, string, string>;
+  size: ColumnType<number, number, number>;
+  mime_type: ColumnType<string, string, string>;
+  created_at: ColumnType<string, string, never>;
+}
+
+export type SelectFile = Selectable<FileTable>;
+export type CreateFile = Insertable<FileTable>;
+export type UpdateFile = Updateable<FileTable>;
+
+interface UploadTable {
+  file_id: ColumnType<string, string, never>;
+  status: ColumnType<UploadStatus, UploadStatus, UploadStatus>;
+  progress: ColumnType<number, number, number>;
+  retries: ColumnType<number, number, number>;
+  created_at: ColumnType<string, string, never>;
+  completed_at: ColumnType<string | null, string | null, string | null>;
+  error_code: ColumnType<string | null, string | null, string | null>;
+  error_message: ColumnType<string | null, string | null, string | null>;
+}
+
+export type SelectUpload = Selectable<UploadTable>;
+export type CreateUpload = Insertable<UploadTable>;
+export type UpdateUpload = Updateable<UploadTable>;
+
+interface DownloadTable {
+  id: ColumnType<string, string, never>;
+  file_id: ColumnType<string, string, never>;
+  version: ColumnType<string, string, string>;
+  type: ColumnType<DownloadType, DownloadType, never>;
+  path: ColumnType<string, string, string>;
+  size: ColumnType<number, number, number>;
+  mime_type: ColumnType<string, string, string>;
+  status: ColumnType<DownloadStatus, DownloadStatus, DownloadStatus>;
+  progress: ColumnType<number, number, number>;
+  retries: ColumnType<number, number, number>;
+  created_at: ColumnType<string, string, never>;
+  completed_at: ColumnType<string | null, string | null, string | null>;
+  error_code: ColumnType<string | null, string | null, string | null>;
+  error_message: ColumnType<string | null, string | null, string | null>;
+}
+
+export type SelectDownload = Selectable<DownloadTable>;
+export type CreateDownload = Insertable<DownloadTable>;
+export type UpdateDownload = Updateable<DownloadTable>;
 export interface WorkspaceDatabaseSchema {
   users: UserTable;
   nodes: NodeTable;
@@ -279,7 +301,9 @@ export interface WorkspaceDatabaseSchema {
   document_updates: DocumentUpdateTable;
   document_texts: DocumentTextTable;
   collaborations: CollaborationTable;
-  file_states: FileStateTable;
+  files: FileTable;
+  uploads: UploadTable;
+  downloads: DownloadTable;
   mutations: MutationTable;
   tombstones: TombstoneTable;
   cursors: CursorTable;

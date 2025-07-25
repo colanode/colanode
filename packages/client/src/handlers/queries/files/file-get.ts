@@ -1,26 +1,23 @@
 import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
-import { mapFileState, mapNode } from '@colanode/client/lib/mappers';
+import { mapFile } from '@colanode/client/lib/mappers';
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
-import { FileStateGetQueryInput } from '@colanode/client/queries/files/file-state-get';
-import { LocalFileNode } from '@colanode/client/types';
+import { FileGetQueryInput } from '@colanode/client/queries/files/file-get';
 import { Event } from '@colanode/client/types/events';
-import { DownloadStatus, FileState } from '@colanode/client/types/files';
+import { File } from '@colanode/client/types/files';
 
-export class FileStateGetQueryHandler
+export class FileGetQueryHandler
   extends WorkspaceQueryHandlerBase
-  implements QueryHandler<FileStateGetQueryInput>
+  implements QueryHandler<FileGetQueryInput>
 {
-  public async handleQuery(
-    input: FileStateGetQueryInput
-  ): Promise<FileState | null> {
-    return await this.fetchFileState(input);
+  public async handleQuery(input: FileGetQueryInput): Promise<File | null> {
+    return await this.fetchFile(input);
   }
 
   public async checkForChanges(
     event: Event,
-    input: FileStateGetQueryInput,
-    _: FileState | null
-  ): Promise<ChangeCheckResult<FileStateGetQueryInput>> {
+    input: FileGetQueryInput,
+    _: File | null
+  ): Promise<ChangeCheckResult<FileGetQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
@@ -33,10 +30,10 @@ export class FileStateGetQueryHandler
     }
 
     if (
-      event.type === 'file.state.updated' &&
+      event.type === 'file.created' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
-      event.fileState.id === input.id
+      event.file.id === input.id
     ) {
       const output = await this.handleQuery(input);
       return {
@@ -46,10 +43,10 @@ export class FileStateGetQueryHandler
     }
 
     if (
-      event.type === 'file.state.deleted' &&
+      event.type === 'file.deleted' &&
       event.accountId === input.accountId &&
       event.workspaceId === input.workspaceId &&
-      event.fileId === input.id
+      event.file.id === input.id
     ) {
       return {
         hasChanges: true,
@@ -87,47 +84,19 @@ export class FileStateGetQueryHandler
     };
   }
 
-  private async fetchFileState(
-    input: FileStateGetQueryInput
-  ): Promise<FileState | null> {
+  private async fetchFile(input: FileGetQueryInput): Promise<File | null> {
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
 
-    const node = await workspace.database
-      .selectFrom('nodes')
+    const file = await workspace.database
+      .selectFrom('files')
       .selectAll()
       .where('id', '=', input.id)
       .executeTakeFirst();
 
-    if (!node) {
+    if (!file) {
       return null;
     }
 
-    const file = mapNode(node) as LocalFileNode;
-    const fileState = await workspace.database
-      .selectFrom('file_states')
-      .selectAll()
-      .where('id', '=', input.id)
-      .executeTakeFirst();
-
-    if (!fileState) {
-      return null;
-    }
-
-    let url: string | null = null;
-    if (fileState.download_status === DownloadStatus.Completed) {
-      const filePath = this.app.path.workspaceFile(
-        input.accountId,
-        input.workspaceId,
-        input.id,
-        file.attributes.extension
-      );
-
-      const exists = await this.app.fs.exists(filePath);
-      if (exists) {
-        url = await this.app.fs.url(filePath);
-      }
-    }
-
-    return mapFileState(fileState, url);
+    return mapFile(file);
   }
 }

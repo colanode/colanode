@@ -9,16 +9,16 @@ export const SidebarUploads = () => {
   const workspace = useWorkspace();
   const layout = useLayout();
 
-  const fileUploadsQuery = useLiveQuery({
-    type: 'file.uploads.list',
+  const uploadsQuery = useLiveQuery({
+    type: 'upload.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     page: 1,
     count: 10,
   });
 
-  const fileUploads = fileUploadsQuery.data ?? [];
-  const pendingUploads = fileUploads.filter(
+  const uploads = uploadsQuery.data ?? [];
+  const pendingUploads = uploads.filter(
     (upload) => upload.status === UploadStatus.Pending
   );
   const pendingUploadsCount = pendingUploads.length;

@@ -1,15 +1,13 @@
-import { FileUploadItem } from '@colanode/client/queries';
-import { LocalFileNode } from '@colanode/client/types';
+import { Upload, LocalFileNode } from '@colanode/client/types';
 import { formatBytes, timeAgo } from '@colanode/core';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
+import { WorkspaceUploadStatus } from '@colanode/ui/components/workspaces/uploads/workspace-upload-status';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
-import { WorkspaceUploadStatus } from './workspace-upload-status';
-
 interface WorkspaceUploadFileProps {
-  upload: FileUploadItem;
+  upload: Upload;
 }
 
 export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
@@ -20,7 +18,7 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
     type: 'node.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
-    nodeId: upload.id,
+    nodeId: upload.fileId,
   });
 
   const file = fileQuery.data as LocalFileNode;
@@ -47,6 +45,9 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
             <span>{timeAgo(new Date(upload.completedAt))}</span>
           )}
         </p>
+        {upload.errorMessage && (
+          <p className="text-xs text-red-500">{upload.errorMessage}</p>
+        )}
       </div>
       <div className="flex items-center gap-2">
         <WorkspaceUploadStatus

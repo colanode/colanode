@@ -33,7 +33,6 @@ export * from './documents/document-update';
 export * from './files/file-create';
 export * from './files/file-delete';
 export * from './files/file-download';
-export * from './files/file-save';
 export * from './folders/folder-create';
 export * from './folders/folder-delete';
 export * from './folders/folder-update';
@@ -183,4 +182,5 @@ export enum MutationErrorCode {
   MessageDeleteFailed = 'message_delete_failed',
   MessageNotFound = 'message_not_found',
   NodeReactionCreateForbidden = 'node_reaction_create_forbidden',
+  DownloadFailed = 'download_failed',
 }

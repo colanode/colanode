@@ -18,11 +18,13 @@ import { EmojiGetQueryHandler } from './emojis/emoji-get';
 import { EmojiGetBySkinIdQueryHandler } from './emojis/emoji-get-by-skin-id';
 import { EmojiListQueryHandler } from './emojis/emoji-list';
 import { EmojiSearchQueryHandler } from './emojis/emoji-search';
+import { BlobUrlGetQueryHandler } from './files/blob-url-get';
+import { DownloadGetLastQueryHandler } from './files/download-get-last';
+import { DownloadListQueryHandler } from './files/download-list';
 import { FileDownloadRequestGetQueryHandler } from './files/file-download-request-get';
+import { FileGetQueryHandler } from './files/file-get';
 import { FileListQueryHandler } from './files/file-list';
-import { FileSaveListQueryHandler } from './files/file-save-list';
-import { FileStateGetQueryHandler } from './files/file-state-get';
-import { FileUploadsListQueryHandler } from './files/file-uploads-list';
+import { UploadListQueryHandler } from './files/upload-list';
 import { IconCategoryListQueryHandler } from './icons/icon-category-list';
 import { IconListQueryHandler } from './icons/icon-list';
 import { IconSearchQueryHandler } from './icons/icon-search';
@@ -85,9 +87,8 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'record.search': new RecordSearchQueryHandler(app),
     'user.get': new UserGetQueryHandler(app),
     'user.storage.get': new UserStorageGetQueryHandler(app),
-    'file.state.get': new FileStateGetQueryHandler(app),
+    'file.get': new FileGetQueryHandler(app),
     'file.download.request.get': new FileDownloadRequestGetQueryHandler(app),
-    'file.save.list': new FileSaveListQueryHandler(app),
     'chat.list': new ChatListQueryHandler(app),
     'space.list': new SpaceListQueryHandler(app),
     'workspace.metadata.list': new WorkspaceMetadataListQueryHandler(app),
@@ -96,6 +97,9 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'document.updates.list': new DocumentUpdatesListQueryHandler(app),
     'account.metadata.list': new AccountMetadataListQueryHandler(app),
     'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
-    'file.uploads.list': new FileUploadsListQueryHandler(app),
+    'upload.list': new UploadListQueryHandler(app),
+    'download.list': new DownloadListQueryHandler(app),
+    'blob.url.get': new BlobUrlGetQueryHandler(app),
+    'download.get.last': new DownloadGetLastQueryHandler(app),
   };
 };

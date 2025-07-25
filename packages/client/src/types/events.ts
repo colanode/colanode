@@ -5,7 +5,7 @@ import {
   DocumentState,
   DocumentUpdate,
 } from '@colanode/client/types/documents';
-import { FileSaveState, FileState } from '@colanode/client/types/files';
+import { File, Upload, Download } from '@colanode/client/types/files';
 import {
   LocalNode,
   NodeCounter,
@@ -84,25 +84,60 @@ export type NodeReactionDeletedEvent = {
   nodeReaction: NodeReaction;
 };
 
-export type FileStateUpdatedEvent = {
-  type: 'file.state.updated';
+export type FileCreatedEvent = {
+  type: 'file.created';
   accountId: string;
   workspaceId: string;
-  fileState: FileState;
+  file: File;
 };
 
-export type FileStateDeletedEvent = {
-  type: 'file.state.deleted';
+export type FileDeletedEvent = {
+  type: 'file.deleted';
   accountId: string;
   workspaceId: string;
-  fileId: string;
+  file: File;
 };
 
-export type FileSaveUpdatedEvent = {
-  type: 'file.save.updated';
+export type UploadCreatedEvent = {
+  type: 'upload.created';
   accountId: string;
   workspaceId: string;
-  fileSave: FileSaveState;
+  upload: Upload;
+};
+
+export type UploadUpdatedEvent = {
+  type: 'upload.updated';
+  accountId: string;
+  workspaceId: string;
+  upload: Upload;
+};
+
+export type UploadDeletedEvent = {
+  type: 'upload.deleted';
+  accountId: string;
+  workspaceId: string;
+  upload: Upload;
+};
+
+export type DownloadCreatedEvent = {
+  type: 'download.created';
+  accountId: string;
+  workspaceId: string;
+  download: Download;
+};
+
+export type DownloadUpdatedEvent = {
+  type: 'download.updated';
+  accountId: string;
+  workspaceId: string;
+  download: Download;
+};
+
+export type DownloadDeletedEvent = {
+  type: 'download.deleted';
+  accountId: string;
+  workspaceId: string;
+  download: Download;
 };
 
 export type AccountCreatedEvent = {
@@ -322,9 +357,14 @@ export type Event =
   | ServerUpdatedEvent
   | ServerDeletedEvent
   | ServerAvailabilityChangedEvent
-  | FileStateUpdatedEvent
-  | FileStateDeletedEvent
-  | FileSaveUpdatedEvent
+  | FileCreatedEvent
+  | FileDeletedEvent
+  | UploadCreatedEvent
+  | UploadUpdatedEvent
+  | UploadDeletedEvent
+  | DownloadCreatedEvent
+  | DownloadUpdatedEvent
+  | DownloadDeletedEvent
   | QueryResultUpdatedEvent
   | RadarDataUpdatedEvent
   | CollaborationCreatedEvent

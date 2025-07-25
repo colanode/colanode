@@ -1,4 +1,3 @@
-import { LocalFileNode } from '@colanode/client/types';
 import { FileSubtype } from '@colanode/core';
 
 export type OpenFileDialogOptions = {
@@ -14,23 +13,44 @@ export type TempFile = {
   type: FileSubtype;
   mimeType: string;
   extension: string;
-  url: string;
 };
 
-export type FileState = {
+export type File = {
   id: string;
   version: string;
-  downloadStatus: DownloadStatus | null;
-  downloadProgress: number | null;
-  downloadRetries: number | null;
-  downloadStartedAt: string | null;
-  downloadCompletedAt: string | null;
-  uploadStatus: UploadStatus | null;
-  uploadProgress: number | null;
-  uploadRetries: number | null;
-  uploadStartedAt: string | null;
-  uploadCompletedAt: string | null;
-  url: string | null;
+  name: string;
+  path: string;
+  size: number;
+  mimeType: string;
+  createdAt: string;
+};
+
+export type Upload = {
+  fileId: string;
+  status: UploadStatus;
+  progress: number;
+  retries: number;
+  createdAt: string;
+  completedAt: string | null;
+  errorCode: string | null;
+  errorMessage: string | null;
+};
+
+export type Download = {
+  id: string;
+  fileId: string;
+  version: string;
+  type: DownloadType;
+  path: string;
+  size: number;
+  mimeType: string;
+  status: DownloadStatus;
+  progress: number;
+  retries: number;
+  createdAt: string;
+  completedAt: string | null;
+  errorCode: string | null;
+  errorMessage: string | null;
 };
 
 export enum DownloadStatus {
@@ -47,18 +67,7 @@ export enum UploadStatus {
   Failed = 3,
 }
 
-export enum SaveStatus {
-  Active = 1,
-  Completed = 2,
-  Failed = 3,
+export enum DownloadType {
+  Auto = 0,
+  Manual = 1,
 }
-
-export type FileSaveState = {
-  id: string;
-  file: LocalFileNode;
-  status: SaveStatus;
-  startedAt: string;
-  completedAt: string | null;
-  path: string;
-  progress: number;
-};

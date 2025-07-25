@@ -22,10 +22,7 @@ import {
   IdType,
 } from '@colanode/core';
 import { app, appBadge } from '@colanode/desktop/main/app-service';
-import {
-  handleAssetRequest,
-  handleFileRequest,
-} from '@colanode/desktop/main/protocols';
+import { handleLocalRequest } from '@colanode/desktop/main/protocols';
 
 const debug = createDebugger('desktop:main');
 
@@ -120,15 +117,9 @@ const createWindow = async () => {
     }
   });
 
-  if (!protocol.isProtocolHandled('local-file')) {
-    protocol.handle('local-file', (request) => {
-      return handleFileRequest(request);
-    });
-  }
-
-  if (!protocol.isProtocolHandled('asset')) {
-    protocol.handle('asset', (request) => {
-      return handleAssetRequest(request);
+  if (!protocol.isProtocolHandled('local')) {
+    protocol.handle('local', (request) => {
+      return handleLocalRequest(request);
     });
   }
 
@@ -148,6 +139,10 @@ const createWindow = async () => {
 
   debug('Window created');
 };
+
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'local', privileges: { standard: true, stream: true } },
+]);
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -234,7 +229,6 @@ ipcMain.handle(
     const filePath = app.path.tempFile(fileName);
 
     await app.fs.writeFile(filePath, file.buffer);
-    const url = await app.fs.url(filePath);
 
     return {
       id,
@@ -244,7 +238,6 @@ ipcMain.handle(
       type,
       path: filePath,
       extension,
-      url,
     };
   }
 );

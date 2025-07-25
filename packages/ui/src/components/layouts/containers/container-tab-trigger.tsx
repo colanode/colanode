@@ -10,7 +10,6 @@ import { AccountSettingsTab } from '@colanode/ui/components/accounts/account-set
 import { ChannelContainerTab } from '@colanode/ui/components/channels/channel-container-tab';
 import { ChatContainerTab } from '@colanode/ui/components/chats/chat-container-tab';
 import { DatabaseContainerTab } from '@colanode/ui/components/databases/database-container-tab';
-import { DownloadsContainerTab } from '@colanode/ui/components/downloads/downloads-container-tab';
 import { FileContainerTab } from '@colanode/ui/components/files/file-container-tab';
 import { FolderContainerTab } from '@colanode/ui/components/folders/folder-container-tab';
 import { MessageContainerTab } from '@colanode/ui/components/messages/message-container-tab';
@@ -18,6 +17,7 @@ import { PageContainerTab } from '@colanode/ui/components/pages/page-container-t
 import { RecordContainerTab } from '@colanode/ui/components/records/record-container-tab';
 import { SpaceContainerTab } from '@colanode/ui/components/spaces/space-container-tab';
 import { TabsTrigger } from '@colanode/ui/components/ui/tabs';
+import { WorkspaceDownloadsTab } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-tab';
 import { WorkspaceStorageTab } from '@colanode/ui/components/workspaces/storage/workspace-storage-tab';
 import { WorkspaceUploadsTab } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-tab';
 import { WorkspaceSettingsTab } from '@colanode/ui/components/workspaces/workspace-settings-tab';
@@ -31,11 +31,7 @@ interface ContainerTabTriggerProps {
   onMove: (before: string | null) => void;
 }
 
-const ContainerTabTriggerContent = ({ tab }: { tab: ContainerTab }) => {
-  if (tab.path === SpecialContainerTabPath.Downloads) {
-    return <DownloadsContainerTab />;
-  }
-
+const getContainerTabTriggerContent = (tab: ContainerTab) => {
   if (tab.path === SpecialContainerTabPath.WorkspaceSettings) {
     return <WorkspaceSettingsTab />;
   }
@@ -58,6 +54,10 @@ const ContainerTabTriggerContent = ({ tab }: { tab: ContainerTab }) => {
 
   if (tab.path === SpecialContainerTabPath.WorkspaceUploads) {
     return <WorkspaceUploadsTab />;
+  }
+
+  if (tab.path === SpecialContainerTabPath.WorkspaceDownloads) {
+    return <WorkspaceDownloadsTab />;
   }
 
   return match(getIdType(tab.path))
@@ -117,6 +117,11 @@ export const ContainerTabTrigger = ({
   const buttonRef = useRef<HTMLButtonElement>(null);
   const dragDropRef = dragRef(dropRef(buttonRef));
 
+  const tabContent = getContainerTabTriggerContent(tab);
+  if (tabContent === null) {
+    return null;
+  }
+
   return (
     <TabsTrigger
       value={tab.path}
@@ -141,9 +146,7 @@ export const ContainerTabTrigger = ({
       }}
       ref={dragDropRef as React.RefAttributes<HTMLButtonElement>['ref']}
     >
-      <div className="overflow-hidden truncate">
-        <ContainerTabTriggerContent tab={tab} />
-      </div>
+      <div className="overflow-hidden truncate">{tabContent}</div>
       <div
         className="opacity-0 group-hover/tab:opacity-100 group-data-[state=active]/tab:opacity-100 transition-opacity duration-200 flex-shrink-0 cursor-pointer"
         onClick={() => onClose()}

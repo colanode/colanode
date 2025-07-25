@@ -3,5 +3,5 @@ interface FilePreviewVideoProps {
 }
 
 export const FilePreviewVideo = ({ url }: FilePreviewVideoProps) => {
-  return <video controls src={url} className="h-full w-full object-contain" />;
+  return <video controls src={url} className="w-full object-contain" />;
 };

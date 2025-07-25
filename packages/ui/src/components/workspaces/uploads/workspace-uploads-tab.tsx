@@ -4,7 +4,7 @@ export const WorkspaceUploadsTab = () => {
   return (
     <div className="flex items-center space-x-2">
       <Upload className="size-4" />
-      <span>Workspace Uploads</span>
+      <span>Uploads</span>
     </div>
   );
 };

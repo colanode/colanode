@@ -37,7 +37,6 @@ import { DocumentUpdateMutationHandler } from './documents/document-update';
 import { FileCreateMutationHandler } from './files/file-create';
 import { FileDeleteMutationHandler } from './files/file-delete';
 import { FileDownloadMutationHandler } from './files/file-download';
-import { FileSaveMutationHandler } from './files/file-save';
 import { FolderCreateMutationHandler } from './folders/folder-create';
 import { FolderDeleteMutationHandler } from './folders/folder-delete';
 import { FolderUpdateMutationHandler } from './folders/folder-update';
@@ -135,7 +134,6 @@ export const buildMutationHandlerMap = (
     'folder.create': new FolderCreateMutationHandler(app),
     'file.create': new FileCreateMutationHandler(app),
     'file.download': new FileDownloadMutationHandler(app),
-    'file.save': new FileSaveMutationHandler(app),
     'space.avatar.update': new SpaceAvatarUpdateMutationHandler(app),
     'space.description.update': new SpaceDescriptionUpdateMutationHandler(app),
     'space.name.update': new SpaceNameUpdateMutationHandler(app),

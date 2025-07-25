@@ -1,6 +1,8 @@
+import AsyncLock from 'async-lock';
+
 import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { mapFileState, mapNode } from '@colanode/client/lib/mappers';
+import { mapDownload, mapNode } from '@colanode/client/lib/mappers';
 import { MutationHandler } from '@colanode/client/lib/types';
 import {
   MutationError,
@@ -8,13 +10,19 @@ import {
   FileDownloadMutationInput,
   FileDownloadMutationOutput,
 } from '@colanode/client/mutations';
-import { DownloadStatus, LocalFileNode } from '@colanode/client/types';
-import { FileStatus } from '@colanode/core';
+import {
+  DownloadStatus,
+  DownloadType,
+  LocalFileNode,
+} from '@colanode/client/types';
+import { FileStatus, generateId, IdType } from '@colanode/core';
 
 export class FileDownloadMutationHandler
   extends WorkspaceMutationHandlerBase
   implements MutationHandler<FileDownloadMutationInput>
 {
+  private readonly lock: AsyncLock = new AsyncLock();
+
   async handleMutation(
     input: FileDownloadMutationInput
   ): Promise<FileDownloadMutationOutput> {
@@ -41,46 +49,71 @@ export class FileDownloadMutationHandler
       );
     }
 
-    const fileState = await workspace.database
-      .selectFrom('file_states')
-      .selectAll()
-      .where('id', '=', input.fileId)
-      .executeTakeFirst();
+    const type = input.path ? DownloadType.Manual : DownloadType.Auto;
 
-    if (
-      fileState?.download_status === DownloadStatus.Completed ||
-      fileState?.download_status === DownloadStatus.Pending
-    ) {
-      return {
-        success: true,
-      };
+    if (type === DownloadType.Auto) {
+      if (this.app.meta.type === 'web') {
+        throw new MutationError(
+          MutationErrorCode.DownloadFailed,
+          'Auto downloads are not supported on the web.'
+        );
+      }
+
+      const lockKey = `${workspace.accountId}.${workspace.id}.${input.fileId}.${file.attributes.version}.${type}`;
+      const result = await this.lock.acquire(lockKey, async () => {
+        const existingDownload = await workspace.database
+          .selectFrom('downloads')
+          .selectAll()
+          .where('file_id', '=', input.fileId)
+          .where('version', '=', file.attributes.version)
+          .where('type', '=', type)
+          .executeTakeFirst();
+
+        if (existingDownload) {
+          return {
+            success: true,
+          };
+        }
+
+        return null;
+      });
+
+      if (result) {
+        return result;
+      }
     }
 
-    const updatedFileState = await workspace.database
-      .insertInto('file_states')
+    const path =
+      input.path ??
+      this.app.path.workspaceFile(
+        workspace.accountId,
+        workspace.id,
+        file.id,
+        file.attributes.extension
+      );
+
+    const download = await workspace.database
+      .insertInto('downloads')
       .returningAll()
       .values({
-        id: input.fileId,
+        id: generateId(IdType.Download),
+        file_id: input.fileId,
         version: file.attributes.version,
-        download_status: DownloadStatus.Pending,
-        download_progress: 0,
-        download_retries: 0,
-        download_started_at: new Date().toISOString(),
+        type,
+        path,
+        size: file.attributes.size,
+        mime_type: file.attributes.mimeType,
+        status: DownloadStatus.Pending,
+        progress: 0,
+        retries: 0,
+        created_at: new Date().toISOString(),
       })
-      .onConflict((oc) =>
-        oc.columns(['id']).doUpdateSet({
-          download_status: DownloadStatus.Pending,
-          download_progress: 0,
-          download_retries: 0,
-          download_started_at: new Date().toISOString(),
-        })
-      )
       .executeTakeFirst();
 
-    if (!updatedFileState) {
+    if (!download) {
       throw new MutationError(
-        MutationErrorCode.FileNotFound,
-        'The file you are trying to download does not exist.'
+        MutationErrorCode.DownloadFailed,
+        'Failed to start the download.'
       );
     }
 
@@ -88,14 +121,14 @@ export class FileDownloadMutationHandler
       type: 'file.download',
       accountId: workspace.accountId,
       workspaceId: workspace.id,
-      fileId: input.fileId,
+      downloadId: download.id,
     });
 
     eventBus.publish({
-      type: 'file.state.updated',
+      type: 'download.created',
       accountId: workspace.accountId,
       workspaceId: workspace.id,
-      fileState: mapFileState(updatedFileState, null),
+      download: mapDownload(download),
     });
 
     return {

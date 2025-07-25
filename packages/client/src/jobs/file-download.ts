@@ -11,7 +11,7 @@ export type FileDownloadInput = {
   type: 'file.download';
   accountId: string;
   workspaceId: string;
-  fileId: string;
+  downloadId: string;
 };
 
 declare module '@colanode/client/jobs' {
@@ -31,7 +31,7 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
 
   public readonly concurrency: JobConcurrencyConfig<FileDownloadInput> = {
     limit: 1,
-    key: (input: FileDownloadInput) => `file.download:${input.fileId}`,
+    key: (input: FileDownloadInput) => `file.download.${input.downloadId}`,
   };
 
   public async handleJob(input: FileDownloadInput): Promise<JobOutput> {
@@ -49,8 +49,14 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
       };
     }
 
-    const result = await workspace.files.downloadFile(input.fileId);
-    if (!result) {
+    const result = await workspace.files.downloadFile(input.downloadId);
+    if (result === null) {
+      return {
+        type: 'cancel',
+      };
+    }
+
+    if (result === false) {
       return {
         type: 'retry',
         delay: ms('1 minute'),

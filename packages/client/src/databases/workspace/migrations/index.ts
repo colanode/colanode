@@ -19,6 +19,9 @@ import { createCursorsTable } from './00016-create-cursors-table';
 import { createMetadataTable } from './00017-create-metadata-table';
 import { createNodeReferencesTable } from './00018-create-node-references-table';
 import { createNodeCountersTable } from './00019-create-node-counters-table';
+import { createFilesTable } from './00020-create-files-table';
+import { createUploadsTable } from './00021-create-uploads-table';
+import { createDownloadsTable } from './00022-create-downloads-table';
 
 export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00001-create-users-table': createUsersTable,
@@ -40,4 +43,7 @@ export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00017-create-metadata-table': createMetadataTable,
   '00018-create-node-references-table': createNodeReferencesTable,
   '00019-create-node-counters-table': createNodeCountersTable,
+  '00020-create-files-table': createFilesTable,
+  '00021-create-uploads-table': createUploadsTable,
+  '00022-create-downloads-table': createDownloadsTable,
 };
