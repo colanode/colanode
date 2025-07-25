@@ -362,6 +362,7 @@ export class JobService {
 
     return this.addJob(input, {
       retries: options?.retries,
+      deduplication: options?.deduplication,
     });
   }
 

@@ -39,18 +39,19 @@ export class FilesCleanTempJobHandler
       };
     }
 
-    const filePaths = await this.app.fs.listFiles(this.app.path.temp);
+    const fileNames = await this.app.fs.listFiles(this.app.path.temp);
     const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
 
-    for (const filePath of filePaths) {
-      const metadata = await this.app.fs.metadata(filePath);
+    for (const fileName of fileNames) {
+      try {
+        const filePath = this.app.path.tempFile(fileName);
+        const metadata = await this.app.fs.metadata(filePath);
 
-      if (metadata.lastModified < oneDayAgo) {
-        try {
+        if (metadata.lastModified < oneDayAgo) {
           await this.app.fs.delete(filePath);
-        } catch (error) {
-          console.error(`Failed to delete temp file: ${filePath}`, error);
         }
+      } catch (error) {
+        console.error(`Failed to delete temp file: ${fileName}`, error);
       }
     }
 

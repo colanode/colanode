@@ -54,7 +54,13 @@ export class ServerService {
         type: 'server.sync',
         server: this.domain,
       },
-      ms('1 minute')
+      ms('1 minute'),
+      {
+        deduplication: {
+          key: scheduleId,
+          replace: true,
+        },
+      }
     );
 
     await this.app.jobs.triggerJobSchedule(scheduleId);

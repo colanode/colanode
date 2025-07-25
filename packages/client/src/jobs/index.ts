@@ -15,6 +15,7 @@ export type JobOptions = {
 
 export type JobScheduleOptions = {
   retries?: number;
+  deduplication?: JobDeduplicationOptions;
 };
 
 export type Job = {

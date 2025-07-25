@@ -105,7 +105,13 @@ export class AccountService {
         type: 'account.sync',
         accountId: this.account.id,
       },
-      ms('1 minute')
+      ms('1 minute'),
+      {
+        deduplication: {
+          key: this.accountSyncJobScheduleId,
+          replace: true,
+        },
+      }
     );
 
     this.socket.init();
