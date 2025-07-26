@@ -1,6 +1,7 @@
 import { LocalFileNode } from '@colanode/client/types';
 import { FileIcon } from '@colanode/ui/components/files/file-icon';
-import { useFileUrl } from '@colanode/ui/hooks/use-file-url';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface FileThumbnailProps {
@@ -9,12 +10,23 @@ interface FileThumbnailProps {
 }
 
 export const FileImageThumbnail = ({ file, className }: FileThumbnailProps) => {
-  const fileUrl = useFileUrl(file.id, true);
+  const workspace = useWorkspace();
+  const localFileQuery = useLiveQuery({
+    type: 'local.file.get',
+    fileId: file.id,
+    accountId: workspace.accountId,
+    workspaceId: workspace.id,
+  });
 
-  if (fileUrl.type === 'available') {
+  if (localFileQuery.isPending) {
+    return null;
+  }
+
+  const localFile = localFileQuery.data?.localFile;
+  if (localFile) {
     return (
       <img
-        src={fileUrl.url}
+        src={localFile.url}
         alt={file.attributes.name}
         className={cn('size-10 object-contain object-center', className)}
       />

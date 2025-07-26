@@ -1,3 +1,5 @@
+import ms from 'ms';
+
 import {
   JobHandler,
   JobOutput,
@@ -39,20 +41,20 @@ export class FilesCleanTempJobHandler
       };
     }
 
-    const fileNames = await this.app.fs.listFiles(this.app.path.temp);
-    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
+    const oneDayAgo = new Date(Date.now() - ms('1 day')).toISOString();
+    const tempFiles = await this.app.database
+      .selectFrom('temp_files')
+      .selectAll()
+      .where('created_at', '<', oneDayAgo)
+      .execute();
 
-    for (const fileName of fileNames) {
-      try {
-        const filePath = this.app.path.tempFile(fileName);
-        const metadata = await this.app.fs.metadata(filePath);
+    for (const tempFile of tempFiles) {
+      await this.app.fs.delete(tempFile.path);
 
-        if (metadata.lastModified < oneDayAgo) {
-          await this.app.fs.delete(filePath);
-        }
-      } catch (error) {
-        console.error(`Failed to delete temp file: ${fileName}`, error);
-      }
+      await this.app.database
+        .deleteFrom('temp_files')
+        .where('id', '=', tempFile.id)
+        .execute();
     }
 
     return {

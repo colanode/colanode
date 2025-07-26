@@ -7,59 +7,46 @@ import { FileNoPreview } from '@colanode/ui/components/files/file-no-preview';
 import { FilePreviewAudio } from '@colanode/ui/components/files/previews/file-preview-audio';
 import { FilePreviewImage } from '@colanode/ui/components/files/previews/file-preview-image';
 import { FilePreviewVideo } from '@colanode/ui/components/files/previews/file-preview-video';
-import { useApp } from '@colanode/ui/contexts/app';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { canPreviewFile } from '@colanode/ui/lib/files';
 
 const TempFilePreview = ({ file }: { file: TempFile }) => {
-  const app = useApp();
-
-  const mimeType = file.mimeType;
-  const name = file.name;
-  const type = file.type;
-
-  const blobUrlQuery = useLiveQuery(
-    {
-      type: 'blob.url.get',
-      path: file.path,
-    },
-    {
-      enabled: app.type === 'web',
-    }
-  );
-
-  const url =
-    app.type === 'web' ? blobUrlQuery.data : `local://temp/${file.name}`;
-
-  if (!url) {
-    return <FileNoPreview mimeType={mimeType} />;
+  if (file.subtype === 'image') {
+    return <FilePreviewImage url={file.url} name={file.name} />;
   }
 
-  if (type === 'image') {
-    return <FilePreviewImage url={url} name={name} />;
+  if (file.subtype === 'video') {
+    return <FilePreviewVideo url={file.url} />;
   }
 
-  if (type === 'video') {
-    return <FilePreviewVideo url={url} />;
+  if (file.subtype === 'audio') {
+    return <FilePreviewAudio url={file.url} />;
   }
 
-  if (type === 'audio') {
-    return <FilePreviewAudio url={url} />;
-  }
-
-  return <FileNoPreview mimeType={mimeType} />;
+  return <FileNoPreview mimeType={file.mimeType} />;
 };
 
 export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
-  const file = node.attrs as TempFile;
+  const fileId = node.attrs.id;
 
-  if (!file) {
+  const tempFileQuery = useLiveQuery(
+    {
+      type: 'temp.file.get',
+      id: fileId,
+    },
+    {
+      enabled: !!fileId,
+    }
+  );
+
+  if (!fileId || tempFileQuery.isPending || !tempFileQuery.data) {
     return null;
   }
 
-  const mimeType = file.mimeType;
-  const type = file.type;
-  const canPreview = canPreviewFile(type);
+  const tempFile = tempFileQuery.data;
+  const mimeType = tempFile.mimeType;
+  const subtype = tempFile.subtype;
+  const canPreview = canPreviewFile(subtype);
 
   return (
     <NodeViewWrapper
@@ -74,7 +61,7 @@ export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
           <X className="size-4" />
         </button>
         {canPreview ? (
-          <TempFilePreview file={file} />
+          <TempFilePreview file={tempFile} />
         ) : (
           <FileNoPreview mimeType={mimeType} />
         )}

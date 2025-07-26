@@ -18,12 +18,12 @@ import { EmojiGetQueryHandler } from './emojis/emoji-get';
 import { EmojiGetBySkinIdQueryHandler } from './emojis/emoji-get-by-skin-id';
 import { EmojiListQueryHandler } from './emojis/emoji-list';
 import { EmojiSearchQueryHandler } from './emojis/emoji-search';
-import { BlobUrlGetQueryHandler } from './files/blob-url-get';
 import { DownloadGetLastQueryHandler } from './files/download-get-last';
 import { DownloadListQueryHandler } from './files/download-list';
 import { FileDownloadRequestGetQueryHandler } from './files/file-download-request-get';
-import { FileGetQueryHandler } from './files/file-get';
 import { FileListQueryHandler } from './files/file-list';
+import { LocalFileGetQueryHandler } from './files/local-file-get';
+import { TempFileGetQueryHandler } from './files/temp-file-get';
 import { UploadListQueryHandler } from './files/upload-list';
 import { IconCategoryListQueryHandler } from './icons/icon-category-list';
 import { IconListQueryHandler } from './icons/icon-list';
@@ -87,7 +87,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'record.search': new RecordSearchQueryHandler(app),
     'user.get': new UserGetQueryHandler(app),
     'user.storage.get': new UserStorageGetQueryHandler(app),
-    'file.get': new FileGetQueryHandler(app),
+    'local.file.get': new LocalFileGetQueryHandler(app),
     'file.download.request.get': new FileDownloadRequestGetQueryHandler(app),
     'chat.list': new ChatListQueryHandler(app),
     'space.list': new SpaceListQueryHandler(app),
@@ -99,7 +99,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
     'upload.list': new UploadListQueryHandler(app),
     'download.list': new DownloadListQueryHandler(app),
-    'blob.url.get': new BlobUrlGetQueryHandler(app),
     'download.get.last': new DownloadGetLastQueryHandler(app),
+    'temp.file.get': new TempFileGetQueryHandler(app),
   };
 };

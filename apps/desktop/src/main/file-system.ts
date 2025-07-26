@@ -56,7 +56,8 @@ export class DesktopFileSystem implements FileSystem {
     };
   }
 
-  public async url(_path: string): Promise<string> {
-    throw new Error('Not implemented');
+  public async url(path: string): Promise<string> {
+    const base64Path = Buffer.from(path).toString('base64');
+    return `local://files/${base64Path}`;
   }
 }

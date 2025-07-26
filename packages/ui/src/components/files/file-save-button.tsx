@@ -8,7 +8,6 @@ import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useApp } from '@colanode/ui/contexts/app';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface FileSaveButtonProps {
@@ -21,13 +20,6 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
   const mutation = useMutation();
   const layout = useLayout();
   const [isSaving, setIsSaving] = useState(false);
-
-  const fileQuery = useLiveQuery({
-    type: 'file.get',
-    id: file.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-  });
 
   const handleDownloadDesktop = async () => {
     const path = await window.colanode.showFileSaveDialog({
@@ -56,31 +48,28 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
   };
 
   const handleDownloadWeb = async () => {
-    if (fileQuery.isPending) {
-      return;
-    }
-
     setIsSaving(true);
 
     try {
-      if (fileQuery.data?.path) {
-        const blobUrl = await window.colanode.executeQuery({
-          type: 'blob.url.get',
-          path: fileQuery.data?.path ?? '',
-        });
+      const localFileQuery = await window.colanode.executeQuery({
+        type: 'local.file.get',
+        fileId: file.id,
+        accountId: workspace.accountId,
+        workspaceId: workspace.id,
+      });
 
-        if (blobUrl) {
-          // the file is already downloaded locally, so we can just trigger a download
-          const link = document.createElement('a');
-          link.href = blobUrl;
-          link.download = file.attributes.name;
-          link.style.display = 'none';
-          document.body.appendChild(link);
-          link.click();
-          document.body.removeChild(link);
-          return;
-        }
+      if (localFileQuery.localFile) {
+        // the file is already downloaded locally, so we can just trigger a download
+        const link = document.createElement('a');
+        link.href = localFileQuery.localFile.url;
+        link.download = file.attributes.name;
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        return;
       }
+
       // the file is not downloaded locally, so we need to download it
       const request = await window.colanode.executeQuery({
         type: 'file.download.request.get',
@@ -137,7 +126,7 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
     <Button
       variant="outline"
       onClick={handleDownload}
-      disabled={fileQuery.isPending || isSaving}
+      disabled={mutation.isPending || isSaving}
     >
       {isSaving ? (
         <Spinner className="size-4" />

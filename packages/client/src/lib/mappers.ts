@@ -6,6 +6,7 @@ import {
   SelectAccount,
   SelectAppMetadata,
   SelectServer,
+  SelectTempFile,
 } from '@colanode/client/databases/app';
 import { SelectEmoji } from '@colanode/client/databases/emojis';
 import { SelectIcon } from '@colanode/client/databases/icons';
@@ -20,7 +21,7 @@ import {
   SelectDocumentState,
   SelectDocumentUpdate,
   SelectNodeReference,
-  SelectFile,
+  SelectLocalFile,
   SelectDownload,
   SelectUpload,
 } from '@colanode/client/databases/workspace';
@@ -36,7 +37,12 @@ import {
   DocumentUpdate,
 } from '@colanode/client/types/documents';
 import { Emoji } from '@colanode/client/types/emojis';
-import { File, Download, Upload } from '@colanode/client/types/files';
+import {
+  LocalFile,
+  Download,
+  Upload,
+  TempFile,
+} from '@colanode/client/types/files';
 import { Icon } from '@colanode/client/types/icons';
 import {
   LocalNode,
@@ -189,15 +195,31 @@ export const mapNodeInteraction = (
   };
 };
 
-export const mapFile = (row: SelectFile): File => {
+export const mapLocalFile = (row: SelectLocalFile, url: string): LocalFile => {
   return {
     id: row.id,
     version: row.version,
     name: row.name,
     path: row.path,
     size: row.size,
+    subtype: row.subtype,
+    openedAt: row.opened_at,
     mimeType: row.mime_type,
     createdAt: row.created_at,
+    url,
+  };
+};
+
+export const mapTempFile = (row: SelectTempFile, url: string): TempFile => {
+  return {
+    id: row.id,
+    name: row.name,
+    path: row.path,
+    size: row.size,
+    subtype: row.subtype,
+    mimeType: row.mime_type,
+    extension: row.extension,
+    url,
   };
 };
 

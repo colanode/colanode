@@ -10,19 +10,23 @@ export type TempFile = {
   name: string;
   path: string;
   size: number;
-  type: FileSubtype;
+  subtype: FileSubtype;
   mimeType: string;
   extension: string;
+  url: string;
 };
 
-export type File = {
+export type LocalFile = {
   id: string;
   version: string;
   name: string;
   path: string;
   size: number;
+  subtype: FileSubtype;
   mimeType: string;
   createdAt: string;
+  openedAt: string;
+  url: string;
 };
 
 export type Upload = {

@@ -68,78 +68,14 @@ export const handleLocalRequest = async (
     return net.fetch(subRequest);
   }
 
-  if (type === 'avatars') {
-    const accountId = parts[1];
-    const avatarId = parts[2];
-
-    if (!accountId || !avatarId) {
-      return new Response(null, { status: 400 });
-    }
-
-    const avatarPath = app.path.accountAvatar(accountId, avatarId);
-    const avatarUrl = `file://${avatarPath}`;
-    const subRequest = new Request(avatarUrl, request);
-
-    const avatarExists = await app.fs.exists(avatarPath);
-    if (avatarExists) {
-      return net.fetch(subRequest);
-    }
-
-    const account = app.getAccount(accountId);
-    if (!account) {
-      return new Response(null, { status: 404 });
-    }
-
-    const downloaded = await account.downloadAvatar(avatarId);
-    if (!downloaded) {
-      return new Response(null, { status: 404 });
-    }
-
-    return net.fetch(subRequest);
-  }
-
   if (type === 'files') {
-    const accountId = parts[1];
-    const workspaceId = parts[2];
-    const fileId = parts[3];
-
-    if (!accountId || !workspaceId || !fileId) {
+    const base64Path = parts[1];
+    if (!base64Path) {
       return new Response(null, { status: 400 });
     }
 
-    const account = app.getAccount(accountId);
-    if (!account) {
-      return new Response(null, { status: 404 });
-    }
-
-    const workspace = account.getWorkspace(workspaceId);
-    if (!workspace) {
-      return new Response(null, { status: 404 });
-    }
-
-    const file = await workspace.database
-      .selectFrom('files')
-      .selectAll()
-      .where('id', '=', fileId)
-      .executeTakeFirst();
-
-    if (!file) {
-      return new Response(null, { status: 404 });
-    }
-
-    const fileUrl = `file://${file.path}`;
-    const subRequest = new Request(fileUrl, request);
-    return net.fetch(subRequest);
-  }
-
-  if (type === 'temp') {
-    const name = parts[1];
-    if (!name) {
-      return new Response(null, { status: 400 });
-    }
-
-    const filePath = app.path.tempFile(name);
-    const fileUrl = `file://${filePath}`;
+    const path = Buffer.from(base64Path, 'base64').toString('utf-8');
+    const fileUrl = `file://${path}`;
     const subRequest = new Request(fileUrl, request);
     return net.fetch(subRequest);
   }

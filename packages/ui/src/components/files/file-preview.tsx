@@ -1,36 +1,52 @@
-import { LocalFileNode } from '@colanode/client/types';
+import { DownloadStatus, LocalFileNode } from '@colanode/client/types';
 import { FileDownloadProgress } from '@colanode/ui/components/files/file-download-progress';
 import { FileNoPreview } from '@colanode/ui/components/files/file-no-preview';
 import { FilePreviewAudio } from '@colanode/ui/components/files/previews/file-preview-audio';
 import { FilePreviewImage } from '@colanode/ui/components/files/previews/file-preview-image';
 import { FilePreviewVideo } from '@colanode/ui/components/files/previews/file-preview-video';
-import { useFileUrl } from '@colanode/ui/hooks/use-file-url';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface FilePreviewProps {
   file: LocalFileNode;
 }
 
 export const FilePreview = ({ file }: FilePreviewProps) => {
-  const fileUrl = useFileUrl(file.id, true);
+  const workspace = useWorkspace();
+  const localFileQuery = useLiveQuery({
+    type: 'local.file.get',
+    fileId: file.id,
+    accountId: workspace.accountId,
+    workspaceId: workspace.id,
+    autoDownload: true,
+  });
 
-  if (fileUrl.type === 'downloading') {
-    return <FileDownloadProgress progress={fileUrl.progress} />;
+  if (localFileQuery.isPending) {
+    return null;
   }
 
-  if (fileUrl.type === 'unavailable') {
-    return <FileNoPreview mimeType={file.attributes.mimeType} />;
+  const localFile = localFileQuery.data?.localFile;
+  if (localFile) {
+    if (file.attributes.subtype === 'image') {
+      return (
+        <FilePreviewImage url={localFile.url} name={file.attributes.name} />
+      );
+    }
+
+    if (file.attributes.subtype === 'video') {
+      return <FilePreviewVideo url={localFile.url} />;
+    }
+
+    if (file.attributes.subtype === 'audio') {
+      return (
+        <FilePreviewAudio url={localFile.url} name={file.attributes.name} />
+      );
+    }
   }
 
-  if (file.attributes.subtype === 'image') {
-    return <FilePreviewImage url={fileUrl.url} name={file.attributes.name} />;
-  }
-
-  if (file.attributes.subtype === 'video') {
-    return <FilePreviewVideo url={fileUrl.url} />;
-  }
-
-  if (file.attributes.subtype === 'audio') {
-    return <FilePreviewAudio url={fileUrl.url} name={file.attributes.name} />;
+  const download = localFileQuery.data?.download;
+  if (download && download.status !== DownloadStatus.Completed) {
+    return <FileDownloadProgress progress={download.progress} />;
   }
 
   return <FileNoPreview mimeType={file.attributes.mimeType} />;

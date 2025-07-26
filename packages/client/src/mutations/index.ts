@@ -70,6 +70,7 @@ export * from './workspaces/workspace-update';
 export * from './users/user-role-update';
 export * from './users/user-storage-update';
 export * from './users/users-create';
+export * from './files/temp-file-create';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MutationMap {}

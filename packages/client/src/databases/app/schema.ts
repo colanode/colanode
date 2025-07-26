@@ -1,5 +1,7 @@
 import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
 
+import { FileSubtype } from '@colanode/core';
+
 interface ServerTable {
   domain: ColumnType<string, string, never>;
   name: ColumnType<string, string, string>;
@@ -77,10 +79,27 @@ export type SelectJobSchedule = Selectable<JobScheduleTableSchema>;
 export type InsertJobSchedule = Insertable<JobScheduleTableSchema>;
 export type UpdateJobSchedule = Updateable<JobScheduleTableSchema>;
 
+interface TempFileTable {
+  id: ColumnType<string, string, never>;
+  name: ColumnType<string, string, string>;
+  path: ColumnType<string, string, string>;
+  size: ColumnType<number, number, number>;
+  subtype: ColumnType<FileSubtype, FileSubtype, FileSubtype>;
+  mime_type: ColumnType<string, string, string>;
+  extension: ColumnType<string, string, string>;
+  created_at: ColumnType<string, string, string>;
+  opened_at: ColumnType<string, string, string>;
+}
+
+export type SelectTempFile = Selectable<TempFileTable>;
+export type InsertTempFile = Insertable<TempFileTable>;
+export type UpdateTempFile = Updateable<TempFileTable>;
+
 export interface AppDatabaseSchema {
   servers: ServerTable;
   accounts: AccountTable;
   metadata: AppMetadataTable;
   jobs: JobTableSchema;
   job_schedules: JobScheduleTableSchema;
+  temp_files: TempFileTable;
 }

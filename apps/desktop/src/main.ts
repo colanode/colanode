@@ -224,20 +224,37 @@ ipcMain.handle(
     const name = app.path.filename(file.name);
     const extension = app.path.extension(file.name);
     const mimeType = file.type;
-    const type = extractFileSubtype(mimeType);
+    const subtype = extractFileSubtype(mimeType);
     const fileName = `${name}.${id}${extension}`;
     const filePath = app.path.tempFile(fileName);
 
     await app.fs.writeFile(filePath, file.buffer);
+    await app.database
+      .insertInto('temp_files')
+      .values({
+        id,
+        name: fileName,
+        size: file.size,
+        mime_type: mimeType,
+        subtype,
+        path: filePath,
+        extension,
+        created_at: new Date().toISOString(),
+        opened_at: new Date().toISOString(),
+      })
+      .execute();
+
+    const url = await app.fs.url(filePath);
 
     return {
       id,
       name: fileName,
       size: file.size,
       mimeType,
-      type,
+      subtype,
       path: filePath,
       extension,
+      url,
     };
   }
 );

@@ -5,7 +5,12 @@ import {
   DocumentState,
   DocumentUpdate,
 } from '@colanode/client/types/documents';
-import { File, Upload, Download } from '@colanode/client/types/files';
+import {
+  LocalFile,
+  Upload,
+  Download,
+  TempFile,
+} from '@colanode/client/types/files';
 import {
   LocalNode,
   NodeCounter,
@@ -84,18 +89,18 @@ export type NodeReactionDeletedEvent = {
   nodeReaction: NodeReaction;
 };
 
-export type FileCreatedEvent = {
-  type: 'file.created';
+export type LocalFileCreatedEvent = {
+  type: 'local.file.created';
   accountId: string;
   workspaceId: string;
-  file: File;
+  localFile: LocalFile;
 };
 
-export type FileDeletedEvent = {
-  type: 'file.deleted';
+export type LocalFileDeletedEvent = {
+  type: 'local.file.deleted';
   accountId: string;
   workspaceId: string;
-  file: File;
+  localFile: LocalFile;
 };
 
 export type UploadCreatedEvent = {
@@ -337,6 +342,16 @@ export type AvatarDownloadedEvent = {
   avatarId: string;
 };
 
+export type TempFileCreatedEvent = {
+  type: 'temp.file.created';
+  tempFile: TempFile;
+};
+
+export type TempFileDeletedEvent = {
+  type: 'temp.file.deleted';
+  tempFile: TempFile;
+};
+
 export type Event =
   | UserCreatedEvent
   | UserUpdatedEvent
@@ -357,8 +372,8 @@ export type Event =
   | ServerUpdatedEvent
   | ServerDeletedEvent
   | ServerAvailabilityChangedEvent
-  | FileCreatedEvent
-  | FileDeletedEvent
+  | LocalFileCreatedEvent
+  | LocalFileDeletedEvent
   | UploadCreatedEvent
   | UploadUpdatedEvent
   | UploadDeletedEvent
@@ -387,4 +402,6 @@ export type Event =
   | NodeReferenceDeletedEvent
   | NodeCounterUpdatedEvent
   | NodeCounterDeletedEvent
-  | AvatarDownloadedEvent;
+  | AvatarDownloadedEvent
+  | TempFileCreatedEvent
+  | TempFileDeletedEvent;

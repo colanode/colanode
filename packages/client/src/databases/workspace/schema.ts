@@ -12,6 +12,7 @@ import {
   WorkspaceRole,
   UserStatus,
   DocumentType,
+  FileSubtype,
 } from '@colanode/core';
 
 interface UserTable {
@@ -237,19 +238,22 @@ export type SelectWorkspaceMetadata = Selectable<MetadataTable>;
 export type CreateWorkspaceMetadata = Insertable<MetadataTable>;
 export type UpdateWorkspaceMetadata = Updateable<MetadataTable>;
 
-interface FileTable {
+interface LocalFileTable {
   id: ColumnType<string, string, never>;
   version: ColumnType<string, string, string>;
   name: ColumnType<string, string, string>;
   path: ColumnType<string, string, string>;
+  extension: ColumnType<string, string, string>;
   size: ColumnType<number, number, number>;
+  subtype: ColumnType<FileSubtype, FileSubtype, FileSubtype>;
   mime_type: ColumnType<string, string, string>;
   created_at: ColumnType<string, string, never>;
+  opened_at: ColumnType<string, string, string>;
 }
 
-export type SelectFile = Selectable<FileTable>;
-export type CreateFile = Insertable<FileTable>;
-export type UpdateFile = Updateable<FileTable>;
+export type SelectLocalFile = Selectable<LocalFileTable>;
+export type CreateLocalFile = Insertable<LocalFileTable>;
+export type UpdateLocalFile = Updateable<LocalFileTable>;
 
 interface UploadTable {
   file_id: ColumnType<string, string, never>;
@@ -301,7 +305,7 @@ export interface WorkspaceDatabaseSchema {
   document_updates: DocumentUpdateTable;
   document_texts: DocumentTextTable;
   collaborations: CollaborationTable;
-  files: FileTable;
+  local_files: LocalFileTable;
   uploads: UploadTable;
   downloads: DownloadTable;
   mutations: MutationTable;

@@ -119,5 +119,5 @@ export const deleteNodeRelations = async (
     .where('node_id', '=', nodeId)
     .execute();
 
-  await database.deleteFrom('files').where('id', '=', nodeId).execute();
+  await database.deleteFrom('local_files').where('id', '=', nodeId).execute();
 };
