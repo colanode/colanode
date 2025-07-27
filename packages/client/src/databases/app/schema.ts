@@ -54,6 +54,7 @@ export interface JobTableSchema {
   scheduled_at: ColumnType<string, string, string>;
   deduplication_key: ColumnType<string | null, string | null, string | null>;
   concurrency_key: ColumnType<string | null, string | null, string | null>;
+  schedule_id: ColumnType<string | null, string | null, string | null>;
   created_at: ColumnType<string, string, string>;
   updated_at: ColumnType<string, string, string>;
 }

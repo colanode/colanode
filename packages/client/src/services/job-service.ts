@@ -70,7 +70,8 @@ export class JobService {
 
   public async addJob(
     input: JobInput,
-    opts?: JobOptions
+    opts?: JobOptions,
+    scheduleId?: string
   ): Promise<SelectJob | null> {
     const handler = this.handlerMap[input.type] as JobHandler<typeof input>;
     if (!handler) {
@@ -142,6 +143,7 @@ export class JobService {
         scheduled_at: scheduledAt.toISOString(),
         deduplication_key: opts?.deduplication?.key || null,
         concurrency_key: concurrencyKey || null,
+        schedule_id: scheduleId || null,
         created_at: now.toISOString(),
         updated_at: now.toISOString(),
       })
@@ -362,10 +364,14 @@ export class JobService {
     const input = this.fromJSON<JobInput>(schedule.input) as JobInput;
     const options = this.fromJSON<JobScheduleOptions>(schedule.options);
 
-    return this.addJob(input, {
-      retries: options?.retries,
-      deduplication: options?.deduplication,
-    });
+    return this.addJob(
+      input,
+      {
+        retries: options?.retries,
+        deduplication: options?.deduplication,
+      },
+      schedule.id
+    );
   }
 
   private async handleJob(jobRow: SelectJob) {
@@ -417,7 +423,16 @@ export class JobService {
           .where('id', '=', jobRow.id)
           .where('status', '=', 'active')
           .execute();
-      } else {
+      } else if (output.type === 'cancel') {
+        if (jobRow.schedule_id) {
+          await this.removeJobSchedule(jobRow.schedule_id);
+        }
+
+        await this.app.database
+          .deleteFrom('jobs')
+          .where('id', '=', jobRow.id)
+          .execute();
+      } else if (output.type === 'success') {
         await this.app.database
           .deleteFrom('jobs')
           .where('id', '=', jobRow.id)

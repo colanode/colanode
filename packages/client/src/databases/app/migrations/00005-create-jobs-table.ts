@@ -13,6 +13,7 @@ export const createJobsTable: Migration = {
       .addColumn('scheduled_at', 'text', (col) => col.notNull())
       .addColumn('deduplication_key', 'text')
       .addColumn('concurrency_key', 'text')
+      .addColumn('schedule_id', 'text')
       .addColumn('created_at', 'text', (col) => col.notNull())
       .addColumn('updated_at', 'text', (col) => col.notNull())
       .execute();
