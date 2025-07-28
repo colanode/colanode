@@ -11,6 +11,8 @@ import {
   JobStatus,
 } from '@colanode/client/jobs';
 import { AccountSyncJobHandler } from '@colanode/client/jobs/account-sync';
+import { AvatarDownloadJobHandler } from '@colanode/client/jobs/avatar-download';
+import { AvatarsCleanJobHandler } from '@colanode/client/jobs/avatars-clean';
 import { FileDownloadJobHandler } from '@colanode/client/jobs/file-download';
 import { FileUploadJobHandler } from '@colanode/client/jobs/file-upload';
 import { FilesCleanTempJobHandler } from '@colanode/client/jobs/files-clean-temp';
@@ -53,6 +55,8 @@ export class JobService {
       'mutations.sync': new MutationsSyncJobHandler(app),
       'files.clean.temp': new FilesCleanTempJobHandler(app),
       'workspace.files.clean': new WorkspaceFilesCleanJobHandler(app),
+      'avatar.download': new AvatarDownloadJobHandler(app),
+      'avatars.clean': new AvatarsCleanJobHandler(app),
     };
   }
 

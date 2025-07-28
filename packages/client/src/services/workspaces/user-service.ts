@@ -48,14 +48,6 @@ export class UserService {
       )
       .executeTakeFirst();
 
-    if (createdUser?.avatar) {
-      await this.workspace.account.downloadAvatar(createdUser.avatar);
-    }
-
-    if (createdUser?.custom_avatar) {
-      await this.workspace.account.downloadAvatar(createdUser.custom_avatar);
-    }
-
     if (createdUser) {
       eventBus.publish({
         type: 'user.created',
@@ -101,14 +93,6 @@ export class UserService {
           .where('revision', '<', user.revision)
       )
       .executeTakeFirst();
-
-    if (createdUser?.avatar) {
-      await this.workspace.account.downloadAvatar(createdUser.avatar);
-    }
-
-    if (createdUser?.custom_avatar) {
-      await this.workspace.account.downloadAvatar(createdUser.custom_avatar);
-    }
 
     if (createdUser) {
       eventBus.publish({

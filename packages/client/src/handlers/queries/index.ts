@@ -6,7 +6,7 @@ import { AccountGetQueryHandler } from './accounts/account-get';
 import { AccountMetadataListQueryHandler } from './accounts/account-metadata-list';
 import { AccountListQueryHandler } from './accounts/accounts-list';
 import { AppMetadataListQueryHandler } from './apps/app-metadata-list';
-import { AvatarUrlGetQueryHandler } from './avatars/avatar-url-get';
+import { AvatarGetQueryHandler } from './avatars/avatar-get';
 import { ChatListQueryHandler } from './chats/chat-list';
 import { DatabaseListQueryHandler } from './databases/database-list';
 import { DatabaseViewListQueryHandler } from './databases/database-view-list';
@@ -56,7 +56,7 @@ export type QueryHandlerMap = {
 export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
   return {
     'app.metadata.list': new AppMetadataListQueryHandler(app),
-    'avatar.url.get': new AvatarUrlGetQueryHandler(app),
+    'avatar.get': new AvatarGetQueryHandler(app),
     'account.list': new AccountListQueryHandler(app),
     'message.list': new MessageListQueryHandler(app),
     'node.reaction.list': new NodeReactionsListQueryHandler(app),

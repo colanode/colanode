@@ -307,7 +307,7 @@ const api: ColanodeWorkerApi = {
         type: 'mutation',
         mutationId: generateId(IdType.Mutation),
         input: {
-          type: 'file.temp.create',
+          type: 'temp.file.create',
           id,
           name: fileName,
           size: file.size,

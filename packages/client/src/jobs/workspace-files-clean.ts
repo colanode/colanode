@@ -32,7 +32,7 @@ export class WorkspaceFilesCleanJobHandler
     {
       limit: 1,
       key: (input: WorkspaceFilesCleanInput) =>
-        `workspace.files.clean:${input.accountId}:${input.workspaceId}`,
+        `workspace.files.clean.${input.accountId}.${input.workspaceId}`,
     };
 
   public async handleJob(input: WorkspaceFilesCleanInput): Promise<JobOutput> {

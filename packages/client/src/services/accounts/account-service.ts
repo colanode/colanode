@@ -10,6 +10,7 @@ import { eventBus } from '@colanode/client/lib/event-bus';
 import { parseApiError } from '@colanode/client/lib/ky';
 import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
 import { AccountSocket } from '@colanode/client/services/accounts/account-socket';
+import { AvatarService } from '@colanode/client/services/accounts/avatar-service';
 import { AppService } from '@colanode/client/services/app-service';
 import { ServerService } from '@colanode/client/services/server-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
@@ -20,8 +21,6 @@ import {
   ApiErrorCode,
   ApiErrorOutput,
   createDebugger,
-  getIdType,
-  IdType,
   Message,
 } from '@colanode/core';
 
@@ -34,6 +33,7 @@ export class AccountService {
   public readonly app: AppService;
   public readonly server: ServerService;
   public readonly database: Kysely<AccountDatabaseSchema>;
+  public readonly avatar: AvatarService;
 
   public readonly socket: AccountSocket;
   public readonly client: KyInstance;
@@ -52,6 +52,7 @@ export class AccountService {
       readonly: false,
     });
 
+    this.avatar = new AvatarService(this);
     this.socket = new AccountSocket(this);
     this.client = this.app.client.extend({
       prefixUrl: this.server.httpBaseUrl,
@@ -94,10 +95,6 @@ export class AccountService {
     await this.app.fs.makeDirectory(
       this.app.path.accountAvatars(this.account.id)
     );
-
-    if (this.account.avatar) {
-      await this.downloadAvatar(this.account.avatar);
-    }
 
     await this.app.jobs.upsertJobSchedule(
       this.accountSyncJobScheduleId,
@@ -198,42 +195,6 @@ export class AccountService {
     await migrator.migrateToLatest();
   }
 
-  public async downloadAvatar(avatar: string): Promise<boolean> {
-    const type = getIdType(avatar);
-    if (type !== IdType.Avatar) {
-      return false;
-    }
-
-    try {
-      const avatarPath = this.app.path.accountAvatar(this.account.id, avatar);
-
-      const exists = await this.app.fs.exists(avatarPath);
-      if (exists) {
-        return true;
-      }
-
-      const response = await this.client.get<ArrayBuffer>(
-        `v1/avatars/${avatar}`
-      );
-
-      const avatarBytes = new Uint8Array(await response.arrayBuffer());
-      await this.app.fs.writeFile(avatarPath, avatarBytes);
-
-      eventBus.publish({
-        type: 'avatar.downloaded',
-        accountId: this.account.id,
-        avatarId: avatar,
-      });
-
-      return true;
-    } catch (err) {
-      console.error(err);
-      debug(`Error downloading avatar for account ${this.account.id}: ${err}`);
-    }
-
-    return false;
-  }
-
   private async initWorkspaces(): Promise<void> {
     const workspaces = await this.database
       .selectFrom('workspaces')
@@ -316,10 +277,6 @@ export class AccountService {
         return;
       }
 
-      if (updatedAccount.avatar) {
-        await this.downloadAvatar(updatedAccount.avatar);
-      }
-
       debug(`Updated account ${this.account.email} after sync`);
       const account = mapAccount(updatedAccount);
       this.updateAccount(account);
@@ -355,10 +312,6 @@ export class AccountService {
             continue;
           }
 
-          if (createdWorkspace.avatar) {
-            await this.downloadAvatar(createdWorkspace.avatar);
-          }
-
           const mappedWorkspace = mapWorkspace(createdWorkspace);
           await this.initWorkspace(mappedWorkspace);
 
@@ -384,10 +337,6 @@ export class AccountService {
           if (updatedWorkspace) {
             const mappedWorkspace = mapWorkspace(updatedWorkspace);
             workspaceService.updateWorkspace(mappedWorkspace);
-
-            if (updatedWorkspace.avatar) {
-              await this.downloadAvatar(updatedWorkspace.avatar);
-            }
 
             eventBus.publish({
               type: 'workspace.updated',

@@ -1,5 +1,6 @@
 import {
   SelectAccountMetadata,
+  SelectAvatar,
   SelectWorkspace,
 } from '@colanode/client/databases/account';
 import {
@@ -31,6 +32,7 @@ import {
   AccountMetadataKey,
 } from '@colanode/client/types/accounts';
 import { AppMetadata, AppMetadataKey } from '@colanode/client/types/apps';
+import { Avatar } from '@colanode/client/types/avatars';
 import {
   Document,
   DocumentState,
@@ -314,5 +316,16 @@ export const mapNodeReference = (row: SelectNodeReference): NodeReference => {
     referenceId: row.reference_id,
     innerId: row.inner_id,
     type: row.type,
+  };
+};
+
+export const mapAvatar = (row: SelectAvatar, url: string): Avatar => {
+  return {
+    id: row.id,
+    path: row.path,
+    size: row.size,
+    createdAt: row.created_at,
+    openedAt: row.opened_at,
+    url,
   };
 };

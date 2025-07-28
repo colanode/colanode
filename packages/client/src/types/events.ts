@@ -1,5 +1,6 @@
 import { Account, AccountMetadata } from '@colanode/client/types/accounts';
 import { AppMetadata } from '@colanode/client/types/apps';
+import { Avatar } from '@colanode/client/types/avatars';
 import {
   Document,
   DocumentState,
@@ -336,10 +337,16 @@ export type NodeCounterDeletedEvent = {
   counter: NodeCounter;
 };
 
-export type AvatarDownloadedEvent = {
-  type: 'avatar.downloaded';
+export type AvatarCreatedEvent = {
+  type: 'avatar.created';
   accountId: string;
-  avatarId: string;
+  avatar: Avatar;
+};
+
+export type AvatarDeletedEvent = {
+  type: 'avatar.deleted';
+  accountId: string;
+  avatar: Avatar;
 };
 
 export type TempFileCreatedEvent = {
@@ -402,6 +409,7 @@ export type Event =
   | NodeReferenceDeletedEvent
   | NodeCounterUpdatedEvent
   | NodeCounterDeletedEvent
-  | AvatarDownloadedEvent
+  | AvatarCreatedEvent
+  | AvatarDeletedEvent
   | TempFileCreatedEvent
   | TempFileDeletedEvent;

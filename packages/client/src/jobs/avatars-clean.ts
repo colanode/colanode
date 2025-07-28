@@ -5,32 +5,32 @@ import {
 } from '@colanode/client/jobs';
 import { AppService } from '@colanode/client/services/app-service';
 
-export type AccountSyncInput = {
-  type: 'account.sync';
+export type AvatarsCleanInput = {
+  type: 'avatars.clean';
   accountId: string;
 };
 
 declare module '@colanode/client/jobs' {
   interface JobMap {
-    'account.sync': {
-      input: AccountSyncInput;
+    'avatars.clean': {
+      input: AvatarsCleanInput;
     };
   }
 }
 
-export class AccountSyncJobHandler implements JobHandler<AccountSyncInput> {
+export class AvatarsCleanJobHandler implements JobHandler<AvatarsCleanInput> {
   private readonly app: AppService;
 
   constructor(app: AppService) {
     this.app = app;
   }
 
-  public readonly concurrency: JobConcurrencyConfig<AccountSyncInput> = {
+  public readonly concurrency: JobConcurrencyConfig<AvatarsCleanInput> = {
     limit: 1,
-    key: (input: AccountSyncInput) => `account.sync.${input.accountId}`,
+    key: (input: AvatarsCleanInput) => `avatars.clean.${input.accountId}`,
   };
 
-  public async handleJob(input: AccountSyncInput): Promise<JobOutput> {
+  public async handleJob(input: AvatarsCleanInput): Promise<JobOutput> {
     const account = this.app.getAccount(input.accountId);
     if (!account) {
       return {
@@ -38,7 +38,7 @@ export class AccountSyncJobHandler implements JobHandler<AccountSyncInput> {
       };
     }
 
-    await account.sync();
+    await account.avatar.cleanupAvatars();
     return {
       type: 'success',
     };

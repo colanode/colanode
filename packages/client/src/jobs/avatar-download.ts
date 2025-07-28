@@ -7,33 +7,35 @@ import {
 } from '@colanode/client/jobs';
 import { AppService } from '@colanode/client/services/app-service';
 
-export type MutationsSyncInput = {
-  type: 'mutations.sync';
+export type AvatarDownloadInput = {
+  type: 'avatar.download';
   accountId: string;
-  workspaceId: string;
+  avatar: string;
 };
 
 declare module '@colanode/client/jobs' {
   interface JobMap {
-    'mutations.sync': {
-      input: MutationsSyncInput;
+    'avatar.download': {
+      input: AvatarDownloadInput;
     };
   }
 }
 
-export class MutationsSyncJobHandler implements JobHandler<MutationsSyncInput> {
+export class AvatarDownloadJobHandler
+  implements JobHandler<AvatarDownloadInput>
+{
   private readonly app: AppService;
 
   constructor(app: AppService) {
     this.app = app;
   }
 
-  public readonly concurrency: JobConcurrencyConfig<MutationsSyncInput> = {
+  public readonly concurrency: JobConcurrencyConfig<AvatarDownloadInput> = {
     limit: 1,
-    key: (input: MutationsSyncInput) => `mutations.sync.${input.workspaceId}`,
+    key: (input: AvatarDownloadInput) => `avatar.download.${input.avatar}`,
   };
 
-  public async handleJob(input: MutationsSyncInput): Promise<JobOutput> {
+  public async handleJob(input: AvatarDownloadInput): Promise<JobOutput> {
     const account = this.app.getAccount(input.accountId);
     if (!account) {
       return {
@@ -41,21 +43,20 @@ export class MutationsSyncJobHandler implements JobHandler<MutationsSyncInput> {
       };
     }
 
-    if (!account.server.isAvailable) {
+    const result = await account.avatar.downloadAvatar(input.avatar);
+    if (result === null) {
       return {
         type: 'retry',
         delay: ms('1 minute'),
       };
     }
 
-    const workspace = account.getWorkspace(input.workspaceId);
-    if (!workspace) {
+    if (!result) {
       return {
         type: 'cancel',
       };
     }
 
-    await workspace.mutations.sync();
     return {
       type: 'success',
     };
