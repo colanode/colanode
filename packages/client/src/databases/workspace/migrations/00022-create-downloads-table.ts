@@ -15,6 +15,7 @@ export const createDownloadsTable: Migration = {
       .addColumn('progress', 'integer', (col) => col.notNull())
       .addColumn('retries', 'integer', (col) => col.notNull().defaultTo(0))
       .addColumn('created_at', 'text', (col) => col.notNull())
+      .addColumn('started_at', 'text')
       .addColumn('completed_at', 'text')
       .addColumn('error_code', 'text')
       .addColumn('error_message', 'text')

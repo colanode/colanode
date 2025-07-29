@@ -107,6 +107,7 @@ export class WorkspaceService {
     await this.collaborations.init();
     await this.synchronizer.init();
     await this.radar.init();
+    await this.files.init();
 
     await this.account.app.jobs.upsertJobSchedule(
       this.workspaceFilesCleanJobScheduleId,

@@ -1,4 +1,4 @@
-import { Check, X } from 'lucide-react';
+import { Check, Clock, X } from 'lucide-react';
 
 import { DownloadStatus } from '@colanode/client/types';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
@@ -19,6 +19,19 @@ export const WorkspaceDownloadStatus = ({
 }: WorkspaceDownloadStatusProps) => {
   switch (status) {
     case DownloadStatus.Pending:
+      return (
+        <Tooltip>
+          <TooltipTrigger>
+            <div className="flex items-center justify-center p-1">
+              <Clock className="size-5 text-muted-foreground animate-pulse" />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className="flex flex-row items-center gap-2">
+            Waiting to download...
+          </TooltipContent>
+        </Tooltip>
+      );
+    case DownloadStatus.Downloading:
       return (
         <Tooltip>
           <TooltipTrigger>

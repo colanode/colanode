@@ -21,7 +21,8 @@ export const AvatarImage = (props: AvatarProps) => {
       <div
         className={cn(
           getAvatarSizeClasses(props.size),
-          'object-cover rounded bg-gray-200'
+          'object-cover rounded bg-gray-200',
+          props.className
         )}
       />
     );
@@ -35,7 +36,11 @@ export const AvatarImage = (props: AvatarProps) => {
   return (
     <img
       src={avatar.url}
-      className={cn(getAvatarSizeClasses(props.size), 'object-cover rounded')}
+      className={cn(
+        getAvatarSizeClasses(props.size),
+        'object-cover rounded',
+        props.className
+      )}
       alt={'Custom Avatar'}
       onError={() => setFailed(true)}
     />

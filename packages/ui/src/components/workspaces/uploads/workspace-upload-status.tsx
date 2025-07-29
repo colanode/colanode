@@ -1,4 +1,4 @@
-import { Check, X } from 'lucide-react';
+import { Check, X, Clock } from 'lucide-react';
 
 import { UploadStatus } from '@colanode/client/types';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
@@ -19,6 +19,19 @@ export const WorkspaceUploadStatus = ({
 }: WorkspaceUploadStatusProps) => {
   switch (status) {
     case UploadStatus.Pending:
+      return (
+        <Tooltip>
+          <TooltipTrigger>
+            <div className="flex items-center justify-center p-1">
+              <Clock className="size-5 text-muted-foreground animate-pulse" />
+            </div>
+          </TooltipTrigger>
+          <TooltipContent className="flex flex-row items-center gap-2">
+            Pending upload
+          </TooltipContent>
+        </Tooltip>
+      );
+    case UploadStatus.Uploading:
       return (
         <Tooltip>
           <TooltipTrigger>

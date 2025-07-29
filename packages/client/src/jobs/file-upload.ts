@@ -1,11 +1,19 @@
 import ms from 'ms';
 
 import {
+  SelectLocalFile,
+  SelectUpload,
+  UpdateUpload,
+} from '@colanode/client/databases';
+import {
   JobHandler,
   JobOutput,
   JobConcurrencyConfig,
 } from '@colanode/client/jobs';
+import { eventBus, mapNode, mapUpload } from '@colanode/client/lib';
 import { AppService } from '@colanode/client/services/app-service';
+import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
+import { LocalFileNode, UploadStatus } from '@colanode/client/types';
 
 export type FileUploadInput = {
   type: 'file.upload';
@@ -21,6 +29,8 @@ declare module '@colanode/client/jobs' {
     };
   }
 }
+
+const UPLOAD_RETRIES_LIMIT = 10;
 
 export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
   private readonly app: AppService;
@@ -42,6 +52,13 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       };
     }
 
+    if (!account.server.isAvailable) {
+      return {
+        type: 'retry',
+        delay: ms('2 seconds'),
+      };
+    }
+
     const workspace = account.getWorkspace(input.workspaceId);
     if (!workspace) {
       return {
@@ -49,22 +66,162 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       };
     }
 
-    const result = await workspace.files.uploadFile(input.fileId);
-    if (result === null) {
+    const upload = await this.fetchUpload(workspace, input.fileId);
+    if (!upload) {
       return {
         type: 'cancel',
       };
     }
 
-    if (result === false) {
+    const file = await this.fetchNode(workspace, upload.file_id);
+    if (!file) {
       return {
-        type: 'retry',
-        delay: ms('1 minute'),
+        type: 'cancel',
       };
     }
 
+    const localFile = await this.fetchLocalFile(workspace, file.id);
+    if (!localFile) {
+      return {
+        type: 'cancel',
+      };
+    }
+
+    if (file.serverRevision === '0') {
+      return {
+        type: 'retry',
+        delay: ms('2 seconds'),
+      };
+    }
+
+    return this.performUpload(workspace, upload, file, localFile);
+  }
+
+  private async performUpload(
+    workspace: WorkspaceService,
+    upload: SelectUpload,
+    file: LocalFileNode,
+    localFile: SelectLocalFile
+  ): Promise<JobOutput> {
+    try {
+      await this.updateUpload(workspace, upload.file_id, {
+        status: UploadStatus.Uploading,
+        started_at: new Date().toISOString(),
+      });
+
+      const fileStream = await this.app.fs.readStream(localFile.path);
+
+      await workspace.account.client.put(
+        `v1/workspaces/${workspace.id}/files/${localFile.id}`,
+        {
+          body: fileStream,
+          headers: {
+            'Content-Type': localFile.mime_type,
+            'Content-Length': localFile.size.toString(),
+          },
+        }
+      );
+
+      await this.updateUpload(workspace, upload.file_id, {
+        status: UploadStatus.Completed,
+        progress: 100,
+        completed_at: new Date().toISOString(),
+        error_code: null,
+        error_message: null,
+      });
+
+      return {
+        type: 'success',
+      };
+    } catch {
+      const newRetries = upload.retries + 1;
+
+      if (newRetries >= UPLOAD_RETRIES_LIMIT) {
+        await this.updateUpload(workspace, upload.file_id, {
+          status: UploadStatus.Failed,
+          completed_at: new Date().toISOString(),
+          progress: 0,
+          error_code: 'file_upload_failed',
+          error_message:
+            'Failed to upload file after ' + newRetries + ' retries',
+        });
+      } else {
+        await this.updateUpload(workspace, upload.file_id, {
+          status: UploadStatus.Pending,
+          retries: newRetries,
+          started_at: new Date().toISOString(),
+          error_code: null,
+          error_message: null,
+        });
+      }
+    }
+
     return {
-      type: 'success',
+      type: 'retry',
+      delay: ms('10 seconds'),
     };
+  }
+
+  private async fetchUpload(
+    workspace: WorkspaceService,
+    fileId: string
+  ): Promise<SelectUpload | undefined> {
+    return workspace.database
+      .selectFrom('uploads')
+      .selectAll()
+      .where('file_id', '=', fileId)
+      .executeTakeFirst();
+  }
+
+  private async fetchNode(
+    workspace: WorkspaceService,
+    fileId: string
+  ): Promise<LocalFileNode | undefined> {
+    const node = await workspace.database
+      .selectFrom('nodes')
+      .selectAll()
+      .where('id', '=', fileId)
+      .executeTakeFirstOrThrow();
+
+    if (!node) {
+      return undefined;
+    }
+
+    return mapNode(node) as LocalFileNode;
+  }
+
+  private async fetchLocalFile(
+    workspace: WorkspaceService,
+    fileId: string
+  ): Promise<SelectLocalFile | undefined> {
+    return workspace.database
+      .selectFrom('local_files')
+      .selectAll()
+      .where('id', '=', fileId)
+      .executeTakeFirstOrThrow();
+  }
+
+  private async updateUpload(
+    workspace: WorkspaceService,
+    fileId: string,
+    values: UpdateUpload
+  ): Promise<void> {
+    const updatedUpload = await workspace.database
+      .updateTable('uploads')
+      .returningAll()
+      .set(values)
+      .where('file_id', '=', fileId)
+      .executeTakeFirst();
+
+    if (!updatedUpload) {
+      return;
+    }
+
+    eventBus.publish({
+      type: 'upload.updated',
+      accountId: workspace.accountId,
+      workspaceId: workspace.id,
+      upload: mapUpload(updatedUpload),
+    });
   }
 }

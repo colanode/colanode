@@ -58,15 +58,15 @@ export type Download = {
 };
 
 export enum DownloadStatus {
-  None = 0,
-  Pending = 1,
+  Pending = 0,
+  Downloading = 1,
   Completed = 2,
   Failed = 3,
 }
 
 export enum UploadStatus {
-  None = 0,
-  Pending = 1,
+  Pending = 0,
+  Uploading = 1,
   Completed = 2,
   Failed = 3,
 }

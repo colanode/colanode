@@ -261,6 +261,7 @@ interface UploadTable {
   progress: ColumnType<number, number, number>;
   retries: ColumnType<number, number, number>;
   created_at: ColumnType<string, string, never>;
+  started_at: ColumnType<string | null, string | null, string | null>;
   completed_at: ColumnType<string | null, string | null, string | null>;
   error_code: ColumnType<string | null, string | null, string | null>;
   error_message: ColumnType<string | null, string | null, string | null>;
@@ -282,6 +283,7 @@ interface DownloadTable {
   progress: ColumnType<number, number, number>;
   retries: ColumnType<number, number, number>;
   created_at: ColumnType<string, string, never>;
+  started_at: ColumnType<string | null, string | null, string | null>;
   completed_at: ColumnType<string | null, string | null, string | null>;
   error_code: ColumnType<string | null, string | null, string | null>;
   error_message: ColumnType<string | null, string | null, string | null>;
