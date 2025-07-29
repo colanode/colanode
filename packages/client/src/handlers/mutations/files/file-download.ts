@@ -4,7 +4,6 @@ import {
   FileDownloadMutationInput,
   FileDownloadMutationOutput,
 } from '@colanode/client/mutations';
-import { DownloadType } from '@colanode/client/types';
 
 export class FileDownloadMutationHandler
   extends WorkspaceMutationHandlerBase
@@ -14,9 +13,9 @@ export class FileDownloadMutationHandler
     input: FileDownloadMutationInput
   ): Promise<FileDownloadMutationOutput> {
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
-    const type = input.path ? DownloadType.Manual : DownloadType.Auto;
+    const path = input.path;
 
-    if (type === DownloadType.Auto) {
+    if (!path) {
       const autoDownload = await workspace.files.initAutoDownload(input.fileId);
       return {
         success: !!autoDownload,
@@ -24,7 +23,8 @@ export class FileDownloadMutationHandler
     }
 
     const manualDownload = await workspace.files.initManualDownload(
-      input.fileId
+      input.fileId,
+      path
     );
 
     return {

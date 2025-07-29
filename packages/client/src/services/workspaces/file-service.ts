@@ -451,7 +451,8 @@ export class FileService {
   }
 
   public async initManualDownload(
-    fileId: string
+    fileId: string,
+    path: string
   ): Promise<SelectDownload | null> {
     const node = await this.workspace.database
       .selectFrom('nodes')
@@ -481,8 +482,8 @@ export class FileService {
         id: generateId(IdType.Download),
         file_id: fileId,
         version: file.attributes.version,
-        type: DownloadType.Auto,
-        path: this.buildFilePath(fileId, file.attributes.extension),
+        type: DownloadType.Manual,
+        path: path,
         size: file.attributes.size,
         mime_type: file.attributes.mimeType,
         status: DownloadStatus.Pending,
