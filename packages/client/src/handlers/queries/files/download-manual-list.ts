@@ -1,23 +1,25 @@
 import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
 import { mapDownload } from '@colanode/client/lib';
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
-import { DownloadListQueryInput } from '@colanode/client/queries/files/download-list';
+import { DownloadManualListQueryInput } from '@colanode/client/queries/files/download-manual-list';
 import { Event } from '@colanode/client/types/events';
-import { Download } from '@colanode/client/types/files';
+import { Download, DownloadType } from '@colanode/client/types/files';
 
-export class DownloadListQueryHandler
+export class DownloadManualListQueryHandler
   extends WorkspaceQueryHandlerBase
-  implements QueryHandler<DownloadListQueryInput>
+  implements QueryHandler<DownloadManualListQueryInput>
 {
-  public async handleQuery(input: DownloadListQueryInput): Promise<Download[]> {
-    return await this.fetchDownloads(input);
+  public async handleQuery(
+    input: DownloadManualListQueryInput
+  ): Promise<Download[]> {
+    return await this.fetchManualDownloads(input);
   }
 
   public async checkForChanges(
     event: Event,
-    input: DownloadListQueryInput,
+    input: DownloadManualListQueryInput,
     output: Download[]
-  ): Promise<ChangeCheckResult<DownloadListQueryInput>> {
+  ): Promise<ChangeCheckResult<DownloadManualListQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
@@ -32,9 +34,10 @@ export class DownloadListQueryHandler
     if (
       event.type === 'download.created' &&
       event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspaceId === input.workspaceId &&
+      event.download.type === DownloadType.Manual
     ) {
-      const newResult = await this.fetchDownloads(input);
+      const newResult = await this.fetchManualDownloads(input);
       return {
         hasChanges: true,
         result: newResult,
@@ -44,7 +47,8 @@ export class DownloadListQueryHandler
     if (
       event.type === 'download.updated' &&
       event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspaceId === input.workspaceId &&
+      event.download.type === DownloadType.Manual
     ) {
       const download = output.find(
         (download) => download.id === event.download.id
@@ -69,7 +73,8 @@ export class DownloadListQueryHandler
     if (
       event.type === 'download.deleted' &&
       event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspaceId === input.workspaceId &&
+      event.download.type === DownloadType.Manual
     ) {
       const download = output.find(
         (download) => download.id === event.download.id
@@ -82,7 +87,7 @@ export class DownloadListQueryHandler
       }
 
       if (output.length === input.count) {
-        const newResult = await this.fetchDownloads(input);
+        const newResult = await this.fetchManualDownloads(input);
         return {
           hasChanges: true,
           result: newResult,
@@ -103,15 +108,16 @@ export class DownloadListQueryHandler
     };
   }
 
-  private async fetchDownloads(
-    input: DownloadListQueryInput
+  private async fetchManualDownloads(
+    input: DownloadManualListQueryInput
   ): Promise<Download[]> {
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
 
     const offset = (input.page - 1) * input.count;
-    const query = workspace.database.selectFrom('downloads').selectAll();
-
-    const downloads = await query
+    const downloads = await workspace.database
+      .selectFrom('downloads')
+      .selectAll()
+      .where('type', '=', DownloadType.Manual)
       .orderBy('id', 'desc')
       .limit(input.count)
       .offset(offset)

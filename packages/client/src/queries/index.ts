@@ -41,8 +41,7 @@ export * from './avatars/avatar-get';
 export * from './records/record-field-value-count';
 export * from './workspaces/workspace-storage-get';
 export * from './files/upload-list';
-export * from './files/download-list';
-export * from './files/download-get-last';
+export * from './files/download-manual-list';
 export * from './files/temp-file-get';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

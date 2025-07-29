@@ -8,6 +8,7 @@ export const createDownloadsTable: Migration = {
       .addColumn('file_id', 'text', (col) => col.notNull())
       .addColumn('version', 'text', (col) => col.notNull())
       .addColumn('type', 'integer', (col) => col.notNull())
+      .addColumn('name', 'text', (col) => col.notNull())
       .addColumn('path', 'text', (col) => col.notNull())
       .addColumn('size', 'integer', (col) => col.notNull())
       .addColumn('mime_type', 'text', (col) => col.notNull())

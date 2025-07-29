@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
-import { DownloadListQueryInput } from '@colanode/client/queries';
+import { DownloadManualListQueryInput } from '@colanode/client/queries';
 import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { WorkspaceDownloadFile } from '@colanode/ui/components/workspaces/downloads/workspace-download-file';
@@ -14,10 +14,10 @@ export const WorkspaceDownloads = () => {
   const workspace = useWorkspace();
 
   const [lastPage, setLastPage] = useState<number>(1);
-  const inputs: DownloadListQueryInput[] = Array.from({
+  const inputs: DownloadManualListQueryInput[] = Array.from({
     length: lastPage,
   }).map((_, i) => ({
-    type: 'download.list',
+    type: 'download.manual.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
     count: DOWNLOADS_PER_PAGE,
@@ -30,8 +30,6 @@ export const WorkspaceDownloads = () => {
   const isPending = result.some((data) => data.isPending);
   const hasMore =
     !isPending && downloads.length === lastPage * DOWNLOADS_PER_PAGE;
-
-  console.log('downloads', downloads);
 
   return (
     <Container>

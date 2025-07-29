@@ -1,6 +1,6 @@
-import { Folder, MemoryStick } from 'lucide-react';
+import { Folder } from 'lucide-react';
 
-import { LocalFileNode, Download, DownloadType } from '@colanode/client/types';
+import { LocalFileNode, Download } from '@colanode/client/types';
 import { formatBytes, timeAgo } from '@colanode/core';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import {
@@ -31,7 +31,6 @@ export const WorkspaceDownloadFile = ({
   });
 
   const file = fileQuery.data as LocalFileNode;
-
   if (!file) {
     return null;
   }
@@ -46,37 +45,29 @@ export const WorkspaceDownloadFile = ({
       <FileThumbnail file={file} className="size-10 text-muted-foreground" />
 
       <div className="flex-1 flex flex-col gap-2 justify-center items-start">
-        <p className="font-medium text-sm truncate">{file.attributes.name}</p>
+        <p className="font-medium text-sm truncate">{download.name}</p>
         <p className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span>{file.attributes.mimeType}</span>
-          <span>{formatBytes(file.attributes.size)}</span>
+          <span>{download.mimeType}</span>
+          <span>{formatBytes(download.size)}</span>
           {download.completedAt && (
             <span>{timeAgo(new Date(download.completedAt))}</span>
           )}
         </p>
-        {download.type === DownloadType.Manual ? (
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <p
-                className="text-xs text-muted-foreground flex items-center gap-2 cursor-pointer hover:text-primary"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  window.colanode.showItemInFolder(download.path);
-                }}
-              >
-                <Folder className="size-4" />
-                <span>Manually downloaded to:</span>
-                <span className="truncate">{download.path}</span>
-              </p>
-            </TooltipTrigger>
-            <TooltipContent>Show in folder</TooltipContent>
-          </Tooltip>
-        ) : (
-          <p className="text-xs text-muted-foreground flex items-center gap-2">
-            <MemoryStick className="size-4" />
-            <span className="truncate">Cached by Colanode</span>
-          </p>
-        )}
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <p
+              className="text-xs text-muted-foreground flex items-center gap-2 cursor-pointer hover:text-primary"
+              onClick={(e) => {
+                e.stopPropagation();
+                window.colanode.showItemInFolder(download.path);
+              }}
+            >
+              <Folder className="size-4" />
+              <span className="truncate">{download.path}</span>
+            </p>
+          </TooltipTrigger>
+          <TooltipContent>Show in folder</TooltipContent>
+        </Tooltip>
         {download.errorMessage && (
           <p className="text-xs text-red-500">{download.errorMessage}</p>
         )}

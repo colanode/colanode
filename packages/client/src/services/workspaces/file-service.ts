@@ -285,6 +285,7 @@ export class FileService {
           file_id: fileId,
           version: file.attributes.version,
           type: DownloadType.Auto,
+          name: file.attributes.name,
           path: this.buildFilePath(fileId, file.attributes.extension),
           size: file.attributes.size,
           mime_type: file.attributes.mimeType,
@@ -354,6 +355,7 @@ export class FileService {
       );
     }
 
+    const name = this.app.path.filename(path);
     const createdDownload = await this.workspace.database
       .insertInto('downloads')
       .returningAll()
@@ -362,6 +364,7 @@ export class FileService {
         file_id: fileId,
         version: file.attributes.version,
         type: DownloadType.Manual,
+        name: name,
         path: path,
         size: file.attributes.size,
         mime_type: file.attributes.mimeType,

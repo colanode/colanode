@@ -45,6 +45,7 @@ export type Download = {
   fileId: string;
   version: string;
   type: DownloadType;
+  name: string;
   path: string;
   size: number;
   mimeType: string;
