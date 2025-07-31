@@ -19,7 +19,7 @@ class JobService {
   private readonly queueName = config.redis.jobs.name;
   private readonly prefix = `{${config.redis.jobs.prefix}}`;
 
-  public initQueue() {
+  public async initQueue(): Promise<void> {
     if (this.jobQueue) {
       return;
     }
@@ -39,71 +39,7 @@ class JobService {
       logger.error(error, `Job queue error`);
     });
 
-    if (config.ai.enabled) {
-      this.jobQueue.upsertJobScheduler(
-        'node.embed.scan',
-        { pattern: '0 */30 * * * *' },
-        {
-          name: 'node.embed.scan',
-          data: { type: 'node.embed.scan' } as JobInput,
-          opts: {
-            backoff: 3,
-            attempts: 5,
-            removeOnFail: 1000,
-          },
-        }
-      );
-
-      this.jobQueue.upsertJobScheduler(
-        'document.embed.scan',
-        { pattern: '0 */30 * * * *' },
-        {
-          name: 'document.embed.scan',
-          data: { type: 'document.embed.scan' } as JobInput,
-          opts: {
-            backoff: 3,
-            attempts: 5,
-            removeOnFail: 1000,
-          },
-        }
-      );
-    }
-
-    if (config.jobs.nodeUpdatesMerge.enabled) {
-      this.jobQueue.upsertJobScheduler(
-        'node.updates.merge',
-        { pattern: config.jobs.nodeUpdatesMerge.cron },
-        {
-          name: 'node.updates.merge',
-          data: { type: 'node.updates.merge' } as JobInput,
-          opts: {
-            backoff: 3,
-            attempts: 3,
-            removeOnFail: 100,
-          },
-        }
-      );
-    } else {
-      this.jobQueue.removeJobScheduler('node.updates.merge');
-    }
-
-    if (config.jobs.documentUpdatesMerge.enabled) {
-      this.jobQueue.upsertJobScheduler(
-        'document.updates.merge',
-        { pattern: config.jobs.documentUpdatesMerge.cron },
-        {
-          name: 'document.updates.merge',
-          data: { type: 'document.updates.merge' } as JobInput,
-          opts: {
-            backoff: 3,
-            attempts: 3,
-            removeOnFail: 100,
-          },
-        }
-      );
-    } else {
-      this.jobQueue.removeJobScheduler('document.updates.merge');
-    }
+    await this.initRecurringJobs();
   }
 
   public async initWorker() {
@@ -147,6 +83,108 @@ class JobService {
 
     logger.debug(`Job ${job.id} with type ${input.type} completed.`);
   };
+
+  private async initRecurringJobs(): Promise<void> {
+    await this.initAiRecurringJobs();
+    await this.initNodeUpdatesMergeRecurringJob();
+    await this.initDocumentUpdatesMergeRecurringJob();
+    await this.initUploadsCleanRecurringJob();
+  }
+
+  private async initAiRecurringJobs(): Promise<void> {
+    if (!this.jobQueue || !config.ai.enabled) {
+      return;
+    }
+
+    this.jobQueue.upsertJobScheduler(
+      'node.embed.scan',
+      { pattern: '0 */30 * * * *' },
+      {
+        name: 'node.embed.scan',
+        data: { type: 'node.embed.scan' } as JobInput,
+        opts: {
+          backoff: 3,
+          attempts: 5,
+          removeOnFail: 1000,
+        },
+      }
+    );
+
+    this.jobQueue.upsertJobScheduler(
+      'document.embed.scan',
+      { pattern: '0 */30 * * * *' },
+      {
+        name: 'document.embed.scan',
+        data: { type: 'document.embed.scan' } as JobInput,
+        opts: {
+          backoff: 3,
+          attempts: 5,
+          removeOnFail: 1000,
+        },
+      }
+    );
+  }
+
+  private async initNodeUpdatesMergeRecurringJob(): Promise<void> {
+    if (!this.jobQueue) {
+      return;
+    }
+
+    const id = 'node.updates.merge';
+    if (config.jobs.nodeUpdatesMerge.enabled) {
+      this.jobQueue.upsertJobScheduler(
+        id,
+        { pattern: config.jobs.nodeUpdatesMerge.cron },
+        {
+          name: id,
+          data: { type: 'node.updates.merge' } as JobInput,
+        }
+      );
+      return;
+    } else {
+      this.jobQueue.removeJobScheduler(id);
+    }
+  }
+
+  private async initDocumentUpdatesMergeRecurringJob(): Promise<void> {
+    if (!this.jobQueue) {
+      return;
+    }
+
+    const id = 'document.updates.merge';
+    if (config.jobs.documentUpdatesMerge.enabled) {
+      this.jobQueue.upsertJobScheduler(
+        'document.updates.merge',
+        { pattern: config.jobs.documentUpdatesMerge.cron },
+        {
+          name: 'document.updates.merge',
+          data: { type: 'document.updates.merge' } as JobInput,
+        }
+      );
+    } else {
+      this.jobQueue.removeJobScheduler(id);
+    }
+  }
+
+  private async initUploadsCleanRecurringJob(): Promise<void> {
+    if (!this.jobQueue) {
+      return;
+    }
+
+    const id = 'uploads.clean';
+    if (config.jobs.uploadsClean.enabled) {
+      this.jobQueue.upsertJobScheduler(
+        id,
+        { pattern: config.jobs.uploadsClean.cron },
+        {
+          name: id,
+          data: { type: 'uploads.clean' } as JobInput,
+        }
+      );
+    } else {
+      this.jobQueue.removeJobScheduler(id);
+    }
+  }
 }
 
 export const jobService = new JobService();

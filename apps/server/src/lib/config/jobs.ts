@@ -34,9 +34,20 @@ export const documentUpdatesMergeJobConfigSchema = z.discriminatedUnion(
   ]
 );
 
+export const uploadsCleanJobConfigSchema = z.discriminatedUnion('enabled', [
+  z.object({
+    enabled: z.literal(true),
+    cron: z.string().default(DEFAULT_CRON_PATTERN),
+  }),
+  z.object({
+    enabled: z.literal(false),
+  }),
+]);
+
 export const jobsConfigSchema = z.object({
   nodeUpdatesMerge: nodeUpdatesMergeJobConfigSchema,
   documentUpdatesMerge: documentUpdatesMergeJobConfigSchema,
+  uploadsClean: uploadsCleanJobConfigSchema,
 });
 
 export type JobsConfig = z.infer<typeof jobsConfigSchema>;
@@ -60,6 +71,10 @@ export const readJobsConfigVariables = () => {
         process.env.JOBS_DOCUMENT_UPDATES_MERGE_TIME_WINDOW_MINUTES,
       excludeRecentHours:
         process.env.JOBS_DOCUMENT_UPDATES_MERGE_EXCLUDE_RECENT_HOURS,
+    },
+    uploadsClean: {
+      enabled: process.env.JOBS_UPLOADS_CLEAN_ENABLED === 'true',
+      cron: process.env.JOBS_UPLOADS_CLEAN_CRON,
     },
   };
 };

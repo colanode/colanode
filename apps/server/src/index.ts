@@ -17,7 +17,7 @@ const init = async () => {
 
   initApp();
 
-  jobService.initQueue();
+  await jobService.initQueue();
   await jobService.initWorker();
 
   await eventBus.init();
