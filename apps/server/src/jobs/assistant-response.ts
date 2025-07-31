@@ -8,10 +8,17 @@ import {
 import { database } from '@colanode/server/data/database';
 import { SelectNode } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
-import { runAssistantResponseChain } from '@colanode/server/lib/ai/assistants';
+import {
+  processAIRequest,
+  AssistantRequest,
+} from '@colanode/server/lib/ai/ai-service';
 import { config } from '@colanode/server/lib/config';
 import { fetchNode, createNode } from '@colanode/server/lib/nodes';
-import { Citation } from '@colanode/server/types/assistant';
+
+interface Citation {
+  sourceId: string;
+  quote: string;
+}
 
 export type AssistantRespondInput = {
   type: 'assistant.respond';
@@ -78,7 +85,10 @@ export const assistantRespondHandler: JobHandler<
   }
 
   try {
-    const chainResult = await runAssistantResponseChain({
+    console.log(`🚀 Processing AI assistant request for message: ${messageId}`);
+
+    // Prepare request for the AI service
+    const assistantRequest: AssistantRequest = {
       userInput: messageText,
       workspaceId,
       userId: user.id,
@@ -88,21 +98,28 @@ export const assistantRespondHandler: JobHandler<
       },
       parentMessageId: message.parent_id || message.id,
       currentMessageId: message.id,
-      originalMessage: message,
       selectedContextNodeIds,
-    });
+    };
+
+    // Process the request through the AI service
+    const assistantResult = await processAIRequest(assistantRequest);
+
+    console.log(
+      `✅ AI response generated (${assistantResult.processingTimeMs}ms): ${assistantResult.intent || 'unknown'} intent`
+    );
 
     await createAndPublishResponse(
-      chainResult.finalAnswer,
-      chainResult.citations,
+      assistantResult.finalAnswer,
+      assistantResult.citations,
       message,
       workspaceId
     );
-    console.log('Response published successfully');
+
+    console.log('📤 Response published successfully');
   } catch (error) {
-    console.error('Error in assistant response handler:', error);
+    console.error('❌ Error in assistant response handler:', error);
     await createAndPublishResponse(
-      'Sorry, I encountered an error while processing your request.',
+      'I apologize, but I encountered an error while processing your request. Please try again or rephrase your question.',
       [],
       message,
       workspaceId

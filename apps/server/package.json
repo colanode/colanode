@@ -28,6 +28,12 @@
     "tsx": "^4.20.3"
   },
   "dependencies": {
+    "@mastra/core": "latest",
+    "@mastra/memory": "latest",
+    "@mastra/rag": "latest",
+    "@mastra/pg": "latest",
+    "@ai-sdk/openai": "latest",
+    "@ai-sdk/google": "latest",
     "@aws-sdk/client-s3": "^3.842.0",
     "@colanode/core": "*",
     "@colanode/crdt": "*",
