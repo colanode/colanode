@@ -1,8 +1,3 @@
-export interface FileMetadata {
-  lastModified: number;
-  size: number;
-}
-
 export type FileReadStream = Buffer | File;
 
 export interface FileSystem {
@@ -15,6 +10,5 @@ export interface FileSystem {
   listFiles(path: string): Promise<string[]>;
   readFile(path: string): Promise<Uint8Array>;
   writeFile(path: string, data: Uint8Array): Promise<void>;
-  metadata(path: string): Promise<FileMetadata>;
   url(path: string): Promise<string>;
 }

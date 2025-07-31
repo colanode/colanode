@@ -1,11 +1,7 @@
 import fs from 'fs';
 import { Writable } from 'stream';
 
-import {
-  FileMetadata,
-  FileReadStream,
-  FileSystem,
-} from '@colanode/client/services';
+import { FileReadStream, FileSystem } from '@colanode/client/services';
 
 export class DesktopFileSystem implements FileSystem {
   public async makeDirectory(path: string): Promise<void> {
@@ -46,14 +42,6 @@ export class DesktopFileSystem implements FileSystem {
 
   public async delete(path: string): Promise<void> {
     await fs.promises.rm(path, { recursive: true, force: true });
-  }
-
-  public async metadata(filePath: string): Promise<FileMetadata> {
-    const stats = await fs.promises.stat(filePath);
-    return {
-      lastModified: stats.mtime.getTime(),
-      size: stats.size,
-    };
   }
 
   public async url(path: string): Promise<string> {
