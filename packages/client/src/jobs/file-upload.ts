@@ -1,4 +1,5 @@
 import ms from 'ms';
+import { Upload } from 'tus-js-client';
 
 import {
   SelectLocalFile,
@@ -11,9 +12,11 @@ import {
   JobConcurrencyConfig,
 } from '@colanode/client/jobs';
 import { eventBus, mapNode, mapUpload } from '@colanode/client/lib';
+import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { AppService } from '@colanode/client/services/app-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import { LocalFileNode, UploadStatus } from '@colanode/client/types';
+import { ApiHeader, build, calculatePercentage } from '@colanode/core';
 
 export type FileUploadInput = {
   type: 'file.upload';
@@ -94,10 +97,11 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       };
     }
 
-    return this.performUpload(workspace, upload, file, localFile);
+    return this.performUpload(account, workspace, upload, file, localFile);
   }
 
   private async performUpload(
+    account: AccountService,
     workspace: WorkspaceService,
     upload: SelectUpload,
     file: LocalFileNode,
@@ -109,18 +113,64 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
         started_at: new Date().toISOString(),
       });
 
-      const fileStream = await this.app.fs.readStream(localFile.path);
+      const updateUpload = async (values: UpdateUpload) => {
+        await this.updateUpload(workspace, upload.file_id, {
+          ...values,
+        });
+      };
 
-      await workspace.account.client.put(
-        `v1/workspaces/${workspace.id}/files/${localFile.id}`,
-        {
-          body: fileStream,
-          headers: {
-            'Content-Type': localFile.mime_type,
-            'Content-Length': localFile.size.toString(),
+      const fileStream = await this.app.fs.readStream(localFile.path);
+      await new Promise<void>((resolve, reject) => {
+        const tusUpload = new Upload(fileStream, {
+          endpoint: `${account.server.httpBaseUrl}/v1/workspaces/${workspace.id}/files/${file.id}`,
+          retryDelays: [0, 3000, 5000, 10000, 20000],
+          metadata: {
+            filename: localFile.name,
+            filetype: file.type,
           },
-        }
-      );
+          headers: {
+            Authorization: `Bearer ${account.token}`,
+            [ApiHeader.ClientType]: this.app.meta.type,
+            [ApiHeader.ClientPlatform]: this.app.meta.platform,
+            [ApiHeader.ClientVersion]: build.version,
+          },
+          onError: function (error) {
+            updateUpload({
+              status: UploadStatus.Failed,
+              completed_at: new Date().toISOString(),
+              progress: 0,
+              error_code: 'file_upload_failed',
+              error_message: error.message,
+            });
+            reject(error);
+          },
+          onProgress: function (bytesUploaded, bytesTotal) {
+            const percentage = calculatePercentage(bytesUploaded, bytesTotal);
+            updateUpload({
+              progress: percentage,
+            });
+          },
+          onSuccess: function () {
+            updateUpload({
+              status: UploadStatus.Completed,
+              progress: 100,
+              completed_at: new Date().toISOString(),
+              error_code: null,
+              error_message: null,
+            });
+            resolve();
+          },
+        });
+
+        tusUpload.findPreviousUploads().then((previousUploads) => {
+          const previousUpload = previousUploads[0];
+          if (previousUpload) {
+            tusUpload.resumeFromPreviousUpload(previousUpload);
+          } else {
+            tusUpload.start();
+          }
+        });
+      });
 
       await this.updateUpload(workspace, upload.file_id, {
         status: UploadStatus.Completed,

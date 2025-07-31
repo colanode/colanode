@@ -1,7 +1,8 @@
+import 'react-circular-progressbar/dist/styles.css';
 import { Check, Clock, X } from 'lucide-react';
+import { CircularProgressbar } from 'react-circular-progressbar';
 
 import { DownloadStatus } from '@colanode/client/types';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
 import {
   Tooltip,
   TooltipContent,
@@ -22,9 +23,7 @@ export const WorkspaceDownloadStatus = ({
       return (
         <Tooltip>
           <TooltipTrigger>
-            <div className="flex items-center justify-center p-1">
-              <Clock className="size-5 text-muted-foreground animate-pulse" />
-            </div>
+            <Clock className="text-muted-foreground animate-pulse size-6" />
           </TooltipTrigger>
           <TooltipContent className="flex flex-row items-center gap-2">
             Waiting to download...
@@ -35,8 +34,17 @@ export const WorkspaceDownloadStatus = ({
       return (
         <Tooltip>
           <TooltipTrigger>
-            <div className="flex items-center justify-center p-1">
-              <Spinner className="size-5 text-muted-foreground" />
+            <div className="flex flex-col items-center justify-center gap-1">
+              <div className="size-6">
+                <CircularProgressbar
+                  value={progress}
+                  strokeWidth={8}
+                  className="text-xs text-muted-foreground"
+                />
+              </div>
+              <span className="text-xs text-muted-foreground font-medium">
+                {Math.round(progress)}%
+              </span>
             </div>
           </TooltipTrigger>
           <TooltipContent className="flex flex-row items-center gap-2">
@@ -48,7 +56,7 @@ export const WorkspaceDownloadStatus = ({
       return (
         <Tooltip>
           <TooltipTrigger>
-            <div className="bg-green-500 rounded-full p-1 flex items-center justify-center">
+            <div className="bg-green-600 rounded-full p-1 flex items-center justify-center size-6">
               <Check className="size-4 text-white" />
             </div>
           </TooltipTrigger>
@@ -61,7 +69,7 @@ export const WorkspaceDownloadStatus = ({
       return (
         <Tooltip>
           <TooltipTrigger>
-            <div className="bg-red-500 rounded-full p-1 flex items-center justify-center">
+            <div className="bg-destructive rounded-full p-1 flex items-center justify-center size-6">
               <X className="size-4 text-white" />
             </div>
           </TooltipTrigger>

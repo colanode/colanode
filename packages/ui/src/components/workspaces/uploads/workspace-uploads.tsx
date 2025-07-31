@@ -32,24 +32,26 @@ export const WorkspaceUploads = () => {
 
   return (
     <Container>
-      <ContainerBody className="max-w-4xl space-y-10">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Uploads</h2>
-          <Separator className="mt-3" />
+      <ContainerBody className="overflow-y-auto">
+        <div className="max-w-4xl space-y-10">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">Uploads</h2>
+            <Separator className="mt-3" />
+          </div>
+          <div className="space-y-4 w-full">
+            {uploads.map((upload) => (
+              <WorkspaceUploadFile key={upload.fileId} upload={upload} />
+            ))}
+          </div>
+          <InView
+            rootMargin="200px"
+            onChange={(inView) => {
+              if (inView && hasMore && !isPending) {
+                setLastPage(lastPage + 1);
+              }
+            }}
+          />
         </div>
-        <div className="space-y-4 w-full">
-          {uploads.map((upload) => (
-            <WorkspaceUploadFile key={upload.fileId} upload={upload} />
-          ))}
-        </div>
-        <InView
-          rootMargin="200px"
-          onChange={(inView) => {
-            if (inView && hasMore && !isPending) {
-              setLastPage(lastPage + 1);
-            }
-          }}
-        />
       </ContainerBody>
     </Container>
   );

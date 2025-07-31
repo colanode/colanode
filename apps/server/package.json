@@ -38,6 +38,8 @@
     "@langchain/langgraph": "^0.3.11",
     "@langchain/openai": "^0.6.2",
     "@node-rs/argon2": "^2.0.2",
+    "@tus/s3-store": "^2.0.0",
+    "@tus/server": "^2.3.0",
     "bullmq": "^5.56.5",
     "diff": "^8.0.2",
     "dotenv": "^17.2.0",

@@ -24,7 +24,7 @@ export class DesktopFileSystem implements FileSystem {
   }
 
   public async readStream(path: string): Promise<FileReadStream> {
-    return fs.createReadStream(path);
+    return fs.promises.readFile(path);
   }
 
   public async writeStream(path: string): Promise<WritableStream<Uint8Array>> {

@@ -3,9 +3,7 @@ export interface FileMetadata {
   size: number;
 }
 
-// In Node.js we use the file stream which is AsyncIterable<Uint8Array>
-// In the browser we use the File object which is a Blob
-export type FileReadStream = AsyncIterable<Uint8Array> | File;
+export type FileReadStream = Buffer | File;
 
 export interface FileSystem {
   makeDirectory(path: string): Promise<void>;
