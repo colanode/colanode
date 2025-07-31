@@ -45,8 +45,6 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
       const { workspaceId, fileId } = request.params;
       const user = request.user;
 
-      console.log('fileUploadRoute', request.method, workspaceId, fileId);
-
       const workspace = await database
         .selectFrom('workspaces')
         .selectAll()
@@ -198,8 +196,6 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
               })
             )
             .executeTakeFirst();
-
-          console.log('createdUpload', createdUpload);
 
           if (!createdUpload) {
             throw {

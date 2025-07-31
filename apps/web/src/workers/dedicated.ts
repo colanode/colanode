@@ -276,12 +276,10 @@ const api: ColanodeWorkerApi = {
   },
   async saveTempFile(file) {
     const id = generateId(IdType.TempFile);
-    const name = path.filename(file.name);
     const extension = path.extension(file.name);
     const mimeType = file.type;
     const subtype = extractFileSubtype(mimeType);
-    const fileName = `${name}.${id}${extension}`;
-    const filePath = path.tempFile(fileName);
+    const filePath = path.tempFile(file.name);
 
     const arrayBuffer = await file.arrayBuffer();
     const fileData = new Uint8Array(arrayBuffer);
@@ -292,7 +290,7 @@ const api: ColanodeWorkerApi = {
         .insertInto('temp_files')
         .values({
           id,
-          name: fileName,
+          name: file.name,
           size: file.size,
           mime_type: mimeType,
           subtype,
@@ -309,7 +307,7 @@ const api: ColanodeWorkerApi = {
         input: {
           type: 'temp.file.create',
           id,
-          name: fileName,
+          name: file.name,
           size: file.size,
           mimeType,
           subtype,

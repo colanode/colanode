@@ -221,19 +221,17 @@ ipcMain.handle(
     file: { name: string; size: number; type: string; buffer: Buffer }
   ): Promise<TempFile> => {
     const id = generateId(IdType.TempFile);
-    const name = app.path.filename(file.name);
     const extension = app.path.extension(file.name);
     const mimeType = file.type;
     const subtype = extractFileSubtype(mimeType);
-    const fileName = `${name}.${id}${extension}`;
-    const filePath = app.path.tempFile(fileName);
+    const filePath = app.path.tempFile(file.name);
 
     await app.fs.writeFile(filePath, file.buffer);
     await app.database
       .insertInto('temp_files')
       .values({
         id,
-        name: fileName,
+        name: file.name,
         size: file.size,
         mime_type: mimeType,
         subtype,
@@ -248,7 +246,7 @@ ipcMain.handle(
 
     return {
       id,
-      name: fileName,
+      name: file.name,
       size: file.size,
       mimeType,
       subtype,
