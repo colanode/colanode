@@ -1,26 +1,24 @@
 import { S3Store } from '@tus/s3-store';
-import { Server } from '@tus/server';
+import { RedisKvStore, Server } from '@tus/server';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
 import { ApiErrorCode, FileStatus, generateId, IdType } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
+import { redis } from '@colanode/server/data/redis';
+import { s3Config } from '@colanode/server/data/storage';
 import { config } from '@colanode/server/lib/config';
 import { fetchCounter } from '@colanode/server/lib/counters';
 import { buildFilePath, deleteFile } from '@colanode/server/lib/files';
 import { mapNode, updateNode } from '@colanode/server/lib/nodes';
+import { RedisLocker } from '@colanode/server/lib/tus/redis-locker';
 
 const s3Store = new S3Store({
   partSize: 20 * 1024 * 1024,
+  cache: new RedisKvStore(redis),
   s3ClientConfig: {
-    endpoint: config.storage.endpoint,
+    ...s3Config,
     bucket: config.storage.bucket,
-    region: config.storage.region,
-    credentials: {
-      accessKeyId: config.storage.accessKey,
-      secretAccessKey: config.storage.secretKey,
-    },
-    forcePathStyle: config.storage.forcePathStyle,
   },
 });
 
@@ -35,7 +33,7 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
   );
 
   instance.route({
-    method: ['GET', 'HEAD', 'POST', 'PATCH', 'DELETE'],
+    method: ['HEAD', 'POST', 'PATCH', 'DELETE'],
     url: '/:fileId',
     schema: {
       params: z.object({
@@ -46,6 +44,8 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
     handler: async (request, reply) => {
       const { workspaceId, fileId } = request.params;
       const user = request.user;
+
+      console.log('fileUploadRoute', request.method, workspaceId, fileId);
 
       const workspace = await database
         .selectFrom('workspaces')
@@ -93,6 +93,7 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
       const tusServer = new Server({
         path: '/tus',
         datastore: s3Store,
+        locker: new RedisLocker(redis),
         async onUploadCreate() {
           const upload = await database
             .selectFrom('uploads')
@@ -169,12 +170,13 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
           }
 
           // create the upload record
+          const uploadId = generateId(IdType.Upload);
           const createdUpload = await database
             .insertInto('uploads')
             .returningAll()
             .values({
               file_id: fileId,
-              upload_id: generateId(IdType.Upload),
+              upload_id: uploadId,
               workspace_id: workspaceId,
               root_id: file.rootId,
               mime_type: file.attributes.mimeType,
@@ -184,7 +186,20 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
               created_at: new Date(),
               created_by: request.user.id,
             })
+            .onConflict((oc) =>
+              oc.columns(['file_id']).doUpdateSet({
+                upload_id: uploadId,
+                created_at: new Date(),
+                created_by: request.user.id,
+                mime_type: file.attributes.mimeType,
+                size: file.attributes.size,
+                path: path,
+                version_id: file.attributes.version,
+              })
+            )
             .executeTakeFirst();
+
+          console.log('createdUpload', createdUpload);
 
           if (!createdUpload) {
             throw {

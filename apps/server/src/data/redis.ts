@@ -1,4 +1,4 @@
-import { createClient } from 'redis';
+import { createClient } from '@redis/client';
 
 import { config } from '@colanode/server/lib/config';
 

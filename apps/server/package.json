@@ -38,6 +38,7 @@
     "@langchain/langgraph": "^0.3.11",
     "@langchain/openai": "^0.6.2",
     "@node-rs/argon2": "^2.0.2",
+    "@redis/client": "^5.7.0",
     "@tus/s3-store": "^2.0.0",
     "@tus/server": "^2.3.0",
     "bullmq": "^5.56.5",
@@ -54,7 +55,6 @@
     "nodemailer": "^7.0.5",
     "pg": "^8.16.3",
     "pino": "^9.7.0",
-    "redis": "^5.6.0",
     "sharp": "^0.34.3"
   }
 }
