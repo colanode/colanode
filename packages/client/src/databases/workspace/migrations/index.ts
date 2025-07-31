@@ -22,6 +22,7 @@ import { createNodeCountersTable } from './00019-create-node-counters-table';
 import { createLocalFilesTable } from './00020-create-local-files-table';
 import { createUploadsTable } from './00021-create-uploads-table';
 import { createDownloadsTable } from './00022-create-downloads-table';
+import { dropFileStatesTable } from './00023-drop-file-states-table';
 
 export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00001-create-users-table': createUsersTable,
@@ -46,4 +47,5 @@ export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00020-create-local-files-table': createLocalFilesTable,
   '00021-create-uploads-table': createUploadsTable,
   '00022-create-downloads-table': createDownloadsTable,
+  '00023-drop-file-states-table': dropFileStatesTable,
 };
