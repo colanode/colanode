@@ -19,6 +19,7 @@ import {
   CreatedByFieldAttributes,
   UpdatedAtFieldAttributes,
   UpdatedByFieldAttributes,
+  RelationFieldAttributes,
 } from '@colanode/core';
 
 type SqliteOperator =
@@ -94,6 +95,8 @@ const buildFilterQuery = (
       return buildNumberFilterQuery(filter, field);
     case 'phone':
       return buildPhoneFilterQuery(filter, field);
+    case 'relation':
+      return buildRelationFilterQuery(filter, field);
     case 'select':
       return buildSelectFilterQuery(filter, field);
     case 'text':
@@ -372,6 +375,36 @@ const buildPhoneFilterQuery = (
       return buildFieldFilterQuery(field.id, 'LIKE', `'${value}%'`);
     case 'ends_with':
       return buildFieldFilterQuery(field.id, 'LIKE', `'%${value}'`);
+    default:
+      return null;
+  }
+};
+
+const buildRelationFilterQuery = (
+  filter: DatabaseViewFieldFilterAttributes,
+  field: RelationFieldAttributes
+): string | null => {
+  if (filter.operator === 'is_empty') {
+    return buildFieldArrayIsEmptyFilterQuery(field.id);
+  }
+
+  if (filter.operator === 'is_not_empty') {
+    return buildFieldArrayIsNotEmptyFilterQuery(field.id);
+  }
+
+  if (!isStringArray(filter.value)) {
+    return null;
+  }
+
+  if (filter.value.length === 0) {
+    return null;
+  }
+
+  switch (filter.operator) {
+    case 'is_in':
+      return buildArrayFieldContainsFilterQuery(field.id, filter.value);
+    case 'is_not_in':
+      return buildArrayFieldDoesNotContainFilterQuery(field.id, filter.value);
     default:
       return null;
   }

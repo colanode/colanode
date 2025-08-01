@@ -426,6 +426,25 @@ export const phoneFieldFilterOperators: FieldFilterOperator[] = [
   },
 ];
 
+export const relationFieldFilterOperators: FieldFilterOperator[] = [
+  {
+    label: 'Is In',
+    value: 'is_in',
+  },
+  {
+    label: 'Is Not In',
+    value: 'is_not_in',
+  },
+  {
+    label: 'Is Empty',
+    value: 'is_empty',
+  },
+  {
+    label: 'Is Not Empty',
+    value: 'is_not_empty',
+  },
+];
+
 export const selectFieldFilterOperators: FieldFilterOperator[] = [
   {
     label: 'Is In',
@@ -588,6 +607,8 @@ export const getFieldFilterOperators = (
       return numberFieldFilterOperators;
     case 'phone':
       return phoneFieldFilterOperators;
+    case 'relation':
+      return relationFieldFilterOperators;
     case 'select':
       return selectFieldFilterOperators;
     case 'text':
