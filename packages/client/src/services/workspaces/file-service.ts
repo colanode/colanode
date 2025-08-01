@@ -52,20 +52,7 @@ export class FileService {
   }
 
   public async init(): Promise<void> {
-    // if the upload or download was interrupted, we need to reset the status on app start
-
-    await this.workspace.database
-      .updateTable('uploads')
-      .set({
-        status: UploadStatus.Pending,
-        started_at: null,
-        completed_at: null,
-        error_code: null,
-        error_message: null,
-      })
-      .where('status', '=', UploadStatus.Uploading)
-      .execute();
-
+    // if the download was interrupted, we need to reset the status on app start
     await this.workspace.database
       .updateTable('downloads')
       .set({
