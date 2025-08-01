@@ -131,30 +131,28 @@ export class AccountService {
 
   public async logout(): Promise<void> {
     try {
-      await this.app.database.transaction().execute(async (tx) => {
-        const deletedAccount = await tx
-          .deleteFrom('accounts')
-          .where('id', '=', this.account.id)
-          .executeTakeFirst();
+      const deletedAccount = await this.app.database
+        .deleteFrom('accounts')
+        .where('id', '=', this.account.id)
+        .executeTakeFirst();
 
-        if (!deletedAccount) {
-          throw new Error('Failed to delete account');
+      if (!deletedAccount) {
+        throw new Error('Failed to delete account');
+      }
+
+      await this.app.jobs.addJob(
+        {
+          type: 'token.delete',
+          token: this.account.token,
+          server: this.server.domain,
+        },
+        {
+          retries: 10,
+          delay: ms('1 second'),
         }
+      );
 
-        await this.app.jobs.addJob(
-          {
-            type: 'token.delete',
-            token: this.account.token,
-            server: this.server.domain,
-          },
-          {
-            retries: 10,
-            delay: ms('1 second'),
-          }
-        );
-
-        await this.app.jobs.removeJobSchedule(this.accountSyncJobScheduleId);
-      });
+      await this.app.jobs.removeJobSchedule(this.accountSyncJobScheduleId);
 
       const workspaces = this.workspaces.values();
       for (const workspace of workspaces) {
