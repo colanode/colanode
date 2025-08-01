@@ -5,6 +5,7 @@ import { Event, TempFile } from '@colanode/client/types';
 import { ColanodeWindowApi } from '@colanode/ui';
 
 export interface ColanodeWorkerApi {
+  init: () => Promise<void>;
   executeMutation: <T extends MutationInput>(
     input: T
   ) => Promise<MutationResult<T>>;

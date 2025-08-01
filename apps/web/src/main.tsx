@@ -28,7 +28,9 @@ const initializeApp = async () => {
   const workerApi = Comlink.wrap<ColanodeWorkerApi>(worker);
 
   window.colanode = {
-    init: async () => {},
+    init: async () => {
+      await workerApi.init();
+    },
     executeMutation: async (input) => {
       return workerApi.executeMutation(input);
     },

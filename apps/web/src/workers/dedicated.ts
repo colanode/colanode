@@ -24,6 +24,7 @@ const pendingPromises = new Map<string, PendingPromise>();
 const fs = new WebFileSystem();
 const path = new WebPathService();
 let app: AppService | null = null;
+let appInitialized = false;
 
 const broadcast = new BroadcastChannel('colanode');
 broadcast.onmessage = (event) => {
@@ -40,6 +41,7 @@ navigator.locks.request('colanode', async () => {
 
   await app.migrate();
   await app.init();
+  appInitialized = true;
 
   const ids = Array.from(pendingPromises.keys());
   for (const id of ids) {
@@ -163,6 +165,24 @@ const handleMessage = async (message: BroadcastMessage) => {
 };
 
 const api: ColanodeWorkerApi = {
+  async init() {
+    if (!app) {
+      return;
+    }
+
+    if (appInitialized) {
+      return;
+    }
+
+    let count = 0;
+    while (!appInitialized) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      count++;
+      if (count > 100) {
+        throw new Error('App initialization timed out');
+      }
+    }
+  },
   executeMutation(input) {
     if (app) {
       return app.mediator.executeMutation(input);
