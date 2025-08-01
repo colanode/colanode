@@ -7,26 +7,26 @@ import {
 } from '@colanode/client/jobs';
 import { AppService } from '@colanode/client/services/app-service';
 
-export type FilesCleanTempInput = {
-  type: 'files.clean.temp';
+export type TempFilesCleanInput = {
+  type: 'temp.files.clean';
 };
 
 declare module '@colanode/client/jobs' {
   interface JobMap {
-    'files.clean.temp': {
-      input: FilesCleanTempInput;
+    'temp.files.clean': {
+      input: TempFilesCleanInput;
     };
   }
 }
 
-export class FilesCleanTempJobHandler
-  implements JobHandler<FilesCleanTempInput>
+export class TempFilesCleanJobHandler
+  implements JobHandler<TempFilesCleanInput>
 {
   private readonly app: AppService;
 
-  public readonly concurrency: JobConcurrencyConfig<FilesCleanTempInput> = {
+  public readonly concurrency: JobConcurrencyConfig<TempFilesCleanInput> = {
     limit: 1,
-    key: () => `files.clean.temp`,
+    key: () => `temp.files.clean`,
   };
 
   constructor(app: AppService) {

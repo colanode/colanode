@@ -16,9 +16,9 @@ import { AvatarDownloadJobHandler } from '@colanode/client/jobs/avatar-download'
 import { AvatarsCleanJobHandler } from '@colanode/client/jobs/avatars-clean';
 import { FileDownloadJobHandler } from '@colanode/client/jobs/file-download';
 import { FileUploadJobHandler } from '@colanode/client/jobs/file-upload';
-import { FilesCleanTempJobHandler } from '@colanode/client/jobs/files-clean-temp';
 import { MutationsSyncJobHandler } from '@colanode/client/jobs/mutations-sync';
 import { ServerSyncJobHandler } from '@colanode/client/jobs/server-sync';
+import { TempFilesCleanJobHandler } from '@colanode/client/jobs/temp-files-clean';
 import { TokenDeleteJobHandler } from '@colanode/client/jobs/token-delete';
 import { WorkspaceFilesCleanJobHandler } from '@colanode/client/jobs/workspace-files-clean';
 import { SleepScheduler } from '@colanode/client/lib/sleep-scheduler';
@@ -54,7 +54,7 @@ export class JobService {
       'file.upload': new FileUploadJobHandler(app),
       'file.download': new FileDownloadJobHandler(app),
       'mutations.sync': new MutationsSyncJobHandler(app),
-      'files.clean.temp': new FilesCleanTempJobHandler(app),
+      'temp.files.clean': new TempFilesCleanJobHandler(app),
       'workspace.files.clean': new WorkspaceFilesCleanJobHandler(app),
       'avatar.download': new AvatarDownloadJobHandler(app),
       'avatars.clean': new AvatarsCleanJobHandler(app),

@@ -125,11 +125,11 @@ export class AppService {
     await this.fs.makeDirectory(this.path.temp);
     await this.jobs.init();
 
-    const scheduleId = 'files.clean.temp';
+    const scheduleId = 'temp.files.clean';
     await this.jobs.upsertJobSchedule(
       scheduleId,
       {
-        type: 'files.clean.temp',
+        type: 'temp.files.clean',
       },
       ms('5 minutes'),
       {
