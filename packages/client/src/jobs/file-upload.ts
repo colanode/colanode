@@ -35,6 +35,7 @@ declare module '@colanode/client/jobs' {
 }
 
 const UPLOAD_RETRIES_LIMIT = 10;
+const LEGACY_UPLOAD_SIZE_LIMIT = 1024 * 1024 * 50; // 50MB
 
 export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
   private readonly app: AppService;
@@ -98,10 +99,41 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       };
     }
 
-    return this.performUpload(account, workspace, upload, file, localFile);
+    if (account.server.isFeatureSupported('file.upload.tus')) {
+      return this.performUploadWithTus(
+        account,
+        workspace,
+        upload,
+        file,
+        localFile
+      );
+    }
+
+    if (file.attributes.size > LEGACY_UPLOAD_SIZE_LIMIT) {
+      await this.updateUpload(workspace, upload.file_id, {
+        status: UploadStatus.Failed,
+        completed_at: new Date().toISOString(),
+        progress: 0,
+        error_code: 'file_upload_failed',
+        error_message:
+          'Please upgrade your server to the latest version to upload files larger than 50MB',
+      });
+
+      return {
+        type: 'cancel',
+      };
+    }
+
+    return this.performUploadWithLegacy(
+      account,
+      workspace,
+      upload,
+      file,
+      localFile
+    );
   }
 
-  private async performUpload(
+  private async performUploadWithTus(
     account: AccountService,
     workspace: WorkspaceService,
     upload: SelectUpload,
@@ -178,6 +210,87 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
           }
         });
       });
+
+      await this.updateUpload(workspace, upload.file_id, {
+        status: UploadStatus.Completed,
+        progress: 100,
+        completed_at: new Date().toISOString(),
+        error_code: null,
+        error_message: null,
+      });
+
+      return {
+        type: 'success',
+      };
+    } catch {
+      const newRetries = upload.retries + 1;
+
+      if (newRetries >= UPLOAD_RETRIES_LIMIT) {
+        await this.updateUpload(workspace, upload.file_id, {
+          status: UploadStatus.Failed,
+          completed_at: new Date().toISOString(),
+          progress: 0,
+          error_code: 'file_upload_failed',
+          error_message:
+            'Failed to upload file after ' + newRetries + ' retries',
+        });
+
+        return {
+          type: 'cancel',
+        };
+      }
+
+      await this.updateUpload(workspace, upload.file_id, {
+        status: UploadStatus.Pending,
+        retries: newRetries,
+        started_at: new Date().toISOString(),
+        error_code: null,
+        error_message: null,
+      });
+
+      return {
+        type: 'retry',
+        delay: ms('1 minute'),
+      };
+    }
+  }
+
+  private async performUploadWithLegacy(
+    account: AccountService,
+    workspace: WorkspaceService,
+    upload: SelectUpload,
+    file: LocalFileNode,
+    localFile: SelectLocalFile
+  ): Promise<JobOutput> {
+    try {
+      await this.updateUpload(workspace, upload.file_id, {
+        status: UploadStatus.Uploading,
+        started_at: new Date().toISOString(),
+      });
+
+      const updateUpload = async (values: UpdateUpload) => {
+        await this.updateUpload(workspace, upload.file_id, {
+          ...values,
+        });
+      };
+
+      const fileStream = await this.app.fs.readStream(localFile.path);
+      await account.client.put(
+        `v1/workspaces/${workspace.id}/files/${file.id}`,
+        {
+          body: fileStream,
+          headers: {
+            'Content-Type': file.attributes.mimeType,
+            'Content-Length': file.attributes.size.toString(),
+          },
+          onUploadProgress(progress, _chunk) {
+            const percentage = Math.round((progress.percent || 0) * 100);
+            updateUpload({
+              progress: percentage,
+            });
+          },
+        }
+      );
 
       await this.updateUpload(workspace, upload.file_id, {
         status: UploadStatus.Completed,

@@ -1,6 +1,7 @@
 import ky from 'ky';
 import ms from 'ms';
 
+import { FeatureKey, isFeatureSupported } from '@colanode/client/lib';
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapServer } from '@colanode/client/lib/mappers';
 import { isServerOutdated } from '@colanode/client/lib/servers';
@@ -44,6 +45,10 @@ export class ServerService {
 
   public get version() {
     return this.server.version;
+  }
+
+  public isFeatureSupported(feature: FeatureKey) {
+    return isFeatureSupported(feature, this.version);
   }
 
   public async init(): Promise<void> {

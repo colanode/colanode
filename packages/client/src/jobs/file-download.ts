@@ -107,9 +107,9 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
         `v1/workspaces/${workspace.id}/files/${file.id}`,
         {
           onDownloadProgress: async (progress, _chunk) => {
-            const percent = Math.round((progress.percent || 0) * 100);
+            const percentage = Math.round((progress.percent || 0) * 100);
             await this.updateDownload(workspace, download.id, {
-              progress: percent,
+              progress: percentage,
             });
           },
         }

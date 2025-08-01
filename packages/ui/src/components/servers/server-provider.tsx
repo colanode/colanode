@@ -1,7 +1,7 @@
+import { isFeatureSupported } from '@colanode/client/lib';
 import { ServerNotFound } from '@colanode/ui/components/servers/server-not-found';
 import { ServerContext } from '@colanode/ui/contexts/server';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
-import { isFeatureSupported } from '@colanode/ui/lib/features';
 
 interface ServerProviderProps {
   domain: string;
