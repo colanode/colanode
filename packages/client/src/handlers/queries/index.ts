@@ -18,7 +18,7 @@ import { EmojiGetQueryHandler } from './emojis/emoji-get';
 import { EmojiGetBySkinIdQueryHandler } from './emojis/emoji-get-by-skin-id';
 import { EmojiListQueryHandler } from './emojis/emoji-list';
 import { EmojiSearchQueryHandler } from './emojis/emoji-search';
-import { DownloadManualListQueryHandler } from './files/download-manual-list';
+import { DownloadListManualQueryHandler } from './files/download-list-manual';
 import { FileDownloadRequestGetQueryHandler } from './files/file-download-request-get';
 import { FileListQueryHandler } from './files/file-list';
 import { LocalFileGetQueryHandler } from './files/local-file-get';
@@ -97,7 +97,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'account.metadata.list': new AccountMetadataListQueryHandler(app),
     'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
     'upload.list': new UploadListQueryHandler(app),
-    'download.manual.list': new DownloadManualListQueryHandler(app),
+    'download.list.manual': new DownloadListManualQueryHandler(app),
     'temp.file.get': new TempFileGetQueryHandler(app),
   };
 };

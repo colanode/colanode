@@ -1,25 +1,25 @@
 import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
 import { mapDownload } from '@colanode/client/lib';
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
-import { DownloadManualListQueryInput } from '@colanode/client/queries/files/download-manual-list';
+import { DownloadListManualQueryInput } from '@colanode/client/queries/files/download-list-manual';
 import { Event } from '@colanode/client/types/events';
 import { Download, DownloadType } from '@colanode/client/types/files';
 
-export class DownloadManualListQueryHandler
+export class DownloadListManualQueryHandler
   extends WorkspaceQueryHandlerBase
-  implements QueryHandler<DownloadManualListQueryInput>
+  implements QueryHandler<DownloadListManualQueryInput>
 {
   public async handleQuery(
-    input: DownloadManualListQueryInput
+    input: DownloadListManualQueryInput
   ): Promise<Download[]> {
     return await this.fetchManualDownloads(input);
   }
 
   public async checkForChanges(
     event: Event,
-    input: DownloadManualListQueryInput,
+    input: DownloadListManualQueryInput,
     output: Download[]
-  ): Promise<ChangeCheckResult<DownloadManualListQueryInput>> {
+  ): Promise<ChangeCheckResult<DownloadListManualQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
       event.workspace.accountId === input.accountId &&
@@ -109,7 +109,7 @@ export class DownloadManualListQueryHandler
   }
 
   private async fetchManualDownloads(
-    input: DownloadManualListQueryInput
+    input: DownloadListManualQueryInput
   ): Promise<Download[]> {
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
 
