@@ -15,11 +15,11 @@ export class IconSearchQueryHandler
   }
 
   public async handleQuery(input: IconSearchQueryInput): Promise<Icon[]> {
-    if (!this.app.asset.icons) {
+    if (!this.app.assets.icons) {
       return [];
     }
 
-    const data = await this.app.asset.icons
+    const data = await this.app.assets.icons
       .selectFrom('icons')
       .innerJoin('icon_search', 'icons.id', 'icon_search.id')
       .selectAll('icons')

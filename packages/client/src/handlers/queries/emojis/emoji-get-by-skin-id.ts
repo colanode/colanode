@@ -17,11 +17,11 @@ export class EmojiGetBySkinIdQueryHandler
   public async handleQuery(
     input: EmojiGetBySkinIdQueryInput
   ): Promise<Emoji | null> {
-    if (!this.app.asset.emojis) {
+    if (!this.app.assets.emojis) {
       return null;
     }
 
-    const data = await this.app.asset.emojis
+    const data = await this.app.assets.emojis
       .selectFrom('emojis')
       .innerJoin('emoji_skins', 'emojis.id', 'emoji_skins.emoji_id')
       .selectAll('emojis')

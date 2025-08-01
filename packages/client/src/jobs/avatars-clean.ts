@@ -38,7 +38,7 @@ export class AvatarsCleanJobHandler implements JobHandler<AvatarsCleanInput> {
       };
     }
 
-    await account.avatar.cleanupAvatars();
+    await account.avatars.cleanupAvatars();
     return {
       type: 'success',
     };

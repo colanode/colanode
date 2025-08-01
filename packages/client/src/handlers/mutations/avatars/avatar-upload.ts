@@ -54,7 +54,7 @@ export class AvatarUploadMutationHandler
         .json<AvatarUploadResponse>();
 
       await this.app.fs.delete(filePath);
-      await account.avatar.downloadAvatar(response.id);
+      await account.avatars.downloadAvatar(response.id);
 
       return {
         id: response.id,

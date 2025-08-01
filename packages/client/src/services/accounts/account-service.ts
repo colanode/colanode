@@ -33,7 +33,7 @@ export class AccountService {
   public readonly app: AppService;
   public readonly server: ServerService;
   public readonly database: Kysely<AccountDatabaseSchema>;
-  public readonly avatar: AvatarService;
+  public readonly avatars: AvatarService;
 
   public readonly socket: AccountSocket;
   public readonly client: KyInstance;
@@ -52,7 +52,7 @@ export class AccountService {
       readonly: false,
     });
 
-    this.avatar = new AvatarService(this);
+    this.avatars = new AvatarService(this);
     this.socket = new AccountSocket(this);
     this.client = this.app.client.extend({
       prefixUrl: this.server.httpBaseUrl,

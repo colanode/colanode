@@ -19,7 +19,7 @@ export class AvatarGetQueryHandler
       return null;
     }
 
-    return account.avatar.getAvatar(input.avatarId, true);
+    return account.avatars.getAvatar(input.avatarId, true);
   }
 
   public async checkForChanges(

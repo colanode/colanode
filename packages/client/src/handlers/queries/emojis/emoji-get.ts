@@ -13,11 +13,11 @@ export class EmojiGetQueryHandler implements QueryHandler<EmojiGetQueryInput> {
   }
 
   public async handleQuery(input: EmojiGetQueryInput): Promise<Emoji | null> {
-    if (!this.app.asset.emojis) {
+    if (!this.app.assets.emojis) {
       return null;
     }
 
-    const data = await this.app.asset.emojis
+    const data = await this.app.assets.emojis
       .selectFrom('emojis')
       .selectAll()
       .where('id', '=', input.id)

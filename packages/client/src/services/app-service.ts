@@ -37,7 +37,7 @@ export class AppService {
   public readonly metadata: MetadataService;
   public readonly kysely: KyselyService;
   public readonly mediator: Mediator;
-  public readonly asset: AssetService;
+  public readonly assets: AssetService;
   public readonly jobs: JobService;
   public readonly client: KyInstance;
 
@@ -58,7 +58,7 @@ export class AppService {
     });
 
     this.mediator = new Mediator(this);
-    this.asset = new AssetService(this);
+    this.assets = new AssetService(this);
     this.jobs = new JobService(this);
 
     this.client = ky.create({

@@ -16,11 +16,11 @@ export class EmojiCategoryListQueryHandler
   public async handleQuery(
     _: EmojiCategoryListQueryInput
   ): Promise<EmojiCategory[]> {
-    if (!this.app.asset.emojis) {
+    if (!this.app.assets.emojis) {
       return [];
     }
 
-    const data = this.app.asset.emojis
+    const data = this.app.assets.emojis
       .selectFrom('categories')
       .selectAll()
       .execute();
