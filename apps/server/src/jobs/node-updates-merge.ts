@@ -1,3 +1,5 @@
+import ms from 'ms';
+
 import { UpdateMergeMetadata } from '@colanode/core';
 import { mergeUpdates } from '@colanode/crdt';
 import { database } from '@colanode/server/data/database';
@@ -32,9 +34,8 @@ export const nodeUpdatesMergeHandler: JobHandler<
 
   const cursor = await fetchCounter(database, 'node.updates.merge.cursor');
 
-  const cutoffTime = new Date();
-  cutoffTime.setTime(
-    cutoffTime.getTime() - config.jobs.nodeUpdatesMerge.cutoffWindow * 1000
+  const cutoffTime = new Date(
+    Date.now() - ms(`${config.jobs.nodeUpdatesMerge.cutoffWindow} seconds`)
   );
 
   let mergedGroups = 0;
@@ -75,7 +76,8 @@ export const nodeUpdatesMergeHandler: JobHandler<
       const result = await processNodeUpdates(
         nodeId,
         nodeUpdates,
-        config.jobs.nodeUpdatesMerge.mergeWindow
+        config.jobs.nodeUpdatesMerge.mergeWindow,
+        config.jobs.nodeUpdatesMerge.cutoffWindow
       );
       mergedGroups += result.mergedGroups;
       deletedUpdates += result.deletedUpdates;
@@ -97,11 +99,12 @@ export const nodeUpdatesMergeHandler: JobHandler<
 const processNodeUpdates = async (
   nodeId: string,
   nodeUpdates: SelectNodeUpdate[],
-  mergeWindow: number
+  mergeWindow: number,
+  cutoffWindow: number
 ): Promise<{ mergedGroups: number; deletedUpdates: number }> => {
   const firstUpdate = nodeUpdates[0]!;
   const cutoffTime = new Date(
-    firstUpdate.created_at.getTime() - 60 * 60 * 1000
+    firstUpdate.created_at.getTime() - ms(`${cutoffWindow} seconds`)
   );
 
   const previousUpdate = await database

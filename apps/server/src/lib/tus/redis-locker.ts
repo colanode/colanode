@@ -6,6 +6,7 @@ import {
   type RequestRelease,
 } from '@tus/utils';
 import { sha256 } from 'js-sha256';
+import ms from 'ms';
 
 /**
  * RedisLocker is an implementation of the Locker interface that manages locks using Redis.
@@ -28,8 +29,8 @@ import { sha256 } from 'js-sha256';
  * - **Race Conditions:** Atomic operations in Redis (SET with NX and PX options) are used to prevent race conditions during lock acquisition.
  */
 
-const DELAY = 100;
-const TIMEOUT = 1000 * 20;
+const DELAY = ms('100 milliseconds');
+const TIMEOUT = ms('30 seconds');
 const UNLOCK_SCRIPT = `
   if redis.call("get", KEYS[1]) == ARGV[1] then
     return redis.call("del", KEYS[1])

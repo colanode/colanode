@@ -1,4 +1,5 @@
 import argon2 from '@node-rs/argon2';
+import ms from 'ms';
 
 import {
   IdType,
@@ -143,7 +144,9 @@ export const buildLoginVerifyOutput = async (
   account: SelectAccount
 ): Promise<LoginVerifyOutput> => {
   const id = generateId(IdType.OtpCode);
-  const expiresAt = new Date(Date.now() + config.account.otpTimeout * 1000);
+  const expiresAt = new Date(
+    Date.now() + ms(`${config.account.otpTimeout} seconds`)
+  );
   const otpCode = generateOtpCode();
 
   const otp: Otp<AccountVerifyOtpAttributes> = {

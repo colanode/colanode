@@ -1,4 +1,5 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
+import ms from 'ms';
 
 import {
   generateId,
@@ -48,7 +49,9 @@ export const emailPasswordResetInitRoute: FastifyPluginCallbackZod = (
       }
 
       const id = generateId(IdType.OtpCode);
-      const expiresAt = new Date(Date.now() + config.account.otpTimeout * 1000);
+      const expiresAt = new Date(
+        Date.now() + ms(`${config.account.otpTimeout} seconds`)
+      );
       const otpCode = generateOtpCode();
 
       const account = await database

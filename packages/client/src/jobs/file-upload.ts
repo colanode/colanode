@@ -124,7 +124,13 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       await new Promise<void>((resolve, reject) => {
         const tusUpload = new Upload(fileStream, {
           endpoint: `${account.server.httpBaseUrl}/v1/workspaces/${workspace.id}/files/${file.id}/tus`,
-          retryDelays: [0, 3000, 5000, 10000, 20000],
+          retryDelays: [
+            0,
+            ms('3 seconds'),
+            ms('5 seconds'),
+            ms('10 seconds'),
+            ms('20 seconds'),
+          ],
           metadata: {
             filename: localFile.name,
             filetype: file.type,

@@ -1,6 +1,9 @@
+import ms from 'ms';
+
 import { database } from '@colanode/server/data/database';
 import { redis } from '@colanode/server/data/redis';
 import { JobHandler } from '@colanode/server/jobs';
+import { config } from '@colanode/server/lib/config';
 import { deleteFile } from '@colanode/server/lib/files';
 import { createLogger } from '@colanode/server/lib/logger';
 import { RedisKvStore } from '@colanode/server/lib/tus/redis-kv';
@@ -24,11 +27,11 @@ export const uploadsCleanHandler: JobHandler<UploadsCleanInput> = async () => {
 
   try {
     // Delete uploads that are older than 7 days
-    const expiration = new Date(Date.now() - 1000 * 60 * 60 * 24 * 7);
+    const sevenDaysAgo = new Date(Date.now() - ms('7 days'));
     const expiredUploads = await database
       .selectFrom('uploads')
       .selectAll()
-      .where('created_at', '<', expiration)
+      .where('created_at', '<', sevenDaysAgo)
       .where('uploaded_at', 'is', null)
       .execute();
 
@@ -37,13 +40,19 @@ export const uploadsCleanHandler: JobHandler<UploadsCleanInput> = async () => {
       return;
     }
 
-    const redisKv = new RedisKvStore(redis);
+    const redisKv = new RedisKvStore(redis, config.redis.tus.kvPrefix);
     for (const upload of expiredUploads) {
       await deleteFile(upload.path);
       await redisKv.delete(upload.path);
 
       const infoPath = `${upload.path}.info`;
       await deleteFile(infoPath);
+
+      await database
+        .deleteFrom('uploads')
+        .where('file_id', '=', upload.file_id)
+        .where('upload_id', '=', upload.upload_id)
+        .execute();
     }
 
     logger.debug(`Deleted ${expiredUploads.length} expired uploads`);
