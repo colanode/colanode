@@ -24,6 +24,7 @@ import { FileListQueryHandler } from './files/file-list';
 import { LocalFileGetQueryHandler } from './files/local-file-get';
 import { TempFileGetQueryHandler } from './files/temp-file-get';
 import { UploadListQueryHandler } from './files/upload-list';
+import { UploadListPendingQueryHandler } from './files/upload-list-pending';
 import { IconCategoryListQueryHandler } from './icons/icon-category-list';
 import { IconListQueryHandler } from './icons/icon-list';
 import { IconSearchQueryHandler } from './icons/icon-search';
@@ -97,6 +98,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'account.metadata.list': new AccountMetadataListQueryHandler(app),
     'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
     'upload.list': new UploadListQueryHandler(app),
+    'upload.list.pending': new UploadListPendingQueryHandler(app),
     'download.list.manual': new DownloadListManualQueryHandler(app),
     'temp.file.get': new TempFileGetQueryHandler(app),
   };

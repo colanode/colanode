@@ -4,10 +4,10 @@ import { SidebarMenuType } from '@colanode/client/types';
 import { SidebarMenuFooter } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-footer';
 import { SidebarMenuHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-header';
 import { SidebarMenuIcon } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-icon';
-import { SidebarUploads } from '@colanode/ui/components/layouts/sidebars/sidebar-uploads';
 import { useApp } from '@colanode/ui/contexts/app';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface SidebarMenuProps {
   value: SidebarMenuType;
@@ -29,6 +29,17 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
     workspace.id
   );
 
+  const pendingUploadsQuery = useLiveQuery({
+    type: 'upload.list.pending',
+    accountId: workspace.accountId,
+    workspaceId: workspace.id,
+    page: 1,
+    count: 21,
+  });
+
+  const pendingUploads = pendingUploadsQuery.data ?? [];
+  const pendingUploadsCount = pendingUploads.length;
+
   return (
     <div className="flex flex-col h-full w-[65px] min-w-[65px] items-center bg-slate-100">
       {showMacOsPlaceholder ? (
@@ -48,7 +59,11 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
             onChange('chats');
           }}
           isActive={value === 'chats'}
-          unreadState={chatsState}
+          unreadBadge={{
+            count: chatsState.unreadCount,
+            unread: chatsState.hasUnread,
+            maxCount: 99,
+          }}
         />
         <SidebarMenuIcon
           icon={LayoutGrid}
@@ -56,16 +71,26 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
             onChange('spaces');
           }}
           isActive={value === 'spaces'}
-          unreadState={channelsState}
+          unreadBadge={{
+            count: channelsState.unreadCount,
+            unread: channelsState.hasUnread,
+            maxCount: 99,
+          }}
         />
         <div className="mt-auto" />
-        <SidebarUploads />
         <SidebarMenuIcon
           icon={Settings}
           onClick={() => {
             onChange('settings');
           }}
+          className="mt-auto"
           isActive={value === 'settings'}
+          unreadBadge={{
+            count: pendingUploadsCount,
+            unread: pendingUploadsCount > 0,
+            maxCount: 20,
+            className: 'bg-blue-500',
+          }}
         />
       </div>
       <SidebarMenuFooter />

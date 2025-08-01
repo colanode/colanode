@@ -1,12 +1,18 @@
 import { cn } from '@colanode/ui/lib/utils';
 
-interface UnreadBadgeProps {
+export interface UnreadBadgeProps {
   count: number;
   unread: boolean;
   className?: string;
+  maxCount?: number;
 }
 
-export const UnreadBadge = ({ count, unread, className }: UnreadBadgeProps) => {
+export const UnreadBadge = ({
+  count,
+  unread,
+  className,
+  maxCount,
+}: UnreadBadgeProps) => {
   if (count === 0 && !unread) {
     return null;
   }
@@ -19,7 +25,7 @@ export const UnreadBadge = ({ count, unread, className }: UnreadBadgeProps) => {
           className
         )}
       >
-        {count}
+        {maxCount && count > maxCount ? `${maxCount}+` : count}
       </span>
     );
   }

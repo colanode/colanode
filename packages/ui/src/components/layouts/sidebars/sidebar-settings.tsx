@@ -12,9 +12,23 @@ import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-
 import { SidebarSettingsItem } from '@colanode/ui/components/layouts/sidebars/sidebar-settings-item';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useApp } from '@colanode/ui/contexts/app';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const SidebarSettings = () => {
   const app = useApp();
+  const workspace = useWorkspace();
+
+  const pendingUploadsQuery = useLiveQuery({
+    type: 'upload.list.pending',
+    accountId: workspace.accountId,
+    workspaceId: workspace.id,
+    page: 1,
+    count: 21,
+  });
+
+  const pendingUploads = pendingUploadsQuery.data ?? [];
+  const pendingUploadsCount = pendingUploads.length;
 
   return (
     <div className="flex flex-col gap-4 h-full px-2 group/sidebar">
@@ -39,6 +53,12 @@ export const SidebarSettings = () => {
           title="Uploads"
           icon={Upload}
           path={SpecialContainerTabPath.WorkspaceUploads}
+          unreadBadge={{
+            count: pendingUploadsCount,
+            unread: pendingUploadsCount > 0,
+            maxCount: 20,
+            className: 'bg-blue-500',
+          }}
         />
         {app.type === 'desktop' && (
           <SidebarSettingsItem

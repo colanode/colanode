@@ -20,7 +20,7 @@ export const handleLocalRequest = async (
       return new Response(null, { status: 400 });
     }
 
-    const emoji = await app.asset.emojis
+    const emoji = await app.assets.emojis
       .selectFrom('emoji_svgs')
       .selectAll()
       .where('skin_id', '=', skinId)
@@ -41,7 +41,7 @@ export const handleLocalRequest = async (
       return new Response(null, { status: 400 });
     }
 
-    const icon = await app.asset.icons
+    const icon = await app.assets.icons
       .selectFrom('icon_svgs')
       .selectAll()
       .where('id', '=', iconId)
