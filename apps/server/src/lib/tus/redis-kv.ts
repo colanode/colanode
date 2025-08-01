@@ -3,8 +3,6 @@ import type { Upload } from '@tus/server';
 import type { KvStore } from '@tus/utils';
 import { sha256 } from 'js-sha256';
 
-const PREFIX = 'colanode:tus:cache:';
-
 /**
  * Redis based configstore.
  * Based on the Tus RedisKvStore, but with a custom prefix and a sha256 hash of the key.
@@ -14,8 +12,12 @@ const PREFIX = 'colanode:tus:cache:';
  */
 
 export class RedisKvStore<T = Upload> implements KvStore<T> {
-  constructor(private redis: RedisClientType) {
+  private readonly redis: RedisClientType;
+  private readonly prefix: string;
+
+  constructor(redis: RedisClientType, prefix: string) {
     this.redis = redis;
+    this.prefix = prefix;
   }
 
   public async get(key: string): Promise<T | undefined> {
@@ -40,7 +42,7 @@ export class RedisKvStore<T = Upload> implements KvStore<T> {
     let cursor = '0';
     do {
       const result = await this.redis.scan(cursor, {
-        MATCH: `${PREFIX}*`,
+        MATCH: `${this.prefix}*`,
         COUNT: 20,
       });
       cursor = result.cursor;
@@ -51,7 +53,7 @@ export class RedisKvStore<T = Upload> implements KvStore<T> {
 
   private buildRedisKey(key: string): string {
     const hash = sha256(key);
-    return `${PREFIX}${hash}`;
+    return `${this.prefix}:${hash}`;
   }
 
   private serializeValue(value: T): string {

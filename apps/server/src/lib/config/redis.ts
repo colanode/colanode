@@ -7,6 +7,10 @@ export const redisConfigSchema = z.object({
     name: z.string().optional().default('jobs'),
     prefix: z.string().optional().default('colanode'),
   }),
+  tus: z.object({
+    lockPrefix: z.string().optional().default('colanode:tus:lock'),
+    kvPrefix: z.string().optional().default('colanode:tus:kv'),
+  }),
   eventsChannel: z.string().optional().default('events'),
 });
 
@@ -19,6 +23,10 @@ export const readRedisConfigVariables = () => {
     jobs: {
       name: process.env.REDIS_JOBS_NAME,
       prefix: process.env.REDIS_JOBS_PREFIX,
+    },
+    tus: {
+      lockPrefix: process.env.REDIS_TUS_LOCK_PREFIX,
+      kvPrefix: process.env.REDIS_TUS_KV_PREFIX,
     },
     eventsChannel: process.env.REDIS_EVENTS_CHANNEL,
   };

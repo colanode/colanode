@@ -30,7 +30,6 @@ import { sha256 } from 'js-sha256';
 
 const DELAY = 100;
 const TIMEOUT = 1000 * 20;
-const PREFIX = 'colanode:tus:lock:';
 const UNLOCK_SCRIPT = `
   if redis.call("get", KEYS[1]) == ARGV[1] then
     return redis.call("del", KEYS[1])
@@ -41,9 +40,11 @@ const UNLOCK_SCRIPT = `
 
 export class RedisLocker implements Locker {
   public readonly redis: RedisClientType;
+  public readonly prefix: string;
 
-  constructor(redis: RedisClientType) {
+  constructor(redis: RedisClientType, prefix: string) {
     this.redis = redis;
+    this.prefix = prefix;
   }
 
   public newLock(id: string): Lock {
@@ -152,7 +153,7 @@ class RedisLock implements Lock {
 
   private buildRedisKey(id: string): string {
     const hash = sha256(id);
-    return `${PREFIX}${hash}`;
+    return `${this.locker.prefix}:${hash}`;
   }
 
   private wait(ms: number): Promise<void> {

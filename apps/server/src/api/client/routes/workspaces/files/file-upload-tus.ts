@@ -1,5 +1,5 @@
 import { S3Store } from '@tus/s3-store';
-import { RedisKvStore, Server } from '@tus/server';
+import { Server } from '@tus/server';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
@@ -11,11 +11,12 @@ import { config } from '@colanode/server/lib/config';
 import { fetchCounter } from '@colanode/server/lib/counters';
 import { buildFilePath, deleteFile } from '@colanode/server/lib/files';
 import { mapNode, updateNode } from '@colanode/server/lib/nodes';
+import { RedisKvStore } from '@colanode/server/lib/tus/redis-kv';
 import { RedisLocker } from '@colanode/server/lib/tus/redis-locker';
 
 const s3Store = new S3Store({
-  partSize: 20 * 1024 * 1024,
-  cache: new RedisKvStore(redis),
+  partSize: config.storage.partSize,
+  cache: new RedisKvStore(redis, config.redis.tus.kvPrefix),
   s3ClientConfig: {
     ...s3Config,
     bucket: config.storage.bucket,
@@ -91,7 +92,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
       const tusServer = new Server({
         path: '/tus',
         datastore: s3Store,
-        locker: new RedisLocker(redis),
+        locker: new RedisLocker(redis, config.redis.tus.lockPrefix),
         async onUploadCreate() {
           const upload = await database
             .selectFrom('uploads')
