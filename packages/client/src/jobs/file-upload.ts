@@ -12,6 +12,7 @@ import {
   JobConcurrencyConfig,
 } from '@colanode/client/jobs';
 import { eventBus, mapNode, mapUpload } from '@colanode/client/lib';
+import { isNodeSynced } from '@colanode/client/lib/nodes';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { AppService } from '@colanode/client/services/app-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
@@ -90,7 +91,7 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       };
     }
 
-    if (file.serverRevision === '0') {
+    if (!isNodeSynced(file)) {
       return {
         type: 'retry',
         delay: ms('2 seconds'),

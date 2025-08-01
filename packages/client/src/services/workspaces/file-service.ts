@@ -207,12 +207,17 @@ export class FileService {
       upload: mapUpload(createdUpload),
     });
 
-    this.app.jobs.addJob({
-      type: 'file.upload',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
-      fileId: fileId,
-    });
+    this.app.jobs.addJob(
+      {
+        type: 'file.upload',
+        accountId: this.workspace.accountId,
+        workspaceId: this.workspace.id,
+        fileId: fileId,
+      },
+      {
+        delay: ms('2 seconds'),
+      }
+    );
   }
 
   public async deleteFile(node: SelectNode): Promise<void> {
