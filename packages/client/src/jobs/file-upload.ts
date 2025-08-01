@@ -17,7 +17,12 @@ import { AccountService } from '@colanode/client/services/accounts/account-servi
 import { AppService } from '@colanode/client/services/app-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import { LocalFileNode, UploadStatus } from '@colanode/client/types';
-import { ApiHeader, build, calculatePercentage } from '@colanode/core';
+import {
+  ApiHeader,
+  build,
+  calculatePercentage,
+  FILE_UPLOAD_PART_SIZE,
+} from '@colanode/core';
 
 export type FileUploadInput = {
   type: 'file.upload';
@@ -156,6 +161,7 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       await new Promise<void>((resolve, reject) => {
         const tusUpload = new Upload(fileStream, {
           endpoint: `${account.server.httpBaseUrl}/v1/workspaces/${workspace.id}/files/${file.id}/tus`,
+          chunkSize: FILE_UPLOAD_PART_SIZE,
           retryDelays: [
             0,
             ms('3 seconds'),
@@ -165,7 +171,7 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
           ],
           metadata: {
             filename: localFile.name,
-            filetype: file.type,
+            contentType: file.attributes.mimeType,
           },
           headers: {
             Authorization: `Bearer ${account.token}`,

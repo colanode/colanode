@@ -1,6 +1,6 @@
 import 'react-circular-progressbar/dist/styles.css';
 import { Check, X, Clock } from 'lucide-react';
-import { CircularProgressbar } from 'react-circular-progressbar';
+import { buildStyles, CircularProgressbar } from 'react-circular-progressbar';
 
 import { UploadStatus } from '@colanode/client/types';
 import {
@@ -39,7 +39,9 @@ export const WorkspaceUploadStatus = ({
                 <CircularProgressbar
                   value={progress}
                   strokeWidth={8}
-                  className="text-xs text-muted-foreground"
+                  styles={buildStyles({
+                    pathColor: 'var(--color-blue-500)',
+                  })}
                 />
               </div>
               <span className="text-xs text-muted-foreground font-medium">

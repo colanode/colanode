@@ -3,7 +3,13 @@ import { Server } from '@tus/server';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
-import { ApiErrorCode, FileStatus, generateId, IdType } from '@colanode/core';
+import {
+  ApiErrorCode,
+  FILE_UPLOAD_PART_SIZE,
+  FileStatus,
+  generateId,
+  IdType,
+} from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { redis } from '@colanode/server/data/redis';
 import { s3Config } from '@colanode/server/data/storage';
@@ -15,7 +21,7 @@ import { RedisKvStore } from '@colanode/server/lib/tus/redis-kv';
 import { RedisLocker } from '@colanode/server/lib/tus/redis-locker';
 
 const s3Store = new S3Store({
-  partSize: config.storage.partSize,
+  partSize: FILE_UPLOAD_PART_SIZE,
   cache: new RedisKvStore(redis, config.redis.tus.kvPrefix),
   s3ClientConfig: {
     ...s3Config,
@@ -211,6 +217,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
           return {
             metadata: {
               uploadId: createdUpload.upload_id,
+              contentType: file.attributes.mimeType,
             },
           };
         },

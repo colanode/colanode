@@ -7,10 +7,6 @@ export const storageConfigSchema = z.object({
   secretKey: z.string({ error: 'STORAGE_S3_SECRET_KEY is required' }),
   bucket: z.string({ error: 'STORAGE_S3_BUCKET is required' }),
   region: z.string({ error: 'STORAGE_S3_REGION is required' }),
-  partSize: z
-    .number()
-    .optional()
-    .default(20 * 1024 * 1024), // 20MB
   forcePathStyle: z.boolean().optional(),
 });
 
@@ -24,7 +20,6 @@ export const readStorageConfigVariables = () => {
     secretKey: process.env.STORAGE_S3_SECRET_KEY,
     bucket: process.env.STORAGE_S3_BUCKET,
     region: process.env.STORAGE_S3_REGION,
-    partSize: process.env.STORAGE_S3_PART_SIZE,
     forcePathStyle: process.env.STORAGE_S3_FORCE_PATH_STYLE === 'true',
   };
 };

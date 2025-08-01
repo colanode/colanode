@@ -238,8 +238,6 @@ Colanode Server Environment Variables
   value: "us-east-1"
 - name: STORAGE_S3_FORCE_PATH_STYLE
   value: "true"
-- name: STORAGE_S3_PART_SIZE
-  value: {{ .Values.colanode.config.STORAGE_S3_PART_SIZE | quote }}
 
 # ───────────────────────────────────────────────────────────────
 # SMTP configuration
@@ -259,4 +257,5 @@ Colanode Server Environment Variables
   value: {{ required "colanode.config.SMTP_EMAIL_FROM must be set when SMTP_ENABLED is true" .Values.colanode.config.SMTP_EMAIL_FROM | quote }}
 - name: SMTP_EMAIL_FROM_NAME
   value: {{ .Values.colanode.config.SMTP_EMAIL_FROM_NAME | quote }}
+{{- end }}
 {{- end }}
