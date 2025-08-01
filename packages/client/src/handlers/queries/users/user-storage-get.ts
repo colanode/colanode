@@ -38,8 +38,8 @@ export class UserStorageGetQueryHandler
       return {
         hasChanges: true,
         result: {
-          limit: '0',
-          used: '0',
+          storageLimit: '0',
+          storageUsed: '0',
           subtypes: [],
         },
       };
@@ -111,7 +111,7 @@ export class UserStorageGetQueryHandler
 
     const subtypes: {
       subtype: FileSubtype;
-      size: string;
+      storageUsed: string;
     }[] = [];
     let totalUsed = 0n;
 
@@ -120,14 +120,14 @@ export class UserStorageGetQueryHandler
       const sizeString = row.total_size || '0';
       subtypes.push({
         subtype,
-        size: sizeString,
+        storageUsed: sizeString,
       });
       totalUsed += BigInt(sizeString);
     }
 
     return {
-      limit: workspace.storageLimit,
-      used: totalUsed.toString(),
+      storageLimit: workspace.storageLimit,
+      storageUsed: totalUsed.toString(),
       subtypes,
     };
   }

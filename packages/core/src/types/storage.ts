@@ -4,7 +4,7 @@ import { fileSubtypeSchema } from '@colanode/core/types/files';
 
 export const workspaceStorageFileSubtypeSchema = z.object({
   subtype: fileSubtypeSchema,
-  size: z.string(),
+  storageUsed: z.string(),
 });
 
 export type WorkspaceStorageFileSubtype = z.infer<
@@ -13,15 +13,16 @@ export type WorkspaceStorageFileSubtype = z.infer<
 
 export const workspaceStorageUserSchema = z.object({
   id: z.string(),
-  used: z.string(),
-  limit: z.string(),
+  storageUsed: z.string(),
+  storageLimit: z.string(),
+  maxFileSize: z.string(),
 });
 
 export type WorkspaceStorageUser = z.infer<typeof workspaceStorageUserSchema>;
 
 export const workspaceStorageGetOutputSchema = z.object({
-  limit: z.string().nullable().optional(),
-  used: z.string(),
+  storageLimit: z.string().nullable().optional(),
+  storageUsed: z.string(),
   subtypes: z.array(workspaceStorageFileSubtypeSchema),
   users: z.array(workspaceStorageUserSchema),
 });

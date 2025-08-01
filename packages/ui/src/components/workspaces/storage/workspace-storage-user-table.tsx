@@ -1,7 +1,7 @@
 import { Settings } from 'lucide-react';
 import { useState } from 'react';
 
-import { formatBytes } from '@colanode/core';
+import { formatBytes, WorkspaceStorageUser } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -17,22 +17,11 @@ import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 import { bigintToPercent, cn } from '@colanode/ui/lib/utils';
 
-interface WorkspaceStorageUser {
-  id: string;
-  used: string;
-  limit: string;
-}
-
-interface UserStorageProgressBarProps {
-  used: bigint;
-  limit: bigint;
-}
-
 const UserStorageProgressBar = ({
-  used,
-  limit,
-}: UserStorageProgressBarProps) => {
-  const percentage = limit > 0n ? bigintToPercent(limit, used) : 0;
+  storageUsed,
+  storageLimit,
+}: WorkspaceStorageUser) => {
+  const percentage = bigintToPercent(BigInt(storageLimit), BigInt(storageUsed));
 
   const getBarColor = () => {
     if (percentage >= 90) return 'bg-red-500';
@@ -43,7 +32,7 @@ const UserStorageProgressBar = ({
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-sm">
-        <span className="font-medium">{formatBytes(used)}</span>
+        <span className="font-medium">{formatBytes(BigInt(storageUsed))}</span>
         <span className="text-muted-foreground">
           ({percentage.toFixed(1)}%)
         </span>
@@ -81,8 +70,8 @@ const WorkspaceStorageUserRow = ({
   const email = userQuery.data?.email ?? '';
   const avatar = userQuery.data?.avatar ?? null;
 
-  const usedBytes = BigInt(user.used);
-  const limitBytes = BigInt(user.limit);
+  const storageLimitBytes = BigInt(user.storageLimit);
+  const maxFileSizeBytes = user.maxFileSize ? BigInt(user.maxFileSize) : null;
 
   return (
     <>
@@ -99,10 +88,17 @@ const WorkspaceStorageUserRow = ({
           </div>
         </TableCell>
         <TableCell className="text-center">
-          <span className="text-sm font-medium">{formatBytes(limitBytes)}</span>
+          <span className="text-sm font-medium">
+            {maxFileSizeBytes ? formatBytes(maxFileSizeBytes) : '#'}
+          </span>
+        </TableCell>
+        <TableCell className="text-center">
+          <span className="text-sm font-medium">
+            {formatBytes(storageLimitBytes)}
+          </span>
         </TableCell>
         <TableCell className="min-w-[200px] text-center">
-          <UserStorageProgressBar used={usedBytes} limit={limitBytes} />
+          <UserStorageProgressBar {...user} />
         </TableCell>
         <TableCell className="w-10 text-right">
           <Button
@@ -117,8 +113,7 @@ const WorkspaceStorageUserRow = ({
       </TableRow>
       {openUpdateDialog && (
         <WorkspaceStorageUserUpdateDialog
-          userId={user.id}
-          limit={user.limit}
+          user={user}
           open={openUpdateDialog}
           onOpenChange={setOpenUpdateDialog}
           onUpdate={() => {
@@ -149,6 +144,7 @@ export const WorkspaceStorageUserTable = ({
       <TableHeader>
         <TableRow>
           <TableHead>User</TableHead>
+          <TableHead className="text-center">File Size Limit</TableHead>
           <TableHead className="text-center">Total Storage</TableHead>
           <TableHead className="text-center">Used Storage</TableHead>
           <TableHead className="w-10 text-right"></TableHead>

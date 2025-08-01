@@ -20,6 +20,7 @@ interface WorkspaceStorageAggregateRow {
 interface UserStorageRow {
   id: string;
   storage_limit: string;
+  max_file_size: string;
   storage_used: string | null;
 }
 
@@ -79,6 +80,7 @@ export const workspaceStorageGetRoute: FastifyPluginCallbackZod = (
           SELECT 
             u.id,
             u.storage_limit,
+            u.max_file_size,
             COALESCE(c.value, '0') as storage_used
           FROM users u
           LEFT JOIN counters c ON c.key = CONCAT(u.id, '.storage.used')
@@ -103,7 +105,7 @@ export const workspaceStorageGetRoute: FastifyPluginCallbackZod = (
         })
         .map(([subtype, size]) => ({
           subtype: subtype as FileSubtype,
-          size: size.toString(),
+          storageUsed: size.toString(),
         }));
 
       const users = usersWithStorage.rows
@@ -119,13 +121,14 @@ export const workspaceStorageGetRoute: FastifyPluginCallbackZod = (
         })
         .map((user) => ({
           id: user.id,
-          used: user.storage_used ?? '0',
-          limit: user.storage_limit,
+          storageUsed: user.storage_used ?? '0',
+          storageLimit: user.storage_limit,
+          maxFileSize: user.max_file_size,
         }));
 
       return {
-        limit: workspace.storage_limit,
-        used: totalUsed.toString(),
+        storageLimit: workspace.storage_limit,
+        storageUsed: totalUsed.toString(),
         subtypes: subtypes,
         users: users,
       };

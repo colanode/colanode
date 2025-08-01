@@ -19,7 +19,8 @@ export class UserStorageUpdateMutationHandler
 
     try {
       const body: UserStorageUpdateInput = {
-        limit: input.limit,
+        storageLimit: input.storageLimit,
+        maxFileSize: input.maxFileSize,
       };
 
       const output = await workspace.account.client

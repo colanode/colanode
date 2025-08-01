@@ -3,7 +3,8 @@ export type UserStorageUpdateMutationInput = {
   accountId: string;
   workspaceId: string;
   userId: string;
-  limit: string;
+  storageLimit: string;
+  maxFileSize: string;
 };
 
 export type UserStorageUpdateMutationOutput = {

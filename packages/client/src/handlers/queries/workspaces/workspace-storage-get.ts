@@ -10,8 +10,8 @@ import { Event } from '@colanode/client/types/events';
 import { WorkspaceStorageGetOutput } from '@colanode/core';
 
 const EMPTY_STORAGE_OUTPUT: WorkspaceStorageGetOutput = {
-  limit: '0',
-  used: '0',
+  storageLimit: '0',
+  storageUsed: '0',
   subtypes: [],
   users: [],
 };

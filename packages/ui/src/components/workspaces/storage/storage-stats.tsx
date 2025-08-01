@@ -37,31 +37,33 @@ const subtypeMetadata: SubtypeMetadata[] = [
 
 interface StorageSubtype {
   subtype: string;
-  size: string;
+  storageUsed: string;
 }
 
 interface StorageStatsProps {
-  usedBytes: bigint;
-  limitBytes: bigint | null;
+  storageUsed: string;
+  storageLimit: string | null;
   subtypes: StorageSubtype[];
 }
 
 export const StorageStats = ({
-  usedBytes,
-  limitBytes,
+  storageUsed,
+  storageLimit,
   subtypes,
 }: StorageStatsProps) => {
-  const usedPercentage = limitBytes
-    ? bigintToPercent(limitBytes, usedBytes)
+  const usedPercentage = storageLimit
+    ? bigintToPercent(BigInt(storageLimit), BigInt(storageUsed))
     : 0;
 
   return (
     <div className="space-y-2">
       <div className="flex gap-2 items-baseline">
-        <span className="text-2xl font-medium">{formatBytes(usedBytes)}</span>
+        <span className="text-2xl font-medium">
+          {formatBytes(BigInt(storageUsed))}
+        </span>
         <span className="text-xl text-muted-foreground">
           {' '}
-          of {limitBytes ? formatBytes(limitBytes) : 'Unlimited'}
+          of {storageLimit ? formatBytes(BigInt(storageLimit)) : 'Unlimited'}
         </span>
         <span className="text-sm text-muted-foreground">
           ({usedPercentage}%) used
@@ -69,12 +71,14 @@ export const StorageStats = ({
       </div>
       <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden flex">
         {subtypes.map((subtype) => {
-          const size = BigInt(subtype.size);
-          if (size === BigInt(0)) {
+          const storageUsed = BigInt(subtype.storageUsed);
+          if (storageUsed === BigInt(0)) {
             return null;
           }
 
-          const percentage = limitBytes ? bigintToPercent(limitBytes, size) : 0;
+          const percentage = storageLimit
+            ? bigintToPercent(BigInt(storageLimit), storageUsed)
+            : 0;
           const metadata = subtypeMetadata.find(
             (m) => m.subtype === subtype.subtype
           );
@@ -85,7 +89,7 @@ export const StorageStats = ({
 
           const name = metadata.name;
           const color = metadata.color;
-          const title = `${name}: ${formatBytes(BigInt(subtype.size))}`;
+          const title = `${name}: ${formatBytes(BigInt(subtype.storageUsed))}`;
 
           return (
             <div
@@ -106,8 +110,8 @@ export const StorageStats = ({
 
       <div className="mb-6 space-y-2">
         {subtypes.map((subtype) => {
-          const size = BigInt(subtype.size);
-          if (size === BigInt(0)) {
+          const storageUsed = BigInt(subtype.storageUsed);
+          if (storageUsed === BigInt(0)) {
             return null;
           }
 
@@ -132,7 +136,7 @@ export const StorageStats = ({
                 <span className="text-sm">{name}</span>
               </div>
               <span className="text-sm text-muted-foreground">
-                {formatBytes(BigInt(subtype.size))}
+                {formatBytes(BigInt(subtype.storageUsed))}
               </span>
             </div>
           );

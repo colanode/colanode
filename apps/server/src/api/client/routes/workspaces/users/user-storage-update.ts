@@ -55,13 +55,22 @@ export const userStorageUpdateRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const limit = BigInt(input.limit);
+      const storageLimit = BigInt(input.storageLimit);
+      const maxFileSize = BigInt(input.maxFileSize);
+
+      if (maxFileSize > storageLimit) {
+        return reply.code(400).send({
+          code: ApiErrorCode.ValidationError,
+          message: 'Max file size cannot be larger than storage limit.',
+        });
+      }
 
       const updatedUser = await database
         .updateTable('users')
         .returningAll()
         .set({
-          storage_limit: limit.toString(),
+          storage_limit: storageLimit.toString(),
+          max_file_size: maxFileSize.toString(),
           updated_at: new Date(),
           updated_by: user.account_id,
         })

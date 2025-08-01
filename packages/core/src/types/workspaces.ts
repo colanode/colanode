@@ -106,7 +106,8 @@ export const userRoleUpdateInputSchema = z.object({
 export type UserRoleUpdateInput = z.infer<typeof userRoleUpdateInputSchema>;
 
 export const userStorageUpdateInputSchema = z.object({
-  limit: z.string(),
+  storageLimit: z.string(),
+  maxFileSize: z.string(),
 });
 
 export type UserStorageUpdateInput = z.infer<

@@ -26,13 +26,11 @@ export const WorkspaceStorageStats = () => {
   );
 
   const data = workspaceStorageGetQuery.data ?? {
-    limit: '0',
-    used: '0',
+    storageLimit: '0',
+    storageUsed: '0',
     subtypes: [],
     users: [],
   };
-  const usedBytes = BigInt(data.used);
-  const limitBytes = data.limit ? BigInt(data.limit) : null;
 
   return (
     <div className="space-y-10">
@@ -61,8 +59,8 @@ export const WorkspaceStorageStats = () => {
           .with({ isPending: false, isError: false }, () => (
             <>
               <StorageStats
-                usedBytes={usedBytes}
-                limitBytes={limitBytes}
+                storageUsed={data.storageUsed}
+                storageLimit={data.storageLimit ?? null}
                 subtypes={data.subtypes}
               />
               <WorkspaceStorageUserTable

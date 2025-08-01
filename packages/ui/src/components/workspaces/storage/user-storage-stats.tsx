@@ -13,12 +13,10 @@ export const UserStorageStats = () => {
   });
 
   const data = userStorageGetQuery.data ?? {
-    limit: '0',
-    used: '0',
+    storageLimit: '0',
+    storageUsed: '0',
     subtypes: [],
   };
-  const usedBytes = BigInt(data.used);
-  const limitBytes = BigInt(data.limit);
 
   return (
     <div className="space-y-6">
@@ -32,8 +30,8 @@ export const UserStorageStats = () => {
         </div>
       ) : (
         <StorageStats
-          usedBytes={usedBytes}
-          limitBytes={limitBytes}
+          storageUsed={data.storageUsed}
+          storageLimit={data.storageLimit}
           subtypes={data.subtypes}
         />
       )}

@@ -7,11 +7,11 @@ export type UserStorageGetQueryInput = {
 };
 
 export type UserStorageGetQueryOutput = {
-  limit: string;
-  used: string;
+  storageLimit: string;
+  storageUsed: string;
   subtypes: {
     subtype: FileSubtype;
-    size: string;
+    storageUsed: string;
   }[];
 };
 

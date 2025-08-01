@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
+import { WorkspaceStorageUser } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -75,20 +76,19 @@ const formatBytes = (bytes: string): string => {
 };
 
 const formSchema = z.object({
-  limit: z.string().min(1, 'Storage limit is required'),
+  storageLimit: z.string().min(1, 'Storage limit is required'),
+  maxFileSize: z.string().min(1, 'Max file size is required'),
 });
 
 interface WorkspaceStorageUserUpdateDialogProps {
-  userId: string;
-  limit: string;
+  user: WorkspaceStorageUser;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onUpdate: () => void;
 }
 
 export const WorkspaceStorageUserUpdateDialog = ({
-  userId,
-  limit,
+  user,
   open,
   onOpenChange,
   onUpdate,
@@ -96,15 +96,21 @@ export const WorkspaceStorageUserUpdateDialog = ({
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
-  const initialLimit = convertBytesToUnit(limit);
+  const initialStorageLimit = convertBytesToUnit(user.storageLimit);
+  const initialMaxFileSize = convertBytesToUnit(user.maxFileSize);
 
-  const [limitUnit, setLimitUnit] = useState(initialLimit.unit);
+  const [storageLimitUnit, setStorageLimitUnit] = useState(
+    initialStorageLimit.unit
+  );
+  const [maxFileSizeUnit, setMaxFileSizeUnit] = useState(
+    initialMaxFileSize.unit
+  );
 
   const userQuery = useQuery({
     type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,
-    userId,
+    userId: user.id,
   });
 
   const name = userQuery.data?.name ?? 'Unknown';
@@ -114,13 +120,15 @@ export const WorkspaceStorageUserUpdateDialog = ({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      limit: initialLimit.value,
+      storageLimit: initialStorageLimit.value,
+      maxFileSize: initialMaxFileSize.value,
     },
   });
 
   const handleCancel = () => {
     form.reset();
-    setLimitUnit(initialLimit.unit);
+    setStorageLimitUnit(initialStorageLimit.unit);
+    setMaxFileSizeUnit(initialMaxFileSize.unit);
     onOpenChange(false);
   };
 
@@ -130,16 +138,23 @@ export const WorkspaceStorageUserUpdateDialog = ({
     }
 
     const apiValues = {
-      limit: convertUnitToBytes(values.limit, limitUnit),
+      storageLimit: convertUnitToBytes(values.storageLimit, storageLimitUnit),
+      maxFileSize: convertUnitToBytes(values.maxFileSize, maxFileSizeUnit),
     };
+
+    if (BigInt(apiValues.maxFileSize) > BigInt(apiValues.storageLimit)) {
+      toast.error('Max file size cannot be larger than storage limit');
+      return;
+    }
 
     mutate({
       input: {
         type: 'user.storage.update',
         accountId: workspace.accountId,
         workspaceId: workspace.id,
-        userId,
-        limit: apiValues.limit,
+        userId: user.id,
+        storageLimit: apiValues.storageLimit,
+        maxFileSize: apiValues.maxFileSize,
       },
       onSuccess: () => {
         toast.success('User storage settings updated');
@@ -152,8 +167,10 @@ export const WorkspaceStorageUserUpdateDialog = ({
     });
   };
 
-  const unit = UNITS.find((u) => u.value === limitUnit);
-  const unitLabel = unit?.label ?? 'bytes';
+  const storageLimitUnitData = UNITS.find((u) => u.value === storageLimitUnit);
+  const storageLimitUnitLabel = storageLimitUnitData?.label ?? 'bytes';
+  const maxFileSizeUnitData = UNITS.find((u) => u.value === maxFileSizeUnit);
+  const maxFileSizeUnitLabel = maxFileSizeUnitData?.label ?? 'bytes';
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -161,11 +178,11 @@ export const WorkspaceStorageUserUpdateDialog = ({
         <DialogHeader>
           <DialogTitle>Update storage settings</DialogTitle>
           <DialogDescription>
-            Update the storage limit for this user
+            Update the storage limits for this user
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center space-x-3 py-4 border-b">
-          <Avatar id={userId} name={name} avatar={avatar} />
+          <Avatar id={user.id} name={name} avatar={avatar} />
           <div className="flex-grow min-w-0">
             <p className="text-sm font-medium leading-none truncate">{name}</p>
             <p className="text-sm text-muted-foreground truncate">{email}</p>
@@ -179,7 +196,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
             <div className="flex-grow space-y-6 py-2 pb-4">
               <FormField
                 control={form.control}
-                name="limit"
+                name="storageLimit"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Storage Limit</FormLabel>
@@ -190,8 +207,8 @@ export const WorkspaceStorageUserUpdateDialog = ({
                           placeholder="5"
                           {...field}
                           className="flex-1"
-                          min="0"
-                          step="0.01"
+                          min="1"
+                          step="1"
                         />
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
@@ -199,7 +216,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
                               variant="outline"
                               className="w-20 justify-between"
                             >
-                              {unitLabel}
+                              {storageLimitUnitLabel}
                               <ChevronDown className="h-4 w-4" />
                             </Button>
                           </DropdownMenuTrigger>
@@ -207,11 +224,11 @@ export const WorkspaceStorageUserUpdateDialog = ({
                             {UNITS.map((unit) => (
                               <DropdownMenuItem
                                 key={unit.value}
-                                onClick={() => setLimitUnit(unit.value)}
+                                onClick={() => setStorageLimitUnit(unit.value)}
                                 className="flex items-center justify-between"
                               >
                                 <span>{unit.label}</span>
-                                {limitUnit === unit.value && (
+                                {storageLimitUnit === unit.value && (
                                   <Check className="h-4 w-4" />
                                 )}
                               </DropdownMenuItem>
@@ -223,7 +240,62 @@ export const WorkspaceStorageUserUpdateDialog = ({
                     <div className="text-xs text-muted-foreground">
                       ={' '}
                       {formatBytes(
-                        convertUnitToBytes(field.value || '0', limitUnit)
+                        convertUnitToBytes(field.value || '0', storageLimitUnit)
+                      )}{' '}
+                      bytes
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="maxFileSize"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Max File Size</FormLabel>
+                    <FormControl>
+                      <div className="flex space-x-2">
+                        <Input
+                          type="number"
+                          placeholder="10"
+                          {...field}
+                          value={field.value || ''}
+                          className="flex-1"
+                          min="1"
+                          step="1"
+                        />
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className="w-20 justify-between"
+                            >
+                              {maxFileSizeUnitLabel}
+                              <ChevronDown className="h-4 w-4" />
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent>
+                            {UNITS.map((unit) => (
+                              <DropdownMenuItem
+                                key={unit.value}
+                                onClick={() => setMaxFileSizeUnit(unit.value)}
+                                className="flex items-center justify-between"
+                              >
+                                <span>{unit.label}</span>
+                                {maxFileSizeUnit === unit.value && (
+                                  <Check className="h-4 w-4" />
+                                )}
+                              </DropdownMenuItem>
+                            ))}
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </FormControl>
+                    <div className="text-xs text-muted-foreground">
+                      ={' '}
+                      {formatBytes(
+                        convertUnitToBytes(field.value || '0', maxFileSizeUnit)
                       )}{' '}
                       bytes
                     </div>
