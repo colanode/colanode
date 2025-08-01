@@ -122,7 +122,7 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       const fileStream = await this.app.fs.readStream(localFile.path);
       await new Promise<void>((resolve, reject) => {
         const tusUpload = new Upload(fileStream, {
-          endpoint: `${account.server.httpBaseUrl}/v1/workspaces/${workspace.id}/files/${file.id}`,
+          endpoint: `${account.server.httpBaseUrl}/v1/workspaces/${workspace.id}/files/${file.id}/tus`,
           retryDelays: [0, 3000, 5000, 10000, 20000],
           metadata: {
             filename: localFile.name,
