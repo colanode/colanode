@@ -110,6 +110,8 @@ colanode:
     REDIS_DB: '0'
     REDIS_JOBS_QUEUE_NAME: 'jobs'
     REDIS_JOBS_QUEUE_PREFIX: 'colanode'
+    REDIS_TUS_LOCK_PREFIX: 'colanode:tus:lock'
+    REDIS_TUS_KV_PREFIX: 'colanode:tus:kv'
     REDIS_EVENTS_CHANNEL: 'events'
 
     # S3 storage for files
@@ -119,6 +121,7 @@ colanode:
     STORAGE_S3_BUCKET: 'colanode'
     STORAGE_S3_REGION: 'us-east-1'
     STORAGE_S3_FORCE_PATH_STYLE: 'true'
+    STORAGE_S3_PART_SIZE: '20971520' # 20MB
 
     # Email configuration
     SMTP_ENABLED: 'false'

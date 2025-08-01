@@ -202,15 +202,19 @@ Colanode Server Environment Variables
   value: {{ .Values.colanode.config.REDIS_JOBS_QUEUE_NAME | quote }}
 - name: REDIS_JOBS_QUEUE_PREFIX
   value: {{ .Values.colanode.config.REDIS_JOBS_QUEUE_PREFIX | quote }}
+- name: REDIS_TUS_LOCK_PREFIX
+  value: {{ .Values.colanode.config.REDIS_TUS_LOCK_PREFIX | quote }}
+- name: REDIS_TUS_KV_PREFIX
+  value: {{ .Values.colanode.config.REDIS_TUS_KV_PREFIX | quote }}
 - name: REDIS_EVENTS_CHANNEL
   value: {{ .Values.colanode.config.REDIS_EVENTS_CHANNEL | quote }}
 
 # ───────────────────────────────────────────────────────────────
-# S3 Configuration for Avatars
+# S3 Configuration for Storage
 # ───────────────────────────────────────────────────────────────
-- name: S3_AVATARS_ENDPOINT
+- name: STORAGE_S3_ENDPOINT
   value: "http://{{ include "colanode.minio.hostname" . }}:9000"
-- name: S3_AVATARS_ACCESS_KEY
+- name: STORAGE_S3_ACCESS_KEY
   {{- if .Values.minio.auth.existingSecret }}
   {{- include "colanode.getRequiredValueOrSecret" (dict "key" "minio.auth.rootUser" "value" (dict "value" .Values.minio.auth.rootUser "existingSecret" .Values.minio.auth.existingSecret "secretKey" .Values.minio.auth.rootUserKey )) | nindent 2 }}
   {{- else }}
@@ -219,7 +223,7 @@ Colanode Server Environment Variables
       name: {{ .Release.Name }}-minio
       key: {{ .Values.minio.auth.rootUserKey }}
   {{- end }}
-- name: S3_AVATARS_SECRET_KEY
+- name: STORAGE_S3_SECRET_KEY
   {{- if .Values.minio.auth.existingSecret }}
   {{- include "colanode.getRequiredValueOrSecret" (dict "key" "minio.auth.rootPassword" "value" (dict "value" .Values.minio.auth.rootPassword "existingSecret" .Values.minio.auth.existingSecret "secretKey" .Values.minio.auth.rootPasswordKey )) | nindent 2 }}
   {{- else }}
@@ -228,42 +232,14 @@ Colanode Server Environment Variables
       name: {{ .Release.Name }}-minio
       key: {{ .Values.minio.auth.rootPasswordKey }}
   {{- end }}
-- name: S3_AVATARS_BUCKET_NAME
-  value: "colanode-avatars"
-- name: S3_AVATARS_REGION
-  value: "us-east-1" # Region is often optional for MinIO but good practice
-- name: S3_AVATARS_FORCE_PATH_STYLE
-  value: "true"
-
-# ───────────────────────────────────────────────────────────────
-# S3 Configuration for Files
-# ───────────────────────────────────────────────────────────────
-- name: S3_FILES_ENDPOINT
-  value: "http://{{ include "colanode.minio.hostname" . }}:9000"
-- name: S3_FILES_ACCESS_KEY
-  {{- if .Values.minio.auth.existingSecret }}
-  {{- include "colanode.getRequiredValueOrSecret" (dict "key" "minio.auth.rootUser" "value" (dict "value" .Values.minio.auth.rootUser "existingSecret" .Values.minio.auth.existingSecret "secretKey" .Values.minio.auth.rootUserKey )) | nindent 2 }}
-  {{- else }}
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Release.Name }}-minio
-      key: {{ .Values.minio.auth.rootUserKey }}
-  {{- end }}
-- name: S3_FILES_SECRET_KEY
-  {{- if .Values.minio.auth.existingSecret }}
-  {{- include "colanode.getRequiredValueOrSecret" (dict "key" "minio.auth.rootPassword" "value" (dict "value" .Values.minio.auth.rootPassword "existingSecret" .Values.minio.auth.existingSecret "secretKey" .Values.minio.auth.rootPasswordKey )) | nindent 2 }}
-  {{- else }}
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Release.Name }}-minio
-      key: {{ .Values.minio.auth.rootPasswordKey }}
-  {{- end }}
-- name: S3_FILES_BUCKET_NAME
-  value: "colanode-files"
-- name: S3_FILES_REGION
+- name: STORAGE_S3_BUCKET
+  value: "colanode"
+- name: STORAGE_S3_REGION
   value: "us-east-1"
-- name: S3_FILES_FORCE_PATH_STYLE
+- name: STORAGE_S3_FORCE_PATH_STYLE
   value: "true"
+- name: STORAGE_S3_PART_SIZE
+  value: {{ .Values.colanode.config.STORAGE_S3_PART_SIZE | quote }}
 
 # ───────────────────────────────────────────────────────────────
 # SMTP configuration
