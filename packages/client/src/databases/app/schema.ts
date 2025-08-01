@@ -1,5 +1,6 @@
 import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
 
+import { JobScheduleStatus, JobStatus } from '@colanode/client/jobs';
 import { FileSubtype } from '@colanode/core';
 
 interface ServerTable {
@@ -49,7 +50,7 @@ export interface JobTableSchema {
   queue: ColumnType<string, string, never>;
   input: ColumnType<string, string, string>;
   options: ColumnType<string | null, string | null, string | null>;
-  status: ColumnType<string, string, string>;
+  status: ColumnType<JobStatus, JobStatus, JobStatus>;
   retries: ColumnType<number, number, number>;
   scheduled_at: ColumnType<string, string, string>;
   deduplication_key: ColumnType<string | null, string | null, string | null>;
@@ -68,7 +69,7 @@ export interface JobScheduleTableSchema {
   queue: ColumnType<string, string, never>;
   input: ColumnType<string, string, string>;
   options: ColumnType<string | null, string | null, string | null>;
-  status: ColumnType<string, string, string>;
+  status: ColumnType<JobScheduleStatus, JobScheduleStatus, JobScheduleStatus>;
   interval: ColumnType<number, number, number>;
   next_run_at: ColumnType<string, string, string>;
   last_run_at: ColumnType<string | null, string | null, string | null>;

@@ -8,7 +8,7 @@ export const createJobsTable: Migration = {
       .addColumn('queue', 'text', (col) => col.notNull())
       .addColumn('input', 'text', (col) => col.notNull())
       .addColumn('options', 'text')
-      .addColumn('status', 'text', (col) => col.notNull())
+      .addColumn('status', 'integer', (col) => col.notNull())
       .addColumn('retries', 'integer', (col) => col.notNull().defaultTo(0))
       .addColumn('scheduled_at', 'text', (col) => col.notNull())
       .addColumn('deduplication_key', 'text')

@@ -1,6 +1,12 @@
-export type JobStatus = 'waiting' | 'active';
+export enum JobStatus {
+  Waiting = 1,
+  Active = 2,
+}
 
-export type JobScheduleStatus = 'active' | 'paused';
+export enum JobScheduleStatus {
+  Active = 1,
+  Paused = 2,
+}
 
 export type JobDeduplicationOptions = {
   key: string;

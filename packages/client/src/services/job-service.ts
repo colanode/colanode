@@ -8,6 +8,7 @@ import {
   JobInput,
   JobOptions,
   JobScheduleOptions,
+  JobScheduleStatus,
   JobStatus,
 } from '@colanode/client/jobs';
 import { AccountSyncJobHandler } from '@colanode/client/jobs/account-sync';
@@ -63,7 +64,7 @@ export class JobService {
   public async init(): Promise<void> {
     await this.app.database
       .updateTable('jobs')
-      .set({ status: 'waiting' })
+      .set({ status: JobStatus.Waiting })
       .execute();
 
     this.jobLoop().catch((err) => console.error('Job loop error:', err));
@@ -98,7 +99,7 @@ export class JobService {
           .selectFrom('jobs')
           .selectAll()
           .where('deduplication_key', '=', deduplication.key)
-          .where('status', '=', 'waiting')
+          .where('status', '=', JobStatus.Waiting)
           .executeTakeFirst();
 
         if (!existing) {
@@ -119,7 +120,7 @@ export class JobService {
             updated_at: now.toISOString(),
           })
           .where('id', '=', existing.id)
-          .where('status', '=', 'waiting')
+          .where('status', '=', JobStatus.Waiting)
           .returningAll()
           .executeTakeFirst();
 
@@ -142,7 +143,7 @@ export class JobService {
         queue: this.queue,
         input: this.toJSON(input),
         options: this.toJSON(opts),
-        status: 'waiting',
+        status: JobStatus.Waiting,
         retries: 0,
         scheduled_at: scheduledAt.toISOString(),
         deduplication_key: opts?.deduplication?.key || null,
@@ -178,7 +179,7 @@ export class JobService {
         queue: this.queue,
         input: this.toJSON(input),
         options: this.toJSON(opts),
-        status: 'active',
+        status: JobScheduleStatus.Active,
         interval: interval,
         next_run_at: nextRunAt,
         created_at: now,
@@ -191,7 +192,7 @@ export class JobService {
           interval: interval,
           next_run_at: nextRunAt,
           updated_at: now,
-          status: 'active',
+          status: JobScheduleStatus.Active,
         })
       )
       .executeTakeFirst();
@@ -216,7 +217,7 @@ export class JobService {
       .selectFrom('job_schedules')
       .selectAll()
       .where('id', '=', id)
-      .where('status', '=', 'active')
+      .where('status', '=', JobScheduleStatus.Active)
       .executeTakeFirst();
 
     if (!schedule) {
@@ -255,7 +256,7 @@ export class JobService {
       const jobRow = await this.app.database
         .updateTable('jobs')
         .set({
-          status: 'active',
+          status: JobStatus.Active,
           updated_at: now.toISOString(),
         })
         .where('id', 'in', (qb) =>
@@ -263,7 +264,7 @@ export class JobService {
             .selectFrom('jobs')
             .select('id')
             .where('queue', '=', this.queue)
-            .where('status', '=', 'waiting')
+            .where('status', '=', JobStatus.Waiting)
             .where('scheduled_at', '<=', now.toISOString())
             .where('concurrency_key', 'not in', Array.from(limitReachedTypes))
             .orderBy('scheduled_at', 'asc')
@@ -277,7 +278,7 @@ export class JobService {
           .selectFrom('jobs')
           .select('scheduled_at')
           .where('queue', '=', this.queue)
-          .where('status', '=', 'waiting')
+          .where('status', '=', JobStatus.Waiting)
           .orderBy('scheduled_at', 'asc')
           .limit(1)
           .executeTakeFirst();
@@ -303,7 +304,7 @@ export class JobService {
         if (currentCount >= handler.concurrency.limit) {
           await this.app.database
             .updateTable('jobs')
-            .set({ status: 'waiting', updated_at: now.toISOString() })
+            .set({ status: JobStatus.Waiting, updated_at: now.toISOString() })
             .where('id', '=', jobRow.id)
             .execute();
           continue;
@@ -323,7 +324,7 @@ export class JobService {
       const schedules = await this.app.database
         .selectFrom('job_schedules')
         .selectAll()
-        .where('status', '=', 'active')
+        .where('status', '=', JobScheduleStatus.Active)
         .where('next_run_at', '<=', now.toISOString())
         .execute();
 
@@ -349,7 +350,7 @@ export class JobService {
       const nextSchedule = await this.app.database
         .selectFrom('job_schedules')
         .select('next_run_at')
-        .where('status', '=', 'active')
+        .where('status', '=', JobScheduleStatus.Active)
         .orderBy('next_run_at', 'asc')
         .limit(1)
         .executeTakeFirst();
@@ -387,7 +388,7 @@ export class JobService {
       queue: jobRow.queue,
       input,
       options,
-      status: jobRow.status as JobStatus,
+      status: jobRow.status,
       retries: jobRow.retries,
       deduplicationKey: jobRow.deduplication_key ?? undefined,
       concurrencyKey: jobRow.concurrency_key ?? undefined,
@@ -420,12 +421,12 @@ export class JobService {
         await this.app.database
           .updateTable('jobs')
           .set({
-            status: 'waiting',
+            status: JobStatus.Waiting,
             scheduled_at: retryAt.toISOString(),
             updated_at: new Date().toISOString(),
           })
           .where('id', '=', jobRow.id)
-          .where('status', '=', 'active')
+          .where('status', '=', JobStatus.Active)
           .execute();
       } else if (output.type === 'cancel') {
         if (jobRow.schedule_id) {
@@ -452,7 +453,7 @@ export class JobService {
         await this.app.database
           .updateTable('jobs')
           .set({
-            status: 'waiting',
+            status: JobStatus.Waiting,
             retries,
             scheduled_at: retryAt.toISOString(),
             updated_at: new Date().toISOString(),
