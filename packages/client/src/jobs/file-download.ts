@@ -189,21 +189,25 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
           error_message:
             'Failed to download file after ' + newRetries + ' retries',
         });
-      } else {
-        await this.updateDownload(workspace, download.id, {
-          status: DownloadStatus.Pending,
-          retries: newRetries,
-          started_at: new Date().toISOString(),
-          error_code: null,
-          error_message: null,
-        });
-      }
-    }
 
-    return {
-      type: 'retry',
-      delay: ms('10 seconds'),
-    };
+        return {
+          type: 'cancel',
+        };
+      }
+
+      await this.updateDownload(workspace, download.id, {
+        status: DownloadStatus.Pending,
+        retries: newRetries,
+        started_at: new Date().toISOString(),
+        error_code: null,
+        error_message: null,
+      });
+
+      return {
+        type: 'retry',
+        delay: ms('1 minute'),
+      };
+    }
   }
 
   private async fetchDownload(

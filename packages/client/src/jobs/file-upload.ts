@@ -195,21 +195,25 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
           error_message:
             'Failed to upload file after ' + newRetries + ' retries',
         });
-      } else {
-        await this.updateUpload(workspace, upload.file_id, {
-          status: UploadStatus.Pending,
-          retries: newRetries,
-          started_at: new Date().toISOString(),
-          error_code: null,
-          error_message: null,
-        });
-      }
-    }
 
-    return {
-      type: 'retry',
-      delay: ms('10 seconds'),
-    };
+        return {
+          type: 'cancel',
+        };
+      }
+
+      await this.updateUpload(workspace, upload.file_id, {
+        status: UploadStatus.Pending,
+        retries: newRetries,
+        started_at: new Date().toISOString(),
+        error_code: null,
+        error_message: null,
+      });
+
+      return {
+        type: 'retry',
+        delay: ms('1 minute'),
+      };
+    }
   }
 
   private async fetchUpload(
