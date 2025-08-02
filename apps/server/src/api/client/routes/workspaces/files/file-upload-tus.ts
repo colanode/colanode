@@ -196,8 +196,6 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
             })
             .onConflict((oc) =>
               oc.columns(['file_id']).doUpdateSet({
-                created_at: new Date(),
-                created_by: request.user.id,
                 mime_type: file.attributes.mimeType,
                 size: file.attributes.size,
                 path: path,
