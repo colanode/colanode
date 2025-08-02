@@ -52,6 +52,7 @@
     "@tiptap/extension-code": "^3.0.9",
     "@tiptap/extension-code-block-lowlight": "^3.0.9",
     "@tiptap/extension-document": "^3.0.9",
+    "@tiptap/extension-hard-break": "^3.0.9",
     "@tiptap/extension-horizontal-rule": "^3.0.9",
     "@tiptap/extension-italic": "^3.0.9",
     "@tiptap/extension-link": "^3.0.9",

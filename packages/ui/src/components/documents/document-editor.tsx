@@ -77,6 +77,7 @@ import {
   UnderlineMark,
   DatabaseNode,
   AutoJoiner,
+  HardBreakNode,
 } from '@colanode/ui/editor/extensions';
 import { ToolbarMenu, ActionMenu } from '@colanode/ui/editor/menus';
 
@@ -179,6 +180,7 @@ export const DocumentEditor = ({
         }),
         TextNode,
         ParagraphNode,
+        HardBreakNode,
         Heading1Node,
         Heading2Node,
         Heading3Node,

@@ -18,6 +18,7 @@ import { DividerNode } from '@colanode/ui/editor/extensions/divider';
 import { DropcursorExtension } from '@colanode/ui/editor/extensions/dropcursor';
 import { FileNode } from '@colanode/ui/editor/extensions/file';
 import { FolderNode } from '@colanode/ui/editor/extensions/folder';
+import { HardBreakNode } from '@colanode/ui/editor/extensions/hard-break';
 import { Heading1Node } from '@colanode/ui/editor/extensions/heading1';
 import { Heading2Node } from '@colanode/ui/editor/extensions/heading2';
 import { Heading3Node } from '@colanode/ui/editor/extensions/heading3';
@@ -77,4 +78,5 @@ export {
   DatabaseNode,
   AutoJoiner,
   MentionExtension,
+  HardBreakNode,
 };

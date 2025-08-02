@@ -7,6 +7,7 @@ import { BulletListRenderer } from '@colanode/ui/editor/renderers/bullet-list';
 import { CodeBlockRenderer } from '@colanode/ui/editor/renderers/code-block';
 import { DocumentRenderer } from '@colanode/ui/editor/renderers/document';
 import { FileRenderer } from '@colanode/ui/editor/renderers/file';
+import { HardBreakRenderer } from '@colanode/ui/editor/renderers/hard-break';
 import { Heading1Renderer } from '@colanode/ui/editor/renderers/heading1';
 import { Heading2Renderer } from '@colanode/ui/editor/renderers/heading2';
 import { Heading3Renderer } from '@colanode/ui/editor/renderers/heading3';
@@ -75,6 +76,9 @@ export const NodeRenderer = ({
         .with('file', () => <FileRenderer node={node} keyPrefix={keyPrefix} />)
         .with('mention', () => (
           <MentionRenderer node={node} keyPrefix={keyPrefix} />
+        ))
+        .with('hardBreak', () => (
+          <HardBreakRenderer node={node} keyPrefix={keyPrefix} />
         ))
         .otherwise(() => null)}
     </MarkRenderer>
