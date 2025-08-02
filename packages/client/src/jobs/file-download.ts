@@ -77,6 +77,7 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
 
     const file = await this.fetchNode(workspace, download.file_id);
     if (!file) {
+      await this.deleteDownload(workspace, download.id);
       return {
         type: 'cancel',
       };
@@ -260,5 +261,15 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
       workspaceId: workspace.id,
       download: mapDownload(updatedDownload),
     });
+  }
+
+  private async deleteDownload(
+    workspace: WorkspaceService,
+    downloadId: string
+  ): Promise<void> {
+    await workspace.database
+      .deleteFrom('downloads')
+      .where('id', '=', downloadId)
+      .execute();
   }
 }

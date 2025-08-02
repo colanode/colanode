@@ -85,6 +85,7 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
 
     const file = await this.fetchNode(workspace, upload.file_id);
     if (!file) {
+      await this.deleteUpload(workspace, upload.file_id);
       return {
         type: 'cancel',
       };
@@ -92,6 +93,7 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
 
     const localFile = await this.fetchLocalFile(workspace, file.id);
     if (!localFile) {
+      await this.deleteUpload(workspace, upload.file_id);
       return {
         type: 'cancel',
       };
@@ -403,5 +405,15 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       workspaceId: workspace.id,
       upload: mapUpload(updatedUpload),
     });
+  }
+
+  private async deleteUpload(
+    workspace: WorkspaceService,
+    fileId: string
+  ): Promise<void> {
+    await workspace.database
+      .deleteFrom('uploads')
+      .where('file_id', '=', fileId)
+      .execute();
   }
 }
