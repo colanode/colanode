@@ -481,17 +481,17 @@ export const updateNodeFromMutation = async (
   user: SelectUser,
   mutation: UpdateNodeMutationData
 ): Promise<MutationStatus> => {
-  const existingNodeUpdate = await database
-    .selectFrom('node_updates')
-    .selectAll()
-    .where('id', '=', mutation.updateId)
-    .executeTakeFirst();
-
-  if (existingNodeUpdate) {
-    return MutationStatus.OK;
-  }
-
   for (let count = 0; count < UPDATE_RETRIES_LIMIT; count++) {
+    const existingNodeUpdate = await database
+      .selectFrom('node_updates')
+      .selectAll()
+      .where('id', '=', mutation.updateId)
+      .executeTakeFirst();
+
+    if (existingNodeUpdate) {
+      return MutationStatus.OK;
+    }
+
     const result = await tryUpdateNodeFromMutation(user, mutation);
 
     if (result.type === 'success') {

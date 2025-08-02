@@ -115,17 +115,17 @@ export const updateDocumentFromMutation = async (
   user: SelectUser,
   mutation: UpdateDocumentMutationData
 ): Promise<MutationStatus> => {
-  const existingDocumentUpdate = await database
-    .selectFrom('document_updates')
-    .where('id', '=', mutation.updateId)
-    .selectAll()
-    .executeTakeFirst();
-
-  if (existingDocumentUpdate) {
-    return MutationStatus.OK;
-  }
-
   for (let count = 0; count < UPDATE_RETRIES_LIMIT; count++) {
+    const existingDocumentUpdate = await database
+      .selectFrom('document_updates')
+      .where('id', '=', mutation.updateId)
+      .selectAll()
+      .executeTakeFirst();
+
+    if (existingDocumentUpdate) {
+      return MutationStatus.OK;
+    }
+
     const result = await tryUpdateDocumentFromMutation(user, mutation);
 
     if (result.type === 'success') {
