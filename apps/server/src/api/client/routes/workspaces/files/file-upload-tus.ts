@@ -179,14 +179,12 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
             }
           }
 
-          // create the upload record
-          const uploadId = generateId(IdType.Upload);
           const createdUpload = await database
             .insertInto('uploads')
             .returningAll()
             .values({
               file_id: fileId,
-              upload_id: uploadId,
+              upload_id: generateId(IdType.Upload),
               workspace_id: workspaceId,
               root_id: file.rootId,
               mime_type: file.attributes.mimeType,
@@ -198,7 +196,6 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
             })
             .onConflict((oc) =>
               oc.columns(['file_id']).doUpdateSet({
-                upload_id: uploadId,
                 created_at: new Date(),
                 created_by: request.user.id,
                 mime_type: file.attributes.mimeType,
