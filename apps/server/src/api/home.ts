@@ -1,6 +1,7 @@
 import { FastifyPluginCallback } from 'fastify';
 
 import { config } from '@colanode/server/lib/config';
+import { generateUrl } from '@colanode/server/lib/fastify';
 import { homeTemplate } from '@colanode/server/templates';
 
 export const homeRoute: FastifyPluginCallback = (instance, _, done) => {
@@ -8,16 +9,7 @@ export const homeRoute: FastifyPluginCallback = (instance, _, done) => {
     method: 'GET',
     url: '/',
     handler: async (request, reply) => {
-      const port =
-        request.port && request.port != 80 && request.port != 443
-          ? `:${request.port}`
-          : '';
-
-      const prefix = config.server.pathPrefix
-        ? `/${config.server.pathPrefix}`
-        : '';
-
-      const configUrl = `${request.protocol}://${request.hostname}${port}${prefix}/config`;
+      const configUrl = generateUrl(request, '/config');
 
       const template = homeTemplate({
         name: config.server.name,

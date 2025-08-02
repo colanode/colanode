@@ -15,6 +15,7 @@ import { redis } from '@colanode/server/data/redis';
 import { s3Config } from '@colanode/server/data/storage';
 import { config } from '@colanode/server/lib/config';
 import { fetchCounter } from '@colanode/server/lib/counters';
+import { generateUrl } from '@colanode/server/lib/fastify';
 import { buildFilePath, deleteFile } from '@colanode/server/lib/files';
 import { mapNode, updateNode } from '@colanode/server/lib/nodes';
 import { RedisKvStore } from '@colanode/server/lib/tus/redis-kv';
@@ -94,6 +95,10 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
       }
 
       const path = buildFilePath(workspaceId, fileId, file.attributes);
+      const url = generateUrl(
+        request,
+        `/client/v1/workspaces/${workspaceId}/files/${fileId}/tus`
+      );
 
       const tusServer = new Server({
         path: '/tus',
@@ -284,8 +289,8 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
             body: JSON.stringify({ uploadId }),
           };
         },
-        generateUrl(_req, options) {
-          return `${options.proto}://${options.host}/client/v1/workspaces/${workspaceId}/files/${fileId}/tus`;
+        generateUrl() {
+          return url;
         },
         getFileIdFromRequest() {
           return path;
