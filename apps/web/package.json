@@ -19,7 +19,7 @@
     "@tailwindcss/postcss": "^4.1.11",
     "@vitejs/plugin-react": "^4.7.0",
     "tailwindcss": "^4.1.8",
-    "vite": "^7.0.5",
-    "vite-plugin-pwa": "^1.0.1"
+    "vite": "^7.0.6",
+    "vite-plugin-pwa": "^1.0.2"
   }
 }
