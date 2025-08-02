@@ -4,13 +4,19 @@ import {
   SelectNodeReference,
 } from '@colanode/client/databases/workspace';
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { mapNode, mapNodeReference } from '@colanode/client/lib/mappers';
+import {
+  mapDownload,
+  mapNode,
+  mapNodeReference,
+  mapUpload,
+} from '@colanode/client/lib/mappers';
 import {
   applyMentionUpdates,
   checkMentionChanges,
 } from '@colanode/client/lib/mentions';
 import { deleteNodeRelations, fetchNodeTree } from '@colanode/client/lib/utils';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
+import { DownloadStatus } from '@colanode/client/types';
 import {
   generateId,
   IdType,
@@ -488,22 +494,63 @@ export class NodeService {
         return { deletedNode, createdMutation };
       });
 
-    if (deletedNode) {
-      debug(`Deleted node ${deletedNode.id} with type ${deletedNode.type}`);
-
-      eventBus.publish({
-        type: 'node.deleted',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
-        node: mapNode(deletedNode),
-      });
-    } else {
-      debug(`Failed to delete node ${nodeId}`);
+    if (!deletedNode || !createdMutation) {
+      return;
     }
 
-    if (createdMutation) {
-      this.workspace.mutations.scheduleSync();
+    debug(`Deleted node ${deletedNode.id} with type ${deletedNode.type}`);
+
+    eventBus.publish({
+      type: 'node.deleted',
+      accountId: this.workspace.accountId,
+      workspaceId: this.workspace.id,
+      node: mapNode(deletedNode),
+    });
+
+    if (deletedNode.type === 'file') {
+      const deletedUpload = await this.workspace.database
+        .deleteFrom('uploads')
+        .where('file_id', '=', deletedNode.id)
+        .returningAll()
+        .executeTakeFirst();
+
+      if (deletedUpload) {
+        eventBus.publish({
+          type: 'upload.deleted',
+          accountId: this.workspace.accountId,
+          workspaceId: this.workspace.id,
+          upload: mapUpload(deletedUpload),
+        });
+      }
+
+      const updatedDownloads = await this.workspace.database
+        .updateTable('downloads')
+        .set({
+          status: DownloadStatus.Failed,
+          error_code: 'file_deleted',
+          error_message: 'File has been deleted',
+        })
+        .where('file_id', '=', deletedNode.id)
+        .where('status', 'in', [
+          DownloadStatus.Pending,
+          DownloadStatus.Downloading,
+        ])
+        .returningAll()
+        .execute();
+
+      if (updatedDownloads.length > 0) {
+        for (const updatedDownload of updatedDownloads) {
+          eventBus.publish({
+            type: 'download.updated',
+            accountId: this.workspace.accountId,
+            workspaceId: this.workspace.id,
+            download: mapDownload(updatedDownload),
+          });
+        }
+      }
     }
+
+    this.workspace.mutations.scheduleSync();
   }
 
   public async syncServerNodeUpdate(update: SyncNodeUpdateData) {
@@ -821,7 +868,48 @@ export class NodeService {
     await this.workspace.nodeCounters.checkCountersForDeletedNode(deletedNode);
 
     if (deletedNode.type === 'file') {
-      this.workspace.files.deleteFile(deletedNode);
+      await this.workspace.files.deleteFile(deletedNode);
+
+      const deletedUpload = await this.workspace.database
+        .deleteFrom('uploads')
+        .where('file_id', '=', deletedNode.id)
+        .returningAll()
+        .executeTakeFirst();
+
+      if (deletedUpload) {
+        eventBus.publish({
+          type: 'upload.deleted',
+          accountId: this.workspace.accountId,
+          workspaceId: this.workspace.id,
+          upload: mapUpload(deletedUpload),
+        });
+      }
+
+      const updatedDownloads = await this.workspace.database
+        .updateTable('downloads')
+        .set({
+          status: DownloadStatus.Failed,
+          error_code: 'file_deleted',
+          error_message: 'File has been deleted',
+        })
+        .where('file_id', '=', deletedNode.id)
+        .where('status', 'in', [
+          DownloadStatus.Pending,
+          DownloadStatus.Downloading,
+        ])
+        .returningAll()
+        .execute();
+
+      if (updatedDownloads.length > 0) {
+        for (const updatedDownload of updatedDownloads) {
+          eventBus.publish({
+            type: 'download.updated',
+            accountId: this.workspace.accountId,
+            workspaceId: this.workspace.id,
+            download: mapDownload(updatedDownload),
+          });
+        }
+      }
     }
 
     eventBus.publish({

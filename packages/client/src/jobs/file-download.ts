@@ -54,13 +54,6 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
       };
     }
 
-    if (!account.server.isAvailable) {
-      return {
-        type: 'retry',
-        delay: ms('5 seconds'),
-      };
-    }
-
     const workspace = account.getWorkspace(input.workspaceId);
     if (!workspace) {
       return {
@@ -77,7 +70,12 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
 
     const file = await this.fetchNode(workspace, download.file_id);
     if (!file) {
-      await this.deleteDownload(workspace, download.id);
+      await this.updateDownload(workspace, download.id, {
+        status: DownloadStatus.Failed,
+        error_code: 'file_deleted',
+        error_message: 'File has been deleted',
+      });
+
       return {
         type: 'cancel',
       };
@@ -87,6 +85,13 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
       return {
         type: 'retry',
         delay: ms('10 seconds'),
+      };
+    }
+
+    if (!account.server.isAvailable) {
+      return {
+        type: 'retry',
+        delay: ms('5 seconds'),
       };
     }
 
@@ -230,7 +235,7 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
       .selectFrom('nodes')
       .selectAll()
       .where('id', '=', fileId)
-      .executeTakeFirstOrThrow();
+      .executeTakeFirst();
 
     if (!node) {
       return undefined;
@@ -261,15 +266,5 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
       workspaceId: workspace.id,
       download: mapDownload(updatedDownload),
     });
-  }
-
-  private async deleteDownload(
-    workspace: WorkspaceService,
-    downloadId: string
-  ): Promise<void> {
-    await workspace.database
-      .deleteFrom('downloads')
-      .where('id', '=', downloadId)
-      .execute();
   }
 }

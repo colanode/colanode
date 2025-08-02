@@ -62,13 +62,6 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       };
     }
 
-    if (!account.server.isAvailable) {
-      return {
-        type: 'retry',
-        delay: ms('2 seconds'),
-      };
-    }
-
     const workspace = account.getWorkspace(input.workspaceId);
     if (!workspace) {
       return {
@@ -86,6 +79,7 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
     const file = await this.fetchNode(workspace, upload.file_id);
     if (!file) {
       await this.deleteUpload(workspace, upload.file_id);
+
       return {
         type: 'cancel',
       };
@@ -94,8 +88,16 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
     const localFile = await this.fetchLocalFile(workspace, file.id);
     if (!localFile) {
       await this.deleteUpload(workspace, upload.file_id);
+
       return {
         type: 'cancel',
+      };
+    }
+
+    if (!account.server.isAvailable) {
+      return {
+        type: 'retry',
+        delay: ms('2 seconds'),
       };
     }
 
@@ -363,7 +365,7 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       .selectFrom('nodes')
       .selectAll()
       .where('id', '=', fileId)
-      .executeTakeFirstOrThrow();
+      .executeTakeFirst();
 
     if (!node) {
       return undefined;
@@ -380,7 +382,7 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       .selectFrom('local_files')
       .selectAll()
       .where('id', '=', fileId)
-      .executeTakeFirstOrThrow();
+      .executeTakeFirst();
   }
 
   private async updateUpload(
@@ -411,9 +413,19 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
     workspace: WorkspaceService,
     fileId: string
   ): Promise<void> {
-    await workspace.database
+    const deletedUpload = await workspace.database
       .deleteFrom('uploads')
       .where('file_id', '=', fileId)
-      .execute();
+      .returningAll()
+      .executeTakeFirst();
+
+    if (deletedUpload) {
+      eventBus.publish({
+        type: 'upload.deleted',
+        accountId: workspace.accountId,
+        workspaceId: workspace.id,
+        upload: mapUpload(deletedUpload),
+      });
+    }
   }
 }

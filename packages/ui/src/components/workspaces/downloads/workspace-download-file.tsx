@@ -2,6 +2,7 @@ import { Folder } from 'lucide-react';
 
 import { LocalFileNode, Download } from '@colanode/client/types';
 import { formatBytes, timeAgo } from '@colanode/core';
+import { FileIcon } from '@colanode/ui/components/files/file-icon';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import {
   Tooltip,
@@ -30,19 +31,22 @@ export const WorkspaceDownloadFile = ({
     nodeId: download.fileId,
   });
 
-  const file = fileQuery.data as LocalFileNode;
-  if (!file) {
-    return null;
-  }
+  const file = fileQuery.data as LocalFileNode | undefined;
 
   return (
     <div
       className="border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors flex items-center gap-6 cursor-pointer"
       onClick={() => {
-        layout.previewLeft(file.id, true);
+        if (file) {
+          layout.previewLeft(file.id, true);
+        }
       }}
     >
-      <FileThumbnail file={file} className="size-10 text-muted-foreground" />
+      {file ? (
+        <FileThumbnail file={file} className="size-10 text-muted-foreground" />
+      ) : (
+        <FileIcon mimeType={download.mimeType} className="size-10" />
+      )}
 
       <div className="flex-grow flex flex-col gap-2 justify-center items-start min-w-0">
         <p className="font-medium text-sm truncate">{download.name}</p>
