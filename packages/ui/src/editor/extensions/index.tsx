@@ -34,6 +34,10 @@ import { PageNode } from '@colanode/ui/editor/extensions/page';
 import { ParagraphNode } from '@colanode/ui/editor/extensions/paragraph';
 import { PlaceholderExtension } from '@colanode/ui/editor/extensions/placeholder';
 import { TabKeymapExtension } from '@colanode/ui/editor/extensions/tab-keymap';
+import { TableNode } from '@colanode/ui/editor/extensions/table';
+import { TableCellNode } from '@colanode/ui/editor/extensions/table-cell';
+import { TableHeaderNode } from '@colanode/ui/editor/extensions/table-header';
+import { TableRowNode } from '@colanode/ui/editor/extensions/table-row';
 import { TaskItemNode } from '@colanode/ui/editor/extensions/task-item';
 import { TaskListNode } from '@colanode/ui/editor/extensions/task-list';
 import { TempFileNode } from '@colanode/ui/editor/extensions/temp-file';
@@ -70,6 +74,10 @@ export {
   PlaceholderExtension,
   StrikethroughMark,
   TabKeymapExtension,
+  TableNode,
+  TableRowNode,
+  TableHeaderNode,
+  TableCellNode,
   TaskItemNode,
   TaskListNode,
   TextNode,

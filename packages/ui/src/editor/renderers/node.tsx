@@ -17,6 +17,10 @@ import { MentionRenderer } from '@colanode/ui/editor/renderers/mention';
 import { MessageRenderer } from '@colanode/ui/editor/renderers/message';
 import { OrderedListRenderer } from '@colanode/ui/editor/renderers/ordered-list';
 import { ParagraphRenderer } from '@colanode/ui/editor/renderers/paragraph';
+import { TableRenderer } from '@colanode/ui/editor/renderers/table';
+import { TableCellRenderer } from '@colanode/ui/editor/renderers/table-cell';
+import { TableHeaderRenderer } from '@colanode/ui/editor/renderers/table-header';
+import { TableRowRenderer } from '@colanode/ui/editor/renderers/table-row';
 import { TaskItemRenderer } from '@colanode/ui/editor/renderers/task-item';
 import { TaskListRenderer } from '@colanode/ui/editor/renderers/task-list';
 import { TextRenderer } from '@colanode/ui/editor/renderers/text';
@@ -79,6 +83,18 @@ export const NodeRenderer = ({
         ))
         .with('hardBreak', () => (
           <HardBreakRenderer node={node} keyPrefix={keyPrefix} />
+        ))
+        .with('table', () => (
+          <TableRenderer node={node} keyPrefix={keyPrefix} />
+        ))
+        .with('tableRow', () => (
+          <TableRowRenderer node={node} keyPrefix={keyPrefix} />
+        ))
+        .with('tableCell', () => (
+          <TableCellRenderer node={node} keyPrefix={keyPrefix} />
+        ))
+        .with('tableHeader', () => (
+          <TableHeaderRenderer node={node} keyPrefix={keyPrefix} />
         ))
         .otherwise(() => null)}
     </MarkRenderer>

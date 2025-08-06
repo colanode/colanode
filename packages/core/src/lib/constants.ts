@@ -15,6 +15,10 @@ export const EditorNodeTypes = {
   File: 'file',
   Folder: 'folder',
   TempFile: 'tempFile',
+  Table: 'table',
+  TableHeader: 'tableHeader',
+  TableCell: 'tableCell',
+  TableRow: 'tableRow',
 };
 
 export type SortDirection = 'asc' | 'desc';
