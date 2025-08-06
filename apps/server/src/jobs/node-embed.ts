@@ -1,4 +1,5 @@
-import { OpenAIEmbeddings } from '@langchain/openai';
+import { openai } from '@ai-sdk/openai';
+import { embedMany } from 'ai';
 import { sql } from 'kysely';
 
 import { getNodeModel } from '@colanode/core';
@@ -57,11 +58,7 @@ export const nodeEmbedHandler: JobHandler<NodeEmbedInput> = async (input) => {
     return;
   }
 
-  const embeddings = new OpenAIEmbeddings({
-    apiKey: config.ai.embedding.apiKey,
-    modelName: config.ai.embedding.modelName,
-    dimensions: config.ai.embedding.dimensions,
-  });
+  const embeddingModel = openai.embedding(config.ai.embedding.modelName);
 
   const existingEmbeddings = await database
     .selectFrom('node_embeddings')
@@ -123,7 +120,10 @@ export const nodeEmbedHandler: JobHandler<NodeEmbedInput> = async (input) => {
       item.summary ? `${item.summary}\n\n${item.text}` : item.text
     );
 
-    const embeddingVectors = await embeddings.embedDocuments(textsToEmbed);
+    const { embeddings: embeddingVectors } = await embedMany({
+      model: embeddingModel,
+      values: textsToEmbed,
+    });
     for (let j = 0; j < batch.length; j++) {
       const vector = embeddingVectors[j];
       const batchItem = batch[j];

@@ -1,13 +1,11 @@
 /**
  * AI Assistant Demo and Examples
  *
- * This file demonstrates how to use the new AI assistant system
+ * This file demonstrates how to use the new AI workflow-based assistant system
  * and provides examples for different use cases.
  */
 
 import { getAIService, processAIRequest } from './ai-service';
-import { runAIWorkflow } from './ai-workflow';
-import { getWorkspaceAssistant } from './ai-assistant';
 
 /**
  * Demo: Basic AI Assistant Usage
@@ -33,7 +31,6 @@ export async function demoBasicUsage() {
       'What are the latest documents about project management?'
     );
     console.log('🤖 AI Response:', response.finalAnswer);
-    console.log('🎯 Intent:', response.intent);
     console.log('🔍 Search Performed:', response.searchPerformed);
     console.log('⏱️ Processing Time:', `${response.processingTimeMs}ms`);
     console.log('📚 Citations:', response.citations.length);
@@ -43,15 +40,15 @@ export async function demoBasicUsage() {
 }
 
 /**
- * Demo: Workflow-Based Processing
+ * Demo: Complex Database Query Processing
  *
- * Shows how to use the workflow approach for more complex scenarios
+ * Shows how the service handles complex database queries
  */
-export async function demoWorkflowUsage() {
-  console.log('\n🔄 === Workflow-Based Processing Demo ===');
+export async function demoComplexDatabaseQuery() {
+  console.log('\n🗄️ === Complex Database Query Demo ===');
 
   try {
-    const response = await runAIWorkflow({
+    const response = await processAIRequest({
       userInput:
         'Can you help me understand the Q3 sales data from our database?',
       workspaceId: 'demo_workspace_123',
@@ -67,55 +64,59 @@ export async function demoWorkflowUsage() {
       'Can you help me understand the Q3 sales data from our database?'
     );
     console.log('🤖 AI Response:', response.finalAnswer);
-    console.log('🎯 Intent:', response.intent);
     console.log('🔍 Search Performed:', response.searchPerformed);
     console.log('⏱️ Processing Time:', `${response.processingTimeMs}ms`);
-    console.log('📊 Workflow Steps:', response.workflowSteps?.join(' → '));
+    console.log('📚 Citations Found:', response.citations.length);
   } catch (error) {
-    console.error('❌ Workflow demo failed:', error);
+    console.error('❌ Complex query demo failed:', error);
   }
 }
 
 /**
- * Demo: Direct Agent Interaction
+ * Demo: Workflow System Usage
  *
- * Shows how to interact directly with the assistant agent
+ * Shows how the new workflow system handles different types of queries
  */
-export async function demoDirectAgentUsage() {
-  console.log('\n🎭 === Direct Agent Interaction Demo ===');
+export async function demoWorkflowUsage() {
+  console.log('\n🔄 === Workflow System Demo ===');
 
   try {
-    const assistant = getWorkspaceAssistant();
-
-    // First interaction
-    const response1 = await assistant.generate([
-      {
-        role: 'user',
-        content: 'Remember that I prefer detailed technical explanations.',
+    // Test general knowledge query (no_context intent)
+    console.log('\n📚 Testing general knowledge query...');
+    const generalResponse = await processAIRequest({
+      userInput: 'What is TypeScript and why is it useful?',
+      workspaceId: 'demo_workspace_123',
+      userId: 'demo_user_456',
+      userDetails: {
+        name: 'John Doe',
+        email: 'john@example.com',
       },
-    ]);
+    });
 
-    console.log(
-      '📝 First Message:',
-      'Remember that I prefer detailed technical explanations.'
-    );
-    console.log('🤖 Assistant Response:', response1.text);
+    console.log('📝 Query: What is TypeScript and why is it useful?');
+    console.log('🤖 Response:', generalResponse.finalAnswer.substring(0, 200) + '...');
+    console.log('🔍 Search Performed:', generalResponse.searchPerformed);
+    console.log('📚 Citations:', generalResponse.citations.length);
 
-    // Second interaction (should remember the preference)
-    const response2 = await assistant.generate([
-      {
-        role: 'user',
-        content: 'Explain how our document search system works.',
+    // Test workspace-specific query (retrieve intent)
+    console.log('\n🔍 Testing workspace-specific query...');
+    const workspaceResponse = await processAIRequest({
+      userInput: 'Show me recent documents about project planning',
+      workspaceId: 'demo_workspace_123',
+      userId: 'demo_user_456',
+      userDetails: {
+        name: 'Jane Smith',
+        email: 'jane@example.com',
       },
-    ]);
+    });
 
-    console.log(
-      '📝 Second Message:',
-      'Explain how our document search system works.'
-    );
-    console.log('🤖 Assistant Response:', response2.text);
+    console.log('📝 Query: Show me recent documents about project planning');
+    console.log('🤖 Response:', workspaceResponse.finalAnswer.substring(0, 200) + '...');
+    console.log('🔍 Search Performed:', workspaceResponse.searchPerformed);
+    console.log('📚 Citations:', workspaceResponse.citations.length);
+
   } catch (error) {
-    console.error('❌ Direct agent demo failed:', error);
+    console.error('❌ Workflow demo failed:', error);
   }
 }
 
@@ -230,7 +231,6 @@ export async function demoPerformance() {
       });
       const totalTime = Date.now() - startTime;
 
-      console.log('🎯 Intent:', response.intent);
       console.log('🔍 Search Performed:', response.searchPerformed);
       console.log('⏱️ Service Time:', `${response.processingTimeMs}ms`);
       console.log('⏱️ Total Time:', `${totalTime}ms`);
@@ -258,8 +258,8 @@ export async function runAllDemos() {
   try {
     await demoHealthCheck();
     await demoBasicUsage();
+    await demoComplexDatabaseQuery();
     await demoWorkflowUsage();
-    await demoDirectAgentUsage();
     await demoErrorHandling();
     await demoPerformance();
 
@@ -288,35 +288,35 @@ export function showMigrationComparison() {
 │ ❌ Difficult to test and maintain                       │
 └─────────────────────────────────────────────────────────┘
 
-📊 AFTER (Clean Mastra System):
+📊 AFTER (Clean Mastra Workflow System):
 ┌─────────────────────────────────────────────────────────┐
-│ ✅ 6 focused files with clear responsibilities          │
-│ ✅ Simple service layer with AI orchestration           │
-│ ✅ Automatic memory and context management              │
-│ ✅ Type-safe tools and agents                           │
-│ ✅ Dynamic runtime configuration                        │
-│ ✅ Built-in RAG with automatic reranking                │
-│ ✅ Modular, testable components                         │
-│ ✅ Easy to understand and extend                        │
+│ ✅ Workflow-based architecture with proper orchestration│
+│ ✅ Specialized agents for intent detection and answering │
+│ ✅ Type-safe workflow steps with full observability     │
+│ ✅ Intelligent routing (no_context vs retrieve)         │
+│ ✅ Built-in RAG with automatic context fetching         │
+│ ✅ Unified processing with branching logic              │
+│ ✅ Proper citation handling and deduplication           │
+│ ✅ Easy to extend with new workflow steps               │
 └─────────────────────────────────────────────────────────┘
 
 🎯 KEY IMPROVEMENTS:
-• 70% reduction in code complexity
-• Better error handling and recovery
-• Improved performance and reliability
-• Enhanced type safety and testing
-• Easier maintenance and feature development
-• Clear separation of concerns
-• Better documentation and examples
+• Proper Mastra workflow utilization
+• Better separation of concerns with focused agents
+• Enhanced observability and debugging capabilities
+• Type-safe workflow orchestration
+• Intelligent intent-based routing
+• Simplified yet more powerful architecture
+• Built-in error handling and fallbacks
 
 📁 NEW FILE STRUCTURE:
-├── ai-models.ts      → Model configuration and providers
+├── ai-workflow.ts    → Main workflow orchestration (NEW)
+├── ai-agents.ts      → Intent and answer agents
 ├── ai-tools.ts       → Document search and database tools
-├── ai-agents.ts      → Specialized agents (intent, rewrite, etc.)
-├── ai-assistant.ts   → Main assistant configuration
-├── ai-service.ts     → Service layer and orchestration
-├── ai-workflow.ts    → Workflow implementation
-└── ai-demo.ts        → Examples and demonstrations
+├── ai-service.ts     → Service layer with workflow integration
+├── ai-models.ts      → Model configuration (simplified)
+├── ai-assistant.ts   → Legacy compatibility (minimal)
+└── ai-demo.ts        → Workflow demonstrations
 `);
 }
 

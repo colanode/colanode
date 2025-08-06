@@ -5,15 +5,18 @@ import {
   getNodeModel,
   MessageAttributes,
 } from '@colanode/core';
+import { Mastra } from '@mastra/core';
+import { RuntimeContext } from '@mastra/core/runtime-context';
 import { database } from '@colanode/server/data/database';
 import { SelectNode } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
+import { assistantWorkflow } from '@colanode/server/lib/ai/ai-workflow';
 import {
-  processAIRequest,
-  AssistantRequest,
-} from '@colanode/server/lib/ai/ai-service';
+  AssistantWorkflowInput,
+  AssistantWorkflowOutput,
+} from '@colanode/server/types/ai';
 import { config } from '@colanode/server/lib/config';
-import { fetchNode, createNode } from '@colanode/server/lib/nodes';
+import { createNode, fetchNode } from '@colanode/server/lib/nodes';
 
 interface Citation {
   sourceId: string;
@@ -86,9 +89,10 @@ export const assistantRespondHandler: JobHandler<
 
   try {
     console.log(`🚀 Processing AI assistant request for message: ${messageId}`);
+    const startTime = Date.now();
 
     // Prepare request for the AI service
-    const assistantRequest: AssistantRequest = {
+    const assistantRequest: AssistantWorkflowInput = {
       userInput: messageText,
       workspaceId,
       userId: user.id,
@@ -101,11 +105,49 @@ export const assistantRespondHandler: JobHandler<
       selectedContextNodeIds,
     };
 
-    // Process the request through the AI service
-    const assistantResult = await processAIRequest(assistantRequest);
+    // Prepare runtime context
+    const runtimeContext = new RuntimeContext();
+    runtimeContext.set('workspaceName', workspace.name || workspaceId);
+    runtimeContext.set('userName', user.name || 'User');
+    runtimeContext.set('userEmail', user.email || '');
+    runtimeContext.set('workspaceId', workspaceId);
+    runtimeContext.set('userId', user.id);
+    runtimeContext.set('selectedContextNodeIds', selectedContextNodeIds || []);
+    runtimeContext.set('userInput', messageText);
+
+    // Initialize Mastra and get the workflow
+    const mastra = new Mastra({
+      workflows: {
+        assistantWorkflow,
+      },
+    });
+    const workflow = mastra.getWorkflow('assistantWorkflow');
+    const run = await workflow.createRunAsync();
+
+    // Execute the workflow
+    const result = await run.start({
+      inputData: assistantRequest,
+      runtimeContext,
+    });
+
+    if (result.status !== 'success' || !result.result) {
+      const errorMessage =
+        result.status === 'suspended'
+          ? 'Workflow was suspended unexpectedly'
+          : (result as any).error || 'Workflow execution failed';
+      console.error('❌ Workflow failed:', errorMessage);
+      throw new Error(errorMessage);
+    }
+
+    const assistantResult: AssistantWorkflowOutput = {
+      ...result.result,
+      processingTimeMs: Date.now() - startTime,
+    };
 
     console.log(
-      `✅ AI response generated (${assistantResult.processingTimeMs}ms): ${assistantResult.intent || 'unknown'} intent`
+      `✅ AI response generated (${assistantResult.processingTimeMs}ms): ${
+        assistantResult.searchPerformed ? 'with search' : 'no search'
+      }`
     );
 
     await createAndPublishResponse(

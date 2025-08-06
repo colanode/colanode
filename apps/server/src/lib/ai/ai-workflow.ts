@@ -1,254 +1,518 @@
-/**
- * AI Assistant Workflow Implementation
- *
- * This file provides a workflow-based approach to AI assistant operations
- * for more complex, multi-step scenarios that require explicit orchestration.
- */
-
 import { createWorkflow, createStep } from '@mastra/core/workflows';
 import { z } from 'zod';
-
 import {
-  processAIRequest,
-  AssistantRequest,
-  AssistantResponse,
-} from './ai-service';
+  createIntentAgent,
+  createAnswerAgent,
+  createQueryAgent,
+  createRerankAgent,
+} from './ai-agents';
+import { createAITools } from './ai-tools';
+import {
+  assistantWorkflowInputSchema,
+  assistantWorkflowOutputSchema,
+  intentClassificationOutputSchema,
+  queryRewriteOutputSchema,
+  searchResultsOutputSchema,
+  rankedResultsOutputSchema,
+  answerOutputSchema,
+} from '@colanode/server/types/ai';
 
-/**
- * Input schema for the AI assistant workflow
- */
-const workflowInputSchema = z.object({
-  userInput: z.string().describe("The user's query or request"),
-  workspaceId: z.string().describe('ID of the workspace'),
-  userId: z.string().describe('ID of the requesting user'),
-  userDetails: z.object({
-    name: z.string().describe("User's display name"),
-    email: z.string().describe("User's email address"),
-  }),
-  parentMessageId: z
-    .string()
-    .optional()
-    .describe('ID of parent message for context'),
-  currentMessageId: z.string().optional().describe('ID of current message'),
-  selectedContextNodeIds: z
-    .array(z.string())
-    .optional()
-    .describe('Specific nodes to search within'),
+const intentClassificationStep = createStep({
+  id: 'intent-classification-step',
+  description:
+    'Classify user intent: general knowledge vs workspace-specific query',
+  inputSchema: assistantWorkflowInputSchema,
+  outputSchema: intentClassificationOutputSchema,
+  execute: async ({ inputData, runtimeContext }) => {
+    const intentAgent = createIntentAgent();
+
+    const prompt = `You are an intent classifier. Your only job is to determine if this query needs workspace data.
+
+Query: "${inputData.userInput}"
+
+Classify as:
+- "no_context": General knowledge, explanations, calculations, definitions
+- "retrieve": Workspace-specific content, documents, people, or data
+
+Examples:
+- "What is TypeScript?" → no_context
+- "How do I write clean code?" → no_context  
+- "Show me recent documents" → retrieve
+- "Find projects by John" → retrieve
+
+Respond with just the classification and your confidence (0-1).`;
+
+    try {
+      const response = await intentAgent.generate(
+        [{ role: 'user', content: prompt }],
+        {
+          runtimeContext,
+          output: z.object({
+            intent: z.enum(['no_context', 'retrieve']),
+            confidence: z.number().min(0).max(1),
+            reasoning: z.string().optional(),
+          }),
+        }
+      );
+
+      console.log(
+        `🎯 Intent: ${response.object.intent} (confidence: ${response.object.confidence})`
+      );
+
+      return {
+        intent: response.object.intent,
+        confidence: response.object.confidence,
+        reasoning: response.object.reasoning,
+        originalInput: inputData.userInput,
+      };
+    } catch (error) {
+      throw error;
+    }
+  },
 });
 
-/**
- * Output schema for the AI assistant workflow
- */
-const workflowOutputSchema = z.object({
-  finalAnswer: z.string().describe("The assistant's final response"),
-  citations: z
-    .array(
-      z.object({
-        sourceId: z.string().describe('ID of the source document/node'),
-        quote: z.string().describe('Relevant quote from the source'),
-      })
-    )
-    .describe('Citations supporting the response'),
-  intent: z.enum(['retrieve', 'no_context']).describe('Determined user intent'),
-  searchPerformed: z
-    .boolean()
-    .describe('Whether workspace search was performed'),
-  processingTimeMs: z
-    .number()
-    .describe('Total processing time in milliseconds'),
-  workflowSteps: z.array(z.string()).describe('Steps executed in the workflow'),
+const queryRewriteStep = createStep({
+  id: 'query-rewrite-step',
+  description: 'Optimize user query for semantic and keyword search',
+  inputSchema: intentClassificationOutputSchema,
+  outputSchema: queryRewriteOutputSchema,
+  execute: async ({ inputData, runtimeContext }) => {
+    const queryAgent = createQueryAgent();
+
+    const prompt = `Original Query: "${inputData.originalInput}"
+
+Create two optimized versions for search.`;
+
+    try {
+      const response = await queryAgent.generate(
+        [{ role: 'user', content: prompt }],
+        {
+          runtimeContext,
+          output: z.object({
+            semanticQuery: z.string(),
+            keywordQuery: z.string(),
+          }),
+        }
+      );
+
+      console.log(`🔍 Semantic query: "${response.object.semanticQuery}"`);
+      console.log(`🔑 Keyword query: "${response.object.keywordQuery}"`);
+
+      return {
+        semanticQuery: response.object.semanticQuery,
+        keywordQuery: response.object.keywordQuery,
+        originalQuery: inputData.originalInput,
+        intent: inputData.intent,
+      };
+    } catch (error) {
+      throw error;
+    }
+  },
 });
 
-/**
- * Step 1: Request Validation and Preprocessing
- */
-const validateRequestStep = createStep({
-  id: 'validate-request',
-  description: 'Validate and preprocess the incoming AI request',
-  inputSchema: workflowInputSchema,
-  outputSchema: workflowInputSchema.extend({
-    validated: z.boolean(),
-    validationErrors: z.array(z.string()).optional(),
-  }),
+const runSearchesStep = createStep({
+  id: 'run-searches-step',
+  description: 'Execute parallel semantic and keyword searches',
+  inputSchema: queryRewriteOutputSchema,
+  outputSchema: searchResultsOutputSchema,
+  execute: async ({ inputData, runtimeContext }) => {
+    const workspaceId = runtimeContext?.get('workspaceId') as string;
+    const userId = runtimeContext?.get('userId') as string;
+    const selectedContextNodeIds =
+      (runtimeContext?.get('selectedContextNodeIds') as string[]) || [];
+
+    if (!workspaceId || !userId) {
+      console.error('❌ Missing required runtime context for search');
+      throw new Error('Missing required runtime context for search');
+    }
+
+    console.log(`🔍 Running parallel searches...`);
+    console.log(`   Semantic: "${inputData.semanticQuery}"`);
+    console.log(`   Keyword: "${inputData.keywordQuery}"`);
+
+    try {
+      const tools = createAITools();
+
+      // Run granular searches in parallel
+      const [semanticResults, keywordResults] = await Promise.all([
+        tools.semanticSearch.execute({
+          context: {
+            query: inputData.semanticQuery,
+            workspaceId,
+            userId,
+            maxResults: 15, // Get more from each search for better combination
+            selectedContextNodeIds,
+          },
+          runtimeContext,
+        }),
+        tools.keywordSearch.execute({
+          context: {
+            query: inputData.keywordQuery,
+            workspaceId,
+            userId,
+            maxResults: 15,
+            selectedContextNodeIds,
+          },
+          runtimeContext,
+        }),
+      ]);
+
+      // Combine results from both search types
+      const allResults = [
+        ...semanticResults.results,
+        ...keywordResults.results,
+      ];
+
+      console.log(`📊 Search completed: ${allResults.length} total results`);
+      console.log(`   - Semantic: ${semanticResults.results.length}`);
+      console.log(`   - Keyword: ${keywordResults.results.length}`);
+
+      return {
+        results: allResults,
+        searchType: 'hybrid' as const,
+        totalFound: allResults.length,
+      };
+    } catch (error) {
+      console.error('❌ Search execution failed:', error);
+      throw error;
+    }
+  },
+});
+
+const combineResultsStep = createStep({
+  id: 'combine-results-step',
+  description: 'Combine and score search results using RRF algorithm',
+  inputSchema: searchResultsOutputSchema,
+  outputSchema: searchResultsOutputSchema, // Same schema for now
   execute: async ({ inputData }) => {
-    console.log('🔍 Validating AI request...');
-
-    const errors: string[] = [];
-
-    // Validate required fields
-    if (!inputData.userInput.trim()) {
-      errors.push('User input cannot be empty');
+    if (inputData.results.length === 0) {
+      console.log('📭 No results to combine');
+      return inputData; // Pass through if no results
     }
 
-    if (!inputData.workspaceId) {
-      errors.push('Workspace ID is required');
-    }
+    console.log(`🔄 Combining ${inputData.results.length} search results`);
 
-    if (!inputData.userId) {
-      errors.push('User ID is required');
-    }
+    // Simple combination: remove duplicates and apply recency boost
+    const uniqueResults = new Map();
 
-    if (!inputData.userDetails.name) {
-      errors.push('User name is required');
-    }
+    inputData.results.forEach((result, index) => {
+      const key = result.sourceId;
 
-    const validated = errors.length === 0;
+      if (!uniqueResults.has(key)) {
+        // Apply position-based scoring (earlier results get higher scores)
+        const positionScore = 1 / (index + 1);
+        const recencyBoost = result.metadata.createdAt
+          ? Math.max(
+              0,
+              1 -
+                (Date.now() - new Date(result.metadata.createdAt).getTime()) /
+                  (1000 * 60 * 60 * 24 * 30)
+            ) // 30 days
+          : 0;
 
-    if (!validated) {
-      console.log('❌ Request validation failed:', errors);
-    } else {
-      console.log('✅ Request validation passed');
-    }
+        const combinedScore =
+          result.score * 0.7 + positionScore * 0.2 + recencyBoost * 0.1;
+
+        uniqueResults.set(key, {
+          ...result,
+          score: Math.min(1, combinedScore), // Cap at 1.0
+        });
+      }
+    });
+
+    // Sort by combined score
+    const combinedResults = Array.from(uniqueResults.values())
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 20); // Top 20 results
+
+    console.log(`✅ Combined to ${combinedResults.length} unique results`);
 
     return {
-      ...inputData,
-      validated,
-      validationErrors: errors.length > 0 ? errors : undefined,
+      results: combinedResults,
+      searchType: inputData.searchType,
+      totalFound: combinedResults.length,
     };
   },
 });
 
-/**
- * Step 2: Process AI Request
- */
-const processRequestStep = createStep({
-  id: 'process-request',
-  description: 'Process the AI request using the assistant service',
-  inputSchema: workflowInputSchema.extend({
-    validated: z.boolean(),
-    validationErrors: z.array(z.string()).optional(),
-  }),
-  outputSchema: workflowOutputSchema,
-  execute: async ({ inputData }) => {
-    console.log('🤖 Processing AI request through service...');
-
-    // If validation failed, return error response
-    if (!inputData.validated) {
-      const errorMessage = `Request validation failed: ${inputData.validationErrors?.join(', ')}`;
+const rerankStep = createStep({
+  id: 'rerank-step',
+  description: 'Rerank search results for relevance using LLM',
+  inputSchema: searchResultsOutputSchema,
+  outputSchema: rankedResultsOutputSchema,
+  execute: async ({ inputData, runtimeContext }) => {
+    if (inputData.results.length === 0) {
+      console.log('📭 No results to rerank');
       return {
-        finalAnswer: errorMessage,
+        rankedResults: [],
         citations: [],
-        intent: 'no_context' as const,
         searchPerformed: false,
-        processingTimeMs: 0,
-        workflowSteps: ['validate-request', 'process-request (failed)'],
       };
     }
 
-    // Process the request
-    const request: AssistantRequest = {
-      userInput: inputData.userInput,
-      workspaceId: inputData.workspaceId,
-      userId: inputData.userId,
-      userDetails: inputData.userDetails,
-      parentMessageId: inputData.parentMessageId,
-      currentMessageId: inputData.currentMessageId,
-      selectedContextNodeIds: inputData.selectedContextNodeIds,
-    };
+    const originalQuery =
+      (runtimeContext?.get('userInput') as string) || 'query';
+    console.log(
+      `🎯 Reranking ${inputData.results.length} results for query: "${originalQuery}"`
+    );
 
-    const response = await processAIRequest(request);
+    try {
+      const rerankAgent = createRerankAgent();
 
-    console.log('✅ AI request processed successfully');
+      // Format results for reranking
+      const resultsText = inputData.results
+        .map(
+          (result, index) => `[${index}] ${result.content.substring(0, 300)}`
+        )
+        .join('\n\n');
 
-    return {
-      ...response,
-      workflowSteps: ['validate-request', 'process-request'],
-    };
+      const prompt = `Query: "${originalQuery}"
+
+Results to score (0.0 to 1.0 for relevance):
+
+${resultsText}
+
+Score each result based on how well it answers the query.`;
+
+      const response = await rerankAgent.generate(
+        [{ role: 'user', content: prompt }],
+        {
+          runtimeContext,
+          output: z.object({
+            scores: z.array(z.number().min(0).max(1)),
+          }),
+        }
+      );
+
+      // Apply scores and sort by relevance
+      const rankedResults = inputData.results
+        .map((result, index) => ({
+          content: result.content,
+          sourceId: result.sourceId,
+          relevanceScore: response.object.scores[index] || 0.5,
+          type: result.type,
+          metadata: result.metadata,
+        }))
+        .sort((a, b) => b.relevanceScore - a.relevanceScore)
+        .slice(0, 20); // Top 20 results
+
+      // Generate citations from top results
+      const citations = rankedResults
+        .slice(0, 10) // Top 10 for citations
+        .map((result) => ({
+          sourceId: result.sourceId,
+          quote:
+            result.content.substring(0, 200).trim() +
+            (result.content.length > 200 ? '...' : ''),
+        }));
+
+      console.log(
+        `✅ Reranked to ${rankedResults.length} results with ${citations.length} citations`
+      );
+
+      return {
+        rankedResults,
+        citations,
+        searchPerformed: true,
+      };
+    } catch (error) {
+      throw error;
+    }
   },
 });
 
-/**
- * Main AI Assistant Workflow
- *
- * This workflow provides a structured approach to processing AI requests
- * with validation, error handling, and step tracking.
- */
-export const aiAssistantWorkflow = createWorkflow({
-  id: 'ai-assistant-workflow',
-  description: 'Complete AI assistant workflow with validation and processing',
-  inputSchema: workflowInputSchema,
-  outputSchema: workflowOutputSchema,
-})
-  .then(validateRequestStep)
-  .then(processRequestStep)
-  .commit();
+const answerWithContextStep = createStep({
+  id: 'answer-with-context-step',
+  description: 'Generate response using retrieved context and citations',
+  inputSchema: rankedResultsOutputSchema,
+  outputSchema: answerOutputSchema,
+  execute: async ({ inputData, runtimeContext }) => {
+    const answerAgent = createAnswerAgent();
+    const userQuery =
+      (runtimeContext?.get('userInput') as string) || 'User query';
 
-/**
- * Execute the AI assistant workflow
- *
- * @param input - Workflow input parameters
- * @returns Promise resolving to the workflow result
- */
-export const executeAIWorkflow = async (
-  input: z.infer<typeof workflowInputSchema>
-) => {
-  console.log('🔄 Starting AI assistant workflow...');
+    if (inputData.rankedResults.length === 0) {
+      throw new Error('No context available for answering the query');
+    }
 
-  const run = await aiAssistantWorkflow.createRunAsync();
+    // Format context for the LLM
+    const contextText = inputData.rankedResults
+      .slice(0, 10) // Top 10 results
+      .map((item, index) => `[Source ${index + 1}] ${item.content}`)
+      .join('\n\n');
 
-  const result = await run.start({
-    inputData: {
-      ...input,
-      selectedContextNodeIds: input.selectedContextNodeIds || [],
-    },
-  });
+    console.log(
+      `📚 Generating response with ${inputData.rankedResults.length} context items`
+    );
 
-  if (result.status === 'success') {
-    console.log('✅ AI workflow completed successfully');
-    return {
-      success: true,
-      data: result.result,
-    };
-  } else {
-    console.error('❌ AI workflow failed:', result);
-    return {
-      success: false,
-      error: result.error || 'Workflow execution failed',
-      data: {
-        finalAnswer:
-          'I apologize, but I encountered an error while processing your request. Please try again.',
-        citations: [],
-        intent: 'no_context' as const,
-        searchPerformed: false,
-        processingTimeMs: 0,
-        workflowSteps: ['workflow-failed'],
-      },
-    };
-  }
-};
+    const prompt = `Answer the user's question using the provided workspace context.
 
-/**
- * Simplified workflow runner for common use cases
- *
- * @param request - Assistant request parameters
- * @returns Promise resolving to the assistant response
- */
-export const runAIWorkflow = async (
-  request: AssistantRequest
-): Promise<AssistantResponse> => {
-  const result = await executeAIWorkflow(request);
-  return result.data;
-};
+**User Question:** ${userQuery}
 
-/**
- * Workflow configuration constants
- */
-export const WorkflowConfig = {
-  ID: 'ai-assistant-workflow',
-  DESCRIPTION: 'Complete AI assistant workflow with validation and processing',
-  MAX_EXECUTION_TIME_MS: 60000, // 60 seconds
-  STEPS: {
-    VALIDATE: 'validate-request',
-    PROCESS: 'process-request',
+**Workspace Context:**
+${contextText}
+
+**Instructions:**
+- Use the context as your primary information source
+- Cite sources using [Source N] format when referencing context
+- If the context doesn't fully answer the question, combine it with general knowledge but clearly distinguish between the two
+- Provide specific, actionable information when possible
+- Be conversational but professional`;
+
+    try {
+      const response = await answerAgent.generate(
+        [{ role: 'user', content: prompt }],
+        { runtimeContext }
+      );
+
+      console.log(
+        `✅ Generated contextual response (${response.text.length} characters)`
+      );
+
+      return {
+        finalAnswer: response.text,
+        additionalCitations: [], // Citations already handled in previous step
+        usedContext: true,
+      };
+    } catch (error) {
+      console.error('❌ Contextual answer generation failed:', error);
+      throw error;
+    }
   },
-} as const;
+});
 
-/**
- * Export workflow utilities
- */
-export const AIWorkflow = {
-  execute: executeAIWorkflow,
-  run: runAIWorkflow,
-  workflow: aiAssistantWorkflow,
-  config: WorkflowConfig,
-} as const;
+const answerDirectStep = createStep({
+  id: 'answer-direct-step',
+  description: 'Generate direct response using general knowledge',
+  inputSchema: intentClassificationOutputSchema,
+  outputSchema: answerOutputSchema,
+  execute: async ({ inputData, runtimeContext }) => {
+    const answerAgent = createAnswerAgent();
+
+    console.log('📝 Generating direct response for general knowledge query');
+
+    const prompt = `Answer this general knowledge question with a comprehensive, helpful response.
+
+**Question:** ${inputData.originalInput}
+
+**Instructions:**
+- Provide accurate, detailed information
+- Use examples and explanations where helpful
+- Be educational and thorough
+- Use clear, professional language
+- Don't reference any workspace-specific information`;
+
+    try {
+      const response = await answerAgent.generate(
+        [{ role: 'user', content: prompt }],
+        { runtimeContext }
+      );
+
+      console.log(
+        `✅ Generated direct response (${response.text.length} characters)`
+      );
+
+      return {
+        finalAnswer: response.text,
+        additionalCitations: [],
+        usedContext: false,
+      };
+    } catch (error) {
+      console.error('❌ Direct answer generation failed:', error);
+      throw error;
+    }
+  },
+});
+
+const formatContextOutputStep = createStep({
+  id: 'format-context-output-step',
+  description: 'Format the final assistant response output with context',
+  inputSchema: answerOutputSchema,
+  outputSchema: assistantWorkflowOutputSchema,
+  execute: async ({ inputData }) => {
+    console.log(`📋 Formatting context-based response output`);
+
+    const response = {
+      finalAnswer: inputData.finalAnswer,
+      citations: inputData.additionalCitations || [],
+      searchPerformed: inputData.usedContext,
+    };
+
+    console.log(`✅ Formatted response with context`);
+    console.log(
+      `📊 Search performed: ${response.searchPerformed ? 'Yes' : 'No'}`
+    );
+    console.log(
+      `💬 Response length: ${response.finalAnswer.length} characters`
+    );
+
+    return response;
+  },
+});
+
+const formatDirectOutputStep = createStep({
+  id: 'format-direct-output-step',
+  description: 'Format the final assistant direct response output',
+  inputSchema: answerOutputSchema,
+  outputSchema: assistantWorkflowOutputSchema,
+  execute: async ({ inputData }) => {
+    console.log(`📋 Formatting direct response output (no context used)`);
+
+    const response = {
+      finalAnswer: inputData.finalAnswer,
+      citations: inputData.additionalCitations || [],
+      searchPerformed: false,
+    };
+
+    console.log(`✅ Formatted direct response`);
+    console.log(
+      `💬 Response length: ${response.finalAnswer.length} characters`
+    );
+
+    return response;
+  },
+});
+
+export const assistantWorkflow = createWorkflow({
+  id: 'assistant-workflow',
+  description:
+    'Declarative AI assistant workflow optimized for smaller LLMs with proper branching',
+  inputSchema: assistantWorkflowInputSchema,
+  outputSchema: assistantWorkflowOutputSchema,
+})
+  // Step 1: Always classify intent first
+  .then(intentClassificationStep)
+
+  // Step 2: Branch based on intent classification
+  .branch([
+    // RETRIEVE BRANCH: RAG pipeline for workspace-specific queries
+    [
+      async ({ inputData }) => inputData.intent === 'retrieve',
+      createWorkflow({
+        id: 'retrieve-branch',
+        inputSchema: intentClassificationOutputSchema,
+        outputSchema: assistantWorkflowOutputSchema,
+      })
+        .then(queryRewriteStep) // Optimize query for search
+        .then(runSearchesStep) // Execute parallel searches
+        .then(combineResultsStep) // Combine results algorithmically
+        .then(rerankStep) // LLM-based reranking
+        .then(answerWithContextStep) // Generate answer with context
+        .then(formatContextOutputStep) // Format output
+        .commit(),
+    ],
+
+    // NO_CONTEXT BRANCH: Direct answer for general knowledge queries
+    [
+      async ({ inputData }) => inputData.intent === 'no_context',
+      createWorkflow({
+        id: 'no-context-branch',
+        inputSchema: intentClassificationOutputSchema,
+        outputSchema: assistantWorkflowOutputSchema,
+      })
+        .then(answerDirectStep) // Generate direct answer
+        .then(formatDirectOutputStep) // Format output
+        .commit(),
+    ],
+  ])
+  .commit();

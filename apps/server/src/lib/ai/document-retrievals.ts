@@ -1,34 +1,35 @@
-import { Document } from '@langchain/core/documents';
-import { OpenAIEmbeddings } from '@langchain/openai';
+import { MDocument } from '@mastra/rag';
+import { openai } from '@ai-sdk/openai';
+import { embed } from 'ai';
 import { sql } from 'kysely';
 
 import { database } from '@colanode/server/data/database';
 import { combineAndScoreSearchResults } from '@colanode/server/lib/ai/utils';
 import { config } from '@colanode/server/lib/config';
-import { RewrittenQuery } from '@colanode/server/types/llm';
+import { QueryRewriteOutput } from '@colanode/server/types/ai';
 import { SearchResult } from '@colanode/server/types/retrieval';
 
-const embeddings = config.ai.enabled
-  ? new OpenAIEmbeddings({
-      apiKey: config.ai.embedding.apiKey,
-      modelName: config.ai.embedding.modelName,
-      dimensions: config.ai.embedding.dimensions,
-    })
+const embeddingModel = config.ai.enabled
+  ? openai.embedding(config.ai.embedding.modelName)
   : undefined;
 
 export const retrieveDocuments = async (
-  rewrittenQuery: RewrittenQuery,
+  rewrittenQuery: QueryRewriteOutput,
   workspaceId: string,
   userId: string,
   limit?: number,
   contextNodeIds?: string[]
-): Promise<Document[]> => {
-  if (!config.ai.enabled || !embeddings) {
+): Promise<MDocument[]> => {
+  if (!config.ai.enabled || !embeddingModel) {
     return [];
   }
 
   const maxResults = limit ?? config.ai.retrieval.hybridSearch.maxResults;
-  const embedding = await embeddings.embedQuery(rewrittenQuery.semanticQuery);
+
+  const { embedding } = await embed({
+    model: embeddingModel,
+    value: rewrittenQuery.semanticQuery,
+  });
 
   if (!embedding) {
     return [];
@@ -187,8 +188,8 @@ const keywordSearchDocuments = async (
 const combineSearchResults = async (
   semanticResults: SearchResult[],
   keywordResults: SearchResult[]
-): Promise<Document[]> => {
-  if (!config.ai.enabled || !embeddings) {
+): Promise<MDocument[]> => {
+  if (!config.ai.enabled || !embeddingModel) {
     return [];
   }
 

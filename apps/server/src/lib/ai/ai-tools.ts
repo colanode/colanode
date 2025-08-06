@@ -1,35 +1,13 @@
-/**
- * AI Tools for Workspace Operations
- *
- * This file contains all the tools that the AI assistant can use to interact
- * with workspace data, including enhanced document search with reranking
- * and advanced database filtering with optimized configurations.
- */
-
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 
-/**
- * Enhanced Document Search Tool
- *
- * Advanced workspace document search with semantic and keyword search,
- * automatic reranking, and quality filtering for optimal results.
- */
-export const createDocumentSearchTool = () =>
+export const createSemanticSearchTool = () =>
   createTool({
-    id: 'workspace-document-search',
+    id: 'semantic-search',
     description:
-      'Search through workspace documents and nodes to find relevant information using advanced semantic search with reranking',
+      'Perform pure semantic/vector search on workspace documents and nodes',
     inputSchema: z.object({
-      query: z.string().describe('The search query'),
-      semanticQuery: z
-        .string()
-        .optional()
-        .describe('Optimized semantic search query'),
-      keywordQuery: z
-        .string()
-        .optional()
-        .describe('Optimized keyword search query'),
+      query: z.string().describe('The semantic search query'),
       workspaceId: z.string().describe('The workspace ID to search in'),
       userId: z.string().describe('The user ID for access control'),
       maxResults: z
@@ -40,14 +18,6 @@ export const createDocumentSearchTool = () =>
         .array(z.string())
         .optional()
         .describe('Specific node IDs to search within'),
-      enableReranking: z
-        .boolean()
-        .default(true)
-        .describe('Whether to use advanced reranking for better results'),
-      minScore: z
-        .number()
-        .optional()
-        .describe('Minimum relevance score threshold (0-1)'),
     }),
     outputSchema: z.object({
       results: z.array(
@@ -59,7 +29,7 @@ export const createDocumentSearchTool = () =>
             .string()
             .describe('The type of content (document, node, etc.)'),
           sourceId: z.string().describe('Unique identifier for the source'),
-          score: z.number().describe('Relevance score (0-1)'),
+          score: z.number().describe('Semantic similarity score (0-1)'),
           metadata: z
             .record(z.any())
             .describe('Additional metadata about the source'),
@@ -67,45 +37,39 @@ export const createDocumentSearchTool = () =>
       ),
       totalFound: z.number().describe('Total number of results found'),
       searchType: z
-        .enum(['semantic', 'keyword', 'hybrid'])
-        .describe('Type of search performed'),
+        .literal('semantic')
+        .describe('Always semantic for this tool'),
     }),
     execute: async ({ context }) => {
-      // Import the existing retrieval functions
       const { retrieveNodes } = await import(
         '@colanode/server/lib/ai/node-retrievals'
       );
       const { retrieveDocuments } = await import(
         '@colanode/server/lib/ai/document-retrievals'
       );
-      const { rerankDocuments } = await import('@colanode/server/lib/ai/llms');
 
       const {
         query,
-        semanticQuery = query,
-        keywordQuery = query,
         workspaceId,
         userId,
-        maxResults,
+        maxResults = 10,
         selectedContextNodeIds = [],
-        enableReranking = true,
-        minScore,
       } = context;
 
       try {
-        console.log(`🔍 Searching workspace documents for: "${query}"`);
+        console.log(`🔍 Semantic search for: "${query}" (max: ${maxResults})`);
 
-        // Perform parallel search across nodes and documents
+        // Perform semantic search only (no keyword search)
         const [nodeResults, documentResults] = await Promise.all([
           retrieveNodes(
-            { semanticQuery, keywordQuery },
+            { semanticQuery: query, keywordQuery: '' }, // Empty keywordQuery for pure semantic
             workspaceId,
             userId,
             maxResults,
             selectedContextNodeIds
           ),
           retrieveDocuments(
-            { semanticQuery, keywordQuery },
+            { semanticQuery: query, keywordQuery: '' },
             workspaceId,
             userId,
             maxResults,
@@ -113,97 +77,251 @@ export const createDocumentSearchTool = () =>
           ),
         ]);
 
-        const allResults = [...nodeResults, ...documentResults];
+        const allResults = [...nodeResults, ...documentResults]
+          .sort((a, b) => (b.metadata.score || 0) - (a.metadata.score || 0)) // Sort by semantic score
+          .slice(0, maxResults);
 
-        if (allResults.length === 0) {
-          console.log('📭 No documents found matching the search criteria');
-          return {
-            results: [],
-            totalFound: 0,
-            searchType: 'hybrid' as const,
-          };
-        }
+        // Convert to standardized format
+        const results = allResults.map((doc) => ({
+          content: doc.pageContent || '',
+          type: doc.metadata.type || 'document',
+          sourceId: doc.metadata.id || '',
+          score: doc.metadata.score || 0,
+          metadata: doc.metadata || {},
+        }));
 
-        console.log(
-          `📄 Found ${allResults.length} initial results, reranking for relevance...`
-        );
-
-        let finalResults = allResults;
-
-        // Apply reranking if enabled
-        if (enableReranking) {
-          const docsForRerank = allResults.map((doc) => ({
-            content: doc.pageContent,
-            type: doc.metadata.type,
-            sourceId: doc.metadata.id,
-          }));
-
-          const rerankedContext = await rerankDocuments(
-            docsForRerank,
-            semanticQuery
-          );
-
-          finalResults = rerankedContext
-            .map((item) => {
-              const originalDoc = allResults.find(
-                (doc) => doc.metadata.id === item.sourceId
-              );
-              return originalDoc;
-            })
-            .filter((doc): doc is NonNullable<typeof doc> => Boolean(doc));
-        }
-
-        // Convert to standardized output format with optional score filtering
-        const results = finalResults
-          .map((doc) => ({
-            content: doc.pageContent || '',
-            type: doc.metadata.type || 'document',
-            sourceId: doc.metadata.id || '',
-            score: doc.metadata.score || 0,
-            metadata: doc.metadata || {},
-          }))
-          .filter((result) => {
-            // Apply minimum score threshold if specified
-            return minScore ? result.score >= minScore : true;
-          })
-          .slice(0, maxResults); // Ensure we don't exceed max results
-
-        console.log(`✅ Returning ${results.length} reranked results`);
+        console.log(`✅ Semantic search found ${results.length} results`);
 
         return {
           results,
           totalFound: allResults.length,
-          searchType: 'hybrid' as const,
+          searchType: 'semantic' as const,
         };
       } catch (error) {
-        console.error('❌ Document search error:', error);
-        return {
-          results: [],
-          totalFound: 0,
-          searchType: 'hybrid' as const,
-        };
+        console.error('❌ Semantic search error:', error);
+        throw error;
       }
     },
   });
 
-/**
- * Database Filter Tool
- *
- * Filters database records based on natural language queries by generating
- * appropriate filter conditions and executing them.
- */
-export const createDatabaseFilterTool = () =>
+export const createKeywordSearchTool = () =>
   createTool({
-    id: 'workspace-database-filter',
-    description: 'Filter database records based on natural language queries',
+    id: 'keyword-search',
+    description:
+      'Perform pure keyword/full-text search on workspace documents and nodes',
     inputSchema: z.object({
-      query: z.string().describe('The natural language query'),
-      workspaceId: z.string().describe('The workspace ID'),
+      query: z.string().describe('The keyword search query'),
+      workspaceId: z.string().describe('The workspace ID to search in'),
       userId: z.string().describe('The user ID for access control'),
       maxResults: z
         .number()
         .default(10)
-        .describe('Maximum number of records to return'),
+        .describe('Maximum number of results to return'),
+      selectedContextNodeIds: z
+        .array(z.string())
+        .optional()
+        .describe('Specific node IDs to search within'),
+    }),
+    outputSchema: z.object({
+      results: z.array(
+        z.object({
+          content: z
+            .string()
+            .describe('The content of the found document/node'),
+          type: z
+            .string()
+            .describe('The type of content (document, node, etc.)'),
+          sourceId: z.string().describe('Unique identifier for the source'),
+          score: z.number().describe('Keyword relevance score (0-1)'),
+          metadata: z
+            .record(z.any())
+            .describe('Additional metadata about the source'),
+        })
+      ),
+      totalFound: z.number().describe('Total number of results found'),
+      searchType: z.literal('keyword').describe('Always keyword for this tool'),
+    }),
+    execute: async ({ context }) => {
+      const { retrieveNodes } = await import(
+        '@colanode/server/lib/ai/node-retrievals'
+      );
+      const { retrieveDocuments } = await import(
+        '@colanode/server/lib/ai/document-retrievals'
+      );
+
+      const {
+        query,
+        workspaceId,
+        userId,
+        maxResults = 10,
+        selectedContextNodeIds = [],
+      } = context;
+
+      try {
+        console.log(`🔤 Keyword search for: "${query}" (max: ${maxResults})`);
+
+        // Perform keyword search only (no semantic search)
+        const [nodeResults, documentResults] = await Promise.all([
+          retrieveNodes(
+            { semanticQuery: '', keywordQuery: query }, // Empty semanticQuery for pure keyword
+            workspaceId,
+            userId,
+            maxResults,
+            selectedContextNodeIds
+          ),
+          retrieveDocuments(
+            { semanticQuery: '', keywordQuery: query },
+            workspaceId,
+            userId,
+            maxResults,
+            selectedContextNodeIds
+          ),
+        ]);
+
+        const allResults = [...nodeResults, ...documentResults]
+          .sort((a, b) => (b.metadata.score || 0) - (a.metadata.score || 0)) // Sort by keyword score
+          .slice(0, maxResults);
+
+        // Convert to standardized format
+        const results = allResults.map((doc) => ({
+          content: doc.pageContent || '',
+          type: doc.metadata.type || 'document',
+          sourceId: doc.metadata.id || '',
+          score: doc.metadata.score || 0,
+          metadata: doc.metadata || {},
+        }));
+
+        console.log(`✅ Keyword search found ${results.length} results`);
+
+        return {
+          results,
+          totalFound: allResults.length,
+          searchType: 'keyword' as const,
+        };
+      } catch (error) {
+        console.error('❌ Keyword search error:', error);
+        throw error;
+      }
+    },
+  });
+
+export const createDatabaseSchemaInspectionTool = () =>
+  createTool({
+    id: 'database-schema-inspection',
+    description: 'Get database schemas and structure for a workspace',
+    inputSchema: z.object({
+      workspaceId: z.string().describe('The workspace ID'),
+      userId: z.string().describe('The user ID for access control'),
+    }),
+    outputSchema: z.object({
+      databases: z.array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          fields: z.record(
+            z.object({
+              type: z.string(),
+              name: z.string(),
+            })
+          ),
+          sampleRecords: z
+            .array(z.any())
+            .describe('Sample records for context'),
+        })
+      ),
+      totalDatabases: z.number(),
+    }),
+    execute: async ({ context }) => {
+      const { retrieveByFilters } = await import(
+        '@colanode/server/lib/records'
+      );
+      const { database } = await import('@colanode/server/data/database');
+
+      const { workspaceId, userId } = context;
+
+      try {
+        console.log(
+          `🗄️ Inspecting database schemas for workspace: ${workspaceId}`
+        );
+
+        // Get available databases for the user
+        const databases = await database
+          .selectFrom('nodes as n')
+          .innerJoin('collaborations as c', 'c.node_id', 'n.root_id')
+          .where('n.type', '=', 'database')
+          .where('n.workspace_id', '=', workspaceId)
+          .where('c.collaborator_id', '=', userId)
+          .where('c.deleted_at', 'is', null)
+          .selectAll()
+          .execute();
+
+        if (databases.length === 0) {
+          console.log('📭 No accessible databases found');
+          return {
+            databases: [],
+            totalDatabases: 0,
+          };
+        }
+
+        console.log(`🔍 Found ${databases.length} accessible databases`);
+
+        // Get database schemas and sample data
+        const databaseSchemas = await Promise.all(
+          databases.map(async (db: any) => {
+            const sampleRecords = await retrieveByFilters(
+              db.id,
+              workspaceId,
+              userId,
+              { filters: [], sorts: [], page: 1, count: 3 } // Just 3 samples
+            );
+
+            const dbAttrs = db.attributes as any;
+            const fields = dbAttrs.fields || {};
+            const formattedFields = Object.entries(fields).reduce(
+              (acc: any, [id, field]: [string, any]) => ({
+                ...acc,
+                [id]: {
+                  type: field.type,
+                  name: field.name,
+                },
+              }),
+              {}
+            );
+
+            return {
+              id: db.id,
+              name: dbAttrs.name || 'Untitled Database',
+              fields: formattedFields,
+              sampleRecords,
+            };
+          })
+        );
+
+        console.log(
+          `✅ Retrieved schemas for ${databaseSchemas.length} databases`
+        );
+
+        return {
+          databases: databaseSchemas,
+          totalDatabases: databaseSchemas.length,
+        };
+      } catch (error) {
+        console.error('❌ Database schema inspection error:', error);
+        throw error;
+      }
+    },
+  });
+
+export const createDatabaseQueryTool = () =>
+  createTool({
+    id: 'database-query',
+    description: 'Execute structured queries against workspace databases',
+    inputSchema: z.object({
+      databaseId: z.string().describe('The database ID to query'),
+      workspaceId: z.string().describe('The workspace ID'),
+      userId: z.string().describe('The user ID for access control'),
+      filters: z.array(z.any()).describe('Structured filter conditions'),
+      maxResults: z.number().default(10).describe('Maximum number of results'),
     }),
     outputSchema: z.object({
       results: z.array(
@@ -221,191 +339,91 @@ export const createDatabaseFilterTool = () =>
           }),
         })
       ),
-      databasesSearched: z
-        .array(z.string())
-        .describe('Names of databases that were searched'),
-      filtersApplied: z
-        .boolean()
-        .describe('Whether any filters were successfully applied'),
+      totalFound: z.number(),
+      databaseName: z.string(),
     }),
     execute: async ({ context }) => {
-      const { generateDatabaseFilters } = await import(
-        '@colanode/server/lib/ai/llms'
-      );
       const { retrieveByFilters } = await import(
         '@colanode/server/lib/records'
       );
       const { fetchNode } = await import('@colanode/server/lib/nodes');
-      const { database } = await import('@colanode/server/data/database');
 
-      const { query, workspaceId, userId, maxResults } = context;
+      const {
+        databaseId,
+        workspaceId,
+        userId,
+        filters,
+        maxResults = 10,
+      } = context;
 
       try {
-        console.log(`🗄️ Filtering database records for: "${query}"`);
+        console.log(
+          `🗄️ Querying database ${databaseId} with ${filters.length} filters`
+        );
 
-        // Get available databases for the user
-        const databases = await database
-          .selectFrom('nodes as n')
-          .innerJoin('collaborations as c', 'c.node_id', 'n.root_id')
-          .where('n.type', '=', 'database')
-          .where('n.workspace_id', '=', workspaceId)
-          .where('c.collaborator_id', '=', userId)
-          .where('c.deleted_at', 'is', null)
-          .selectAll()
-          .execute();
-
-        if (databases.length === 0) {
-          console.log('📭 No accessible databases found');
+        // Get the database node for metadata
+        const dbNode = await fetchNode(databaseId);
+        if (!dbNode || dbNode.type !== 'database') {
+          console.log('❌ Database not found or not accessible');
           return {
             results: [],
-            databasesSearched: [],
-            filtersApplied: false,
+            totalFound: 0,
+            databaseName: 'Unknown Database',
           };
         }
 
-        console.log(`🔍 Found ${databases.length} accessible databases`);
+        const databaseName =
+          (dbNode.attributes as any).name || 'Untitled Database';
 
-        // Prepare database context for AI filtering
-        const databaseContext = await Promise.all(
-          databases.map(async (db: any) => {
-            const sampleRecords = await retrieveByFilters(
-              db.id,
-              workspaceId,
-              userId,
-              { filters: [], sorts: [], page: 1, count: 5 }
-            );
+        // Execute the query
+        const records = await retrieveByFilters(
+          databaseId,
+          workspaceId,
+          userId,
+          { filters, sorts: [], page: 1, count: maxResults }
+        );
 
-            const dbAttrs = db.attributes as any;
-            const fields = dbAttrs.fields || {};
-            const formattedFields = Object.entries(fields).reduce(
-              (acc: any, [id, field]: [string, any]) => ({
-                ...acc,
-                [id]: {
-                  type: field.type,
-                  name: field.name,
-                },
-              }),
-              {}
-            );
+        // Format results
+        const results = records.map((record: any) => {
+          const fields = Object.entries((record.attributes as any).fields || {})
+            .map(([key, value]) => `${key}: ${value}`)
+            .join('\n');
 
-            // Convert sample records to expected format
-            const convertedSampleRecords = sampleRecords.map((record: any) => ({
+          const content = `Database Record from ${databaseName}:\n${fields}`;
+
+          return {
+            content,
+            metadata: {
               id: record.id,
-              type: record.type,
-              parentId: record.parent_id,
-              rootId: record.root_id,
+              type: 'record' as const,
+              databaseId,
+              databaseName,
               createdAt: record.created_at,
               createdBy: record.created_by,
-              updatedAt: record.updated_at,
-              updatedBy: record.updated_by,
-              attributes: record.attributes,
-            }));
-
-            return {
-              id: db.id,
-              name: dbAttrs.name || 'Untitled Database',
-              fields: formattedFields,
-              sampleRecords: convertedSampleRecords,
-            };
-          })
-        );
-
-        // Generate AI-powered filters
-        const filterResult = await generateDatabaseFilters({
-          query,
-          databases: databaseContext,
+            },
+          };
         });
 
-        if (!filterResult.shouldFilter) {
-          console.log(
-            '🤖 AI determined no database filtering is needed for this query'
-          );
-          return {
-            results: [],
-            databasesSearched: databaseContext.map((db) => db.name),
-            filtersApplied: false,
-          };
-        }
-
         console.log(
-          `🎯 AI generated filters for ${filterResult.filters.length} databases`
+          `✅ Database query returned ${results.length} records from ${databaseName}`
         );
 
-        // Execute filters and collect results
-        const allResults = [];
-        const searchedDatabases = [];
-
-        for (const filter of filterResult.filters) {
-          const dbContext = databaseContext.find(
-            (db) => db.id === filter.databaseId
-          );
-          if (!dbContext) continue;
-
-          searchedDatabases.push(dbContext.name);
-
-          const records = await retrieveByFilters(
-            filter.databaseId,
-            workspaceId,
-            userId,
-            { filters: filter.filters, sorts: [], page: 1, count: maxResults }
-          );
-
-          const dbNode = await fetchNode(filter.databaseId);
-          if (!dbNode || dbNode.type !== 'database') continue;
-
-          for (const record of records) {
-            const fields = Object.entries(
-              (record.attributes as any).fields || {}
-            )
-              .map(([key, value]) => `${key}: ${value}`)
-              .join('\n');
-
-            const content = `Database Record from ${(dbNode.attributes as any).name || 'Database'}:\n${fields}`;
-
-            allResults.push({
-              content,
-              metadata: {
-                id: record.id,
-                type: 'record' as const,
-                databaseId: filter.databaseId,
-                databaseName: dbContext.name,
-                createdAt: record.created_at,
-                createdBy: record.created_by,
-              },
-            });
-          }
-        }
-
-        console.log(`✅ Found ${allResults.length} matching database records`);
-
         return {
-          results: allResults,
-          databasesSearched: searchedDatabases,
-          filtersApplied: true,
+          results,
+          totalFound: results.length,
+          databaseName,
         };
       } catch (error) {
-        console.error('❌ Database filter error:', error);
-        return {
-          results: [],
-          databasesSearched: [],
-          filtersApplied: false,
-        };
+        console.error('❌ Database query error:', error);
+        throw error;
       }
     },
   });
 
-/**
- * Export all available AI tools
- */
 export const createAITools = () => ({
-  documentSearch: createDocumentSearchTool(),
-  databaseFilter: createDatabaseFilterTool(),
-});
+  semanticSearch: createSemanticSearchTool(),
+  keywordSearch: createKeywordSearchTool(),
 
-/**
- * Tool configuration for easy access
- */
-export const AIToolsConfig = {
-  DOCUMENT_SEARCH: 'workspace-document-search',
-  DATABASE_FILTER: 'workspace-database-filter',
-} as const;
+  databaseSchemaInspection: createDatabaseSchemaInspectionTool(),
+  databaseQuery: createDatabaseQueryTool(),
+});
