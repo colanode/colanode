@@ -1,6 +1,8 @@
 import { Editor, JSONContent } from '@tiptap/core';
 import { Node as ProseMirrorNode, ResolvedPos } from '@tiptap/pm/model';
 import { NodeSelection, TextSelection } from '@tiptap/pm/state';
+import { TableMap } from '@tiptap/pm/tables';
+import { EditorView } from '@tiptap/pm/view';
 
 import {
   Block,
@@ -12,6 +14,12 @@ import {
   IdType,
   RichTextContent,
 } from '@colanode/core';
+
+interface TableCellAttrs {
+  colspan: number;
+  rowspan: number;
+  colwidth: number[] | null;
+}
 
 const leafBlockTypes = new Set([
   EditorNodeTypes.Paragraph,
@@ -427,6 +435,51 @@ export const restoreRelativeSelection = (
     );
 
     tr = tr.setSelection(textSelection);
+    view.dispatch(tr);
+  }
+};
+
+export const updateColumnWidth = (
+  view: EditorView,
+  cell: number,
+  width: number
+): void => {
+  const $cell = view.state.doc.resolve(cell);
+  const table = $cell.node(-1);
+  const map = TableMap.get(table);
+  const start = $cell.start(-1);
+
+  const col =
+    map.colCount($cell.pos - start) + $cell.nodeAfter!.attrs.colspan - 1;
+
+  const tr = view.state.tr;
+  for (let row = 0; row < map.height; row++) {
+    const mapIndex = row * map.width + col;
+    // Rowspanning cell that has already been handled
+    if (row && map.map[mapIndex] == map.map[mapIndex - map.width]) {
+      continue;
+    }
+
+    const pos = map.map[mapIndex];
+    if (!pos) {
+      continue;
+    }
+
+    const attrs = table.nodeAt(pos)!.attrs as TableCellAttrs;
+    const index = attrs.colspan == 1 ? 0 : col - map.colCount(pos);
+    if (attrs.colwidth && attrs.colwidth[index] == width) {
+      continue;
+    }
+
+    const colwidth = attrs.colwidth
+      ? attrs.colwidth.slice()
+      : Array(attrs.colspan).fill(0);
+
+    colwidth[index] = width;
+    tr.setNodeMarkup(start + pos, null, { ...attrs, colwidth: colwidth });
+  }
+
+  if (tr.docChanged) {
     view.dispatch(tr);
   }
 };

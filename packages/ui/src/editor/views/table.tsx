@@ -72,8 +72,20 @@ export const TableNodeView = ({ editor, getPos }: NodeViewProps) => {
   };
 
   const handleMouseLeave = (event: React.MouseEvent) => {
-    const relatedTarget = event.relatedTarget as Node;
-    const currentTarget = event.currentTarget as Node;
+    const relatedTarget = event.relatedTarget;
+    const currentTarget = event.currentTarget;
+
+    // Check if both targets are actually Node instances
+    if (
+      !relatedTarget ||
+      !currentTarget ||
+      !(relatedTarget instanceof Node) ||
+      !(currentTarget instanceof Node)
+    ) {
+      setIsSideHovered(false);
+      setIsBottomHovered(false);
+      return;
+    }
 
     if (relatedTarget && currentTarget?.contains(relatedTarget)) {
       return;
