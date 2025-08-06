@@ -1,6 +1,6 @@
 import { Editor } from '@tiptap/core';
 import { useEditorState } from '@tiptap/react';
-import { Baseline } from 'lucide-react';
+import { Highlighter } from 'lucide-react';
 
 import {
   Popover,
@@ -10,7 +10,7 @@ import {
 import { editorColors } from '@colanode/ui/lib/editor';
 import { cn } from '@colanode/ui/lib/utils';
 
-export const ColorButton = ({
+export const HighlightButton = ({
   editor,
   isOpen,
   setIsOpen,
@@ -28,20 +28,26 @@ export const ColorButton = ({
 
       return {
         isEditable: editor.isEditable,
-        activeColor: editorColors.find((editorColor) =>
-          editor.isActive('color', { color: editorColor.color })
+        activeHighlight: editorColors.find((editorColor) =>
+          editor.isActive('highlight', { highlight: editorColor.color })
         ),
       };
     },
   });
 
-  const activeColor = state?.activeColor ?? editorColors[0]!;
+  const activeHighlight = state?.activeHighlight ?? editorColors[0]!;
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen} modal={true}>
       <PopoverTrigger>
-        <span className="flex size-8 items-center justify-center rounded-md cursor-pointer hover:bg-gray-100">
-          <Baseline className={cn('size-4', activeColor.textClass)} />
+        <span
+          className={cn(
+            'flex size-8 items-center justify-center rounded-md cursor-pointer',
+            activeHighlight.bgClass,
+            activeHighlight.bgHoverClass
+          )}
+        >
+          <Highlighter className="size-4" />
         </span>
       </PopoverTrigger>
 
@@ -49,25 +55,30 @@ export const ColorButton = ({
         align="start"
         className="overflow-x-hidden overflow-y-auto rounded-md p-1"
       >
-        <div className="px-2 py-1.5 text-sm font-medium">Color</div>
+        <div className="px-2 py-1.5 text-sm font-medium">Highlight</div>
         <div>
-          {editorColors.map((color) => (
+          {editorColors.map((editorColor) => (
             <button
-              key={`text-color-${color.color}`}
+              key={`highlight-color-${editorColor.color}`}
               onClick={() => {
-                if (color.color === 'default') {
-                  editor.commands.unsetColor();
+                if (editorColor.color === 'default') {
+                  editor.commands.unsetHighlight();
                 } else {
-                  editor.chain().focus().setColor(color.color).run();
+                  editor.commands.setHighlight(editorColor.color);
                 }
                 setIsOpen(false);
               }}
               className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-gray-100 cursor-pointer"
             >
-              <div className="relative inline-flex size-6 items-center justify-center overflow-hidden rounded bg-gray-50 shadow">
-                <span className={cn('font-medium', color.textClass)}>A</span>
+              <div
+                className={cn(
+                  'relative inline-flex size-6 items-center justify-center overflow-hidden rounded bg-gray-50 shadow',
+                  editorColor.bgClass
+                )}
+              >
+                <span className="font-medium">A</span>
               </div>
-              <span>{color.name}</span>
+              <span>{editorColor.name}</span>
             </button>
           ))}
         </div>

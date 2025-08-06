@@ -1,4 +1,5 @@
 import { Editor } from '@tiptap/core';
+import { useEditorState } from '@tiptap/react';
 import { Check, Link, Trash2 } from 'lucide-react';
 
 import { isValidUrl } from '@colanode/core';
@@ -30,13 +31,28 @@ interface LinkButtonProps {
 }
 
 export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
+  const state = useEditorState({
+    editor,
+    selector: ({ editor }) => {
+      if (!editor) {
+        return null;
+      }
+
+      return {
+        isEditable: editor.isEditable,
+        isActive: editor.isActive('link'),
+        attributes: editor.getAttributes('link'),
+      };
+    },
+  });
+
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen} modal={true}>
       <PopoverTrigger>
         <span
           className={cn(
             'flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-gray-100',
-            editor.isActive('link') ? 'bg-gray-100' : 'bg-white'
+            state?.isActive ? 'bg-gray-100' : 'bg-white'
           )}
         >
           <Link className="size-4" />
@@ -60,9 +76,9 @@ export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
           <Input
             placeholder="Write or paste link"
             className="border-0"
-            defaultValue={editor.getAttributes('link').href || ''}
+            defaultValue={state?.attributes.href || ''}
           />
-          {editor.getAttributes('link').href ? (
+          {state?.attributes.href ? (
             <button
               type="button"
               className="flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-gray-100"
