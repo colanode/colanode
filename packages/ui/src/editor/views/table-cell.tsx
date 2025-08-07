@@ -3,6 +3,7 @@ import { NodeViewContent, NodeViewWrapper } from '@tiptap/react';
 import { Resizable } from 're-resizable';
 
 import { updateColumnWidth } from '@colanode/client/lib';
+import { defaultClasses } from '@colanode/ui/editor/classes';
 import { TableCellMenu } from '@colanode/ui/editor/menus/table-cell-menu';
 import { useEditorNodeActive } from '@colanode/ui/hooks/use-editor-node-active';
 import { editorColors } from '@colanode/ui/lib/editor';
@@ -23,7 +24,8 @@ export const TableCellNodeView = (props: NodeViewProps) => {
     <NodeViewWrapper>
       <Resizable
         className={cn(
-          'flex p-1 px-2 relative items-center',
+          defaultClasses.tableCell,
+          'relative',
           isActive && 'outline outline-gray-400',
           textColor?.textClass,
           backgroundColor?.bgClass,
