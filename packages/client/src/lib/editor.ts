@@ -483,3 +483,39 @@ export const updateColumnWidth = (
     view.dispatch(tr);
   }
 };
+
+export const isDescendantNode = (
+  ancestor: ProseMirrorNode,
+  candidate: ProseMirrorNode
+): boolean => {
+  if (ancestor === candidate) return false;
+
+  let found = false;
+
+  ancestor.descendants((node) => {
+    if (node === candidate) {
+      found = true;
+      return false; // break out early
+    }
+    return !found;
+  });
+
+  return found;
+};
+
+export const findClosestNodeAtPos = (
+  doc: ProseMirrorNode,
+  pos: number
+): ProseMirrorNode | null => {
+  let currentPos = pos;
+  while (currentPos >= 0) {
+    const node = doc.nodeAt(currentPos);
+    if (node) {
+      return node;
+    }
+
+    currentPos--;
+  }
+
+  return null;
+};

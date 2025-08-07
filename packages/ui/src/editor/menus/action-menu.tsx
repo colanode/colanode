@@ -5,6 +5,8 @@ import { Editor } from '@tiptap/react';
 import { GripVertical, Plus } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
+import { findClosestNodeAtPos, isDescendantNode } from '@colanode/client/lib';
+
 interface ActionMenuProps {
   editor: Editor | null;
 }
@@ -72,8 +74,15 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
         return;
       }
 
-      // Find the nearest block parent at the current horizontal position
-      let currentPos = pos.pos;
+      const nodeAtPos = findClosestNodeAtPos(view.current.state.doc, pos.pos);
+      if (!nodeAtPos) {
+        setMenuState({
+          show: false,
+        });
+        return;
+      }
+
+      let currentPos = pos.pos - 1;
       let pmNode = null;
       let domNode = null;
       let nodePos = -1;
@@ -81,16 +90,12 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
       while (currentPos >= 0) {
         const node = view.current.state.doc.nodeAt(currentPos);
 
-        if (
-          !node ||
-          !node.isBlock ||
-          node.type.name === 'bulletList' ||
-          node.type.name === 'orderedList' ||
-          node.type.name === 'taskList' ||
-          node.type.name === 'tableCell' ||
-          node.type.name === 'tableRow' ||
-          node.type.name === 'tableHeader'
-        ) {
+        if (!node || !node.isBlock) {
+          currentPos--;
+          continue;
+        }
+
+        if (!isDescendantNode(node, nodeAtPos)) {
           currentPos--;
           continue;
         }
@@ -102,20 +107,11 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
             : ((nodeDOM as Node)?.parentElement as HTMLElement);
 
         if (nodeDOMElement) {
-          const nodeRect = nodeDOMElement.getBoundingClientRect();
-
-          // Are we on the same horizontal axis (vertical range) as the mouse over?
-          const verticallyAligned =
-            event.clientY >= nodeRect.top && event.clientY <= nodeRect.bottom;
-
-          if (verticallyAligned) {
-            pmNode = node;
-            domNode = nodeDOMElement;
-            nodePos = currentPos;
-          } else {
-            break;
-          }
+          pmNode = node;
+          domNode = nodeDOMElement;
+          nodePos = currentPos;
         }
+
         currentPos--;
       }
 
