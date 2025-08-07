@@ -398,7 +398,7 @@ export const DocumentEditor = ({
   }, [node.id, editor]);
 
   return (
-    <div className="min-h-[500px]">
+    <>
       {editor && canEdit && (
         <Fragment>
           <ToolbarMenu editor={editor} />
@@ -406,6 +406,6 @@ export const DocumentEditor = ({
         </Fragment>
       )}
       <EditorContent editor={editor} />
-    </div>
+    </>
   );
 };
