@@ -17,8 +17,6 @@ export const defaultClasses = {
   link: 'font-medium underline underline-offset-4 cursor-pointer',
   table: 'border-collapse border w-full',
   tableRow: 'min-w-full',
-  tableHeader: 'border p-1 px-2 text-left font-semibold bg-gray-50 w-20',
-  tableCell: 'border p-1 px-2 w-20',
   gif: 'max-h-72 my-1',
   emoji: 'max-h-5 max-w-5 h-5 w-5 px-0.5 mb-1 inline-block',
   dropcursor: 'text-primary-foreground bg-blue-500',

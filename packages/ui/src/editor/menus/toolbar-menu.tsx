@@ -42,7 +42,6 @@ export const ToolbarMenu = (props: ToolbarMenuProps) => {
       const { empty } = selection;
 
       if (empty) {
-        console.log('empty');
         return false;
       }
 

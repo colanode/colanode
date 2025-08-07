@@ -7,7 +7,25 @@ export const TableCellNode = TableCell.extend({
   addNodeView() {
     return ReactNodeViewRenderer(TableCellNodeView, {
       as: 'td',
-      className: 'border w-20',
+      className: 'border',
     });
+  },
+  addAttributes() {
+    const baseAttributes = this.parent?.() ?? {};
+    return {
+      ...baseAttributes,
+      align: {
+        default: null,
+        parseHTML: (element) => element.getAttribute('data-align'),
+      },
+      textColor: {
+        default: null,
+        parseHTML: (element) => element.getAttribute('data-text-color'),
+      },
+      backgroundColor: {
+        default: null,
+        parseHTML: (element) => element.getAttribute('data-background-color'),
+      },
+    };
   },
 });

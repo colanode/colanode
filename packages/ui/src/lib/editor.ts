@@ -1,4 +1,4 @@
-export interface EditorColorItem {
+export interface EditorColorOption {
   color: string;
   name: string;
   textClass: string;
@@ -6,7 +6,7 @@ export interface EditorColorItem {
   bgHoverClass: string;
 }
 
-export const editorColors: EditorColorItem[] = [
+export const editorColors: EditorColorOption[] = [
   {
     name: 'Default',
     color: 'default',

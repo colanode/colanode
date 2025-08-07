@@ -8,7 +8,7 @@ import { useEditorNodeActive } from '@colanode/ui/hooks/use-editor-node-active';
 import { editorColors } from '@colanode/ui/lib/editor';
 import { cn } from '@colanode/ui/lib/utils';
 
-export const TableCellNodeView = (props: NodeViewProps) => {
+export const TableHeaderNodeView = (props: NodeViewProps) => {
   const isActive = useEditorNodeActive(props);
   const colWidth = props.node.attrs.colwidth ?? 100;
   const align = props.node.attrs.align;
@@ -23,7 +23,7 @@ export const TableCellNodeView = (props: NodeViewProps) => {
     <NodeViewWrapper>
       <Resizable
         className={cn(
-          'flex p-1 px-2 relative items-center',
+          'flex p-1 px-2 relative items-center font-semibold bg-gray-50',
           isActive && 'outline outline-gray-400',
           textColor?.textClass,
           backgroundColor?.bgClass,
