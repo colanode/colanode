@@ -1,11 +1,10 @@
-import { NodeViewProps } from '@tiptap/core';
+import { type NodeViewProps } from '@tiptap/core';
 import {
   Trash,
   ArrowLeft,
   ArrowRight,
   ArrowUp,
   ArrowDown,
-  EllipsisVertical,
   AlignLeft,
   AlignCenter,
   AlignRight,
@@ -15,49 +14,46 @@ import {
 } from 'lucide-react';
 
 import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from '@colanode/ui/components/ui/dropdown-menu';
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuLabel,
+  ContextMenuSeparator,
+  ContextMenuSub,
+  ContextMenuSubContent,
+  ContextMenuSubTrigger,
+  ContextMenuTrigger,
+} from '@colanode/ui/components/ui/context-menu';
 import { editorColors } from '@colanode/ui/lib/editor';
 import { cn } from '@colanode/ui/lib/utils';
 
-export const TableCellMenu = ({
+interface TableCellContextMenuProps extends NodeViewProps {
+  children: React.ReactNode;
+}
+
+export const TableCellContextMenu = ({
   editor,
   node,
   updateAttributes,
-}: NodeViewProps) => {
-  const textAlign = node.attrs.textAlign ?? 'left';
+  children,
+}: TableCellContextMenuProps) => {
+  const textAlign = node.attrs.align ?? 'left';
   const backgroundColor = node.attrs.backgroundColor ?? 'default';
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <button
-          className={cn(
-            'absolute top-1/2 -right-2 transform -translate-y-1/2 bg-white hover:bg-gray-100 py-1 cursor-pointer border border-gray-200 rounded z-10'
-          )}
-        >
-          <EllipsisVertical className="size-3 text-muted-foreground" />
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" side="right" className="w-52">
-        <DropdownMenuLabel>Cell Actions</DropdownMenuLabel>
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger className="flex gap-2">
+    <ContextMenu>
+      <ContextMenuTrigger asChild>{children}</ContextMenuTrigger>
+      <ContextMenuContent className="w-52">
+        <ContextMenuLabel>Cell Actions</ContextMenuLabel>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger className="flex gap-2">
             <AlignJustify className="size-4 text-muted-foreground" />
             Alignment
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-48">
-            <DropdownMenuLabel>Alignment</DropdownMenuLabel>
-            <DropdownMenuItem
-              onClick={() => updateAttributes({ align: 'left' })}
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent className="w-48">
+            <ContextMenuLabel>Alignment</ContextMenuLabel>
+            <ContextMenuItem
+              onSelect={() => updateAttributes({ align: 'left' })}
               className="flex items-center justify-between"
             >
               <div className="flex items-center gap-2">
@@ -65,9 +61,9 @@ export const TableCellMenu = ({
                 Left
               </div>
               {textAlign === 'left' && <Check className="size-4" />}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => updateAttributes({ align: 'center' })}
+            </ContextMenuItem>
+            <ContextMenuItem
+              onSelect={() => updateAttributes({ align: 'center' })}
               className="flex items-center justify-between"
             >
               <div className="flex items-center gap-2">
@@ -75,9 +71,9 @@ export const TableCellMenu = ({
                 Center
               </div>
               {textAlign === 'center' && <Check className="size-4" />}
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onClick={() => updateAttributes({ align: 'right' })}
+            </ContextMenuItem>
+            <ContextMenuItem
+              onSelect={() => updateAttributes({ align: 'right' })}
               className="flex items-center justify-between"
             >
               <div className="flex items-center gap-2">
@@ -85,20 +81,20 @@ export const TableCellMenu = ({
                 Right
               </div>
               {textAlign === 'right' && <Check className="size-4" />}
-            </DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger className="flex gap-2">
+            </ContextMenuItem>
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuSub>
+          <ContextMenuSubTrigger className="flex gap-2">
             <Highlighter className="size-4 text-muted-foreground" />
             Background Color
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-48">
-            <DropdownMenuLabel>Background Color</DropdownMenuLabel>
+          </ContextMenuSubTrigger>
+          <ContextMenuSubContent className="w-48">
+            <ContextMenuLabel>Background Color</ContextMenuLabel>
             {editorColors.map((color) => (
-              <DropdownMenuItem
+              <ContextMenuItem
                 key={color.color}
-                onClick={() =>
+                onSelect={() =>
                   updateAttributes({ backgroundColor: color.color })
                 }
                 className="flex items-center justify-between"
@@ -115,63 +111,63 @@ export const TableCellMenu = ({
                 {backgroundColor === color.color && (
                   <Check className="size-4" />
                 )}
-              </DropdownMenuItem>
+              </ContextMenuItem>
             ))}
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel>Column Actions</DropdownMenuLabel>
-        <DropdownMenuItem
-          onClick={() => {
+          </ContextMenuSubContent>
+        </ContextMenuSub>
+        <ContextMenuSeparator />
+        <ContextMenuLabel>Column Actions</ContextMenuLabel>
+        <ContextMenuItem
+          onSelect={() => {
             editor.chain().addColumnBefore().focus().run();
           }}
         >
           <ArrowLeft className="size-4" />
           Insert column left
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
+        </ContextMenuItem>
+        <ContextMenuItem
+          onSelect={() => {
             editor.chain().addColumnAfter().focus().run();
           }}
         >
           <ArrowRight className="size-4" />
           Insert column right
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
+        </ContextMenuItem>
+        <ContextMenuItem
+          onSelect={() => {
             editor.chain().focus().deleteColumn().run();
           }}
         >
           <Trash className="size-4" />
           Delete column
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuLabel>Row Actions</DropdownMenuLabel>
-        <DropdownMenuItem
-          onClick={() => {
+        </ContextMenuItem>
+        <ContextMenuSeparator />
+        <ContextMenuLabel>Row Actions</ContextMenuLabel>
+        <ContextMenuItem
+          onSelect={() => {
             editor.chain().addRowBefore().focus().run();
           }}
         >
           <ArrowUp className="size-4" />
           Insert row above
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
+        </ContextMenuItem>
+        <ContextMenuItem
+          onSelect={() => {
             editor.chain().addRowAfter().focus().run();
           }}
         >
           <ArrowDown className="size-4" />
           Insert row below
-        </DropdownMenuItem>
-        <DropdownMenuItem
-          onClick={() => {
+        </ContextMenuItem>
+        <ContextMenuItem
+          onSelect={() => {
             editor.chain().focus().deleteRow().run();
           }}
         >
           <Trash className="size-4" />
           Delete row
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </ContextMenuItem>
+      </ContextMenuContent>
+    </ContextMenu>
   );
 };

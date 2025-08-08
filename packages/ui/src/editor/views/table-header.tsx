@@ -4,7 +4,8 @@ import { Resizable } from 're-resizable';
 
 import { updateColumnWidth } from '@colanode/client/lib';
 import { defaultClasses } from '@colanode/ui/editor/classes';
-import { TableCellMenu } from '@colanode/ui/editor/menus/table-cell-menu';
+import { TableCellContextMenu } from '@colanode/ui/editor/menus/table-cell-context-menu';
+import { TableCellDropdownMenu } from '@colanode/ui/editor/menus/table-cell-dropdown-menu';
 import { useEditorNodeActive } from '@colanode/ui/hooks/use-editor-node-active';
 import { editorColors } from '@colanode/ui/lib/editor';
 import { cn } from '@colanode/ui/lib/utils';
@@ -19,56 +20,58 @@ export const TableHeaderNodeView = (props: NodeViewProps) => {
 
   return (
     <NodeViewWrapper>
-      <Resizable
-        className={cn(
-          defaultClasses.tableHeader,
-          'relative',
-          isActive && 'outline outline-gray-400',
-          backgroundColor?.bgClass,
-          align === 'left' && 'justify-start',
-          align === 'center' && 'justify-center',
-          align === 'right' && 'justify-end'
-        )}
-        defaultSize={{
-          width: `${colWidth}px`,
-        }}
-        minWidth={100}
-        maxWidth={500}
-        size={{
-          width: `${colWidth}px`,
-        }}
-        enable={{
-          bottom: false,
-          bottomLeft: false,
-          bottomRight: false,
-          left: false,
-          right: !isActive,
-          top: false,
-          topLeft: false,
-          topRight: false,
-        }}
-        handleClasses={{
-          right: 'opacity-0 hover:opacity-100 bg-blue-300',
-        }}
-        handleStyles={{
-          right: {
-            width: '3px',
-            right: '-3px',
-          },
-        }}
-        onResizeStop={(_e, _direction, ref) => {
-          const newWidth = ref.offsetWidth;
-          const pos = props.getPos();
-          if (!pos) {
-            return;
-          }
+      <TableCellContextMenu {...props}>
+        <Resizable
+          className={cn(
+            defaultClasses.tableHeader,
+            'relative',
+            isActive && 'outline outline-gray-400',
+            backgroundColor?.bgClass,
+            align === 'left' && 'justify-start',
+            align === 'center' && 'justify-center',
+            align === 'right' && 'justify-end'
+          )}
+          defaultSize={{
+            width: `${colWidth}px`,
+          }}
+          minWidth={100}
+          maxWidth={500}
+          size={{
+            width: `${colWidth}px`,
+          }}
+          enable={{
+            bottom: false,
+            bottomLeft: false,
+            bottomRight: false,
+            left: false,
+            right: !isActive,
+            top: false,
+            topLeft: false,
+            topRight: false,
+          }}
+          handleClasses={{
+            right: 'opacity-0 hover:opacity-100 bg-blue-300',
+          }}
+          handleStyles={{
+            right: {
+              width: '3px',
+              right: '-3px',
+            },
+          }}
+          onResizeStop={(_e, _direction, ref) => {
+            const newWidth = ref.offsetWidth;
+            const pos = props.getPos();
+            if (!pos) {
+              return;
+            }
 
-          updateColumnWidth(props.editor.view, pos, newWidth);
-        }}
-      >
-        {isActive && <TableCellMenu {...props} />}
-        <NodeViewContent className="z-0 w-full h-full" />
-      </Resizable>
+            updateColumnWidth(props.editor.view, pos, newWidth);
+          }}
+        >
+          {isActive && <TableCellDropdownMenu {...props} />}
+          <NodeViewContent className="z-0 w-full h-full" />
+        </Resizable>
+      </TableCellContextMenu>
     </NodeViewWrapper>
   );
 };
