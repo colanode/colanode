@@ -21,16 +21,16 @@ export const TableHeaderRenderer = ({
     : null;
 
   return (
-    <th
-      className={cn(
-        defaultClasses.tableHeaderWrapper,
-        backgroundColor?.bgClass,
-        align === 'left' && 'justify-start',
-        align === 'center' && 'justify-center',
-        align === 'right' && 'justify-end'
-      )}
-    >
-      <div className={defaultClasses.tableHeader}>
+    <th className={defaultClasses.tableHeaderWrapper}>
+      <div
+        className={cn(
+          defaultClasses.tableHeader,
+          backgroundColor?.bgClass,
+          align === 'left' && 'justify-start',
+          align === 'center' && 'justify-center',
+          align === 'right' && 'justify-end'
+        )}
+      >
         <NodeChildrenRenderer node={node} keyPrefix={keyPrefix} />
       </div>
     </th>

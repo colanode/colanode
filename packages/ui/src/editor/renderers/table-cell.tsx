@@ -21,16 +21,16 @@ export const TableCellRenderer = ({
     : null;
 
   return (
-    <td
-      className={cn(
-        defaultClasses.tableCellWrapper,
-        backgroundColor?.bgClass,
-        align === 'left' && 'justify-start',
-        align === 'center' && 'justify-center',
-        align === 'right' && 'justify-end'
-      )}
-    >
-      <div className={defaultClasses.tableCell}>
+    <td className={defaultClasses.tableCellWrapper}>
+      <div
+        className={cn(
+          defaultClasses.tableCell,
+          backgroundColor?.bgClass,
+          align === 'left' && 'justify-start',
+          align === 'center' && 'justify-center',
+          align === 'right' && 'justify-end'
+        )}
+      >
         <NodeChildrenRenderer node={node} keyPrefix={keyPrefix} />
       </div>
     </td>
