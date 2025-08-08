@@ -8,7 +8,12 @@ import { HTML5Backend as ReactDndHTML5Backend } from 'react-dnd-html5-backend';
 // https://github.com/react-dnd/react-dnd/issues/802
 
 const shouldIgnoreTarget = (domNode: HTMLElement) => {
-  return domNode.closest('.ProseMirror');
+  const hasProseMirror = domNode.closest('.ProseMirror');
+  if (hasProseMirror) {
+    return !domNode.closest('.react-renderer.node-database');
+  }
+
+  return false;
 };
 
 export const HTML5Backend = (...args: unknown[]) => {

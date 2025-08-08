@@ -25,7 +25,19 @@ export const DatabaseNodeView = ({ node }: NodeViewProps) => {
   const { node: database, role } = data;
   if (node.attrs.inline) {
     return (
-      <NodeViewWrapper data-id={node.attrs.id} className="my-4 w-full">
+      <NodeViewWrapper
+        data-id={node.attrs.id}
+        className="my-4 w-full"
+        contentEditable={false}
+        onDragStart={(e: React.DragEvent<HTMLDivElement>) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        onDragOver={(e: React.DragEvent<HTMLDivElement>) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
         <Database database={database} role={role}>
           <DatabaseViews inline />
         </Database>
@@ -39,7 +51,7 @@ export const DatabaseNodeView = ({ node }: NodeViewProps) => {
   return (
     <NodeViewWrapper
       data-id={node.attrs.id}
-      className="my-0.5 w-full cursor-pointer flex-row items-center gap-1 rounded-md bg-gray-50 p-2 hover:bg-gray-100"
+      className="my-0.5 flex h-12 w-full cursor-pointer flex-row items-center gap-1 rounded-md bg-gray-50 p-2 hover:bg-gray-100"
       onClick={() => {
         layout.previewLeft(id, true);
       }}
