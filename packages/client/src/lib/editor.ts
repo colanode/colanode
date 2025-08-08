@@ -19,6 +19,8 @@ interface TableCellAttrs {
   colspan: number;
   rowspan: number;
   colwidth: number[] | null;
+  align?: 'left' | 'center' | 'right';
+  backgroundColor?: string;
 }
 
 const leafBlockTypes = new Set([
