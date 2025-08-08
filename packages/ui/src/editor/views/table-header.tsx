@@ -1,17 +1,32 @@
 import { type NodeViewProps } from '@tiptap/core';
-import { NodeViewContent, NodeViewWrapper } from '@tiptap/react';
+import {
+  NodeViewContent,
+  NodeViewWrapper,
+  useEditorState,
+} from '@tiptap/react';
 import { Resizable } from 're-resizable';
 
 import { updateColumnWidth } from '@colanode/client/lib';
 import { defaultClasses } from '@colanode/ui/editor/classes';
 import { TableCellContextMenu } from '@colanode/ui/editor/menus/table-cell-context-menu';
 import { TableCellDropdownMenu } from '@colanode/ui/editor/menus/table-cell-dropdown-menu';
-import { useEditorNodeActive } from '@colanode/ui/hooks/use-editor-node-active';
 import { editorColors } from '@colanode/ui/lib/editor';
 import { cn } from '@colanode/ui/lib/utils';
 
 export const TableHeaderNodeView = (props: NodeViewProps) => {
-  const isActive = useEditorNodeActive(props);
+  const state = useEditorState({
+    editor: props.editor,
+    selector(context) {
+      return {
+        isActive: context.editor.isActive(
+          props.node.type.name,
+          props.node.attrs
+        ),
+      };
+    },
+  });
+
+  const isActive = state.isActive;
   const colWidth = props.node.attrs.colwidth ?? 100;
   const align = props.node.attrs.align;
   const backgroundColor = editorColors.find(
