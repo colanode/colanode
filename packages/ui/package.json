@@ -70,7 +70,7 @@
     "cmdk": "^1.1.1",
     "date-fns": "^4.1.0",
     "is-hotkey": "^0.2.0",
-    "lucide-react": "^0.536.0",
+    "lucide-react": "^0.539.0",
     "re-resizable": "^6.11.2",
     "react": "^19.1.1",
     "react-circular-progressbar": "^2.2.0",
@@ -80,10 +80,10 @@
     "react-dom": "^19.1.1",
     "react-hook-form": "^7.62.0",
     "react-intersection-observer": "^9.16.0",
-    "sonner": "^2.0.6",
+    "sonner": "^2.0.7",
     "tailwind-merge": "^3.3.1",
     "tiptap-extension-auto-joiner": "^0.1.3",
     "ts-pattern": "^5.8.0",
-    "zod": "^4.0.14"
+    "zod": "^4.0.15"
   }
 }
