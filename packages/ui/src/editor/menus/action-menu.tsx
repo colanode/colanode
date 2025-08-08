@@ -5,7 +5,7 @@ import { Editor } from '@tiptap/react';
 import { GripVertical, Plus } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
-import { findClosestNodeAtPos, isDescendantNode } from '@colanode/client/lib';
+import { isDescendantNode } from '@colanode/client/lib';
 
 interface ActionMenuProps {
   editor: Editor | null;
@@ -61,12 +61,7 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
         return;
       }
 
-      const coords = {
-        left: Math.max(event.clientX, editorBounds.left),
-        top: event.clientY,
-      };
-
-      const pos = view.current.posAtCoords(coords);
+      const pos = view.current.posAtDOM(event.target as Node, 0, 0);
       if (!pos) {
         setMenuState({
           show: false,
@@ -74,15 +69,7 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
         return;
       }
 
-      const nodeAtPos = findClosestNodeAtPos(view.current.state.doc, pos.pos);
-      if (!nodeAtPos) {
-        setMenuState({
-          show: false,
-        });
-        return;
-      }
-
-      let currentPos = pos.pos - 1;
+      let currentPos = pos;
       let pmNode = null;
       let domNode = null;
       let nodePos = -1;
@@ -95,7 +82,7 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
           continue;
         }
 
-        if (!isDescendantNode(node, nodeAtPos)) {
+        if (pmNode && !isDescendantNode(node, pmNode)) {
           currentPos--;
           continue;
         }

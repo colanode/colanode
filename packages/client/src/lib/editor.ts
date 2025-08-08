@@ -504,20 +504,3 @@ export const isDescendantNode = (
 
   return found;
 };
-
-export const findClosestNodeAtPos = (
-  doc: ProseMirrorNode,
-  pos: number
-): ProseMirrorNode | null => {
-  let currentPos = pos;
-  while (currentPos >= 0) {
-    const node = doc.nodeAt(currentPos);
-    if (node) {
-      return node;
-    }
-
-    currentPos--;
-  }
-
-  return null;
-};
