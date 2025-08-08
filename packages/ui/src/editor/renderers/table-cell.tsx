@@ -2,6 +2,8 @@ import { JSONContent } from '@tiptap/core';
 
 import { defaultClasses } from '@colanode/ui/editor/classes';
 import { NodeChildrenRenderer } from '@colanode/ui/editor/renderers/node-children';
+import { editorColors } from '@colanode/ui/lib/editor';
+import { cn } from '@colanode/ui/lib/utils';
 
 interface TableCellRendererProps {
   node: JSONContent;
@@ -12,8 +14,22 @@ export const TableCellRenderer = ({
   node,
   keyPrefix,
 }: TableCellRendererProps) => {
+  const align = node.attrs?.align ?? 'left';
+  const backgroundColorAttr = node.attrs?.backgroundColor ?? null;
+  const backgroundColor = backgroundColorAttr
+    ? editorColors.find((color) => color.color === backgroundColorAttr)
+    : null;
+
   return (
-    <td className={defaultClasses.tableCellWrapper}>
+    <td
+      className={cn(
+        defaultClasses.tableCellWrapper,
+        backgroundColor?.bgClass,
+        align === 'left' && 'justify-start',
+        align === 'center' && 'justify-center',
+        align === 'right' && 'justify-end'
+      )}
+    >
       <div className={defaultClasses.tableCell}>
         <NodeChildrenRenderer node={node} keyPrefix={keyPrefix} />
       </div>

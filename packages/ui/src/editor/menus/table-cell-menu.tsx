@@ -9,7 +9,6 @@ import {
   AlignLeft,
   AlignCenter,
   AlignRight,
-  Baseline,
   Highlighter,
   AlignJustify,
   Check,
@@ -35,7 +34,6 @@ export const TableCellMenu = ({
   updateAttributes,
 }: NodeViewProps) => {
   const textAlign = node.attrs.textAlign ?? 'left';
-  const textColor = node.attrs.textColor ?? 'default';
   const backgroundColor = node.attrs.backgroundColor ?? 'default';
 
   return (
@@ -88,33 +86,6 @@ export const TableCellMenu = ({
               </div>
               {textAlign === 'right' && <Check className="size-4" />}
             </DropdownMenuItem>
-          </DropdownMenuSubContent>
-        </DropdownMenuSub>
-        <DropdownMenuSub>
-          <DropdownMenuSubTrigger className="flex gap-2">
-            <Baseline className="size-4 text-muted-foreground" />
-            Text Color
-          </DropdownMenuSubTrigger>
-          <DropdownMenuSubContent className="w-48">
-            <DropdownMenuLabel>Text Color</DropdownMenuLabel>
-            {editorColors.map((color) => (
-              <DropdownMenuItem
-                key={color.color}
-                onClick={() => updateAttributes({ textColor: color.color })}
-                className="flex items-center justify-between"
-              >
-                <div className="flex items-center gap-2">
-                  <div
-                    className={cn(
-                      'w-4 h-4 rounded border border-gray-300',
-                      color.bgClass
-                    )}
-                  />
-                  {color.name}
-                </div>
-                {textColor === color.color && <Check className="size-4" />}
-              </DropdownMenuItem>
-            ))}
           </DropdownMenuSubContent>
         </DropdownMenuSub>
         <DropdownMenuSub>

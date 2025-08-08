@@ -13,9 +13,6 @@ export const TableHeaderNodeView = (props: NodeViewProps) => {
   const isActive = useEditorNodeActive(props);
   const colWidth = props.node.attrs.colwidth ?? 100;
   const align = props.node.attrs.align;
-  const textColor = editorColors.find(
-    (color) => color.color === props.node.attrs.textColor
-  );
   const backgroundColor = editorColors.find(
     (color) => color.color === props.node.attrs.backgroundColor
   );
@@ -27,7 +24,6 @@ export const TableHeaderNodeView = (props: NodeViewProps) => {
           defaultClasses.tableHeader,
           'relative',
           isActive && 'outline outline-gray-400',
-          textColor?.textClass,
           backgroundColor?.bgClass,
           align === 'left' && 'justify-start',
           align === 'center' && 'justify-center',

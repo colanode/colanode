@@ -34,11 +34,6 @@ export const TableHeaderNode = TableHeader.extend({
         default: null,
         parseHTML: (element: HTMLElement) => element.getAttribute('data-align'),
       },
-      textColor: {
-        default: null,
-        parseHTML: (element: HTMLElement) =>
-          element.getAttribute('data-text-color'),
-      },
       backgroundColor: {
         default: null,
         parseHTML: (element: HTMLElement) =>
