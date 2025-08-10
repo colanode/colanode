@@ -53,13 +53,17 @@ const createDocumentFromResult = (
   authorMap: Map<string, { id: string; name: string | null }>
 ): MDocument => {
   const author = result.createdBy ? authorMap.get(result.createdBy) : null;
-  const content = `${result.summary}\n\n${result.text}`;
+  const summaryPart = (result.summary ?? '').trim();
+  const content = summaryPart
+    ? `${summaryPart}\n\n${result.text}`
+    : result.text;
 
   const doc = MDocument.fromText(content, {
     id: result.id,
     score: result.finalScore,
     createdAt: result.createdAt,
-    type: result.type === 'semantic' ? 'node' : 'document',
+
+    type: (result as any).sourceType ?? 'document',
     chunkIndex: result.chunkIndex,
     author: author ? { id: author.id, name: author.name || 'Unknown' } : null,
   });

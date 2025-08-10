@@ -1,4 +1,4 @@
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { embedMany } from 'ai';
 import { sql } from 'kysely';
 
@@ -61,7 +61,8 @@ export const documentEmbedHandler: JobHandler<DocumentEmbedInput> = async (
     return;
   }
 
-  const embeddingModel = openai.embedding(config.ai.embedding.modelName);
+  const openaiClient = createOpenAI({ apiKey: config.ai.embedding.apiKey });
+  const embeddingModel = openaiClient.embedding(config.ai.embedding.modelName);
 
   const existingEmbeddings = await database
     .selectFrom('document_embeddings')

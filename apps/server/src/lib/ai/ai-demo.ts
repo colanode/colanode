@@ -5,7 +5,67 @@
  * and provides examples for different use cases.
  */
 
-import { getAIService, processAIRequest } from './ai-service';
+import { Mastra } from '@mastra/core';
+import { RuntimeContext } from '@mastra/core/runtime-context';
+import { assistantWorkflow } from './ai-workflow';
+import {
+  AssistantWorkflowInput,
+  AssistantWorkflowOutput,
+} from '@colanode/server/types/ai';
+
+/**
+ * Process an AI request using the Mastra workflow directly.
+ *
+ * @param request - The user's request with context
+ * @returns Promise resolving to the assistant's response
+ */
+async function processAIRequest(
+  request: AssistantWorkflowInput
+): Promise<AssistantWorkflowOutput> {
+  const startTime = Date.now();
+
+  // Prepare runtime context
+  const runtimeContext = new RuntimeContext();
+  runtimeContext.set('workspaceName', request.workspaceId);
+  runtimeContext.set('userName', request.userDetails.name);
+  runtimeContext.set('userEmail', request.userDetails.email);
+  runtimeContext.set('workspaceId', request.workspaceId);
+  runtimeContext.set('userId', request.userId);
+  runtimeContext.set(
+    'selectedContextNodeIds',
+    request.selectedContextNodeIds || []
+  );
+  runtimeContext.set('userInput', request.userInput);
+
+  // Initialize Mastra and get the workflow
+  const mastra = new Mastra({
+    workflows: {
+      assistantWorkflow,
+    },
+  });
+  const workflow = mastra.getWorkflow('assistantWorkflow');
+  const run = await workflow.createRunAsync();
+
+  // Execute the workflow
+  const result = await run.start({
+    inputData: request,
+    runtimeContext,
+  });
+
+  if (result.status !== 'success' || !result.result) {
+    const errorMessage =
+      result.status === 'suspended'
+        ? 'Workflow was suspended unexpectedly'
+        : (result as any).error || 'Workflow execution failed';
+    console.error('❌ Workflow failed:', errorMessage);
+    throw new Error(errorMessage);
+  }
+
+  return {
+    ...result.result,
+    processingTimeMs: Date.now() - startTime,
+  };
+}
 
 /**
  * Demo: Basic AI Assistant Usage
@@ -94,7 +154,10 @@ export async function demoWorkflowUsage() {
     });
 
     console.log('📝 Query: What is TypeScript and why is it useful?');
-    console.log('🤖 Response:', generalResponse.finalAnswer.substring(0, 200) + '...');
+    console.log(
+      '🤖 Response:',
+      generalResponse.finalAnswer.substring(0, 200) + '...'
+    );
     console.log('🔍 Search Performed:', generalResponse.searchPerformed);
     console.log('📚 Citations:', generalResponse.citations.length);
 
@@ -111,37 +174,14 @@ export async function demoWorkflowUsage() {
     });
 
     console.log('📝 Query: Show me recent documents about project planning');
-    console.log('🤖 Response:', workspaceResponse.finalAnswer.substring(0, 200) + '...');
+    console.log(
+      '🤖 Response:',
+      workspaceResponse.finalAnswer.substring(0, 200) + '...'
+    );
     console.log('🔍 Search Performed:', workspaceResponse.searchPerformed);
     console.log('📚 Citations:', workspaceResponse.citations.length);
-
   } catch (error) {
     console.error('❌ Workflow demo failed:', error);
-  }
-}
-
-/**
- * Demo: Service Health Check
- *
- * Shows how to check if the AI system is healthy and operational
- */
-export async function demoHealthCheck() {
-  console.log('\n🏥 === AI System Health Check Demo ===');
-
-  try {
-    const aiService = getAIService();
-    const health = await aiService.healthCheck();
-
-    console.log('🏥 Health Status:', health.status);
-    console.log('📋 Details:', health.details);
-
-    if (health.status === 'healthy') {
-      console.log('✅ AI system is operational and ready to process requests');
-    } else {
-      console.log('❌ AI system has issues and may not work properly');
-    }
-  } catch (error) {
-    console.error('❌ Health check failed:', error);
   }
 }
 
@@ -245,25 +285,104 @@ export async function demoPerformance() {
 }
 
 /**
- * Run all demos
+ * Demo: New Workflow Architecture
+ *
+ * Shows the new declarative workflow with proper branching
+ */
+export async function demoNewWorkflowArchitecture() {
+  console.log('\n🏗️ === New Workflow Architecture Demo ===');
+
+  try {
+    // Test 1: No-context branch (general knowledge)
+    console.log('\n1️⃣ Testing NO_CONTEXT branch (general knowledge)...');
+    const generalResponse = await processAIRequest({
+      userInput: 'What is TypeScript and why should I use it?',
+      workspaceId: 'demo_workspace_123',
+      userId: 'demo_user_456',
+      userDetails: {
+        name: 'Alice Developer',
+        email: 'alice@example.com',
+      },
+    });
+
+    console.log('📝 Query: "What is TypeScript and why should I use it?"');
+    console.log('🎯 Expected Branch: no_context');
+    console.log(
+      '🔍 Search Performed:',
+      generalResponse.searchPerformed ? '❌ Unexpected' : '✅ None (correct)'
+    );
+    console.log(
+      '📚 Citations:',
+      generalResponse.citations.length === 0
+        ? '✅ None (correct)'
+        : '❌ Unexpected'
+    );
+    console.log(
+      '💬 Response Preview:',
+      generalResponse.finalAnswer.substring(0, 150) + '...'
+    );
+
+    // Test 2: Retrieve branch (workspace-specific)
+    console.log('\n2️⃣ Testing RETRIEVE branch (workspace-specific)...');
+    const workspaceResponse = await processAIRequest({
+      userInput: 'Show me recent documents about project planning',
+      workspaceId: 'demo_workspace_123',
+      userId: 'demo_user_456',
+      userDetails: {
+        name: 'Bob Manager',
+        email: 'bob@example.com',
+      },
+    });
+
+    console.log('📝 Query: "Show me recent documents about project planning"');
+    console.log('🎯 Expected Branch: retrieve');
+    console.log(
+      '🔍 Search Performed:',
+      workspaceResponse.searchPerformed
+        ? '✅ Yes (correct)'
+        : '❌ None (unexpected)'
+    );
+    console.log(
+      '📚 Citations:',
+      workspaceResponse.citations.length > 0
+        ? '✅ Present (good)'
+        : '⚠️ None (no results)'
+    );
+    console.log(
+      '💬 Response Preview:',
+      workspaceResponse.finalAnswer.substring(0, 150) + '...'
+    );
+
+    console.log('\n✅ New workflow architecture demo completed successfully!');
+  } catch (error) {
+    console.error('❌ New workflow architecture demo failed:', error);
+  }
+}
+
+/**
+ * Run all demos including new architecture demonstrations
  *
  * Executes all demo functions to show the complete system capabilities
  */
 export async function runAllDemos() {
-  console.log('🎬 === AI Assistant System Demo ===');
-  console.log(
-    'This demo shows the capabilities of the new AI assistant system\n'
-  );
+  console.log('🎬 === AI Assistant System Demo Suite ===');
+  console.log('This demo showcases the new Mastra-based AI assistant system\n');
 
   try {
-    await demoHealthCheck();
+    // Show the migration comparison first
+    showMigrationComparison();
+
+    // Demo new architecture
+    await demoNewWorkflowArchitecture();
+
+    // Run original demos for compatibility
     await demoBasicUsage();
-    await demoComplexDatabaseQuery();
     await demoWorkflowUsage();
     await demoErrorHandling();
     await demoPerformance();
 
     console.log('\n🎉 === All Demos Completed Successfully ===');
+    console.log('The new Mastra-based AI system is ready for production! 🚀');
   } catch (error) {
     console.error('❌ Demo suite failed:', error);
   }
@@ -274,49 +393,46 @@ export async function runAllDemos() {
  */
 export function showMigrationComparison() {
   console.log(`
-🔄 === MIGRATION COMPARISON ===
+🔄 === MASTRA MIGRATION COMPLETED ===
 
 📊 BEFORE (Complex LangChain System):
 ┌─────────────────────────────────────────────────────────┐
-│ ❌ 600+ lines across 4 complex files                   │
-│ ❌ Manual LangGraph workflow with 14+ nodes            │
+│ ❌ 600+ lines across multiple complex files             │
+│ ❌ Manual LangGraph workflow with 14+ imperative nodes  │
 │ ❌ Complex state management between workflow steps      │
-│ ❌ Manual chat history and memory handling              │
-│ ❌ Hardcoded prompt templates and tool definitions      │
-│ ❌ Custom document retrieval and reranking logic        │
-│ ❌ Tightly coupled components                           │
-│ ❌ Difficult to test and maintain                       │
+│ ❌ Monolithic agents with multi-purpose prompts         │
+│ ❌ Tightly coupled search and reranking logic           │
+│ ❌ Poor observability and debugging capabilities        │
+│ ❌ Not optimized for smaller/self-hosted LLMs           │
+│ ❌ Difficult to test, maintain, and extend              │
 └─────────────────────────────────────────────────────────┘
 
-📊 AFTER (Clean Mastra Workflow System):
+📊 AFTER (Declarative Mastra Workflow System):
 ┌─────────────────────────────────────────────────────────┐
-│ ✅ Workflow-based architecture with proper orchestration│
-│ ✅ Specialized agents for intent detection and answering │
-│ ✅ Type-safe workflow steps with full observability     │
-│ ✅ Intelligent routing (no_context vs retrieve)         │
-│ ✅ Built-in RAG with automatic context fetching         │
-│ ✅ Unified processing with branching logic              │
-│ ✅ Proper citation handling and deduplication           │
-│ ✅ Easy to extend with new workflow steps               │
+│ ✅ Fully declarative workflow with proper branching     │
+│ ✅ Single-purpose agents optimized for smaller LLMs     │
+│ ✅ Granular tools with focused responsibilities         │
+│ ✅ Intelligent intent-based routing                     │
+│ ✅ Full observability through Mastra's workflow engine  │
+│ ✅ Type-safe, maintainable, and easily extensible      │
 └─────────────────────────────────────────────────────────┘
 
-🎯 KEY IMPROVEMENTS:
-• Proper Mastra workflow utilization
-• Better separation of concerns with focused agents
-• Enhanced observability and debugging capabilities
-• Type-safe workflow orchestration
-• Intelligent intent-based routing
-• Simplified yet more powerful architecture
-• Built-in error handling and fallbacks
+🎯 KEY ACHIEVEMENTS:
+• TRUE Mastra idiomatic implementation with .branch() routing
+• BYOM (Bring Your Own Model) optimization for self-hosted LLMs
+• Granular tools: semantic search, keyword search, database tools
+• Step-by-step observability for debugging and optimization
 
-📁 NEW FILE STRUCTURE:
-├── ai-workflow.ts    → Main workflow orchestration (NEW)
-├── ai-agents.ts      → Intent and answer agents
-├── ai-tools.ts       → Document search and database tools
-├── ai-service.ts     → Service layer with workflow integration
-├── ai-models.ts      → Model configuration (simplified)
-├── ai-assistant.ts   → Legacy compatibility (minimal)
-└── ai-demo.ts        → Workflow demonstrations
+🏗️ ARCHITECTURE HIGHLIGHTS:
+• Declarative workflow: intentClassification → branch(intent) → publish
+• Simplified agents: intentClassifier, queryOptimizer, answerGenerator
+
+📁 REFACTORED FILE STRUCTURE:
+├── ai-workflow.ts    → Declarative Mastra workflow with branching
+├── ai-agents.ts      → Single-purpose agents optimized for small LLMs
+├── ai-tools.ts       → Granular tools (semantic, keyword, database)
+├── ai-models.ts      → Multi-provider model configuration
+└── ai-demo.ts        → Workflow path demonstrations
 `);
 }
 

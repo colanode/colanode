@@ -1,5 +1,5 @@
 import { MDocument } from '@mastra/rag';
-import { openai } from '@ai-sdk/openai';
+import { createOpenAI } from '@ai-sdk/openai';
 import { embed } from 'ai';
 import { sql } from 'kysely';
 
@@ -10,7 +10,9 @@ import { QueryRewriteOutput } from '@colanode/server/types/ai';
 import { SearchResult } from '@colanode/server/types/retrieval';
 
 const embeddingModel = config.ai.enabled
-  ? openai.embedding(config.ai.embedding.modelName)
+  ? createOpenAI({ apiKey: config.ai.embedding.apiKey }).embedding(
+      config.ai.embedding.modelName
+    )
   : undefined;
 
 export const retrieveDocuments = async (
@@ -26,31 +28,35 @@ export const retrieveDocuments = async (
 
   const maxResults = limit ?? config.ai.retrieval.hybridSearch.maxResults;
 
-  const { embedding } = await embed({
-    model: embeddingModel,
-    value: rewrittenQuery.semanticQuery,
-  });
+  const doSemantic = (rewrittenQuery.semanticQuery || '').trim().length > 0;
+  const doKeyword = (rewrittenQuery.keywordQuery || '').trim().length > 0;
 
-  if (!embedding) {
-    return [];
+  let semanticResults: SearchResult[] = [];
+  if (doSemantic) {
+    const { embedding } = await embed({
+      model: embeddingModel,
+      value: rewrittenQuery.semanticQuery,
+    });
+    if (embedding) {
+      semanticResults = await semanticSearchDocuments(
+        embedding,
+        workspaceId,
+        userId,
+        maxResults,
+        contextNodeIds
+      );
+    }
   }
 
-  const [semanticResults, keywordResults] = await Promise.all([
-    semanticSearchDocuments(
-      embedding,
-      workspaceId,
-      userId,
-      maxResults,
-      contextNodeIds
-    ),
-    keywordSearchDocuments(
-      rewrittenQuery.keywordQuery,
-      workspaceId,
-      userId,
-      maxResults,
-      contextNodeIds
-    ),
-  ]);
+  const keywordResults: SearchResult[] = doKeyword
+    ? await keywordSearchDocuments(
+        rewrittenQuery.keywordQuery,
+        workspaceId,
+        userId,
+        maxResults,
+        contextNodeIds
+      )
+    : [];
 
   return combineSearchResults(semanticResults, keywordResults);
 };
@@ -115,6 +121,7 @@ const semanticSearchDocuments = async (
     createdAt: result.created_at,
     createdBy: result.created_by,
     chunkIndex: result.chunk_index,
+    sourceType: 'document' as const,
   }));
 };
 
@@ -182,6 +189,7 @@ const keywordSearchDocuments = async (
     createdAt: result.created_at,
     createdBy: result.created_by,
     chunkIndex: result.chunk_index,
+    sourceType: 'document' as const,
   }));
 };
 

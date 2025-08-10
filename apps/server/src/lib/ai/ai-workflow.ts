@@ -112,7 +112,7 @@ Create two optimized versions for search.`;
 
 const runSearchesStep = createStep({
   id: 'run-searches-step',
-  description: 'Execute parallel semantic and keyword searches',
+  description: 'Execute hybrid (semantic + keyword) search via single tool',
   inputSchema: queryRewriteOutputSchema,
   outputSchema: searchResultsOutputSchema,
   execute: async ({ inputData, runtimeContext }) => {
@@ -126,51 +126,33 @@ const runSearchesStep = createStep({
       throw new Error('Missing required runtime context for search');
     }
 
-    console.log(`🔍 Running parallel searches...`);
+    console.log(`🔍 Running hybrid search...`);
     console.log(`   Semantic: "${inputData.semanticQuery}"`);
     console.log(`   Keyword: "${inputData.keywordQuery}"`);
 
     try {
       const tools = createAITools();
 
-      // Run granular searches in parallel
-      const [semanticResults, keywordResults] = await Promise.all([
-        tools.semanticSearch.execute({
-          context: {
-            query: inputData.semanticQuery,
-            workspaceId,
-            userId,
-            maxResults: 15, // Get more from each search for better combination
-            selectedContextNodeIds,
-          },
-          runtimeContext,
-        }),
-        tools.keywordSearch.execute({
-          context: {
-            query: inputData.keywordQuery,
-            workspaceId,
-            userId,
-            maxResults: 15,
-            selectedContextNodeIds,
-          },
-          runtimeContext,
-        }),
-      ]);
+      const hybridResults = await tools.hybridSearch.execute({
+        context: {
+          semanticQuery: inputData.semanticQuery,
+          keywordQuery: inputData.keywordQuery,
+          workspaceId,
+          userId,
+          maxResults: 20,
+          selectedContextNodeIds,
+        },
+        runtimeContext,
+      });
 
-      // Combine results from both search types
-      const allResults = [
-        ...semanticResults.results,
-        ...keywordResults.results,
-      ];
-
-      console.log(`📊 Search completed: ${allResults.length} total results`);
-      console.log(`   - Semantic: ${semanticResults.results.length}`);
-      console.log(`   - Keyword: ${keywordResults.results.length}`);
+      console.log(
+        `📊 Hybrid search completed: ${hybridResults.results.length} results`
+      );
 
       return {
-        results: allResults,
+        results: hybridResults.results,
         searchType: 'hybrid' as const,
-        totalFound: allResults.length,
+        totalFound: hybridResults.totalFound,
       };
     } catch (error) {
       console.error('❌ Search execution failed:', error);
@@ -371,7 +353,7 @@ ${contextText}
 
       return {
         finalAnswer: response.text,
-        additionalCitations: [], // Citations already handled in previous step
+        additionalCitations: inputData.citations,
         usedContext: true,
       };
     } catch (error) {

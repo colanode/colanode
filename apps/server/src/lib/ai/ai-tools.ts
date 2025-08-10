@@ -1,13 +1,14 @@
 import { createTool } from '@mastra/core/tools';
 import { z } from 'zod';
 
-export const createSemanticSearchTool = () =>
+export const createHybridSearchTool = () =>
   createTool({
-    id: 'semantic-search',
+    id: 'hybrid-search',
     description:
-      'Perform pure semantic/vector search on workspace documents and nodes',
+      'Perform hybrid (semantic + keyword) search on workspace documents and nodes',
     inputSchema: z.object({
-      query: z.string().describe('The semantic search query'),
+      semanticQuery: z.string().describe('The semantic search query'),
+      keywordQuery: z.string().describe('The keyword search query'),
       workspaceId: z.string().describe('The workspace ID to search in'),
       userId: z.string().describe('The user ID for access control'),
       maxResults: z
@@ -29,16 +30,14 @@ export const createSemanticSearchTool = () =>
             .string()
             .describe('The type of content (document, node, etc.)'),
           sourceId: z.string().describe('Unique identifier for the source'),
-          score: z.number().describe('Semantic similarity score (0-1)'),
+          score: z.number().describe('Hybrid relevance score (0-1 scaled)'),
           metadata: z
             .record(z.any())
             .describe('Additional metadata about the source'),
         })
       ),
-      totalFound: z.number().describe('Total number of results found'),
-      searchType: z
-        .literal('semantic')
-        .describe('Always semantic for this tool'),
+      totalFound: z.number().describe('Total number of results returned'),
+      searchType: z.literal('hybrid').describe('Hybrid search'),
     }),
     execute: async ({ context }) => {
       const { retrieveNodes } = await import(
@@ -49,7 +48,8 @@ export const createSemanticSearchTool = () =>
       );
 
       const {
-        query,
+        semanticQuery,
+        keywordQuery,
         workspaceId,
         userId,
         maxResults = 10,
@@ -57,19 +57,31 @@ export const createSemanticSearchTool = () =>
       } = context;
 
       try {
-        console.log(`🔍 Semantic search for: "${query}" (max: ${maxResults})`);
+        console.log(
+          `🔎 Hybrid search for: semantic="${semanticQuery}" keyword="${keywordQuery}" (max: ${maxResults})`
+        );
 
-        // Perform semantic search only (no keyword search)
+        // Perform hybrid retrieval per source type
         const [nodeResults, documentResults] = await Promise.all([
           retrieveNodes(
-            { semanticQuery: query, keywordQuery: '' }, // Empty keywordQuery for pure semantic
+            {
+              semanticQuery,
+              keywordQuery,
+              originalQuery: semanticQuery || keywordQuery,
+              intent: 'retrieve',
+            },
             workspaceId,
             userId,
             maxResults,
             selectedContextNodeIds
           ),
           retrieveDocuments(
-            { semanticQuery: query, keywordQuery: '' },
+            {
+              semanticQuery,
+              keywordQuery,
+              originalQuery: semanticQuery || keywordQuery,
+              intent: 'retrieve',
+            },
             workspaceId,
             userId,
             maxResults,
@@ -77,129 +89,32 @@ export const createSemanticSearchTool = () =>
           ),
         ]);
 
-        const allResults = [...nodeResults, ...documentResults]
-          .sort((a, b) => (b.metadata.score || 0) - (a.metadata.score || 0)) // Sort by semantic score
-          .slice(0, maxResults);
+        const allResults = [...nodeResults, ...documentResults].slice(
+          0,
+          maxResults
+        );
 
-        // Convert to standardized format
-        const results = allResults.map((doc) => ({
-          content: doc.pageContent || '',
-          type: doc.metadata.type || 'document',
-          sourceId: doc.metadata.id || '',
-          score: doc.metadata.score || 0,
-          metadata: doc.metadata || {},
-        }));
+        // Convert to standardized format (loosen typing for MDocument)
+        const results = allResults.map((doc) => {
+          const md = doc as any;
+          return {
+            content: md.pageContent || md.text || '',
+            type: md.metadata?.type || 'document',
+            sourceId: md.metadata?.id || md.id || '',
+            score: md.metadata?.score || md.score || 0,
+            metadata: md.metadata || {},
+          };
+        });
 
-        console.log(`✅ Semantic search found ${results.length} results`);
-
-        return {
-          results,
-          totalFound: allResults.length,
-          searchType: 'semantic' as const,
-        };
-      } catch (error) {
-        console.error('❌ Semantic search error:', error);
-        throw error;
-      }
-    },
-  });
-
-export const createKeywordSearchTool = () =>
-  createTool({
-    id: 'keyword-search',
-    description:
-      'Perform pure keyword/full-text search on workspace documents and nodes',
-    inputSchema: z.object({
-      query: z.string().describe('The keyword search query'),
-      workspaceId: z.string().describe('The workspace ID to search in'),
-      userId: z.string().describe('The user ID for access control'),
-      maxResults: z
-        .number()
-        .default(10)
-        .describe('Maximum number of results to return'),
-      selectedContextNodeIds: z
-        .array(z.string())
-        .optional()
-        .describe('Specific node IDs to search within'),
-    }),
-    outputSchema: z.object({
-      results: z.array(
-        z.object({
-          content: z
-            .string()
-            .describe('The content of the found document/node'),
-          type: z
-            .string()
-            .describe('The type of content (document, node, etc.)'),
-          sourceId: z.string().describe('Unique identifier for the source'),
-          score: z.number().describe('Keyword relevance score (0-1)'),
-          metadata: z
-            .record(z.any())
-            .describe('Additional metadata about the source'),
-        })
-      ),
-      totalFound: z.number().describe('Total number of results found'),
-      searchType: z.literal('keyword').describe('Always keyword for this tool'),
-    }),
-    execute: async ({ context }) => {
-      const { retrieveNodes } = await import(
-        '@colanode/server/lib/ai/node-retrievals'
-      );
-      const { retrieveDocuments } = await import(
-        '@colanode/server/lib/ai/document-retrievals'
-      );
-
-      const {
-        query,
-        workspaceId,
-        userId,
-        maxResults = 10,
-        selectedContextNodeIds = [],
-      } = context;
-
-      try {
-        console.log(`🔤 Keyword search for: "${query}" (max: ${maxResults})`);
-
-        // Perform keyword search only (no semantic search)
-        const [nodeResults, documentResults] = await Promise.all([
-          retrieveNodes(
-            { semanticQuery: '', keywordQuery: query }, // Empty semanticQuery for pure keyword
-            workspaceId,
-            userId,
-            maxResults,
-            selectedContextNodeIds
-          ),
-          retrieveDocuments(
-            { semanticQuery: '', keywordQuery: query },
-            workspaceId,
-            userId,
-            maxResults,
-            selectedContextNodeIds
-          ),
-        ]);
-
-        const allResults = [...nodeResults, ...documentResults]
-          .sort((a, b) => (b.metadata.score || 0) - (a.metadata.score || 0)) // Sort by keyword score
-          .slice(0, maxResults);
-
-        // Convert to standardized format
-        const results = allResults.map((doc) => ({
-          content: doc.pageContent || '',
-          type: doc.metadata.type || 'document',
-          sourceId: doc.metadata.id || '',
-          score: doc.metadata.score || 0,
-          metadata: doc.metadata || {},
-        }));
-
-        console.log(`✅ Keyword search found ${results.length} results`);
+        console.log(`✅ Hybrid search returned ${results.length} results`);
 
         return {
           results,
-          totalFound: allResults.length,
-          searchType: 'keyword' as const,
+          totalFound: results.length,
+          searchType: 'hybrid' as const,
         };
       } catch (error) {
-        console.error('❌ Keyword search error:', error);
+        console.error('❌ Hybrid search error:', error);
         throw error;
       }
     },
@@ -421,8 +336,7 @@ export const createDatabaseQueryTool = () =>
   });
 
 export const createAITools = () => ({
-  semanticSearch: createSemanticSearchTool(),
-  keywordSearch: createKeywordSearchTool(),
+  hybridSearch: createHybridSearchTool(),
 
   databaseSchemaInspection: createDatabaseSchemaInspectionTool(),
   databaseQuery: createDatabaseQueryTool(),
