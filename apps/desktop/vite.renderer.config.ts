@@ -23,6 +23,7 @@ export default defineConfig((env) => {
     },
     plugins: [react(), pluginExposeRenderer(name)],
     resolve: {
+      dedupe: ['react', 'react-dom'],
       alias: {
         '@colanode/desktop': path.resolve(__dirname, './src'),
         '@colanode/core': path.resolve(__dirname, '../../packages/core/src'),
