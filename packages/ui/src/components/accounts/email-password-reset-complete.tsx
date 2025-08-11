@@ -90,15 +90,25 @@ export const EmailPasswordResetComplete = ({
 
   if (showSuccess) {
     return (
-      <div className="flex flex-col items-center justify-center border border-border rounded-md p-4 gap-3 text-center">
-        <CheckCircle className="size-7 text-green-600" />
-        <p className="text-sm text-muted-foreground">
-          Your password has been reset. You can now login with your new
-          password.
-        </p>
-        <p className="text-sm font-semibold text-muted-foreground">
-          You have been logged out of all devices.
-        </p>
+      <div className="space-y-3">
+        <div className="flex flex-col items-center justify-center border border-border rounded-md p-4 gap-3 text-center">
+          <CheckCircle className="size-7 text-green-600" />
+          <p className="text-sm text-muted-foreground">
+            Your password has been reset. You can now login with your new
+            password.
+          </p>
+          <p className="text-sm font-semibold text-muted-foreground">
+            You have been logged out of all devices.
+          </p>
+        </div>
+        <Button
+          variant="link"
+          className="w-full text-muted-foreground"
+          onClick={onBack}
+          type="button"
+        >
+          Back to login
+        </Button>
       </div>
     );
   }
