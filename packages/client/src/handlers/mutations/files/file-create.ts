@@ -16,7 +16,7 @@ export class FileCreateMutationHandler
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
 
     const fileId = generateId(IdType.File);
-    await workspace.files.createFile(fileId, input.parentId, input.file);
+    await workspace.files.createFile(fileId, input.tempFileId, input.parentId);
 
     return {
       id: fileId,

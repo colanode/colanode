@@ -1,11 +1,17 @@
 import { Account, AccountMetadata } from '@colanode/client/types/accounts';
 import { AppMetadata } from '@colanode/client/types/apps';
+import { Avatar } from '@colanode/client/types/avatars';
 import {
   Document,
   DocumentState,
   DocumentUpdate,
 } from '@colanode/client/types/documents';
-import { FileSaveState, FileState } from '@colanode/client/types/files';
+import {
+  LocalFile,
+  Upload,
+  Download,
+  TempFile,
+} from '@colanode/client/types/files';
 import {
   LocalNode,
   NodeCounter,
@@ -84,25 +90,60 @@ export type NodeReactionDeletedEvent = {
   nodeReaction: NodeReaction;
 };
 
-export type FileStateUpdatedEvent = {
-  type: 'file.state.updated';
+export type LocalFileCreatedEvent = {
+  type: 'local.file.created';
   accountId: string;
   workspaceId: string;
-  fileState: FileState;
+  localFile: LocalFile;
 };
 
-export type FileStateDeletedEvent = {
-  type: 'file.state.deleted';
+export type LocalFileDeletedEvent = {
+  type: 'local.file.deleted';
   accountId: string;
   workspaceId: string;
-  fileId: string;
+  localFile: LocalFile;
 };
 
-export type FileSaveUpdatedEvent = {
-  type: 'file.save.updated';
+export type UploadCreatedEvent = {
+  type: 'upload.created';
   accountId: string;
   workspaceId: string;
-  fileSave: FileSaveState;
+  upload: Upload;
+};
+
+export type UploadUpdatedEvent = {
+  type: 'upload.updated';
+  accountId: string;
+  workspaceId: string;
+  upload: Upload;
+};
+
+export type UploadDeletedEvent = {
+  type: 'upload.deleted';
+  accountId: string;
+  workspaceId: string;
+  upload: Upload;
+};
+
+export type DownloadCreatedEvent = {
+  type: 'download.created';
+  accountId: string;
+  workspaceId: string;
+  download: Download;
+};
+
+export type DownloadUpdatedEvent = {
+  type: 'download.updated';
+  accountId: string;
+  workspaceId: string;
+  download: Download;
+};
+
+export type DownloadDeletedEvent = {
+  type: 'download.deleted';
+  accountId: string;
+  workspaceId: string;
+  download: Download;
 };
 
 export type AccountCreatedEvent = {
@@ -296,10 +337,26 @@ export type NodeCounterDeletedEvent = {
   counter: NodeCounter;
 };
 
-export type AvatarDownloadedEvent = {
-  type: 'avatar.downloaded';
+export type AvatarCreatedEvent = {
+  type: 'avatar.created';
   accountId: string;
-  avatarId: string;
+  avatar: Avatar;
+};
+
+export type AvatarDeletedEvent = {
+  type: 'avatar.deleted';
+  accountId: string;
+  avatar: Avatar;
+};
+
+export type TempFileCreatedEvent = {
+  type: 'temp.file.created';
+  tempFile: TempFile;
+};
+
+export type TempFileDeletedEvent = {
+  type: 'temp.file.deleted';
+  tempFile: TempFile;
 };
 
 export type Event =
@@ -322,9 +379,14 @@ export type Event =
   | ServerUpdatedEvent
   | ServerDeletedEvent
   | ServerAvailabilityChangedEvent
-  | FileStateUpdatedEvent
-  | FileStateDeletedEvent
-  | FileSaveUpdatedEvent
+  | LocalFileCreatedEvent
+  | LocalFileDeletedEvent
+  | UploadCreatedEvent
+  | UploadUpdatedEvent
+  | UploadDeletedEvent
+  | DownloadCreatedEvent
+  | DownloadUpdatedEvent
+  | DownloadDeletedEvent
   | QueryResultUpdatedEvent
   | RadarDataUpdatedEvent
   | CollaborationCreatedEvent
@@ -347,4 +409,7 @@ export type Event =
   | NodeReferenceDeletedEvent
   | NodeCounterUpdatedEvent
   | NodeCounterDeletedEvent
-  | AvatarDownloadedEvent;
+  | AvatarCreatedEvent
+  | AvatarDeletedEvent
+  | TempFileCreatedEvent
+  | TempFileDeletedEvent;

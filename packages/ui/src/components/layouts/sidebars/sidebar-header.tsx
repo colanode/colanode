@@ -10,7 +10,7 @@ export const SidebarHeader = ({ title, actions }: SidebarHeaderProps) => {
         {title}
       </p>
       {actions && (
-        <div className="text-muted-foreground opacity-0 transition-opacity group-hover/sidebar-chats:opacity-100 flex items-center justify-center app-no-drag-region">
+        <div className="text-muted-foreground opacity-0 transition-opacity group-hover/sidebar:opacity-100 flex items-center justify-center app-no-drag-region">
           {actions}
         </div>
       )}

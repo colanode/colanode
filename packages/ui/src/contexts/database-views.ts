@@ -6,6 +6,7 @@ interface DatabaseViewsContext {
   views: LocalDatabaseViewNode[];
   activeViewId: string;
   setActiveViewId: (viewId: string) => void;
+  inline: boolean;
 }
 
 export const DatabaseViewsContext = createContext<DatabaseViewsContext>(

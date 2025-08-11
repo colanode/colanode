@@ -1,12 +1,14 @@
-import { UnreadState } from '@colanode/client/types';
-import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
+import {
+  UnreadBadge,
+  UnreadBadgeProps,
+} from '@colanode/ui/components/ui/unread-badge';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface SidebarMenuIconProps {
   icon: React.ComponentType<{ className?: string }>;
   onClick: () => void;
   isActive?: boolean;
-  unreadState?: UnreadState;
+  unreadBadge?: UnreadBadgeProps;
   className?: string;
 }
 
@@ -14,7 +16,7 @@ export const SidebarMenuIcon = ({
   icon: Icon,
   onClick,
   isActive = false,
-  unreadState,
+  unreadBadge,
   className,
 }: SidebarMenuIconProps) => {
   return (
@@ -32,11 +34,12 @@ export const SidebarMenuIcon = ({
           isActive ? 'text-primary' : 'text-muted-foreground'
         )}
       />
-      <UnreadBadge
-        count={unreadState?.unreadCount ?? 0}
-        unread={unreadState?.hasUnread ?? false}
-        className="absolute top-0 right-0"
-      />
+      {unreadBadge && (
+        <UnreadBadge
+          {...unreadBadge}
+          className={cn('absolute top-0 right-0', unreadBadge.className)}
+        />
+      )}
     </div>
   );
 };

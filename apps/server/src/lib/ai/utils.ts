@@ -13,8 +13,7 @@ export const calculateRecencyBoost = (
 ): number => {
   if (!createdAt) return 1;
   const now = new Date();
-  const ageInDays =
-    (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60 * 24);
+  const ageInDays = (now.getTime() - createdAt.getTime()) / ms('1 day');
   return ageInDays <= halfLifeDays
     ? 1 + (1 - ageInDays / halfLifeDays) * boostFactor
     : 1;

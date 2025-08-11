@@ -1,12 +1,12 @@
-import { createDebugger } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { CreateNodeTombstone } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
 import { eventBus } from '@colanode/server/lib/event-bus';
 import { deleteFile } from '@colanode/server/lib/files';
+import { createLogger } from '@colanode/server/lib/logger';
 
 const BATCH_SIZE = 100;
-const debug = createDebugger('server:job:clean-node-data');
+const logger = createLogger('server:job:clean-node-data');
 
 export type NodeCleanInput = {
   type: 'node.clean';
@@ -24,7 +24,7 @@ declare module '@colanode/server/jobs' {
 }
 
 export const nodeCleanHandler: JobHandler<NodeCleanInput> = async (input) => {
-  debug(`Cleaning node data for ${input.nodeId}`);
+  logger.debug(`Cleaning node data for ${input.nodeId}`);
 
   await cleanNodeRelations([input.nodeId]);
   await cleanNodeFiles([input.nodeId]);

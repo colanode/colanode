@@ -1,7 +1,7 @@
+import { isFeatureSupported } from '@colanode/client/lib';
 import { ServerNotFound } from '@colanode/ui/components/servers/server-not-found';
 import { ServerContext } from '@colanode/ui/contexts/server';
-import { useQuery } from '@colanode/ui/hooks/use-query';
-import { isFeatureSupported } from '@colanode/ui/lib/features';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface ServerProviderProps {
   domain: string;
@@ -9,7 +9,7 @@ interface ServerProviderProps {
 }
 
 export const ServerProvider = ({ domain, children }: ServerProviderProps) => {
-  const serverListQuery = useQuery({
+  const serverListQuery = useLiveQuery({
     type: 'server.list',
   });
 

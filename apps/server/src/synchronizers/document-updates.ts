@@ -2,15 +2,15 @@ import {
   SynchronizerOutputMessage,
   SyncDocumentUpdatesInput,
   SyncDocumentUpdateData,
-  createDebugger,
 } from '@colanode/core';
 import { encodeState } from '@colanode/crdt';
 import { database } from '@colanode/server/data/database';
 import { SelectDocumentUpdate } from '@colanode/server/data/schema';
+import { createLogger } from '@colanode/server/lib/logger';
 import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
 import { Event } from '@colanode/server/types/events';
 
-const debug = createDebugger('document-update-synchronizer');
+const logger = createLogger('document-update-synchronizer');
 
 export class DocumentUpdateSynchronizer extends BaseSynchronizer<SyncDocumentUpdatesInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncDocumentUpdatesInput> | null> {
@@ -56,7 +56,7 @@ export class DocumentUpdateSynchronizer extends BaseSynchronizer<SyncDocumentUpd
 
       return documentUpdates;
     } catch (error) {
-      debug('Error fetching document updates for sync', error);
+      logger.error(error, 'Error fetching document updates for sync');
     } finally {
       this.status = 'pending';
     }

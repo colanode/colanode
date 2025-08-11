@@ -11,7 +11,7 @@ import {
   CommandList,
 } from '@colanode/ui/components/ui/command';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface UserSearchProps {
   exclude?: string[];
@@ -22,7 +22,7 @@ export const UserSearch = ({ exclude, onSelect }: UserSearchProps) => {
   const workspace = useWorkspace();
 
   const [query, setQuery] = useState('');
-  const userSearchQuery = useQuery({
+  const userSearchQuery = useLiveQuery({
     type: 'user.search',
     searchQuery: query,
     accountId: workspace.accountId,

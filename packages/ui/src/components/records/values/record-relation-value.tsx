@@ -1,7 +1,8 @@
 import { X } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
-import { RecordNode, RelationFieldAttributes } from '@colanode/core';
+import { LocalRecordNode } from '@colanode/client/types';
+import { RelationFieldAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { RecordSearch } from '@colanode/ui/components/records/record-search';
 import { Badge } from '@colanode/ui/components/ui/badge';
@@ -13,14 +14,14 @@ import {
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQueries } from '@colanode/ui/hooks/use-queries';
+import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 interface RecordRelationValueProps {
   field: RelationFieldAttributes;
   readOnly?: boolean;
 }
 
-const RelationBadge = ({ record }: { record: RecordNode }) => {
+const RelationBadge = ({ record }: { record: LocalRecordNode }) => {
   const name = record.attributes.name ?? 'Unnamed';
   return (
     <div className="flex flex-row items-center gap-1">
@@ -45,7 +46,7 @@ export const RecordRelationValue = ({
   const [open, setOpen] = useState(false);
 
   const relationIds = record.getRelationValue(field) ?? [];
-  const results = useQueries(
+  const results = useLiveQueries(
     relationIds.map((id) => ({
       type: 'node.get',
       nodeId: id,
@@ -54,7 +55,7 @@ export const RecordRelationValue = ({
     }))
   );
 
-  const relations: RecordNode[] = [];
+  const relations: LocalRecordNode[] = [];
   for (const result of results) {
     if (result.data && result.data.type === 'record') {
       relations.push(result.data);

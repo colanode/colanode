@@ -14,9 +14,8 @@ export * from './emojis/emoji-get';
 export * from './emojis/emoji-list';
 export * from './emojis/emoji-search';
 export * from './files/file-list';
-export * from './files/file-state-get';
+export * from './files/local-file-get';
 export * from './files/file-download-request-get';
-export * from './files/file-save-list';
 export * from './icons/icon-category-list';
 export * from './icons/icon-list';
 export * from './icons/icon-search';
@@ -34,11 +33,17 @@ export * from './spaces/space-list';
 export * from './users/user-get';
 export * from './users/user-list';
 export * from './users/user-search';
+export * from './users/user-storage-get';
 export * from './workspaces/workspace-get';
 export * from './workspaces/workspace-list';
 export * from './workspaces/workspace-metadata-list';
-export * from './avatars/avatar-url-get';
+export * from './avatars/avatar-get';
 export * from './records/record-field-value-count';
+export * from './workspaces/workspace-storage-get';
+export * from './files/upload-list';
+export * from './files/download-list-manual';
+export * from './files/temp-file-get';
+export * from './files/upload-list-pending';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface QueryMap {}
@@ -58,4 +63,5 @@ export enum QueryErrorCode {
   Unknown = 'unknown',
   AccountNotFound = 'account_not_found',
   WorkspaceNotFound = 'workspace_not_found',
+  ApiError = 'api_error',
 }

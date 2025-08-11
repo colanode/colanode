@@ -16,6 +16,10 @@ const types = [
   EditorNodeTypes.TaskItem,
   EditorNodeTypes.CodeBlock,
   EditorNodeTypes.HorizontalRule,
+  EditorNodeTypes.Table,
+  EditorNodeTypes.TableHeader,
+  EditorNodeTypes.TableCell,
+  EditorNodeTypes.TableRow,
 ];
 
 export const IdExtension = Extension.create({

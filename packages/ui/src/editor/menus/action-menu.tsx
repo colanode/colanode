@@ -5,6 +5,8 @@ import { Editor } from '@tiptap/react';
 import { GripVertical, Plus } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 
+import { isDescendantNode } from '@colanode/client/lib';
+
 interface ActionMenuProps {
   editor: Editor | null;
 }
@@ -59,12 +61,7 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
         return;
       }
 
-      const coords = {
-        left: Math.max(event.clientX, editorBounds.left),
-        top: event.clientY,
-      };
-
-      const pos = view.current.posAtCoords(coords);
+      const pos = view.current.posAtDOM(event.target as Node, 0, 0);
       if (!pos) {
         setMenuState({
           show: false,
@@ -72,8 +69,7 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
         return;
       }
 
-      // Find the nearest block parent at the current horizontal position
-      let currentPos = pos.pos;
+      let currentPos = pos;
       let pmNode = null;
       let domNode = null;
       let nodePos = -1;
@@ -81,13 +77,12 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
       while (currentPos >= 0) {
         const node = view.current.state.doc.nodeAt(currentPos);
 
-        if (
-          !node ||
-          !node.isBlock ||
-          node.type.name === 'bulletList' ||
-          node.type.name === 'orderedList' ||
-          node.type.name === 'taskList'
-        ) {
+        if (!node || !node.isBlock) {
+          currentPos--;
+          continue;
+        }
+
+        if (pmNode && !isDescendantNode(node, pmNode)) {
           currentPos--;
           continue;
         }
@@ -99,20 +94,11 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
             : ((nodeDOM as Node)?.parentElement as HTMLElement);
 
         if (nodeDOMElement) {
-          const nodeRect = nodeDOMElement.getBoundingClientRect();
-
-          // Are we on the same horizontal axis (vertical range) as the mouse over?
-          const verticallyAligned =
-            event.clientY >= nodeRect.top && event.clientY <= nodeRect.bottom;
-
-          if (verticallyAligned) {
-            pmNode = node;
-            domNode = nodeDOMElement;
-            nodePos = currentPos;
-          } else {
-            break;
-          }
+          pmNode = node;
+          domNode = nodeDOMElement;
+          nodePos = currentPos;
         }
+
         currentPos--;
       }
 

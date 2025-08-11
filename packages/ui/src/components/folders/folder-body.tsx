@@ -75,13 +75,13 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
     const result = await openFileDialog();
 
     if (result.type === 'success') {
-      result.files.forEach((file) => {
+      result.files.forEach((tempFile) => {
         window.colanode
           .executeMutation({
             type: 'file.create',
             accountId: workspace.accountId,
             workspaceId: workspace.id,
-            file,
+            tempFileId: tempFile.id,
             parentId: folder.id,
           })
           .then((result) => {

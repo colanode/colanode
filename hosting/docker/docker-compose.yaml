@@ -102,6 +102,13 @@ services:
       # SERVER_CORS_MAX_AGE: '7200'
 
       # ───────────────────────────────────────────────────────────────
+      # Logging Configuration
+      # ───────────────────────────────────────────────────────────────
+      # Possible values for LOGGING_LEVEL: 'trace', 'debug', 'info', 'warn', 'error', 'fatal', 'silent'
+      # Default: 'info'
+      # LOGGING_LEVEL: 'debug'
+
+      # ───────────────────────────────────────────────────────────────
       # Account Configuration
       # ───────────────────────────────────────────────────────────────
       # Possible values for ACCOUNT_VERIFICATION_TYPE: 'automatic', 'manual', 'email'
@@ -112,6 +119,13 @@ services:
       # ACCOUNT_GOOGLE_ENABLED: 'true'
       # ACCOUNT_GOOGLE_CLIENT_ID: 'your_google_client_id'
       # ACCOUNT_GOOGLE_CLIENT_SECRET: 'your_google_client_secret'
+
+      # ───────────────────────────────────────────────────────────────
+      # Workspace Configuration
+      # ───────────────────────────────────────────────────────────────
+      # Optional, leave empty for no limits
+      # WORKSPACE_STORAGE_LIMIT: '10737418240' # 10 GB
+      # WORKSPACE_MAX_FILE_SIZE: '104857600' # 100 MB
 
       # ───────────────────────────────────────────────────────────────
       # User Configuration
@@ -137,9 +151,11 @@ services:
       REDIS_URL: 'redis://:your_valkey_password@valkey:6379/0'
       REDIS_DB: '0'
       # Optional variables:
-      REDIS_JOBS_QUEUE_NAME: 'jobs'
-      REDIS_JOBS_QUEUE_PREFIX: 'colanode'
-      REDIS_EVENTS_CHANNEL: 'events'
+      # REDIS_JOBS_QUEUE_NAME: 'jobs'
+      # REDIS_JOBS_QUEUE_PREFIX: 'colanode'
+      # REDIS_TUS_LOCK_PREFIX: 'colanode:tus:lock'
+      # REDIS_TUS_KV_PREFIX: 'colanode:tus:kv'
+      # REDIS_EVENTS_CHANNEL: 'events'
 
       # ───────────────────────────────────────────────────────────────
       # S3 configuration for files.
@@ -177,15 +193,6 @@ services:
       # SMTP_EMAIL_FROM: 'your_email@example.com'
       # SMTP_EMAIL_FROM_NAME: 'Colanode'
       # ---------------------------------------------------------------
-
-      # ───────────────────────────────────────────────────────────────
-      # AI Configuration
-      # ---------------------------------------------------------------
-      # The AI integration is in experimental mode yet and we don't
-      # recommend using it.
-      # ---------------------------------------------------------------
-      AI_ENABLED: 'false'
-      # ───────────────────────────────────────────────────────────────
 
     ports:
       - '3000:3000'

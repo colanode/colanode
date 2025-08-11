@@ -86,7 +86,7 @@ export const userOutputSchema = z.object({
 export type UserOutput = z.infer<typeof userOutputSchema>;
 
 export const userCreateErrorOutputSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   error: z.string(),
 });
 
@@ -104,3 +104,12 @@ export const userRoleUpdateInputSchema = z.object({
 });
 
 export type UserRoleUpdateInput = z.infer<typeof userRoleUpdateInputSchema>;
+
+export const userStorageUpdateInputSchema = z.object({
+  storageLimit: z.string(),
+  maxFileSize: z.string(),
+});
+
+export type UserStorageUpdateInput = z.infer<
+  typeof userStorageUpdateInputSchema
+>;

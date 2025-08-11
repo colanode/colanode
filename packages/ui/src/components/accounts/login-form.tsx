@@ -2,6 +2,7 @@ import { HouseIcon } from 'lucide-react';
 import { useState, Fragment, useEffect } from 'react';
 import { match } from 'ts-pattern';
 
+import { isFeatureSupported } from '@colanode/client/lib';
 import { Account, ServerDetails } from '@colanode/client/types';
 import { EmailLogin } from '@colanode/ui/components/accounts/email-login';
 import { EmailPasswordResetComplete } from '@colanode/ui/components/accounts/email-password-reset-complete';
@@ -13,7 +14,6 @@ import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useApp } from '@colanode/ui/contexts/app';
 import { ServerContext } from '@colanode/ui/contexts/server';
-import { isFeatureSupported } from '@colanode/ui/lib/features';
 
 interface LoginFormProps {
   accounts: Account[];

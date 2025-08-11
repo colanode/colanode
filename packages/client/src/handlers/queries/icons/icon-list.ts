@@ -13,12 +13,12 @@ export class IconListQueryHandler implements QueryHandler<IconListQueryInput> {
   }
 
   public async handleQuery(input: IconListQueryInput): Promise<Icon[]> {
-    if (!this.app.asset.icons) {
+    if (!this.app.assets.icons) {
       return [];
     }
 
     const offset = input.page * input.count;
-    const data = await this.app.asset.icons
+    const data = await this.app.assets.icons
       .selectFrom('icons')
       .selectAll()
       .where('category_id', '=', input.category)

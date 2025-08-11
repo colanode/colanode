@@ -18,6 +18,7 @@ import { DividerNode } from '@colanode/ui/editor/extensions/divider';
 import { DropcursorExtension } from '@colanode/ui/editor/extensions/dropcursor';
 import { FileNode } from '@colanode/ui/editor/extensions/file';
 import { FolderNode } from '@colanode/ui/editor/extensions/folder';
+import { HardBreakNode } from '@colanode/ui/editor/extensions/hard-break';
 import { Heading1Node } from '@colanode/ui/editor/extensions/heading1';
 import { Heading2Node } from '@colanode/ui/editor/extensions/heading2';
 import { Heading3Node } from '@colanode/ui/editor/extensions/heading3';
@@ -33,6 +34,10 @@ import { PageNode } from '@colanode/ui/editor/extensions/page';
 import { ParagraphNode } from '@colanode/ui/editor/extensions/paragraph';
 import { PlaceholderExtension } from '@colanode/ui/editor/extensions/placeholder';
 import { TabKeymapExtension } from '@colanode/ui/editor/extensions/tab-keymap';
+import { TableNode } from '@colanode/ui/editor/extensions/table';
+import { TableCellNode } from '@colanode/ui/editor/extensions/table-cell';
+import { TableHeaderNode } from '@colanode/ui/editor/extensions/table-header';
+import { TableRowNode } from '@colanode/ui/editor/extensions/table-row';
 import { TaskItemNode } from '@colanode/ui/editor/extensions/task-item';
 import { TaskListNode } from '@colanode/ui/editor/extensions/task-list';
 import { TempFileNode } from '@colanode/ui/editor/extensions/temp-file';
@@ -69,6 +74,10 @@ export {
   PlaceholderExtension,
   StrikethroughMark,
   TabKeymapExtension,
+  TableNode,
+  TableRowNode,
+  TableHeaderNode,
+  TableCellNode,
   TaskItemNode,
   TaskListNode,
   TextNode,
@@ -77,4 +86,5 @@ export {
   DatabaseNode,
   AutoJoiner,
   MentionExtension,
+  HardBreakNode,
 };

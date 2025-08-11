@@ -1,16 +1,17 @@
 import {
   SelectAccountMetadata,
+  SelectAvatar,
   SelectWorkspace,
 } from '@colanode/client/databases/account';
 import {
   SelectAccount,
   SelectAppMetadata,
   SelectServer,
+  SelectTempFile,
 } from '@colanode/client/databases/app';
 import { SelectEmoji } from '@colanode/client/databases/emojis';
 import { SelectIcon } from '@colanode/client/databases/icons';
 import {
-  SelectFileState,
   SelectMutation,
   SelectNode,
   SelectUser,
@@ -21,6 +22,9 @@ import {
   SelectDocumentState,
   SelectDocumentUpdate,
   SelectNodeReference,
+  SelectLocalFile,
+  SelectDownload,
+  SelectUpload,
 } from '@colanode/client/databases/workspace';
 import {
   Account,
@@ -28,13 +32,19 @@ import {
   AccountMetadataKey,
 } from '@colanode/client/types/accounts';
 import { AppMetadata, AppMetadataKey } from '@colanode/client/types/apps';
+import { Avatar } from '@colanode/client/types/avatars';
 import {
   Document,
   DocumentState,
   DocumentUpdate,
 } from '@colanode/client/types/documents';
 import { Emoji } from '@colanode/client/types/emojis';
-import { FileState } from '@colanode/client/types/files';
+import {
+  LocalFile,
+  Download,
+  Upload,
+  TempFile,
+} from '@colanode/client/types/files';
 import { Icon } from '@colanode/client/types/icons';
 import {
   LocalNode,
@@ -187,24 +197,64 @@ export const mapNodeInteraction = (
   };
 };
 
-export const mapFileState = (
-  row: SelectFileState,
-  url: string | null
-): FileState => {
+export const mapLocalFile = (row: SelectLocalFile, url: string): LocalFile => {
   return {
     id: row.id,
     version: row.version,
-    downloadStatus: row.download_status,
-    downloadProgress: row.download_progress,
-    downloadRetries: row.download_retries,
-    downloadStartedAt: row.download_started_at,
-    downloadCompletedAt: row.download_completed_at,
-    uploadStatus: row.upload_status,
-    uploadProgress: row.upload_progress,
-    uploadRetries: row.upload_retries,
-    uploadStartedAt: row.upload_started_at,
-    uploadCompletedAt: row.upload_completed_at,
+    name: row.name,
+    path: row.path,
+    size: row.size,
+    subtype: row.subtype,
+    openedAt: row.opened_at,
+    mimeType: row.mime_type,
+    createdAt: row.created_at,
     url,
+  };
+};
+
+export const mapTempFile = (row: SelectTempFile, url: string): TempFile => {
+  return {
+    id: row.id,
+    name: row.name,
+    path: row.path,
+    size: row.size,
+    subtype: row.subtype,
+    mimeType: row.mime_type,
+    extension: row.extension,
+    url,
+  };
+};
+
+export const mapDownload = (row: SelectDownload): Download => {
+  return {
+    id: row.id,
+    fileId: row.file_id,
+    version: row.version,
+    type: row.type,
+    name: row.name,
+    path: row.path,
+    size: row.size,
+    mimeType: row.mime_type,
+    status: row.status,
+    progress: row.progress,
+    retries: row.retries,
+    createdAt: row.created_at,
+    completedAt: row.completed_at,
+    errorCode: row.error_code,
+    errorMessage: row.error_message,
+  };
+};
+
+export const mapUpload = (row: SelectUpload): Upload => {
+  return {
+    fileId: row.file_id,
+    status: row.status,
+    progress: row.progress,
+    retries: row.retries,
+    createdAt: row.created_at,
+    completedAt: row.completed_at,
+    errorCode: row.error_code,
+    errorMessage: row.error_message,
   };
 };
 
@@ -267,5 +317,16 @@ export const mapNodeReference = (row: SelectNodeReference): NodeReference => {
     referenceId: row.reference_id,
     innerId: row.inner_id,
     type: row.type,
+  };
+};
+
+export const mapAvatar = (row: SelectAvatar, url: string): Avatar => {
+  return {
+    id: row.id,
+    path: row.path,
+    size: row.size,
+    createdAt: row.created_at,
+    openedAt: row.opened_at,
+    url,
   };
 };

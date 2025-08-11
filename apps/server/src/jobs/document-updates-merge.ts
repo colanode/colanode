@@ -1,12 +1,15 @@
-import { createDebugger, UpdateMergeMetadata } from '@colanode/core';
+import ms from 'ms';
+
+import { UpdateMergeMetadata } from '@colanode/core';
 import { mergeUpdates } from '@colanode/crdt';
 import { database } from '@colanode/server/data/database';
 import { SelectDocumentUpdate } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
 import { config } from '@colanode/server/lib/config';
 import { fetchCounter, setCounter } from '@colanode/server/lib/counters';
+import { createLogger } from '@colanode/server/lib/logger';
 
-const debug = createDebugger('server:job:document-updates-merge');
+const logger = createLogger('server:job:document-updates-merge');
 
 export type DocumentUpdatesMergeInput = {
   type: 'document.updates.merge';
@@ -27,13 +30,12 @@ export const documentUpdatesMergeHandler: JobHandler<
     return;
   }
 
-  debug('Starting document updates merge job');
+  logger.debug('Starting document updates merge job');
 
   const cursor = await fetchCounter(database, 'document.updates.merge.cursor');
 
-  const cutoffTime = new Date();
-  cutoffTime.setTime(
-    cutoffTime.getTime() - config.jobs.documentUpdatesMerge.cutoffWindow * 1000
+  const cutoffTime = new Date(
+    Date.now() - ms(`${config.jobs.documentUpdatesMerge.cutoffWindow} seconds`)
   );
 
   let mergedGroups = 0;
@@ -56,7 +58,7 @@ export const documentUpdatesMergeHandler: JobHandler<
       continue;
     }
 
-    debug(`Processing batch of ${updates.length} updates`);
+    logger.debug(`Processing batch of ${updates.length} updates`);
 
     const documentsMap = new Map<string, SelectDocumentUpdate[]>();
     for (const update of updates) {
@@ -74,7 +76,8 @@ export const documentUpdatesMergeHandler: JobHandler<
       const result = await processDocumentUpdates(
         documentId,
         documentUpdates,
-        config.jobs.documentUpdatesMerge.mergeWindow
+        config.jobs.documentUpdatesMerge.mergeWindow,
+        config.jobs.documentUpdatesMerge.cutoffWindow
       );
       mergedGroups += result.mergedGroups;
       deletedUpdates += result.deletedUpdates;
@@ -88,7 +91,7 @@ export const documentUpdatesMergeHandler: JobHandler<
     }
   }
 
-  debug(
+  logger.debug(
     `Document updates merge job completed. Merged ${mergedGroups} groups, deleted ${deletedUpdates} redundant updates`
   );
 };
@@ -96,11 +99,12 @@ export const documentUpdatesMergeHandler: JobHandler<
 const processDocumentUpdates = async (
   documentId: string,
   documentUpdates: SelectDocumentUpdate[],
-  mergeWindow: number
+  mergeWindow: number,
+  cutoffWindow: number
 ): Promise<{ mergedGroups: number; deletedUpdates: number }> => {
   const firstUpdate = documentUpdates[0]!;
   const cutoffTime = new Date(
-    firstUpdate.created_at.getTime() - 60 * 60 * 1000
+    firstUpdate.created_at.getTime() - ms(`${cutoffWindow} seconds`)
   );
 
   const previousUpdate = await database
@@ -240,7 +244,7 @@ const mergeUpdatesGroup = async (
 
     return true;
   } catch (error) {
-    debug(`Failed to merge updates for document ${documentId}: ${error}`);
+    logger.error(error, `Failed to merge updates for document ${documentId}`);
     return false;
   }
 };

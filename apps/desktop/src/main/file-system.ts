@@ -1,12 +1,7 @@
 import fs from 'fs';
-import os from 'os';
 import { Writable } from 'stream';
 
-import {
-  FileMetadata,
-  FileReadStream,
-  FileSystem,
-} from '@colanode/client/services';
+import { FileReadStream, FileSystem } from '@colanode/client/services';
 
 export class DesktopFileSystem implements FileSystem {
   public async makeDirectory(path: string): Promise<void> {
@@ -25,7 +20,7 @@ export class DesktopFileSystem implements FileSystem {
   }
 
   public async readStream(path: string): Promise<FileReadStream> {
-    return fs.createReadStream(path);
+    return fs.promises.readFile(path);
   }
 
   public async writeStream(path: string): Promise<WritableStream<Uint8Array>> {
@@ -49,31 +44,8 @@ export class DesktopFileSystem implements FileSystem {
     await fs.promises.rm(path, { recursive: true, force: true });
   }
 
-  public async metadata(filePath: string): Promise<FileMetadata> {
-    const stats = await fs.promises.stat(filePath);
-    return {
-      lastModified: stats.mtime.getTime(),
-      size: stats.size,
-    };
-  }
-
   public async url(path: string): Promise<string> {
-    return `local-file://${DesktopFileSystem.win32PathPreUrl(path)}`;
-  }
-
-  public static win32PathPreUrl(path: string): string {
-    if (os.platform() === 'win32') {
-      let urlPath = path;
-      let filePathPrefix = "";
-
-      urlPath = urlPath.replace(/\\/g, '/');
-      if (/^[a-zA-Z]:/.test(urlPath)) {
-        filePathPrefix = '/';
-      }
-
-      return `${filePathPrefix}${urlPath}`;
-    }
-
-    return path;
+    const base64Path = Buffer.from(path).toString('base64');
+    return `local://files/${base64Path}`;
   }
 }

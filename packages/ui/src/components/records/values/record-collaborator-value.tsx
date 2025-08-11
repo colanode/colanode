@@ -14,7 +14,7 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { UserSearch } from '@colanode/ui/components/users/user-search';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQueries } from '@colanode/ui/hooks/use-queries';
+import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 interface RecordCollaboratorValueProps {
   field: CollaboratorFieldAttributes;
@@ -45,7 +45,7 @@ export const RecordCollaboratorValue = ({
   const [open, setOpen] = useState(false);
 
   const collaboratorIds = record.getCollaboratorValue(field) ?? [];
-  const results = useQueries(
+  const results = useLiveQueries(
     collaboratorIds.map((id) => ({
       type: 'user.get',
       userId: id,

@@ -1,8 +1,8 @@
 import ky from 'ky';
 import ms from 'ms';
 
+import { FeatureKey, isFeatureSupported } from '@colanode/client/lib';
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { EventLoop } from '@colanode/client/lib/event-loop';
 import { mapServer } from '@colanode/client/lib/mappers';
 import { isServerOutdated } from '@colanode/client/lib/servers';
 import { AppService } from '@colanode/client/services/app-service';
@@ -17,7 +17,6 @@ const debug = createDebugger('desktop:service:server');
 
 export class ServerService {
   private readonly app: AppService;
-  private readonly eventLoop: EventLoop;
 
   public state: ServerState | null = null;
   public isOutdated: boolean;
@@ -34,13 +33,6 @@ export class ServerService {
     this.socketBaseUrl = this.buildSocketBaseUrl();
     this.httpBaseUrl = this.buildHttpBaseUrl();
     this.isOutdated = isServerOutdated(server.version);
-
-    this.eventLoop = new EventLoop(
-      ms('1 minute'),
-      ms('1 second'),
-      this.sync.bind(this)
-    );
-    this.eventLoop.start();
   }
 
   public get isAvailable() {
@@ -55,7 +47,31 @@ export class ServerService {
     return this.server.version;
   }
 
-  private async sync() {
+  public isFeatureSupported(feature: FeatureKey) {
+    return isFeatureSupported(feature, this.version);
+  }
+
+  public async init(): Promise<void> {
+    const scheduleId = `server.sync.${this.domain}`;
+    await this.app.jobs.upsertJobSchedule(
+      scheduleId,
+      {
+        type: 'server.sync',
+        server: this.domain,
+      },
+      ms('1 minute'),
+      {
+        deduplication: {
+          key: scheduleId,
+          replace: true,
+        },
+      }
+    );
+
+    await this.app.jobs.triggerJobSchedule(scheduleId);
+  }
+
+  public async sync() {
     const config = await ServerService.fetchServerConfig(this.configUrl);
     const existingState = this.state;
 

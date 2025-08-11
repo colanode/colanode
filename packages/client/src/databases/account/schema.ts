@@ -30,7 +30,20 @@ export type SelectAccountMetadata = Selectable<AccountMetadataTable>;
 export type CreateAccountMetadata = Insertable<AccountMetadataTable>;
 export type UpdateAccountMetadata = Updateable<AccountMetadataTable>;
 
+interface AvatarTable {
+  id: ColumnType<string, string, never>;
+  path: ColumnType<string, string, string>;
+  size: ColumnType<number, number, number>;
+  created_at: ColumnType<string, string, never>;
+  opened_at: ColumnType<string, string, string>;
+}
+
+export type SelectAvatar = Selectable<AvatarTable>;
+export type CreateAvatar = Insertable<AvatarTable>;
+export type UpdateAvatar = Updateable<AvatarTable>;
+
 export interface AccountDatabaseSchema {
   workspaces: WorkspaceTable;
   metadata: AccountMetadataTable;
+  avatars: AvatarTable;
 }

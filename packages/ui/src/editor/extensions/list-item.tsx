@@ -1,4 +1,4 @@
-import { ListItem } from '@tiptap/extension-list-item';
+import { ListItem } from '@tiptap/extension-list';
 
 import { defaultClasses } from '@colanode/ui/editor/classes';
 

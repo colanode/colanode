@@ -1,7 +1,7 @@
 import { LocalFileNode } from '@colanode/client/types';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface FileContainerTabProps {
   fileId: string;
@@ -10,7 +10,7 @@ interface FileContainerTabProps {
 export const FileContainerTab = ({ fileId }: FileContainerTabProps) => {
   const workspace = useWorkspace();
 
-  const nodeGetQuery = useQuery({
+  const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: fileId,
     accountId: workspace.accountId,

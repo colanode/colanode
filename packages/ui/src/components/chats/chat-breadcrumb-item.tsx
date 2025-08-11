@@ -1,7 +1,7 @@
 import { LocalChatNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface ChatBreadcrumbItemProps {
   chat: LocalChatNode;
@@ -17,7 +17,7 @@ export const ChatBreadcrumbItem = ({ chat }: ChatBreadcrumbItemProps) => {
         ) ?? '')
       : '';
 
-  const userGetQuery = useQuery({
+  const userGetQuery = useLiveQuery({
     type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,

@@ -22,10 +22,7 @@ import {
   IdType,
 } from '@colanode/core';
 import { app, appBadge } from '@colanode/desktop/main/app-service';
-import {
-  handleAssetRequest,
-  handleFileRequest,
-} from '@colanode/desktop/main/protocols';
+import { handleLocalRequest } from '@colanode/desktop/main/protocols';
 
 const debug = createDebugger('desktop:main');
 
@@ -120,15 +117,9 @@ const createWindow = async () => {
     }
   });
 
-  if (!protocol.isProtocolHandled('local-file')) {
-    protocol.handle('local-file', (request) => {
-      return handleFileRequest(request);
-    });
-  }
-
-  if (!protocol.isProtocolHandled('asset')) {
-    protocol.handle('asset', (request) => {
-      return handleAssetRequest(request);
+  if (!protocol.isProtocolHandled('local')) {
+    protocol.handle('local', (request) => {
+      return handleLocalRequest(request);
     });
   }
 
@@ -148,6 +139,10 @@ const createWindow = async () => {
 
   debug('Window created');
 };
+
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'local', privileges: { standard: true, stream: true } },
+]);
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -226,22 +221,35 @@ ipcMain.handle(
     file: { name: string; size: number; type: string; buffer: Buffer }
   ): Promise<TempFile> => {
     const id = generateId(IdType.TempFile);
-    const name = app.path.filename(file.name);
     const extension = app.path.extension(file.name);
     const mimeType = file.type;
-    const type = extractFileSubtype(mimeType);
-    const fileName = `${name}.${id}${extension}`;
-    const filePath = app.path.tempFile(fileName);
+    const subtype = extractFileSubtype(mimeType);
+    const filePath = app.path.tempFile(file.name);
 
     await app.fs.writeFile(filePath, file.buffer);
+    await app.database
+      .insertInto('temp_files')
+      .values({
+        id,
+        name: file.name,
+        size: file.size,
+        mime_type: mimeType,
+        subtype,
+        path: filePath,
+        extension,
+        created_at: new Date().toISOString(),
+        opened_at: new Date().toISOString(),
+      })
+      .execute();
+
     const url = await app.fs.url(filePath);
 
     return {
       id,
-      name: fileName,
+      name: file.name,
       size: file.size,
       mimeType,
-      type,
+      subtype,
       path: filePath,
       extension,
       url,

@@ -1,4 +1,4 @@
-import { TaskList } from '@tiptap/extension-task-list';
+import { TaskList } from '@tiptap/extension-list';
 
 import { defaultClasses } from '@colanode/ui/editor/classes';
 

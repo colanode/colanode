@@ -1,5 +1,7 @@
 import { Mark } from '@tiptap/core';
 
+import { editorColors } from '@colanode/ui/lib/editor';
+
 declare module '@tiptap/core' {
   interface Commands<ReturnType> {
     color: {
@@ -36,9 +38,14 @@ export const ColorMark = Mark.create({
             return {};
           }
 
+          const value = attributes.color;
+          const color = editorColors.find((editorColor) => {
+            return editorColor.color === value;
+          });
+
           return {
             'data-color': attributes.color,
-            class: `text-${attributes.color}-600`,
+            class: color?.textClass,
           };
         },
       },

@@ -1,6 +1,3 @@
-import ms from 'ms';
-
-import { EventLoop } from '@colanode/client/lib/event-loop';
 import { mapMutation } from '@colanode/client/lib/mappers';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import {
@@ -18,24 +15,29 @@ const debug = createDebugger('desktop:service:mutation');
 
 export class MutationService {
   private readonly workspace: WorkspaceService;
-  private readonly eventLoop: EventLoop;
 
   constructor(workspaceService: WorkspaceService) {
     this.workspace = workspaceService;
-
-    this.eventLoop = new EventLoop(ms('1 minute'), 100, this.sync.bind(this));
-    this.eventLoop.start();
   }
 
-  public destroy(): void {
-    this.eventLoop.stop();
+  public async scheduleSync(): Promise<void> {
+    await this.workspace.account.app.jobs.addJob(
+      {
+        type: 'mutations.sync',
+        accountId: this.workspace.accountId,
+        workspaceId: this.workspace.id,
+      },
+      {
+        deduplication: {
+          key: `mutations.sync.${this.workspace.accountId}.${this.workspace.id}`,
+          replace: true,
+        },
+        delay: 500,
+      }
+    );
   }
 
-  public triggerSync(): void {
-    this.eventLoop.trigger();
-  }
-
-  private async sync(): Promise<void> {
+  public async sync(): Promise<void> {
     try {
       let hasMutations = true;
 
@@ -105,7 +107,10 @@ export class MutationService {
         const unsyncedMutationIds: string[] = [];
 
         for (const result of response.results) {
-          if (result.status === MutationStatus.OK) {
+          if (
+            result.status === MutationStatus.OK ||
+            result.status === MutationStatus.CREATED
+          ) {
             syncedMutationIds.push(result.id);
           } else {
             unsyncedMutationIds.push(result.id);

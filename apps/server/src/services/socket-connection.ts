@@ -5,9 +5,9 @@ import {
   SynchronizerInput,
   SynchronizerInputMessage,
   UserStatus,
-  createDebugger,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
+import { createLogger } from '@colanode/server/lib/logger';
 import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
 import { CollaborationSynchronizer } from '@colanode/server/synchronizers/collaborations';
 import { DocumentUpdateSynchronizer } from '@colanode/server/synchronizers/document-updates';
@@ -35,7 +35,7 @@ type SocketUser = {
   synchronizers: Map<string, BaseSynchronizer<SynchronizerInput>>;
 };
 
-const debug = createDebugger('server:service:socket-connection');
+const logger = createLogger('server:service:socket-connection');
 
 export class SocketConnection {
   private readonly context: SocketContext;
@@ -46,9 +46,7 @@ export class SocketConnection {
     new Map();
 
   constructor(context: SocketContext, socket: WebSocket, onClose: () => void) {
-    debug(
-      `New connection, account:${context.accountId}, device:${context.deviceId}`
-    );
+    logger.debug(context, 'New socket connection');
 
     this.context = context;
     this.socket = socket;
@@ -59,9 +57,7 @@ export class SocketConnection {
     });
 
     this.socket.on('close', () => {
-      debug(
-        `Connection closed, account:${this.context.accountId}, device:${this.context.deviceId}`
-      );
+      logger.debug(this.context, 'Socket connection closed');
 
       onClose();
     });
@@ -84,8 +80,12 @@ export class SocketConnection {
   }
 
   private async handleMessage(message: Message) {
-    debug(
-      `Socket message, account:${this.context.accountId}, device:${this.context.deviceId}, type:${message.type}`
+    logger.debug(
+      {
+        context: this.context,
+        message,
+      },
+      `New socket message`
     );
 
     if (message.type === 'synchronizer.input') {

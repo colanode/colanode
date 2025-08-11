@@ -6,7 +6,7 @@ import { AccountGetQueryHandler } from './accounts/account-get';
 import { AccountMetadataListQueryHandler } from './accounts/account-metadata-list';
 import { AccountListQueryHandler } from './accounts/accounts-list';
 import { AppMetadataListQueryHandler } from './apps/app-metadata-list';
-import { AvatarUrlGetQueryHandler } from './avatars/avatar-url-get';
+import { AvatarGetQueryHandler } from './avatars/avatar-get';
 import { ChatListQueryHandler } from './chats/chat-list';
 import { DatabaseListQueryHandler } from './databases/database-list';
 import { DatabaseViewListQueryHandler } from './databases/database-view-list';
@@ -18,10 +18,13 @@ import { EmojiGetQueryHandler } from './emojis/emoji-get';
 import { EmojiGetBySkinIdQueryHandler } from './emojis/emoji-get-by-skin-id';
 import { EmojiListQueryHandler } from './emojis/emoji-list';
 import { EmojiSearchQueryHandler } from './emojis/emoji-search';
+import { DownloadListManualQueryHandler } from './files/download-list-manual';
 import { FileDownloadRequestGetQueryHandler } from './files/file-download-request-get';
 import { FileListQueryHandler } from './files/file-list';
-import { FileSaveListQueryHandler } from './files/file-save-list';
-import { FileStateGetQueryHandler } from './files/file-state-get';
+import { LocalFileGetQueryHandler } from './files/local-file-get';
+import { TempFileGetQueryHandler } from './files/temp-file-get';
+import { UploadListQueryHandler } from './files/upload-list';
+import { UploadListPendingQueryHandler } from './files/upload-list-pending';
 import { IconCategoryListQueryHandler } from './icons/icon-category-list';
 import { IconListQueryHandler } from './icons/icon-list';
 import { IconSearchQueryHandler } from './icons/icon-search';
@@ -40,9 +43,11 @@ import { SpaceListQueryHandler } from './spaces/space-list';
 import { UserGetQueryHandler } from './users/user-get';
 import { UserListQueryHandler } from './users/user-list';
 import { UserSearchQueryHandler } from './users/user-search';
+import { UserStorageGetQueryHandler } from './users/user-storage-get';
 import { WorkspaceGetQueryHandler } from './workspaces/workspace-get';
 import { WorkspaceListQueryHandler } from './workspaces/workspace-list';
 import { WorkspaceMetadataListQueryHandler } from './workspaces/workspace-metadata-list';
+import { WorkspaceStorageGetQueryHandler } from './workspaces/workspace-storage-get';
 
 export type QueryHandlerMap = {
   [K in keyof QueryMap]: QueryHandler<QueryMap[K]['input']>;
@@ -51,7 +56,7 @@ export type QueryHandlerMap = {
 export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
   return {
     'app.metadata.list': new AppMetadataListQueryHandler(app),
-    'avatar.url.get': new AvatarUrlGetQueryHandler(app),
+    'avatar.get': new AvatarGetQueryHandler(app),
     'account.list': new AccountListQueryHandler(app),
     'message.list': new MessageListQueryHandler(app),
     'node.reaction.list': new NodeReactionsListQueryHandler(app),
@@ -81,9 +86,9 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'database.view.list': new DatabaseViewListQueryHandler(app),
     'record.search': new RecordSearchQueryHandler(app),
     'user.get': new UserGetQueryHandler(app),
-    'file.state.get': new FileStateGetQueryHandler(app),
+    'user.storage.get': new UserStorageGetQueryHandler(app),
+    'local.file.get': new LocalFileGetQueryHandler(app),
     'file.download.request.get': new FileDownloadRequestGetQueryHandler(app),
-    'file.save.list': new FileSaveListQueryHandler(app),
     'chat.list': new ChatListQueryHandler(app),
     'space.list': new SpaceListQueryHandler(app),
     'workspace.metadata.list': new WorkspaceMetadataListQueryHandler(app),
@@ -91,5 +96,10 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'document.state.get': new DocumentStateGetQueryHandler(app),
     'document.updates.list': new DocumentUpdatesListQueryHandler(app),
     'account.metadata.list': new AccountMetadataListQueryHandler(app),
+    'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
+    'upload.list': new UploadListQueryHandler(app),
+    'upload.list.pending': new UploadListPendingQueryHandler(app),
+    'download.list.manual': new DownloadListManualQueryHandler(app),
+    'temp.file.get': new TempFileGetQueryHandler(app),
   };
 };

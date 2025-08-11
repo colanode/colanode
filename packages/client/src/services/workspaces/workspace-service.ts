@@ -1,4 +1,5 @@
 import { Kysely, Migration, Migrator } from 'kysely';
+import ms from 'ms';
 
 import {
   WorkspaceDatabaseSchema,
@@ -39,6 +40,8 @@ export class WorkspaceService {
   public readonly radar: RadarService;
   public readonly nodeCounters: NodeCountersService;
 
+  private readonly workspaceFilesCleanJobScheduleId: string;
+
   constructor(workspace: Workspace, account: AccountService) {
     debug(`Initializing workspace service ${workspace.id}`);
 
@@ -64,6 +67,8 @@ export class WorkspaceService {
     this.synchronizer = new SyncService(this);
     this.radar = new RadarService(this);
     this.nodeCounters = new NodeCountersService(this);
+
+    this.workspaceFilesCleanJobScheduleId = `workspace.files.clean.${this.account.id}.${this.workspace.id}`;
   }
 
   public get id(): string {
@@ -102,6 +107,23 @@ export class WorkspaceService {
     await this.collaborations.init();
     await this.synchronizer.init();
     await this.radar.init();
+    await this.files.init();
+
+    await this.account.app.jobs.upsertJobSchedule(
+      this.workspaceFilesCleanJobScheduleId,
+      {
+        type: 'workspace.files.clean',
+        accountId: this.account.id,
+        workspaceId: this.workspace.id,
+      },
+      ms('1 minute'),
+      {
+        deduplication: {
+          key: this.workspaceFilesCleanJobScheduleId,
+          replace: true,
+        },
+      }
+    );
   }
 
   private async migrate(): Promise<void> {
@@ -122,10 +144,7 @@ export class WorkspaceService {
   public async delete(): Promise<void> {
     try {
       this.database.destroy();
-      this.mutations.destroy();
       this.synchronizer.destroy();
-      this.files.destroy();
-      this.mutations.destroy();
       this.radar.destroy();
 
       const databasePath = this.account.app.path.workspaceDatabase(
@@ -146,6 +165,10 @@ export class WorkspaceService {
         .deleteFrom('workspaces')
         .where('id', '=', this.workspace.id)
         .execute();
+
+      await this.account.app.jobs.removeJobSchedule(
+        this.workspaceFilesCleanJobScheduleId
+      );
 
       eventBus.publish({
         type: 'workspace.deleted',

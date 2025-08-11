@@ -1,12 +1,5 @@
 import { z } from 'zod/v4';
 
-export const fileUploadOutputSchema = z.object({
-  success: z.boolean(),
-  uploadId: z.string(),
-});
-
-export type FileUploadOutput = z.infer<typeof fileUploadOutputSchema>;
-
 export const fileSubtypeSchema = z.enum([
   'image',
   'video',
@@ -22,3 +15,5 @@ export enum FileStatus {
   Ready = 1,
   Error = 2,
 }
+
+export const FILE_UPLOAD_PART_SIZE = 20 * 1024 * 1024; // 20MB

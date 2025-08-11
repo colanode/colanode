@@ -36,7 +36,10 @@ export class AvatarUploadMutationHandler
       const fileExists = await this.app.fs.exists(filePath);
 
       if (!fileExists) {
-        throw new Error(`File ${filePath} does not exist`);
+        throw new MutationError(
+          MutationErrorCode.FileNotFound,
+          `Avatar file does not exist`
+        );
       }
 
       const fileStream = await this.app.fs.readStream(filePath);
@@ -50,7 +53,8 @@ export class AvatarUploadMutationHandler
         })
         .json<AvatarUploadResponse>();
 
-      await account.downloadAvatar(response.id);
+      await this.app.fs.delete(filePath);
+      await account.avatars.downloadAvatar(response.id);
 
       return {
         id: response.id,

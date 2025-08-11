@@ -16,11 +16,11 @@ export class IconCategoryListQueryHandler
   public async handleQuery(
     _: IconCategoryListQueryInput
   ): Promise<IconCategory[]> {
-    if (!this.app.asset.icons) {
+    if (!this.app.assets.icons) {
       return [];
     }
 
-    const data = this.app.asset.icons
+    const data = this.app.assets.icons
       .selectFrom('categories')
       .selectAll()
       .execute();

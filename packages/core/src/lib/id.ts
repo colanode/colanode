@@ -41,6 +41,8 @@ export enum IdType {
   TempFile = 'tf',
   Socket = 'sk',
   Save = 'sv',
+  Job = 'jb',
+  Download = 'dl',
 }
 
 export const SpecialId = {

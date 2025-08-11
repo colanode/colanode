@@ -4,9 +4,9 @@ import { EditorCommand } from '@colanode/client/types';
 
 export const DatabaseCommand: EditorCommand = {
   key: 'database',
-  name: 'Database',
-  description: 'Insert a nested database',
-  keywords: ['database'],
+  name: 'Database - Full Page',
+  description: 'Insert a full page database',
+  keywords: ['database', 'full', 'page'],
   icon: Database,
   disabled: false,
   async handler({ editor, range, context }) {

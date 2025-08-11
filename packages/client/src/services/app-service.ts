@@ -9,27 +9,25 @@ import {
 } from '@colanode/client/databases/app';
 import { Mediator } from '@colanode/client/handlers';
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { EventLoop } from '@colanode/client/lib/event-loop';
-import { parseApiError } from '@colanode/client/lib/ky';
 import { mapServer, mapAccount } from '@colanode/client/lib/mappers';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { AppMeta } from '@colanode/client/services/app-meta';
 import { AssetService } from '@colanode/client/services/asset-service';
 import { FileSystem } from '@colanode/client/services/file-system';
+import { JobService } from '@colanode/client/services/job-service';
 import { KyselyService } from '@colanode/client/services/kysely-service';
 import { MetadataService } from '@colanode/client/services/metadata-service';
 import { PathService } from '@colanode/client/services/path-service';
 import { ServerService } from '@colanode/client/services/server-service';
 import { Account } from '@colanode/client/types/accounts';
 import { Server, ServerAttributes } from '@colanode/client/types/servers';
-import { ApiErrorCode, ApiHeader, build, createDebugger } from '@colanode/core';
+import { ApiHeader, build, createDebugger } from '@colanode/core';
 
 const debug = createDebugger('desktop:service:app');
 
 export class AppService {
   private readonly servers: Map<string, ServerService> = new Map();
   private readonly accounts: Map<string, AccountService> = new Map();
-  private readonly cleanupEventLoop: EventLoop;
   private readonly eventSubscriptionId: string;
 
   public readonly meta: AppMeta;
@@ -39,7 +37,8 @@ export class AppService {
   public readonly metadata: MetadataService;
   public readonly kysely: KyselyService;
   public readonly mediator: Mediator;
-  public readonly asset: AssetService;
+  public readonly assets: AssetService;
+  public readonly jobs: JobService;
   public readonly client: KyInstance;
 
   constructor(
@@ -59,7 +58,8 @@ export class AppService {
     });
 
     this.mediator = new Mediator(this);
-    this.asset = new AssetService(this);
+    this.assets = new AssetService(this);
+    this.jobs = new JobService(this);
 
     this.client = ky.create({
       headers: {
@@ -71,12 +71,6 @@ export class AppService {
     });
 
     this.metadata = new MetadataService(this);
-
-    this.cleanupEventLoop = new EventLoop(
-      ms('10 minutes'),
-      ms('1 minute'),
-      this.cleanup.bind(this)
-    );
 
     this.eventSubscriptionId = eventBus.subscribe((event) => {
       if (event.type === 'account.deleted') {
@@ -129,8 +123,22 @@ export class AppService {
     await this.initServers();
     await this.initAccounts();
     await this.fs.makeDirectory(this.path.temp);
+    await this.jobs.init();
 
-    this.cleanupEventLoop.start();
+    const scheduleId = 'temp.files.clean';
+    await this.jobs.upsertJobSchedule(
+      scheduleId,
+      {
+        type: 'temp.files.clean',
+      },
+      ms('5 minutes'),
+      {
+        deduplication: {
+          key: scheduleId,
+          replace: true,
+        },
+      }
+    );
   }
 
   private async initServers(): Promise<void> {
@@ -178,8 +186,9 @@ export class AppService {
     }
 
     const serverService = new ServerService(this, server);
-    this.servers.set(server.domain, serverService);
+    await serverService.init();
 
+    this.servers.set(server.domain, serverService);
     return serverService;
   }
 
@@ -264,130 +273,11 @@ export class AppService {
     }
   }
 
-  public triggerCleanup(): void {
-    this.cleanupEventLoop.trigger();
-  }
-
-  private async cleanup(): Promise<void> {
-    await this.syncDeletedTokens();
-    await this.cleanTempFiles();
-  }
-
-  private async syncDeletedTokens(): Promise<void> {
-    debug('Syncing deleted tokens');
-
-    const deletedTokens = await this.database
-      .selectFrom('deleted_tokens')
-      .innerJoin('servers', 'deleted_tokens.server', 'servers.domain')
-      .select([
-        'deleted_tokens.token',
-        'deleted_tokens.account_id',
-        'servers.domain',
-        'servers.attributes',
-      ])
-      .execute();
-
-    if (deletedTokens.length === 0) {
-      debug('No deleted tokens found');
-      return;
-    }
-
-    for (const deletedToken of deletedTokens) {
-      const server = this.servers.get(deletedToken.domain);
-      if (!server) {
-        debug(
-          `Server ${deletedToken.domain} not found, skipping token ${deletedToken.token} for account ${deletedToken.account_id}`
-        );
-
-        await this.database
-          .deleteFrom('deleted_tokens')
-          .where('token', '=', deletedToken.token)
-          .where('account_id', '=', deletedToken.account_id)
-          .execute();
-
-        continue;
-      }
-
-      if (!server.isAvailable) {
-        debug(
-          `Server ${deletedToken.domain} is not available for logging out account ${deletedToken.account_id}`
-        );
-        continue;
-      }
-
-      try {
-        await this.client.delete(`${server.httpBaseUrl}/v1/accounts/logout`, {
-          headers: {
-            Authorization: `Bearer ${deletedToken.token}`,
-          },
-        });
-
-        await this.database
-          .deleteFrom('deleted_tokens')
-          .where('token', '=', deletedToken.token)
-          .where('account_id', '=', deletedToken.account_id)
-          .execute();
-
-        debug(
-          `Logged out account ${deletedToken.account_id} from server ${deletedToken.domain}`
-        );
-      } catch (error) {
-        const parsedError = await parseApiError(error);
-        if (
-          parsedError.code === ApiErrorCode.TokenInvalid ||
-          parsedError.code === ApiErrorCode.AccountNotFound ||
-          parsedError.code === ApiErrorCode.DeviceNotFound
-        ) {
-          debug(
-            `Account ${deletedToken.account_id} is already logged out, skipping...`
-          );
-
-          await this.database
-            .deleteFrom('deleted_tokens')
-            .where('token', '=', deletedToken.token)
-            .where('account_id', '=', deletedToken.account_id)
-            .execute();
-
-          continue;
-        }
-
-        debug(
-          `Failed to logout account ${deletedToken.account_id} from server ${deletedToken.domain}`,
-          error
-        );
-      }
-    }
-  }
-
-  private async cleanTempFiles(): Promise<void> {
-    debug(`Cleaning temp files`);
-
-    const exists = await this.fs.exists(this.path.temp);
-    if (!exists) {
-      return;
-    }
-
-    const filePaths = await this.fs.listFiles(this.path.temp);
-    const oneDayAgo = Date.now() - 24 * 60 * 60 * 1000; // 24 hours in milliseconds
-
-    for (const filePath of filePaths) {
-      const metadata = await this.fs.metadata(filePath);
-
-      if (metadata.lastModified < oneDayAgo) {
-        try {
-          await this.fs.delete(filePath);
-          debug(`Deleted old temp file: ${filePath}`);
-        } catch (error) {
-          debug(`Failed to delete temp file: ${filePath}`, error);
-        }
-      }
-    }
-  }
-
   private async deleteAllData(): Promise<void> {
     await this.database.deleteFrom('accounts').execute();
     await this.database.deleteFrom('metadata').execute();
-    await this.database.deleteFrom('deleted_tokens').execute();
+    await this.database.deleteFrom('job_schedules').execute();
+    await this.database.deleteFrom('jobs').execute();
     await this.fs.delete(this.path.accounts);
   }
 }

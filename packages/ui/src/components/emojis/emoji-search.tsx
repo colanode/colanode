@@ -1,12 +1,12 @@
 import { EmojiPickerItem } from '@colanode/ui/components/emojis/emoji-picker-item';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface EmojiSearchProps {
   query: string;
 }
 
 export const EmojiSearch = ({ query }: EmojiSearchProps) => {
-  const emojiSearchQuery = useQuery({
+  const emojiSearchQuery = useLiveQuery({
     type: 'emoji.search',
     query,
     count: 100,

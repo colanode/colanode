@@ -216,3 +216,17 @@ export const trimString = (str: string, maxLength: number) => {
 
   return str.slice(0, maxLength - 3) + '...';
 };
+
+export const calculatePercentage = (
+  partial: number,
+  total: number,
+  digits: number = 2
+) => {
+  if (total === 0) {
+    return 0;
+  }
+
+  const raw = (partial / total) * 100;
+  const factor = 10 ** digits;
+  return Math.round(raw * factor) / factor;
+};

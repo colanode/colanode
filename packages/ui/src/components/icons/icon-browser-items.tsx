@@ -1,6 +1,6 @@
 import { IconPickerItemsRow } from '@colanode/client/types';
 import { IconPickerItem } from '@colanode/ui/components/icons/icon-picker-item';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface IconBrowserItemsProps {
   row: IconPickerItemsRow;
@@ -8,7 +8,7 @@ interface IconBrowserItemsProps {
 }
 
 export const IconBrowserItems = ({ row, style }: IconBrowserItemsProps) => {
-  const iconListQuery = useQuery({
+  const iconListQuery = useLiveQuery({
     type: 'icon.list',
     category: row.category,
     page: row.page,

@@ -20,10 +20,10 @@ export const FileCommand: EditorCommand = {
     const result = await openFileDialog();
 
     if (result.type === 'success') {
-      result.files.forEach(async (file) => {
+      result.files.forEach(async (tempFile) => {
         const output = await window.colanode.executeMutation({
           type: 'file.create',
-          file,
+          tempFileId: tempFile.id,
           accountId,
           workspaceId,
           parentId: documentId,

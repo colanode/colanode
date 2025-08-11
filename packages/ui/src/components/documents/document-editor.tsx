@@ -37,8 +37,10 @@ import {
   OrderedListCommand,
   PageCommand,
   ParagraphCommand,
+  TableCommand,
   TodoCommand,
   DatabaseCommand,
+  DatabaseInlineCommand,
 } from '@colanode/ui/editor/commands';
 import {
   BlockquoteNode,
@@ -69,6 +71,10 @@ import {
   PlaceholderExtension,
   StrikethroughMark,
   TabKeymapExtension,
+  TableNode,
+  TableRowNode,
+  TableHeaderNode,
+  TableCellNode,
   TaskItemNode,
   TaskListNode,
   TextNode,
@@ -76,6 +82,7 @@ import {
   UnderlineMark,
   DatabaseNode,
   AutoJoiner,
+  HardBreakNode,
 } from '@colanode/ui/editor/extensions';
 import { ToolbarMenu, ActionMenu } from '@colanode/ui/editor/menus';
 
@@ -178,6 +185,7 @@ export const DocumentEditor = ({
         }),
         TextNode,
         ParagraphNode,
+        HardBreakNode,
         Heading1Node,
         Heading2Node,
         Heading3Node,
@@ -193,6 +201,10 @@ export const DocumentEditor = ({
         }),
         TaskListNode,
         TaskItemNode,
+        TableNode,
+        TableRowNode,
+        TableCellNode,
+        TableHeaderNode,
         DividerNode,
         TrailingNode,
         LinkMark,
@@ -211,6 +223,8 @@ export const DocumentEditor = ({
             BulletListCommand,
             CodeBlockCommand,
             OrderedListCommand,
+            TableCommand,
+            DatabaseInlineCommand,
             DatabaseCommand,
             DividerCommand,
             TodoCommand,
@@ -384,7 +398,7 @@ export const DocumentEditor = ({
   }, [node.id, editor]);
 
   return (
-    <div className="min-h-[500px]">
+    <>
       {editor && canEdit && (
         <Fragment>
           <ToolbarMenu editor={editor} />
@@ -392,6 +406,6 @@ export const DocumentEditor = ({
         </Fragment>
       )}
       <EditorContent editor={editor} />
-    </div>
+    </>
   );
 };

@@ -2,14 +2,14 @@ import {
   SynchronizerOutputMessage,
   SyncNodeReactionsInput,
   SyncNodeReactionData,
-  createDebugger,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { SelectNodeReaction } from '@colanode/server/data/schema';
+import { createLogger } from '@colanode/server/lib/logger';
 import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
 import { Event } from '@colanode/server/types/events';
 
-const debug = createDebugger('node-reaction-synchronizer');
+const logger = createLogger('node-reaction-synchronizer');
 
 export class NodeReactionSynchronizer extends BaseSynchronizer<SyncNodeReactionsInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncNodeReactionsInput> | null> {
@@ -55,7 +55,7 @@ export class NodeReactionSynchronizer extends BaseSynchronizer<SyncNodeReactions
 
       return nodeReactions;
     } catch (error) {
-      debug('Error fetching node reactions for sync', error);
+      logger.error(error, 'Error fetching node reactions for sync');
     } finally {
       this.status = 'pending';
     }

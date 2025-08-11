@@ -24,6 +24,7 @@ const pendingPromises = new Map<string, PendingPromise>();
 const fs = new WebFileSystem();
 const path = new WebPathService();
 let app: AppService | null = null;
+let appInitialized = false;
 
 const broadcast = new BroadcastChannel('colanode');
 broadcast.onmessage = (event) => {
@@ -40,6 +41,7 @@ navigator.locks.request('colanode', async () => {
 
   await app.migrate();
   await app.init();
+  appInitialized = true;
 
   const ids = Array.from(pendingPromises.keys());
   for (const id of ids) {
@@ -163,6 +165,24 @@ const handleMessage = async (message: BroadcastMessage) => {
 };
 
 const api: ColanodeWorkerApi = {
+  async init() {
+    if (!app) {
+      return;
+    }
+
+    if (appInitialized) {
+      return;
+    }
+
+    let count = 0;
+    while (!appInitialized) {
+      await new Promise((resolve) => setTimeout(resolve, 50));
+      count++;
+      if (count > 100) {
+        throw new Error('App initialization timed out');
+      }
+    }
+  },
   executeMutation(input) {
     if (app) {
       return app.mediator.executeMutation(input);
@@ -276,28 +296,58 @@ const api: ColanodeWorkerApi = {
   },
   async saveTempFile(file) {
     const id = generateId(IdType.TempFile);
-    const name = path.filename(file.name);
     const extension = path.extension(file.name);
     const mimeType = file.type;
-    const type = extractFileSubtype(mimeType);
-    const fileName = `${name}.${id}${extension}`;
+    const subtype = extractFileSubtype(mimeType);
+    const filePath = path.tempFile(file.name);
 
     const arrayBuffer = await file.arrayBuffer();
     const fileData = new Uint8Array(arrayBuffer);
 
-    const filePath = path.tempFile(fileName);
     await fs.writeFile(filePath, fileData);
+    if (app) {
+      await app.database
+        .insertInto('temp_files')
+        .values({
+          id,
+          name: file.name,
+          size: file.size,
+          mime_type: mimeType,
+          subtype,
+          path: filePath,
+          extension,
+          created_at: new Date().toISOString(),
+          opened_at: new Date().toISOString(),
+        })
+        .execute();
+    } else {
+      const message: BroadcastMutationMessage = {
+        type: 'mutation',
+        mutationId: generateId(IdType.Mutation),
+        input: {
+          type: 'temp.file.create',
+          id,
+          name: file.name,
+          size: file.size,
+          mimeType,
+          subtype,
+          extension,
+          path: filePath,
+        },
+      };
+
+      broadcastMessage(message);
+    }
 
     const url = await fs.url(filePath);
-
     return {
       id,
       name: file.name,
       size: file.size,
-      type,
+      mimeType,
+      subtype,
       path: filePath,
       extension,
-      mimeType,
       url,
     };
   },

@@ -7,10 +7,10 @@ import {
   accountDatabaseMigrations,
 } from '@colanode/client/databases/account';
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { EventLoop } from '@colanode/client/lib/event-loop';
 import { parseApiError } from '@colanode/client/lib/ky';
 import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
 import { AccountSocket } from '@colanode/client/services/accounts/account-socket';
+import { AvatarService } from '@colanode/client/services/accounts/avatar-service';
 import { AppService } from '@colanode/client/services/app-service';
 import { ServerService } from '@colanode/client/services/server-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
@@ -21,8 +21,6 @@ import {
   ApiErrorCode,
   ApiErrorOutput,
   createDebugger,
-  getIdType,
-  IdType,
   Message,
 } from '@colanode/core';
 
@@ -30,15 +28,16 @@ const debug = createDebugger('desktop:service:account');
 
 export class AccountService {
   private readonly workspaces: Map<string, WorkspaceService> = new Map();
-  private readonly eventLoop: EventLoop;
   private readonly account: Account;
 
   public readonly app: AppService;
   public readonly server: ServerService;
   public readonly database: Kysely<AccountDatabaseSchema>;
+  public readonly avatars: AvatarService;
 
   public readonly socket: AccountSocket;
   public readonly client: KyInstance;
+  private readonly accountSyncJobScheduleId: string;
   private readonly eventSubscriptionId: string;
 
   constructor(account: Account, server: ServerService, app: AppService) {
@@ -53,6 +52,7 @@ export class AccountService {
       readonly: false,
     });
 
+    this.avatars = new AvatarService(this);
     this.socket = new AccountSocket(this);
     this.client = this.app.client.extend({
       prefixUrl: this.server.httpBaseUrl,
@@ -61,24 +61,18 @@ export class AccountService {
       },
     });
 
-    this.eventLoop = new EventLoop(
-      ms('1 minute'),
-      ms('1 second'),
-      this.sync.bind(this)
-    );
-
+    this.accountSyncJobScheduleId = `account.sync.${this.account.id}`;
     this.eventSubscriptionId = eventBus.subscribe((event) => {
       if (
-        event.type === 'server.availability.changed' &&
-        event.server.domain === this.server.domain &&
-        event.isAvailable
-      ) {
-        this.eventLoop.trigger();
-      } else if (
         event.type === 'account.connection.message.received' &&
         event.accountId === this.account.id
       ) {
         this.handleMessage(event.message);
+      } else if (
+        event.type === 'server.availability.changed' &&
+        event.server.domain === this.server.domain
+      ) {
+        this.app.jobs.triggerJobSchedule(this.accountSyncJobScheduleId);
       }
     });
   }
@@ -102,13 +96,22 @@ export class AccountService {
       this.app.path.accountAvatars(this.account.id)
     );
 
-    if (this.account.avatar) {
-      await this.downloadAvatar(this.account.avatar);
-    }
+    await this.app.jobs.upsertJobSchedule(
+      this.accountSyncJobScheduleId,
+      {
+        type: 'account.sync',
+        accountId: this.account.id,
+      },
+      ms('1 minute'),
+      {
+        deduplication: {
+          key: this.accountSyncJobScheduleId,
+          replace: true,
+        },
+      }
+    );
 
     this.socket.init();
-    this.eventLoop.start();
-
     await this.initWorkspaces();
   }
 
@@ -128,26 +131,28 @@ export class AccountService {
 
   public async logout(): Promise<void> {
     try {
-      await this.app.database.transaction().execute(async (tx) => {
-        const deletedAccount = await tx
-          .deleteFrom('accounts')
-          .where('id', '=', this.account.id)
-          .executeTakeFirst();
+      const deletedAccount = await this.app.database
+        .deleteFrom('accounts')
+        .where('id', '=', this.account.id)
+        .executeTakeFirst();
 
-        if (!deletedAccount) {
-          throw new Error('Failed to delete account');
+      if (!deletedAccount) {
+        throw new Error('Failed to delete account');
+      }
+
+      await this.app.jobs.addJob(
+        {
+          type: 'token.delete',
+          token: this.account.token,
+          server: this.server.domain,
+        },
+        {
+          retries: 10,
+          delay: ms('1 second'),
         }
+      );
 
-        await tx
-          .insertInto('deleted_tokens')
-          .values({
-            account_id: this.account.id,
-            token: this.account.token,
-            server: this.server.domain,
-            created_at: new Date().toISOString(),
-          })
-          .execute();
-      });
+      await this.app.jobs.removeJobSchedule(this.accountSyncJobScheduleId);
 
       const workspaces = this.workspaces.values();
       for (const workspace of workspaces) {
@@ -157,7 +162,6 @@ export class AccountService {
 
       this.database.destroy();
       this.socket.close();
-      this.eventLoop.stop();
       eventBus.unsubscribe(this.eventSubscriptionId);
 
       const databasePath = this.app.path.accountDatabase(this.account.id);
@@ -187,42 +191,6 @@ export class AccountService {
     });
 
     await migrator.migrateToLatest();
-  }
-
-  public async downloadAvatar(avatar: string): Promise<boolean> {
-    const type = getIdType(avatar);
-    if (type !== IdType.Avatar) {
-      return false;
-    }
-
-    try {
-      const avatarPath = this.app.path.accountAvatar(this.account.id, avatar);
-
-      const exists = await this.app.fs.exists(avatarPath);
-      if (exists) {
-        return true;
-      }
-
-      const response = await this.client.get<ArrayBuffer>(
-        `v1/avatars/${avatar}`
-      );
-
-      const avatarBytes = new Uint8Array(await response.arrayBuffer());
-      await this.app.fs.writeFile(avatarPath, avatarBytes);
-
-      eventBus.publish({
-        type: 'avatar.downloaded',
-        accountId: this.account.id,
-        avatarId: avatar,
-      });
-
-      return true;
-    } catch (err) {
-      console.error(err);
-      debug(`Error downloading avatar for account ${this.account.id}: ${err}`);
-    }
-
-    return false;
   }
 
   private async initWorkspaces(): Promise<void> {
@@ -265,11 +233,11 @@ export class AccountService {
       message.type === 'user.created' ||
       message.type === 'user.updated'
     ) {
-      this.eventLoop.trigger();
+      this.app.jobs.triggerJobSchedule(this.accountSyncJobScheduleId);
     }
   }
 
-  private async sync(): Promise<void> {
+  public async sync(): Promise<void> {
     debug(`Syncing account ${this.account.id}`);
 
     if (!this.server.isAvailable) {
@@ -307,13 +275,10 @@ export class AccountService {
         return;
       }
 
-      if (updatedAccount.avatar) {
-        await this.downloadAvatar(updatedAccount.avatar);
-      }
-
       debug(`Updated account ${this.account.email} after sync`);
       const account = mapAccount(updatedAccount);
       this.updateAccount(account);
+      this.socket.checkConnection();
 
       eventBus.publish({
         type: 'account.updated',
@@ -345,10 +310,6 @@ export class AccountService {
             continue;
           }
 
-          if (createdWorkspace.avatar) {
-            await this.downloadAvatar(createdWorkspace.avatar);
-          }
-
           const mappedWorkspace = mapWorkspace(createdWorkspace);
           await this.initWorkspace(mappedWorkspace);
 
@@ -374,10 +335,6 @@ export class AccountService {
           if (updatedWorkspace) {
             const mappedWorkspace = mapWorkspace(updatedWorkspace);
             workspaceService.updateWorkspace(mappedWorkspace);
-
-            if (updatedWorkspace.avatar) {
-              await this.downloadAvatar(updatedWorkspace.avatar);
-            }
 
             eventBus.publish({
               type: 'workspace.updated',

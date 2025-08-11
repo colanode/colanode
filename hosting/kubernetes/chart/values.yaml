@@ -49,8 +49,7 @@ colanode:
     # -- Ingress controller class name
     className: ''
     # -- Ingress annotations
-    annotations:
-      {}
+    annotations: {}
       # kubernetes.io/ingress.class: nginx
       # kubernetes.io/tls-acme: "true"
     # -- Ingress hostnames
@@ -81,13 +80,19 @@ colanode:
     SERVER_AVATAR: ''
     SERVER_MODE: 'standalone'
 
-    # Debug logging (uncomment to enable verbose logs)
-    DEBUG: 'colanode:*'
+    # Logging Config
+    # Possible values: 'trace', 'debug', 'info', 'warn', 'error', 'fatal', 'silent'
+    # Defalt is 'info'
+    # LOGGING_LEVEL=info
 
     # Account settings
     ACCOUNT_VERIFICATION_TYPE: 'automatic'
     ACCOUNT_OTP_TIMEOUT: '600' # in seconds
     ACCOUNT_ALLOW_GOOGLE_LOGIN: 'false'
+
+    # Workspace limits. Leave empty for no limits
+    # WORKSPACE_STORAGE_LIMIT: '10737418240' # 10 GB
+    # WORKSPACE_MAX_FILE_SIZE: '104857600' # 100 MB
 
     # User limits
     USER_STORAGE_LIMIT: '10737418240' # 10 GB
@@ -105,6 +110,8 @@ colanode:
     REDIS_DB: '0'
     REDIS_JOBS_QUEUE_NAME: 'jobs'
     REDIS_JOBS_QUEUE_PREFIX: 'colanode'
+    REDIS_TUS_LOCK_PREFIX: 'colanode:tus:lock'
+    REDIS_TUS_KV_PREFIX: 'colanode:tus:kv'
     REDIS_EVENTS_CHANNEL: 'events'
 
     # S3 storage for files
@@ -123,9 +130,6 @@ colanode:
     # SMTP_PASSWORD: ""
     # SMTP_EMAIL_FROM: ""
     # SMTP_EMAIL_FROM_NAME: "Colanode"
-
-    # AI features (optional)
-    AI_ENABLED: 'false'
 
 global:
   security:

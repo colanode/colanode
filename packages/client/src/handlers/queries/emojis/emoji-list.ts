@@ -15,12 +15,12 @@ export class EmojiListQueryHandler
   }
 
   public async handleQuery(input: EmojiListQueryInput): Promise<Emoji[]> {
-    if (!this.app.asset.emojis) {
+    if (!this.app.assets.emojis) {
       return [];
     }
 
     const offset = input.page * input.count;
-    const data = await this.app.asset.emojis
+    const data = await this.app.assets.emojis
       .selectFrom('emojis')
       .selectAll()
       .where('category_id', '=', input.category)

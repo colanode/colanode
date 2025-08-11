@@ -1,9 +1,7 @@
 import WebSocket from 'isomorphic-ws';
-import ms from 'ms';
 
 import { BackoffCalculator } from '@colanode/client/lib/backoff-calculator';
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { EventLoop } from '@colanode/client/lib/event-loop';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { Message, SocketInitOutput, createDebugger } from '@colanode/core';
 
@@ -11,39 +9,19 @@ const debug = createDebugger('desktop:service:account-socket');
 
 export class AccountSocket {
   private readonly account: AccountService;
-  private readonly eventLoop: EventLoop;
 
   private socket: WebSocket | null;
   private backoffCalculator: BackoffCalculator;
   private closingCount: number;
-
-  private eventSubscriptionId: string;
 
   constructor(account: AccountService) {
     this.account = account;
     this.socket = null;
     this.backoffCalculator = new BackoffCalculator();
     this.closingCount = 0;
-
-    this.eventLoop = new EventLoop(
-      ms('1 minute'),
-      ms('1 second'),
-      this.checkConnection.bind(this)
-    );
-
-    this.eventSubscriptionId = eventBus.subscribe((event) => {
-      if (
-        event.type === 'server.availability.changed' &&
-        event.server.domain === this.account.server.domain
-      ) {
-        this.eventLoop.trigger();
-      }
-    });
   }
 
   public async init(): Promise<void> {
-    this.eventLoop.start();
-
     if (!this.account.server.isAvailable) {
       return;
     }
@@ -133,12 +111,9 @@ export class AccountSocket {
       this.socket.close();
       this.socket = null;
     }
-
-    this.eventLoop.stop();
-    eventBus.unsubscribe(this.eventSubscriptionId);
   }
 
-  private checkConnection(): void {
+  public checkConnection(): void {
     try {
       debug(`Checking connection for account ${this.account.id}`);
       if (!this.account.server.isAvailable) {

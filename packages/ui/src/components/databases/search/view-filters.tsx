@@ -12,6 +12,7 @@ import { ViewMultiSelectFieldFilter } from '@colanode/ui/components/databases/se
 import { ViewNameFieldFilter } from '@colanode/ui/components/databases/search/view-name-field-filter';
 import { ViewNumberFieldFilter } from '@colanode/ui/components/databases/search/view-number-field-filter';
 import { ViewPhoneFieldFilter } from '@colanode/ui/components/databases/search/view-phone-field-filter';
+import { ViewRelationFieldFilter } from '@colanode/ui/components/databases/search/view-relation-field-filter';
 import { ViewSelectFieldFilter } from '@colanode/ui/components/databases/search/view-select-field-filter';
 import { ViewTextFieldFilter } from '@colanode/ui/components/databases/search/view-text-field-filter';
 import { ViewUpdatedAtFieldFilter } from '@colanode/ui/components/databases/search/view-updated-at-field-filter';
@@ -155,6 +156,14 @@ export const ViewFilters = () => {
             case 'updated_by':
               return (
                 <ViewUpdatedByFieldFilter
+                  key={filter.id}
+                  field={field}
+                  filter={filter}
+                />
+              );
+            case 'relation':
+              return (
+                <ViewRelationFieldFilter
                   key={filter.id}
                   field={field}
                   filter={filter}

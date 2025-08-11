@@ -1,12 +1,15 @@
-import { createDebugger, UpdateMergeMetadata } from '@colanode/core';
+import ms from 'ms';
+
+import { UpdateMergeMetadata } from '@colanode/core';
 import { mergeUpdates } from '@colanode/crdt';
 import { database } from '@colanode/server/data/database';
 import { SelectNodeUpdate } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
 import { config } from '@colanode/server/lib/config';
 import { fetchCounter, setCounter } from '@colanode/server/lib/counters';
+import { createLogger } from '@colanode/server/lib/logger';
 
-const debug = createDebugger('server:job:node-updates-merge');
+const logger = createLogger('server:job:node-updates-merge');
 
 export type NodeUpdatesMergeInput = {
   type: 'node.updates.merge';
@@ -27,13 +30,12 @@ export const nodeUpdatesMergeHandler: JobHandler<
     return;
   }
 
-  debug('Starting node updates merge job');
+  logger.debug('Starting node updates merge job');
 
   const cursor = await fetchCounter(database, 'node.updates.merge.cursor');
 
-  const cutoffTime = new Date();
-  cutoffTime.setTime(
-    cutoffTime.getTime() - config.jobs.nodeUpdatesMerge.cutoffWindow * 1000
+  const cutoffTime = new Date(
+    Date.now() - ms(`${config.jobs.nodeUpdatesMerge.cutoffWindow} seconds`)
   );
 
   let mergedGroups = 0;
@@ -56,7 +58,7 @@ export const nodeUpdatesMergeHandler: JobHandler<
       continue;
     }
 
-    debug(`Processing batch of ${updates.length} updates`);
+    logger.debug(`Processing batch of ${updates.length} updates`);
 
     const nodesMap = new Map<string, SelectNodeUpdate[]>();
     for (const update of updates) {
@@ -74,7 +76,8 @@ export const nodeUpdatesMergeHandler: JobHandler<
       const result = await processNodeUpdates(
         nodeId,
         nodeUpdates,
-        config.jobs.nodeUpdatesMerge.mergeWindow
+        config.jobs.nodeUpdatesMerge.mergeWindow,
+        config.jobs.nodeUpdatesMerge.cutoffWindow
       );
       mergedGroups += result.mergedGroups;
       deletedUpdates += result.deletedUpdates;
@@ -88,7 +91,7 @@ export const nodeUpdatesMergeHandler: JobHandler<
     }
   }
 
-  debug(
+  logger.debug(
     `Node updates merge job completed. Merged ${mergedGroups} groups, deleted ${deletedUpdates} redundant updates`
   );
 };
@@ -96,11 +99,12 @@ export const nodeUpdatesMergeHandler: JobHandler<
 const processNodeUpdates = async (
   nodeId: string,
   nodeUpdates: SelectNodeUpdate[],
-  mergeWindow: number
+  mergeWindow: number,
+  cutoffWindow: number
 ): Promise<{ mergedGroups: number; deletedUpdates: number }> => {
   const firstUpdate = nodeUpdates[0]!;
   const cutoffTime = new Date(
-    firstUpdate.created_at.getTime() - 60 * 60 * 1000
+    firstUpdate.created_at.getTime() - ms(`${cutoffWindow} seconds`)
   );
 
   const previousUpdate = await database
@@ -239,7 +243,7 @@ const mergeUpdatesGroup = async (
 
     return true;
   } catch (error) {
-    debug(`Failed to merge updates for node ${nodeId}: ${error}`);
+    logger.error(error, `Failed to merge updates for node ${nodeId}`);
     return false;
   }
 };

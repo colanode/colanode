@@ -7,7 +7,6 @@ import {
   MutationError,
   MutationErrorCode,
 } from '@colanode/client/mutations';
-import { TempFile } from '@colanode/client/types';
 import {
   EditorNodeTypes,
   generateId,
@@ -17,7 +16,7 @@ import {
 
 interface MessageFile {
   id: string;
-  file: TempFile;
+  tempFileId: string;
 }
 
 export class MessageCreateMutationHandler
@@ -37,8 +36,8 @@ export class MessageCreateMutationHandler
     // check if there are nested nodes (files, pages, folders etc.)
     for (const block of Object.values(blocks)) {
       if (block.type === EditorNodeTypes.TempFile) {
-        const file = block.attrs?.file as TempFile;
-        if (!file) {
+        const tempFileId = block.attrs?.id;
+        if (!tempFileId) {
           throw new MutationError(
             MutationErrorCode.FileInvalid,
             'File is invalid or could not be read.'
@@ -49,7 +48,7 @@ export class MessageCreateMutationHandler
 
         filesToCreate.push({
           id: fileId,
-          file,
+          tempFileId,
         });
 
         block.id = fileId;
@@ -73,7 +72,7 @@ export class MessageCreateMutationHandler
     });
 
     for (const file of filesToCreate) {
-      await workspace.files.createFile(file.id, messageId, file.file);
+      await workspace.files.createFile(file.id, file.tempFileId, messageId);
     }
 
     return {

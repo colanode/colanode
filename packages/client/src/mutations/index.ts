@@ -33,7 +33,6 @@ export * from './documents/document-update';
 export * from './files/file-create';
 export * from './files/file-delete';
 export * from './files/file-download';
-export * from './files/file-save';
 export * from './folders/folder-create';
 export * from './folders/folder-delete';
 export * from './folders/folder-update';
@@ -69,7 +68,9 @@ export * from './workspaces/workspace-metadata-delete';
 export * from './workspaces/workspace-metadata-update';
 export * from './workspaces/workspace-update';
 export * from './users/user-role-update';
+export * from './users/user-storage-update';
 export * from './users/users-create';
+export * from './files/temp-file-create';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MutationMap {}
@@ -182,4 +183,5 @@ export enum MutationErrorCode {
   MessageDeleteFailed = 'message_delete_failed',
   MessageNotFound = 'message_not_found',
   NodeReactionCreateForbidden = 'node_reaction_create_forbidden',
+  DownloadFailed = 'download_failed',
 }

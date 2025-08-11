@@ -16,5 +16,5 @@ export const IconElement = ({ id, className }: IconElementProps) => {
     );
   }
 
-  return <img src={`asset://icons/${id}`} className={className} />;
+  return <img src={`local://icons/${id}`} className={className} />;
 };

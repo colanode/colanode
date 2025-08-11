@@ -4,7 +4,7 @@ import { Account as AccountType } from '@colanode/client/types';
 import { Workspace } from '@colanode/ui/components/workspaces/workspace';
 import { WorkspaceCreate } from '@colanode/ui/components/workspaces/workspace-create';
 import { AccountContext } from '@colanode/ui/contexts/account';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface AccountProps {
   account: AccountType;
@@ -13,12 +13,12 @@ interface AccountProps {
 export const Account = ({ account }: AccountProps) => {
   const [openCreateWorkspace, setOpenCreateWorkspace] = useState(false);
 
-  const accountMetadataListQuery = useQuery({
+  const accountMetadataListQuery = useLiveQuery({
     type: 'account.metadata.list',
     accountId: account.id,
   });
 
-  const workspaceListQuery = useQuery({
+  const workspaceListQuery = useLiveQuery({
     type: 'workspace.list',
     accountId: account.id,
   });

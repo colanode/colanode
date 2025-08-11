@@ -1,18 +1,10 @@
-import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { useAccount } from '@colanode/ui/contexts/account';
+import { Settings } from 'lucide-react';
 
 export const AccountSettingsTab = () => {
-  const account = useAccount();
-
   return (
     <div className="flex items-center space-x-2">
-      <Avatar
-        id={account.id}
-        name={account.name}
-        avatar={account.avatar}
-        size="small"
-      />
-      <span>{account.name} Settings</span>
+      <Settings className="size-4" />
+      <span>Account Settings</span>
     </div>
   );
 };

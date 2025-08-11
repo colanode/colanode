@@ -7,7 +7,9 @@ import { eventBus } from '@colanode/server/lib/event-bus';
 import { emailService } from '@colanode/server/services/email-service';
 import { jobService } from '@colanode/server/services/job-service';
 
-dotenv.config();
+dotenv.config({
+  quiet: true,
+});
 
 const init = async () => {
   await migrate();
@@ -15,7 +17,7 @@ const init = async () => {
 
   initApp();
 
-  jobService.initQueue();
+  await jobService.initQueue();
   await jobService.initWorker();
 
   await eventBus.init();

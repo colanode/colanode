@@ -1,7 +1,7 @@
 import { LocalNode } from '@colanode/client/types';
 import { NodeRole, extractNodeRole } from '@colanode/core';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 type UseNodeContainerResult<T extends LocalNode> =
   | {
@@ -25,7 +25,7 @@ export const useNodeContainer = <T extends LocalNode>(
 ): UseNodeContainerResult<T> => {
   const workspace = useWorkspace();
 
-  const nodeTreeGetQuery = useQuery({
+  const nodeTreeGetQuery = useLiveQuery({
     type: 'node.tree.get',
     nodeId: id,
     accountId: workspace.accountId,

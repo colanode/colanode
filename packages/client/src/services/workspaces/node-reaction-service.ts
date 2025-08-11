@@ -136,7 +136,7 @@ export class NodeReactionService {
       throw new Error('Failed to create node reaction');
     }
 
-    this.workspace.mutations.triggerSync();
+    this.workspace.mutations.scheduleSync();
 
     eventBus.publish({
       type: 'node.reaction.created',
@@ -223,7 +223,7 @@ export class NodeReactionService {
       throw new Error('Failed to delete node reaction');
     }
 
-    this.workspace.mutations.triggerSync();
+    this.workspace.mutations.scheduleSync();
 
     eventBus.publish({
       type: 'node.reaction.deleted',

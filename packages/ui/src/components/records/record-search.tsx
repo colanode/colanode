@@ -11,7 +11,7 @@ import {
   CommandList,
 } from '@colanode/ui/components/ui/command';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface RecordSearchProps {
   exclude?: string[];
@@ -27,7 +27,7 @@ export const RecordSearch = ({
   const workspace = useWorkspace();
 
   const [query, setQuery] = useState('');
-  const recordSearchQuery = useQuery({
+  const recordSearchQuery = useLiveQuery({
     type: 'record.search',
     searchQuery: query,
     accountId: workspace.accountId,

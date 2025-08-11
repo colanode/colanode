@@ -26,6 +26,7 @@ import {
   TrailingNode,
   UnderlineMark,
   MentionExtension,
+  HardBreakNode,
 } from '@colanode/ui/editor/extensions';
 import { ToolbarMenu } from '@colanode/ui/editor/menus';
 
@@ -56,6 +57,7 @@ export const MessageEditor = forwardRef<
         MessageNode,
         TextNode,
         ParagraphNode,
+        HardBreakNode,
         CodeBlockNode,
         TabKeymapExtension,
         PlaceholderExtension.configure({

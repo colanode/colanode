@@ -14,7 +14,7 @@ import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const SidebarMenuHeader = () => {
   const workspace = useWorkspace();
@@ -22,7 +22,7 @@ export const SidebarMenuHeader = () => {
   const radar = useRadar();
 
   const [open, setOpen] = useState(false);
-  const workspaceListQuery = useQuery({
+  const workspaceListQuery = useLiveQuery({
     type: 'workspace.list',
     accountId: account.id,
   });

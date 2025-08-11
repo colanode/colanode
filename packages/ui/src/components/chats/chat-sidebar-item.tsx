@@ -6,7 +6,7 @@ import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface ChatSidebarItemProps {
@@ -23,7 +23,7 @@ export const ChatSidebarItem = ({ chat }: ChatSidebarItemProps) => {
       (id) => id !== workspace.userId
     ) ?? '';
 
-  const userGetQuery = useQuery({
+  const userGetQuery = useLiveQuery({
     type: 'user.get',
     accountId: workspace.accountId,
     workspaceId: workspace.id,

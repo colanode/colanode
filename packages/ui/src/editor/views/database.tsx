@@ -3,33 +3,46 @@ import { NodeViewWrapper } from '@tiptap/react';
 
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { Database } from '@colanode/ui/components/databases/database';
+import { DatabaseViews } from '@colanode/ui/components/databases/database-views';
 import { useLayout } from '@colanode/ui/contexts/layout';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
 
 export const DatabaseNodeView = ({ node }: NodeViewProps) => {
-  const workspace = useWorkspace();
   const layout = useLayout();
 
   const id = node.attrs.id;
-  const nodeGetQuery = useQuery({
-    type: 'node.get',
-    nodeId: id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-  });
+  const data = useNodeContainer<LocalDatabaseNode>(id);
 
-  if (!id) {
+  if (data.isPending) {
     return null;
   }
 
-  if (nodeGetQuery.isPending) {
+  if (!data.node) {
     return null;
   }
 
-  const database = nodeGetQuery.data as LocalDatabaseNode;
-  if (!database) {
-    return null;
+  const { node: database, role } = data;
+  if (node.attrs.inline) {
+    return (
+      <NodeViewWrapper
+        data-id={node.attrs.id}
+        className="my-4 w-full"
+        contentEditable={false}
+        onDragStart={(e: React.DragEvent<HTMLDivElement>) => {
+          e.stopPropagation();
+          e.preventDefault();
+        }}
+        onDragOver={(e: React.DragEvent<HTMLDivElement>) => {
+          e.preventDefault();
+          e.stopPropagation();
+        }}
+      >
+        <Database database={database} role={role}>
+          <DatabaseViews inline />
+        </Database>
+      </NodeViewWrapper>
+    );
   }
 
   const name = database.attributes.name ?? 'Unnamed';

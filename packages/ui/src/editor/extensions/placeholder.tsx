@@ -1,4 +1,4 @@
-import { Placeholder, PlaceholderOptions } from '@tiptap/extension-placeholder';
+import { Placeholder, PlaceholderOptions } from '@tiptap/extensions';
 
 interface PlaceholderProps extends PlaceholderOptions {
   message: string;

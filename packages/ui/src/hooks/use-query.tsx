@@ -20,7 +20,7 @@ export const useQuery = <T extends QueryInput>(
 
   const result = useTanstackQuery({
     queryKey: [hash],
-    queryFn: () => window.colanode.executeQueryAndSubscribe(hash, input),
+    queryFn: () => window.colanode.executeQuery(input),
     ...options,
   });
 

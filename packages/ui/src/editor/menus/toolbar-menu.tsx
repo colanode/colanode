@@ -1,13 +1,10 @@
-import {
-  BubbleMenu,
-  type BubbleMenuProps,
-  Editor,
-  isNodeSelection,
-} from '@tiptap/react';
+import { Editor, isNodeSelection, useEditorState } from '@tiptap/react';
+import { BubbleMenu, type BubbleMenuProps } from '@tiptap/react/menus';
 import { Bold, Code, Italic, Strikethrough, Underline } from 'lucide-react';
 import { useState } from 'react';
 
 import { ColorButton } from '@colanode/ui/editor/menus/color-button';
+import { HighlightButton } from '@colanode/ui/editor/menus/highlight-button';
 import { LinkButton } from '@colanode/ui/editor/menus/link-button';
 import { MarkButton } from '@colanode/ui/editor/menus/mark-button';
 
@@ -18,6 +15,25 @@ interface ToolbarMenuProps extends Omit<BubbleMenuProps, 'children'> {
 export const ToolbarMenu = (props: ToolbarMenuProps) => {
   const [isColorButtonOpen, setIsColorButtonOpen] = useState(false);
   const [isLinkButtonOpen, setIsLinkButtonOpen] = useState(false);
+  const [isHighlightButtonOpen, setIsHighlightButtonOpen] = useState(false);
+
+  const state = useEditorState({
+    editor: props.editor,
+    selector: ({ editor }) => {
+      if (!editor) {
+        return null;
+      }
+
+      return {
+        isEditable: editor.isEditable,
+        isBoldActive: editor.isActive('bold'),
+        isItalicActive: editor.isActive('italic'),
+        isUnderlineActive: editor.isActive('underline'),
+        isStrikeActive: editor.isActive('strike'),
+        isCodeActive: editor.isActive('code'),
+      };
+    },
+  });
 
   const bubbleMenuProps: ToolbarMenuProps = {
     ...props,
@@ -45,11 +61,14 @@ export const ToolbarMenu = (props: ToolbarMenuProps) => {
 
       return true;
     },
-    tippyOptions: {
-      moveTransition: 'transform 0.15s ease-out',
-      onHidden: () => {
+    options: {
+      strategy: 'absolute',
+      placement: 'top',
+      offset: 8,
+      onHide: () => {
         setIsColorButtonOpen(false);
         setIsLinkButtonOpen(false);
+        setIsHighlightButtonOpen(false);
       },
     },
   };
@@ -61,38 +80,39 @@ export const ToolbarMenu = (props: ToolbarMenuProps) => {
   return (
     <BubbleMenu
       {...bubbleMenuProps}
-      className="flex flex-row items-center gap-1 rounded border bg-white p-0.5 shadow-xl"
+      className="flex flex-row items-center gap-1 rounded border bg-white p-0.5 shadow-xl transition-transform duration-150 ease-out"
     >
       <LinkButton
         editor={props.editor}
         isOpen={isLinkButtonOpen}
         setIsOpen={(isOpen) => {
           setIsColorButtonOpen(false);
+          setIsHighlightButtonOpen(false);
           setIsLinkButtonOpen(isOpen);
         }}
       />
       <MarkButton
-        isActive={props.editor?.isActive('bold') === true}
+        isActive={state?.isBoldActive ?? false}
         onClick={() => props.editor?.chain().focus().toggleBold().run()}
         icon={Bold}
       />
       <MarkButton
-        isActive={props.editor?.isActive('italic') === true}
+        isActive={state?.isItalicActive ?? false}
         onClick={() => props.editor?.chain().focus().toggleItalic().run()}
         icon={Italic}
       />
       <MarkButton
-        isActive={props.editor?.isActive('underline') === true}
+        isActive={state?.isUnderlineActive ?? false}
         onClick={() => props.editor?.chain().focus().toggleUnderline().run()}
         icon={Underline}
       />
       <MarkButton
-        isActive={props.editor?.isActive('strike') === true}
+        isActive={state?.isStrikeActive ?? false}
         onClick={() => props.editor?.chain().focus().toggleStrike().run()}
         icon={Strikethrough}
       />
       <MarkButton
-        isActive={props.editor?.isActive('code') === true}
+        isActive={state?.isCodeActive ?? false}
         onClick={() => props.editor?.chain().focus().toggleCode().run()}
         icon={Code}
       />
@@ -101,6 +121,16 @@ export const ToolbarMenu = (props: ToolbarMenuProps) => {
         isOpen={isColorButtonOpen}
         setIsOpen={(isOpen) => {
           setIsColorButtonOpen(isOpen);
+          setIsLinkButtonOpen(false);
+          setIsHighlightButtonOpen(false);
+        }}
+      />
+      <HighlightButton
+        editor={props.editor}
+        isOpen={isHighlightButtonOpen}
+        setIsOpen={(isOpen) => {
+          setIsHighlightButtonOpen(isOpen);
+          setIsColorButtonOpen(false);
           setIsLinkButtonOpen(false);
         }}
       />

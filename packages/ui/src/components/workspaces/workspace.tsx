@@ -6,7 +6,7 @@ import {
 import { Layout } from '@colanode/ui/components/layouts/layout';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface WorkspaceProps {
   workspace: WorkspaceType;
@@ -15,7 +15,7 @@ interface WorkspaceProps {
 export const Workspace = ({ workspace }: WorkspaceProps) => {
   const account = useAccount();
 
-  const workspaceMetadataListQuery = useQuery({
+  const workspaceMetadataListQuery = useLiveQuery({
     type: 'workspace.metadata.list',
     accountId: account.id,
     workspaceId: workspace.id,

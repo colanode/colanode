@@ -15,11 +15,11 @@ export class EmojiSearchQueryHandler
   }
 
   public async handleQuery(input: EmojiSearchQueryInput): Promise<Emoji[]> {
-    if (!this.app.asset.emojis) {
+    if (!this.app.assets.emojis) {
       return [];
     }
 
-    const data = await this.app.asset.emojis
+    const data = await this.app.assets.emojis
       .selectFrom('emojis')
       .innerJoin('emoji_search', 'emojis.id', 'emoji_search.id')
       .selectAll('emojis')

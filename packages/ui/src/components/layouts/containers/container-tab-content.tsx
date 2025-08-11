@@ -7,7 +7,6 @@ import { AccountSettings } from '@colanode/ui/components/accounts/account-settin
 import { ChannelContainer } from '@colanode/ui/components/channels/channel-container';
 import { ChatContainer } from '@colanode/ui/components/chats/chat-container';
 import { DatabaseContainer } from '@colanode/ui/components/databases/database-container';
-import { DownloadsContainer } from '@colanode/ui/components/downloads/downloads-container';
 import { FileContainer } from '@colanode/ui/components/files/file-container';
 import { FolderContainer } from '@colanode/ui/components/folders/folder-container';
 import { MessageContainer } from '@colanode/ui/components/messages/message-container';
@@ -15,6 +14,9 @@ import { PageContainer } from '@colanode/ui/components/pages/page-container';
 import { RecordContainer } from '@colanode/ui/components/records/record-container';
 import { SpaceContainer } from '@colanode/ui/components/spaces/space-container';
 import { TabsContent } from '@colanode/ui/components/ui/tabs';
+import { WorkspaceDownloads } from '@colanode/ui/components/workspaces/downloads/workspace-downloads';
+import { WorkspaceStorage } from '@colanode/ui/components/workspaces/storage/workspace-storage';
+import { WorkspaceUploads } from '@colanode/ui/components/workspaces/uploads/workspace-uploads';
 import { WorkspaceSettings } from '@colanode/ui/components/workspaces/workspace-settings';
 import { WorkspaceUsers } from '@colanode/ui/components/workspaces/workspace-users';
 
@@ -22,11 +24,7 @@ interface ContainerTabContentProps {
   tab: ContainerTab;
 }
 
-const ContainerTabContentBody = ({ tab }: ContainerTabContentProps) => {
-  if (tab.path === SpecialContainerTabPath.Downloads) {
-    return <DownloadsContainer />;
-  }
-
+const getContainerTabContentBody = (tab: ContainerTab) => {
   if (tab.path === SpecialContainerTabPath.WorkspaceSettings) {
     return <WorkspaceSettings />;
   }
@@ -43,6 +41,18 @@ const ContainerTabContentBody = ({ tab }: ContainerTabContentProps) => {
     return <AccountLogout />;
   }
 
+  if (tab.path === SpecialContainerTabPath.WorkspaceStorage) {
+    return <WorkspaceStorage />;
+  }
+
+  if (tab.path === SpecialContainerTabPath.WorkspaceUploads) {
+    return <WorkspaceUploads />;
+  }
+
+  if (tab.path === SpecialContainerTabPath.WorkspaceDownloads) {
+    return <WorkspaceDownloads />;
+  }
+
   return match(getIdType(tab.path))
     .with(IdType.Space, () => <SpaceContainer spaceId={tab.path} />)
     .with(IdType.Channel, () => <ChannelContainer channelId={tab.path} />)
@@ -57,13 +67,18 @@ const ContainerTabContentBody = ({ tab }: ContainerTabContentProps) => {
 };
 
 export const ContainerTabContent = ({ tab }: ContainerTabContentProps) => {
+  const content = getContainerTabContentBody(tab);
+  if (content === null) {
+    return null;
+  }
+
   return (
     <TabsContent
       value={tab.path}
       key={tab.path}
       className="h-full min-h-full w-full min-w-full m-0 pt-2"
     >
-      <ContainerTabContentBody tab={tab} />
+      {content}
     </TabsContent>
   );
 };

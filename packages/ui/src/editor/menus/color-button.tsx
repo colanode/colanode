@@ -1,4 +1,5 @@
 import { Editor } from '@tiptap/core';
+import { useEditorState } from '@tiptap/react';
 import { Baseline } from 'lucide-react';
 
 import {
@@ -6,71 +7,8 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
+import { editorColors } from '@colanode/ui/lib/editor';
 import { cn } from '@colanode/ui/lib/utils';
-
-interface ColorItem {
-  color: string;
-  textClass: string;
-  bgClass: string;
-  name: string;
-}
-
-const colors: ColorItem[] = [
-  {
-    name: 'Default',
-    color: 'default',
-    textClass: 'text-black-600',
-    bgClass: '',
-  },
-  {
-    name: 'Gray',
-    color: 'gray',
-    textClass: 'text-gray-600',
-    bgClass: 'bg-gray-100',
-  },
-  {
-    name: 'Orange',
-    color: 'orange',
-    textClass: 'text-orange-600',
-    bgClass: 'bg-orange-200',
-  },
-  {
-    name: 'Yellow',
-    color: 'yellow',
-    textClass: 'text-yellow-600',
-    bgClass: 'bg-yello-200',
-  },
-  {
-    name: 'Green',
-    color: 'green',
-    textClass: 'text-green-600',
-    bgClass: 'bg-green-200',
-  },
-  {
-    name: 'Blue',
-    color: 'blue',
-    textClass: 'text-blue-600',
-    bgClass: 'bg-blue-200',
-  },
-  {
-    name: 'Purple',
-    color: 'purple',
-    textClass: 'text-purple-600',
-    bgClass: 'bg-purple-200',
-  },
-  {
-    name: 'Pink',
-    color: 'pink',
-    textClass: 'text-pink-600',
-    bgClass: 'bg-pink-200',
-  },
-  {
-    name: 'Red',
-    color: 'red',
-    textClass: 'text-red-600',
-    bgClass: 'bg-red-200',
-  },
-];
 
 export const ColorButton = ({
   editor,
@@ -81,75 +19,55 @@ export const ColorButton = ({
   isOpen: boolean;
   setIsOpen: (isOpen: boolean) => void;
 }) => {
-  const activeColor = colors.find((color) =>
-    editor.isActive('color', { color: color.color })
-  );
+  const state = useEditorState({
+    editor,
+    selector: ({ editor }) => {
+      if (!editor) {
+        return null;
+      }
 
-  const activeHighlight = colors.find((color) =>
-    editor.isActive('highlight', { highlight: color.color })
-  );
+      return {
+        isEditable: editor.isEditable,
+        activeColor: editorColors.find((editorColor) =>
+          editor.isActive('color', { color: editorColor.color })
+        ),
+      };
+    },
+  });
+
+  const activeColor = state?.activeColor ?? editorColors[0]!;
 
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen} modal={true}>
       <PopoverTrigger>
-        <span
-          className={cn(
-            'flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-gray-100',
-            activeHighlight?.bgClass ?? 'bg-white'
-          )}
-        >
-          <Baseline className={cn('size-4', activeColor?.textClass ?? '')} />
+        <span className="flex size-8 items-center justify-center rounded-md cursor-pointer hover:bg-gray-100">
+          <Baseline className={cn('size-4', activeColor.textClass)} />
         </span>
       </PopoverTrigger>
 
       <PopoverContent
         align="start"
-        className="z-50 max-h-96 min-w-0 overflow-y-auto"
+        className="overflow-x-hidden overflow-y-auto rounded-md p-1"
       >
-        <p className="text-sm text-muted-foreground">Color</p>
-        <div className="mt-1 flex flex-col gap-1">
-          {colors.map((color) => (
+        <div className="px-2 py-1.5 text-sm font-medium">Color</div>
+        <div>
+          {editorColors.map((color) => (
             <button
-              type="button"
               key={`text-color-${color.color}`}
-              onClick={() =>
-                color.color === 'default'
-                  ? editor.commands.unsetColor()
-                  : editor.chain().focus().setColor(color.color).run()
-              }
+              onClick={() => {
+                if (color.color === 'default') {
+                  editor.commands.unsetColor();
+                } else {
+                  editor.chain().focus().setColor(color.color).run();
+                }
+                setIsOpen(false);
+              }}
+              className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-gray-100 cursor-pointer"
             >
-              <div className="flex cursor-pointer flex-row items-center gap-2 p-1 pl-0 hover:bg-gray-100">
-                <div className="relative inline-flex h-6 w-6 items-center justify-center overflow-hidden rounded bg-gray-50 shadow">
-                  <span className={cn('font-medium', color.textClass)}>A</span>
-                </div>
-                <span className="text-sm">{color.name}</span>
+              <div className="relative inline-flex size-6 items-center justify-center overflow-hidden rounded bg-gray-50 shadow">
+                <span className={cn('font-medium', color.textClass)}>A</span>
               </div>
-            </button>
-          ))}
-        </div>
-        <p className="mt-4 text-sm text-muted-foreground">Highlight</p>
-        <div className="mt-1 flex flex-col gap-1">
-          {colors.map((color) => (
-            <button
-              type="button"
-              key={`text-color-${color.color}`}
-              onClick={() =>
-                color.color === 'default'
-                  ? editor.commands.unsetHighlight()
-                  : editor.commands.setHighlight(color.color)
-              }
-            >
-              <div className="flex cursor-pointer flex-row items-center gap-2 p-1 pl-0 hover:bg-gray-100">
-                <div
-                  className={cn(
-                    'relative inline-flex h-6 w-6 items-center justify-center overflow-hidden rounded shadow',
-                    color.bgClass
-                  )}
-                >
-                  <span className="font-medium">A</span>
-                </div>
-                <span className="text-sm">{color.name}</span>
-              </div>
+              <span>{color.name}</span>
             </button>
           ))}
         </div>

@@ -36,6 +36,8 @@ export const createWorkspace = async (
       created_at: date,
       created_by: account.id,
       status: WorkspaceStatus.Active,
+      storage_limit: config.workspace.storageLimit,
+      max_file_size: config.workspace.maxFileSize,
     })
     .returningAll()
     .executeTakeFirst();

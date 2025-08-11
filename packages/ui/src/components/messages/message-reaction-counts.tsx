@@ -6,8 +6,8 @@ import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
 import { MessageReactionCountTooltip } from '@colanode/ui/components/messages/message-reaction-count-tooltip';
 import { MessageReactionCountsDialog } from '@colanode/ui/components/messages/message-reaction-counts-dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface MessageReactionCountsProps {
@@ -22,7 +22,7 @@ export const MessageReactionCounts = ({
 
   const { mutate, isPending } = useMutation();
 
-  const nodeReactionsAggregateQuery = useQuery({
+  const nodeReactionsAggregateQuery = useLiveQuery({
     type: 'node.reactions.aggregate',
     nodeId: message.id,
     accountId: workspace.accountId,

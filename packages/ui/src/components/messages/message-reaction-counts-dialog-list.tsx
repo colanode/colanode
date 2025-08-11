@@ -5,7 +5,7 @@ import { NodeReactionListQueryInput } from '@colanode/client/queries';
 import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQueries } from '@colanode/ui/hooks/use-queries';
+import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 const REACTIONS_PER_PAGE = 20;
 
@@ -33,7 +33,7 @@ export const MessageReactionCountsDialogList = ({
     count: REACTIONS_PER_PAGE,
   }));
 
-  const result = useQueries(inputs);
+  const result = useLiveQueries(inputs);
   const reactions = result.flatMap((data) => data.data ?? []);
   const isPending = result.some((data) => data.isPending);
   const hasMore =
@@ -41,7 +41,7 @@ export const MessageReactionCountsDialogList = ({
 
   const userIds = reactions?.map((reaction) => reaction.collaboratorId) ?? [];
 
-  const results = useQueries(
+  const results = useLiveQueries(
     userIds.map((userId) => ({
       type: 'user.get',
       accountId: workspace.accountId,

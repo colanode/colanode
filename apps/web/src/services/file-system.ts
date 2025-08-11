@@ -1,8 +1,4 @@
-import {
-  FileMetadata,
-  FileReadStream,
-  FileSystem,
-} from '@colanode/client/services';
+import { FileReadStream, FileSystem } from '@colanode/client/services';
 
 export class WebFileSystem implements FileSystem {
   private root: FileSystemDirectoryHandle | null = null;
@@ -192,17 +188,6 @@ export class WebFileSystem implements FileSystem {
     const writable = await fileHandle.createWritable();
     await writable.write(data);
     await writable.close();
-  }
-
-  public async metadata(path: string): Promise<FileMetadata> {
-    const { parent, name } = await this.getFileLocation(path, false);
-    const fileHandle = await parent.getFileHandle(name);
-    const file = await fileHandle.getFile();
-
-    return {
-      lastModified: file.lastModified,
-      size: file.size,
-    };
   }
 
   public async url(path: string): Promise<string> {

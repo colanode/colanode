@@ -2,9 +2,10 @@ import { FastifyPluginCallback } from 'fastify';
 import fp from 'fastify-plugin';
 import { hasZodFastifySchemaValidationErrors } from 'fastify-type-provider-zod';
 
-import { ApiErrorCode, createDebugger } from '@colanode/core';
+import { ApiErrorCode } from '@colanode/core';
+import { createLogger } from '@colanode/server/lib/logger';
 
-const debug = createDebugger('api:client:error-handler');
+const logger = createLogger('api:client:error-handler');
 
 export const errorHandlerCallback: FastifyPluginCallback = (
   fastify,
@@ -12,7 +13,10 @@ export const errorHandlerCallback: FastifyPluginCallback = (
   done
 ) => {
   fastify.setErrorHandler(async (error, _, reply) => {
-    debug(`Error processing request ${error.code} - ${error.message}`);
+    logger.error(
+      error,
+      `Error processing request ${error.statusCode} - ${error.code} - ${error.message}`
+    );
 
     // TODO: return detailed validation errors
     if (hasZodFastifySchemaValidationErrors(error)) {

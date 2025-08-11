@@ -17,7 +17,7 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface DatabaseSelectProps {
@@ -29,7 +29,7 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
   const workspace = useWorkspace();
   const [open, setOpen] = useState(false);
 
-  const databaseListQuery = useQuery({
+  const databaseListQuery = useLiveQuery({
     type: 'database.list',
     accountId: workspace.accountId,
     workspaceId: workspace.id,

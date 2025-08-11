@@ -1,13 +1,13 @@
 import { getIdType, IdType } from '@colanode/core';
 import { RadarContext } from '@colanode/ui/contexts/radar';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface RadarProviderProps {
   children: React.ReactNode;
 }
 
 export const RadarProvider = ({ children }: RadarProviderProps) => {
-  const radarDataQuery = useQuery({
+  const radarDataQuery = useLiveQuery({
     type: 'radar.data.get',
   });
 

@@ -45,12 +45,12 @@ export const FileNode = Node.create<FileNodeOptions>({
   addCommands() {
     const options = this.options;
     return {
-      addFile: (file: TempFile) => {
+      addFile: (tempFile: TempFile) => {
         return ({ editor, tr }) => {
           (async () => {
             const fileCreateResult = await window.colanode.executeMutation({
               type: 'file.create',
-              file,
+              tempFileId: tempFile.id,
               accountId: options.context.accountId,
               workspaceId: options.context.workspaceId,
               parentId: options.context.documentId,

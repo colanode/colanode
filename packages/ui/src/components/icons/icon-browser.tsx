@@ -4,12 +4,12 @@ import { useMemo, useRef } from 'react';
 import { IconPickerRowData } from '@colanode/client/types';
 import { IconBrowserCategory } from '@colanode/ui/components/icons/icon-browser-category';
 import { IconBrowserItems } from '@colanode/ui/components/icons/icon-browser-items';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 const ICONS_PER_ROW = 10;
 
 export const IconBrowser = () => {
-  const iconCategoryListQuery = useQuery({
+  const iconCategoryListQuery = useLiveQuery({
     type: 'icon.category.list',
   });
 

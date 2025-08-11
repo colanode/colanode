@@ -2,15 +2,15 @@ import {
   SynchronizerOutputMessage,
   SyncNodesUpdatesInput,
   SyncNodeUpdateData,
-  createDebugger,
 } from '@colanode/core';
 import { encodeState } from '@colanode/crdt';
 import { database } from '@colanode/server/data/database';
 import { SelectNodeUpdate } from '@colanode/server/data/schema';
+import { createLogger } from '@colanode/server/lib/logger';
 import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
 import { Event } from '@colanode/server/types/events';
 
-const debug = createDebugger('node-update-synchronizer');
+const logger = createLogger('node-update-synchronizer');
 
 export class NodeUpdatesSynchronizer extends BaseSynchronizer<SyncNodesUpdatesInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncNodesUpdatesInput> | null> {
@@ -56,7 +56,7 @@ export class NodeUpdatesSynchronizer extends BaseSynchronizer<SyncNodesUpdatesIn
 
       return nodesUpdates;
     } catch (error) {
-      debug('Error fetching node updates for sync', error);
+      logger.error(error, 'Error fetching node updates for sync');
     } finally {
       this.status = 'pending';
     }

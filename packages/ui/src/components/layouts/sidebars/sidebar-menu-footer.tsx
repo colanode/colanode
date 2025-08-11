@@ -15,7 +15,7 @@ import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { AccountContext, useAccount } from '@colanode/ui/contexts/account';
 import { useApp } from '@colanode/ui/contexts/app';
 import { useRadar } from '@colanode/ui/contexts/radar';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export function SidebarMenuFooter() {
   const app = useApp();
@@ -23,7 +23,7 @@ export function SidebarMenuFooter() {
   const radar = useRadar();
   const [open, setOpen] = useState(false);
 
-  const accountListQuery = useQuery({
+  const accountListQuery = useLiveQuery({
     type: 'account.list',
   });
 

@@ -245,7 +245,7 @@ export class DocumentService {
     }
 
     if (createdMutation) {
-      this.workspace.mutations.triggerSync();
+      this.workspace.mutations.scheduleSync();
     }
 
     return true;
@@ -420,7 +420,7 @@ export class DocumentService {
     }
 
     if (createdMutation) {
-      this.workspace.mutations.triggerSync();
+      this.workspace.mutations.scheduleSync();
     }
 
     return true;

@@ -1,3 +1,5 @@
+import ms from 'ms';
+
 import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapNodeInteraction } from '@colanode/client/lib/mappers';
@@ -41,7 +43,7 @@ export class NodeInteractionSeenMutationHandler
       const lastSeenAt = existingInteraction.last_seen_at;
       if (
         lastSeenAt &&
-        lastSeenAt > new Date(Date.now() - 5 * 60 * 1000).toISOString()
+        lastSeenAt > new Date(Date.now() - ms('5 minutes')).toISOString()
       ) {
         return {
           success: true,
@@ -118,7 +120,7 @@ export class NodeInteractionSeenMutationHandler
       existingInteraction
     );
 
-    workspace.mutations.triggerSync();
+    workspace.mutations.scheduleSync();
 
     eventBus.publish({
       type: 'node.interaction.updated',

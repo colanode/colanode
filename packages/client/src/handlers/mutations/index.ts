@@ -37,7 +37,7 @@ import { DocumentUpdateMutationHandler } from './documents/document-update';
 import { FileCreateMutationHandler } from './files/file-create';
 import { FileDeleteMutationHandler } from './files/file-delete';
 import { FileDownloadMutationHandler } from './files/file-download';
-import { FileSaveMutationHandler } from './files/file-save';
+import { TempFileCreateMutationHandler } from './files/temp-file-create';
 import { FolderCreateMutationHandler } from './folders/folder-create';
 import { FolderDeleteMutationHandler } from './folders/folder-delete';
 import { FolderUpdateMutationHandler } from './folders/folder-update';
@@ -68,6 +68,7 @@ import { SpaceDeleteMutationHandler } from './spaces/space-delete';
 import { SpaceDescriptionUpdateMutationHandler } from './spaces/space-description-update';
 import { SpaceNameUpdateMutationHandler } from './spaces/space-name-update';
 import { UserRoleUpdateMutationHandler } from './users/user-role-update';
+import { UserStorageUpdateMutationHandler } from './users/user-storage-update';
 import { UsersCreateMutationHandler } from './users/users-create';
 import { WorkspaceCreateMutationHandler } from './workspaces/workspace-create';
 import { WorkspaceDeleteMutationHandler } from './workspaces/workspace-delete';
@@ -134,7 +135,6 @@ export const buildMutationHandlerMap = (
     'folder.create': new FolderCreateMutationHandler(app),
     'file.create': new FileCreateMutationHandler(app),
     'file.download': new FileDownloadMutationHandler(app),
-    'file.save': new FileSaveMutationHandler(app),
     'space.avatar.update': new SpaceAvatarUpdateMutationHandler(app),
     'space.description.update': new SpaceDescriptionUpdateMutationHandler(app),
     'space.name.update': new SpaceNameUpdateMutationHandler(app),
@@ -162,5 +162,7 @@ export const buildMutationHandlerMap = (
     'email.password.reset.complete':
       new EmailPasswordResetCompleteMutationHandler(app),
     'workspace.delete': new WorkspaceDeleteMutationHandler(app),
+    'user.storage.update': new UserStorageUpdateMutationHandler(app),
+    'temp.file.create': new TempFileCreateMutationHandler(app),
   };
 };

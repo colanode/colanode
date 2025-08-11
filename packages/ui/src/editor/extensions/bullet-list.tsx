@@ -1,4 +1,4 @@
-import { BulletList } from '@tiptap/extension-bullet-list';
+import { BulletList } from '@tiptap/extension-list';
 
 import { defaultClasses } from '@colanode/ui/editor/classes';
 

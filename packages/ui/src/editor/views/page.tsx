@@ -5,14 +5,14 @@ import { LocalPageNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const PageNodeView = ({ node }: NodeViewProps) => {
   const workspace = useWorkspace();
   const layout = useLayout();
 
   const id = node.attrs.id;
-  const nodeGetQuery = useQuery({
+  const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: id,
     accountId: workspace.accountId,

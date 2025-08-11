@@ -3,7 +3,7 @@ import { MessageAuthorAvatar } from '@colanode/ui/components/messages/message-au
 import { MessageAuthorName } from '@colanode/ui/components/messages/message-author-name';
 import { MessageContent } from '@colanode/ui/components/messages/message-content';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface MessageReferenceProps {
   messageId: string;
@@ -11,7 +11,7 @@ interface MessageReferenceProps {
 
 export const MessageReference = ({ messageId }: MessageReferenceProps) => {
   const workspace = useWorkspace();
-  const nodeGetQuery = useQuery({
+  const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: messageId,
     accountId: workspace.accountId,

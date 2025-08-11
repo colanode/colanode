@@ -1,6 +1,5 @@
 import {
   CanUpdateDocumentContext,
-  createDebugger,
   DocumentContent,
   generateId,
   getNodeModel,
@@ -13,6 +12,7 @@ import { database } from '@colanode/server/data/database';
 import { SelectUser } from '@colanode/server/data/schema';
 import { scheduleDocumentEmbedding } from '@colanode/server/lib/ai/embeddings';
 import { eventBus } from '@colanode/server/lib/event-bus';
+import { createLogger } from '@colanode/server/lib/logger';
 import { fetchNode, fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
 import {
   CreateDocumentInput,
@@ -20,7 +20,7 @@ import {
 } from '@colanode/server/types/documents';
 import { ConcurrentUpdateResult } from '@colanode/server/types/nodes';
 
-const debug = createDebugger('server:lib:documents');
+const logger = createLogger('server:lib:documents');
 
 const UPDATE_RETRIES_LIMIT = 10;
 
@@ -115,17 +115,17 @@ export const updateDocumentFromMutation = async (
   user: SelectUser,
   mutation: UpdateDocumentMutationData
 ): Promise<MutationStatus> => {
-  const existingDocumentUpdate = await database
-    .selectFrom('document_updates')
-    .where('id', '=', mutation.updateId)
-    .selectAll()
-    .executeTakeFirst();
-
-  if (existingDocumentUpdate) {
-    return MutationStatus.OK;
-  }
-
   for (let count = 0; count < UPDATE_RETRIES_LIMIT; count++) {
+    const existingDocumentUpdate = await database
+      .selectFrom('document_updates')
+      .where('id', '=', mutation.updateId)
+      .selectAll()
+      .executeTakeFirst();
+
+    if (existingDocumentUpdate) {
+      return MutationStatus.OK;
+    }
+
     const result = await tryUpdateDocumentFromMutation(user, mutation);
 
     if (result.type === 'success') {
@@ -282,7 +282,7 @@ const tryUpdateDocumentFromMutation = async (
       output: MutationStatus.OK,
     };
   } catch (error) {
-    debug(`Failed to update document: ${error}`);
+    logger.error(error, `Failed to update document`);
     return { type: 'retry' };
   }
 };

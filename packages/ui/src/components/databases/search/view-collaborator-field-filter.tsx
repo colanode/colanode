@@ -24,7 +24,7 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { UserSearch } from '@colanode/ui/components/users/user-search';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQueries } from '@colanode/ui/hooks/use-queries';
+import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 import {
   collaboratorFieldFilterOperators,
   createdByFieldFilterOperators,
@@ -71,7 +71,7 @@ export const ViewCollaboratorFieldFilter = ({
     ) ?? collaboratorFieldFilterOperators[0]!;
 
   const collaboratorIds = (filter.value as string[]) ?? [];
-  const results = useQueries(
+  const results = useLiveQueries(
     collaboratorIds.map((id) => ({
       type: 'user.get',
       userId: id,

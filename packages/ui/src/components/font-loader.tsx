@@ -6,7 +6,7 @@ interface FontLoaderProps {
 
 export const FontLoader = ({ type }: FontLoaderProps) => {
   const fontUrl =
-    type === 'web' ? `/assets/fonts/neotrax.otf` : `asset://fonts/neotrax.otf`;
+    type === 'web' ? `/assets/fonts/neotrax.otf` : `local://fonts/neotrax.otf`;
 
   return (
     <style>{`

@@ -2,14 +2,14 @@ import {
   SynchronizerOutputMessage,
   SyncNodeInteractionsInput,
   SyncNodeInteractionData,
-  createDebugger,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { SelectNodeInteraction } from '@colanode/server/data/schema';
+import { createLogger } from '@colanode/server/lib/logger';
 import { BaseSynchronizer } from '@colanode/server/synchronizers/base';
 import { Event } from '@colanode/server/types/events';
 
-const debug = createDebugger('node-interaction-synchronizer');
+const logger = createLogger('node-interaction-synchronizer');
 
 export class NodeInteractionSynchronizer extends BaseSynchronizer<SyncNodeInteractionsInput> {
   public async fetchData(): Promise<SynchronizerOutputMessage<SyncNodeInteractionsInput> | null> {
@@ -55,7 +55,7 @@ export class NodeInteractionSynchronizer extends BaseSynchronizer<SyncNodeIntera
 
       return nodeInteractions;
     } catch (error) {
-      debug('Error fetching node interactions for sync', error);
+      logger.error(error, 'Error fetching node interactions for sync');
     } finally {
       this.status = 'pending';
     }

@@ -3,7 +3,7 @@ import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface ChannelContainerTabProps {
   channelId: string;
@@ -17,7 +17,7 @@ export const ChannelContainerTab = ({
   const workspace = useWorkspace();
   const radar = useRadar();
 
-  const nodeGetQuery = useQuery({
+  const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: channelId,
     accountId: workspace.accountId,
