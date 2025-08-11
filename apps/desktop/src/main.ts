@@ -40,7 +40,7 @@ updateElectronApp({
     repo: 'colanode/colanode',
     host: 'https://update.electronjs.org',
   },
-  updateInterval: '10 minutes',
+  updateInterval: '5 minutes',
   notifyUser: true,
 });
 
