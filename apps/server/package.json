@@ -24,8 +24,7 @@
     "@types/pg": "^8.15.5",
     "@types/ws": "^8.18.1",
     "nodemon": "^3.1.10",
-    "tsup": "^8.5.0",
-    "tsx": "^4.20.3"
+    "tsup": "^8.5.0"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.863.0",

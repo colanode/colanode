@@ -23,7 +23,7 @@
     "lint": "turbo run lint --parallel",
     "test": "turbo run test -- --watch false",
     "format": "prettier --write .",
-    "postinstall": "node --no-warnings --loader ts-node/esm scripts/src/postinstall/index.ts"
+    "postinstall": "tsx scripts/src/postinstall/index.ts"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
@@ -35,7 +35,7 @@
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react": "^7.37.5",
     "prettier": "^3.6.2",
-    "ts-node": "^10.9.2",
+    "tsx": "^4.20.3",
     "turbo": "^2.5.5",
     "typescript": "^5.8.3",
     "vitest": "^3.2.4"

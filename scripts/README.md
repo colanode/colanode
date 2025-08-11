@@ -9,7 +9,6 @@ This folder contains a collection of one-time or utility scripts that support th
 - **Icons Generator (`/src/icons`)** - Generates icon files and metadata used in Colanode app.
 
 - **Seed Script (`/src/seed`)** - Automatically creates dummy data for testing or local development. This includes:
-
   - Creating user accounts
   - Generating sample workspaces
   - Populating these workspaces with example content like pages, databases, and messages
@@ -36,5 +35,5 @@ Each script can be run independently by calling the corresponding npm script in 
 The `postinstall` script typically runs automatically after each `npm install`, but you can also manually run it if needed:
 
 ```bash
-node --no-warnings --loader ts-node/esm scripts/src/postinstall/index.ts
+tsx scripts/src/postinstall/index.ts
 ```

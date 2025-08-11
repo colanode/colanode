@@ -44,5 +44,5 @@ For more information about how these assets are generated, check:
 While it's normally triggered by the monorepo's `postinstall` hook, you can manually invoke it if you'd like:
 
 ```bash
-node --no-warnings --loader ts-node/esm scripts/src/postinstall/index.ts
+tsx scripts/src/postinstall/index.ts
 ```

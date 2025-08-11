@@ -13,8 +13,7 @@
     "@faker-js/faker": "^9.9.0",
     "@types/adm-zip": "^0.5.7",
     "@types/better-sqlite3": "^7.6.12",
-    "@types/svg-sprite": "^0.0.39",
-    "tsx": "^4.20.3"
+    "@types/svg-sprite": "^0.0.39"
   },
   "dependencies": {
     "@colanode/core": "*",
