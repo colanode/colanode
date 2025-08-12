@@ -29,6 +29,7 @@ export const workspaceUpdateRoute: FastifyPluginCallbackZod = (
         400: apiErrorOutputSchema,
         403: apiErrorOutputSchema,
         404: apiErrorOutputSchema,
+        500: apiErrorOutputSchema,
       },
     },
     handler: async (request, reply) => {

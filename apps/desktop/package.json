@@ -33,7 +33,7 @@
     "@types/electron-squirrel-startup": "^1.0.2",
     "@vitejs/plugin-react": "^5.0.0",
     "electron": "^37.2.6",
-    "vite": "^7.1.1"
+    "vite": "^7.1.2"
   },
   "dependencies": {
     "@colanode/client": "*",

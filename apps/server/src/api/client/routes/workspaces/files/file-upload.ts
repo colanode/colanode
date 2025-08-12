@@ -40,7 +40,9 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
           uploadId: z.string(),
         }),
         400: apiErrorOutputSchema,
+        403: apiErrorOutputSchema,
         404: apiErrorOutputSchema,
+        500: apiErrorOutputSchema,
       },
     },
     bodyLimit: 1024 * 1024 * 100, // 100MB

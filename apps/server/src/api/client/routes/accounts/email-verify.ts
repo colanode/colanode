@@ -26,6 +26,7 @@ export const emailVerifyRoute: FastifyPluginCallbackZod = (
       response: {
         200: loginOutputSchema,
         400: apiErrorOutputSchema,
+        404: apiErrorOutputSchema,
         429: apiErrorOutputSchema,
       },
     },
