@@ -1,9 +1,13 @@
 import { Toaster as Sonner, ToasterProps } from 'sonner';
 
+import { useApp } from '@colanode/ui/contexts/app';
+
 const Toaster = ({ ...props }: ToasterProps) => {
+  const app = useApp();
+
   return (
     <Sonner
-      theme="light"
+      theme={app.theme === 'dark' ? 'dark' : 'light'}
       className="toaster group"
       style={
         {

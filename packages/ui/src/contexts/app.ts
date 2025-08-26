@@ -8,6 +8,7 @@ import {
 
 interface AppContext {
   type: AppType;
+  theme: 'dark' | 'light';
   getMetadata: <K extends AppMetadataKey>(
     key: K
   ) => AppMetadataMap[K]['value'] | undefined;

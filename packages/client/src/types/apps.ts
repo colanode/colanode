@@ -34,11 +34,21 @@ export type AppAccountMetadata = {
   updatedAt: string | null;
 };
 
+export type AppTheme = 'system' | 'light' | 'dark';
+
+export type AppThemeMetadata = {
+  key: 'theme';
+  value: AppTheme;
+  createdAt: string;
+  updatedAt: string | null;
+};
+
 export type AppMetadata =
   | AppPlatformMetadata
   | AppVersionMetadata
   | AppWindowSizeMetadata
-  | AppAccountMetadata;
+  | AppAccountMetadata
+  | AppThemeMetadata;
 
 export type AppMetadataKey = AppMetadata['key'];
 
@@ -47,4 +57,5 @@ export type AppMetadataMap = {
   version: AppVersionMetadata;
   'window.size': AppWindowSizeMetadata;
   account: AppAccountMetadata;
+  theme: AppThemeMetadata;
 };
