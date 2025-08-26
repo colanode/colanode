@@ -2,6 +2,7 @@ import {
   Cylinder,
   Download,
   LogOut,
+  Palette,
   Settings,
   Upload,
   Users,
@@ -74,6 +75,14 @@ export const SidebarSettings = () => {
           title="General"
           icon={Settings}
           path={SpecialContainerTabPath.AccountSettings}
+        />
+      </div>
+      <div className="flex w-full min-w-0 flex-col gap-1">
+        <SidebarHeader title="App settings" />
+        <SidebarSettingsItem
+          title="Appearance"
+          icon={Palette}
+          path={SpecialContainerTabPath.AppAppearance}
         />
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
