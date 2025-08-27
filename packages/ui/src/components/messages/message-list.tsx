@@ -77,11 +77,11 @@ export const MessageList = () => {
           <Fragment key={message.id}>
             {showDate && (
               <div className="relative flex items-center py-1">
-                <div className="flex-grow border-t border-gray-100" />
+                <div className="flex-grow border-t border-muted" />
                 <span className="mx-4 flex-shrink text-xs text-muted-foreground">
                   {currentMessageDate.toDateString()}
                 </span>
-                <div className="flex-grow border-t border-gray-100" />
+                <div className="flex-grow border-t border-muted" />
               </div>
             )}
             <Message message={message} previousMessage={previousMessage} />

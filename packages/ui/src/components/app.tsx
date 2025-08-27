@@ -3,13 +3,13 @@ import { useState, useEffect } from 'react';
 import { AppType } from '@colanode/client/types';
 import { Account } from '@colanode/ui/components/accounts/account';
 import { Login } from '@colanode/ui/components/accounts/login';
+import { AppThemeProvider } from '@colanode/ui/components/app/app-theme-provider';
 import { AppLoader } from '@colanode/ui/components/app-loader';
 import { RadarProvider } from '@colanode/ui/components/radar-provider';
 import { ServerProvider } from '@colanode/ui/components/servers/server-provider';
 import { DelayedComponent } from '@colanode/ui/components/ui/delayed-component';
 import { AppContext } from '@colanode/ui/contexts/app';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
-import { useSystemTheme } from '@colanode/ui/hooks/use-system-theme';
 
 interface AppProps {
   type: AppType;
@@ -18,7 +18,6 @@ interface AppProps {
 export const App = ({ type }: AppProps) => {
   const [initialized, setInitialized] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
-  const systemTheme = useSystemTheme();
 
   const appMetadataListQuery = useLiveQuery({
     type: 'app.metadata.list',
@@ -55,20 +54,10 @@ export const App = ({ type }: AppProps) => {
       (account) => account.id === accountMetadata?.value
     ) || accountListQuery.data?.[0];
 
-  const themeMetadata = appMetadataListQuery.data?.find(
-    (metadata) => metadata.key === 'theme'
-  );
-
-  let theme = themeMetadata?.value;
-  if (!theme || theme === 'system') {
-    theme = systemTheme;
-  }
-
   return (
     <AppContext.Provider
       value={{
         type,
-        theme,
         getMetadata: (key) => {
           return appMetadataListQuery.data?.find(
             (metadata) => metadata.key === key
@@ -99,7 +88,7 @@ export const App = ({ type }: AppProps) => {
         },
       }}
     >
-      <div className={theme === 'dark' ? 'dark' : ''}>
+      <AppThemeProvider>
         <RadarProvider>
           {!openLogin && account ? (
             <ServerProvider domain={account.server}>
@@ -109,7 +98,7 @@ export const App = ({ type }: AppProps) => {
             <Login />
           )}
         </RadarProvider>
-      </div>
+      </AppThemeProvider>
     </AppContext.Provider>
   );
 };
