@@ -25,7 +25,8 @@ export const SidebarSettingsItem = ({
     <div
       className={cn(
         'text-sm flex h-7 items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer',
-        isActive && 'font-semibold'
+        isActive &&
+          'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
       )}
       onClick={() => {
         layout.previewLeft(path);

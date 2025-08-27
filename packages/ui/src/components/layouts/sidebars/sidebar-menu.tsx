@@ -41,7 +41,7 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
   const pendingUploadsCount = pendingUploads.length;
 
   return (
-    <div className="flex flex-col h-full w-[65px] min-w-[65px] items-center bg-slate-100 dark:bg-slate-900">
+    <div className="flex flex-col h-full w-[65px] min-w-[65px] items-center">
       {showMacOsPlaceholder ? (
         <div className="w-full h-8 flex gap-[8px] px-[6px] py-[7px]">
           <div className="w-3 h-3 bg-gray-400 rounded-full"></div>

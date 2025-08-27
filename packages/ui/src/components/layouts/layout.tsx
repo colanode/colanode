@@ -66,7 +66,7 @@ export const Layout = () => {
         <Resizable
           as="aside"
           size={{ width: sidebarMetadata.width, height: '100vh' }}
-          className="border-r border-gray-200"
+          className="border-r border-sidebar-border"
           minWidth={200}
           maxWidth={500}
           enable={{
@@ -115,7 +115,7 @@ export const Layout = () => {
         {shouldDisplayLeft && shouldDisplayRight && (
           <Resizable
             as="div"
-            className="h-full max-h-full min-h-full overflow-hidden border-l border-gray-200"
+            className="h-full max-h-full min-h-full overflow-hidden"
             size={{ width: rightContainerMetadata.width, height: '100%' }}
             minWidth={percentToNumber(windowSize.width, 20)}
             maxWidth={percentToNumber(windowSize.width, 50)}

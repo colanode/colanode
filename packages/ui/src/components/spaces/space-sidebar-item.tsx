@@ -80,7 +80,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
     >
       <div
         className={cn(
-          'flex w-full min-w-0 flex-row items-center hover:bg-sidebar-accent hover:text-sidebar-accent-foreground h-8',
+          'text-sm flex h-7 items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer',
           dropMonitor.isOver &&
             dropMonitor.canDrop &&
             'border-b-2 border-blue-300'
