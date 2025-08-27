@@ -121,22 +121,6 @@
   }
 }
 
-/* @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
-  *:focus {
-    outline: none;
-  }
-
-  *:focus-visible {
-    outline: none;
-  }
-} */
-
 .cm-editor.cm-focused {
   outline: none;
 }

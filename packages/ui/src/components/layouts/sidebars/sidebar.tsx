@@ -11,9 +11,9 @@ interface SidebarProps {
 
 export const Sidebar = ({ menu, onMenuChange }: SidebarProps) => {
   return (
-    <div className="flex h-screen min-h-screen max-h-screen w-full min-w-full flex-row bg-slate-50">
+    <div className="flex h-screen min-h-screen max-h-screen w-full min-w-full flex-row bg-sidebar">
       <SidebarMenu value={menu} onChange={onMenuChange} />
-      <div className="min-h-0 flex-grow overflow-auto">
+      <div className="min-h-0 flex-grow overflow-auto border-l border-sidebar-border">
         {menu === 'spaces' && <SidebarSpaces />}
         {menu === 'chats' && <SidebarChats />}
         {menu === 'settings' && <SidebarSettings />}
