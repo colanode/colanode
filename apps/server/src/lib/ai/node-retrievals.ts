@@ -1,19 +1,13 @@
-import { MDocument } from '@mastra/rag';
-import { createOpenAI } from '@ai-sdk/openai';
+import { AIDocument } from '@colanode/server/lib/ai/utils';
 import { embed } from 'ai';
 import { sql } from 'kysely';
 
 import { database } from '@colanode/server/data/database';
 import { combineAndScoreSearchResults } from '@colanode/server/lib/ai/utils';
 import { config } from '@colanode/server/lib/config';
+import { getEmbeddingModel } from '@colanode/server/lib/ai/ai-models';
 import { QueryRewriteOutput } from '@colanode/server/types/ai';
 import { SearchResult } from '@colanode/server/types/retrieval';
-
-const embeddingModel = config.ai.enabled
-  ? createOpenAI({ apiKey: config.ai.embedding.apiKey }).embedding(
-      config.ai.embedding.modelName
-    )
-  : undefined;
 
 export const retrieveNodes = async (
   rewrittenQuery: QueryRewriteOutput,
@@ -21,8 +15,8 @@ export const retrieveNodes = async (
   userId: string,
   limit?: number,
   contextNodeIds?: string[]
-): Promise<MDocument[]> => {
-  if (!config.ai.enabled || !embeddingModel) {
+): Promise<AIDocument[]> => {
+  if (!config.ai.enabled) {
     return [];
   }
 
@@ -33,9 +27,15 @@ export const retrieveNodes = async (
 
   let semanticResults: SearchResult[] = [];
   if (doSemantic) {
+    const embeddingModel = getEmbeddingModel();
     const { embedding } = await embed({
       model: embeddingModel,
       value: rewrittenQuery.semanticQuery,
+      providerOptions: {
+        openai: {
+          dimensions: config.ai.embedding.dimensions,
+        },
+      },
     });
     if (embedding) {
       semanticResults = await semanticSearchNodes(
@@ -84,7 +84,7 @@ const semanticSearchNodes = async (
       'nodes.created_at',
       'nodes.created_by',
       'node_embeddings.chunk as chunk_index',
-      sql<number>`${sql.raw(`'[${embedding}]'::vector`)} <=> node_embeddings.embedding_vector`.as(
+      sql<number>`1 - (${sql.raw(`'[${embedding}]'::vector`)} <=> node_embeddings.embedding_vector)`.as(
         'similarity'
       ),
     ])
@@ -99,15 +99,10 @@ const semanticSearchNodes = async (
   }
 
   const results = await queryBuilder
-    .groupBy([
-      'node_embeddings.node_id',
-      'node_embeddings.text',
-      'nodes.created_at',
-      'nodes.created_by',
-      'node_embeddings.chunk',
-      'node_embeddings.summary',
-    ])
-    .orderBy('similarity', 'asc')
+    .distinctOn(['node_embeddings.node_id', 'node_embeddings.chunk'])
+    .orderBy('node_embeddings.node_id')
+    .orderBy('node_embeddings.chunk')
+    .orderBy('similarity', 'desc')
     .limit(limit)
     .execute();
 
@@ -194,8 +189,8 @@ const keywordSearchNodes = async (
 const combineSearchResults = async (
   semanticResults: SearchResult[],
   keywordResults: SearchResult[]
-): Promise<MDocument[]> => {
-  if (!config.ai.enabled || !embeddingModel) {
+): Promise<AIDocument[]> => {
+  if (!config.ai.enabled) {
     return [];
   }
 

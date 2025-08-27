@@ -1,4 +1,3 @@
-import { createOpenAI } from '@ai-sdk/openai';
 import { embedMany } from 'ai';
 import { sql } from 'kysely';
 
@@ -7,6 +6,7 @@ import { database } from '@colanode/server/data/database';
 import { CreateNodeEmbedding } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
 import { chunkText } from '@colanode/server/lib/ai/chunking';
+import { getEmbeddingModel } from '@colanode/server/lib/ai/ai-models';
 import { config } from '@colanode/server/lib/config';
 import { fetchNode } from '@colanode/server/lib/nodes';
 
@@ -58,8 +58,7 @@ export const nodeEmbedHandler: JobHandler<NodeEmbedInput> = async (input) => {
     return;
   }
 
-  const openaiClient = createOpenAI({ apiKey: config.ai.embedding.apiKey });
-  const embeddingModel = openaiClient.embedding(config.ai.embedding.modelName);
+  const embeddingModel = getEmbeddingModel();
 
   const existingEmbeddings = await database
     .selectFrom('node_embeddings')
@@ -79,7 +78,7 @@ export const nodeEmbedHandler: JobHandler<NodeEmbedInput> = async (input) => {
 
   const textChunks = await chunkText(
     fullText,
-    existingEmbeddings.map((e) => ({
+    existingEmbeddings.map((e: { text: string; summary: string | null }) => ({
       text: e.text,
       summary: e.summary ?? undefined,
     })),
@@ -93,7 +92,9 @@ export const nodeEmbedHandler: JobHandler<NodeEmbedInput> = async (input) => {
       continue;
     }
 
-    const existing = existingEmbeddings.find((e) => e.chunk === i);
+    const existing = existingEmbeddings.find(
+      (e: { chunk: number; text: string }) => e.chunk === i
+    );
     if (existing && existing.text === chunk.text) {
       continue;
     }
@@ -124,6 +125,11 @@ export const nodeEmbedHandler: JobHandler<NodeEmbedInput> = async (input) => {
     const { embeddings: embeddingVectors } = await embedMany({
       model: embeddingModel,
       values: textsToEmbed,
+      providerOptions: {
+        openai: {
+          dimensions: config.ai.embedding.dimensions,
+        },
+      },
     });
     for (let j = 0; j < batch.length; j++) {
       const vector = embeddingVectors[j];
@@ -134,10 +140,16 @@ export const nodeEmbedHandler: JobHandler<NodeEmbedInput> = async (input) => {
     }
   }
 
+  // Filter out entries with empty vectors
+  const ready = embeddingsToUpsert.filter((e) => e.embedding_vector.length > 0);
+  if (ready.length === 0) {
+    return;
+  }
+
   await database
     .insertInto('node_embeddings')
     .values(
-      embeddingsToUpsert.map((embedding) => ({
+      ready.map((embedding) => ({
         node_id: embedding.node_id,
         chunk: embedding.chunk,
         revision: embedding.revision,

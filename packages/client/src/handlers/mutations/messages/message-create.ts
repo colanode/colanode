@@ -59,7 +59,7 @@ export class MessageCreateMutationHandler
 
     const messageAttributes: MessageAttributes = {
       type: 'message',
-      subtype: 'standard',
+      subtype: input.subtype ?? 'standard',
       parentId: input.parentId,
       content: blocks,
       referenceId: input.referenceId,

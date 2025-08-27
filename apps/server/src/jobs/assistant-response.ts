@@ -5,12 +5,10 @@ import {
   getNodeModel,
   MessageAttributes,
 } from '@colanode/core';
-import { Mastra } from '@mastra/core';
-import { RuntimeContext } from '@mastra/core/runtime-context';
 import { database } from '@colanode/server/data/database';
 import { SelectNode } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
-import { assistantWorkflow } from '@colanode/server/lib/ai/ai-workflow';
+import { runAssistantWorkflow } from '@colanode/server/lib/ai/ai-workflow';
 import {
   AssistantWorkflowInput,
   AssistantWorkflowOutput,
@@ -91,10 +89,10 @@ export const assistantRespondHandler: JobHandler<
     console.log(`🚀 Processing AI assistant request for message: ${messageId}`);
     const startTime = Date.now();
 
-    // Prepare request for the AI service
     const assistantRequest: AssistantWorkflowInput = {
       userInput: messageText,
       workspaceId,
+      workspaceName: workspace.name || workspaceId,
       userId: user.id,
       userDetails: {
         name: user.name || 'User',
@@ -105,54 +103,19 @@ export const assistantRespondHandler: JobHandler<
       selectedContextNodeIds,
     };
 
-    // Prepare runtime context
-    const runtimeContext = new RuntimeContext();
-    runtimeContext.set('workspaceName', workspace.name || workspaceId);
-    runtimeContext.set('userName', user.name || 'User');
-    runtimeContext.set('userEmail', user.email || '');
-    runtimeContext.set('workspaceId', workspaceId);
-    runtimeContext.set('userId', user.id);
-    runtimeContext.set('selectedContextNodeIds', selectedContextNodeIds || []);
-    runtimeContext.set('userInput', messageText);
-
-    // Initialize Mastra and get the workflow
-    const mastra = new Mastra({
-      workflows: {
-        assistantWorkflow,
-      },
-    });
-    const workflow = mastra.getWorkflow('assistantWorkflow');
-    const run = await workflow.createRunAsync();
-
-    // Execute the workflow
-    const result = await run.start({
-      inputData: assistantRequest,
-      runtimeContext,
-    });
-
-    if (result.status !== 'success' || !result.result) {
-      const errorMessage =
-        result.status === 'suspended'
-          ? 'Workflow was suspended unexpectedly'
-          : (result as any).error || 'Workflow execution failed';
-      console.error('❌ Workflow failed:', errorMessage);
-      throw new Error(errorMessage);
-    }
-
-    const assistantResult: AssistantWorkflowOutput = {
-      ...result.result,
-      processingTimeMs: Date.now() - startTime,
-    };
+    const result: AssistantWorkflowOutput =
+      await runAssistantWorkflow(assistantRequest);
+    result.processingTimeMs = Date.now() - startTime;
 
     console.log(
-      `✅ AI response generated (${assistantResult.processingTimeMs}ms): ${
-        assistantResult.searchPerformed ? 'with search' : 'no search'
+      `✅ AI response generated (${result.processingTimeMs}ms): ${
+        result.searchPerformed ? 'with search' : 'no search'
       }`
     );
 
     await createAndPublishResponse(
-      assistantResult.finalAnswer,
-      assistantResult.citations,
+      result.finalAnswer,
+      result.citations,
       message,
       workspaceId
     );

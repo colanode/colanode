@@ -9,7 +9,9 @@ export type AITask =
   | 'response' // Main assistant responses
   | 'intentRecognition' // Intent classification
   | 'rerank' // Document reranking
-  | 'databaseFilter'; // Database filtering
+  | 'databaseFilter' // Database filtering
+  | 'queryRewrite' // Query rewriting
+  | 'contextEnhancer'; // Context enhancement for chunks
 
 export const getModelForTask = (task: AITask) => {
   if (!config.ai.enabled) {
@@ -75,9 +77,31 @@ export const getAvailableProviders = (): AIProvider[] => {
   ) as AIProvider[];
 };
 
+export const getEmbeddingModel = () => {
+  if (!config.ai.enabled) {
+    throw new Error('AI is disabled in configuration.');
+  }
+
+  const { provider, modelName, apiKey } = config.ai.embedding;
+
+  if (provider === 'openai') {
+    process.env.OPENAI_API_KEY = apiKey;
+    return openai.textEmbeddingModel(modelName);
+  }
+
+  if (provider === 'google') {
+    process.env.GOOGLE_GENERATIVE_AI_API_KEY = apiKey;
+    return google.textEmbedding(modelName);
+  }
+
+  throw new Error(`Unsupported embedding provider: ${provider}`);
+};
+
 export const ModelConfig = {
   forAssistant: () => getModelForTask('response'),
   forIntentRecognition: () => getModelForTask('intentRecognition'),
   forReranking: () => getModelForTask('rerank'),
   forDatabaseFilter: () => getModelForTask('databaseFilter'),
+  forQueryRewrite: () => getModelForTask('queryRewrite'),
+  forContextEnhancer: () => getModelForTask('contextEnhancer'),
 } as const;

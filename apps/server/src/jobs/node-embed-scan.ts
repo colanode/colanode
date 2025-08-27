@@ -25,6 +25,7 @@ declare module '@colanode/server/jobs' {
 export const nodeEmbedScanHandler: JobHandler<
   NodeEmbedScanInput
 > = async () => {
+  console.log('node embed scan job');
   if (!config.ai.enabled) {
     return;
   }

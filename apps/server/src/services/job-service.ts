@@ -20,7 +20,9 @@ class JobService {
   private readonly prefix = `{${config.redis.jobs.prefix}}`;
 
   public async initQueue(): Promise<void> {
+    console.log('initQueue');
     if (this.jobQueue) {
+      console.log('jobQueue already initialized');
       return;
     }
 
@@ -39,11 +41,14 @@ class JobService {
       logger.error(error, `Job queue error`);
     });
 
+    console.log('initRecurringJobs');
     await this.initRecurringJobs();
   }
 
   public async initWorker() {
+    console.log('initWorker');
     if (this.jobWorker) {
+      console.log('jobWorker already initialized');
       return;
     }
 
@@ -61,7 +66,36 @@ class JobService {
       throw new Error('Job queue not initialized.');
     }
 
+    console.log('adding job', job.type);
     await this.jobQueue.add(job.type, job, options);
+  }
+
+  public async removeJob(jobId: string) {
+    if (!this.jobQueue) {
+      throw new Error('Job queue not initialized.');
+    }
+
+    console.log(`Removing job ${jobId}`);
+    const job = await this.jobQueue.getJob(jobId);
+    if (job) {
+      await job.remove();
+      console.log(`Successfully removed job ${jobId}`);
+    } else {
+      console.log(`Job ${jobId} not found, nothing to remove`);
+    }
+  }
+
+  public async getJob(jobId: string): Promise<Job | null> {
+    if (!this.jobQueue) {
+      throw new Error('Job queue not initialized.');
+    }
+
+    try {
+      return await this.jobQueue.getJob(jobId);
+    } catch (error) {
+      console.error(`Error getting job ${jobId}:`, error);
+      return null;
+    }
   }
 
   private handleJobJob = async (job: Job) => {

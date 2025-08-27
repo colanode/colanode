@@ -1,4 +1,4 @@
-import { MDocument } from '@mastra/rag';
+import ms from 'ms';
 import { SearchResult } from '@colanode/server/types/retrieval';
 
 export const formatDate = (date?: Date | null): string => {
@@ -33,8 +33,8 @@ const processSearchResult = (
   const key = createKey(result);
   const recencyBoost = calculateRecencyBoost(result.createdAt);
   const normalizedScore = isKeyword
-    ? (result.score / maxScore) * weight
-    : ((maxScore - result.score) / maxScore) * weight;
+    ? (result.score / maxScore) * weight // rank normalized
+    : Math.max(0, Math.min(1, result.score)) * weight; // similarity already 0..1
 
   if (combined.has(key)) {
     const existing = combined.get(key)!;
@@ -47,27 +47,12 @@ const processSearchResult = (
   }
 };
 
-const createDocumentFromResult = (
-  result: SearchResult & { finalScore: number },
-  authorMap: Map<string, { id: string; name: string | null }>
-): MDocument => {
-  const author = result.createdBy ? authorMap.get(result.createdBy) : null;
-  const summaryPart = (result.summary ?? '').trim();
-  const content = summaryPart
-    ? `${summaryPart}\n\n${result.text}`
-    : result.text;
-
-  const doc = MDocument.fromText(content, {
-    id: result.id,
-    score: result.finalScore,
-    createdAt: result.createdAt,
-
-    type: (result as any).sourceType ?? 'document',
-    chunkIndex: result.chunkIndex,
-    author: author ? { id: author.id, name: author.name || 'Unknown' } : null,
-  });
-
-  return doc;
+export type AIDocument = {
+  id: string;
+  text: string;
+  summary: string | null;
+  score: number;
+  metadata: Record<string, any>[];
 };
 
 export const combineAndScoreSearchResults = (
@@ -76,7 +61,7 @@ export const combineAndScoreSearchResults = (
   semanticSearchWeight: number,
   keywordSearchWeight: number,
   authorMap: Map<string, { id: string; name: string | null }>
-): Promise<MDocument[]> => {
+): Promise<AIDocument[]> => {
   const maxSemanticScore = Math.max(...semanticResults.map((r) => r.score), 1);
   const maxKeywordScore = Math.max(...keywordResults.map((r) => r.score), 1);
 
@@ -103,6 +88,26 @@ export const combineAndScoreSearchResults = (
   return Promise.resolve(
     Array.from(combined.values())
       .sort((a, b) => b.finalScore - a.finalScore)
-      .map((result) => createDocumentFromResult(result, authorMap))
+      .map((result) => {
+        const author = result.createdBy
+          ? authorMap.get(result.createdBy)
+          : null;
+        const type = (result as any).sourceType ?? 'document';
+        const meta: Record<string, any> = {
+          type,
+          createdAt: result.createdAt ?? null,
+          createdBy: result.createdBy ?? null,
+          chunkIndex: result.chunkIndex,
+        };
+        if (author)
+          meta.author = { id: author.id, name: author.name || 'Unknown' };
+        return {
+          id: result.id,
+          text: result.text,
+          summary: result.summary,
+          score: result.finalScore,
+          metadata: [meta],
+        };
+      })
   );
 };

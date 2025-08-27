@@ -25,6 +25,7 @@ declare module '@colanode/server/jobs' {
 export const documentEmbedScanHandler: JobHandler<
   DocumentEmbedScanInput
 > = async () => {
+  console.log('document embed scan job');
   if (!config.ai.enabled) {
     return;
   }
@@ -55,7 +56,7 @@ export const documentEmbedScanHandler: JobHandler<
           .where('document_id', '=', document.id)
           .execute();
 
-        return;
+        continue;
       }
 
       const firstEmbedding = await database

@@ -7,6 +7,7 @@ export type MessageCreateMutationInput = {
   parentId: string;
   content: JSONContent;
   referenceId?: string;
+  subtype?: 'standard' | 'question';
 };
 
 export type MessageCreateMutationOutput = {

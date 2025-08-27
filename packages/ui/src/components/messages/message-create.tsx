@@ -41,6 +41,7 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
   const messageEditorRef = useRef<MessageEditorRefProps>(null);
   const [content, setContent] = useState<JSONContent | null>(null);
   const [replyTo, setReplyTo] = useState<LocalMessageNode | null>(null);
+  const [askAI, setAskAI] = useState<boolean>(false);
 
   const hasContent = content != null && editorHasContent(content);
 
@@ -79,9 +80,11 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
         workspaceId: workspace.id,
         referenceId: replyTo?.id,
         rootId: conversation.rootId,
+        subtype: askAI ? 'question' : undefined,
       },
       onSuccess: () => {
         setReplyTo(null);
+        setAskAI(false);
         if (messageEditorRef.current) {
           messageEditorRef.current.clear();
           messageEditorRef.current.focus();
@@ -170,6 +173,21 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
             )}
           </div>
           <div className="flex flex-row gap-2">
+            <button
+              type="button"
+              className={`${
+                conversation.canCreateMessage
+                  ? askAI
+                    ? 'text-blue-600'
+                    : 'text-muted-foreground'
+                  : 'text-muted-foreground'
+              }`}
+              disabled={isPending || !conversation.canCreateMessage}
+              onClick={() => setAskAI((v) => !v)}
+              title="Ask AI"
+            >
+              AI
+            </button>
             {isPending ? (
               <Spinner size={20} />
             ) : (

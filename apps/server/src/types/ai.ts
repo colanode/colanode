@@ -8,6 +8,7 @@ export const assistantWorkflowInputSchema = z.object({
   userInput: z.string(),
   workspaceId: z.string(),
   userId: z.string(),
+  workspaceName: z.string(),
   userDetails: z.object({
     name: z.string(),
     email: z.string(),
@@ -54,7 +55,7 @@ export const searchResultsOutputSchema = z.object({
       sourceId: z.string(),
       score: z.number(),
       type: z.string(),
-      metadata: z.record(z.any()),
+      metadata: z.array(z.record(z.string(), z.any())),
     })
   ),
   searchType: z.enum(['semantic', 'keyword', 'database', 'hybrid']),
@@ -68,7 +69,7 @@ export const rankedResultsOutputSchema = z.object({
       sourceId: z.string(),
       relevanceScore: z.number(),
       type: z.string(),
-      metadata: z.record(z.any()),
+      metadata: z.array(z.record(z.string(), z.any())),
     })
   ),
   citations: z.array(
@@ -109,10 +110,29 @@ export const WorkflowConfig = {
 // TYPE EXPORTS
 // ============================================================================
 
-export type AssistantWorkflowInput = z.infer<typeof assistantWorkflowInputSchema>;
-export type AssistantWorkflowOutput = z.infer<typeof assistantWorkflowOutputSchema>;
-export type IntentClassificationOutput = z.infer<typeof intentClassificationOutputSchema>;
+export type AssistantWorkflowInput = z.infer<
+  typeof assistantWorkflowInputSchema
+>;
+export type AssistantWorkflowOutput = z.infer<
+  typeof assistantWorkflowOutputSchema
+>;
+export type IntentClassificationOutput = z.infer<
+  typeof intentClassificationOutputSchema
+>;
 export type QueryRewriteOutput = z.infer<typeof queryRewriteOutputSchema>;
 export type SearchResultsOutput = z.infer<typeof searchResultsOutputSchema>;
 export type RankedResultsOutput = z.infer<typeof rankedResultsOutputSchema>;
 export type AnswerOutput = z.infer<typeof answerOutputSchema>;
+
+// =========================================================================
+// HYBRID SEARCH ARGS
+// =========================================================================
+
+export type HybridSearchArgs = {
+  semanticQuery: string;
+  keywordQuery: string;
+  workspaceId: string;
+  userId: string;
+  maxResults?: number;
+  selectedContextNodeIds?: string[];
+};
