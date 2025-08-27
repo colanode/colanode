@@ -108,7 +108,7 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
           </div>
           <button
             type="button"
-            className="absolute right-2 flex h-6 cursor-pointer flex-row items-center gap-1 rounded-md border bg-white p-1 text-sm text-muted-foreground opacity-0 hover:bg-gray-50 group-hover:opacity-100"
+            className="absolute right-2 flex h-6 cursor-pointer flex-row items-center gap-1 rounded-md border p-1 text-sm text-muted-foreground opacity-0 hover:bg-accent group-hover:opacity-100"
             onClick={() => {
               layout.previewLeft(record.id, true);
             }}

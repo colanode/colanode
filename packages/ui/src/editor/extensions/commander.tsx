@@ -135,23 +135,27 @@ const CommandList = ({
         <div
           id="slash-command"
           ref={commandListContainer}
-          className="z-50 h-auto max-h-[330px] w-72 overflow-y-auto rounded-md border border-stone-200 bg-white px-1 py-2 shadow-md transition-all"
+          className="z-50 max-h-[330px] min-w-[8rem] w-80 overflow-x-hidden overflow-y-auto rounded-md border bg-popover text-popover-foreground p-1 shadow-md animate-in fade-in-0 zoom-in-95 slide-in-from-top-2"
         >
           {items.map((item: EditorCommand, index: number) => (
             <button
               type="button"
-              className={`flex w-full items-center space-x-2 rounded-md px-2 py-1 text-left text-sm text-stone-900 hover:bg-stone-100 ${
-                index === selectedIndex ? 'bg-stone-100 text-stone-900' : ''
+              className={`relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-left outline-hidden select-none focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground ${
+                index === selectedIndex
+                  ? 'bg-accent text-accent-foreground'
+                  : ''
               }`}
               key={item.key}
               onClick={() => selectItem(index)}
             >
-              <div className="flex size-10 min-w-10 items-center justify-center rounded-md border border-stone-200 bg-white">
-                <item.icon className="size-5" />
+              <div className="flex size-10 min-w-10 items-center justify-center rounded-md border bg-background">
+                <item.icon className="size-4 text-foreground" />
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="font-medium">{item.name}</p>
-                <p className="text-xs text-stone-500">{item.description}</p>
+                <p className="text-sm text-muted-foreground">
+                  {item.description}
+                </p>
               </div>
             </button>
           ))}

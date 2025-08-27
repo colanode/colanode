@@ -15,7 +15,7 @@ export const ViewFullscreenButton = () => {
 
   return (
     <button
-      className="flex cursor-pointer items-center rounded-md p-1.5 hover:bg-gray-50"
+      className="flex cursor-pointer items-center rounded-md p-1.5 hover:bg-accent"
       onClick={() => layout.previewLeft(database.id, true)}
     >
       <Fullscreen className="size-4" />

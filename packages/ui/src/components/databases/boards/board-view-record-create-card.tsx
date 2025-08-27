@@ -21,7 +21,7 @@ export const BoardViewRecordCreateCard = ({
   return (
     <button
       type="button"
-      className="animate-fade-in flex h-8 w-full cursor-pointer flex-row items-center gap-1 text-muted-foreground hover:bg-gray-50 mt-2"
+      className="animate-fade-in flex h-8 w-full cursor-pointer flex-row items-center gap-1 text-muted-foreground hover:bg-accent mt-2 rounded-md"
       onClick={() => view.createRecord(filters)}
     >
       <Plus className="size-4" />

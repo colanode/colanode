@@ -38,7 +38,7 @@ export const FolderNodeView = ({ node }: NodeViewProps) => {
   return (
     <NodeViewWrapper
       data-id={node.attrs.id}
-      className="my-0.5 flex h-12 w-full cursor-pointer flex-row items-center gap-1 rounded-md bg-gray-50 p-2 hover:bg-gray-100"
+      className="my-0.5 flex h-10 w-full cursor-pointer flex-row items-center gap-1 rounded-md p-1 hover:bg-accent"
       onClick={() => {
         layout.previewLeft(id, true);
       }}

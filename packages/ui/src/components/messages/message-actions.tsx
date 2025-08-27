@@ -14,7 +14,7 @@ import { defaultEmojis } from '@colanode/ui/lib/assets';
 
 const MessageAction = ({ children }: { children: React.ReactNode }) => {
   return (
-    <li className="flex h-8 w-7 cursor-pointer items-center justify-center hover:bg-gray-200">
+    <li className="flex h-8 w-7 cursor-pointer items-center justify-center hover:bg-accent">
       {children}
     </li>
   );

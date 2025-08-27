@@ -90,7 +90,7 @@ export const TableViewSettings = () => {
                   key={field.id}
                   className={cn(
                     'flex flex-row items-center justify-between gap-2 p-0.5',
-                    'cursor-pointer rounded-md hover:bg-gray-50'
+                    'cursor-pointer rounded-md hover:bg-accent'
                   )}
                 >
                   <div className="flex flex-row items-center gap-2">
@@ -153,7 +153,7 @@ export const TableViewSettings = () => {
               <div className="flex flex-col gap-2 text-sm">
                 <p className="my-1 font-semibold">Settings</p>
                 <div
-                  className="flex cursor-pointer flex-row items-center gap-1 rounded-md p-0.5 hover:bg-gray-50"
+                  className="flex cursor-pointer flex-row items-center gap-1 rounded-md p-0.5 hover:bg-accent"
                   onClick={() => {
                     setOpenDelete(true);
                     setOpen(false);

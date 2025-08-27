@@ -87,7 +87,7 @@ export const TableViewFieldHeader = ({
           topRight: false,
         }}
         handleClasses={{
-          right: 'opacity-0 hover:opacity-100 bg-blue-300',
+          right: 'opacity-0 hover:opacity-100 bg-blue-300 dark:bg-blue-900',
         }}
         handleStyles={{
           right: {
@@ -104,9 +104,9 @@ export const TableViewFieldHeader = ({
           <PopoverTrigger asChild>
             <div
               className={cn(
-                'flex h-8 w-full cursor-pointer flex-row items-center gap-1 p-1 text-sm hover:bg-gray-50',
+                'flex h-8 w-full cursor-pointer flex-row items-center gap-1 p-1 text-sm hover:bg-accent',
                 dropMonitor.isOver && dropMonitor.canDrop
-                  ? 'border-r-2 border-blue-300'
+                  ? 'border-r-2 border-blue-300 dark:border-blue-900'
                   : 'border-r'
               )}
               ref={dragDropRef as React.LegacyRef<HTMLDivElement>}
@@ -121,7 +121,7 @@ export const TableViewFieldHeader = ({
             {canSort && (
               <Fragment>
                 <div
-                  className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
+                  className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent rounded-sm"
                   onClick={() => {
                     view.initFieldSort(viewField.field.id, 'asc');
                     setOpenPopover(false);
@@ -132,7 +132,7 @@ export const TableViewFieldHeader = ({
                 </div>
 
                 <div
-                  className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
+                  className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent rounded-sm"
                   onClick={() => {
                     view.initFieldSort(viewField.field.id, 'desc');
                     setOpenPopover(false);
@@ -145,7 +145,7 @@ export const TableViewFieldHeader = ({
             )}
             {canFilter && (
               <div
-                className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
+                className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent rounded-sm"
                 onClick={() => {
                   view.initFieldFilter(viewField.field.id);
                   setOpenPopover(false);
@@ -158,7 +158,7 @@ export const TableViewFieldHeader = ({
             <Separator />
             {database.canEdit && (
               <div
-                className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
+                className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent rounded-sm"
                 onClick={() => {
                   view.setFieldDisplay(viewField.field.id, false);
                 }}
@@ -169,7 +169,7 @@ export const TableViewFieldHeader = ({
             )}
             {database.canEdit && (
               <div
-                className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
+                className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent rounded-sm"
                 onClick={() => {
                   setShowDeleteDialog(true);
                 }}

@@ -34,7 +34,7 @@ export const BoardViewRecordCard = () => {
       ref={dragRef as React.Ref<HTMLDivElement>}
       role="presentation"
       key={record.id}
-      className="animate-fade-in flex cursor-pointer flex-col gap-1 rounded-md border p-2 text-left hover:bg-gray-50"
+      className="animate-fade-in flex cursor-pointer flex-col gap-1 rounded-md border p-2 text-left hover:bg-accent"
       onClick={() => {
         layout.previewLeft(record.id, true);
       }}

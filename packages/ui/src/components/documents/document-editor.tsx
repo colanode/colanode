@@ -250,7 +250,7 @@ export const DocumentEditor = ({
       editorProps: {
         attributes: {
           class:
-            'prose-lg prose-stone dark:prose-invert prose-headings:font-title font-default focus:outline-none max-w-full',
+            'prose-lg prose-stone dark:prose-invert prose-headings:font-title font-default focus:outline-none max-w-full text-primary',
           spellCheck: 'false',
         },
         handleKeyDown: (_, event) => {

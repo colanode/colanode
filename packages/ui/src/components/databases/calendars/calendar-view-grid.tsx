@@ -109,7 +109,7 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
           defaultClassNames.weekday
         ),
         week: cn(
-          'flex w-full mt-2 border-b first:border-t border-gray-100',
+          'flex w-full mt-2 border-b first:border-t border-border',
           defaultClassNames.week
         ),
         week_number_header: cn(

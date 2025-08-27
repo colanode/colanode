@@ -25,7 +25,7 @@ export const RecordField = ({ field }: RecordFieldProps) => {
     <Fragment>
       <Popover modal={true}>
         <PopoverTrigger asChild>
-          <div className="flex h-8 w-full cursor-pointer flex-row items-center gap-1 p-1 text-sm hover:bg-gray-50">
+          <div className="flex h-8 w-full cursor-pointer flex-row items-center gap-1 p-1 text-sm hover:bg-accent">
             <FieldIcon type={field.type} className="size-4" />
             <p>{field.name}</p>
           </div>
@@ -35,7 +35,7 @@ export const RecordField = ({ field }: RecordFieldProps) => {
           <Separator />
           {database.canEdit && (
             <div
-              className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
+              className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent"
               onClick={() => {
                 setShowDeleteDialog(true);
               }}

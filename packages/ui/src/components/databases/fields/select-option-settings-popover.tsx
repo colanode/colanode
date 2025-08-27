@@ -59,7 +59,7 @@ export const SelectOptionSettingsPopover = ({
             return (
               <div
                 key={color.value}
-                className="flex cursor-pointer flex-row items-center gap-2 rounded-md p-1 hover:bg-gray-100"
+                className="flex cursor-pointer flex-row items-center gap-2 rounded-md p-1 hover:bg-accent"
                 onClick={() => {
                   database.updateSelectOption(fieldId, {
                     ...option,
@@ -74,7 +74,7 @@ export const SelectOptionSettingsPopover = ({
           })}
           <Separator className="my-1" />
           <div
-            className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
+            className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent rounded-md"
             onClick={() => {
               setOpenDeleteDialog(true);
               setOpenSetttingsPopover(false);

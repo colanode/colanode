@@ -55,7 +55,7 @@ export const TableViewNameHeader = () => {
         topRight: false,
       }}
       handleClasses={{
-        right: 'opacity-0 hover:opacity-100 bg-blue-300',
+        right: 'opacity-0 hover:opacity-100 bg-blue-300 dark:bg-blue-900',
       }}
       handleStyles={{
         right: {
@@ -72,9 +72,9 @@ export const TableViewNameHeader = () => {
         <PopoverTrigger asChild>
           <div
             className={cn(
-              'flex h-8 w-full cursor-pointer flex-row items-center gap-1 p-1 text-sm hover:bg-gray-50',
+              'flex h-8 w-full cursor-pointer flex-row items-center gap-1 p-1 text-sm hover:bg-accent',
               dropMonitor.isOver && dropMonitor.canDrop
-                ? 'border-r-2 border-blue-300'
+                ? 'border-r-2 border-blue-300 dark:border-blue-900'
                 : 'border-r'
             )}
             ref={dropDivRef as React.Ref<HTMLDivElement>}
@@ -98,7 +98,7 @@ export const TableViewNameHeader = () => {
           {database.canEdit && (
             <Fragment>
               <div
-                className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
+                className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent rounded-sm"
                 onClick={() => {
                   view.initFieldSort(SpecialId.Name, 'asc');
                   setOpenPopover(false);
@@ -109,7 +109,7 @@ export const TableViewNameHeader = () => {
               </div>
 
               <div
-                className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
+                className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent rounded-sm"
                 onClick={() => {
                   view.initFieldSort(SpecialId.Name, 'desc');
                   setOpenPopover(false);
@@ -121,7 +121,7 @@ export const TableViewNameHeader = () => {
             </Fragment>
           )}
           <div
-            className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-gray-100"
+            className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent rounded-sm"
             onClick={() => {
               view.initFieldFilter(SpecialId.Name);
               setOpenPopover(false);

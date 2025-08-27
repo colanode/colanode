@@ -118,7 +118,7 @@ export const TableNodeView = ({ editor, getPos }: NodeViewProps) => {
             <Tooltip delayDuration={500}>
               <TooltipTrigger asChild>
                 <button
-                  className="w-4 h-full hover:bg-gray-50 cursor-pointer flex items-center justify-center rounded-sm transition-colors text-muted-foreground text-xs"
+                  className="w-4 h-full hover:bg-accent cursor-pointer flex items-center justify-center rounded-sm transition-colors text-muted-foreground text-xs"
                   onClick={() => {
                     if (focusTable()) {
                       editor.chain().addColumnAfter().run();
@@ -140,7 +140,7 @@ export const TableNodeView = ({ editor, getPos }: NodeViewProps) => {
             <Tooltip delayDuration={500}>
               <TooltipTrigger asChild>
                 <button
-                  className="h-4 w-full hover:bg-gray-50 cursor-pointer flex items-center justify-center rounded-sm transition-colors text-muted-foreground text-xs"
+                  className="h-4 w-full hover:bg-accent cursor-pointer flex items-center justify-center rounded-sm transition-colors text-muted-foreground text-xs"
                   onClick={() => {
                     if (focusTable()) {
                       editor.chain().addRowAfter().run();

@@ -11,7 +11,7 @@ export const defaultClasses = {
   codeBlockHeader:
     'flex flex-row items-center justify-between text-muted-foreground font-sans border-b pb-2 mb-2 text-xs',
   code: 'whitespace-pre-wrap rounded-md bg-muted px-[0.3em] py-[0.2em] font-mono text-sm',
-  blockquote: 'p-2 my-1 border-l-4 border-gray-300 bg-gray-50',
+  blockquote: 'p-2 my-1 border-l-4 border-border bg-muted',
   taskList: 'not-prose pl-2',
   taskItem: 'flex items-start my-1',
   link: 'font-medium underline underline-offset-4 cursor-pointer',

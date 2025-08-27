@@ -40,7 +40,7 @@ export const TableCellNodeView = (props: NodeViewProps) => {
           className={cn(
             defaultClasses.tableCell,
             'relative',
-            isActive && 'outline outline-gray-400',
+            isActive && 'outline outline-primary',
             backgroundColor?.bgClass,
             align === 'left' && 'justify-start',
             align === 'center' && 'justify-center',
@@ -65,7 +65,7 @@ export const TableCellNodeView = (props: NodeViewProps) => {
             topRight: false,
           }}
           handleClasses={{
-            right: 'opacity-0 hover:opacity-100 bg-blue-300',
+            right: 'opacity-0 hover:opacity-100 bg-blue-300 dark:bg-blue-900',
           }}
           handleStyles={{
             right: {

@@ -161,9 +161,9 @@ export const ViewCreateDialog = ({
                         key={viewType.name}
                         className={cn(
                           'flex cursor-pointer flex-col items-center gap-2 rounded-md border p-3 text-muted-foreground',
-                          'hover:border-gray-500 hover:bg-gray-50 cursor-pointer',
+                          'hover:bg-accent cursor-pointer',
                           viewType.type === field.value
-                            ? 'border-gray-500 text-primary'
+                            ? 'border-primary text-primary'
                             : ''
                         )}
                         onClick={() => {

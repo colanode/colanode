@@ -31,7 +31,7 @@ export const FileBlock = ({ id }: FileBlockProps) => {
   if (canPreview) {
     return (
       <div
-        className="flex h-72 max-h-72 max-w-128 w-full cursor-pointer overflow-hidden rounded-md p-2 hover:bg-gray-100"
+        className="flex h-72 max-h-72 max-w-128 w-full cursor-pointer overflow-hidden rounded-md p-2 hover:bg-muted/50"
         onClick={() => {
           layout.previewLeft(id, true);
         }}
@@ -43,7 +43,7 @@ export const FileBlock = ({ id }: FileBlockProps) => {
 
   return (
     <div
-      className="flex flex-row gap-4 items-center w-full cursor-pointer overflow-hidden rounded-md p-2 pl-0 hover:bg-gray-100"
+      className="flex flex-row gap-4 items-center w-full cursor-pointer overflow-hidden rounded-md p-2 pl-0 hover:bg-accent"
       onClick={() => {
         layout.previewLeft(id, true);
       }}

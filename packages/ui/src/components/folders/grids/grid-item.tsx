@@ -19,7 +19,7 @@ export const GridItem = ({ id, children }: GridItemProps) => {
       ref={ref}
       className={cn(
         'flex cursor-pointer select-none flex-col items-center gap-2 p-2',
-        selected ? 'bg-blue-100' : 'hover:bg-blue-50'
+        selected ? 'bg-accent' : 'hover:bg-accent'
       )}
       onClick={(event) => folder.onClick(event, id)}
       onDoubleClick={(event) => folder.onDoubleClick(event, id)}

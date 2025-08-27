@@ -51,7 +51,7 @@ export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
   return (
     <NodeViewWrapper
       data-id={node.attrs.id}
-      className="flex max-h-72 w-full cursor-pointer overflow-hidden rounded-md p-2 hover:bg-gray-100"
+      className="flex max-h-72 w-full cursor-pointer overflow-hidden rounded-md p-2 hover:bg-accent"
     >
       <div className="group/temp-file relative">
         <button

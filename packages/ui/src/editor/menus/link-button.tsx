@@ -51,7 +51,7 @@ export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
       <PopoverTrigger>
         <span
           className={cn(
-            'flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-gray-100',
+            'flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-accent',
             state?.isActive ? 'bg-gray-100' : 'bg-white'
           )}
         >
@@ -81,7 +81,7 @@ export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
           {state?.attributes.href ? (
             <button
               type="button"
-              className="flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-gray-100"
+              className="flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-accent"
               onClick={(e) => {
                 e.preventDefault();
                 editor.chain().focus().unsetLink().run();

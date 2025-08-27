@@ -11,7 +11,7 @@ export const IconPickerItem = ({ icon }: IconPickerItemProps) => {
 
   return (
     <button
-      className="p-1 ring-gray-100 transition-colors duration-100 ease-in-out hover:bg-gray-100 focus:border-gray-100 focus:outline-none focus:ring"
+      className="p-1 ring-gray-100 transition-colors duration-100 ease-in-out hover:bg-accent focus:border-gray-100 focus:outline-none focus:ring"
       onClick={() => onIconClick(icon)}
     >
       <IconElement className="h-5 w-5" id={icon.id} />
