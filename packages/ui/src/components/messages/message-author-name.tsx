@@ -26,5 +26,9 @@ export const MessageAuthorName = ({
   }
 
   const user = userGetQuery.data;
-  return <span className={cn('font-medium', className)}>{user.name}</span>;
+  return (
+    <span className={cn('font-medium text-primary', className)}>
+      {user.name}
+    </span>
+  );
 };
