@@ -3,7 +3,6 @@ import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
 import { EmojiSearchQueryInput } from '@colanode/client/queries/emojis/emoji-search';
 import { AppService } from '@colanode/client/services/app-service';
 import { Emoji } from '@colanode/client/types/emojis';
-import { Event } from '@colanode/client/types/events';
 
 export class EmojiSearchQueryHandler
   implements QueryHandler<EmojiSearchQueryInput>
@@ -31,11 +30,9 @@ export class EmojiSearchQueryHandler
     return emojis;
   }
 
-  public async checkForChanges(
-    _: Event,
-    __: EmojiSearchQueryInput,
-    ___: Emoji[]
-  ): Promise<ChangeCheckResult<EmojiSearchQueryInput>> {
+  public async checkForChanges(): Promise<
+    ChangeCheckResult<EmojiSearchQueryInput>
+  > {
     return {
       hasChanges: false,
     };

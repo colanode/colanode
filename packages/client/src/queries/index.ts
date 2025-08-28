@@ -44,6 +44,8 @@ export * from './files/upload-list';
 export * from './files/download-list-manual';
 export * from './files/temp-file-get';
 export * from './files/upload-list-pending';
+export * from './icons/icon-svg-get';
+export * from './emojis/emoji-svg-get';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface QueryMap {}
