@@ -8,7 +8,7 @@ import {
 import { database } from '@colanode/server/data/database';
 import { SelectNode } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
-import { runAssistantWorkflow } from '@colanode/server/lib/ai/ai-workflow';
+import { mastra } from '@colanode/server/lib/ai/mastra';
 import {
   AssistantWorkflowInput,
   AssistantWorkflowOutput,
@@ -103,9 +103,40 @@ export const assistantRespondHandler: JobHandler<
       selectedContextNodeIds,
     };
 
-    const result: AssistantWorkflowOutput =
-      await runAssistantWorkflow(assistantRequest);
-    result.processingTimeMs = Date.now() - startTime;
+    // Execute the assistant workflow directly through Mastra
+    const run = await mastra.getWorkflow('assistantWorkflow').createRunAsync();
+    const workflowResult = await run.start({ inputData: assistantRequest });
+
+    let result: AssistantWorkflowOutput;
+
+    if (workflowResult.status === 'success') {
+      // Extract result from whichever sub-workflow executed (retrieve-subflow or no-context-subflow)
+      const subflowResult =
+        workflowResult.result['retrieve-subflow'] ||
+        workflowResult.result['no-context-subflow'];
+
+      if (subflowResult) {
+        result = {
+          ...subflowResult,
+          processingTimeMs: Date.now() - startTime,
+        };
+      } else {
+        throw new Error('No sub-workflow result found in branched workflow');
+      }
+    } else if (workflowResult.status === 'suspended') {
+      result = {
+        finalAnswer:
+          'This request requires additional input. Please try again.',
+        citations: [],
+        searchPerformed: false,
+        processingTimeMs: Date.now() - startTime,
+      };
+    } else {
+      // failed
+      throw new Error(
+        `Workflow execution failed: ${workflowResult.error || 'Unknown error'}`
+      );
+    }
 
     console.log(
       `✅ AI response generated (${result.processingTimeMs}ms): ${

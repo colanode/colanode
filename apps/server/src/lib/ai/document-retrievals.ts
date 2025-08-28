@@ -5,7 +5,7 @@ import { sql } from 'kysely';
 import { database } from '@colanode/server/data/database';
 import { combineAndScoreSearchResults } from '@colanode/server/lib/ai/utils';
 import { config } from '@colanode/server/lib/config';
-import { getEmbeddingModel } from '@colanode/server/lib/ai/ai-models';
+import { getEmbeddingModel } from '@colanode/server/lib/ai/models';
 import { QueryRewriteOutput } from '@colanode/server/types/ai';
 import { SearchResult } from '@colanode/server/types/retrieval';
 
@@ -58,7 +58,9 @@ export const retrieveDocuments = async (
       )
     : [];
 
-  return combineSearchResults(semanticResults, keywordResults);
+  const res = combineSearchResults(semanticResults, keywordResults);
+  console.log('res', res);
+  return res;
 };
 
 const semanticSearchDocuments = async (
@@ -110,11 +112,6 @@ const semanticSearchDocuments = async (
     .limit(limit)
     .execute();
 
-  console.log(
-    'results text',
-    results.map((r) => r.text)
-  );
-
   return results.map((result) => ({
     id: result.id,
     text: result.text,
@@ -135,6 +132,7 @@ const keywordSearchDocuments = async (
   limit: number,
   contextNodeIds?: string[]
 ): Promise<SearchResult[]> => {
+  console.log('Keyword search query:', query);
   let queryBuilder = database
     .selectFrom('document_embeddings')
     .innerJoin('documents', 'documents.id', 'document_embeddings.document_id')
@@ -183,6 +181,8 @@ const keywordSearchDocuments = async (
     .limit(limit)
     .execute();
 
+  console.log('Keyword search results count:', results.length);
+
   return results.map((result) => ({
     id: result.id,
     text: result.text,
@@ -204,6 +204,8 @@ const combineSearchResults = async (
     return [];
   }
 
+  console.log('semanticResults', semanticResults);
+  console.log('keywordResults', keywordResults);
   const { semanticSearchWeight, keywordSearchWeight } =
     config.ai.retrieval.hybridSearch;
 

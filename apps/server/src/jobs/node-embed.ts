@@ -6,7 +6,7 @@ import { database } from '@colanode/server/data/database';
 import { CreateNodeEmbedding } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
 import { chunkText } from '@colanode/server/lib/ai/chunking';
-import { getEmbeddingModel } from '@colanode/server/lib/ai/ai-models';
+import { getEmbeddingModel } from '@colanode/server/lib/ai/models';
 import { config } from '@colanode/server/lib/config';
 import { fetchNode } from '@colanode/server/lib/nodes';
 

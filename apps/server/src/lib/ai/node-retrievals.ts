@@ -5,7 +5,7 @@ import { sql } from 'kysely';
 import { database } from '@colanode/server/data/database';
 import { combineAndScoreSearchResults } from '@colanode/server/lib/ai/utils';
 import { config } from '@colanode/server/lib/config';
-import { getEmbeddingModel } from '@colanode/server/lib/ai/ai-models';
+import { getEmbeddingModel } from '@colanode/server/lib/ai/models';
 import { QueryRewriteOutput } from '@colanode/server/types/ai';
 import { SearchResult } from '@colanode/server/types/retrieval';
 

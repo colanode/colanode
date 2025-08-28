@@ -15,6 +15,7 @@ import {
   MutationStatus,
   UpdateNodeMutationData,
 } from '@colanode/core';
+import { MessageAttributes } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
 import { database } from '@colanode/server/data/database';
 import {
@@ -202,6 +203,32 @@ export const createNode = async (input: CreateNodeInput): Promise<boolean> => {
 
     await scheduleNodeEmbedding(createdNode);
 
+    // Trigger assistant response for question messages
+    if (attributes.type === 'message') {
+      const maybeMessage = attributes as Partial<MessageAttributes>;
+      logger.info(
+        `Message created with subtype: ${maybeMessage.subtype} for node ${input.nodeId}`
+      );
+
+      if (maybeMessage.subtype === 'question') {
+        try {
+          await jobService.addJob({
+            type: 'assistant.respond',
+            messageId: input.nodeId,
+            workspaceId: input.workspaceId,
+          });
+          logger.info(
+            `Assistant response job scheduled for message ${input.nodeId}`
+          );
+        } catch (error) {
+          logger.error(
+            error,
+            `Failed to schedule assistant response job for message ${input.nodeId}`
+          );
+        }
+      }
+    }
+
     return true;
   } catch (error) {
     logger.error(error, `Failed to create node transaction`);
@@ -343,6 +370,32 @@ export const tryUpdateNode = async (
 
     await scheduleNodeEmbedding(updatedNode);
 
+    // Trigger assistant response for question messages
+    if (attributes.type === 'message') {
+      const maybeMessage = attributes as Partial<MessageAttributes>;
+      logger.info(
+        `Message updated with subtype: ${maybeMessage.subtype} for node ${input.nodeId}`
+      );
+
+      if (maybeMessage.subtype === 'question') {
+        try {
+          await jobService.addJob({
+            type: 'assistant.respond',
+            messageId: input.nodeId,
+            workspaceId: input.workspaceId,
+          });
+          logger.info(
+            `Assistant response job scheduled for updated message ${input.nodeId}`
+          );
+        } catch (error) {
+          logger.error(
+            error,
+            `Failed to schedule assistant response job for updated message ${input.nodeId}`
+          );
+        }
+      }
+    }
+
     return {
       type: 'success',
       output: updatedNode,
@@ -469,6 +522,32 @@ export const createNodeFromMutation = async (
     }
 
     await scheduleNodeEmbedding(createdNode);
+
+    // Trigger assistant response for question messages
+    if (attributes.type === 'message') {
+      const maybeMessage = attributes as Partial<MessageAttributes>;
+      logger.info(
+        `Message created from mutation with subtype: ${maybeMessage.subtype} for node ${mutation.nodeId}`
+      );
+
+      if (maybeMessage.subtype === 'question') {
+        try {
+          await jobService.addJob({
+            type: 'assistant.respond',
+            messageId: mutation.nodeId,
+            workspaceId: user.workspace_id,
+          });
+          logger.info(
+            `Assistant response job scheduled for mutation message ${mutation.nodeId}`
+          );
+        } catch (error) {
+          logger.error(
+            error,
+            `Failed to schedule assistant response job for mutation message ${mutation.nodeId}`
+          );
+        }
+      }
+    }
 
     return MutationStatus.CREATED;
   } catch (error) {
@@ -634,6 +713,32 @@ const tryUpdateNodeFromMutation = async (
     }
 
     await scheduleNodeEmbedding(updatedNode);
+
+    // Trigger assistant response for question messages
+    if (attributes.type === 'message') {
+      const maybeMessage = attributes as Partial<MessageAttributes>;
+      logger.info(
+        `Message updated from mutation with subtype: ${maybeMessage.subtype} for node ${mutation.nodeId}`
+      );
+
+      if (maybeMessage.subtype === 'question') {
+        try {
+          await jobService.addJob({
+            type: 'assistant.respond',
+            messageId: mutation.nodeId,
+            workspaceId: user.workspace_id,
+          });
+          logger.info(
+            `Assistant response job scheduled for updated mutation message ${mutation.nodeId}`
+          );
+        } catch (error) {
+          logger.error(
+            error,
+            `Failed to schedule assistant response job for updated mutation message ${mutation.nodeId}`
+          );
+        }
+      }
+    }
 
     return { type: 'success', output: MutationStatus.OK };
   } catch {

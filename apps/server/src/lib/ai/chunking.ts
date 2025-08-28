@@ -2,7 +2,7 @@ import { generateText } from 'ai';
 import type { NodeType } from '@colanode/core';
 import { config } from '@colanode/server/lib/config';
 import { TextChunk } from '@colanode/server/types/chunking';
-import { ModelConfig } from './ai-models';
+import { ModelConfig } from './models';
 
 export const chunkText = async (
   text: string,
