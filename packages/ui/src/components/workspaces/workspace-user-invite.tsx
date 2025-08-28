@@ -31,7 +31,7 @@ export const WorkspaceUserInvite = ({
           {emails.map((email) => (
             <p
               key={email}
-              className="flex h-full flex-row items-center gap-1 border border-gray-200 bg-gray-100 p-0.5 px-1 text-primary shadow"
+              className="flex h-full flex-row items-center gap-1 border border-border bg-accent p-0.5 px-1 text-primary shadow"
             >
               <span>{email}</span>
               <X

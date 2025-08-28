@@ -2,23 +2,25 @@ import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutation
 import { MutationHandler } from '@colanode/client/lib/types';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
-  SpaceAvatarUpdateMutationInput,
-  SpaceAvatarUpdateMutationOutput,
-} from '@colanode/client/mutations/spaces/space-avatar-update';
+  SpaceUpdateMutationInput,
+  SpaceUpdateMutationOutput,
+} from '@colanode/client/mutations/spaces/space-update';
 import { SpaceAttributes } from '@colanode/core';
 
-export class SpaceAvatarUpdateMutationHandler
+export class SpaceUpdateMutationHandler
   extends WorkspaceMutationHandlerBase
-  implements MutationHandler<SpaceAvatarUpdateMutationInput>
+  implements MutationHandler<SpaceUpdateMutationInput>
 {
   async handleMutation(
-    input: SpaceAvatarUpdateMutationInput
-  ): Promise<SpaceAvatarUpdateMutationOutput> {
+    input: SpaceUpdateMutationInput
+  ): Promise<SpaceUpdateMutationOutput> {
     const workspace = this.getWorkspace(input.accountId, input.workspaceId);
 
     const result = await workspace.nodes.updateNode<SpaceAttributes>(
       input.spaceId,
       (attributes) => {
+        attributes.name = input.name;
+        attributes.description = input.description;
         attributes.avatar = input.avatar;
         return attributes;
       }

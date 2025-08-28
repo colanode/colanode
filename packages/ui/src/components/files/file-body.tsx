@@ -27,7 +27,7 @@ export const FileBody = ({ file }: FileBodyProps) => {
           )}
         </div>
       </div>
-      <div className="h-full w-72 min-w-72 overflow-hidden border-l border-gray-100 p-2 pl-3">
+      <div className="h-full w-72 min-w-72 overflow-hidden border-l border-border p-2 pl-3">
         <FileSidebar file={file} />
       </div>
     </div>

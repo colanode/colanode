@@ -15,36 +15,37 @@ import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
-interface SpaceDeleteFormProps {
+interface SpaceDeleteProps {
   id: string;
   onDeleted: () => void;
 }
 
-export const SpaceDeleteForm = ({ id, onDeleted }: SpaceDeleteFormProps) => {
+export const SpaceDelete = ({ id, onDeleted }: SpaceDeleteProps) => {
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   return (
-    <div className="flex flex-col gap-4">
-      <h3 className="font-heading mb-px text-2xl font-semibold tracking-tight">
-        Delete space
-      </h3>
-      <p>Deleting a space is permanent and cannot be undone.</p>
-      <p>
-        All data associated with the space will be deleted, including messages,
-        pages, channels, databases, records, files and more.
-      </p>
-      <div>
-        <Button
-          variant="destructive"
-          onClick={() => {
-            setShowDeleteModal(true);
-          }}
-        >
-          Delete space
-        </Button>
+    <>
+      <div className="flex items-center justify-between gap-6">
+        <div className="flex-1 space-y-2">
+          <h3 className="font-semibold">Delete space</h3>
+          <p className="text-sm text-muted-foreground">
+            Once you delete a space, there is no going back. Please be certain.
+          </p>
+        </div>
+        <div className="flex-shrink-0">
+          <Button
+            variant="destructive"
+            onClick={() => {
+              setShowDeleteModal(true);
+            }}
+            className="w-20"
+          >
+            Delete
+          </Button>
+        </div>
       </div>
       <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <AlertDialogContent>
@@ -87,6 +88,6 @@ export const SpaceDeleteForm = ({ id, onDeleted }: SpaceDeleteFormProps) => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+    </>
   );
 };

@@ -4,6 +4,7 @@ export type SpaceCreateMutationInput = {
   workspaceId: string;
   name: string;
   description: string;
+  avatar?: string | null;
 };
 
 export type SpaceCreateMutationOutput = {

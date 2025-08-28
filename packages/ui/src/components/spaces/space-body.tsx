@@ -1,17 +1,15 @@
-import { Info, Trash2, Users } from 'lucide-react';
+import { toast } from 'sonner';
 
 import { LocalSpaceNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { NodeCollaborators } from '@colanode/ui/components/collaborators/node-collaborators';
-import { SpaceDeleteForm } from '@colanode/ui/components/spaces/space-delete-form';
-import { SpaceGeneralTab } from '@colanode/ui/components/spaces/space-general-tab';
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@colanode/ui/components/ui/tabs';
+import { SpaceDelete } from '@colanode/ui/components/spaces/space-delete';
+import { SpaceForm } from '@colanode/ui/components/spaces/space-form';
+import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
+import { Separator } from '@colanode/ui/components/ui/separator';
 import { useLayout } from '@colanode/ui/contexts/layout';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface SpaceBodyProps {
   space: LocalSpaceNode;
@@ -19,73 +17,79 @@ interface SpaceBodyProps {
 }
 
 export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
+  const workspace = useWorkspace();
+  const { mutate, isPending } = useMutation();
+
   const layout = useLayout();
   const canEdit = hasNodeRole(role, 'admin');
   const canDelete = hasNodeRole(role, 'admin');
 
   return (
-    <Tabs
-      defaultValue="general"
-      className="grid h-full max-h-full grid-cols-[200px_minmax(0,1fr)] overflow-hidden gap-4"
-    >
-      <TabsList className="flex w-full flex-col items-start justify-start gap-1 rounded-none bg-white">
-        <TabsTrigger
-          key={`tab-trigger-general`}
-          className="w-full justify-start p-2 hover:bg-accent cursor-pointer"
-          value="general"
-        >
-          <Info className="mr-2 size-4" />
-          General
-        </TabsTrigger>
-        <TabsTrigger
-          key={`tab-trigger-collaborators`}
-          className="w-full justify-start p-2 hover:bg-accent cursor-pointer"
-          value="collaborators"
-        >
-          <Users className="mr-2 size-4" />
-          Collaborators
-        </TabsTrigger>
-        {canDelete && (
-          <TabsTrigger
-            key={`tab-trigger-delete`}
-            className="w-full justify-start p-2 hover:bg-accent cursor-pointer"
-            value="delete"
-          >
-            <Trash2 className="mr-2 size-4" />
-            Delete
-          </TabsTrigger>
-        )}
-      </TabsList>
-      <div className="overflow-auto pl-1 max-w-[50rem]">
-        <TabsContent
-          key="tab-content-info"
-          className="focus-visible:ring-0 focus-visible:ring-offset-0"
-          value="general"
-        >
-          <SpaceGeneralTab space={space} readonly={!canEdit} />
-        </TabsContent>
-        <TabsContent
-          key="tab-content-collaborators"
-          className="focus-visible:ring-0 focus-visible:ring-offset-0"
-          value="collaborators"
-        >
+    <Container>
+      <ContainerBody className="max-w-4xl space-y-8">
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">General</h2>
+            <Separator className="mt-3" />
+          </div>
+          <SpaceForm
+            values={{
+              name: space.attributes.name,
+              description: space.attributes.description ?? '',
+              avatar: space.attributes.avatar ?? null,
+            }}
+            readOnly={!canEdit}
+            onSubmit={(values) => {
+              mutate({
+                input: {
+                  type: 'space.update',
+                  accountId: workspace.accountId,
+                  workspaceId: workspace.id,
+                  spaceId: space.id,
+                  name: values.name,
+                  description: values.description,
+                  avatar: values.avatar,
+                },
+                onSuccess() {
+                  toast.success('Space updated');
+                },
+                onError(error) {
+                  toast.error(error.message);
+                },
+              });
+            }}
+            isSaving={isPending}
+            saveText="Update"
+          />
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              Collaborators
+            </h2>
+            <Separator className="mt-3" />
+          </div>
           <NodeCollaborators node={space} nodes={[space]} role={role} />
-        </TabsContent>
+        </div>
+
         {canDelete && (
-          <TabsContent
-            key="tab-content-delete"
-            className="focus-visible:ring-0 focus-visible:ring-offset-0"
-            value="delete"
-          >
-            <SpaceDeleteForm
+          <div className="space-y-6">
+            <div>
+              <h2 className="text-2xl font-semibold tracking-tight">
+                Danger Zone
+              </h2>
+              <Separator className="mt-3" />
+            </div>
+            <SpaceDelete
               id={space.id}
               onDeleted={() => {
                 layout.close(space.id);
               }}
             />
-          </TabsContent>
+          </div>
         )}
-      </div>
-    </Tabs>
+      </ContainerBody>
+    </Container>
   );
 };

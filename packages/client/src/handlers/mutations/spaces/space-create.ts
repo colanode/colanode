@@ -45,6 +45,7 @@ export class SpaceCreateMutationHandler
         [workspace.userId]: 'admin',
       },
       description: input.description,
+      avatar: input.avatar,
     };
 
     await workspace.nodes.createNode({

@@ -114,7 +114,7 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
               />
               <div
                 className={cn(
-                  `absolute left-0 top-0 hidden h-32 w-32 items-center justify-center overflow-hidden bg-gray-50 group-hover:inline-flex`,
+                  `absolute left-0 top-0 hidden h-32 w-32 items-center justify-center overflow-hidden bg-accent/50 group-hover:inline-flex`,
                   isUploadingAvatar ? 'inline-flex' : 'hidden'
                 )}
               >

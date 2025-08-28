@@ -61,12 +61,10 @@ import { RecordFieldValueSetMutationHandler } from './records/record-field-value
 import { RecordNameUpdateMutationHandler } from './records/record-name-update';
 import { ServerCreateMutationHandler } from './servers/server-create';
 import { ServerDeleteMutationHandler } from './servers/server-delete';
-import { SpaceAvatarUpdateMutationHandler } from './spaces/space-avatar-update';
 import { SpaceChildReorderMutationHandler } from './spaces/space-child-reorder';
 import { SpaceCreateMutationHandler } from './spaces/space-create';
 import { SpaceDeleteMutationHandler } from './spaces/space-delete';
-import { SpaceDescriptionUpdateMutationHandler } from './spaces/space-description-update';
-import { SpaceNameUpdateMutationHandler } from './spaces/space-name-update';
+import { SpaceUpdateMutationHandler } from './spaces/space-update';
 import { UserRoleUpdateMutationHandler } from './users/user-role-update';
 import { UserStorageUpdateMutationHandler } from './users/user-storage-update';
 import { UsersCreateMutationHandler } from './users/users-create';
@@ -135,9 +133,7 @@ export const buildMutationHandlerMap = (
     'folder.create': new FolderCreateMutationHandler(app),
     'file.create': new FileCreateMutationHandler(app),
     'file.download': new FileDownloadMutationHandler(app),
-    'space.avatar.update': new SpaceAvatarUpdateMutationHandler(app),
-    'space.description.update': new SpaceDescriptionUpdateMutationHandler(app),
-    'space.name.update': new SpaceNameUpdateMutationHandler(app),
+    'space.update': new SpaceUpdateMutationHandler(app),
     'space.child.reorder': new SpaceChildReorderMutationHandler(app),
     'account.update': new AccountUpdateMutationHandler(app),
     'view.update': new ViewUpdateMutationHandler(app),
