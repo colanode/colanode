@@ -21,7 +21,7 @@ export const AvatarImage = (props: AvatarProps) => {
       <div
         className={cn(
           getAvatarSizeClasses(props.size),
-          'object-cover rounded bg-gray-200',
+          'object-cover rounded bg-muted',
           props.className
         )}
       />

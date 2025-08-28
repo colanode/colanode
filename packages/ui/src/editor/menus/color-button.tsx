@@ -40,7 +40,7 @@ export const ColorButton = ({
   return (
     <Popover open={isOpen} onOpenChange={setIsOpen} modal={true}>
       <PopoverTrigger>
-        <span className="flex size-8 items-center justify-center rounded-md cursor-pointer hover:bg-accent">
+        <span className="flex size-8 items-center justify-center rounded-md cursor-pointer hover:bg-input">
           <Baseline className={cn('size-4', activeColor.textClass)} />
         </span>
       </PopoverTrigger>
@@ -62,9 +62,9 @@ export const ColorButton = ({
                 }
                 setIsOpen(false);
               }}
-              className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-accent cursor-pointer"
+              className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-input cursor-pointer"
             >
-              <div className="relative inline-flex size-6 items-center justify-center overflow-hidden rounded bg-gray-50 shadow">
+              <div className="relative inline-flex size-6 items-center justify-center overflow-hidden rounded bg-muted shadow">
                 <span className={cn('font-medium', color.textClass)}>A</span>
               </div>
               <span>{color.name}</span>

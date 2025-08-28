@@ -26,7 +26,7 @@ export const MessageReplyBanner = ({
   }
 
   return (
-    <div className="flex flex-row items-center justify-between rounded-t-lg border-b-2 bg-gray-100 p-2 text-foreground">
+    <div className="flex flex-row items-center justify-between rounded-t-lg border-b-2 bg-muted p-2 text-foreground">
       <p className="text-sm">
         Replying to{' '}
         <span className="font-semibold">{userGetQuery.data.name}</span>

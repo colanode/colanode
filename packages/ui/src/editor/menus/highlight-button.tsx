@@ -68,11 +68,11 @@ export const HighlightButton = ({
                 }
                 setIsOpen(false);
               }}
-              className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-gray-100 cursor-pointer"
+              className="flex w-full items-center gap-2 rounded-sm px-2 py-1.5 text-sm hover:bg-input cursor-pointer"
             >
               <div
                 className={cn(
-                  'relative inline-flex size-6 items-center justify-center overflow-hidden rounded bg-gray-50 shadow',
+                  'relative inline-flex size-6 items-center justify-center overflow-hidden rounded bg-muted shadow',
                   editorColor.bgClass
                 )}
               >

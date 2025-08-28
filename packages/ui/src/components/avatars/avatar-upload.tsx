@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { Button } from '@colanode/ui/components/ui/button';
+import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -22,7 +23,7 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
   };
 
   return (
-    <div className="h-[280px] min-h-[280px] w-[340px] min-w-[340px] p-1">
+    <div className="h-[280px] min-h-[280px] w-[345px] min-w-[345px] p-1">
       <form
         className="mb-5 flex gap-x-2"
         onSubmit={async (e) => {
@@ -34,10 +35,9 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
           }
         }}
       >
-        <input
+        <Input
           type="text"
           name="url"
-          className="w-full flex-1 rounded-md bg-gray-100 p-2 text-xs focus:outline-none"
           placeholder="Paste link to an image..."
           onChange={(e) => setUrl(e.target.value)}
           autoComplete="off"
@@ -91,9 +91,9 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
         {isPending && <Spinner className="mr-1" />}
         Upload file
       </Button>
-      <div className="mt-4 flex flex-col gap-y-4 text-center text-xs text-gray-500">
-        <div className="">Recommended size is 280px x 280px</div>
-        <div className="">The maximum size per file is 5MB.</div>
+      <div className="mt-4 flex flex-col gap-2 text-center text-xs text-muted-foreground">
+        <div>Recommended size is 280px x 280px</div>
+        <div>The maximum size per file is 5MB.</div>
       </div>
     </div>
   );

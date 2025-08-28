@@ -51,7 +51,9 @@ export const FileBlock = ({ id }: FileBlockProps) => {
       <FileIcon mimeType={file.attributes.mimeType} className="size-10" />
       <div className="flex flex-col gap-1">
         <div className="text-sm font-medium">{file.attributes.name}</div>
-        <div className="text-xs text-gray-500">{file.attributes.mimeType}</div>
+        <div className="text-xs text-muted-foreground">
+          {file.attributes.mimeType}
+        </div>
       </div>
     </div>
   );

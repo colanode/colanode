@@ -69,7 +69,7 @@ export const StorageStats = ({
           ({usedPercentage}%) used
         </span>
       </div>
-      <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden flex">
+      <div className="w-full h-3 bg-secondary rounded-full overflow-hidden flex">
         {subtypes.map((subtype) => {
           const storageUsed = BigInt(subtype.storageUsed);
           if (storageUsed === BigInt(0)) {
@@ -102,7 +102,7 @@ export const StorageStats = ({
         })}
         {usedPercentage < 100 && (
           <div
-            className="bg-gray-200"
+            className="bg-secondary"
             style={{ width: `${100 - usedPercentage}%` }}
           />
         )}

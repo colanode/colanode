@@ -19,11 +19,11 @@ export const defaultClasses = {
   emoji: 'max-h-5 max-w-5 h-5 w-5 px-0.5 mb-1 inline-block',
   dropcursor: 'text-primary-foreground bg-blue-500',
   mention:
-    'inline-flex flex-row items-center gap-1 rounded-md bg-blue-50 px-0.5 py-0',
+    'inline-flex flex-row items-center gap-1 rounded-md bg-muted px-0.5 py-0',
   table: 'w-full',
   tableRow: 'min-w-full',
   tableCellWrapper: 'border',
   tableCell: 'flex p-1 px-2 items-center',
   tableHeaderWrapper: 'border',
-  tableHeader: 'flex p-1 px-2 items-center font-semibold bg-gray-50',
+  tableHeader: 'flex p-1 px-2 items-center font-semibold bg-muted',
 };

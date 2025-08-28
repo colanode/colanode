@@ -4,6 +4,7 @@ import { Emoji } from '@colanode/client/types';
 import { EmojiBrowser } from '@colanode/ui/components/emojis/emoji-browser';
 import { EmojiSearch } from '@colanode/ui/components/emojis/emoji-search';
 import { EmojiSkinToneSelector } from '@colanode/ui/components/emojis/emoji-skin-tone-selector';
+import { Input } from '@colanode/ui/components/ui/input';
 import { EmojiPickerContext } from '@colanode/ui/contexts/emoji-picker';
 
 interface EmojiPickerProps {
@@ -17,19 +18,18 @@ export const EmojiPicker = ({ onPick }: EmojiPickerProps) => {
   return (
     <div className="flex flex-col gap-1 p-1">
       <div className="flex flex-row items-center gap-1">
-        <input
+        <Input
           type="text"
-          placeholder="Search..."
+          placeholder="Search emojis..."
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          className="w-full rounded-md bg-gray-100 p-2 text-xs focus:outline-none"
         />
         <EmojiSkinToneSelector
           skinTone={skinTone}
           onSkinToneChange={setSkinTone}
         />
       </div>
-      <div className="h-[280px] min-h-[280px] overflow-auto w-[330px] min-w-[330px]">
+      <div className="h-[280px] min-h-[280px] overflow-auto w-[340px] min-w-[340px]">
         <EmojiPickerContext.Provider
           value={{
             skinTone,

@@ -15,8 +15,8 @@ export const MarkButton = ({
     <button
       type="button"
       className={cn(
-        'flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-accent',
-        isActive ? 'bg-accent' : 'bg-white'
+        'flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-input',
+        isActive && 'bg-input'
       )}
       onClick={onClick}
     >

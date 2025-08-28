@@ -102,7 +102,7 @@ export const TableCellContextMenu = ({
                 <div className="flex items-center gap-2">
                   <div
                     className={cn(
-                      'w-4 h-4 rounded border border-gray-300',
+                      'w-4 h-4 rounded border border-border',
                       color.bgClass
                     )}
                   />

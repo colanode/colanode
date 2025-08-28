@@ -24,7 +24,7 @@ export const BoardViewColumn = () => {
 
   const divRef = useRef<HTMLDivElement>(null);
   const dropRef = drop(divRef);
-  const dragOverClass = boardView.dragOverClass ?? 'bg-gray-50';
+  const dragOverClass = boardView.dragOverClass ?? 'bg-muted';
 
   return (
     <div

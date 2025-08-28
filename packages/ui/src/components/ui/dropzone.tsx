@@ -28,7 +28,7 @@ const Dropzone = ({ text, children, onDrop }: DropzoneProps) => {
     <div ref={dropRef as React.LegacyRef<HTMLDivElement>}>
       {isActive && (
         <div className="fixed bottom-0 left-0 right-0 top-0 z-50">
-          <div className="absolute inset-0 flex items-center justify-center bg-gray-500 opacity-50 transition-all duration-100 ease-in-out">
+          <div className="absolute inset-0 flex items-center justify-center bg-muted opacity-50 transition-all duration-100 ease-in-out">
             <div className="flex flex-col items-center justify-center gap-2 opacity-100">
               <Upload className="size-8 text-white" />
               <p className="text-xl font-bold text-white">{text}</p>

@@ -80,7 +80,7 @@ export const ToolbarMenu = (props: ToolbarMenuProps) => {
   return (
     <BubbleMenu
       {...bubbleMenuProps}
-      className="flex flex-row items-center gap-1 rounded border bg-white p-0.5 shadow-xl transition-transform duration-150 ease-out"
+      className="flex flex-row items-center gap-1 rounded border border-border bg-muted p-0.5 shadow-xl transition-transform duration-150 ease-out"
     >
       <LinkButton
         editor={props.editor}

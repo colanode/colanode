@@ -37,7 +37,7 @@ const UserStorageProgressBar = ({
           ({percentage.toFixed(1)}%)
         </span>
       </div>
-      <div className="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div className="w-full h-2 bg-secondary rounded-full overflow-hidden">
         <div
           className={cn('h-full transition-all duration-300', getBarColor())}
           style={{ width: `${Math.min(percentage, 100)}%` }}

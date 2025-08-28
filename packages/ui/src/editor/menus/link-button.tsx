@@ -3,6 +3,7 @@ import { useEditorState } from '@tiptap/react';
 import { Check, Link, Trash2 } from 'lucide-react';
 
 import { isValidUrl } from '@colanode/core';
+import { Button } from '@colanode/ui/components/ui/button';
 import { Input } from '@colanode/ui/components/ui/input';
 import {
   Popover,
@@ -51,8 +52,8 @@ export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
       <PopoverTrigger>
         <span
           className={cn(
-            'flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-accent',
-            state?.isActive ? 'bg-gray-100' : 'bg-white'
+            'flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-input',
+            state?.isActive && 'bg-input'
           )}
         >
           <Link className="size-4" />
@@ -61,7 +62,7 @@ export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
 
       <PopoverContent align="start" className="z-[9999] min-w-0 p-1">
         <form
-          className="flex flex-row items-center gap-1"
+          className="flex flex-row items-center gap-2"
           onSubmit={(e) => {
             e.preventDefault();
             const input = e.currentTarget[0] as HTMLInputElement;
@@ -79,9 +80,10 @@ export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
             defaultValue={state?.attributes.href || ''}
           />
           {state?.attributes.href ? (
-            <button
+            <Button
               type="button"
-              className="flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-accent"
+              variant="outline"
+              size="icon"
               onClick={(e) => {
                 e.preventDefault();
                 editor.chain().focus().unsetLink().run();
@@ -89,14 +91,11 @@ export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
               }}
             >
               <Trash2 className="size-4" />
-            </button>
+            </Button>
           ) : (
-            <button
-              type="submit"
-              className="flex h-8 w-8 items-center justify-center rounded-md cursor-pointer hover:bg-gray-100"
-            >
+            <Button type="submit" variant="outline" size="icon">
               <Check className="size-4" />
-            </button>
+            </Button>
           )}
         </form>
       </PopoverContent>

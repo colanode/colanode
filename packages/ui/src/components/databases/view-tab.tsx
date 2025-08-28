@@ -14,7 +14,7 @@ export const ViewTab = ({ view, isActive, onClick }: ViewTabProps) => {
       role="presentation"
       className={cn(
         'inline-flex cursor-pointer flex-row items-center gap-1 border-b-2 p-1 pl-0 text-sm',
-        isActive ? 'border-gray-500' : 'border-transparent'
+        isActive ? 'border-border' : 'border-transparent'
       )}
       onClick={() => onClick()}
       onKeyDown={() => onClick()}
