@@ -99,7 +99,9 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
     conversation.canCreateMessage,
     content,
     replyTo,
-    workspace.userId,
+    askAI,
+    workspace.accountId,
+    workspace.id,
   ]);
 
   const handleUploadClick = useCallback(async () => {
