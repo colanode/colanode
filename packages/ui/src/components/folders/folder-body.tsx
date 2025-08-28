@@ -22,7 +22,11 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { Dropzone } from '@colanode/ui/components/ui/dropzone';
-import { ScrollArea } from '@colanode/ui/components/ui/scroll-area';
+import {
+  ScrollArea,
+  ScrollBar,
+  ScrollViewport,
+} from '@colanode/ui/components/ui/scroll-area';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { openFileDialog } from '@colanode/ui/lib/files';
 
@@ -141,7 +145,11 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
           </div>
         </div>
         <ScrollArea className="flex-grow">
-          <FolderFiles id={folder.id} name="Folder" layout={layout} />
+          <ScrollViewport>
+            <FolderFiles id={folder.id} name="Folder" layout={layout} />
+            <ScrollBar orientation="horizontal" />
+            <ScrollBar orientation="vertical" />
+          </ScrollViewport>
         </ScrollArea>
       </div>
     </Dropzone>

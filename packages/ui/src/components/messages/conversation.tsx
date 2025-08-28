@@ -7,7 +7,11 @@ import {
   MessageCreateRefProps,
 } from '@colanode/ui/components/messages/message-create';
 import { MessageList } from '@colanode/ui/components/messages/message-list';
-import { ScrollArea } from '@colanode/ui/components/ui/scroll-area';
+import {
+  ScrollArea,
+  ScrollBar,
+  ScrollViewport,
+} from '@colanode/ui/components/ui/scroll-area';
 import { ConversationContext } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
@@ -103,18 +107,21 @@ export const Conversation = ({
           onScroll={handleScroll}
           className="flex-grow overflow-y-auto"
         >
-          <div ref={containerRef}>
-            <MessageList />
-          </div>
-          <InView
-            className="h-4"
-            rootMargin="20px"
-            onChange={(inView) => {
-              bottomVisibleRef.current = inView;
-            }}
-          >
-            <div ref={bottomRef} className="h-4"></div>
-          </InView>
+          <ScrollViewport>
+            <div ref={containerRef}>
+              <MessageList />
+            </div>
+            <InView
+              className="h-4"
+              rootMargin="20px"
+              onChange={(inView) => {
+                bottomVisibleRef.current = inView;
+              }}
+            >
+              <div ref={bottomRef} className="h-4"></div>
+            </InView>
+            <ScrollBar orientation="vertical" />
+          </ScrollViewport>
         </ScrollArea>
         <MessageCreate ref={messageCreateRef} />
       </div>

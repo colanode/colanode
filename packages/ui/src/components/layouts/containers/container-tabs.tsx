@@ -4,7 +4,11 @@ import { useDrop } from 'react-dnd';
 import { ContainerTab } from '@colanode/client/types';
 import { ContainerTabContent } from '@colanode/ui/components/layouts/containers/container-tab-content';
 import { ContainerTabTrigger } from '@colanode/ui/components/layouts/containers/container-tab-trigger';
-import { ScrollArea, ScrollBar } from '@colanode/ui/components/ui/scroll-area';
+import {
+  ScrollArea,
+  ScrollBar,
+  ScrollViewport,
+} from '@colanode/ui/components/ui/scroll-area';
 import { Tabs, TabsList } from '@colanode/ui/components/ui/tabs';
 import { cn } from '@colanode/ui/lib/utils';
 
@@ -50,27 +54,29 @@ export const ContainerTabs = ({
       className="h-full min-h-full w-full min-w-full max-h-full max-w-full flex flex-col overflow-hidden"
     >
       <ScrollArea className="h-10 min-h-10 w-full">
-        <TabsList className="h-10 w-full justify-start p-0 app-drag-region rounded-none">
-          {tabs.map((tab) => (
-            <ContainerTabTrigger
-              key={tab.path}
-              tab={tab}
-              onClose={() => onClose(tab.path)}
-              onOpen={() => onOpen(tab.path)}
-              onMove={(before) => onMove(tab.path, before)}
+        <ScrollViewport>
+          <TabsList className="h-10 w-full justify-start p-0 app-drag-region rounded-none">
+            {tabs.map((tab) => (
+              <ContainerTabTrigger
+                key={tab.path}
+                tab={tab}
+                onClose={() => onClose(tab.path)}
+                onOpen={() => onOpen(tab.path)}
+                onMove={(before) => onMove(tab.path, before)}
+              />
+            ))}
+            <div
+              ref={dragDropRef as React.LegacyRef<HTMLDivElement>}
+              className={cn(
+                'h-full w-10',
+                dropMonitor.isOver &&
+                  dropMonitor.canDrop &&
+                  'border-l-2 border-blue-300'
+              )}
             />
-          ))}
-          <div
-            ref={dragDropRef as React.LegacyRef<HTMLDivElement>}
-            className={cn(
-              'h-full w-10',
-              dropMonitor.isOver &&
-                dropMonitor.canDrop &&
-                'border-l-2 border-blue-300'
-            )}
-          />
-        </TabsList>
-        <ScrollBar orientation="horizontal" />
+          </TabsList>
+          <ScrollBar orientation="horizontal" className="z-10" />
+        </ScrollViewport>
       </ScrollArea>
       <div className="flex-grow overflow-hidden">
         {tabs.map((tab) => (
