@@ -114,14 +114,15 @@ const CommandList = ({
     setSelectedIndex(0);
   }, [items]);
 
-  const commandListContainer = useRef<HTMLDivElement>(null);
+  const scrollContainer = useRef<HTMLDivElement>(null);
+  const listContainer = useRef<HTMLDivElement>(null);
 
   useLayoutEffect(() => {
-    const container = commandListContainer?.current;
+    const item = listContainer?.current?.children[selectedIndex] as HTMLElement;
 
-    const item = container?.children[selectedIndex] as HTMLElement;
-
-    if (item && container) updateScrollView(container, item);
+    if (item && scrollContainer?.current) {
+      updateScrollView(scrollContainer.current, item);
+    }
   }, [selectedIndex]);
 
   return items.length > 0 ? (
@@ -132,11 +133,8 @@ const CommandList = ({
           className="z-50 min-w-[8rem] w-80 rounded-md border bg-popover text-popover-foreground p-1 shadow-md animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 overflow-hidden"
         >
           <ScrollArea className="h-80">
-            <ScrollViewport>
-              <div
-                ref={commandListContainer}
-                className="max-h-none overflow-hidden"
-              >
+            <ScrollViewport ref={scrollContainer}>
+              <div ref={listContainer}>
                 {items.map((item: User, index: number) => (
                   <button
                     type="button"
