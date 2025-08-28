@@ -10,6 +10,11 @@ import {
   CommandItem,
   CommandList,
 } from '@colanode/ui/components/ui/command';
+import {
+  ScrollArea,
+  ScrollViewport,
+  ScrollBar,
+} from '@colanode/ui/components/ui/scroll-area';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -45,29 +50,36 @@ export const RecordSearch = ({
         className="h-9"
       />
       <CommandEmpty>No record found.</CommandEmpty>
-      <CommandList>
-        <CommandGroup className="h-min">
-          {recordSearchQuery.data?.map((record) => (
-            <CommandItem
-              key={record.id}
-              onSelect={() => {
-                onSelect(record);
-                setQuery('');
-              }}
-            >
-              <div className="flex w-full flex-row items-center gap-2">
-                <Avatar
-                  id={record.id}
-                  name={record.attributes.name}
-                  avatar={record.attributes.avatar}
-                  className="size-4"
-                />
-                <p className="text-sm flex-grow">{record.attributes.name}</p>
-              </div>
-            </CommandItem>
-          ))}
-        </CommandGroup>
-      </CommandList>
+      <ScrollArea className="h-80">
+        <ScrollViewport>
+          <CommandList className="max-h-none overflow-hidden">
+            <CommandGroup className="h-min">
+              {recordSearchQuery.data?.map((record) => (
+                <CommandItem
+                  key={record.id}
+                  onSelect={() => {
+                    onSelect(record);
+                    setQuery('');
+                  }}
+                >
+                  <div className="flex w-full flex-row items-center gap-2">
+                    <Avatar
+                      id={record.id}
+                      name={record.attributes.name}
+                      avatar={record.attributes.avatar}
+                      className="size-4"
+                    />
+                    <p className="text-sm flex-grow">
+                      {record.attributes.name}
+                    </p>
+                  </div>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          </CommandList>
+        </ScrollViewport>
+        <ScrollBar orientation="vertical" />
+      </ScrollArea>
     </Command>
   );
 };

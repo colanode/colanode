@@ -22,7 +22,7 @@ export const IconPicker = ({ onPick }: IconPickerProps) => {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />
-        <div className="h-[280px] min-h-[280px] overflow-auto w-[340px] min-w-[340px]">
+        <div className="h-[280px] min-h-[280px] w-[330px] min-w-[330px]">
           {query.length > 2 ? <IconSearch query={query} /> : <IconBrowser />}
         </div>
       </div>

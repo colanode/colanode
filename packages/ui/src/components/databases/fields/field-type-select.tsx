@@ -17,6 +17,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
+import {
+  ScrollArea,
+  ScrollViewport,
+  ScrollBar,
+} from '@colanode/ui/components/ui/scroll-area';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface FieldTypeOption {
@@ -126,34 +131,41 @@ export const FieldTypeSelect = ({
         <Command className="min-h-min">
           <CommandInput placeholder="Search field types..." className="h-9" />
           <CommandEmpty>No field type found.</CommandEmpty>
-          <CommandList>
-            <CommandGroup className="h-min overflow-y-auto">
-              {filteredFieldTypes.map((fieldType) => (
-                <CommandItem
-                  key={fieldType.type}
-                  value={`${fieldType.type} - ${fieldType.name}`}
-                  onSelect={() => {
-                    onChange(fieldType.type);
-                    setOpen(false);
-                  }}
-                >
-                  <div className="flex w-full flex-row items-center gap-2">
-                    <FieldIcon
-                      type={fieldType.type}
-                      className="size-4 text-foreground"
-                    />
-                    <p>{fieldType.name}</p>
-                    <Check
-                      className={cn(
-                        'ml-auto size-4',
-                        value === fieldType.type ? 'opacity-100' : 'opacity-0'
-                      )}
-                    />
-                  </div>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
+          <ScrollArea className="h-80">
+            <ScrollViewport>
+              <CommandList className="max-h-none overflow-hidden">
+                <CommandGroup className="h-min">
+                  {filteredFieldTypes.map((fieldType) => (
+                    <CommandItem
+                      key={fieldType.type}
+                      value={`${fieldType.type} - ${fieldType.name}`}
+                      onSelect={() => {
+                        onChange(fieldType.type);
+                        setOpen(false);
+                      }}
+                    >
+                      <div className="flex w-full flex-row items-center gap-2">
+                        <FieldIcon
+                          type={fieldType.type}
+                          className="size-4 text-foreground"
+                        />
+                        <p>{fieldType.name}</p>
+                        <Check
+                          className={cn(
+                            'ml-auto size-4',
+                            value === fieldType.type
+                              ? 'opacity-100'
+                              : 'opacity-0'
+                          )}
+                        />
+                      </div>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </ScrollViewport>
+            <ScrollBar orientation="vertical" />
+          </ScrollArea>
         </Command>
       </PopoverContent>
     </Popover>

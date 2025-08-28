@@ -18,6 +18,11 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
+import {
+  ScrollArea,
+  ScrollViewport,
+  ScrollBar,
+} from '@colanode/ui/components/ui/scroll-area';
 import { defaultClasses } from '@colanode/ui/editor/classes';
 import { languages } from '@colanode/ui/lib/lowlight';
 import { cn } from '@colanode/ui/lib/utils';
@@ -45,36 +50,41 @@ export const CodeBlockNodeView = ({
             <p>{languageItem?.name ?? ' '}</p>
             <ChevronDown className="size-4" />
           </PopoverTrigger>
-          <PopoverContent className="p-2">
-            <Command className="max-h-80">
+          <PopoverContent className="p-2 overflow-hidden">
+            <Command className="min-h-min">
               <CommandInput placeholder="Search language..." />
               <CommandEmpty>No languages found.</CommandEmpty>
-              <CommandList>
-                <CommandGroup className="overflow-auto">
-                  {languages.map((languageItem) => (
-                    <CommandItem
-                      key={languageItem.code}
-                      value={`${languageItem.code} - ${languageItem.name}`}
-                      onSelect={() => {
-                        updateAttributes({
-                          language: languageItem.code,
-                        });
-                        setOpen(false);
-                      }}
-                    >
-                      {languageItem.name}
-                      <Check
-                        className={cn(
-                          'ml-auto mr-2 size-4',
-                          language === languageItem.code
-                            ? 'opacity-100'
-                            : 'opacity-0'
-                        )}
-                      />
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
+              <ScrollArea className="h-80">
+                <ScrollViewport>
+                  <CommandList className="max-h-none overflow-hidden">
+                    <CommandGroup className="h-min">
+                      {languages.map((languageItem) => (
+                        <CommandItem
+                          key={languageItem.code}
+                          value={`${languageItem.code} - ${languageItem.name}`}
+                          onSelect={() => {
+                            updateAttributes({
+                              language: languageItem.code,
+                            });
+                            setOpen(false);
+                          }}
+                        >
+                          {languageItem.name}
+                          <Check
+                            className={cn(
+                              'ml-auto mr-2 size-4',
+                              language === languageItem.code
+                                ? 'opacity-100'
+                                : 'opacity-0'
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </ScrollViewport>
+                <ScrollBar orientation="vertical" />
+              </ScrollArea>
             </Command>
           </PopoverContent>
         </Popover>

@@ -10,6 +10,11 @@ import {
   DialogTitle,
   DialogDescription,
 } from '@colanode/ui/components/ui/dialog';
+import {
+  ScrollArea,
+  ScrollViewport,
+  ScrollBar,
+} from '@colanode/ui/components/ui/scroll-area';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -62,14 +67,21 @@ export const CalendarViewNoValueCount = ({
           <p>({noValueCount.toLocaleString()})</p>
         </div>
       </DialogTrigger>
-      <DialogContent className="w-128 min-w-128 min-h-40 max-h-128 overflow-auto p-4">
+      <DialogContent className="w-128 min-w-128 min-h-40 overflow-hidden p-4">
         <DialogHeader>
           <DialogTitle>{view.name}</DialogTitle>
           <DialogDescription>
             Record with no {field.name} value ({noValueCount.toLocaleString()})
           </DialogDescription>
         </DialogHeader>
-        <CalendarViewNoValueList filters={filters} field={field} />
+        <ScrollArea className="h-96">
+          <ScrollViewport>
+            <div className="max-h-none overflow-hidden pr-4">
+              <CalendarViewNoValueList filters={filters} field={field} />
+            </div>
+          </ScrollViewport>
+          <ScrollBar orientation="vertical" />
+        </ScrollArea>
       </DialogContent>
     </Dialog>
   );

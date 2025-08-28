@@ -23,7 +23,7 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
   };
 
   return (
-    <div className="h-[280px] min-h-[280px] w-[345px] min-w-[345px] p-1">
+    <div className="h-[280px] min-h-[280px] w-[335px] min-w-[335px] p-1">
       <form
         className="mb-5 flex gap-x-2"
         onSubmit={async (e) => {

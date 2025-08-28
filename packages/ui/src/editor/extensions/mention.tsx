@@ -25,6 +25,11 @@ import {
 import { EditorContext, User } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import {
+  ScrollArea,
+  ScrollViewport,
+  ScrollBar,
+} from '@colanode/ui/components/ui/scroll-area';
 import { MentionNodeView } from '@colanode/ui/editor/views';
 import { updateScrollView } from '@colanode/ui/lib/utils';
 
@@ -60,15 +65,13 @@ const CommandList = ({
     middleware: [offset(6), flip(), shift()],
     whileElementsMounted: autoUpdate,
     strategy: 'fixed',
-  });
-
-  useLayoutEffect(() => {
-    if (props.clientRect) {
-      refs.setPositionReference({
+    elements: {
+      reference: {
         getBoundingClientRect: () => props.clientRect?.() || new DOMRect(),
-      });
-    }
-  }, [props.clientRect, refs]);
+        contextElement: document.body,
+      } as unknown as Element,
+    },
+  });
 
   const selectItem = useCallback(
     (index: number) => {
@@ -125,31 +128,46 @@ const CommandList = ({
     <FloatingPortal>
       <div ref={refs.setFloating} style={floatingStyles}>
         <div
-          id="slash-command"
-          ref={commandListContainer}
-          className="z-50 h-auto max-h-[330px] w-72 overflow-y-auto rounded-md border border-stone-200 bg-white px-1 py-2 shadow-md transition-all"
+          id="mention-command"
+          className="z-50 min-w-[8rem] w-80 rounded-md border bg-popover text-popover-foreground p-1 shadow-md animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 overflow-hidden"
         >
-          {items.map((item: User, index: number) => (
-            <button
-              type="button"
-              className={`flex w-full items-center space-x-2 rounded-md px-2 py-1 text-left text-sm text-stone-900 hover:bg-stone-100 ${
-                index === selectedIndex ? 'bg-stone-100 text-stone-900' : ''
-              }`}
-              key={item.id}
-              onClick={() => selectItem(index)}
-            >
-              <Avatar
-                id={item.id}
-                name={item.name}
-                avatar={item.avatar}
-                className="size-8"
-              />
-              <div>
-                <p className="font-medium">{item.name}</p>
-                <p className="text-xs text-stone-500">{item.email}</p>
+          <ScrollArea className="h-80">
+            <ScrollViewport>
+              <div
+                ref={commandListContainer}
+                className="max-h-none overflow-hidden"
+              >
+                {items.map((item: User, index: number) => (
+                  <button
+                    type="button"
+                    className={`relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-left outline-hidden select-none focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground ${
+                      index === selectedIndex
+                        ? 'bg-accent text-accent-foreground'
+                        : ''
+                    }`}
+                    key={item.id}
+                    onClick={() => selectItem(index)}
+                  >
+                    <div className="flex size-10 min-w-10 items-center justify-center rounded-md border bg-background">
+                      <Avatar
+                        id={item.id}
+                        name={item.name}
+                        avatar={item.avatar}
+                        className="size-8"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{item.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.email}
+                      </p>
+                    </div>
+                  </button>
+                ))}
               </div>
-            </button>
-          ))}
+            </ScrollViewport>
+            <ScrollBar orientation="vertical" />
+          </ScrollArea>
         </div>
       </div>
     </FloatingPortal>

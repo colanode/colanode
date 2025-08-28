@@ -4,6 +4,11 @@ import { useMemo, useRef } from 'react';
 import { EmojiPickerRowData } from '@colanode/client/types';
 import { EmojiBrowserCategory } from '@colanode/ui/components/emojis/emoji-browser-category';
 import { EmojiBrowserItems } from '@colanode/ui/components/emojis/emoji-browser-items';
+import {
+  ScrollArea,
+  ScrollViewport,
+  ScrollBar,
+} from '@colanode/ui/components/ui/scroll-area';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 const EMOJIS_PER_ROW = 10;
@@ -39,7 +44,7 @@ export const EmojiBrowser = () => {
     return rows;
   }, [categories]);
 
-  const parentRef = useRef(null);
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const virtualizer = useVirtualizer({
     count: rowDataArray.length,
@@ -48,45 +53,42 @@ export const EmojiBrowser = () => {
   });
 
   return (
-    <div
-      ref={parentRef}
-      style={{
-        height: `100%`,
-        overflow: 'auto',
-      }}
-    >
-      <div
-        style={{
-          height: `${virtualizer.getTotalSize()}px`,
-          width: '100%',
-          position: 'relative',
-        }}
-      >
-        {virtualizer.getVirtualItems().map((virtualItem) => {
-          const row = rowDataArray[virtualItem.index]!;
-          const style: React.CSSProperties = {
-            position: 'absolute',
-            top: 0,
-            left: 0,
+    <ScrollArea className="h-full overflow-auto">
+      <ScrollViewport ref={parentRef}>
+        <div
+          style={{
+            height: `${virtualizer.getTotalSize()}px`,
             width: '100%',
-            height: `${virtualItem.size}px`,
-            transform: `translateY(${virtualItem.start}px)`,
-          };
+            position: 'relative',
+          }}
+        >
+          {virtualizer.getVirtualItems().map((virtualItem) => {
+            const row = rowDataArray[virtualItem.index]!;
+            const style: React.CSSProperties = {
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: `${virtualItem.size}px`,
+              transform: `translateY(${virtualItem.start}px)`,
+            };
 
-          if (row.type === 'category') {
-            return (
-              <EmojiBrowserCategory
-                row={row}
-                style={style}
-                key={row.category}
-              />
-            );
-          }
+            if (row.type === 'category') {
+              return (
+                <EmojiBrowserCategory
+                  row={row}
+                  style={style}
+                  key={row.category}
+                />
+              );
+            }
 
-          const key = `${row.category}-${row.page}`;
-          return <EmojiBrowserItems row={row} style={style} key={key} />;
-        })}
-      </div>
-    </div>
+            const key = `${row.category}-${row.page}`;
+            return <EmojiBrowserItems row={row} style={style} key={key} />;
+          })}
+        </div>
+      </ScrollViewport>
+      <ScrollBar orientation="vertical" />
+    </ScrollArea>
   );
 };

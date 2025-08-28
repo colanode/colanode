@@ -23,6 +23,11 @@ import {
 } from 'react';
 
 import { EditorCommand, EditorContext } from '@colanode/client/types';
+import {
+  ScrollArea,
+  ScrollViewport,
+  ScrollBar,
+} from '@colanode/ui/components/ui/scroll-area';
 import { updateScrollView } from '@colanode/ui/lib/utils';
 
 interface CommanderOptions {
@@ -134,31 +139,40 @@ const CommandList = ({
       <div ref={refs.setFloating} style={floatingStyles}>
         <div
           id="slash-command"
-          ref={commandListContainer}
-          className="z-50 max-h-[330px] min-w-[8rem] w-80 overflow-x-hidden overflow-y-auto rounded-md border bg-popover text-popover-foreground p-1 shadow-md animate-in fade-in-0 zoom-in-95 slide-in-from-top-2"
+          className="z-50 min-w-[8rem] w-80 rounded-md border bg-popover text-popover-foreground p-1 shadow-md animate-in fade-in-0 zoom-in-95 slide-in-from-top-2 overflow-hidden"
         >
-          {items.map((item: EditorCommand, index: number) => (
-            <button
-              type="button"
-              className={`relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-left outline-hidden select-none focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground ${
-                index === selectedIndex
-                  ? 'bg-accent text-accent-foreground'
-                  : ''
-              }`}
-              key={item.key}
-              onClick={() => selectItem(index)}
-            >
-              <div className="flex size-10 min-w-10 items-center justify-center rounded-md border bg-background">
-                <item.icon className="size-4 text-foreground" />
+          <ScrollArea className="h-80">
+            <ScrollViewport>
+              <div
+                ref={commandListContainer}
+                className="max-h-none overflow-hidden"
+              >
+                {items.map((item: EditorCommand, index: number) => (
+                  <button
+                    type="button"
+                    className={`relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-left outline-hidden select-none focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground ${
+                      index === selectedIndex
+                        ? 'bg-accent text-accent-foreground'
+                        : ''
+                    }`}
+                    key={item.key}
+                    onClick={() => selectItem(index)}
+                  >
+                    <div className="flex size-10 min-w-10 items-center justify-center rounded-md border bg-background">
+                      <item.icon className="size-4 text-foreground" />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{item.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {item.description}
+                      </p>
+                    </div>
+                  </button>
+                ))}
               </div>
-              <div className="flex-1">
-                <p className="font-medium">{item.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {item.description}
-                </p>
-              </div>
-            </button>
-          ))}
+            </ScrollViewport>
+            <ScrollBar orientation="vertical" />
+          </ScrollArea>
         </div>
       </div>
     </FloatingPortal>
