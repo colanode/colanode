@@ -51,7 +51,7 @@ export const MessageReactionCountTooltipContent = ({
 
   return (
     <div className="flex items-center gap-4">
-      <EmojiElement id={reactionCount.reaction} className="h-5 w-5" />
+      <EmojiElement id={reactionCount.reaction} className="size-5" />
       {users.length === 1 && (
         <p>
           <span className="font-semibold">{users[0]}</span>

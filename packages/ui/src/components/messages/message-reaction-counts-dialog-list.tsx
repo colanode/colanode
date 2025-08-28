@@ -55,7 +55,7 @@ export const MessageReactionCountsDialogList = ({
     .map((result) => result.data!);
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 p-2">
       {users.map((user) => (
         <div key={user.id} className="flex items-center space-x-3">
           <Avatar

@@ -6,7 +6,6 @@ import { LocalMessageNode } from '@colanode/client/types';
 import { MessageDeleteButton } from '@colanode/ui/components/messages/message-delete-button';
 import { MessageQuickReaction } from '@colanode/ui/components/messages/message-quick-reaction';
 import { MessageReactionCreatePopover } from '@colanode/ui/components/messages/message-reaction-create-popover';
-import { Separator } from '@colanode/ui/components/ui/separator';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -14,7 +13,7 @@ import { defaultEmojis } from '@colanode/ui/lib/assets';
 
 const MessageAction = ({ children }: { children: React.ReactNode }) => {
   return (
-    <li className="flex h-8 w-7 cursor-pointer items-center justify-center hover:bg-accent">
+    <li className="flex size-8 cursor-pointer items-center justify-center rounded-md hover:bg-input">
       {children}
     </li>
   );
@@ -56,7 +55,7 @@ export const MessageActions = ({ message }: MessageActionsProps) => {
   );
 
   return (
-    <ul className="invisible absolute -top-2 right-1 z-10 flex flex-row items-center bg-gray-100 text-muted-foreground shadow group-hover:visible">
+    <ul className="invisible absolute -top-5 right-1 z-10 flex flex-row items-center rounded-md bg-muted p-0.5 text-muted-foreground shadow-md group-hover:visible">
       <MessageAction>
         <MessageQuickReaction
           emoji={defaultEmojis.like}
@@ -75,7 +74,7 @@ export const MessageActions = ({ message }: MessageActionsProps) => {
           onClick={handleReactionClick}
         />
       </MessageAction>
-      <Separator orientation="vertical" className="h-6 w-[2px] mx-1" />
+      <div className="mx-1 h-6 w-[1px] bg-border" />
       {canReplyInThread && (
         <MessageAction>
           <MessagesSquare className="size-4 cursor-pointer" />

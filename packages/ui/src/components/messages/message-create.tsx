@@ -124,11 +124,12 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
             onCancel={() => setReplyTo(null)}
           />
         )}
-        <div className="flex min-h-0 flex-row items-center rounded bg-gray-100 p-2 pl-0">
+        <div className="flex min-h-0 flex-row items-center rounded bg-muted p-2 pl-0">
           <div className="flex w-10 items-center justify-center">
             <DropdownMenu>
               <DropdownMenuTrigger
                 disabled={isPending || !conversation.canCreateMessage}
+                className="cursor-pointer hover:bg-accent"
               >
                 <span>
                   <Plus size={20} />

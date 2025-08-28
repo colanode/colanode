@@ -26,10 +26,7 @@ export const MessageReactionCountTooltip = ({
   return (
     <Tooltip>
       <TooltipTrigger>{children}</TooltipTrigger>
-      <TooltipContent
-        className="bg-background text-primary p-2 shadow-md cursor-pointer"
-        onClick={onOpen}
-      >
+      <TooltipContent className="p-2 shadow-md cursor-pointer" onClick={onOpen}>
         <MessageReactionCountTooltipContent
           message={message}
           reactionCount={reactionCount}

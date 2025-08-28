@@ -42,14 +42,14 @@ export const MessageReactionCountsDialog = ({
           defaultValue={reactionCounts[0]!.reaction}
           className="flex flex-row gap-4"
         >
-          <TabsList className="flex h-full max-h-full w-24 flex-col items-start justify-start gap-1 rounded-none border-r border-r-gray-100 bg-white pr-3">
+          <TabsList>
             {reactionCounts.map((reactionCount) => (
               <TabsTrigger
                 key={`tab-trigger-${reactionCount.reaction}`}
                 className="flex w-full flex-row items-center justify-start gap-2 p-2"
                 value={reactionCount.reaction}
               >
-                <EmojiElement id={reactionCount.reaction} className="h-5 w-5" />
+                <EmojiElement id={reactionCount.reaction} className="size-5" />
                 {reactionCount.count}
               </TabsTrigger>
             ))}

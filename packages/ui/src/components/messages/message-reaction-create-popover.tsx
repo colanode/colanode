@@ -20,7 +20,7 @@ export const MessageReactionCreatePopover = ({
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger>
-        <SmilePlus className="size-4" />
+        <SmilePlus className="size-4 cursor-pointer" />
       </PopoverTrigger>
       <PopoverContent className="w-max p-0" align="end">
         <EmojiPicker

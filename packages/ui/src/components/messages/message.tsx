@@ -43,7 +43,7 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
     <div
       id={`message-${message.id}`}
       key={`message-${message.id}`}
-      className={`group flex flex-row px-1 rounded-sm hover:bg-muted ${
+      className={`group flex flex-row px-1 rounded-sm hover:bg-accent ${
         displayAuthor ? 'mt-2 first:mt-0' : ''
       }`}
     >
