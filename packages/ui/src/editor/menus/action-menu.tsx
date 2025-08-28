@@ -154,7 +154,7 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
         className="flex items-center text-muted-foreground p-1 mr-2"
       >
         <Plus
-          className="size-4 cursor-pointer hover:text-primary"
+          className="size-4 cursor-pointer hover:text-foreground"
           onClick={() => {
             if (menuState.pos === undefined || !menuState.domNode) {
               return;
@@ -202,7 +202,7 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
             view.current.dom.blur();
           }}
         >
-          <GripVertical className="size-4 cursor-pointer hover:text-primary" />
+          <GripVertical className="size-4 cursor-pointer hover:text-foreground" />
         </div>
       </div>
     </FloatingPortal>

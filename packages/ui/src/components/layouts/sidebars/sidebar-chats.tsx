@@ -28,7 +28,7 @@ export const SidebarChats = () => {
           <button
             key={item.id}
             className={cn(
-              'px-2 flex w-full items-center gap-2 overflow-hidden rounded-md text-left text-sm h-7 cursor-pointer text-primary hover:bg-muted',
+              'px-2 flex w-full items-center gap-2 overflow-hidden rounded-md text-left text-sm h-7 cursor-pointer text-foreground hover:bg-muted',
               layout.activeTab === item.id && 'bg-muted font-medium'
             )}
             onClick={() => {

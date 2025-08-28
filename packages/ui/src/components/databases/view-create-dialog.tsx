@@ -163,7 +163,7 @@ export const ViewCreateDialog = ({
                           'flex cursor-pointer flex-col items-center gap-2 rounded-md border p-3 text-muted-foreground',
                           'hover:bg-accent cursor-pointer',
                           viewType.type === field.value
-                            ? 'border-primary text-primary'
+                            ? 'border-foreground text-foreground'
                             : ''
                         )}
                         onClick={() => {

@@ -8,8 +8,8 @@ export const ServerUpgradeRequired = () => {
   return (
     <div className="flex h-full w-full items-center justify-center">
       <div className="flex flex-col items-center gap-8 text-center w-128">
-        <CircleFadingArrowUp className="h-10 w-10 text-primary" />
-        <h2 className="text-4xl text-primary">Server upgrade required</h2>
+        <CircleFadingArrowUp className="h-10 w-10 text-foreground" />
+        <h2 className="text-4xl text-foreground">Server upgrade required</h2>
         <p className="text-sm text-muted-foreground">
           The Colanode server{' '}
           <span className="font-semibold">{server.name}</span> with domain{' '}

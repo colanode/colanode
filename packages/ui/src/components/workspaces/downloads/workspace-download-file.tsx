@@ -60,7 +60,7 @@ export const WorkspaceDownloadFile = ({
         <Tooltip>
           <TooltipTrigger asChild>
             <p
-              className="text-xs text-muted-foreground flex items-center gap-2 cursor-pointer hover:text-primary"
+              className="text-xs text-muted-foreground flex items-center gap-2 cursor-pointer hover:text-foreground"
               onClick={(e) => {
                 e.stopPropagation();
                 window.colanode.showItemInFolder(download.path);

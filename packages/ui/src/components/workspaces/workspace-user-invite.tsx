@@ -31,11 +31,11 @@ export const WorkspaceUserInvite = ({
           {emails.map((email) => (
             <p
               key={email}
-              className="flex h-full flex-row items-center gap-1 border border-border bg-accent p-0.5 px-1 text-primary shadow"
+              className="flex h-full flex-row items-center gap-1 border border-border bg-accent p-0.5 px-1 text-foreground shadow"
             >
               <span>{email}</span>
               <X
-                className="size-3 text-muted-foreground cursor-pointer hover:text-primary"
+                className="size-3 text-muted-foreground cursor-pointer hover:text-foreground"
                 onClick={() => {
                   setEmails((emails) => emails.filter((e) => e !== email));
                 }}

@@ -31,7 +31,7 @@ export const SidebarMenuIcon = ({
       <Icon
         className={cn(
           'size-5',
-          isActive ? 'text-primary' : 'text-muted-foreground'
+          isActive ? 'text-foreground' : 'text-muted-foreground'
         )}
       />
       {unreadBadge && (

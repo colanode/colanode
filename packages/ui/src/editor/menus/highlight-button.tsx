@@ -42,7 +42,7 @@ export const HighlightButton = ({
       <PopoverTrigger>
         <span
           className={cn(
-            'flex size-8 items-center justify-center rounded-md cursor-pointer',
+            'flex size-8 items-center justify-center rounded-md cursor-pointer hover:bg-input',
             activeHighlight.bgClass,
             activeHighlight.bgHoverClass
           )}
