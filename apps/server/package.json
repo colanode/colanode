@@ -36,6 +36,7 @@
     "@langchain/google-genai": "^0.2.16",
     "@langchain/langgraph": "^0.4.4",
     "@langchain/openai": "^0.6.7",
+    "@modelcontextprotocol/sdk": "^1.17.4",
     "@node-rs/argon2": "^2.0.2",
     "@redis/client": "^5.8.0",
     "@tus/s3-store": "^2.0.0",
