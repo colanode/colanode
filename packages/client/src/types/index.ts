@@ -11,5 +11,6 @@ export * from './icons';
 export * from './nodes';
 export * from './radars';
 export * from './servers';
+export * from './themes';
 export * from './users';
 export * from './workspaces';

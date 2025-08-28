@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react';
 
+import { ThemeMode } from '@colanode/client/types';
 import { useApp } from '@colanode/ui/contexts/app';
-import { Theme, ThemeContext } from '@colanode/ui/contexts/theme';
+import { ThemeContext } from '@colanode/ui/contexts/theme';
+import { getThemeVariables } from '@colanode/ui/lib/themes';
 
-const getSystemTheme = (): Theme => {
+const getSystemTheme = (): ThemeMode => {
   if (typeof window === 'undefined' || !window.matchMedia) {
     return 'light';
   }
@@ -18,9 +20,10 @@ export const AppThemeProvider = ({
   children: React.ReactNode;
 }) => {
   const app = useApp();
-  const [systemTheme, setSystemTheme] = useState<Theme>(getSystemTheme());
-  const appTheme = app.getMetadata('theme');
-  const theme = !appTheme || appTheme === 'system' ? systemTheme : appTheme;
+  const [systemTheme, setSystemTheme] = useState<ThemeMode>(getSystemTheme());
+
+  const themeMode = app.getMetadata('theme.mode') ?? systemTheme;
+  const themeColor = app.getMetadata('theme.color');
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) {
@@ -40,7 +43,6 @@ export const AppThemeProvider = ({
     };
   }, []);
 
-  // Apply theme class to root HTML element
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
@@ -48,7 +50,7 @@ export const AppThemeProvider = ({
 
     const htmlElement = document.documentElement;
 
-    if (theme === 'dark') {
+    if (themeMode === 'dark') {
       htmlElement.classList.add('dark');
     } else {
       htmlElement.classList.remove('dark');
@@ -57,10 +59,23 @@ export const AppThemeProvider = ({
     return () => {
       htmlElement.classList.remove('dark');
     };
-  }, [theme]);
+  }, [themeMode]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const themeVariables = getThemeVariables(themeMode, themeColor);
+    const htmlElement = document.documentElement;
+
+    Object.entries(themeVariables).forEach(([key, value]) => {
+      htmlElement.style.setProperty(key, value);
+    });
+  }, [themeColor, themeMode]);
 
   return (
-    <ThemeContext.Provider value={{ value: theme }}>
+    <ThemeContext.Provider value={{ mode: themeMode, color: themeColor }}>
       {children}
     </ThemeContext.Provider>
   );
