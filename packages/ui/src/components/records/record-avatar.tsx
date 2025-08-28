@@ -51,7 +51,7 @@ export const RecordAvatar = () => {
           id={record.id}
           name={record.name}
           avatar={record.avatar}
-          className="h-6 w-6"
+          className="size-6"
         />
       </Button>
     </AvatarPopover>

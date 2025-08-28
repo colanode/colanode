@@ -83,7 +83,7 @@ export const PageForm = ({
                   id={id}
                   name={name}
                   avatar={avatar}
-                  className="h-6 w-6"
+                  className="size-6"
                 />
               </Button>
             </AvatarPopover>

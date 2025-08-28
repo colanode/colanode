@@ -39,7 +39,7 @@ export const EmojiSkinToneSelector = ({
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button size="icon" variant="outline">
+        <Button size="icon" variant="outline" className="p-2">
           <EmojiElement
             id={emoji.skins[skinTone || 0]?.id ?? ''}
             className="h-full w-full"
@@ -49,11 +49,11 @@ export const EmojiSkinToneSelector = ({
       <PopoverContent className="flex flex-row gap-1 p-1 w-60">
         {emoji.skins.map((skin, idx) => (
           <Button
-            key={`skin-selector-${skin}`}
+            key={`skin-selector-${skin.id}`}
             size="icon"
             variant="ghost"
             onClick={() => handleSkinToneSelection(idx)}
-            className="size-8"
+            className="size-8 p-1"
           >
             <EmojiElement id={skin.id} className="h-full w-full" />
           </Button>

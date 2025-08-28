@@ -1,5 +1,6 @@
 import { useApp } from '@colanode/ui/contexts/app';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { cn } from '@colanode/ui/lib/utils';
 
 interface IconElementProps {
   id: string;
@@ -8,9 +9,11 @@ interface IconElementProps {
 
 const IconElementWeb = ({ id, className }: IconElementProps) => {
   return (
-    <svg className={className}>
-      <use href={`/assets/icons.svg#${id}`} />
-    </svg>
+    <div className={cn('icon-element', className)}>
+      <svg>
+        <use href={`/assets/icons.svg#${id}`} />
+      </svg>
+    </div>
   );
 };
 
@@ -34,7 +37,10 @@ const IconElementDesktop = ({ id, className }: IconElementProps) => {
   }
 
   return (
-    <div className={className} dangerouslySetInnerHTML={{ __html: svg }} />
+    <div
+      className={cn('icon-element', className)}
+      dangerouslySetInnerHTML={{ __html: svg }}
+    />
   );
 };
 

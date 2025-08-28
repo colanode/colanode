@@ -1,5 +1,6 @@
 import { useApp } from '@colanode/ui/contexts/app';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { cn } from '@colanode/ui/lib/utils';
 
 interface EmojiElementProps {
   id: string;
@@ -9,9 +10,11 @@ interface EmojiElementProps {
 
 const EmojiElementWeb = ({ id, className, onClick }: EmojiElementProps) => {
   return (
-    <svg className={className} onClick={onClick}>
-      <use href={`/assets/emojis.svg#${id}`} />
-    </svg>
+    <div className={cn('emoji-element', className)} onClick={onClick}>
+      <svg>
+        <use href={`/assets/emojis.svg#${id}`} />
+      </svg>
+    </div>
   );
 };
 
@@ -36,7 +39,7 @@ const EmojiElementDesktop = ({ id, className, onClick }: EmojiElementProps) => {
 
   return (
     <div
-      className={className}
+      className={cn('emoji-element', className)}
       onClick={onClick}
       dangerouslySetInnerHTML={{ __html: svg }}
     />
