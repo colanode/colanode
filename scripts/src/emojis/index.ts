@@ -101,7 +101,7 @@ const EMOJI_MART_DATA_FILE_PATH = path.join(
 );
 
 const TWEEMOJI_REPO = 'jdecked/twemoji';
-const TWEEMOJI_TAG = '15.1.0';
+const TWEEMOJI_TAG = '16.0.1';
 const TWEEMOJI_DIR_PATH = path.join(WORK_DIR_PATH, `twemoji-${TWEEMOJI_TAG}`);
 const TWEEMOJI_SVG_DIR_PATH = path.join(TWEEMOJI_DIR_PATH, 'assets', 'svg');
 
@@ -250,6 +250,7 @@ const initDatabase = () => {
 
   database.exec(CREATE_CATEGORIES_TABLE_SQL);
   database.exec(CREATE_EMOJITS_TABLE_SQL);
+  database.exec(CREATE_EMOJI_SKINS_TABLE_SQL);
   database.exec(CREATE_EMOJI_SVGS_TABLE_SQL);
   database.exec(CREATE_EMOJI_SEARCH_TABLE_SQL);
   database.exec(CREATE_EMOJI_CATEGORY_INDEX_SQL);
@@ -331,8 +332,10 @@ const processEmojis = (
   const insertSearch = database.prepare(INSERT_SEARCH_SQL);
   const insertSearchMin = minDatabase.prepare(INSERT_SEARCH_SQL);
 
+  const upsertEmojiSkin = database.prepare(UPSERT_EMOJI_SKIN_SQL);
+  const upsertEmojiSkinMin = minDatabase.prepare(UPSERT_EMOJI_SKIN_SQL);
+
   const upsertSvg = database.prepare(UPSERT_SVG_SQL);
-  const upsertEmojiSkin = minDatabase.prepare(UPSERT_EMOJI_SKIN_SQL);
 
   const existingMetadata = readExistingMetadata(database);
 
@@ -481,7 +484,13 @@ const processEmojis = (
           emoji_id: newEmoji.id,
           svg: svgBuffer,
         });
+
         upsertEmojiSkin.run({
+          skin_id: skin.id,
+          emoji_id: newEmoji.id,
+        });
+
+        upsertEmojiSkinMin.run({
           skin_id: skin.id,
           emoji_id: newEmoji.id,
         });

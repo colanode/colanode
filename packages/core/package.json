@@ -5,7 +5,11 @@
   "type": "module",
   "types": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./registry/*": "./src/registry/*",
+    "./lib/*": "./src/lib/*",
+    "./types/*": "./src/types/*",
+    "./synchronizers/*": "./src/synchronizers/*"
   },
   "files": [
     "src"

@@ -89,7 +89,7 @@ const REMIX_ICON_TAGS_FILE_PATH = path.join(REMIX_ICON_DIR_PATH, 'tags.json');
 const REMIX_ICON_ICONS_DIR_PATH = path.join(REMIX_ICON_DIR_PATH, 'icons');
 
 const SIMPLE_ICONS_REPO = 'simple-icons/simple-icons';
-const SIMPLE_ICONS_TAG = '14.13.0';
+const SIMPLE_ICONS_TAG = '15.12.0';
 const SIMPLE_ICONS_DIR_PATH = path.join(
   WORK_DIR_PATH,
   `simple-icons-${SIMPLE_ICONS_TAG}`
