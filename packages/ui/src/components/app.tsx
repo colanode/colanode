@@ -7,7 +7,6 @@ import { AppThemeProvider } from '@colanode/ui/components/app/app-theme-provider
 import { AppLoader } from '@colanode/ui/components/app-loader';
 import { RadarProvider } from '@colanode/ui/components/radar-provider';
 import { ServerProvider } from '@colanode/ui/components/servers/server-provider';
-import { DelayedComponent } from '@colanode/ui/components/ui/delayed-component';
 import { AppContext } from '@colanode/ui/contexts/app';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -38,11 +37,7 @@ export const App = ({ type }: AppProps) => {
     appMetadataListQuery.isPending ||
     accountListQuery.isPending
   ) {
-    return (
-      <DelayedComponent>
-        <AppLoader />
-      </DelayedComponent>
-    );
+    return <AppLoader />;
   }
 
   const accountMetadata = appMetadataListQuery.data?.find(

@@ -3,16 +3,7 @@ import { useEffect, useState } from 'react';
 import { ThemeMode } from '@colanode/client/types';
 import { useApp } from '@colanode/ui/contexts/app';
 import { ThemeContext } from '@colanode/ui/contexts/theme';
-import { getThemeVariables } from '@colanode/ui/lib/themes';
-
-const getSystemTheme = (): ThemeMode => {
-  if (typeof window === 'undefined' || !window.matchMedia) {
-    return 'light';
-  }
-
-  const isDark = window.matchMedia('(prefers-color-scheme: dark)')?.matches;
-  return isDark ? 'dark' : 'light';
-};
+import { getSystemTheme, getThemeVariables } from '@colanode/ui/lib/themes';
 
 export const AppThemeProvider = ({
   children,

@@ -8,6 +8,26 @@
     <meta name="description" content="Colanode" />
     <link rel="manifest" href="/manifest.json" />
     <title>Colanode</title>
+
+    <style>
+      :root {
+        --background: oklch(1 0 0);
+        --foreground: oklch(0.145 0 0);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --background: oklch(0.145 0 0);
+          --foreground: oklch(0.985 0 0);
+        }
+      }
+
+      body,
+      html {
+        background-color: var(--background);
+        color: var(--foreground);
+      }
+    </style>
   </head>
   <body>
     <div id="root"></div>
