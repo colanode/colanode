@@ -12,7 +12,7 @@ interface IconElementProps {
 const IconElementWeb = ({ id, className }: IconElementProps) => {
   return (
     <div className={cn('icon-element', className)}>
-      <svg>
+      <svg fill="currentColor" viewBox="0 0 24 24">
         <use href={`/assets/icons.svg#${id}`} />
       </svg>
     </div>

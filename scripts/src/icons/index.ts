@@ -5,6 +5,7 @@ import AdmZip from 'adm-zip';
 import SQLite from 'better-sqlite3';
 import ky from 'ky';
 import SvgSprite from 'svg-sprite';
+import { optimize } from 'svgo';
 
 import { generateId, IdType } from '@colanode/core';
 
@@ -178,6 +179,37 @@ const downloadZipAndExtract = async (url: string, dir: string) => {
   const buffer = await response.arrayBuffer();
   const zip = new AdmZip(Buffer.from(buffer));
   zip.extractAllTo(dir, true);
+};
+
+const processSvgContent = (svgContent: string): string => {
+  try {
+    const { data } = optimize(svgContent, {
+      multipass: true,
+      plugins: [
+        {
+          name: 'addAttributesToSVGElement',
+          params: {
+            attributes: [
+              {
+                fill: 'currentColor',
+              },
+            ],
+          },
+        },
+        {
+          name: 'removeTitle',
+        },
+      ],
+    });
+
+    return data;
+  } catch (error) {
+    console.warn(
+      'Failed to process SVG with SVGO, falling back to original:',
+      error
+    );
+    return svgContent;
+  }
 };
 
 const downloadRemixIconRepo = async () => {
@@ -378,13 +410,15 @@ const processIcons = (
       const svgPath = path.join(REMIX_ICON_ICONS_DIR_PATH, category, file);
       if (fs.existsSync(svgPath)) {
         const svgBuffer = fs.readFileSync(svgPath);
+        const svgContent = svgBuffer.toString('utf-8');
+        const processedSvg = processSvgContent(svgContent);
 
         upsertSvg.run({
           id: newIcon.id,
-          svg: svgBuffer,
+          svg: Buffer.from(processedSvg),
         });
 
-        sprite.add(newIcon.id, null, svgBuffer.toString('utf-8'));
+        sprite.add(newIcon.id, null, processedSvg);
       }
     }
   }
@@ -472,10 +506,12 @@ const processIcons = (
 
     if (fs.existsSync(svgFile)) {
       const svgBuffer = fs.readFileSync(svgFile);
+      const svgContent = svgBuffer.toString('utf-8');
+      const processedSvg = processSvgContent(svgContent);
 
-      upsertSvg.run({ id: logo.id, svg: svgBuffer });
+      upsertSvg.run({ id: logo.id, svg: Buffer.from(processedSvg) });
 
-      sprite.add(logo.id, null, svgBuffer.toString('utf-8'));
+      sprite.add(logo.id, null, processedSvg);
     }
   }
 
