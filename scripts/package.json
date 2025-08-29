@@ -10,7 +10,7 @@
     "seed": "tsx src/seed/index.ts"
   },
   "devDependencies": {
-    "@faker-js/faker": "^9.9.0",
+    "@faker-js/faker": "^10.0.0",
     "@types/adm-zip": "^0.5.7",
     "@types/better-sqlite3": "^7.6.12",
     "@types/svg-sprite": "^0.0.39"
@@ -20,7 +20,7 @@
     "@colanode/crdt": "*",
     "adm-zip": "^0.5.16",
     "better-sqlite3": "^12.2.0",
-    "ky": "^1.8.2",
+    "ky": "^1.9.1",
     "svg-sprite": "^2.0.4",
     "svgo": "^4.0.0"
   }
