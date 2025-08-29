@@ -1,10 +1,43 @@
-import { Laptop, Moon, Sun } from 'lucide-react';
+import { Check, Laptop, Moon, Sun } from 'lucide-react';
 
-import { ThemeColor } from '@colanode/client/types';
+import { ThemeColor, ThemeMode } from '@colanode/client/types';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useApp } from '@colanode/ui/contexts/app';
+import { cn } from '@colanode/ui/lib/utils';
+
+interface ThemeModeOption {
+  key: string;
+  value: ThemeMode | null;
+  label: string;
+  icon: typeof Laptop;
+  title: string;
+}
+
+const themeModeOptions: ThemeModeOption[] = [
+  {
+    key: 'system',
+    value: null,
+    label: 'System',
+    icon: Laptop,
+    title: 'Follow system',
+  },
+  {
+    key: 'light',
+    value: 'light',
+    label: 'Light',
+    icon: Sun,
+    title: 'Light theme',
+  },
+  {
+    key: 'dark',
+    value: 'dark',
+    label: 'Dark',
+    icon: Moon,
+    title: 'Dark theme',
+  },
+];
 
 const themeColorOptions = [
   { value: 'default', label: 'Default', color: 'oklch(0.205 0 0)' },
@@ -31,33 +64,36 @@ export const AppAppearanceSettings = () => {
         </div>
 
         <div className="flex items-center gap-3">
-          <Button
-            variant={!themeMode ? 'default' : 'outline'}
-            onClick={() => app.deleteMetadata('theme.mode')}
-            className="h-12 min-w-32 justify-center gap-2"
-            title="Follow system"
-          >
-            <Laptop className="size-5" />
-            System
-          </Button>
-          <Button
-            variant={themeMode === 'light' ? 'default' : 'outline'}
-            onClick={() => app.setMetadata('theme.mode', 'light')}
-            className="h-12 min-w-32 justify-center gap-2"
-            title="Light theme"
-          >
-            <Sun className="size-5" />
-            Light
-          </Button>
-          <Button
-            variant={themeMode === 'dark' ? 'default' : 'outline'}
-            onClick={() => app.setMetadata('theme.mode', 'dark')}
-            className="h-12 min-w-32 justify-center gap-2"
-            title="Dark theme"
-          >
-            <Moon className="size-5" />
-            Dark
-          </Button>
+          {themeModeOptions.map((option) => {
+            const isActive =
+              option.value === null ? !themeMode : themeMode === option.value;
+            const Icon = option.icon;
+
+            return (
+              <Button
+                key={option.key}
+                variant="outline"
+                onClick={() => {
+                  if (option.value === null) {
+                    app.deleteMetadata('theme.mode');
+                  } else {
+                    app.setMetadata('theme.mode', option.value);
+                  }
+                }}
+                className={cn(
+                  'h-10 min-w-32 justify-center gap-2 relative',
+                  isActive && 'ring-1 ring-ring border-primary'
+                )}
+                title={option.title}
+              >
+                <Icon className="size-5" />
+                {option.label}
+                {isActive && (
+                  <Check className="size-5 absolute -top-2 -right-2 text-background bg-primary rounded-full p-0.5" />
+                )}
+              </Button>
+            );
+          })}
         </div>
 
         <div>
@@ -74,7 +110,7 @@ export const AppAppearanceSettings = () => {
             return (
               <Button
                 key={option.value}
-                variant={isActive ? 'default' : 'outline'}
+                variant="outline"
                 onClick={() => {
                   if (isDefault) {
                     app.deleteMetadata('theme.color');
@@ -82,14 +118,20 @@ export const AppAppearanceSettings = () => {
                     app.setMetadata('theme.color', option.value as ThemeColor);
                   }
                 }}
-                className="h-12 justify-start gap-3 text-left"
+                className={cn(
+                  'h-10 justify-start gap-3 text-left relative',
+                  isActive && 'ring-1 ring-ring border-primary'
+                )}
                 title={option.label}
               >
                 <div
-                  className="w-5 h-5 rounded-full border border-border/50 flex-shrink-0"
+                  className="size-5 rounded-full border border-border/50 flex-shrink-0"
                   style={{ backgroundColor: option.color }}
                 />
                 {option.label}
+                {isActive && (
+                  <Check className="size-5 absolute -top-2 -right-2 text-background bg-primary rounded-full p-0.5" />
+                )}
               </Button>
             );
           })}
