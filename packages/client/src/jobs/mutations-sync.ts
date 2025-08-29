@@ -30,7 +30,8 @@ export class MutationsSyncJobHandler implements JobHandler<MutationsSyncInput> {
 
   public readonly concurrency: JobConcurrencyConfig<MutationsSyncInput> = {
     limit: 1,
-    key: (input: MutationsSyncInput) => `mutations.sync.${input.workspaceId}`,
+    key: (input: MutationsSyncInput) =>
+      `mutations.sync.${input.accountId}.${input.workspaceId}`,
   };
 
   public async handleJob(input: MutationsSyncInput): Promise<JobOutput> {
@@ -44,7 +45,7 @@ export class MutationsSyncJobHandler implements JobHandler<MutationsSyncInput> {
     if (!account.server.isAvailable) {
       return {
         type: 'retry',
-        delay: ms('1 minute'),
+        delay: ms('5 seconds'),
       };
     }
 
