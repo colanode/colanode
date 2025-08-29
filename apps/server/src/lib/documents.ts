@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash-es';
+
 import {
   CanUpdateDocumentContext,
   DocumentContent,
@@ -17,6 +19,7 @@ import { fetchNode, fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
 import {
   CreateDocumentInput,
   CreateDocumentOutput,
+  UpdateDocumentInput,
 } from '@colanode/server/types/documents';
 import { ConcurrentUpdateResult } from '@colanode/server/types/nodes';
 
@@ -280,6 +283,151 @@ const tryUpdateDocumentFromMutation = async (
     return {
       type: 'success',
       output: MutationStatus.OK,
+    };
+  } catch (error) {
+    logger.error(error, `Failed to update document`);
+    return { type: 'retry' };
+  }
+};
+
+export const updateDocument = async (
+  input: UpdateDocumentInput
+): Promise<boolean> => {
+  for (let count = 0; count < UPDATE_RETRIES_LIMIT; count++) {
+    const result = await tryUpdateDocument(input);
+
+    if (result.type === 'success') {
+      return true;
+    }
+
+    if (result.type === 'error') {
+      return false;
+    }
+  }
+
+  return false;
+};
+
+const tryUpdateDocument = async (
+  input: UpdateDocumentInput
+): Promise<ConcurrentUpdateResult<boolean>> => {
+  const node = await fetchNode(input.documentId);
+  if (!node) {
+    return { type: 'error', error: 'Node not found' };
+  }
+
+  const model = getNodeModel(node.type);
+  if (!model.documentSchema) {
+    return { type: 'error', error: 'Node does not support documents' };
+  }
+
+  const documentUpdates = await database
+    .selectFrom('document_updates')
+    .where('document_id', '=', input.documentId)
+    .selectAll()
+    .execute();
+
+  const ydoc = new YDoc();
+  for (const update of documentUpdates) {
+    ydoc.applyUpdate(update.data);
+  }
+
+  const currentContent = ydoc.getObject<DocumentContent>();
+  const updatedContent = input.updater(cloneDeep(currentContent));
+  if (!updatedContent) {
+    return { type: 'error', error: 'Failed to update document' };
+  }
+
+  const update = ydoc.update(model.documentSchema, updatedContent);
+  if (!update) {
+    return { type: 'error', error: 'Failed to create document update' };
+  }
+
+  const content = ydoc.getObject<DocumentContent>();
+
+  if (!model.documentSchema.safeParse(content).success) {
+    return { type: 'error', error: 'Updated content is invalid' };
+  }
+
+  const date = new Date();
+  const updateId = generateId(IdType.Update);
+
+  try {
+    const { updatedDocument, createdDocumentUpdate } = await database
+      .transaction()
+      .execute(async (trx) => {
+        const createdDocumentUpdate = await trx
+          .insertInto('document_updates')
+          .returningAll()
+          .values({
+            id: updateId,
+            document_id: input.documentId,
+            root_id: node.root_id,
+            workspace_id: input.workspaceId,
+            data: update,
+            created_at: date,
+            created_by: input.userId,
+            merged_updates: null,
+          })
+          .executeTakeFirst();
+
+        if (!createdDocumentUpdate) {
+          throw new Error('Failed to create document update');
+        }
+
+        const updatedDocument = await trx
+          .insertInto('documents')
+          .returningAll()
+          .values({
+            id: input.documentId,
+            workspace_id: input.workspaceId,
+            content: JSON.stringify(content),
+            created_at: date,
+            created_by: input.userId,
+            revision: createdDocumentUpdate.revision,
+          })
+          .onConflict((cb) =>
+            cb.column('id').doUpdateSet({
+              content: JSON.stringify(content),
+              updated_at: date,
+              updated_by: input.userId,
+              revision: createdDocumentUpdate.revision,
+            })
+          )
+          .executeTakeFirst();
+
+        if (!updatedDocument) {
+          throw new Error('Failed to update document');
+        }
+
+        return {
+          updatedDocument,
+          createdDocumentUpdate,
+        };
+      });
+
+    if (!updatedDocument || !createdDocumentUpdate) {
+      throw new Error('Failed to update document');
+    }
+
+    eventBus.publish({
+      type: 'document.updated',
+      documentId: input.documentId,
+      workspaceId: input.workspaceId,
+    });
+
+    eventBus.publish({
+      type: 'document.update.created',
+      documentId: input.documentId,
+      rootId: node.root_id,
+      workspaceId: input.workspaceId,
+    });
+
+    await scheduleDocumentEmbedding(input.documentId);
+
+    return {
+      type: 'success',
+      output: true,
     };
   } catch (error) {
     logger.error(error, `Failed to update document`);

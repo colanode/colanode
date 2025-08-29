@@ -730,6 +730,7 @@ export const deleteNodeFromMutation = async (
   await jobService.addJob({
     type: 'node.clean',
     nodeId: mutation.nodeId,
+    parentId: node.parent_id,
     workspaceId: user.workspace_id,
     userId: user.id,
   });

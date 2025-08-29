@@ -1,6 +1,8 @@
+import { getIdType, IdType } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { CreateNodeTombstone } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
+import { updateDocument } from '@colanode/server/lib/documents';
 import { eventBus } from '@colanode/server/lib/event-bus';
 import { deleteFile } from '@colanode/server/lib/files';
 import { createLogger } from '@colanode/server/lib/logger';
@@ -11,6 +13,7 @@ const logger = createLogger('server:job:clean-node-data');
 export type NodeCleanInput = {
   type: 'node.clean';
   nodeId: string;
+  parentId: string | null;
   workspaceId: string;
   userId: string;
 };
@@ -28,6 +31,10 @@ export const nodeCleanHandler: JobHandler<NodeCleanInput> = async (input) => {
 
   await cleanNodeRelations([input.nodeId]);
   await cleanNodeFiles([input.nodeId]);
+
+  if (input.parentId) {
+    await cleanNodeFromDocument(input);
+  }
 
   let hasMore = true;
   while (hasMore) {
@@ -163,4 +170,29 @@ const cleanNodeFiles = async (nodeIds: string[]) => {
       .where('file_id', 'in', nodeIds)
       .execute();
   }
+};
+
+const cleanNodeFromDocument = async (input: NodeCleanInput) => {
+  if (!input.parentId) {
+    return;
+  }
+
+  const parentIdType = getIdType(input.parentId);
+  if (parentIdType !== IdType.Page && parentIdType !== IdType.Record) {
+    return;
+  }
+
+  await updateDocument({
+    documentId: input.parentId,
+    userId: input.userId,
+    workspaceId: input.workspaceId,
+    updater: (content) => {
+      if (!content.blocks[input.nodeId]) {
+        return content;
+      }
+
+      delete content.blocks[input.nodeId];
+      return content;
+    },
+  });
 };

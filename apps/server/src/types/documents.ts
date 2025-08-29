@@ -11,3 +11,10 @@ export type CreateDocumentInput = {
 export type CreateDocumentOutput = {
   document: SelectDocument;
 };
+
+export type UpdateDocumentInput = {
+  documentId: string;
+  userId: string;
+  workspaceId: string;
+  updater: (content: DocumentContent) => DocumentContent | null;
+};
