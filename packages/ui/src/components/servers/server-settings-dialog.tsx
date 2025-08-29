@@ -80,7 +80,9 @@ export const ServerSettingsDialog = ({
                       variant="default"
                       className={cn(
                         'cursor-pointer select-none',
-                        isAvailable ? 'bg-emerald-500' : 'bg-destructive'
+                        isAvailable
+                          ? 'bg-emerald-500 dark:bg-emerald-700'
+                          : 'bg-destructive'
                       )}
                     >
                       {server.state?.isAvailable ? 'Available' : 'Unavailable'}

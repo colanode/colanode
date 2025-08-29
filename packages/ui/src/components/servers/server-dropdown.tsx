@@ -92,7 +92,7 @@ export const ServerDropdown = ({
                   onChange(server.domain);
                 }
               }}
-              className="group/server flex w-full flex-grow flex-row items-center gap-3 rounded-md border-b border-input p-2 cursor-pointer hover:bg-accent"
+              className="group/server flex w-full flex-grow flex-row items-center gap-3 p-2 cursor-pointer hover:bg-accent"
             >
               <div className="flex flex-grow items-center gap-3">
                 <ServerAvatar
@@ -108,7 +108,7 @@ export const ServerDropdown = ({
                 </div>
               </div>
               <button
-                className="text-muted-foreground opacity-0 group-hover/server:opacity-100 hover:bg-accent size-8 flex items-center justify-center rounded-md cursor-pointer"
+                className="text-muted-foreground opacity-0 group-hover/server:opacity-100 hover:bg-input size-8 flex items-center justify-center rounded-md cursor-pointer"
                 onClick={(e) => {
                   e.stopPropagation();
                   e.preventDefault();
