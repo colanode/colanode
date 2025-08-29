@@ -1,3 +1,5 @@
+import { ShieldQuestionMark } from 'lucide-react';
+
 import { useApp } from '@colanode/ui/contexts/app';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
@@ -28,13 +30,13 @@ const EmojiElementDesktop = ({ id, className, onClick }: EmojiElementProps) => {
     return null;
   }
 
-  if (svgQuery.isError) {
-    return null;
-  }
-
   const svg = svgQuery.data;
   if (!svg) {
-    return null;
+    return (
+      <div className={cn('emoji-element', className)} onClick={onClick}>
+        <ShieldQuestionMark />
+      </div>
+    );
   }
 
   return (

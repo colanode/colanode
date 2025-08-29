@@ -47,7 +47,7 @@ export const MessageReactionCountTooltipContent = ({
     .filter((result) => result.data !== null)
     .map((result) => result.data!.customName ?? result.data!.name);
 
-  const emojiName = `:${emojiGetQuery.data?.code ?? reactionCount.reaction}:`;
+  const emojiName = `:${emojiGetQuery.data?.code ?? emojiGetQuery.data?.name ?? reactionCount.reaction}:`;
 
   return (
     <div className="flex items-center gap-4">
