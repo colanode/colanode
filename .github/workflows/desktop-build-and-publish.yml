@@ -329,9 +329,11 @@ jobs:
           echo "=== Package.json contents ==="
           cat package.json | grep -E "(name|version|executableName)"
           echo "=== Forge config name ==="
-          echo "Expected name: colanode-desktop"
+          echo "Expected name: colanode"
           echo "=== Looking for executable ==="
           find out/ -name "colanode" -type f 2>/dev/null || echo "Executable 'colanode' not found"
+          echo "=== Expected binary path ==="
+          echo "Should be: out/colanode-linux-x64/colanode"
 
       - name: Publish Electron App
         env:
