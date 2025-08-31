@@ -107,17 +107,6 @@ const config: ForgeConfig = {
         },
       },
     },
-    {
-      name: '@electron-forge/maker-appimage',
-      config: {
-        options: {
-          icon: 'assets/colanode-logo-black.png',
-          categories: ['Development', 'Utility'],
-          maintainer: 'Colanode',
-          homepage: 'https://github.com/colanode/colanode',
-        },
-      },
-    },
   ],
   publishers: [
     {
