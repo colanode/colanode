@@ -191,28 +191,36 @@ const config: ForgeConfig = {
         force: true,
       });
     },
-    postPackage: async (_, buildPath) => {
+    postPackage: async (forgeConfig, buildPath) => {
+      console.log('🔧 postPackage hook called');
+      console.log('📁 buildPath:', buildPath);
+      console.log('📋 forgeConfig:', typeof forgeConfig);
+      
       // Ensure the built package.json has the required license field
-      const packageJsonPath = path.join(buildPath, 'package.json');
-      try {
-        const packageJson = await fs.readFile(packageJsonPath, 'utf-8');
-        const content = JSON.parse(packageJson);
-        
-        // Ensure required fields are present for RPM/DEB makers
-        if (!content.license) {
-          content.license = 'MIT';
+      if (buildPath && typeof buildPath === 'string') {
+        const packageJsonPath = path.join(buildPath, 'package.json');
+        try {
+          const packageJson = await fs.readFile(packageJsonPath, 'utf-8');
+          const content = JSON.parse(packageJson);
+          
+          // Ensure required fields are present for RPM/DEB makers
+          if (!content.license) {
+            content.license = 'MIT';
+          }
+          if (!content.description) {
+            content.description = 'Colanode desktop application';
+          }
+          if (!content.maintainer) {
+            content.maintainer = 'Colanode';
+          }
+          
+          await fs.writeFile(packageJsonPath, JSON.stringify(content, null, 2));
+          console.log('✅ Updated built package.json with required fields');
+        } catch (error) {
+          console.error('❌ Failed to update built package.json:', error);
         }
-        if (!content.description) {
-          content.description = 'Colanode desktop application';
-        }
-        if (!content.maintainer) {
-          content.maintainer = 'Colanode';
-        }
-        
-        await fs.writeFile(packageJsonPath, JSON.stringify(content, null, 2));
-        console.log('✅ Updated built package.json with required fields');
-      } catch (error) {
-        console.error('❌ Failed to update built package.json:', error);
+      } else {
+        console.log('⚠️ buildPath is not a string, skipping package.json update');
       }
       
       // Remove the node_modules directory
