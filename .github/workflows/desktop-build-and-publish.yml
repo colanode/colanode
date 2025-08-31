@@ -515,6 +515,11 @@ jobs:
           echo "🔑 Certificate path: $env:CERTIFICATE_PATH"
           echo "🔑 Certificate password: $env:CERTIFICATE_PASSWORD"
           
+          # Clean previous builds
+          if (Test-Path "out/") {
+            Remove-Item -Path "out/" -Recurse -Force
+          }
+          
           # Run the build with verbose output
           echo "🔨 Running: npm run make -- --platform=win32 --arch=x64"
           npm run make -- --platform=win32 --arch="x64" 2>&1
@@ -526,12 +531,21 @@ jobs:
           } else {
             echo "✅ Windows x64 build completed successfully"
           }
-          echo "📁 Checking output directory..."
+          
+          # Move x64 files to a separate directory
           if (Test-Path "out/") {
-            echo "out/ directory exists"
-            Get-ChildItem -Path "out/" -Recurse | Format-Table Name, Length, LastWriteTime
+            echo "📁 Moving x64 files to out-x64/"
+            New-Item -ItemType Directory -Path "out-x64" -Force
+            Copy-Item -Path "out/**/*" -Destination "out-x64/" -Recurse -Force
+            echo "✅ x64 files moved to out-x64/"
+          }
+          
+          echo "📁 Checking output directory..."
+          if (Test-Path "out-x64/") {
+            echo "out-x64/ directory exists"
+            Get-ChildItem -Path "out-x64/" -Recurse | Format-Table Name, Length, LastWriteTime
           } else {
-            echo "❌ out/ directory not found"
+            echo "❌ out-x64/ directory not found"
           }
           
           echo "🔍 Environment variables for signing:"
@@ -556,6 +570,11 @@ jobs:
           echo "🔑 Certificate path: $env:CERTIFICATE_PATH"
           echo "🔑 Certificate password: $env:CERTIFICATE_PASSWORD"
           
+          # Clean previous builds
+          if (Test-Path "out/") {
+            Remove-Item -Path "out/" -Recurse -Force
+          }
+          
           # Run the build with verbose output
           echo "🔨 Running: npm run make -- --platform=win32 --arch=arm64"
           npm run make -- --platform=win32 --arch="arm64" 2>&1
@@ -567,12 +586,21 @@ jobs:
           } else {
             echo "✅ Windows ARM64 build completed successfully"
           }
-          echo "📁 Checking output directory..."
+          
+          # Move ARM64 files to a separate directory
           if (Test-Path "out/") {
-            echo "out/ directory exists"
-            Get-ChildItem -Path "out/" -Recurse | Format-Table Name, Length, LastWriteTime
+            echo "📁 Moving ARM64 files to out-arm64/"
+            New-Item -ItemType Directory -Path "out-arm64" -Force
+            Copy-Item -Path "out/**/*" -Destination "out-arm64/" -Recurse -Force
+            echo "✅ ARM64 files moved to out-arm64/"
+          }
+          
+          echo "📁 Checking output directory..."
+          if (Test-Path "out-arm64/") {
+            echo "out-arm64/ directory exists"
+            Get-ChildItem -Path "out-arm64/" -Recurse | Format-Table Name, LastWriteTime
           } else {
-            echo "❌ out/ directory not found"
+            echo "❌ out-arm64/ directory not found"
           }
           
           echo "🔍 Environment variables for signing:"
@@ -589,32 +617,47 @@ jobs:
         shell: pwsh
         run: |
           echo "=== Windows Build Output Directory Structure ==="
-          echo "=== Full out/ directory contents ==="
-          if (Test-Path "out/") {
-            Get-ChildItem -Path "out/" -Recurse | Format-Table Name, Length, LastWriteTime
+          echo "=== Full out-x64/ directory contents ==="
+          if (Test-Path "out-x64/") {
+            Get-ChildItem -Path "out-x64/" -Recurse | Format-Table Name, Length, LastWriteTime
           } else {
-            echo "out/ directory not found"
+            echo "out-x64/ directory not found"
           }
+          
+          echo "=== Full out-arm64/ directory contents ==="
+          if (Test-Path "out-arm64/") {
+            Get-ChildItem -Path "out-arm64/" -Recurse | Format-Table Name, Length, LastWriteTime
+          } else {
+            echo "out-arm64/ directory not found"
+          }
+          
           echo "=== Looking for Windows x64 packages ==="
-          $x64Packages = Get-ChildItem -Path "out/" -Recurse -Include "*x64*.exe", "*x64*.msi", "*x64*.zip" -ErrorAction SilentlyContinue
+          $x64Packages = Get-ChildItem -Path "out-x64/" -Recurse -Include "*.exe", "*.msi", "*.zip" -ErrorAction SilentlyContinue
           if ($x64Packages) {
             echo "Found x64 packages:"
             $x64Packages | ForEach-Object { echo "  $($_.FullName)" }
           } else {
-            echo "No x64 packages found"
+            echo "No x64 packages found in out-x64/"
           }
           
           echo "=== Looking for Windows ARM64 packages ==="
-          $arm64Packages = Get-ChildItem -Path "out/" -Recurse -Include "*arm64*.exe", "*arm64*.msi", "*arm64*.zip" -ErrorAction SilentlyContinue
+          $arm64Packages = Get-ChildItem -Path "out-arm64/" -Recurse -Include "*.exe", "*.msi", "*.zip" -ErrorAction SilentlyContinue
           if ($arm64Packages) {
             echo "Found ARM64 packages:"
             $arm64Packages | ForEach-Object { echo "  $($_.FullName)" }
           } else {
-            echo "No ARM64 packages found"
+            echo "No ARM64 packages found in out-arm64/"
           }
           
           echo "=== Looking for ALL Windows packages (any extension) ==="
-          $allPackages = Get-ChildItem -Path "out/" -Recurse -Include "*.exe", "*.msi", "*.zip" -ErrorAction SilentlyContinue
+          $allPackages = @()
+          if (Test-Path "out-x64/") {
+            $allPackages += Get-ChildItem -Path "out-x64/" -Recurse -Include "*.exe", "*.msi", "*.zip" -ErrorAction SilentlyContinue
+          }
+          if (Test-Path "out-arm64/") {
+            $allPackages += Get-ChildItem -Path "out-arm64/" -Recurse -Include "*.exe", "*.msi", "*.zip" -ErrorAction SilentlyContinue
+          }
+          
           if ($allPackages) {
             echo "Found all Windows packages:"
             $allPackages | ForEach-Object { echo "  $($_.FullName)" }
@@ -622,13 +665,25 @@ jobs:
             echo "No Windows packages found at all"
           }
           
-          echo "=== Looking for any files in out/ directory ==="
-          $anyFiles = Get-ChildItem -Path "out/" -Recurse -ErrorAction SilentlyContinue
-          if ($anyFiles) {
-            echo "Found any files in out/:"
-            $anyFiles | ForEach-Object { echo "  $($_.Name) - $($_.Extension)" }
-          } else {
-            echo "No files found in out/ directory"
+          echo "=== Looking for any files in both directories ==="
+          if (Test-Path "out-x64/") {
+            $x64Files = Get-ChildItem -Path "out-x64/" -Recurse -ErrorAction SilentlyContinue
+            if ($x64Files) {
+              echo "Found files in out-x64/:"
+              $x64Files | ForEach-Object { echo "  $($_.Name) - $($_.Extension)" }
+            } else {
+              echo "No files found in out-x64/ directory"
+            }
+          }
+          
+          if (Test-Path "out-arm64/") {
+            $arm64Files = Get-ChildItem -Path "out-arm64/" -Recurse -ErrorAction SilentlyContinue
+            if ($arm64Files) {
+              echo "Found files in out-arm64/:"
+              $arm64Files | ForEach-Object { echo "  $($_.Name) - $($_.Extension)" }
+            } else {
+              echo "No files found in out-arm64/ directory"
+            }
           }
 
       - name: Publish Electron App
@@ -667,7 +722,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-x64.exe
-          path: apps/desktop/out/**/*x64*.exe
+          path: apps/desktop/out-x64/**/*.exe
           retention-days: 30
           if-no-files-found: warn
 
@@ -675,7 +730,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-x64.msi
-          path: apps/desktop/out/**/*x64*.msi
+          path: apps/desktop/out-x64/**/*.msi
           retention-days: 30
           if-no-files-found: warn
 
@@ -683,7 +738,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-x64.zip
-          path: apps/desktop/out/**/*x64*.zip
+          path: apps/desktop/out-x64/**/*.zip
           retention-days: 30
           if-no-files-found: warn
 
@@ -691,7 +746,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-arm64.exe
-          path: apps/desktop/out/**/*arm64*.exe
+          path: apps/desktop/out-arm64/**/*.exe
           retention-days: 30
           if-no-files-found: warn
 
@@ -699,7 +754,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-arm64.msi
-          path: apps/desktop/out/**/*arm64*.msi
+          path: apps/desktop/out-arm64/**/*.msi
           retention-days: 30
           if-no-files-found: warn
 
@@ -707,7 +762,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-arm64.zip
-          path: apps/desktop/out/**/*arm64*.zip
+          path: apps/desktop/out-arm64/**/*.zip
           retention-days: 30
           if-no-files-found: warn
 
@@ -715,7 +770,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-windows-all
-          path: apps/desktop/out/**/*.{exe,msi,zip}
+          path: |
+            apps/desktop/out-x64/**/*.{exe,msi,zip}
+            apps/desktop/out-arm64/**/*.{exe,msi,zip}
           retention-days: 30
           if-no-files-found: warn
 
