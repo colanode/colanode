@@ -303,9 +303,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: apps/desktop
-        run: |
-          npm ci
-          npm install @electron-forge/maker-appimage@^7.8.3
+        run: npm ci
 
       - name: Build Electron App (Linux)
         env:
@@ -401,9 +399,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: apps/desktop
-        run: |
-          npm ci
-          npm install @electron-forge/maker-appimage@^7.8.3
+        run: npm ci
 
       - name: Build Electron App
         env:
@@ -517,9 +513,7 @@ jobs:
 
       - name: Install Dependencies
         working-directory: apps/desktop
-        run: |
-          npm ci
-          npm install @electron-forge/maker-appimage@^7.8.3
+        run: npm ci
 
       - name: Build Electron App (macOS Apple Silicon)
         env:
