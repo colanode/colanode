@@ -15,7 +15,7 @@ const config: ForgeConfig = {
     icon: 'assets/colanode-logo-black',
     appBundleId: 'com.colanode.desktop',
     overwrite: true,
-    ...(process.platform === 'win32' && {
+    ...(process.env.SIGNING_ENABLED === 'true' && {
       certificateFile: process.env.CERTIFICATE_PATH,
       certificatePassword: process.env.CERTIFICATE_PASSWORD,
     }),
@@ -74,7 +74,7 @@ const config: ForgeConfig = {
   makers: [
     new MakerSquirrel({
       name: 'colanode',
-      ...(process.platform === 'win32' && {
+      ...(process.env.SIGNING_ENABLED === 'true' && {
         certificateFile: process.env.CERTIFICATE_PATH,
         certificatePassword: process.env.CERTIFICATE_PASSWORD,
       }),

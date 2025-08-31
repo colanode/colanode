@@ -456,13 +456,32 @@ jobs:
 
       - name: Decode certificate
         run: |
-          $certPath = Join-Path -Path $env:RUNNER_TEMP -ChildPath "build_cert.pfx"
-          $certContent = [System.Convert]::FromBase64String($env:WINDOWS_CERT_BASE64)
-          [IO.File]::WriteAllBytes($certPath, $certContent)
-          echo "CERTIFICATE_PATH=$certPath" >> $env:GITHUB_ENV
+          echo "🔐 Decoding Windows certificate..."
+          
+          if ([string]::IsNullOrEmpty($env:WINDOWS_CERT_BASE64)) {
+            echo "⚠️  Warning: WINDOWS_CERT_BASE64 secret is not set"
+            echo "🔧 Building without code signing (packages will be unsigned)"
+            echo "CERTIFICATE_PATH=" >> $env:GITHUB_ENV
+            echo "CERTIFICATE_PASSWORD=" >> $env:GITHUB_ENV
+            echo "SIGNING_ENABLED=false" >> $env:GITHUB_ENV
+          } else {
+            echo "✅ Windows certificate secret is configured"
+            echo "🔐 Proceeding with code signing..."
+            echo "SIGNING_ENABLED=true" >> $env:GITHUB_ENV
+            
+            $certPath = Join-Path -Path $env:RUNNER_TEMP -ChildPath "build_cert.pfx"
+            $certContent = [System.Convert]::FromBase64String($env:WINDOWS_CERT_BASE64)
+            [IO.File]::WriteAllBytes($certPath, $certContent)
+            echo "CERTIFICATE_PATH=$certPath" >> $env:GITHUB_ENV
+            echo "CERTIFICATE_PASSWORD=$env:WINDOWS_CERT_PASSWORD" >> $env:GITHUB_ENV
+            
+            echo "📁 Certificate saved to: $certPath"
+            echo "🔑 Certificate password: $env:WINDOWS_CERT_PASSWORD"
+          }
         shell: pwsh
         env:
           WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
+          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
 
       - name: Update package.json version
         shell: bash
@@ -487,19 +506,83 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CERTIFICATE_PATH: ${{ env.CERTIFICATE_PATH }}
-          CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+          CERTIFICATE_PASSWORD: ${{ env.CERTIFICATE_PASSWORD }}
           NODE_ENV: production
         working-directory: apps/desktop
-        run: npm run make -- --platform=win32 --arch="x64"
+        run: |
+          echo "🔨 Building Windows x64 package..."
+          echo "📁 Current directory: $(pwd)"
+          echo "🔑 Certificate path: $env:CERTIFICATE_PATH"
+          echo "🔑 Certificate password: $env:CERTIFICATE_PASSWORD"
+          
+          # Run the build with verbose output
+          echo "🔨 Running: npm run make -- --platform=win32 --arch=x64"
+          npm run make -- --platform=win32 --arch="x64" 2>&1
+          $BUILD_EXIT_CODE = $LASTEXITCODE
+          
+          if ($BUILD_EXIT_CODE -ne 0) {
+            echo "❌ Windows x64 build failed with exit code: $BUILD_EXIT_CODE"
+            exit $BUILD_EXIT_CODE
+          } else {
+            echo "✅ Windows x64 build completed successfully"
+          }
+          echo "📁 Checking output directory..."
+          if (Test-Path "out/") {
+            echo "out/ directory exists"
+            Get-ChildItem -Path "out/" -Recurse | Format-Table Name, Length, LastWriteTime
+          } else {
+            echo "❌ out/ directory not found"
+          }
+          
+          echo "🔍 Environment variables for signing:"
+          echo "  SIGNING_ENABLED: $env:SIGNING_ENABLED"
+          echo "  CERTIFICATE_PATH: $env:CERTIFICATE_PATH"
+          echo "  CERTIFICATE_PASSWORD: $env:CERTIFICATE_PASSWORD"
+          
+          echo "📁 Current working directory: $(pwd)"
+          echo "📁 Listing all files in current directory:"
+          Get-ChildItem -Path "." -Recurse -Depth 1 | Format-Table Name, Length, LastWriteTime
 
       - name: Build Electron App (Windows ARM64)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           CERTIFICATE_PATH: ${{ env.CERTIFICATE_PATH }}
-          CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+          CERTIFICATE_PASSWORD: ${{ env.CERTIFICATE_PASSWORD }}
           NODE_ENV: production
         working-directory: apps/desktop
-        run: npm run make -- --platform=win32 --arch="arm64"
+        run: |
+          echo "🔨 Building Windows ARM64 package..."
+          echo "📁 Current directory: $(pwd)"
+          echo "🔑 Certificate path: $env:CERTIFICATE_PATH"
+          echo "🔑 Certificate password: $env:CERTIFICATE_PASSWORD"
+          
+          # Run the build with verbose output
+          echo "🔨 Running: npm run make -- --platform=win32 --arch=arm64"
+          npm run make -- --platform=win32 --arch="arm64" 2>&1
+          $BUILD_EXIT_CODE = $LASTEXITCODE
+          
+          if ($BUILD_EXIT_CODE -ne 0) {
+            echo "❌ Windows ARM64 build failed with exit code: $BUILD_EXIT_CODE"
+            exit $BUILD_EXIT_CODE
+          } else {
+            echo "✅ Windows ARM64 build completed successfully"
+          }
+          echo "📁 Checking output directory..."
+          if (Test-Path "out/") {
+            echo "out/ directory exists"
+            Get-ChildItem -Path "out/" -Recurse | Format-Table Name, Length, LastWriteTime
+          } else {
+            echo "❌ out/ directory not found"
+          }
+          
+          echo "🔍 Environment variables for signing:"
+          echo "  SIGNING_ENABLED: $env:SIGNING_ENABLED"
+          echo "  CERTIFICATE_PATH: $env:CERTIFICATE_PATH"
+          echo "  CERTIFICATE_PASSWORD: $env:CERTIFICATE_PASSWORD"
+          
+          echo "📁 Current working directory: $(pwd)"
+          echo "📁 Listing all files in current directory:"
+          Get-ChildItem -Path "." -Recurse -Depth 1 | Format-Table Name, Length, LastWriteTime
 
       - name: Debug Windows Build Output
         working-directory: apps/desktop
@@ -528,6 +611,24 @@ jobs:
             $arm64Packages | ForEach-Object { echo "  $($_.FullName)" }
           } else {
             echo "No ARM64 packages found"
+          }
+          
+          echo "=== Looking for ALL Windows packages (any extension) ==="
+          $allPackages = Get-ChildItem -Path "out/" -Recurse -Include "*.exe", "*.msi", "*.zip" -ErrorAction SilentlyContinue
+          if ($allPackages) {
+            echo "Found all Windows packages:"
+            $allPackages | ForEach-Object { echo "  $($_.FullName)" }
+          } else {
+            echo "No Windows packages found at all"
+          }
+          
+          echo "=== Looking for any files in out/ directory ==="
+          $anyFiles = Get-ChildItem -Path "out/" -Recurse -ErrorAction SilentlyContinue
+          if ($anyFiles) {
+            echo "Found any files in out/:"
+            $anyFiles | ForEach-Object { echo "  $($_.Name) - $($_.Extension)" }
+          } else {
+            echo "No files found in out/ directory"
           }
 
       - name: Publish Electron App
@@ -568,6 +669,7 @@ jobs:
           name: Colanode-${{ env.VERSION }}-x64.exe
           path: apps/desktop/out/**/*x64*.exe
           retention-days: 30
+          if-no-files-found: warn
 
       - name: Upload Windows x64 MSI
         uses: actions/upload-artifact@v4
@@ -575,6 +677,7 @@ jobs:
           name: Colanode-${{ env.VERSION }}-x64.msi
           path: apps/desktop/out/**/*x64*.msi
           retention-days: 30
+          if-no-files-found: warn
 
       - name: Upload Windows x64 ZIP
         uses: actions/upload-artifact@v4
@@ -582,6 +685,7 @@ jobs:
           name: Colanode-${{ env.VERSION }}-x64.zip
           path: apps/desktop/out/**/*x64*.zip
           retention-days: 30
+          if-no-files-found: warn
 
       - name: Upload Windows ARM64 Installer
         uses: actions/upload-artifact@v4
@@ -589,6 +693,7 @@ jobs:
           name: Colanode-${{ env.VERSION }}-arm64.exe
           path: apps/desktop/out/**/*arm64*.exe
           retention-days: 30
+          if-no-files-found: warn
 
       - name: Upload Windows ARM64 MSI
         uses: actions/upload-artifact@v4
@@ -596,6 +701,7 @@ jobs:
           name: Colanode-${{ env.VERSION }}-arm64.msi
           path: apps/desktop/out/**/*arm64*.msi
           retention-days: 30
+          if-no-files-found: warn
 
       - name: Upload Windows ARM64 ZIP
         uses: actions/upload-artifact@v4
@@ -603,6 +709,15 @@ jobs:
           name: Colanode-${{ env.VERSION }}-arm64.zip
           path: apps/desktop/out/**/*arm64*.zip
           retention-days: 30
+          if-no-files-found: warn
+
+      - name: Upload All Windows Packages (Fallback)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Colanode-${{ env.VERSION }}-windows-all
+          path: apps/desktop/out/**/*.{exe,msi,zip}
+          retention-days: 30
+          if-no-files-found: warn
 
       - name: Clean up certificate
         run: |
