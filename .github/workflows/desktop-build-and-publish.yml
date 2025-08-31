@@ -326,6 +326,8 @@ jobs:
           find out/ -type f -name "colanode*" 2>/dev/null || echo "No colanode files found"
           echo "=== Full out/ directory contents ==="
           ls -la out/ || echo "out/ directory not found"
+          echo "=== Looking for DEB and RPM packages ==="
+          find out/ -name "*.deb" -o -name "*.rpm" 2>/dev/null || echo "No DEB or RPM packages found"
           echo "=== Package.json contents ==="
           cat package.json | grep -E "(name|version|executableName)"
           echo "=== Forge config name ==="
@@ -354,14 +356,14 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-amd64.deb
-          path: apps/desktop/out/make/*.deb
+          path: apps/desktop/out/**/*.deb
           retention-days: 30
 
       - name: Upload RPM Package
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-amd64.rpm
-          path: apps/desktop/out/make/*.rpm
+          path: apps/desktop/out/**/*.rpm
           retention-days: 30
 
   build-windows:
