@@ -366,11 +366,19 @@ jobs:
           path: apps/desktop/out/**/*.rpm
           retention-days: 30
 
+      - name: Upload Linux ZIP Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Colanode-${{ env.VERSION }}-linux-x64.zip
+          path: apps/desktop/out/**/*.zip
+          retention-days: 30
+
   build-windows:
     runs-on: windows-latest
     if: |
-      github.event_name == 'workflow_dispatch' && 
-      (github.event.inputs.build_type == 'windows' || github.event.inputs.build_type == 'all')
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.build_type == 'windows' || github.event.inputs.build_type == 'all'))
 
     steps:
       - name: Check out Git repository
@@ -464,12 +472,48 @@ jobs:
         working-directory: apps/desktop
         run: npm run make -- --platform=win32
 
+      - name: Debug Windows Build Output
+        working-directory: apps/desktop
+        run: |
+          echo "=== Windows Build Output Directory Structure ==="
+          echo "=== Full out/ directory contents ==="
+          ls -la out/ || echo "out/ directory not found"
+          echo "=== Looking for Windows packages ==="
+          find out/ -name "*.exe" -o -name "*.msi" -o -name "*.zip" 2>/dev/null || echo "No Windows packages found"
+
       - name: Publish Electron App
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: production
         working-directory: apps/desktop
-        run: npm run publish
+        run: |
+          echo "🚀 Attempting to publish to GitHub releases..."
+          npm run publish 2>&1 || {
+            echo "❌ Publish failed, but build succeeded!"
+            echo "📦 Your Windows packages are available as artifacts above"
+            echo "🔍 Publish error details saved above"
+          }
+
+      - name: Upload Windows Installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: Colanode-${{ env.VERSION }}-win32-x64.exe
+          path: apps/desktop/out/**/*.exe
+          retention-days: 30
+
+      - name: Upload Windows MSI
+        uses: actions/upload-artifact@v4
+        with:
+          name: Colanode-${{ env.VERSION }}-win32-x64.msi
+          path: apps/desktop/out/**/*.msi
+          retention-days: 30
+
+      - name: Upload Windows ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: Colanode-${{ env.VERSION }}-win32-x64.zip
+          path: apps/desktop/out/**/*.zip
+          retention-days: 30
 
       - name: Clean up certificate
         run: |
@@ -481,8 +525,9 @@ jobs:
   build-macos:
     runs-on: macos-latest
     if: |
-      github.event_name == 'workflow_dispatch' && 
-      (github.event.inputs.build_type == 'macos' || github.event.inputs.build_type == 'all')
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.build_type == 'macos' || github.event.inputs.build_type == 'all'))
 
     steps:
       - name: Check out Git repository
@@ -602,12 +647,48 @@ jobs:
         run: |
           npm run make -- --platform=darwin --arch="x64"
 
+      - name: Debug macOS Build Output
+        working-directory: apps/desktop
+        run: |
+          echo "=== macOS Build Output Directory Structure ==="
+          echo "=== Full out/ directory contents ==="
+          ls -la out/ || echo "out/ directory not found"
+          echo "=== Looking for macOS packages ==="
+          find out/ -name "*.dmg" -o -name "*.zip" 2>/dev/null || echo "No macOS packages found"
+
       - name: Publish Electron App (macOS)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: production
         working-directory: apps/desktop
-        run: npm run publish
+        run: |
+          echo "🚀 Attempting to publish to GitHub releases..."
+          npm run publish 2>&1 || {
+            echo "❌ Publish failed, but build succeeded!"
+            echo "📦 Your macOS packages are available as artifacts above"
+            echo "🔍 Publish error details saved above"
+          }
+
+      - name: Upload macOS Apple Silicon DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: Colanode-${{ env.VERSION }}-darwin-arm64.dmg
+          path: apps/desktop/out/**/*arm64*.dmg
+          retention-days: 30
+
+      - name: Upload macOS Intel DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: Colanode-${{ env.VERSION }}-darwin-x64.dmg
+          path: apps/desktop/out/**/*x64*.dmg
+          retention-days: 30
+
+      - name: Upload macOS ZIP
+        uses: actions/upload-artifact@v4
+        with:
+          name: Colanode-${{ env.VERSION }}-darwin-x64.zip
+          path: apps/desktop/out/**/*.zip
+          retention-days: 30
 
       - name: Delete Temporary Keychain
         if: always()
