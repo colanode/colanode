@@ -474,12 +474,23 @@ jobs:
 
       - name: Debug Windows Build Output
         working-directory: apps/desktop
+        shell: pwsh
         run: |
           echo "=== Windows Build Output Directory Structure ==="
           echo "=== Full out/ directory contents ==="
-          ls -la out/ || echo "out/ directory not found"
+          if (Test-Path "out/") {
+            Get-ChildItem -Path "out/" -Recurse | Format-Table Name, Length, LastWriteTime
+          } else {
+            echo "out/ directory not found"
+          }
           echo "=== Looking for Windows packages ==="
-          find out/ -name "*.exe" -o -name "*.msi" -o -name "*.zip" 2>/dev/null || echo "No Windows packages found"
+          $packages = Get-ChildItem -Path "out/" -Recurse -Include "*.exe", "*.msi", "*.zip" -ErrorAction SilentlyContinue
+          if ($packages) {
+            echo "Found packages:"
+            $packages | ForEach-Object { echo "  $($_.FullName)" }
+          } else {
+            echo "No Windows packages found"
+          }
 
       - name: Publish Electron App
         env:
@@ -579,28 +590,57 @@ jobs:
       - name: Decode and Import macOS Certificate
         run: |
           # Decode the base64 encoded certificate
-          CERTIFICATE_CONTENT=$(echo "${{ secrets.MACOS_CERTIFICATE_BASE64 }}" | base64 --decode)
+          echo "${{ secrets.MACOS_CERTIFICATE_BASE64 }}" | base64 --decode > "${RUNNER_TEMP}/certificate.p12"
+          
+          # Verify the certificate file exists and has content
+          if [ ! -s "${RUNNER_TEMP}/certificate.p12" ]; then
+            echo "❌ Error: Certificate file is empty or was not created properly"
+            exit 1
+          fi
+          
+          echo "✅ Certificate file created successfully"
+          ls -la "${RUNNER_TEMP}/certificate.p12"
 
           # Create a temporary keychain
           KEYCHAIN_PATH="${RUNNER_TEMP}/temporary.keychain"
           security create-keychain -p "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" "${KEYCHAIN_PATH}"
+          
+          if [ $? -ne 0 ]; then
+            echo "❌ Error: Failed to create keychain"
+            exit 1
+          fi
+          echo "✅ Keychain created successfully"
 
           # Import the certificate into the temporary keychain
-          echo "${CERTIFICATE_CONTENT}" > "${RUNNER_TEMP}/certificate.p12"
+          echo "🔐 Importing certificate into keychain..."
           security import "${RUNNER_TEMP}/certificate.p12" -k "${KEYCHAIN_PATH}" -P "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign
+          
+          if [ $? -ne 0 ]; then
+            echo "❌ Error: Failed to import certificate"
+            echo "🔍 Certificate file info:"
+            file "${RUNNER_TEMP}/certificate.p12"
+            echo "🔍 Keychain info:"
+            security list-keychains
+            exit 1
+          fi
+          echo "✅ Certificate imported successfully"
 
           # Set the temporary keychain as the default keychain
           security default-keychain -s "${KEYCHAIN_PATH}"
+          echo "✅ Keychain set as default"
 
           # Unlock the keychain
           security unlock-keychain -p "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" "${KEYCHAIN_PATH}"
+          echo "✅ Keychain unlocked"
 
-          # Optionally, list available keys to verify (for debugging)
-          security find-identity -v -p codesigning
+          # List available keys to verify (for debugging)
+          echo "🔍 Available signing identities:"
+          security find-identity -v -p codesigning "${KEYCHAIN_PATH}"
 
           # Set environment variables for codesigning
           echo "KEYCHAIN_PATH=${KEYCHAIN_PATH}" >> $GITHUB_ENV
           echo "KEYCHAIN_PASSWORD=${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" >> $GITHUB_ENV
+          echo "✅ Environment variables set"
         shell: bash
 
       - name: Update package.json version
@@ -693,5 +733,15 @@ jobs:
       - name: Delete Temporary Keychain
         if: always()
         run: |
-          security delete-keychain "${{ env.KEYCHAIN_PATH }}"
+          echo "🧹 Cleaning up temporary keychain..."
+          if [ -n "${{ env.KEYCHAIN_PATH }}" ] && [ -f "${{ env.KEYCHAIN_PATH }}" ]; then
+            echo "🔍 Attempting to delete keychain: ${{ env.KEYCHAIN_PATH }}"
+            security delete-keychain "${{ env.KEYCHAIN_PATH }}" 2>/dev/null || {
+              echo "⚠️  Warning: Could not delete keychain (this is normal if build failed early)"
+              echo "🔍 Keychain cleanup will happen automatically when runner is recycled"
+            }
+          else
+            echo "ℹ️  No keychain to clean up"
+          fi
+          echo "✅ Cleanup completed"
         shell: bash
