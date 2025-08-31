@@ -196,3 +196,73 @@ jobs:
         run: |
           security delete-keychain "${{ env.KEYCHAIN_PATH }}"
         shell: bash
+
+  build-linux:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Cache Electron (Linux)
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/electron
+            ~/.cache/electron-builder
+          key: ${{ runner.os }}-electron-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-cache-
+
+      - name: Extract version from tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
+      - name: Set version and commit SHA into build.ts
+        run: |
+          cat <<EOF > ./packages/core/src/types/build.ts
+          // This file is auto-generated during CI/CD
+          const VERSION = "${{ env.VERSION }}";
+          const SHA = "${{ github.sha }}";
+
+          export const build = {
+              version: VERSION,
+              sha: SHA
+          };
+          EOF
+
+      - name: Update package.json version
+        working-directory: apps/desktop
+        run: npm version $VERSION --no-git-tag-version
+
+      - name: Install Dependencies
+        run: |
+          npm ci
+
+      - name: Build Electron App (Linux DEB)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ENV: production
+        working-directory: apps/desktop
+        run: npm run publish -- --linux --target=deb
+
+      - name: Build Electron App (Linux RPM)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ENV: production
+        working-directory: apps/desktop
+        run: npm run publish -- --linux --target=rpm
+
+      - name: Build Electron App (Linux AppImage)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ENV: production
+        working-directory: apps/desktop
+        run: npm run publish -- --linux --target=AppImage
