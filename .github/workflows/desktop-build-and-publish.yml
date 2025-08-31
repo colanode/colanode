@@ -350,11 +350,18 @@ jobs:
             echo "🔍 Publish error details saved above"
           }
 
-      - name: Upload Build Artifacts
+      - name: Upload DEB Package
         uses: actions/upload-artifact@v4
         with:
-          name: linux-packages
-          path: apps/desktop/out/make/
+          name: Colanode-${{ env.VERSION }}-amd64.deb
+          path: apps/desktop/out/make/*.deb
+          retention-days: 30
+
+      - name: Upload RPM Package
+        uses: actions/upload-artifact@v4
+        with:
+          name: Colanode-${{ env.VERSION }}-amd64.rpm
+          path: apps/desktop/out/make/*.rpm
           retention-days: 30
 
   build-windows:
