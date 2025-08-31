@@ -274,8 +274,11 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-          else
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          else
+            # For branch pushes, use a default version or extract from package.json
+            echo "VERSION=0.3.4" >> $GITHUB_ENV
           fi
 
       - name: Set version and commit SHA into build.ts
@@ -352,9 +355,12 @@ jobs:
         run: |
           if ("${{ github.event_name }}" -eq "workflow_dispatch") {
             $env:VERSION = "${{ github.event.inputs.version }}"
-          } else {
+          } elseif ($env:GITHUB_REF -like "refs/tags/*") {
             $version = $env:GITHUB_REF -replace '^refs/tags/v',''
             $env:VERSION = $version
+          } else {
+            # For branch pushes, use a default version
+            $env:VERSION = "0.3.4"
           }
           echo "VERSION=$env:VERSION" >> $env:GITHUB_ENV
 
@@ -455,8 +461,11 @@ jobs:
         run: |
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-          else
+          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          else
+            # For branch pushes, use a default version
+            echo "VERSION=0.3.4" >> $GITHUB_ENV
           fi
 
       - name: Set version and commit SHA into build.ts
