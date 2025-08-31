@@ -5,6 +5,7 @@
   "version": "1.0.0",
   "author": "Colanode",
   "description": "Colanode desktop application",
+  "license": "MIT",
   "main": ".vite/build/main.js",
   "scripts": {
     "dev": "DEBUG=colanode:* electron-forge start",
