@@ -4,6 +4,23 @@ on:
   push:
     tags:
       - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 1.0.0)'
+        required: true
+        default: '0.3.4'
+        type: string
+      build_type:
+        description: 'Type of build to run'
+        required: true
+        default: 'linux'
+        type: choice
+        options:
+          - linux
+          - windows
+          - macos
+          - all
 
 jobs:
   # build-windows:
@@ -223,6 +240,10 @@ jobs:
 
   build-linux:
     runs-on: ubuntu-latest
+    if: |
+      github.event_name == 'push' ||
+      (github.event_name == 'workflow_dispatch' && 
+       (github.event.inputs.build_type == 'linux' || github.event.inputs.build_type == 'all'))
 
     steps:
       - name: Check out Git repository
@@ -246,8 +267,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-electron-cache-
 
-      - name: Extract version from tag
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+      - name: Extract version from tag or input
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          fi
 
       - name: Set version and commit SHA into build.ts
         run: |
@@ -288,3 +314,234 @@ jobs:
           NODE_ENV: production
         working-directory: apps/desktop
         run: npm run publish
+
+  build-windows:
+    runs-on: windows-latest
+    if: |
+      github.event_name == 'workflow_dispatch' && 
+      (github.event.inputs.build_type == 'windows' || github.event.inputs.build_type == 'all')
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Cache Electron (Windows)
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~\AppData\Local\electron\Cache
+            ~\AppData\Local\electron-builder\Cache
+          key: ${{ runner.os }}-electron-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-cache-
+
+      - name: Extract version from tag or input
+        shell: pwsh
+        run: |
+          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+            $env:VERSION = "${{ github.event.inputs.version }}"
+          } else {
+            $version = $env:GITHUB_REF -replace '^refs/tags/v',''
+            $env:VERSION = $version
+          }
+          echo "VERSION=$env:VERSION" >> $env:GITHUB_ENV
+
+      - name: Set version and commit SHA into build.ts
+        shell: pwsh
+        run: |
+          $content = @'
+
+          // This file is auto-generated during CI/CD
+          const VERSION = "${{ env.VERSION }}";
+          const SHA = "${{ github.sha }}";
+
+          export const build = {
+              version: VERSION,
+              sha: SHA
+          };
+
+          '@
+          Set-Content -Path "./packages/core/src/types/build.ts" -Value $content
+
+      - name: Decode certificate
+        run: |
+          $certPath = Join-Path -Path $env:RUNNER_TEMP -ChildPath "build_cert.pfx"
+          $certContent = [System.Convert]::FromBase64String($env:WINDOWS_CERT_BASE64)
+          [IO.File]::WriteAllBytes($certPath, $certContent)
+          echo "CERTIFICATE_PATH=$certPath" >> $env:GITHUB_ENV
+        shell: pwsh
+        env:
+          WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
+
+      - name: Update package.json version
+        shell: bash
+        working-directory: apps/desktop
+        run: npm version ${VERSION} --no-git-tag-version
+
+      - name: Install Root Dependencies
+        run: npm ci
+
+      - name: Install Dependencies
+        working-directory: apps/desktop
+        run: |
+          npm ci
+          npm install @electron-forge/maker-appimage@^7.8.3
+
+      - name: Build Electron App
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CERTIFICATE_PATH: ${{ env.CERTIFICATE_PATH }}
+          CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+          NODE_ENV: production
+        working-directory: apps/desktop
+        run: npm run make -- --platform=win32
+
+      - name: Publish Electron App
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ENV: production
+        working-directory: apps/desktop
+        run: npm run publish
+
+      - name: Clean up certificate
+        run: |
+          if (Test-Path $env:CERTIFICATE_PATH) {
+            Remove-Item -Path $env:CERTIFICATE_PATH
+          }
+        shell: pwsh
+
+  build-macos:
+    runs-on: macos-latest
+    if: |
+      github.event_name == 'workflow_dispatch' && 
+      (github.event.inputs.build_type == 'macos' || github.event.inputs.build_type == 'all')
+
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'npm'
+
+      - name: Cache Electron (macOS)
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+          key: ${{ runner.os }}-electron-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-cache-
+
+      - name: Extract version from tag or input
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+          else
+            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          fi
+
+      - name: Set version and commit SHA into build.ts
+        run: |
+          cat <<EOF > ./packages/core/src/types/build.ts
+          // This file is auto-generated during CI/CD
+          const VERSION = "${{ env.VERSION }}";
+          const SHA = "${{ github.sha }}";
+
+          export const build = {
+              version: VERSION,
+              sha: SHA
+          };
+          EOF
+
+      - name: Decode and Import macOS Certificate
+        run: |
+          # Decode the base64 encoded certificate
+          CERTIFICATE_CONTENT=$(echo "${{ secrets.MACOS_CERTIFICATE_BASE64 }}" | base64 --decode)
+
+          # Create a temporary keychain
+          KEYCHAIN_PATH="${RUNNER_TEMP}/temporary.keychain"
+          security create-keychain -p "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" "${KEYCHAIN_PATH}"
+
+          # Import the certificate into the temporary keychain
+          echo "${CERTIFICATE_CONTENT}" > "${RUNNER_TEMP}/certificate.p12"
+          security import "${RUNNER_TEMP}/certificate.p12" -k "${KEYCHAIN_PATH}" -P "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign
+
+          # Set the temporary keychain as the default keychain
+          security default-keychain -s "${KEYCHAIN_PATH}"
+
+          # Unlock the keychain
+          security unlock-keychain -p "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" "${KEYCHAIN_PATH}"
+
+          # Optionally, list available keys to verify (for debugging)
+          security find-identity -v -p codesigning
+
+          # Set environment variables for codesigning
+          echo "KEYCHAIN_PATH=${KEYCHAIN_PATH}" >> $GITHUB_ENV
+          echo "KEYCHAIN_PASSWORD=${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" >> $GITHUB_ENV
+        shell: bash
+
+      - name: Update package.json version
+        working-directory: apps/desktop
+        run: npm version $VERSION --no-git-tag-version
+
+      - name: Install Root Dependencies
+        run: npm ci
+
+      - name: Install Dependencies
+        working-directory: apps/desktop
+        run: |
+          npm ci
+          npm install @electron-forge/maker-appimage@^7.8.3
+
+      - name: Build Electron App (macOS Apple Silicon)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ENV: production
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          KEYCHAIN_PATH: ${{ env.KEYCHAIN_PATH }}
+          KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
+        working-directory: apps/desktop
+        run: |
+          npm run make -- --platform=darwin --arch="arm64"
+
+      - name: Build Electron App (macOS Intel)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ENV: production
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          KEYCHAIN_PATH: ${{ env.KEYCHAIN_PATH }}
+          KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
+        working-directory: apps/desktop
+        run: |
+          npm run make -- --platform=darwin --arch="x64"
+
+      - name: Publish Electron App (macOS)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ENV: production
+        working-directory: apps/desktop
+        run: npm run publish
+
+      - name: Delete Temporary Keychain
+        if: always()
+        run: |
+          security delete-keychain "${{ env.KEYCHAIN_PATH }}"
+        shell: bash
