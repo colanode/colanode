@@ -348,7 +348,11 @@ jobs:
           echo "🔧 If publish fails, packages are still available as artifacts"
           
           # Try to publish, but don't fail the build if it doesn't work
-          npm run publish 2>&1 || {
+          set +e  # Don't exit on error
+          npm run publish 2>&1
+          PUBLISH_EXIT_CODE=$?
+          
+          if [ $PUBLISH_EXIT_CODE -ne 0 ]; then
             echo "⚠️  Publish failed, but build succeeded!"
             echo "📦 Your Linux packages are available as artifacts above"
             echo "🔍 Publish error details saved above"
@@ -357,7 +361,12 @@ jobs:
             echo "   2. Ensure 'Read and write permissions' is enabled"
             echo "   3. Ensure 'Allow GitHub Actions to create and approve pull requests' is enabled"
             echo "✅ Build completed successfully despite publish failure"
-          }
+          else
+            echo "✅ Publish completed successfully!"
+          fi
+          
+          # Always exit with success to continue the workflow
+          exit 0
 
       - name: Upload DEB Package
         uses: actions/upload-artifact@v4
@@ -510,7 +519,11 @@ jobs:
           echo "🔧 If publish fails, packages are still available as artifacts"
           
           # Try to publish, but don't fail the build if it doesn't work
-          npm run publish 2>&1 || {
+          set +e  # Don't exit on error
+          npm run publish 2>&1
+          PUBLISH_EXIT_CODE=$?
+          
+          if [ $PUBLISH_EXIT_CODE -ne 0 ]; then
             echo "⚠️  Publish failed, but build succeeded!"
             echo "📦 Your Windows packages are available as artifacts above"
             echo "🔍 Publish error details saved above"
@@ -519,7 +532,12 @@ jobs:
             echo "   2. Ensure 'Read and write permissions' is enabled"
             echo "   3. Ensure 'Allow GitHub Actions to create and approve pull requests' is enabled"
             echo "✅ Build completed successfully despite publish failure"
-          }
+          else
+            echo "✅ Publish completed successfully!"
+          fi
+          
+          # Always exit with success to continue the workflow
+          exit 0
 
       - name: Upload Windows Installer
         uses: actions/upload-artifact@v4
@@ -603,8 +621,34 @@ jobs:
           };
           EOF
 
-      - name: Decode and Import macOS Certificate
+      - name: Check macOS Certificate Status
         run: |
+          echo "🔍 Checking macOS certificate configuration..."
+          
+          if [ -z "${{ secrets.MACOS_CERTIFICATE_BASE64 }}" ] || [ -z "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" ]; then
+            echo "⚠️  Warning: macOS certificate secrets are not configured"
+            echo "📝 Building without code signing (packages will be unsigned)"
+            echo "💡 To enable code signing, set these secrets:"
+            echo "   - MACOS_CERTIFICATE_BASE64: Your .p12 certificate file encoded in base64"
+            echo "   - MACOS_CERTIFICATE_PASSWORD: The password for your certificate"
+            echo "✅ Continuing with unsigned build..."
+            
+            # Set empty values to avoid errors in subsequent steps
+            echo "KEYCHAIN_PATH=" >> $GITHUB_ENV
+            echo "KEYCHAIN_PASSWORD=" >> $GITHUB_ENV
+            echo "SIGNING_ENABLED=false" >> $GITHUB_ENV
+          else
+            echo "✅ macOS certificate secrets are configured"
+            echo "🔐 Proceeding with code signing..."
+            echo "SIGNING_ENABLED=true" >> $GITHUB_ENV
+          fi
+        shell: bash
+
+      - name: Decode and Import macOS Certificate
+        if: env.SIGNING_ENABLED == 'true'
+        run: |
+          echo "🔐 Setting up code signing environment..."
+          
           # Check if the secret exists and has content
           if [ -z "${{ secrets.MACOS_CERTIFICATE_BASE64 }}" ]; then
             echo "❌ Error: MACOS_CERTIFICATE_BASE64 secret is empty or not set"
@@ -706,7 +750,13 @@ jobs:
           KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
         working-directory: apps/desktop
         run: |
-          npm run make -- --platform=darwin --arch="arm64"
+          if [ "${{ env.SIGNING_ENABLED }}" = "true" ]; then
+            echo "🔐 Building with code signing..."
+            npm run make -- --platform=darwin --arch="arm64"
+          else
+            echo "📝 Building without code signing..."
+            npm run make -- --platform=darwin --arch="arm64"
+          fi
 
       - name: Build Electron App (macOS Intel)
         env:
@@ -719,7 +769,13 @@ jobs:
           KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
         working-directory: apps/desktop
         run: |
-          npm run make -- --platform=darwin --arch="x64"
+          if [ "${{ env.SIGNING_ENABLED }}" = "true" ]; then
+            echo "🔐 Building with code signing..."
+            npm run make -- --platform=darwin --arch="x64"
+          else
+            echo "📝 Building without code signing..."
+            npm run make -- --platform=darwin --arch="x64"
+          fi
 
       - name: Debug macOS Build Output
         working-directory: apps/desktop
@@ -741,7 +797,11 @@ jobs:
           echo "🔧 If publish fails, packages are still available as artifacts"
           
           # Try to publish, but don't fail the build if it doesn't work
-          npm run publish 2>&1 || {
+          set +e  # Don't exit on error
+          npm run publish 2>&1
+          PUBLISH_EXIT_CODE=$?
+          
+          if [ $PUBLISH_EXIT_CODE -ne 0 ]; then
             echo "⚠️  Publish failed, but build succeeded!"
             echo "📦 Your macOS packages are available as artifacts above"
             echo "🔍 Publish error details saved above"
@@ -750,7 +810,12 @@ jobs:
             echo "   2. Ensure 'Read and write permissions' is enabled"
             echo "   3. Ensure 'Allow GitHub Actions to create and approve pull requests' is enabled"
             echo "✅ Build completed successfully despite publish failure"
-          }
+          else
+            echo "✅ Publish completed successfully!"
+          fi
+          
+          # Always exit with success to continue the workflow
+          exit 0
 
       - name: Upload macOS Apple Silicon DMG
         uses: actions/upload-artifact@v4
@@ -774,7 +839,7 @@ jobs:
           retention-days: 30
 
       - name: Delete Temporary Keychain
-        if: always()
+        if: always() && env.SIGNING_ENABLED == 'true'
         run: |
           echo "🧹 Cleaning up temporary keychain..."
           if [ -n "${{ env.KEYCHAIN_PATH }}" ] && [ -f "${{ env.KEYCHAIN_PATH }}" ]; then
