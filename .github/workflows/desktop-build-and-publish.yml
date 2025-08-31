@@ -319,6 +319,16 @@ jobs:
         working-directory: apps/desktop
         run: npm run make -- --platform=linux
 
+      - name: Debug Build Output
+        working-directory: apps/desktop
+        run: |
+          echo "=== Build Output Directory Structure ==="
+          find out/ -type f -name "colanode*" 2>/dev/null || echo "No colanode files found"
+          echo "=== Full out/ directory contents ==="
+          ls -la out/ || echo "out/ directory not found"
+          echo "=== Package.json contents ==="
+          cat package.json | grep -E "(name|version|executableName)"
+
       - name: Publish Electron App
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

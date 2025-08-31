@@ -10,8 +10,8 @@ import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
 const config: ForgeConfig = {
   packagerConfig: {
-    name: 'Colanode',
-    executableName: process.platform === 'linux' ? 'colanode' : 'Colanode',
+    name: '@colanode/desktop',
+    executableName: 'colanode',
     icon: 'assets/colanode-logo-black',
     appBundleId: 'com.colanode.desktop',
     ...(process.platform === 'win32' && {
@@ -70,7 +70,7 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({
-      name: 'Colanode',
+      name: '@colanode/desktop',
       ...(process.platform === 'win32' && {
         certificateFile: process.env.CERTIFICATE_PATH,
         certificatePassword: process.env.CERTIFICATE_PASSWORD,
