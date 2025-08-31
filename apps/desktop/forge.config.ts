@@ -191,10 +191,25 @@ const config: ForgeConfig = {
         force: true,
       });
     },
-    postPackage: async (forgeConfig, buildPath) => {
+    postPackage: async () => {
       console.log('🔧 postPackage hook called');
+      
+      // Remove the node_modules directory
+      try {
+        await fs.rm('./node_modules', {
+          recursive: true,
+          force: true,
+          maxRetries: 3,
+          retryDelay: 1000,
+        });
+        console.log('✅ Cleaned up node_modules directory');
+      } catch (error) {
+        console.error('❌ Failed to clean up node_modules:', error);
+      }
+    },
+    packageAfterPrune: async (_, buildPath) => {
+      console.log('🔧 packageAfterPrune hook called');
       console.log('📁 buildPath:', buildPath);
-      console.log('📋 forgeConfig:', typeof forgeConfig);
       
       // Ensure the built package.json has the required license field
       if (buildPath && typeof buildPath === 'string') {
@@ -219,23 +234,8 @@ const config: ForgeConfig = {
         } catch (error) {
           console.error('❌ Failed to update built package.json:', error);
         }
-      } else {
-        console.log('⚠️ buildPath is not a string, skipping package.json update');
       }
       
-      // Remove the node_modules directory
-      try {
-        await fs.rm('./node_modules', {
-          recursive: true,
-          force: true,
-          maxRetries: 3,
-          retryDelay: 1000,
-        });
-      } catch (error) {
-        console.error(error);
-      }
-    },
-    packageAfterPrune: async (_, buildPath) => {
       // Remove empty node_modules folders that are left behind
       // after the package and prune process. We also delete all non-necessary
       // files, for example md files, license files, development config files etc.
