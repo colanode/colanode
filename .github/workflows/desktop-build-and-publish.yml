@@ -69,6 +69,9 @@ jobs:
         working-directory: apps/desktop
         run: npm version ${VERSION} --no-git-tag-version
 
+      - name: Install Root Dependencies
+        run: npm ci
+
       - name: Install Dependencies
         run: |
           npm ci
@@ -161,6 +164,9 @@ jobs:
         working-directory: apps/desktop
         run: npm version $VERSION --no-git-tag-version
 
+      - name: Install Root Dependencies
+        run: npm ci
+
       - name: Install Dependencies
         run: |
           npm ci
@@ -242,27 +248,25 @@ jobs:
         working-directory: apps/desktop
         run: npm version $VERSION --no-git-tag-version
 
+      - name: Install Root Dependencies
+        run: npm ci
+
       - name: Install Dependencies
+        working-directory: apps/desktop
         run: |
           npm ci
+          npm install @electron-forge/maker-appimage@^7.8.3
 
-      - name: Build Electron App (Linux DEB)
+      - name: Build Electron App (Linux)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: production
         working-directory: apps/desktop
-        run: npm run publish -- --linux --target=deb
+        run: npm run make -- --platform=linux
 
-      - name: Build Electron App (Linux RPM)
+      - name: Publish Electron App
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: production
         working-directory: apps/desktop
-        run: npm run publish -- --linux --target=rpm
-
-      - name: Build Electron App (Linux AppImage)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_ENV: production
-        working-directory: apps/desktop
-        run: npm run publish -- --linux --target=AppImage
+        run: npm run publish

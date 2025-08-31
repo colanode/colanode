@@ -1,12 +1,12 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { FuseV1Options, FuseVersion } from '@electron/fuses';
 import { MakerDMG } from '@electron-forge/maker-dmg';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import type { ForgeConfig } from '@electron-forge/shared-types';
+import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
 const config: ForgeConfig = {
   packagerConfig: {
@@ -84,6 +84,39 @@ const config: ForgeConfig = {
       name: '@electron-forge/maker-zip',
       platforms: ['darwin'],
       config: {},
+    },
+    {
+      name: '@electron-forge/maker-deb',
+      config: {
+        options: {
+          icon: 'assets/colanode-logo-black.png',
+          categories: ['Development', 'Utility'],
+          maintainer: 'Colanode',
+          homepage: 'https://github.com/colanode/colanode',
+        },
+      },
+    },
+    {
+      name: '@electron-forge/maker-rpm',
+      config: {
+        options: {
+          icon: 'assets/colanode-logo-black.png',
+          categories: ['Development', 'Utility'],
+          maintainer: 'Colanode',
+          homepage: 'https://github.com/colanode/colanode',
+        },
+      },
+    },
+    {
+      name: '@electron-forge/maker-appimage',
+      config: {
+        options: {
+          icon: 'assets/colanode-logo-black.png',
+          categories: ['Development', 'Utility'],
+          maintainer: 'Colanode',
+          homepage: 'https://github.com/colanode/colanode',
+        },
+      },
     },
   ],
   publishers: [
