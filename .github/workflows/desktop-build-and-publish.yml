@@ -344,6 +344,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: production
         working-directory: apps/desktop
+        continue-on-error: true
         run: |
           echo "🚀 Attempting to publish to GitHub releases..."
           echo "📝 Note: Publishing requires GitHub repository permissions"
@@ -534,6 +535,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: production
         working-directory: apps/desktop
+        continue-on-error: true
         run: |
           echo "🚀 Attempting to publish to GitHub releases..."
           echo "📝 Note: Publishing requires GitHub repository permissions"
@@ -849,6 +851,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: production
         working-directory: apps/desktop
+        continue-on-error: true
         run: |
           echo "🚀 Attempting to publish to GitHub releases..."
           echo "📝 Note: Publishing requires GitHub repository permissions"
