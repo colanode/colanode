@@ -107,6 +107,8 @@ const config: ForgeConfig = {
           maintainer: 'Colanode',
           homepage: 'https://github.com/colanode/colanode',
           license: 'MIT',
+          description: 'Colanode desktop application',
+          productName: 'Colanode',
         },
       },
     },
@@ -189,7 +191,30 @@ const config: ForgeConfig = {
         force: true,
       });
     },
-    postPackage: async () => {
+    postPackage: async (_, buildPath) => {
+      // Ensure the built package.json has the required license field
+      const packageJsonPath = path.join(buildPath, 'package.json');
+      try {
+        const packageJson = await fs.readFile(packageJsonPath, 'utf-8');
+        const content = JSON.parse(packageJson);
+        
+        // Ensure required fields are present for RPM/DEB makers
+        if (!content.license) {
+          content.license = 'MIT';
+        }
+        if (!content.description) {
+          content.description = 'Colanode desktop application';
+        }
+        if (!content.maintainer) {
+          content.maintainer = 'Colanode';
+        }
+        
+        await fs.writeFile(packageJsonPath, JSON.stringify(content, null, 2));
+        console.log('✅ Updated built package.json with required fields');
+      } catch (error) {
+        console.error('❌ Failed to update built package.json:', error);
+      }
+      
       // Remove the node_modules directory
       try {
         await fs.rm('./node_modules', {
