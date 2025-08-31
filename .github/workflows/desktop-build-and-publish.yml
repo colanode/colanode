@@ -335,7 +335,7 @@ jobs:
           echo "=== Expected binary path ==="
           echo "Should be: out/colanode-linux-x64/colanode"
 
-            - name: Publish Electron App
+      - name: Publish Electron App
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NODE_ENV: production
@@ -357,7 +357,7 @@ jobs:
           path: apps/desktop/out/make/
           retention-days: 30
 
-    build-windows:
+  build-windows:
     runs-on: windows-latest
     if: |
       github.event_name == 'workflow_dispatch' && 
