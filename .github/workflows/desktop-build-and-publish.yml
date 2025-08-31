@@ -632,6 +632,7 @@ jobs:
             echo "   - MACOS_CERTIFICATE_BASE64: Your .p12 certificate file encoded in base64"
             echo "   - MACOS_CERTIFICATE_PASSWORD: The password for your certificate"
             echo "✅ Continuing with unsigned build..."
+            echo "🔧 Setting SIGNING_ENABLED=false to disable code signing in Electron Forge"
             
             # Set empty values to avoid errors in subsequent steps
             echo "KEYCHAIN_PATH=" >> $GITHUB_ENV
@@ -640,8 +641,11 @@ jobs:
           else
             echo "✅ macOS certificate secrets are configured"
             echo "🔐 Proceeding with code signing..."
+            echo "🔧 Setting SIGNING_ENABLED=true to enable code signing in Electron Forge"
             echo "SIGNING_ENABLED=true" >> $GITHUB_ENV
           fi
+          
+          echo "📋 Environment variable SIGNING_ENABLED=${{ env.SIGNING_ENABLED }}"
         shell: bash
 
       - name: Decode and Import macOS Certificate
@@ -748,6 +752,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           KEYCHAIN_PATH: ${{ env.KEYCHAIN_PATH }}
           KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
+          SIGNING_ENABLED: ${{ env.SIGNING_ENABLED }}
         working-directory: apps/desktop
         run: |
           if [ "${{ env.SIGNING_ENABLED }}" = "true" ]; then
@@ -755,6 +760,11 @@ jobs:
             npm run make -- --platform=darwin --arch="arm64"
           else
             echo "📝 Building without code signing..."
+            echo "🚫 Disabling code signing for unsigned build..."
+            # Set environment variables to disable code signing
+            export CSC_IDENTITY_AUTO_DISCOVERY=false
+            export CSC_LINK=
+            export CSC_KEY_PASSWORD=
             npm run make -- --platform=darwin --arch="arm64"
           fi
 
@@ -767,6 +777,7 @@ jobs:
           APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
           KEYCHAIN_PATH: ${{ env.KEYCHAIN_PATH }}
           KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
+          SIGNING_ENABLED: ${{ env.SIGNING_ENABLED }}
         working-directory: apps/desktop
         run: |
           if [ "${{ env.SIGNING_ENABLED }}" = "true" ]; then
@@ -774,6 +785,11 @@ jobs:
             npm run make -- --platform=darwin --arch="x64"
           else
             echo "📝 Building without code signing..."
+            echo "🚫 Disabling code signing for unsigned build..."
+            # Set environment variables to disable code signing
+            export CSC_IDENTITY_AUTO_DISCOVERY=false
+            export CSC_LINK=
+            export CSC_KEY_PASSWORD=
             npm run make -- --platform=darwin --arch="x64"
           fi
 

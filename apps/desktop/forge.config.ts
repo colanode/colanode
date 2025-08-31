@@ -50,23 +50,25 @@ const config: ForgeConfig = {
       return true;
     },
     extraResource: ['assets'],
-    osxSign: {
-      type: 'distribution',
-      keychain: process.env.KEYCHAIN!,
-      optionsForFile: (_) => {
-        return {
-          hardenedRuntime: true,
-          entitlements: 'entitlements.mac.plist',
-          entitlementsInherit: 'entitlements.mac.plist',
-        };
+    ...(process.env.SIGNING_ENABLED === 'true' && {
+      osxSign: {
+        type: 'distribution',
+        keychain: process.env.KEYCHAIN_PATH!,
+        optionsForFile: (_) => {
+          return {
+            hardenedRuntime: true,
+            entitlements: 'entitlements.mac.plist',
+            entitlementsInherit: 'entitlements.mac.plist',
+          };
+        },
       },
-    },
-    osxNotarize: {
-      appleId: process.env.APPLE_ID!,
-      appleIdPassword: process.env.APPLE_ID_PASSWORD!,
-      teamId: process.env.APPLE_TEAM_ID!,
-      keychain: process.env.KEYCHAIN!,
-    },
+      osxNotarize: {
+        appleId: process.env.APPLE_ID!,
+        appleIdPassword: process.env.APPLE_ID_PASSWORD!,
+        teamId: process.env.APPLE_TEAM_ID!,
+        keychain: process.env.KEYCHAIN_PATH!,
+      },
+    }),
   },
   rebuildConfig: {},
   makers: [
