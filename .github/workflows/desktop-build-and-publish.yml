@@ -2,6 +2,8 @@ name: Desktop - Build and publish electron app
 
 on:
   push:
+    branches:
+      - 'linux-build'
     tags:
       - 'v*'
   workflow_dispatch:
@@ -249,6 +251,7 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && 'linux-build' || github.ref }}
           fetch-depth: 1
 
       - name: Setup Node.js
@@ -325,6 +328,7 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && 'linux-build' || github.ref }}
           fetch-depth: 1
 
       - name: Setup Node.js
@@ -428,6 +432,7 @@ jobs:
       - name: Check out Git repository
         uses: actions/checkout@v3
         with:
+          ref: ${{ github.event_name == 'workflow_dispatch' && 'linux-build' || github.ref }}
           fetch-depth: 1
 
       - name: Setup Node.js
