@@ -296,7 +296,14 @@ jobs:
 
       - name: Update package.json version
         working-directory: apps/desktop
-        run: npm version $VERSION --no-git-tag-version
+        run: |
+          # Update version without triggering npm hooks
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            pkg.version = '${{ env.VERSION }}';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          "
 
       - name: Install Root Dependencies
         run: npm ci
@@ -392,7 +399,14 @@ jobs:
       - name: Update package.json version
         shell: bash
         working-directory: apps/desktop
-        run: npm version ${VERSION} --no-git-tag-version
+        run: |
+          # Update version without triggering npm hooks
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            pkg.version = '${VERSION}';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          "
 
       - name: Install Root Dependencies
         run: npm ci
@@ -506,7 +520,14 @@ jobs:
 
       - name: Update package.json version
         working-directory: apps/desktop
-        run: npm version $VERSION --no-git-tag-version
+        run: |
+          # Update version without triggering npm hooks
+          node -e "
+            const fs = require('fs');
+            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
+            pkg.version = '${{ env.VERSION }}';
+            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
+          "
 
       - name: Install Root Dependencies
         run: npm ci
