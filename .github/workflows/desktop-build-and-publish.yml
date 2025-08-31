@@ -328,6 +328,10 @@ jobs:
           ls -la out/ || echo "out/ directory not found"
           echo "=== Package.json contents ==="
           cat package.json | grep -E "(name|version|executableName)"
+          echo "=== Forge config name ==="
+          echo "Expected name: colanode-desktop"
+          echo "=== Looking for executable ==="
+          find out/ -name "colanode" -type f 2>/dev/null || echo "Executable 'colanode' not found"
 
       - name: Publish Electron App
         env:

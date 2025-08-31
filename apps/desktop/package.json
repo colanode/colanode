@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@colanode/desktop",
+  "name": "colanode-desktop",
   "productName": "Colanode",
   "version": "1.0.0",
   "author": "Colanode",
