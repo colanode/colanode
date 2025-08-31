@@ -306,11 +306,11 @@ jobs:
           "
 
       - name: Install Root Dependencies
-        run: npm ci
+        run: npm install
 
       - name: Install Dependencies
         working-directory: apps/desktop
-        run: npm ci
+        run: npm install
 
       - name: Build Electron App (Linux)
         env:
