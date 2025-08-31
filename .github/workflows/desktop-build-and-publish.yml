@@ -344,12 +344,19 @@ jobs:
         working-directory: apps/desktop
         run: |
           echo "🚀 Attempting to publish to GitHub releases..."
+          echo "📝 Note: Publishing requires GitHub repository permissions"
+          echo "🔧 If publish fails, packages are still available as artifacts"
           
-          # Try to publish with more detailed error output
+          # Try to publish, but don't fail the build if it doesn't work
           npm run publish 2>&1 || {
-            echo "❌ Publish failed, but build succeeded!"
+            echo "⚠️  Publish failed, but build succeeded!"
             echo "📦 Your Linux packages are available as artifacts above"
             echo "🔍 Publish error details saved above"
+            echo "💡 To fix publish issues, check:"
+            echo "   1. GitHub repository settings → Actions → General"
+            echo "   2. Ensure 'Read and write permissions' is enabled"
+            echo "   3. Ensure 'Allow GitHub Actions to create and approve pull requests' is enabled"
+            echo "✅ Build completed successfully despite publish failure"
           }
 
       - name: Upload DEB Package
@@ -499,10 +506,19 @@ jobs:
         working-directory: apps/desktop
         run: |
           echo "🚀 Attempting to publish to GitHub releases..."
+          echo "📝 Note: Publishing requires GitHub repository permissions"
+          echo "🔧 If publish fails, packages are still available as artifacts"
+          
+          # Try to publish, but don't fail the build if it doesn't work
           npm run publish 2>&1 || {
-            echo "❌ Publish failed, but build succeeded!"
+            echo "⚠️  Publish failed, but build succeeded!"
             echo "📦 Your Windows packages are available as artifacts above"
             echo "🔍 Publish error details saved above"
+            echo "💡 To fix publish issues, check:"
+            echo "   1. GitHub repository settings → Actions → General"
+            echo "   2. Ensure 'Read and write permissions' is enabled"
+            echo "   3. Ensure 'Allow GitHub Actions to create and approve pull requests' is enabled"
+            echo "✅ Build completed successfully despite publish failure"
           }
 
       - name: Upload Windows Installer
@@ -589,24 +605,40 @@ jobs:
 
       - name: Decode and Import macOS Certificate
         run: |
+          # Check if the secret exists and has content
+          if [ -z "${{ secrets.MACOS_CERTIFICATE_BASE64 }}" ]; then
+            echo "❌ Error: MACOS_CERTIFICATE_BASE64 secret is empty or not set"
+            exit 1
+          fi
+          
+          echo "🔍 Certificate secret length: ${#MACOS_CERTIFICATE_BASE64}"
+          
           # Decode the base64 encoded certificate
           echo "${{ secrets.MACOS_CERTIFICATE_BASE64 }}" | base64 --decode > "${RUNNER_TEMP}/certificate.p12"
           
           # Verify the certificate file exists and has content
           if [ ! -s "${RUNNER_TEMP}/certificate.p12" ]; then
             echo "❌ Error: Certificate file is empty or was not created properly"
+            echo "🔍 Certificate file size: $(wc -c < "${RUNNER_TEMP}/certificate.p12" 2>/dev/null || echo 'unknown')"
+            echo "🔍 Certificate file exists: $(test -f "${RUNNER_TEMP}/certificate.p12" && echo 'yes' || echo 'no')"
+            echo "🔍 Certificate file readable: $(test -r "${RUNNER_TEMP}/certificate.p12" && echo 'yes' || echo 'no')"
             exit 1
           fi
           
           echo "✅ Certificate file created successfully"
           ls -la "${RUNNER_TEMP}/certificate.p12"
+          echo "🔍 Certificate file type:"
+          file "${RUNNER_TEMP}/certificate.p12" || echo "file command not available"
 
           # Create a temporary keychain
           KEYCHAIN_PATH="${RUNNER_TEMP}/temporary.keychain"
+          echo "🔐 Creating temporary keychain..."
           security create-keychain -p "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" "${KEYCHAIN_PATH}"
           
           if [ $? -ne 0 ]; then
             echo "❌ Error: Failed to create keychain"
+            echo "🔍 Keychain creation failed. Checking security command availability..."
+            which security || echo "security command not found"
             exit 1
           fi
           echo "✅ Keychain created successfully"
@@ -621,6 +653,8 @@ jobs:
             file "${RUNNER_TEMP}/certificate.p12"
             echo "🔍 Keychain info:"
             security list-keychains
+            echo "🔍 Available keychains:"
+            security list-keychains -d user
             exit 1
           fi
           echo "✅ Certificate imported successfully"
@@ -703,10 +737,19 @@ jobs:
         working-directory: apps/desktop
         run: |
           echo "🚀 Attempting to publish to GitHub releases..."
+          echo "📝 Note: Publishing requires GitHub repository permissions"
+          echo "🔧 If publish fails, packages are still available as artifacts"
+          
+          # Try to publish, but don't fail the build if it doesn't work
           npm run publish 2>&1 || {
-            echo "❌ Publish failed, but build succeeded!"
+            echo "⚠️  Publish failed, but build succeeded!"
             echo "📦 Your macOS packages are available as artifacts above"
             echo "🔍 Publish error details saved above"
+            echo "💡 To fix publish issues, check:"
+            echo "   1. GitHub repository settings → Actions → General"
+            echo "   2. Ensure 'Read and write permissions' is enabled"
+            echo "   3. Ensure 'Allow GitHub Actions to create and approve pull requests' is enabled"
+            echo "✅ Build completed successfully despite publish failure"
           }
 
       - name: Upload macOS Apple Silicon DMG
