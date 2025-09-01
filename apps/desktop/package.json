@@ -26,7 +26,6 @@
     "@electron-forge/plugin-fuses": "^7.8.3",
     "@electron-forge/plugin-vite": "^7.8.3",
     "@electron-forge/publisher-github": "^7.8.3",
-    "@electron/fuses": "^2.0.0",
     "@electron/rebuild": "^4.0.1",
     "@tailwindcss/postcss": "^4.1.12",
     "@types/better-sqlite3": "^7.6.13",
