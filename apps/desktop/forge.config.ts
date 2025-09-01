@@ -74,11 +74,23 @@ const config: ForgeConfig = {
   makers: [
     new MakerSquirrel({
       name: 'colanode',
+      setupIcon: 'assets/colanode-logo-black.ico',
       ...(process.env.SIGNING_ENABLED === 'true' && {
         certificateFile: process.env.CERTIFICATE_PATH,
         certificatePassword: process.env.CERTIFICATE_PASSWORD,
       }),
     }),
+    {
+      name: '@electron-forge/maker-wix',
+      config: {
+        icon: 'assets/colanode-logo-black.ico',
+        language: 1033,
+        manufacturer: 'Colanode',
+        ui: {
+          chooseDirectory: true,
+        },
+      },
+    },
     new MakerDMG({
       icon: 'assets/colanode-logo-black.png',
       title: 'Colanode',

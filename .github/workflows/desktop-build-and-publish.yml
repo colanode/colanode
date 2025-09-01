@@ -502,6 +502,26 @@ jobs:
         working-directory: apps/desktop
         run: npm install
 
+      - name: Install Windows MSI Maker
+        working-directory: apps/desktop
+        run: npm install @electron-forge/maker-wix@^7.8.3
+
+      - name: Verify MSI Maker Installation
+        working-directory: apps/desktop
+        run: |
+          echo "🔍 Verifying MSI maker installation..."
+          if (Test-Path "node_modules/@electron-forge/maker-wix") {
+            echo "✅ maker-wix package found"
+            Get-ChildItem "node_modules/@electron-forge/maker-wix" | Select-Object Name, LastWriteTime
+          } else {
+            echo "❌ maker-wix package not found"
+          }
+          
+          echo "🔍 Checking forge.config.ts for MSI maker..."
+          if (Test-Path "forge.config.ts") {
+            Get-Content "forge.config.ts" | Select-String "maker-wix" | ForEach-Object { echo "  Found: $_" }
+          }
+
       - name: Build Electron App (Windows x64)
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -704,6 +724,29 @@ jobs:
           } else {
             echo "❌ Both builds failed or missing output"
           }
+          
+          echo "🔍 Detailed package analysis:"
+          if ($x64Exists) {
+            echo "📁 x64 packages found:"
+            $x64Exe = Get-ChildItem -Path "out-x64/" -Recurse -Include "*.exe" -ErrorAction SilentlyContinue
+            $x64Msi = Get-ChildItem -Path "out-x64/" -Recurse -Include "*.msi" -ErrorAction SilentlyContinue
+            $x64Zip = Get-ChildItem -Path "out-x64/" -Recurse -Include "*.zip" -ErrorAction SilentlyContinue
+            
+            if ($x64Exe) { echo "  ✅ .exe files: $($x64Exe.Count)" } else { echo "  ❌ .exe files: 0" }
+            if ($x64Msi) { echo "  ✅ .msi files: $($x64Msi.Count)" } else { echo "  ❌ .msi files: 0" }
+            if ($x64Zip) { echo "  ✅ .zip files: $($x64Zip.Count)" } else { echo "  ❌ .zip files: 0" }
+          }
+          
+          if ($arm64Exists) {
+            echo "📁 ARM64 packages found:"
+            $arm64Exe = Get-ChildItem -Path "out-arm64/" -Recurse -Include "*.exe" -ErrorAction SilentlyContinue
+            $arm64Msi = Get-ChildItem -Path "out-arm64/" -Recurse -Include "*.msi" -ErrorAction SilentlyContinue
+            $arm64Zip = Get-ChildItem -Path "out-arm64/" -Recurse -Include "*.zip" -ErrorAction SilentlyContinue
+            
+            if ($arm64Exe) { echo "  ✅ .exe files: $($arm64Exe.Count)" } else { echo "  ❌ .exe files: 0" }
+            if ($arm64Msi) { echo "  ✅ .msi files: $($arm64Msi.Count)" } else { echo "  ❌ .msi files: 0" }
+            if ($arm64Zip) { echo "  ✅ .zip files: $($arm64Zip.Count)" } else { echo "  ❌ .zip files: 0" }
+          }
 
       - name: Publish Electron App
         env:
@@ -805,9 +848,15 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-windows-all
-          path: |
-            apps/desktop/out-x64/**/*.{exe,msi,zip}
-            apps/desktop/out-arm64/**/*.{exe,msi,zip}
+          path: apps/desktop/out-x64/**/*.{exe,msi,zip}
+          retention-days: 30
+          if-no-files-found: warn
+
+      - name: Upload All Windows ARM64 Packages (Fallback)
+        uses: actions/upload-artifact@v4
+        with:
+          name: Colanode-${{ env.VERSION }}-windows-arm64-all
+          path: apps/desktop/out-arm64/**/*.{exe,msi,zip}
           retention-days: 30
           if-no-files-found: warn
 
