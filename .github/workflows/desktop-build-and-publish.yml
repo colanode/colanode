@@ -570,7 +570,7 @@ jobs:
           echo "🔑 Certificate path: $env:CERTIFICATE_PATH"
           echo "🔑 Certificate password: $env:CERTIFICATE_PASSWORD"
           
-          # Clean previous builds
+          # Clean only the main out directory, preserve x64 output
           if (Test-Path "out/") {
             Remove-Item -Path "out/" -Recurse -Force
           }
@@ -598,7 +598,7 @@ jobs:
           echo "📁 Checking output directory..."
           if (Test-Path "out-arm64/") {
             echo "out-arm64/ directory exists"
-            Get-ChildItem -Path "out-arm64/" -Recurse | Format-Table Name, LastWriteTime
+            Get-ChildItem -Path "out-arm64/" -Recurse | Format-Table Name, Length, LastWriteTime
           } else {
             echo "❌ out-arm64/ directory not found"
           }
@@ -685,6 +685,25 @@ jobs:
               echo "No files found in out-arm64/ directory"
             }
           }
+          
+          echo "🔍 Final build verification:"
+          echo "📁 Checking if both architectures built successfully..."
+          $x64Exists = Test-Path "out-x64/"
+          $arm64Exists = Test-Path "out-arm64/"
+          
+          if ($x64Exists -and $arm64Exists) {
+            echo "✅ Both x64 and ARM64 builds completed successfully!"
+            echo "📦 x64 packages: out-x64/"
+            echo "📦 ARM64 packages: out-arm64/"
+          } elseif ($x64Exists) {
+            echo "⚠️  Only x64 build completed successfully"
+            echo "❌ ARM64 build failed or missing"
+          } elseif ($arm64Exists) {
+            echo "⚠️  Only ARM64 build completed successfully"
+            echo "❌ x64 build failed or missing"
+          } else {
+            echo "❌ Both builds failed or missing output"
+          }
 
       - name: Publish Electron App
         env:
@@ -696,6 +715,22 @@ jobs:
           echo "🚀 Attempting to publish to GitHub releases..."
           echo "📝 Note: Publishing requires GitHub repository permissions"
           echo "🔧 If publish fails, packages are still available as artifacts"
+          
+          # Verify build outputs are still available before publishing
+          echo "🔍 Verifying build outputs before publish..."
+          if (Test-Path "out-x64/") {
+            echo "✅ x64 build output confirmed: out-x64/"
+            Get-ChildItem -Path "out-x64/" -Recurse | Measure-Object | ForEach-Object { echo "📁 x64 files count: $($_.Count)" }
+          } else {
+            echo "❌ x64 build output missing before publish"
+          }
+          
+          if (Test-Path "out-arm64/") {
+            echo "✅ ARM64 build output confirmed: out-arm64/"
+            Get-ChildItem -Path "out-arm64/" -Recurse | Measure-Object | ForEach-Object { echo "📁 ARM64 files count: $($_.Count)" }
+          } else {
+            echo "❌ ARM64 build output missing before publish"
+          }
           
           # Try to publish, but don't fail the build if it doesn't work
           $ErrorActionPreference = "Continue"  # Don't exit on error
