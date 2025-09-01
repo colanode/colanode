@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
     inputs:
       version:
-        description: 'Version to build (e.g., 1.0.0)'
-        required: true
-        default: '0.3.4'
+        description: 'Version to build (e.g., 1.0.0). Leave empty to use package.json'
+        required: false
+        default: ''
         type: string
       build_type:
         description: 'Type of build to run'
@@ -58,13 +58,15 @@ jobs:
       - name: Extract version from tag or input
         shell: pwsh
         run: |
-          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
+          if ("${{ github.event_name }}" -eq "workflow_dispatch" -and -not [string]::IsNullOrEmpty("${{ github.event.inputs.version }}")) {
             $env:VERSION = "${{ github.event.inputs.version }}"
           } elseif ("${{ github.ref }}" -like "refs/tags/*") {
             $env:VERSION = "${{ github.ref }}" -replace '^refs/tags/v',''
           } else {
-            # For branch pushes, use a default version
-            $env:VERSION = "0.3.4"
+            # Fallback: read version from apps/desktop/package.json
+            $pkgPath = "apps/desktop/package.json"
+            $pkg = Get-Content $pkgPath -Raw | ConvertFrom-Json
+            $env:VERSION = $pkg.version
           }
           echo "VERSION=$env:VERSION" >> $env:GITHUB_ENV
 
@@ -250,42 +252,42 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-windows-x64.exe
-          path: apps/desktop/out/**/*x64*.exe
+          path: apps/desktop/out/make/**/x64/*.exe
           retention-days: 30
 
       - name: Upload Windows x64 MSI
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-windows-x64.msi
-          path: apps/desktop/out/**/*x64*.msi
+          path: apps/desktop/out/make/**/x64/*.msi
           retention-days: 30
 
       - name: Upload Windows x64 ZIP
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-windows-x64.zip
-          path: apps/desktop/out/**/*x64*.zip
+          path: apps/desktop/out/make/zip/win32/x64/*.zip
           retention-days: 30
 
       - name: Upload Windows ARM64 EXE
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-windows-arm64.exe
-          path: apps/desktop/out/**/*arm64*.exe
+          path: apps/desktop/out/make/**/arm64/*.exe
           retention-days: 30
 
       - name: Upload Windows ARM64 MSI
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-windows-arm64.msi
-          path: apps/desktop/out/**/*arm64*.msi
+          path: apps/desktop/out/make/**/arm64/*.msi
           retention-days: 30
 
       - name: Upload Windows ARM64 ZIP
         uses: actions/upload-artifact@v4
         with:
           name: Colanode-${{ env.VERSION }}-windows-arm64.zip
-          path: apps/desktop/out/**/*arm64*.zip
+          path: apps/desktop/out/make/zip/win32/arm64/*.zip
           retention-days: 30
 
       - name: Clean up certificate
@@ -331,13 +333,14 @@ jobs:
 
       - name: Extract version from tag or input
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.version }}" ]]; then
             echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
           else
-            # For branch pushes, use a default version
-            echo "VERSION=0.3.4" >> $GITHUB_ENV
+            # Fallback: read version from apps/desktop/package.json
+            VERSION=$(node -e "console.log(require('./apps/desktop/package.json').version)")
+            echo "VERSION=$VERSION" >> $GITHUB_ENV
           fi
 
       - name: Set version and commit SHA into build.ts
@@ -635,12 +638,12 @@ jobs:
 
       - name: Extract version from tag or input
         run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" && -n "${{ github.event.inputs.version }}" ]]; then
             echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
           elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
             echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
           else
-            # For branch pushes, use a default version or extract from package.json
+            # Fallback: read version from apps/desktop/package.json
             echo "VERSION=0.3.4" >> $GITHUB_ENV
           fi
 
