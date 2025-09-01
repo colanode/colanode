@@ -25,220 +25,194 @@ on:
           - all
 
 jobs:
-  # build-windows:
-  #   runs-on: windows-latest
+  build-windows:
+    runs-on: windows-latest
 
-  #   steps:
-  #     - name: Check out Git repository
-  #       uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 1
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 22
-  #         cache: 'npm'
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'npm'
 
-  #     - name: Cache Electron (Windows)
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           ~\AppData\Local\electron\Cache
-  #           ~\AppData\Local\electron-builder\Cache
-  #         key: ${{ runner.os }}-electron-cache-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-electron-cache-
+      - name: Cache Electron (Windows)
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~\AppData\Local\electron\Cache
+            ~\AppData\Local\electron-builder\Cache
+          key: ${{ runner.os }}-electron-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-cache-
 
-  #     - name: Extract version from tag
-  #       shell: pwsh
-  #       run: |
-  #         $version = $env:GITHUB_REF -replace '^refs/tags/v',''
-  #         echo "VERSION=$version" >> $env:GITHUB_ENV
+      - name: Extract version from tag
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF -replace '^refs/tags/v',''
+          echo "VERSION=$version" >> $env:GITHUB_ENV
 
-  #     - name: Set version and commit SHA into build.ts
-  #       shell: pwsh
-  #       run: |
-  #         $content = @'
+      - name: Set version and commit SHA into build.ts
+        shell: pwsh
+        run: |
+          $content = @'
+          // This file is auto-generated during CI/CD
+          const VERSION = "${{ env.VERSION }}";
+          const SHA = "${{ github.sha }}";
 
-  #         // This file is auto-generated during CI/CD
-  #         const VERSION = "${{ env.VERSION }}";
-  #         const SHA = "${{ github.sha }}";
+          export const build = {
+              version: VERSION,
+              sha: SHA
+          };
+          '@
+          Set-Content -Path "./packages/core/src/types/build.ts" -Value $content
 
-  #         export const build = {
-  #             version: VERSION,
-  #             sha: SHA
-  #         };
+      - name: Decode certificate
+        run: |
+          $certPath = Join-Path -Path $env:RUNNER_TEMP -ChildPath "build_cert.pfx"
+          $certContent = [System.Convert]::FromBase64String($env:WINDOWS_CERT_BASE64)
+          [IO.File]::WriteAllBytes($certPath, $certContent)
+          echo "CERTIFICATE_PATH=$certPath" >> $env:GITHUB_ENV
+        shell: pwsh
+        env:
+          WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
 
-  #         '@
-  #         Set-Content -Path "./packages/core/src/types/build.ts" -Value $content
+      - name: Update package.json version
+        shell: bash
+        working-directory: apps/desktop
+        run: npm version ${VERSION} --no-git-tag-version
 
-  #     - name: Decode certificate
-  #       run: |
-  #         $certPath = Join-Path -Path $env:RUNNER_TEMP -ChildPath "build_cert.pfx"
-  #         $certContent = [System.Convert]::FromBase64String($env:WINDOWS_CERT_BASE64)
-  #         [IO.File]::WriteAllBytes($certPath, $certContent)
-  #         echo "CERTIFICATE_PATH=$certPath" >> $env:GITHUB_ENV
-  #       shell: pwsh
-  #       env:
-  #         WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
+      - name: Install Dependencies
+        run: |
+          npm ci
 
-  #     - name: Update package.json version
-  #       shell: bash
-  #       working-directory: apps/desktop
-  #       run: npm version ${VERSION} --no-git-tag-version
+      - name: Build Electron App
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          CERTIFICATE_PATH: ${{ env.CERTIFICATE_PATH }}
+          CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
+          NODE_ENV: production
+        working-directory: apps/desktop
+        run: npm run publish -- --win
 
-  #     - name: Install Root Dependencies
-  #       run: npm ci
+      - name: Clean up certificate
+        run: |
+          if (Test-Path $env:CERTIFICATE_PATH) {
+            Remove-Item -Path $env:CERTIFICATE_PATH
+          }
+        shell: pwsh
 
-  #     - name: Install Dependencies
-  #       working-directory: apps/desktop
-  #       run: |
-  #         npm ci
-  #         npm install @electron-forge/maker-appimage@^7.8.3
+  build-macos:
+    runs-on: macos-latest
 
-  #     - name: Build Electron App
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         CERTIFICATE_PATH: ${{ env.CERTIFICATE_PATH }}
-  #         CERTIFICATE_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
-  #         NODE_ENV: production
-  #       working-directory: apps/desktop
-  #       run: npm run make -- --platform=win32
+    steps:
+      - name: Check out Git repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 1
 
-  #     - name: Publish Electron App
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         NODE_ENV: production
-  #       working-directory: apps/desktop
-  #       run: npm run publish
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22
+          cache: 'npm'
 
-  #     - name: Clean up certificate
-  #       run: |
-  #         if (Test-Path $env:CERTIFICATE_PATH) {
-  #           Remove-Item -Path $env:CERTIFICATE_PATH
-  #         }
-  #       shell: pwsh
+      - name: Cache Electron (macOS)
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/Library/Caches/electron
+            ~/Library/Caches/electron-builder
+          key: ${{ runner.os }}-electron-cache-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-electron-cache-
 
-  # build-macos:
-  #   runs-on: macos-latest
+      - name: Extract version from tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
-  #   steps:
-  #     - name: Check out Git repository
-  #       uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 1
+      - name: Set version and commit SHA into build.ts
+        run: |
+          cat <<EOF > ./packages/core/src/types/build.ts
+          // This file is auto-generated during CI/CD
+          const VERSION = "${{ env.VERSION }}";
+          const SHA = "${{ github.sha }}";
 
-  #     - name: Setup Node.js
-  #       uses: actions/setup-node@v3
-  #       with:
-  #         node-version: 22
-  #         cache: 'npm'
+          export const build = {
+              version: VERSION,
+              sha: SHA
+          };
+          EOF
 
-  #     - name: Cache Electron (macOS)
-  #       uses: actions/cache@v3
-  #       with:
-  #         path: |
-  #           ~/Library/Caches/electron
-  #           ~/Library/Caches/electron-builder
-  #         key: ${{ runner.os }}-electron-cache-${{ hashFiles('**/package-lock.json') }}
-  #         restore-keys: |
-  #           ${{ runner.os }}-electron-cache-
+      - name: Decode and Import macOS Certificate
+        run: |
+          # Decode the base64 encoded certificate
+          CERTIFICATE_CONTENT=$(echo "${{ secrets.MACOS_CERTIFICATE_BASE64 }}" | base64 --decode)
 
-  #     - name: Extract version from tag
-  #       run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+          # Create a temporary keychain
+          KEYCHAIN_PATH="${RUNNER_TEMP}/temporary.keychain"
+          security create-keychain -p "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" "${KEYCHAIN_PATH}"
 
-  #     - name: Set version and commit SHA into build.ts
-  #       run: |
-  #         cat <<EOF > ./packages/core/src/types/build.ts
-  #         // This file is auto-generated during CI/CD
-  #         const VERSION = "${{ env.VERSION }}";
-  #         const SHA = "${{ github.sha }}";
+          # Import the certificate into the temporary keychain
+          echo "${CERTIFICATE_CONTENT}" > "${RUNNER_TEMP}/certificate.p12"
+          security import "${RUNNER_TEMP}/certificate.p12" -k "${KEYCHAIN_PATH}" -P "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign
 
-  #         export const build = {
-  #             version: VERSION,
-  #             sha: SHA
-  #         };
-  #         EOF
+          # Set the temporary keychain as the default keychain
+          security default-keychain -s "${KEYCHAIN_PATH}"
 
-  #     - name: Decode and Import macOS Certificate
-  #       run: |
-  #         # Decode the base64 encoded certificate
-  #         CERTIFICATE_CONTENT=$(echo "${{ secrets.MACOS_CERTIFICATE_BASE64 }}" | base64 --decode)
+          # Unlock the keychain
+          security unlock-keychain -p "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" "${KEYCHAIN_PATH}"
 
-  #         # Create a temporary keychain
-  #         KEYCHAIN_PATH="${RUNNER_TEMP}/temporary.keychain"
-  #         security create-keychain -p "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" "${KEYCHAIN_PATH}"
+          # Optionally, list available keys to verify (for debugging)
+          security find-identity -v -p codesigning
 
-  #         # Import the certificate into the temporary keychain
-  #         echo "${CERTIFICATE_CONTENT}" > "${RUNNER_TEMP}/temporary.keychain"
-  #         security import "${RUNNER_TEMP}/certificate.p12" -k "${KEYCHAIN_PATH}" -P "${{ secrets.MACOS_CERTIFICATE_PATH }}" -T /usr/bin/codesign
+          # Set environment variables for codesigning
+          echo "KEYCHAIN_PATH=${KEYCHAIN_PATH}" >> $GITHUB_ENV
+          echo "KEYCHAIN_PASSWORD=${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" >> $GITHUB_ENV
+        shell: bash
 
-  #         # Set the temporary keychain as the default keychain
-  #         security default-keychain -s "${KEYCHAIN_PATH}"
+      - name: Update package.json version
+        working-directory: apps/desktop
+        run: npm version $VERSION --no-git-tag-version
 
-  #         # Unlock the keychain
-  #         security unlock-keychain -p "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" "${KEYCHAIN_PATH}"
+      - name: Install Dependencies
+        run: |
+          npm ci
 
-  #         # Optionally, list available keys to verify (for debugging)
-  #         security find-identity -v -p codesigning
+      - name: Publish and Notarize Electron App (macOS Apple Silicon)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ENV: production
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          KEYCHAIN_PATH: ${{ env.KEYCHAIN_PATH }}
+          KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
+        working-directory: apps/desktop
+        run: |
+          npm run publish -- --mac --arch="arm64"
 
-  #         # Set environment variables for codesigning
-  #         echo "KEYCHAIN_PATH=${KEYCHAIN_PATH}" >> $GITHUB_ENV
-  #         echo "KEYCHAIN_PASSWORD=${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" >> $GITHUB_ENV
-  #       shell: bash
+      - name: Publish and Notarize Electron App (macOS Intel)
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NODE_ENV: production
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
+          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
+          KEYCHAIN_PATH: ${{ env.KEYCHAIN_PATH }}
+          KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
+        working-directory: apps/desktop
+        run: |
+          npm run publish -- --mac --arch="x64"
 
-  #     - name: Update package.json version
-  #       working-directory: apps/desktop
-  #       run: npm version $VERSION --no-git-tag-version
-
-  #     - name: Install Root Dependencies
-  #       run: npm ci
-
-  #     - name: Install Dependencies
-  #       working-directory: apps/desktop
-  #       run: |
-  #         npm ci
-  #         npm install @electron-forge/maker-appimage@^7.8.3
-
-  #     - name: Build Electron App (macOS Apple Silicon)
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         NODE_ENV: production
-  #         APPLE_ID: ${{ secrets.APPLE_ID }}
-  #         APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-  #         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-  #         KEYCHAIN_PATH: ${{ env.KEYCHAIN_PATH }}
-  #         KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
-  #       working-directory: apps/desktop
-  #       run: |
-  #         npm run make -- --platform=darwin --arch="arm64"
-
-  #     - name: Build Electron App (macOS Intel)
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         NODE_ENV: production
-  #         APPLE_ID: ${{ secrets.APPLE_ID }}
-  #         APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID }}
-  #         APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-  #         KEYCHAIN_PATH: ${{ env.KEYCHAIN_PATH }}
-  #         KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
-  #       working-directory: apps/desktop
-  #       run: |
-  #         npm run make -- --platform=darwin --arch="x64"
-
-  #     - name: Publish Electron App (macOS)
-  #       env:
-  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  #         NODE_ENV: production
-  #       working-directory: apps/desktop
-  #       run: npm run publish
-
-  #     - name: Delete Temporary Keychain
-  #       if: always()
-  #       run: |
-  #         security delete-keychain "${{ env.KEYCHAIN_PATH }}"
-  #       shell: bash
+      - name: Delete Temporary Keychain
+        if: always()
+        run: |
+          security delete-keychain "${{ env.KEYCHAIN_PATH }}"
+        shell: bash
 
   build-linux:
     runs-on: ubuntu-latest
@@ -392,781 +366,3 @@ jobs:
           path: apps/desktop/out/**/*.zip
           retention-days: 30
         continue-on-error: true
-
-  build-windows:
-    runs-on: windows-latest
-    if: |
-      github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' && 
-       (github.event.inputs.build_type == 'windows' || github.event.inputs.build_type == 'all'))
-
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && 'linux-build' || github.ref }}
-          fetch-depth: 1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          cache: 'npm'
-
-      - name: Cache Electron (Windows)
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~\AppData\Local\electron\Cache
-            ~\AppData\Local\electron-builder\Cache
-          key: ${{ runner.os }}-electron-cache-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-electron-cache-
-
-      - name: Extract version from tag or input
-        shell: pwsh
-        run: |
-          if ("${{ github.event_name }}" -eq "workflow_dispatch") {
-            $env:VERSION = "${{ github.event.inputs.version }}"
-          } elseif ($env:GITHUB_REF -like "refs/tags/*") {
-            $version = $env:GITHUB_REF -replace '^refs/tags/v',''
-            $env:VERSION = $version
-          } else {
-            # For branch pushes, use a default version
-            $env:VERSION = "0.3.4"
-          }
-          echo "VERSION=$env:VERSION" >> $env:GITHUB_ENV
-
-      - name: Set version and commit SHA into build.ts
-        shell: pwsh
-        run: |
-          $content = @'
-
-          // This file is auto-generated during CI/CD
-          const VERSION = "${{ env.VERSION }}";
-          const SHA = "${{ github.sha }}";
-
-          export const build = {
-              version: VERSION,
-              sha: SHA
-          };
-
-          '@
-          Set-Content -Path "./packages/core/src/types/build.ts" -Value $content
-
-      - name: Decode certificate
-        run: |
-          echo "🔐 Decoding Windows certificate..."
-          
-          if ([string]::IsNullOrEmpty($env:WINDOWS_CERT_BASE64)) {
-            echo "⚠️  Warning: WINDOWS_CERT_BASE64 secret is not set"
-            echo "🔧 Building without code signing (packages will be unsigned)"
-            echo "CERTIFICATE_PATH=" >> $env:GITHUB_ENV
-            echo "CERTIFICATE_PASSWORD=" >> $env:GITHUB_ENV
-            echo "SIGNING_ENABLED=false" >> $env:GITHUB_ENV
-          } else {
-            echo "✅ Windows certificate secret is configured"
-            echo "🔐 Proceeding with code signing..."
-            echo "SIGNING_ENABLED=true" >> $env:GITHUB_ENV
-            
-            $certPath = Join-Path -Path $env:RUNNER_TEMP -ChildPath "build_cert.pfx"
-            $certContent = [System.Convert]::FromBase64String($env:WINDOWS_CERT_BASE64)
-            [IO.File]::WriteAllBytes($certPath, $certContent)
-            echo "CERTIFICATE_PATH=$certPath" >> $env:GITHUB_ENV
-            echo "CERTIFICATE_PASSWORD=$env:WINDOWS_CERT_PASSWORD" >> $env:GITHUB_ENV
-            
-            echo "📁 Certificate saved to: $certPath"
-            echo "🔑 Certificate password: $env:WINDOWS_CERT_PASSWORD"
-          }
-        shell: pwsh
-        env:
-          WINDOWS_CERT_BASE64: ${{ secrets.WINDOWS_CERT_BASE64 }}
-          WINDOWS_CERT_PASSWORD: ${{ secrets.WINDOWS_CERT_PASSWORD }}
-
-      - name: Update package.json version
-        shell: bash
-        working-directory: apps/desktop
-        run: |
-          # Update version without triggering npm hooks
-          node -e "
-            const fs = require('fs');
-            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-            pkg.version = '${VERSION}';
-            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-          "
-
-      - name: Install Root Dependencies
-        run: npm install
-
-      - name: Install Dependencies
-        working-directory: apps/desktop
-        run: npm install
-
-      - name: Install Windows MSI Maker
-        working-directory: apps/desktop
-        run: npm install @electron-forge/maker-wix@^7.8.3
-
-      - name: Verify MSI Maker Installation
-        working-directory: apps/desktop
-        run: |
-          echo "🔍 Verifying MSI maker installation..."
-          if (Test-Path "node_modules/@electron-forge/maker-wix") {
-            echo "✅ maker-wix package found"
-            Get-ChildItem "node_modules/@electron-forge/maker-wix" | Select-Object Name, LastWriteTime
-          } else {
-            echo "❌ maker-wix package not found"
-          }
-          
-          echo "🔍 Checking forge.config.ts for MSI maker..."
-          if (Test-Path "forge.config.ts") {
-            Get-Content "forge.config.ts" | Select-String "maker-wix" | ForEach-Object { echo "  Found: $_" }
-          }
-
-      - name: Build Electron App (Windows x64)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CERTIFICATE_PATH: ${{ env.CERTIFICATE_PATH }}
-          CERTIFICATE_PASSWORD: ${{ env.CERTIFICATE_PASSWORD }}
-          NODE_ENV: production
-        working-directory: apps/desktop
-        run: |
-          echo "🔨 Building Windows x64 package..."
-          echo "📁 Current directory: $(pwd)"
-          echo "🔑 Certificate path: $env:CERTIFICATE_PATH"
-          echo "🔑 Certificate password: $env:CERTIFICATE_PASSWORD"
-          
-          # Clean previous builds
-          if (Test-Path "out/") {
-            Remove-Item -Path "out/" -Recurse -Force
-          }
-          
-          # Run the build with verbose output
-          echo "🔨 Running: npm run make -- --platform=win32 --arch=x64"
-          npm run make -- --platform=win32 --arch="x64" 2>&1
-          $BUILD_EXIT_CODE = $LASTEXITCODE
-          
-          if ($BUILD_EXIT_CODE -ne 0) {
-            echo "❌ Windows x64 build failed with exit code: $BUILD_EXIT_CODE"
-            exit $BUILD_EXIT_CODE
-          } else {
-            echo "✅ Windows x64 build completed successfully"
-          }
-          
-          # Move x64 files to a separate directory
-          if (Test-Path "out/") {
-            echo "📁 Moving x64 files to out-x64/"
-            New-Item -ItemType Directory -Path "out-x64" -Force
-            Copy-Item -Path "out/**/*" -Destination "out-x64/" -Recurse -Force
-            echo "✅ x64 files moved to out-x64/"
-          }
-          
-          echo "📁 Checking output directory..."
-          if (Test-Path "out-x64/") {
-            echo "out-x64/ directory exists"
-            Get-ChildItem -Path "out-x64/" -Recurse | Format-Table Name, Length, LastWriteTime
-          } else {
-            echo "❌ out-x64/ directory not found"
-          }
-          
-          echo "🔍 Environment variables for signing:"
-          echo "  SIGNING_ENABLED: $env:SIGNING_ENABLED"
-          echo "  CERTIFICATE_PATH: $env:CERTIFICATE_PATH"
-          echo "  CERTIFICATE_PASSWORD: $env:CERTIFICATE_PASSWORD"
-          
-          echo "📁 Current working directory: $(pwd)"
-          echo "📁 Listing all files in current directory:"
-          Get-ChildItem -Path "." -Recurse -Depth 1 | Format-Table Name, Length, LastWriteTime
-
-      - name: Build Electron App (Windows ARM64)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          CERTIFICATE_PATH: ${{ env.CERTIFICATE_PATH }}
-          CERTIFICATE_PASSWORD: ${{ env.CERTIFICATE_PASSWORD }}
-          NODE_ENV: production
-        working-directory: apps/desktop
-        run: |
-          echo "🔨 Building Windows ARM64 package..."
-          echo "📁 Current directory: $(pwd)"
-          echo "🔑 Certificate path: $env:CERTIFICATE_PATH"
-          echo "🔑 Certificate password: $env:CERTIFICATE_PASSWORD"
-          
-          # Clean only the main out directory, preserve x64 output
-          if (Test-Path "out/") {
-            Remove-Item -Path "out/" -Recurse -Force
-          }
-          
-          # Run the build with verbose output
-          echo "🔨 Running: npm run make -- --platform=win32 --arch=arm64"
-          npm run make -- --platform=win32 --arch="arm64" 2>&1
-          $BUILD_EXIT_CODE = $LASTEXITCODE
-          
-          if ($BUILD_EXIT_CODE -ne 0) {
-            echo "❌ Windows ARM64 build failed with exit code: $BUILD_EXIT_CODE"
-            exit $BUILD_EXIT_CODE
-          } else {
-            echo "✅ Windows ARM64 build completed successfully"
-          }
-          
-          # Move ARM64 files to a separate directory
-          if (Test-Path "out/") {
-            echo "📁 Moving ARM64 files to out-arm64/"
-            New-Item -ItemType Directory -Path "out-arm64" -Force
-            Copy-Item -Path "out/**/*" -Destination "out-arm64/" -Recurse -Force
-            echo "✅ ARM64 files moved to out-arm64/"
-          }
-          
-          echo "📁 Checking output directory..."
-          if (Test-Path "out-arm64/") {
-            echo "out-arm64/ directory exists"
-            Get-ChildItem -Path "out-arm64/" -Recurse | Format-Table Name, Length, LastWriteTime
-          } else {
-            echo "❌ out-arm64/ directory not found"
-          }
-          
-          echo "🔍 Environment variables for signing:"
-          echo "  SIGNING_ENABLED: $env:SIGNING_ENABLED"
-          echo "  CERTIFICATE_PATH: $env:CERTIFICATE_PATH"
-          echo "  CERTIFICATE_PASSWORD: $env:CERTIFICATE_PASSWORD"
-          
-          echo "📁 Current working directory: $(pwd)"
-          echo "📁 Listing all files in current directory:"
-          Get-ChildItem -Path "." -Recurse -Depth 1 | Format-Table Name, Length, LastWriteTime
-
-      - name: Debug Windows Build Output
-        working-directory: apps/desktop
-        shell: pwsh
-        run: |
-          echo "=== Windows Build Output Directory Structure ==="
-          echo "=== Full out-x64/ directory contents ==="
-          if (Test-Path "out-x64/") {
-            Get-ChildItem -Path "out-x64/" -Recurse | Format-Table Name, Length, LastWriteTime
-          } else {
-            echo "out-x64/ directory not found"
-          }
-          
-          echo "=== Full out-arm64/ directory contents ==="
-          if (Test-Path "out-arm64/") {
-            Get-ChildItem -Path "out-arm64/" -Recurse | Format-Table Name, Length, LastWriteTime
-          } else {
-            echo "out-arm64/ directory not found"
-          }
-          
-          echo "=== Looking for Windows x64 packages ==="
-          $x64Packages = Get-ChildItem -Path "out-x64/" -Recurse -Include "*.exe", "*.msi", "*.zip" -ErrorAction SilentlyContinue
-          if ($x64Packages) {
-            echo "Found x64 packages:"
-            $x64Packages | ForEach-Object { echo "  $($_.FullName)" }
-          } else {
-            echo "No x64 packages found in out-x64/"
-          }
-          
-          echo "=== Looking for Windows ARM64 packages ==="
-          $arm64Packages = Get-ChildItem -Path "out-arm64/" -Recurse -Include "*.exe", "*.msi", "*.zip" -ErrorAction SilentlyContinue
-          if ($arm64Packages) {
-            echo "Found ARM64 packages:"
-            $arm64Packages | ForEach-Object { echo "  $($_.FullName)" }
-          } else {
-            echo "No ARM64 packages found in out-arm64/"
-          }
-          
-          echo "=== Looking for ALL Windows packages (any extension) ==="
-          $allPackages = @()
-          if (Test-Path "out-x64/") {
-            $allPackages += Get-ChildItem -Path "out-x64/" -Recurse -Include "*.exe", "*.msi", "*.zip" -ErrorAction SilentlyContinue
-          }
-          if (Test-Path "out-arm64/") {
-            $allPackages += Get-ChildItem -Path "out-arm64/" -Recurse -Include "*.exe", "*.msi", "*.zip" -ErrorAction SilentlyContinue
-          }
-          
-          if ($allPackages) {
-            echo "Found all Windows packages:"
-            $allPackages | ForEach-Object { echo "  $($_.FullName)" }
-          } else {
-            echo "No Windows packages found at all"
-          }
-          
-          echo "=== Looking for any files in both directories ==="
-          if (Test-Path "out-x64/") {
-            $x64Files = Get-ChildItem -Path "out-x64/" -Recurse -ErrorAction SilentlyContinue
-            if ($x64Files) {
-              echo "Found files in out-x64/:"
-              $x64Files | ForEach-Object { echo "  $($_.Name) - $($_.Extension)" }
-            } else {
-              echo "No files found in out-x64/ directory"
-            }
-          }
-          
-          if (Test-Path "out-arm64/") {
-            $arm64Files = Get-ChildItem -Path "out-arm64/" -Recurse -ErrorAction SilentlyContinue
-            if ($arm64Files) {
-              echo "Found files in out-arm64/:"
-              $arm64Files | ForEach-Object { echo "  $($_.Name) - $($_.Extension)" }
-            } else {
-              echo "No files found in out-arm64/ directory"
-            }
-          }
-          
-          echo "🔍 Final build verification:"
-          echo "📁 Checking if both architectures built successfully..."
-          $x64Exists = Test-Path "out-x64/"
-          $arm64Exists = Test-Path "out-arm64/"
-          
-          if ($x64Exists -and $arm64Exists) {
-            echo "✅ Both x64 and ARM64 builds completed successfully!"
-            echo "📦 x64 packages: out-x64/"
-            echo "📦 ARM64 packages: out-arm64/"
-          } elseif ($x64Exists) {
-            echo "⚠️  Only x64 build completed successfully"
-            echo "❌ ARM64 build failed or missing"
-          } elseif ($arm64Exists) {
-            echo "⚠️  Only ARM64 build completed successfully"
-            echo "❌ x64 build failed or missing"
-          } else {
-            echo "❌ Both builds failed or missing output"
-          }
-          
-          echo "🔍 Detailed package analysis:"
-          if ($x64Exists) {
-            echo "📁 x64 packages found:"
-            $x64Exe = Get-ChildItem -Path "out-x64/" -Recurse -Include "*.exe" -ErrorAction SilentlyContinue
-            $x64Msi = Get-ChildItem -Path "out-x64/" -Recurse -Include "*.msi" -ErrorAction SilentlyContinue
-            $x64Zip = Get-ChildItem -Path "out-x64/" -Recurse -Include "*.zip" -ErrorAction SilentlyContinue
-            
-            if ($x64Exe) { echo "  ✅ .exe files: $($x64Exe.Count)" } else { echo "  ❌ .exe files: 0" }
-            if ($x64Msi) { echo "  ✅ .msi files: $($x64Msi.Count)" } else { echo "  ❌ .msi files: 0" }
-            if ($x64Zip) { echo "  ✅ .zip files: $($x64Zip.Count)" } else { echo "  ❌ .zip files: 0" }
-          }
-          
-          if ($arm64Exists) {
-            echo "📁 ARM64 packages found:"
-            $arm64Exe = Get-ChildItem -Path "out-arm64/" -Recurse -Include "*.exe" -ErrorAction SilentlyContinue
-            $arm64Msi = Get-ChildItem -Path "out-arm64/" -Recurse -Include "*.msi" -ErrorAction SilentlyContinue
-            $arm64Zip = Get-ChildItem -Path "out-arm64/" -Recurse -Include "*.zip" -ErrorAction SilentlyContinue
-            
-            if ($arm64Exe) { echo "  ✅ .exe files: $($arm64Exe.Count)" } else { echo "  ❌ .exe files: 0" }
-            if ($arm64Msi) { echo "  ✅ .msi files: $($arm64Msi.Count)" } else { echo "  ❌ .msi files: 0" }
-            if ($arm64Zip) { echo "  ✅ .zip files: $($arm64Zip.Count)" } else { echo "  ❌ .zip files: 0" }
-          }
-
-      - name: Publish Electron App
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_ENV: production
-        working-directory: apps/desktop
-        continue-on-error: true
-        run: |
-          echo "🚀 Attempting to publish to GitHub releases..."
-          echo "📝 Note: Publishing requires GitHub repository permissions"
-          echo "🔧 If publish fails, packages are still available as artifacts"
-          
-          # Verify build outputs are still available before publishing
-          echo "🔍 Verifying build outputs before publish..."
-          if (Test-Path "out-x64/") {
-            echo "✅ x64 build output confirmed: out-x64/"
-            Get-ChildItem -Path "out-x64/" -Recurse | Measure-Object | ForEach-Object { echo "📁 x64 files count: $($_.Count)" }
-          } else {
-            echo "❌ x64 build output missing before publish"
-          }
-          
-          if (Test-Path "out-arm64/") {
-            echo "✅ ARM64 build output confirmed: out-arm64/"
-            Get-ChildItem -Path "out-arm64/" -Recurse | Measure-Object | ForEach-Object { echo "📁 ARM64 files count: $($_.Count)" }
-          } else {
-            echo "❌ ARM64 build output missing before publish"
-          }
-          
-          # Try to publish, but don't fail the build if it doesn't work
-          $ErrorActionPreference = "Continue"  # Don't exit on error
-          npm run publish 2>&1
-          $PUBLISH_EXIT_CODE = $LASTEXITCODE
-          
-          if ($PUBLISH_EXIT_CODE -ne 0) {
-            echo "⚠️  Publish failed, but build succeeded!"
-            echo "📦 Your Windows x64 and ARM64 packages are available as artifacts above"
-            echo "🔍 Publish error details saved above"
-            echo "💡 To fix publish issues, check:"
-            echo "   1. GitHub repository settings → Actions → General"
-            echo "   2. Ensure 'Read and write permissions' is enabled"
-            echo "   3. Ensure 'Allow GitHub Actions to create and approve pull requests' is enabled"
-            echo "✅ Build completed successfully despite publish failure"
-          } else {
-            echo "✅ Publish completed successfully!"
-          }
-          
-          echo "✅ Build completed successfully"
-        shell: pwsh
-
-      - name: Upload Windows x64 Installer
-        uses: actions/upload-artifact@v4
-        with:
-          name: Colanode-${{ env.VERSION }}-x64.exe
-          path: apps/desktop/out-x64/**/*.exe
-          retention-days: 30
-          if-no-files-found: warn
-
-      - name: Upload Windows x64 MSI
-        uses: actions/upload-artifact@v4
-        with:
-          name: Colanode-${{ env.VERSION }}-x64.msi
-          path: apps/desktop/out-x64/**/*.msi
-          retention-days: 30
-          if-no-files-found: warn
-
-      - name: Upload Windows x64 ZIP
-        uses: actions/upload-artifact@v4
-        with:
-          name: Colanode-${{ env.VERSION }}-x64.zip
-          path: apps/desktop/out-x64/**/*.zip
-          retention-days: 30
-          if-no-files-found: warn
-
-      - name: Upload Windows ARM64 Installer
-        uses: actions/upload-artifact@v4
-        with:
-          name: Colanode-${{ env.VERSION }}-arm64.exe
-          path: apps/desktop/out-arm64/**/*.exe
-          retention-days: 30
-          if-no-files-found: warn
-
-      - name: Upload Windows ARM64 MSI
-        uses: actions/upload-artifact@v4
-        with:
-          name: Colanode-${{ env.VERSION }}-arm64.msi
-          path: apps/desktop/out-arm64/**/*.msi
-          retention-days: 30
-          if-no-files-found: warn
-
-      - name: Upload Windows ARM64 ZIP
-        uses: actions/upload-artifact@v4
-        with:
-          name: Colanode-${{ env.VERSION }}-arm64.zip
-          path: apps/desktop/out-arm64/**/*.zip
-          retention-days: 30
-          if-no-files-found: warn
-
-      - name: Upload All Windows Packages (Fallback)
-        uses: actions/upload-artifact@v4
-        with:
-          name: Colanode-${{ env.VERSION }}-windows-all
-          path: apps/desktop/out-x64/**/*.{exe,msi,zip}
-          retention-days: 30
-          if-no-files-found: warn
-
-      - name: Upload All Windows ARM64 Packages (Fallback)
-        uses: actions/upload-artifact@v4
-        with:
-          name: Colanode-${{ env.VERSION }}-windows-arm64-all
-          path: apps/desktop/out-arm64/**/*.{exe,msi,zip}
-          retention-days: 30
-          if-no-files-found: warn
-
-      - name: Clean up certificate
-        run: |
-          if (Test-Path $env:CERTIFICATE_PATH) {
-            Remove-Item -Path $env:CERTIFICATE_PATH
-          }
-        shell: pwsh
-
-  build-macos:
-    runs-on: macos-latest
-    if: |
-      github.event_name == 'push' ||
-      (github.event_name == 'workflow_dispatch' && 
-       (github.event.inputs.build_type == 'macos' || github.event.inputs.build_type == 'all'))
-
-    steps:
-      - name: Check out Git repository
-        uses: actions/checkout@v3
-        with:
-          ref: ${{ github.event_name == 'workflow_dispatch' && 'linux-build' || github.ref }}
-          fetch-depth: 1
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 22
-          cache: 'npm'
-
-      - name: Cache Electron (macOS)
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/Library/Caches/electron
-            ~/Library/Caches/electron-builder
-          key: ${{ runner.os }}-electron-cache-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-electron-cache-
-
-      - name: Extract version from tag or input
-        run: |
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
-          elif [[ "${{ github.ref }}" == refs/tags/* ]]; then
-            echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
-          else
-            # For branch pushes, use a default version
-            echo "VERSION=0.3.4" >> $GITHUB_ENV
-          fi
-
-      - name: Set version and commit SHA into build.ts
-        run: |
-          cat <<EOF > ./packages/core/src/types/build.ts
-          // This file is auto-generated during CI/CD
-          const VERSION = "${{ env.VERSION }}";
-          const SHA = "${{ github.sha }}";
-
-          export const build = {
-              version: VERSION,
-              sha: SHA
-          };
-          EOF
-
-      - name: Check macOS Certificate Status
-        run: |
-          echo "🔍 Checking macOS certificate configuration..."
-          
-          if [ -z "${{ secrets.MACOS_CERTIFICATE_BASE64 }}" ] || [ -z "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" ]; then
-            echo "⚠️  Warning: macOS certificate secrets are not configured"
-            echo "📝 Building without code signing (packages will be unsigned)"
-            echo "💡 To enable code signing, set these secrets:"
-            echo "   - MACOS_CERTIFICATE_BASE64: Your .p12 certificate file encoded in base64"
-            echo "   - MACOS_CERTIFICATE_PASSWORD: The password for your certificate"
-            echo "✅ Continuing with unsigned build..."
-            echo "🔧 Setting SIGNING_ENABLED=false to disable code signing in Electron Forge"
-            
-            # Set empty values to avoid errors in subsequent steps
-            echo "KEYCHAIN_PATH=" >> $GITHUB_ENV
-            echo "KEYCHAIN_PASSWORD=" >> $GITHUB_ENV
-            echo "SIGNING_ENABLED=false" >> $GITHUB_ENV
-          else
-            echo "✅ macOS certificate secrets are configured"
-            echo "🔐 Proceeding with code signing..."
-            echo "🔧 Setting SIGNING_ENABLED=true to enable code signing in Electron Forge"
-            echo "SIGNING_ENABLED=true" >> $GITHUB_ENV
-          fi
-          
-          echo "📋 Environment variable SIGNING_ENABLED=${{ env.SIGNING_ENABLED }}"
-        shell: bash
-
-      - name: Decode and Import macOS Certificate
-        if: env.SIGNING_ENABLED == 'true'
-        run: |
-          echo "🔐 Setting up code signing environment..."
-          
-          # Check if the secret exists and has content
-          if [ -z "${{ secrets.MACOS_CERTIFICATE_BASE64 }}" ]; then
-            echo "❌ Error: MACOS_CERTIFICATE_BASE64 secret is empty or not set"
-            exit 1
-          fi
-          
-          echo "🔍 Certificate secret length: ${#MACOS_CERTIFICATE_BASE64}"
-          
-          # Decode the base64 encoded certificate
-          echo "${{ secrets.MACOS_CERTIFICATE_BASE64 }}" | base64 --decode > "${RUNNER_TEMP}/certificate.p12"
-          
-          # Verify the certificate file exists and has content
-          if [ ! -s "${RUNNER_TEMP}/certificate.p12" ]; then
-            echo "❌ Error: Certificate file is empty or was not created properly"
-            echo "🔍 Certificate file size: $(wc -c < "${RUNNER_TEMP}/certificate.p12" 2>/dev/null || echo 'unknown')"
-            echo "🔍 Certificate file exists: $(test -f "${RUNNER_TEMP}/certificate.p12" && echo 'yes' || echo 'no')"
-            echo "🔍 Certificate file readable: $(test -r "${RUNNER_TEMP}/certificate.p12" && echo 'yes' || echo 'no')"
-            exit 1
-          fi
-          
-          echo "✅ Certificate file created successfully"
-          ls -la "${RUNNER_TEMP}/certificate.p12"
-          echo "🔍 Certificate file type:"
-          file "${RUNNER_TEMP}/certificate.p12" || echo "file command not available"
-
-          # Create a temporary keychain
-          KEYCHAIN_PATH="${RUNNER_TEMP}/temporary.keychain"
-          echo "🔐 Creating temporary keychain..."
-          security create-keychain -p "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" "${KEYCHAIN_PATH}"
-          
-          if [ $? -ne 0 ]; then
-            echo "❌ Error: Failed to create keychain"
-            echo "🔍 Keychain creation failed. Checking security command availability..."
-            which security || echo "security command not found"
-            exit 1
-          fi
-          echo "✅ Keychain created successfully"
-
-          # Import the certificate into the temporary keychain
-          echo "🔐 Importing certificate into keychain..."
-          security import "${RUNNER_TEMP}/certificate.p12" -k "${KEYCHAIN_PATH}" -P "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" -T /usr/bin/codesign
-          
-          if [ $? -ne 0 ]; then
-            echo "❌ Error: Failed to import certificate"
-            echo "🔍 Certificate file info:"
-            file "${RUNNER_TEMP}/certificate.p12"
-            echo "🔍 Keychain info:"
-            security list-keychains
-            echo "🔍 Available keychains:"
-            security list-keychains -d user
-            exit 1
-          fi
-          echo "✅ Certificate imported successfully"
-
-          # Set the temporary keychain as the default keychain
-          security default-keychain -s "${KEYCHAIN_PATH}"
-          echo "✅ Keychain set as default"
-
-          # Unlock the keychain
-          security unlock-keychain -p "${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" "${KEYCHAIN_PATH}"
-          echo "✅ Keychain unlocked"
-
-          # List available keys to verify (for debugging)
-          echo "🔍 Available signing identities:"
-          security find-identity -v -p codesigning "${KEYCHAIN_PATH}"
-
-          # Set environment variables for codesigning
-          echo "KEYCHAIN_PATH=${KEYCHAIN_PATH}" >> $GITHUB_ENV
-          echo "KEYCHAIN_PASSWORD=${{ secrets.MACOS_CERTIFICATE_PASSWORD }}" >> $GITHUB_ENV
-          echo "✅ Environment variables set"
-        shell: bash
-
-      - name: Update package.json version
-        working-directory: apps/desktop
-        run: |
-          # Update version without triggering npm hooks
-          node -e "
-            const fs = require('fs');
-            const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-            pkg.version = '${{ env.VERSION }}';
-            fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-          "
-
-      - name: Install Root Dependencies
-        run: npm install
-
-      - name: Install Dependencies
-        working-directory: apps/desktop
-        run: npm install
-
-      - name: Build Electron App (macOS Apple Silicon)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_ENV: production
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          KEYCHAIN_PATH: ${{ env.KEYCHAIN_PATH }}
-          KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
-          SIGNING_ENABLED: ${{ env.SIGNING_ENABLED }}
-        working-directory: apps/desktop
-        run: |
-          if [ "${{ env.SIGNING_ENABLED }}" = "true" ]; then
-            echo "🔐 Building with code signing..."
-            npm run make -- --platform=darwin --arch="arm64"
-          else
-            echo "📝 Building without code signing..."
-            echo "🚫 Disabling code signing for unsigned build..."
-            # Set environment variables to disable code signing
-            export CSC_IDENTITY_AUTO_DISCOVERY=false
-            export CSC_LINK=
-            export CSC_KEY_PASSWORD=
-            npm run make -- --platform=darwin --arch="arm64"
-          fi
-
-      - name: Build Electron App (macOS Intel)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_ENV: production
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APPLE_ID_PASSWORD: ${{ secrets.APPLE_ID_PASSWORD }}
-          APPLE_TEAM_ID: ${{ secrets.APPLE_TEAM_ID }}
-          KEYCHAIN_PATH: ${{ env.KEYCHAIN_PATH }}
-          KEYCHAIN_PASSWORD: ${{ env.KEYCHAIN_PASSWORD }}
-          SIGNING_ENABLED: ${{ env.SIGNING_ENABLED }}
-        working-directory: apps/desktop
-        run: |
-          if [ "${{ env.SIGNING_ENABLED }}" = "true" ]; then
-            echo "🔐 Building with code signing..."
-            npm run make -- --platform=darwin --arch="x64"
-          else
-            echo "📝 Building without code signing..."
-            echo "🚫 Disabling code signing for unsigned build..."
-            # Set environment variables to disable code signing
-            export CSC_IDENTITY_AUTO_DISCOVERY=false
-            export CSC_LINK=
-            export CSC_KEY_PASSWORD=
-            npm run make -- --platform=darwin --arch="x64"
-          fi
-
-      - name: Debug macOS Build Output
-        working-directory: apps/desktop
-        run: |
-          echo "=== macOS Build Output Directory Structure ==="
-          echo "=== Full out/ directory contents ==="
-          ls -la out/ || echo "out/ directory not found"
-          echo "=== Looking for macOS packages ==="
-          find out/ -name "*.dmg" -o -name "*.zip" 2>/dev/null || echo "No macOS packages found"
-
-      - name: Publish Electron App (macOS)
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NODE_ENV: production
-        working-directory: apps/desktop
-        continue-on-error: true
-        run: |
-          echo "🚀 Attempting to publish to GitHub releases..."
-          echo "📝 Note: Publishing requires GitHub repository permissions"
-          echo "🔧 If publish fails, packages are still available as artifacts"
-          
-          # Try to publish, but don't fail the build if it doesn't work
-          set +e  # Don't exit on error
-          npm run publish 2>&1
-          PUBLISH_EXIT_CODE=$?
-          
-          if [ $PUBLISH_EXIT_CODE -ne 0 ]; then
-            echo "⚠️  Publish failed, but build succeeded!"
-            echo "📦 Your macOS packages are available as artifacts above"
-            echo "🔍 Publish error details saved above"
-            echo "💡 To fix publish issues, check:"
-            echo "   1. GitHub repository settings → Actions → General"
-            echo "   2. Ensure 'Read and write permissions' is enabled"
-            echo "   3. Ensure 'Allow GitHub Actions to create and approve pull requests' is enabled"
-            echo "✅ Build completed successfully despite publish failure"
-          else
-            echo "✅ Publish completed successfully!"
-          fi
-          
-          # Always exit with success to continue the workflow
-          exit 0
-
-      - name: Upload macOS Apple Silicon DMG
-        uses: actions/upload-artifact@v4
-        with:
-          name: Colanode-${{ env.VERSION }}-darwin-arm64.dmg
-          path: apps/desktop/out/**/*arm64*.dmg
-          retention-days: 30
-
-      - name: Upload macOS Intel DMG
-        uses: actions/upload-artifact@v4
-        with:
-          name: Colanode-${{ env.VERSION }}-darwin-x64.dmg
-          path: apps/desktop/out/**/*x64*.dmg
-          retention-days: 30
-
-      - name: Upload macOS ZIP
-        uses: actions/upload-artifact@v4
-        with:
-          name: Colanode-${{ env.VERSION }}-darwin-x64.zip
-          path: apps/desktop/out/**/*.zip
-          retention-days: 30
-
-      - name: Delete Temporary Keychain
-        if: always() && env.SIGNING_ENABLED == 'true'
-        run: |
-          echo "🧹 Cleaning up temporary keychain..."
-          if [ -n "${{ env.KEYCHAIN_PATH }}" ] && [ -f "${{ env.KEYCHAIN_PATH }}" ]; then
-            echo "🔍 Attempting to delete keychain: ${{ env.KEYCHAIN_PATH }}"
-            security delete-keychain "${{ env.KEYCHAIN_PATH }}" 2>/dev/null || {
-              echo "⚠️  Warning: Could not delete keychain (this is normal if build failed early)"
-              echo "🔍 Keychain cleanup will happen automatically when runner is recycled"
-            }
-          else
-            echo "ℹ️  No keychain to clean up"
-          fi
-          echo "✅ Cleanup completed"
-        shell: bash
