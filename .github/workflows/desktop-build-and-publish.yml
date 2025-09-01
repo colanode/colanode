@@ -3,7 +3,7 @@ name: Desktop - Build and publish electron app
 on:
   push:
     branches:
-      - 'linux-build'
+      - 'main'
     tags:
       - 'v*'
   workflow_dispatch:
