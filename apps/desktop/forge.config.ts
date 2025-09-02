@@ -108,7 +108,7 @@ const config: ForgeConfig = {
           categories: ['Development', 'Utility'],
           maintainer: 'Colanode',
           homepage: 'https://github.com/colanode/colanode',
-          license: 'MIT',
+          license: 'Apache-2.0',
         },
       },
     },
@@ -120,7 +120,7 @@ const config: ForgeConfig = {
           categories: ['Development', 'Utility'],
           maintainer: 'Colanode',
           homepage: 'https://github.com/colanode/colanode',
-          license: 'MIT',
+          license: 'Apache-2.0',
           description: 'Colanode desktop application',
           productName: 'Colanode',
         },
@@ -234,7 +234,7 @@ const config: ForgeConfig = {
           
           // Ensure required fields are present for RPM/DEB makers
           if (!content.license) {
-            content.license = 'MIT';
+            content.license = 'Apache-2.0';
           }
           if (!content.description) {
             content.description = 'Colanode desktop application';

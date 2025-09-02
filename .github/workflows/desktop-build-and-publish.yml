@@ -2,8 +2,6 @@ name: Desktop - Build and publish electron app
 
 on:
   push:
-    branches:
-      - 'main'
     tags:
       - 'v*'
   workflow_dispatch:
