@@ -69,6 +69,20 @@ export class WebFileSystem implements FileSystem {
     return { parent, name: fileName };
   }
 
+  //Ensure the data type is compatible with the File Write API
+  private ensureArrayBuffer(data: Uint8Array): ArrayBuffer {
+    const arrayBuffer: ArrayBuffer =
+      data.buffer instanceof ArrayBuffer ?
+        data.buffer : new ArrayBuffer(data.byteLength);
+
+    if (!(data.buffer instanceof ArrayBuffer)) {
+      const view = new Uint8Array<ArrayBuffer>(arrayBuffer);
+      view.set(data);
+    }
+
+    return arrayBuffer;
+  }
+
   public async makeDirectory(path: string): Promise<void> {
     await this.getDirectoryHandle(path, true);
   }
@@ -138,9 +152,10 @@ export class WebFileSystem implements FileSystem {
     const file = await fileHandle.createWritable({ keepExistingData: false });
 
     return new WritableStream<Uint8Array>({
-      async write(chunk) {
-        // write each chunk directly to disk
-        await file.write(chunk);
+      write: async (chunk) => {
+        // Ensure data compatibility, write each chunk directly to disk
+        const arrayBuffer = this.ensureArrayBuffer(chunk);
+        await file.write(arrayBuffer);
       },
       async close() {
         await file.close(); // makes the data durable
@@ -184,9 +199,10 @@ export class WebFileSystem implements FileSystem {
     // Create or open the file
     const fileHandle = await parent.getFileHandle(name, { create: true });
 
-    // Create a writable stream and write the data
+    // Create a writable stream, ensure data compat, and write the data
     const writable = await fileHandle.createWritable();
-    await writable.write(data);
+    const arrayBuffer = this.ensureArrayBuffer(data);
+    await writable.write(arrayBuffer);
     await writable.close();
   }
 
