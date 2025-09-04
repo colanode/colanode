@@ -163,6 +163,12 @@ const CommandList = ({
                     }`}
                     key={item.key}
                     onClick={() => selectItem(index)}
+                    onPointerDownCapture={(e) => {
+                      // Added this event handler because the onClick handler was not working
+                      e.preventDefault();
+                      e.stopPropagation();
+                      selectItem(index);
+                    }}
                   >
                     <div className="flex size-10 min-w-10 items-center justify-center rounded-md border bg-background">
                       <item.icon className="size-4 text-foreground" />
