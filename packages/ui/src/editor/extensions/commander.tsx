@@ -5,6 +5,7 @@ import {
   shift,
   autoUpdate,
   FloatingPortal,
+  VirtualElement,
 } from '@floating-ui/react';
 import type { Range } from '@tiptap/core';
 import { Editor, Extension } from '@tiptap/core';
@@ -70,18 +71,25 @@ const CommandList = ({
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
-  const { refs, floatingStyles } = useFloating({
+  const { refs, floatingStyles, update } = useFloating({
     placement: 'bottom-start',
     middleware: [offset(6), flip(), shift()],
     whileElementsMounted: autoUpdate,
     strategy: 'fixed',
-    elements: {
-      reference: {
-        getBoundingClientRect: () => props.clientRect?.() || new DOMRect(),
-        contextElement: document.body,
-      } as unknown as Element,
-    },
   });
+
+  useLayoutEffect(() => {
+    const rect = props.clientRect?.();
+    if (!rect) return;
+
+    const virtualEl = {
+      getBoundingClientRect: () => rect,
+      contextElement: props.editor.view.dom as Element,
+    };
+
+    refs.setPositionReference(virtualEl as VirtualElement);
+    update();
+  }, [props.clientRect, props.editor.view.dom, refs, update]);
 
   const selectItem = useCallback(
     (index: number) => {
