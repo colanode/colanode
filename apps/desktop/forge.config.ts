@@ -1,20 +1,21 @@
 import fs from 'fs/promises';
 import path from 'path';
 
-import { FuseV1Options, FuseVersion } from '@electron/fuses';
 import { MakerDMG } from '@electron-forge/maker-dmg';
 import { MakerSquirrel } from '@electron-forge/maker-squirrel';
 import { FusesPlugin } from '@electron-forge/plugin-fuses';
 import { VitePlugin } from '@electron-forge/plugin-vite';
 import type { ForgeConfig } from '@electron-forge/shared-types';
+import { FuseV1Options, FuseVersion } from '@electron/fuses';
 
 const config: ForgeConfig = {
   packagerConfig: {
-    name: 'Colanode',
-    executableName: process.platform === 'linux' ? 'colanode' : 'Colanode',
+    name: 'colanode',
+    executableName: 'colanode',
     icon: 'assets/colanode-logo-black',
     appBundleId: 'com.colanode.desktop',
-    ...(process.platform === 'win32' && {
+    overwrite: true,
+    ...(process.env.SIGNING_ENABLED === 'true' && {
       certificateFile: process.env.CERTIFICATE_PATH,
       certificatePassword: process.env.CERTIFICATE_PASSWORD,
     }),
@@ -49,41 +50,81 @@ const config: ForgeConfig = {
       return true;
     },
     extraResource: ['assets'],
-    osxSign: {
-      type: 'distribution',
-      keychain: process.env.KEYCHAIN!,
-      optionsForFile: (_) => {
-        return {
-          hardenedRuntime: true,
-          entitlements: 'entitlements.mac.plist',
-          entitlementsInherit: 'entitlements.mac.plist',
-        };
+    ...(process.env.SIGNING_ENABLED === 'true' && {
+      osxSign: {
+        type: 'distribution',
+        keychain: process.env.KEYCHAIN_PATH!,
+        optionsForFile: (_) => {
+          return {
+            hardenedRuntime: true,
+            entitlements: 'entitlements.mac.plist',
+            entitlementsInherit: 'entitlements.mac.plist',
+          };
+        },
       },
-    },
-    osxNotarize: {
-      appleId: process.env.APPLE_ID!,
-      appleIdPassword: process.env.APPLE_ID_PASSWORD!,
-      teamId: process.env.APPLE_TEAM_ID!,
-      keychain: process.env.KEYCHAIN!,
-    },
+      osxNotarize: {
+        appleId: process.env.APPLE_ID!,
+        appleIdPassword: process.env.APPLE_ID_PASSWORD!,
+        teamId: process.env.APPLE_TEAM_ID!,
+        keychain: process.env.KEYCHAIN_PATH!,
+      },
+    }),
   },
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({
-      name: 'Colanode',
-      ...(process.platform === 'win32' && {
+      name: 'colanode',
+      setupIcon: 'assets/colanode-logo-black.ico',
+      ...(process.env.SIGNING_ENABLED === 'true' && {
         certificateFile: process.env.CERTIFICATE_PATH,
         certificatePassword: process.env.CERTIFICATE_PASSWORD,
       }),
     }),
+    {
+      name: '@electron-forge/maker-wix',
+      config: {
+        icon: 'assets/colanode-logo-black.ico',
+        language: 1033,
+        manufacturer: 'Colanode',
+        ui: {
+          chooseDirectory: true,
+        },
+      },
+    },
     new MakerDMG({
       icon: 'assets/colanode-logo-black.png',
       title: 'Colanode',
     }),
     {
       name: '@electron-forge/maker-zip',
-      platforms: ['darwin'],
+      platforms: ['darwin', 'linux', 'win32'],
       config: {},
+    },
+    {
+      name: '@electron-forge/maker-deb',
+      config: {
+        options: {
+          icon: 'assets/colanode-logo-black.png',
+          categories: ['Development', 'Utility'],
+          maintainer: 'Colanode',
+          homepage: 'https://github.com/colanode/colanode',
+          license: 'Apache-2.0',
+        },
+      },
+    },
+    {
+      name: '@electron-forge/maker-rpm',
+      config: {
+        options: {
+          icon: 'assets/colanode-logo-black.png',
+          categories: ['Development', 'Utility'],
+          maintainer: 'Colanode',
+          homepage: 'https://github.com/colanode/colanode',
+          license: 'Apache-2.0',
+          description: 'Colanode desktop application',
+          productName: 'Colanode',
+        },
+      },
     },
   ],
   publishers: [
@@ -165,6 +206,8 @@ const config: ForgeConfig = {
       });
     },
     postPackage: async () => {
+      console.log('🔧 postPackage hook called');
+      
       // Remove the node_modules directory
       try {
         await fs.rm('./node_modules', {
@@ -173,11 +216,40 @@ const config: ForgeConfig = {
           maxRetries: 3,
           retryDelay: 1000,
         });
+        console.log('✅ Cleaned up node_modules directory');
       } catch (error) {
-        console.error(error);
+        console.error('❌ Failed to clean up node_modules:', error);
       }
     },
     packageAfterPrune: async (_, buildPath) => {
+      console.log('🔧 packageAfterPrune hook called');
+      console.log('📁 buildPath:', buildPath);
+      
+      // Ensure the built package.json has the required license field
+      if (buildPath && typeof buildPath === 'string') {
+        const packageJsonPath = path.join(buildPath, 'package.json');
+        try {
+          const packageJson = await fs.readFile(packageJsonPath, 'utf-8');
+          const content = JSON.parse(packageJson);
+          
+          // Ensure required fields are present for RPM/DEB makers
+          if (!content.license) {
+            content.license = 'Apache-2.0';
+          }
+          if (!content.description) {
+            content.description = 'Colanode desktop application';
+          }
+          if (!content.maintainer) {
+            content.maintainer = 'Colanode';
+          }
+          
+          await fs.writeFile(packageJsonPath, JSON.stringify(content, null, 2));
+          console.log('✅ Updated built package.json with required fields');
+        } catch (error) {
+          console.error('❌ Failed to update built package.json:', error);
+        }
+      }
+      
       // Remove empty node_modules folders that are left behind
       // after the package and prune process. We also delete all non-necessary
       // files, for example md files, license files, development config files etc.
