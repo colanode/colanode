@@ -18,7 +18,7 @@ const debug = createDebugger('desktop:service:server');
 export class ServerService {
   private readonly app: AppService;
 
-  public state: ServerState | null = null;
+  public state: ServerState;
   public isOutdated: boolean;
 
   public readonly server: Server;
@@ -33,6 +33,13 @@ export class ServerService {
     this.socketBaseUrl = this.buildSocketBaseUrl();
     this.httpBaseUrl = this.buildHttpBaseUrl();
     this.isOutdated = isServerOutdated(server.version);
+
+    this.state = {
+      isAvailable: true,
+      lastCheckedAt: new Date(),
+      lastCheckedSuccessfullyAt: null,
+      count: 0,
+    };
   }
 
   public get isAvailable() {
