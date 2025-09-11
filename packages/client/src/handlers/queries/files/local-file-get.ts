@@ -1,12 +1,18 @@
 import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
-import { mapDownload, mapLocalFile } from '@colanode/client/lib/mappers';
+import {
+  mapDownload,
+  mapLocalFile,
+  mapNode,
+} from '@colanode/client/lib/mappers';
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
 import {
   LocalFileGetQueryInput,
   LocalFileGetQueryOutput,
 } from '@colanode/client/queries';
+import { LocalFileNode } from '@colanode/client/types';
 import { Event } from '@colanode/client/types/events';
 import { DownloadType } from '@colanode/client/types/files';
+import { FileStatus } from '@colanode/core';
 
 export class LocalFileGetQueryHandler
   extends WorkspaceQueryHandlerBase
@@ -136,6 +142,27 @@ export class LocalFileGetQueryHandler
     }
 
     if (input.autoDownload) {
+      const fileNode = await workspace.database
+        .selectFrom('nodes')
+        .selectAll()
+        .where('id', '=', input.fileId)
+        .executeTakeFirst();
+
+      if (!fileNode) {
+        return {
+          localFile: null,
+          download: null,
+        };
+      }
+
+      const file = mapNode(fileNode) as LocalFileNode;
+      if (file.attributes.status !== FileStatus.Ready) {
+        return {
+          localFile: null,
+          download: null,
+        };
+      }
+
       const download = await workspace.files.initAutoDownload(input.fileId);
 
       return {
