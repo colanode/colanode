@@ -36,7 +36,7 @@ export class MessageCreateMutationHandler
     // check if there are nested nodes (files, pages, folders etc.)
     for (const block of Object.values(blocks)) {
       if (block.type === EditorNodeTypes.TempFile) {
-        const tempFileId = block.attrs?.id;
+        const tempFileId = block.id;
         if (!tempFileId) {
           throw new MutationError(
             MutationErrorCode.FileInvalid,

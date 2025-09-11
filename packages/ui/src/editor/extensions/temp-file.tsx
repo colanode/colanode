@@ -24,27 +24,6 @@ export const TempFileNode = Node.create({
       id: {
         default: null,
       },
-      name: {
-        default: null,
-      },
-      path: {
-        default: null,
-      },
-      size: {
-        default: null,
-      },
-      type: {
-        default: null,
-      },
-      mimeType: {
-        default: null,
-      },
-      extension: {
-        default: null,
-      },
-      url: {
-        default: null,
-      },
     };
   },
   renderHTML({ HTMLAttributes }) {
@@ -66,7 +45,9 @@ export const TempFileNode = Node.create({
             .focus()
             .insertContentAt(pos, {
               type: 'tempFile',
-              attrs: file,
+              attrs: {
+                id: file.id,
+              },
             })
             .run();
 
