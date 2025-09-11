@@ -24,6 +24,6 @@
   "dependencies": {
     "fractional-indexing-jittered": "^1.0.0",
     "ulid": "^3.0.1",
-    "zod": "^4.1.5"
+    "zod": "^4.1.7"
   }
 }
