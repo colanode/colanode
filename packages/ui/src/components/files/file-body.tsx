@@ -1,7 +1,5 @@
 import { LocalFileNode } from '@colanode/client/types';
-import { FileStatus } from '@colanode/core';
 import { FileNoPreview } from '@colanode/ui/components/files/file-no-preview';
-import { FileNotUploaded } from '@colanode/ui/components/files/file-not-uploaded';
 import { FilePreview } from '@colanode/ui/components/files/file-preview';
 import { FileSaveButton } from '@colanode/ui/components/files/file-save-button';
 import { FileSidebar } from '@colanode/ui/components/files/file-sidebar';
@@ -13,7 +11,6 @@ interface FileBodyProps {
 
 export const FileBody = ({ file }: FileBodyProps) => {
   const canPreview = canPreviewFile(file.attributes.subtype);
-  const isReady = file.attributes.status === FileStatus.Ready;
 
   return (
     <div className="flex h-full max-h-full w-full flex-row items-center gap-2">
@@ -23,9 +20,7 @@ export const FileBody = ({ file }: FileBodyProps) => {
         </div>
 
         <div className="flex flex-col flex-grow items-center justify-center overflow-hidden p-10">
-          {!isReady ? (
-            <FileNotUploaded mimeType={file.attributes.mimeType} />
-          ) : canPreview ? (
+          {canPreview ? (
             <FilePreview file={file} />
           ) : (
             <FileNoPreview mimeType={file.attributes.mimeType} />

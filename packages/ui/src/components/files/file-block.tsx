@@ -1,7 +1,5 @@
 import { LocalFileNode } from '@colanode/client/types';
-import { FileStatus } from '@colanode/core';
 import { FileIcon } from '@colanode/ui/components/files/file-icon';
-import { FileNotUploaded } from '@colanode/ui/components/files/file-not-uploaded';
 import { FilePreview } from '@colanode/ui/components/files/file-preview';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -28,21 +26,7 @@ export const FileBlock = ({ id }: FileBlockProps) => {
   }
 
   const file = nodeGetQuery.data as LocalFileNode;
-  const isReady = file.attributes.status === FileStatus.Ready;
   const canPreview = canPreviewFile(file.attributes.subtype);
-
-  if (!isReady) {
-    return (
-      <div
-        className="flex h-72 max-h-72 max-w-128 w-full items-center justify-center cursor-pointer overflow-hidden rounded-md p-2 hover:bg-muted/50"
-        onClick={() => {
-          layout.previewLeft(id, true);
-        }}
-      >
-        <FileNotUploaded mimeType={file.attributes.mimeType} />
-      </div>
-    );
-  }
 
   if (canPreview) {
     return (

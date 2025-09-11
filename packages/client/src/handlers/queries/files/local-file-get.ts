@@ -99,6 +99,19 @@ export class LocalFileGetQueryHandler
       };
     }
 
+    if (
+      event.type === 'node.updated' &&
+      event.accountId === input.accountId &&
+      event.workspaceId === input.workspaceId &&
+      event.node.id === input.fileId
+    ) {
+      const newOutput = await this.handleQuery(input);
+      return {
+        hasChanges: true,
+        result: newOutput,
+      };
+    }
+
     return {
       hasChanges: false,
     };
