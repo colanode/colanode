@@ -19,7 +19,6 @@ export * from './registry/nodes/space';
 export * from './registry/nodes/file';
 export * from './registry/documents/index';
 export * from './registry/documents/rich-text';
-export * from './registry/zod';
 export * from './types/accounts';
 export * from './types/files';
 export * from './types/sockets';

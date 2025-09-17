@@ -1,6 +1,6 @@
 import { ThemeColor, ThemeMode } from '@colanode/client/types';
 
-export type AppType = 'desktop' | 'web';
+export type AppType = 'desktop' | 'web' | 'mobile';
 
 export type WindowSize = {
   width: number;

@@ -1,6 +1,6 @@
 import { z } from 'zod/v4';
 
-import { ZodText } from '@colanode/core';
+import { ZOD_TEXT_DESCRIPTION } from '@colanode/core/lib/constants';
 
 export const booleanFieldValueSchema = z.object({
   type: z.literal('boolean'),
@@ -32,7 +32,7 @@ export type NumberFieldValue = z.infer<typeof numberFieldValueSchema>;
 
 export const textFieldValueSchema = z.object({
   type: z.literal('text'),
-  value: new ZodText(),
+  value: z.string().describe(ZOD_TEXT_DESCRIPTION),
 });
 
 export type TextFieldValue = z.infer<typeof textFieldValueSchema>;

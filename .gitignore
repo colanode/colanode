@@ -146,6 +146,7 @@ dist/
 .DS_Store
 .turbo
 .tsbuildinfo
+*.pem
 
 # Ignore temporary emoji and icon directories
 src/scripts/emojis/temp/
@@ -169,3 +170,19 @@ apps/web/public/assets/icons.svg
 apps/web/public/assets/fonts/neotrax.otf
 apps/web/public/assets/colanode-logo-black-192.png
 apps/web/public/assets/colanode-logo-black-512.png
+
+# Ignore mobile assets
+apps/mobile/assets/ui/index.html
+
+.expo
+web-build/
+expo-env.d.ts
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+/ios
+/android
