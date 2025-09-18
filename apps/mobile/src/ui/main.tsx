@@ -168,6 +168,8 @@ const handleMessage = (message: Message) => {
 
     promise.resolve(message.result);
     pendingPromises.delete(message.queryId);
+  } else if (message.type === 'event') {
+    eventBus.publish(message.event);
   }
 };
 

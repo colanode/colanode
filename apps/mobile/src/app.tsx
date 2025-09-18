@@ -60,6 +60,14 @@ export const App = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    const id = eventBus.subscribe((event) => {
+      sendMessage({ type: 'event', windowId: windowId.current, event });
+    });
+
+    return () => eventBus.unsubscribe(id);
+  }, []);
+
   const handleMessage = useCallback(async (e: WebViewMessageEvent) => {
     const message = JSON.parse(e.nativeEvent.data) as Message;
     if (message.type === 'console') {
@@ -143,14 +151,6 @@ export const App = () => {
   const sendMessage = useCallback((message: Message) => {
     webViewRef.current?.postMessage(JSON.stringify(message));
   }, []);
-
-  useEffect(() => {
-    const id = eventBus.subscribe((event) => {
-      sendMessage({ type: 'event', windowId: windowId.current, event });
-    });
-
-    return () => eventBus.unsubscribe(id);
-  }, [uri]);
 
   if (!uri) {
     return (
