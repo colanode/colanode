@@ -3,20 +3,12 @@ import { createRoot } from 'react-dom/client';
 
 import { eventBus } from '@colanode/client/lib';
 import { BrowserNotSupported } from '@colanode/web/components/browser-not-supported';
-import { MobileNotSupported } from '@colanode/web/components/mobile-not-supported';
 import { ColanodeWorkerApi } from '@colanode/web/lib/types';
-import { isMobileDevice, isOpfsSupported } from '@colanode/web/lib/utils';
+import { isOpfsSupported } from '@colanode/web/lib/utils';
 import { Root } from '@colanode/web/root';
 import DedicatedWorker from '@colanode/web/workers/dedicated?worker';
 
 const initializeApp = async () => {
-  const isMobile = isMobileDevice();
-  if (isMobile) {
-    const root = createRoot(document.getElementById('root') as HTMLElement);
-    root.render(<MobileNotSupported />);
-    return;
-  }
-
   const hasOpfsSupport = await isOpfsSupported();
   if (!hasOpfsSupport) {
     const root = createRoot(document.getElementById('root') as HTMLElement);

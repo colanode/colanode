@@ -3,12 +3,15 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { View, ActivityIndicator, Platform } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 
+import { eventBus } from '@colanode/client/lib';
+import { generateId, IdType } from '@colanode/core';
 import { Message } from '@colanode/mobile/lib/types';
 import { app } from '@colanode/mobile/services/app-service';
 
 import indexHtml from '../assets/ui/index.html';
 
 export const App = () => {
+  const windowId = useRef<string>(generateId(IdType.Window));
   const [uri, setUri] = useState<string | null>(null);
   const [baseDir, setBaseDir] = useState<string | null>(null);
   const webViewRef = useRef<WebView>(null);
@@ -26,7 +29,6 @@ export const App = () => {
 
   const handleMessage = useCallback(async (e: WebViewMessageEvent) => {
     const message = JSON.parse(e.nativeEvent.data) as Message;
-    console.log('message', message);
     if (message.type === 'console') {
       console.log(
         `[WebView ${message.level.toUpperCase()}] ${message.timestamp} ${message.message}`
@@ -51,7 +53,6 @@ export const App = () => {
         message.windowId,
         message.input
       );
-      console.log('result', result);
       sendMessage({
         type: 'query_and_subscribe_result',
         queryId: message.queryId,
@@ -61,12 +62,22 @@ export const App = () => {
       });
     } else if (message.type === 'query_unsubscribe') {
       app.mediator.unsubscribeQuery(message.key, message.windowId);
+    } else if (message.type === 'event') {
+      eventBus.publish(message.event);
     }
   }, []);
 
   const sendMessage = useCallback((message: Message) => {
     webViewRef.current?.postMessage(JSON.stringify(message));
   }, []);
+
+  useEffect(() => {
+    const id = eventBus.subscribe((event) => {
+      sendMessage({ type: 'event', windowId: windowId.current, event });
+    });
+
+    return () => eventBus.unsubscribe(id);
+  }, [uri]);
 
   if (!uri) {
     return (

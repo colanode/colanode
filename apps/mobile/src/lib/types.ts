@@ -1,5 +1,6 @@
 import { MutationInput, MutationResult } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
+import { Event } from '@colanode/client/types';
 
 declare global {
   interface Window {

@@ -15,11 +15,11 @@ export const Login = () => {
   }
 
   return (
-    <div className="grid h-screen min-h-screen w-full grid-cols-5">
-      <div className="col-span-2 flex items-center justify-center bg-foreground">
+    <div className="grid h-screen min-h-screen w-full grid-cols-1 lg:grid-cols-5">
+      <div className="items-center justify-center bg-foreground hidden lg:flex">
         <h1 className="font-neotrax text-6xl text-background">colanode</h1>
       </div>
-      <div className="col-span-3 flex items-center justify-center py-12">
+      <div className="flex items-center justify-center py-12 lg:col-span-3">
         <div className="mx-auto grid w-96 gap-6">
           <div className="grid gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
