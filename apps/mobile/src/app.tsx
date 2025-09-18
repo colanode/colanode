@@ -1,25 +1,31 @@
 import { Asset } from 'expo-asset';
+import { modelName } from 'expo-device';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { View, ActivityIndicator, Platform } from 'react-native';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 
 import { eventBus } from '@colanode/client/lib';
+import { AppMeta, AppService } from '@colanode/client/services';
 import { generateId, IdType } from '@colanode/core';
+import { copyAssets, indexHtmlAsset } from '@colanode/mobile/lib/assets';
 import { Message } from '@colanode/mobile/lib/types';
-import { app } from '@colanode/mobile/services/app-service';
-
-import indexHtml from '../assets/ui/index.html';
+import { MobileFileSystem } from '@colanode/mobile/services/file-system';
+import { MobileKyselyService } from '@colanode/mobile/services/kysely-service';
+import { MobilePathService } from '@colanode/mobile/services/path-service';
 
 export const App = () => {
   const windowId = useRef<string>(generateId(IdType.Window));
+  const webViewRef = useRef<WebView>(null);
+  const app = useRef<AppService | null>(null);
+  const appInitialized = useRef<boolean>(false);
+
   const [uri, setUri] = useState<string | null>(null);
   const [baseDir, setBaseDir] = useState<string | null>(null);
-  const webViewRef = useRef<WebView>(null);
 
   useEffect(() => {
     (async () => {
-      const indexAsset = Asset.fromModule(indexHtml);
-      await indexAsset.downloadAsync(); // no-op in prod
+      const indexAsset = Asset.fromModule(indexHtmlAsset);
+      await indexAsset.downloadAsync();
       const localUri = indexAsset.localUri ?? indexAsset.uri;
       const dir = localUri.replace(/index\.html$/, '');
       setUri(localUri);
@@ -27,28 +33,91 @@ export const App = () => {
     })();
   }, []);
 
+  useEffect(() => {
+    (async () => {
+      try {
+        const paths = new MobilePathService();
+        await copyAssets(paths);
+
+        const appMeta: AppMeta = {
+          type: 'mobile',
+          platform: modelName ?? 'unknown',
+        };
+
+        app.current = new AppService(
+          appMeta,
+          new MobileFileSystem(),
+          new MobileKyselyService(),
+          paths
+        );
+
+        await app.current.migrate();
+        await app.current.init();
+        appInitialized.current = true;
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, []);
+
   const handleMessage = useCallback(async (e: WebViewMessageEvent) => {
     const message = JSON.parse(e.nativeEvent.data) as Message;
     if (message.type === 'console') {
-      console.log(
-        `[WebView ${message.level.toUpperCase()}] ${message.timestamp} ${message.message}`
-      );
+      if (message.level === 'log') {
+        console.log(
+          `[WebView ${message.level.toUpperCase()}] ${message.timestamp} ${message.message}`
+        );
+      } else if (message.level === 'warn') {
+        console.warn(
+          `[WebView ${message.level.toUpperCase()}] ${message.timestamp} ${message.message}`
+        );
+      } else if (message.level === 'error') {
+        console.error(
+          `[WebView ${message.level.toUpperCase()}] ${message.timestamp} ${message.message}`
+        );
+      } else if (message.level === 'info') {
+        console.info(
+          `[WebView ${message.level.toUpperCase()}] ${message.timestamp} ${message.message}`
+        );
+      } else if (message.level === 'debug') {
+        console.debug(
+          `[WebView ${message.level.toUpperCase()}] ${message.timestamp} ${message.message}`
+        );
+      }
     } else if (message.type === 'init') {
-      await app.migrate();
-      await app.init();
+      let count = 0;
+      while (!appInitialized.current) {
+        await new Promise((resolve) => setTimeout(resolve, 50));
+        count++;
+        if (count > 100) {
+          throw new Error('App initialization timed out');
+        }
+      }
       sendMessage({ type: 'init_result' });
     } else if (message.type === 'mutation') {
-      const result = await app.mediator.executeMutation(message.input);
+      if (!app.current) {
+        return;
+      }
+
+      const result = await app.current.mediator.executeMutation(message.input);
       sendMessage({
         type: 'mutation_result',
         mutationId: message.mutationId,
         result,
       });
     } else if (message.type === 'query') {
-      const result = await app.mediator.executeQuery(message.input);
+      if (!app.current) {
+        return;
+      }
+
+      const result = await app.current.mediator.executeQuery(message.input);
       sendMessage({ type: 'query_result', queryId: message.queryId, result });
     } else if (message.type === 'query_and_subscribe') {
-      const result = await app.mediator.executeQueryAndSubscribe(
+      if (!app.current) {
+        return;
+      }
+
+      const result = await app.current.mediator.executeQueryAndSubscribe(
         message.key,
         message.windowId,
         message.input
@@ -61,7 +130,11 @@ export const App = () => {
         result,
       });
     } else if (message.type === 'query_unsubscribe') {
-      app.mediator.unsubscribeQuery(message.key, message.windowId);
+      if (!app.current) {
+        return;
+      }
+
+      app.current.mediator.unsubscribeQuery(message.key, message.windowId);
     } else if (message.type === 'event') {
       eventBus.publish(message.event);
     }

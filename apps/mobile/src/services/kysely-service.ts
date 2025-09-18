@@ -18,6 +18,7 @@ import {
 
 import { KyselyBuildOptions, KyselyService } from '@colanode/client/services';
 import { MobileFileSystem } from '@colanode/mobile/services/file-system';
+import { MobilePathService } from '@colanode/mobile/services/path-service';
 
 export class MobileKyselyService implements KyselyService {
   private readonly fs = new MobileFileSystem();
@@ -87,9 +88,17 @@ class ExpoSqliteDriver implements Driver {
 class ExpoSqliteConnection implements DatabaseConnection {
   private readonly database: SQLiteDatabase;
   private readonly options: KyselyBuildOptions;
+  private readonly paths: MobilePathService = new MobilePathService();
 
   constructor(options: KyselyBuildOptions) {
-    this.database = openDatabaseSync(options.path);
+    const databaseName = this.paths.filename(options.path);
+    const databaseDirectory = this.paths.dirname(options.path);
+
+    this.database = openDatabaseSync(
+      databaseName,
+      undefined,
+      databaseDirectory
+    );
     this.options = options;
   }
 

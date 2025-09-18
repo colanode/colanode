@@ -7,6 +7,7 @@ import {
   globalShortcut,
   dialog,
 } from 'electron';
+import path from 'path';
 
 import started from 'electron-squirrel-startup';
 import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
@@ -56,9 +57,9 @@ const createWindow = async () => {
     fullscreenable: true,
     minWidth: 800,
     minHeight: 600,
-    icon: app.path.join(app.path.assets, 'colanode-logo-black.png'),
+    icon: path.join(app.path.assets, 'colanode-logo-black.png'),
     webPreferences: {
-      preload: app.path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.js'),
     },
     autoHideMenuBar: true,
     titleBarStyle: 'hiddenInset',
@@ -104,10 +105,7 @@ const createWindow = async () => {
     // mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(
-      app.path.join(
-        __dirname,
-        `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`
-      )
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
 

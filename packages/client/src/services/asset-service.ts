@@ -19,6 +19,7 @@ export class AssetService {
       path: this.app.path.emojisDatabase,
       readonly: true,
     });
+
     this.icons = this.app.kysely.build<IconDatabaseSchema>({
       path: this.app.path.iconsDatabase,
       readonly: true,

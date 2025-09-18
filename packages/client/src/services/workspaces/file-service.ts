@@ -389,7 +389,12 @@ export class FileService {
   }
 
   private buildFilePath(id: string, extension: string): string {
-    return this.app.path.join(this.filesDir, `${id}${extension}`);
+    return this.app.path.workspaceFile(
+      this.workspace.accountId,
+      this.workspace.id,
+      id,
+      extension
+    );
   }
 
   public async cleanupFiles(): Promise<void> {
@@ -423,7 +428,15 @@ export class FileService {
           continue;
         }
 
-        const filePath = this.app.path.join(this.filesDir, fileIdMap[fileId]!);
+        const fsFile = fileIdMap[fileId]!;
+        const name = this.app.path.filename(fsFile);
+        const extension = this.app.path.extension(fsFile);
+        const filePath = this.app.path.workspaceFile(
+          this.workspace.accountId,
+          this.workspace.id,
+          name,
+          extension
+        );
         await this.app.fs.delete(filePath);
       }
     }

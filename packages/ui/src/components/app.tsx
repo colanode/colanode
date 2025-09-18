@@ -18,13 +18,23 @@ export const App = ({ type }: AppProps) => {
   const [initialized, setInitialized] = useState(false);
   const [openLogin, setOpenLogin] = useState(false);
 
-  const appMetadataListQuery = useLiveQuery({
-    type: 'app.metadata.list',
-  });
+  const appMetadataListQuery = useLiveQuery(
+    {
+      type: 'app.metadata.list',
+    },
+    {
+      enabled: initialized,
+    }
+  );
 
-  const accountListQuery = useLiveQuery({
-    type: 'account.list',
-  });
+  const accountListQuery = useLiveQuery(
+    {
+      type: 'account.list',
+    },
+    {
+      enabled: initialized,
+    }
+  );
 
   useEffect(() => {
     window.colanode.init().then(() => {

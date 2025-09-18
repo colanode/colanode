@@ -19,10 +19,10 @@ export interface PathService {
   accountAvatar: (accountId: string, avatarId: string) => string;
   dirname: (path: string) => string;
   filename: (path: string) => string;
-  join: (...paths: string[]) => string;
   extension: (path: string) => string;
   assets: string;
   fonts: string;
   emojisDatabase: string;
   iconsDatabase: string;
+  font: (name: string) => string;
 }

@@ -154,4 +154,8 @@ export class DesktopPathService implements PathService {
   public get iconsDatabase(): string {
     return this.nativePath.join(this.getAssetsSourcePath(), 'icons.db');
   }
+
+  public font(name: string): string {
+    return this.nativePath.join(this.getAssetsSourcePath(), 'fonts', name);
+  }
 }

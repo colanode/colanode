@@ -101,4 +101,8 @@ export class WebPathService implements PathService {
     const parts = path.split('.');
     return parts.length > 1 ? '.' + parts[parts.length - 1] : '';
   }
+
+  public font(name: string): string {
+    return this.join(this.assetsSourcePath, 'fonts', name);
+  }
 }

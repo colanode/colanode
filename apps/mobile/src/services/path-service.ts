@@ -1,66 +1,65 @@
-import { Paths } from 'expo-file-system';
+import { Paths, File, Directory } from 'expo-file-system';
 
 import { PathService } from '@colanode/client/services';
 
 export class MobilePathService implements PathService {
-  private readonly appPath = Paths.document.uri;
-  private readonly appDatabasePath = this.join(this.appPath, 'app.db');
-  private readonly accountsDirectoryPath = this.join(this.appPath, 'accounts');
+  private readonly accountsDirectoryPath = new Directory(
+    Paths.document,
+    'accounts'
+  );
 
   private getAccountDirectoryPath(accountId: string): string {
-    return this.join(this.accountsDirectoryPath, accountId);
+    return new Directory(this.accountsDirectoryPath, accountId).uri;
   }
 
   private getWorkspaceDirectoryPath(
     accountId: string,
     workspaceId: string
   ): string {
-    return this.join(
+    return new Directory(
       this.getAccountDirectoryPath(accountId),
       'workspaces',
       workspaceId
-    );
+    ).uri;
   }
 
   private getWorkspaceFilesDirectoryPath(
     accountId: string,
     workspaceId: string
   ): string {
-    return this.join(
+    return new Directory(
       this.getWorkspaceDirectoryPath(accountId, workspaceId),
       'files'
-    );
+    ).uri;
   }
 
   private getAccountAvatarsDirectoryPath(accountId: string): string {
-    return this.join(this.getAccountDirectoryPath(accountId), 'avatars');
+    return new Directory(this.getAccountDirectoryPath(accountId), 'avatars')
+      .uri;
   }
 
   private getAssetsSourcePath(): string {
-    // In React Native/Expo, we should copy bundled assets to document directory
-    // for file system access, or use Asset.fromModule for bundled assets
-    // For now, we'll use a path in the document directory where assets will be copied
-    return this.join(this.appPath, 'bundled-assets');
+    return new Directory(Paths.document, 'assets').uri;
   }
 
   public get app(): string {
-    return this.appPath;
+    return Paths.document.uri;
   }
 
   public get appDatabase(): string {
-    return this.appDatabasePath;
+    return new File(Paths.document, 'app.db').uri;
   }
 
   public get accounts(): string {
-    return this.accountsDirectoryPath;
+    return this.accountsDirectoryPath.uri;
   }
 
   public get temp(): string {
-    return this.join(this.appPath, 'temp');
+    return new Directory(Paths.document, 'temp').uri;
   }
 
   public tempFile(name: string): string {
-    return this.join(this.appPath, 'temp', name);
+    return new File(Paths.document, 'temp', name).uri;
   }
 
   public account(accountId: string): string {
@@ -68,7 +67,7 @@ export class MobilePathService implements PathService {
   }
 
   public accountDatabase(accountId: string): string {
-    return this.join(this.getAccountDirectoryPath(accountId), 'account.db');
+    return new File(this.getAccountDirectoryPath(accountId), 'account.db').uri;
   }
 
   public workspace(accountId: string, workspaceId: string): string {
@@ -76,10 +75,10 @@ export class MobilePathService implements PathService {
   }
 
   public workspaceDatabase(accountId: string, workspaceId: string): string {
-    return this.join(
+    return new File(
       this.getWorkspaceDirectoryPath(accountId, workspaceId),
       'workspace.db'
-    );
+    ).uri;
   }
 
   public workspaceFiles(accountId: string, workspaceId: string): string {
@@ -92,10 +91,10 @@ export class MobilePathService implements PathService {
     fileId: string,
     extension: string
   ): string {
-    return this.join(
+    return new File(
       this.getWorkspaceFilesDirectoryPath(accountId, workspaceId),
       fileId + extension
-    );
+    ).uri;
   }
 
   public accountAvatars(accountId: string): string {
@@ -103,62 +102,30 @@ export class MobilePathService implements PathService {
   }
 
   public accountAvatar(accountId: string, avatarId: string): string {
-    return this.join(
+    return new File(
       this.getAccountAvatarsDirectoryPath(accountId),
       avatarId + '.jpeg'
-    );
+    ).uri;
   }
 
-  public dirname(dir: string): string {
-    // Remove trailing slash if present
-    const normalizedPath = dir.replace(/\/+$/, '');
-    const lastSlashIndex = normalizedPath.lastIndexOf('/');
-    if (lastSlashIndex === -1) {
-      return '.';
+  public dirname(path: string): string {
+    const info = Paths.info(path);
+    if (info.isDirectory) {
+      return path;
     }
-    if (lastSlashIndex === 0) {
-      return '/';
-    }
-    return normalizedPath.substring(0, lastSlashIndex);
+
+    const file = new File(path);
+    return file.parentDirectory.uri;
   }
 
-  public filename(file: string): string {
-    const basename = file.substring(file.lastIndexOf('/') + 1);
-    const lastDotIndex = basename.lastIndexOf('.');
-    if (lastDotIndex === -1 || lastDotIndex === 0) {
-      return basename;
-    }
-    return basename.substring(0, lastDotIndex);
-  }
-
-  public join(...paths: string[]): string {
-    if (paths.length === 0) return '.';
-
-    // Filter out empty strings and normalize paths
-    const normalizedPaths = paths
-      .filter((path) => path && path.length > 0)
-      .map((path) => path.replace(/\/+$/, '')); // Remove trailing slashes
-
-    if (normalizedPaths.length === 0) return '.';
-
-    // Join with single slashes
-    const result = normalizedPaths.join('/');
-
-    // Handle absolute paths (starting with /)
-    if (paths[0] && paths[0].startsWith('/')) {
-      return '/' + result.replace(/^\/+/, '');
-    }
-
-    return result.replace(/\/+/g, '/'); // Replace multiple slashes with single slash
+  public filename(path: string): string {
+    const file = new File(path);
+    return file.name;
   }
 
   public extension(name: string): string {
-    const basename = name.substring(name.lastIndexOf('/') + 1);
-    const lastDotIndex = basename.lastIndexOf('.');
-    if (lastDotIndex === -1 || lastDotIndex === 0) {
-      return '';
-    }
-    return basename.substring(lastDotIndex);
+    const file = new File(name);
+    return file.extension;
   }
 
   public get assets(): string {
@@ -166,14 +133,18 @@ export class MobilePathService implements PathService {
   }
 
   public get fonts(): string {
-    return this.join(this.getAssetsSourcePath(), 'fonts');
+    return new Directory(this.getAssetsSourcePath(), 'fonts').uri;
   }
 
   public get emojisDatabase(): string {
-    return this.join(this.getAssetsSourcePath(), 'emojis.db');
+    return new File(this.getAssetsSourcePath(), 'emojis.db').uri;
   }
 
   public get iconsDatabase(): string {
-    return this.join(this.getAssetsSourcePath(), 'icons.db');
+    return new File(this.getAssetsSourcePath(), 'icons.db').uri;
+  }
+
+  public font(name: string): string {
+    return new File(this.getAssetsSourcePath(), 'fonts', name).uri;
   }
 }

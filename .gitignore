@@ -155,8 +155,6 @@ src/scripts/icons/temp/
 # Ignore desktop assets
 apps/desktop/assets/emojis.db
 apps/desktop/assets/icons.db
-apps/desktop/assets/emojis.svg
-apps/desktop/assets/icons.svg
 apps/desktop/assets/fonts/neotrax.otf
 apps/desktop/assets/colanode-logo-black.png
 apps/desktop/assets/colanode-logo-black.ico
@@ -173,6 +171,9 @@ apps/web/public/assets/colanode-logo-black-512.png
 
 # Ignore mobile assets
 apps/mobile/assets/ui/index.html
+apps/mobile/assets/emojis.db
+apps/mobile/assets/icons.db
+apps/mobile/assets/fonts/neotrax.otf
 
 .expo
 web-build/

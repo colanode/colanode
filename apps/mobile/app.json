@@ -26,9 +26,6 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "plugins": [
-      "expo-asset",
-      "expo-sqlite"
-    ]
+    "plugins": ["expo-asset", "expo-sqlite"]
   }
 }

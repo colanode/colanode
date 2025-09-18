@@ -20,6 +20,7 @@ const FONTS_OTF_PATH = path.resolve(FONTS_DIR, NEOTRAX_FONT_NAME);
 
 const DESKTOP_ASSETS_DIR = path.resolve('apps', 'desktop', 'assets');
 const WEB_ASSETS_DIR = path.resolve('apps', 'web', 'public', 'assets');
+const MOBILE_ASSETS_DIR = path.resolve('apps', 'mobile', 'assets');
 
 const copyFile = (source: string, target: string | string[]) => {
   if (!fs.existsSync(source)) {
@@ -40,24 +41,19 @@ const copyFile = (source: string, target: string | string[]) => {
 
 const execute = () => {
   copyFile(EMOJIS_DB_PATH, path.resolve(DESKTOP_ASSETS_DIR, 'emojis.db'));
+  copyFile(EMOJIS_DB_PATH, path.resolve(MOBILE_ASSETS_DIR, 'emojis.db'));
   copyFile(EMOJIS_MIN_DB_PATH, path.resolve(WEB_ASSETS_DIR, 'emojis.db'));
-
-  copyFile(EMOJI_SVG_PATH, [
-    path.resolve(DESKTOP_ASSETS_DIR, 'emojis.svg'),
-    path.resolve(WEB_ASSETS_DIR, 'emojis.svg'),
-  ]);
+  copyFile(EMOJI_SVG_PATH, path.resolve(WEB_ASSETS_DIR, 'emojis.svg'));
 
   copyFile(ICONS_DB_PATH, path.resolve(DESKTOP_ASSETS_DIR, 'icons.db'));
+  copyFile(ICONS_DB_PATH, path.resolve(MOBILE_ASSETS_DIR, 'icons.db'));
   copyFile(ICONS_MIN_DB_PATH, path.resolve(WEB_ASSETS_DIR, 'icons.db'));
-
-  copyFile(ICONS_SVG_PATH, [
-    path.resolve(DESKTOP_ASSETS_DIR, 'icons.svg'),
-    path.resolve(WEB_ASSETS_DIR, 'icons.svg'),
-  ]);
+  copyFile(ICONS_SVG_PATH, path.resolve(WEB_ASSETS_DIR, 'icons.svg'));
 
   copyFile(FONTS_OTF_PATH, [
     path.resolve(DESKTOP_ASSETS_DIR, 'fonts', NEOTRAX_FONT_NAME),
     path.resolve(WEB_ASSETS_DIR, 'fonts', NEOTRAX_FONT_NAME),
+    path.resolve(MOBILE_ASSETS_DIR, 'fonts', NEOTRAX_FONT_NAME),
   ]);
 
   copyFile(

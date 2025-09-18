@@ -16,7 +16,7 @@ export const Login = () => {
 
   return (
     <div className="grid h-screen min-h-screen w-full grid-cols-1 lg:grid-cols-5">
-      <div className="items-center justify-center bg-foreground hidden lg:flex">
+      <div className="items-center justify-center bg-foreground hidden lg:flex lg:col-span-2">
         <h1 className="font-neotrax text-6xl text-background">colanode</h1>
       </div>
       <div className="flex items-center justify-center py-12 lg:col-span-3">
