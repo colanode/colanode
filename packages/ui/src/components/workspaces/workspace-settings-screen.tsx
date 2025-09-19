@@ -7,7 +7,7 @@ import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
-export const WorkspaceSettings = () => {
+export const WorkspaceSettingsScreen = () => {
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
   const canEdit = workspace.role === 'owner';

@@ -4,12 +4,12 @@ import { useCallback, useState } from 'react';
 
 import { SidebarMenuType, SidebarMetadata } from '@colanode/client/types';
 import { Sidebar } from '@colanode/ui/components/layouts/sidebars/sidebar';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useWorkspaceMetadata } from '@colanode/ui/contexts/workspace-metadata';
 
 export const WorkspaceLayout = () => {
-  const workspace = useWorkspace();
+  const workspace = useWorkspaceMetadata();
   const [sidebarMetadata, setSidebarMetadata] = useState<SidebarMetadata>(
-    workspace.getMetadata('sidebar')?.value ?? {
+    workspace.get('sidebar')?.value ?? {
       menu: 'spaces',
       width: 300,
     }
@@ -22,7 +22,7 @@ export const WorkspaceLayout = () => {
         width,
       });
 
-      workspace.setMetadata('sidebar', {
+      workspace.set('sidebar', {
         ...sidebarMetadata,
         width,
       });
@@ -37,7 +37,7 @@ export const WorkspaceLayout = () => {
         menu,
       });
 
-      workspace.setMetadata('sidebar', {
+      workspace.set('sidebar', {
         ...sidebarMetadata,
         menu,
       });

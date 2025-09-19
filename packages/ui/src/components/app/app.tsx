@@ -1,13 +1,18 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { DndProvider } from 'react-dnd';
 
 import { AppType, Event } from '@colanode/client/types';
 import { build } from '@colanode/core';
-import { App } from '@colanode/ui/components/app';
-import { FontLoader } from '@colanode/ui/components/font-loader';
+import { AppAssets } from '@colanode/ui/components/app/app-assets';
+import { AppLayout } from '@colanode/ui/components/app/app-layout';
+import { AppLoadingScreen } from '@colanode/ui/components/app/app-loading-screen';
+import { AppMetadataProvider } from '@colanode/ui/components/app/app-metadata-provider';
+import { AppThemeProvider } from '@colanode/ui/components/app/app-theme-provider';
+import { RadarProvider } from '@colanode/ui/components/app/radar-provider';
 import { Toaster } from '@colanode/ui/components/ui/sonner';
 import { TooltipProvider } from '@colanode/ui/components/ui/tooltip';
+import { AppContext } from '@colanode/ui/contexts/app';
 import { HTML5Backend } from '@colanode/ui/lib/dnd-backend';
 
 export const queryClient = new QueryClient({
@@ -21,11 +26,13 @@ export const queryClient = new QueryClient({
   },
 });
 
-interface RootProviderProps {
+interface AppProps {
   type: AppType;
 }
 
-export const RootProvider = ({ type }: RootProviderProps) => {
+export const App = ({ type }: AppProps) => {
+  const [initialized, setInitialized] = useState(false);
+
   useEffect(() => {
     console.log(`Colanode | Version: ${build.version} | SHA: ${build.sha}`);
 
@@ -53,20 +60,36 @@ export const RootProvider = ({ type }: RootProviderProps) => {
       }
     });
 
+    window.colanode.init().then(() => {
+      setInitialized(true);
+    });
+
     return () => {
       window.eventBus.unsubscribe(id);
     };
   }, []);
 
+  if (!initialized) {
+    return <AppLoadingScreen />;
+  }
+
   return (
-    <QueryClientProvider client={queryClient}>
-      <DndProvider backend={HTML5Backend}>
-        <TooltipProvider>
-          <FontLoader type={type} />
-          <App type={type} />
-        </TooltipProvider>
-        <Toaster />
-      </DndProvider>
-    </QueryClientProvider>
+    <AppContext.Provider value={{ type }}>
+      <QueryClientProvider client={queryClient}>
+        <DndProvider backend={HTML5Backend}>
+          <TooltipProvider>
+            <AppAssets />
+            <AppMetadataProvider>
+              <AppThemeProvider>
+                <RadarProvider>
+                  <AppLayout />
+                </RadarProvider>
+              </AppThemeProvider>
+            </AppMetadataProvider>
+          </TooltipProvider>
+          <Toaster />
+        </DndProvider>
+      </QueryClientProvider>
+    </AppContext.Provider>
   );
 };

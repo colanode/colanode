@@ -3,7 +3,7 @@ import { useEffect } from 'react';
 
 import { useAccount } from '@colanode/ui/contexts/account';
 
-export const AppHome = () => {
+export const AppHomeScreen = () => {
   const navigate = useNavigate();
   const account = useAccount();
 

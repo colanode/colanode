@@ -1,7 +1,7 @@
 import { DelayedComponent } from '@colanode/ui/components/ui/delayed-component';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 
-export const AppLoader = () => {
+export const AppLoadingScreen = () => {
   return (
     <div className="min-w-screen flex h-full min-h-screen w-full items-center justify-center">
       <DelayedComponent>

@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 import { Account } from '@colanode/client/types';
 import { AccountContext } from '@colanode/ui/contexts/account';
-// import { useApp } from '@colanode/ui/contexts/app';
+import { useAppMetadata } from '@colanode/ui/contexts/app-metadata';
 
 const fetchAccountForWorkspace = async (
   workspaceId?: string
@@ -44,11 +44,11 @@ export const AccountProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  // const app = useApp();
+  const appMetadata = useAppMetadata();
   const navigate = useNavigate();
   const match = useMatch({ from: '/$workspaceId', shouldThrow: false });
   const workspaceId = match?.params.workspaceId;
-  // const accountId = app.getMetadata('account');
+  const accountId = appMetadata.get('account');
 
   const [account, setAccount] = useState<Account | null>(null);
 
@@ -60,6 +60,22 @@ export const AccountProvider = ({
         return;
       }
 
+      if (accounts.length === 1) {
+        if (accountId !== accounts[0]!.id) {
+          appMetadata.set('account', accounts[0]!.id);
+        }
+
+        setAccount(accounts[0]!);
+        return;
+      }
+
+      const account = accounts.find((account) => account.id === accountId);
+      if (account) {
+        setAccount(account);
+        return;
+      }
+
+      //TODO: Show account selection
       setAccount(accounts[0]!);
     })();
   }, [workspaceId]);

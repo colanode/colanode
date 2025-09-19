@@ -1,7 +1,7 @@
 import { LoginForm } from '@colanode/ui/components/accounts/login-form';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
-export const Login = () => {
+export const LoginScreen = () => {
   const accountListQuery = useLiveQuery({
     type: 'account.list',
   });

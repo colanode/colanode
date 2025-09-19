@@ -10,7 +10,7 @@ import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 const UPLOADS_PER_PAGE = 100;
 
-export const WorkspaceUploads = () => {
+export const WorkspaceUploadsScreen = () => {
   const workspace = useWorkspace();
 
   const [lastPage, setLastPage] = useState<number>(1);

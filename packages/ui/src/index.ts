@@ -1,2 +1,2 @@
-export * from './components/root-provider';
+export * from './components/app/app';
 export * from './window';

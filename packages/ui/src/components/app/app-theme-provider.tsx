@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 
 import { ThemeMode } from '@colanode/client/types';
-import { useApp } from '@colanode/ui/contexts/app';
+import { useAppMetadata } from '@colanode/ui/contexts/app-metadata';
 import { ThemeContext } from '@colanode/ui/contexts/theme';
 import { getSystemTheme, getThemeVariables } from '@colanode/ui/lib/themes';
 
@@ -10,11 +10,11 @@ export const AppThemeProvider = ({
 }: {
   children: React.ReactNode;
 }) => {
-  const app = useApp();
+  const appMetadata = useAppMetadata();
   const [systemTheme, setSystemTheme] = useState<ThemeMode>(getSystemTheme());
 
-  const themeMode = app.getMetadata('theme.mode') ?? systemTheme;
-  const themeColor = app.getMetadata('theme.color');
+  const themeMode = appMetadata.get('theme.mode') ?? systemTheme;
+  const themeColor = appMetadata.get('theme.color');
 
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) {

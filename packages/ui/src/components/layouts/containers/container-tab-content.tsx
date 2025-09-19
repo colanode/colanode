@@ -2,9 +2,9 @@ import { match } from 'ts-pattern';
 
 import { ContainerTab, SpecialContainerTabPath } from '@colanode/client/types';
 import { getIdType, IdType } from '@colanode/core';
-import { AccountLogout } from '@colanode/ui/components/accounts/account-logout';
-import { AccountSettings } from '@colanode/ui/components/accounts/account-settings';
-import { AppAppearanceSettings } from '@colanode/ui/components/app/app-appearance-settings';
+import { AccountLogout } from '@colanode/ui/components/accounts/account-logout-screen';
+import { AccountSettings } from '@colanode/ui/components/accounts/account-settings-screen';
+import { AppAppearanceSettings } from '@colanode/ui/components/app/app-appearance-settings-screen';
 import { ChannelContainer } from '@colanode/ui/components/channels/channel-container';
 import { ChatContainer } from '@colanode/ui/components/chats/chat-container';
 import { DatabaseContainer } from '@colanode/ui/components/databases/database-container';
@@ -15,11 +15,11 @@ import { PageContainer } from '@colanode/ui/components/pages/page-container';
 import { RecordContainer } from '@colanode/ui/components/records/record-container';
 import { SpaceContainer } from '@colanode/ui/components/spaces/space-container';
 import { TabsContent } from '@colanode/ui/components/ui/tabs';
-import { WorkspaceDownloads } from '@colanode/ui/components/workspaces/downloads/workspace-downloads';
-import { WorkspaceStorage } from '@colanode/ui/components/workspaces/storage/workspace-storage';
-import { WorkspaceUploads } from '@colanode/ui/components/workspaces/uploads/workspace-uploads';
-import { WorkspaceSettings } from '@colanode/ui/components/workspaces/workspace-settings';
-import { WorkspaceUsers } from '@colanode/ui/components/workspaces/workspace-users';
+import { WorkspaceDownloads } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-screen';
+import { WorkspaceStorage } from '@colanode/ui/components/workspaces/storage/workspace-storage-screen';
+import { WorkspaceUploads } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-screen';
+import { WorkspaceSettings } from '@colanode/ui/components/workspaces/workspace-settings-screen';
+import { WorkspaceUsers } from '@colanode/ui/components/workspaces/workspace-users-screen';
 
 interface ContainerTabContentProps {
   tab: ContainerTab;

@@ -10,7 +10,7 @@ import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 const DOWNLOADS_PER_PAGE = 100;
 
-export const WorkspaceDownloads = () => {
+export const WorkspaceDownloadsScreen = () => {
   const workspace = useWorkspace();
 
   const [lastPage, setLastPage] = useState<number>(1);

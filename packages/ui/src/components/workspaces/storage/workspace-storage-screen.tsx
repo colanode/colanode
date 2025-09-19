@@ -3,7 +3,7 @@ import { UserStorageStats } from '@colanode/ui/components/workspaces/storage/use
 import { WorkspaceStorageStats } from '@colanode/ui/components/workspaces/storage/workspace-storage-stats';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
-export const WorkspaceStorage = () => {
+export const WorkspaceStorageScreen = () => {
   const workspace = useWorkspace();
   const canManageStorage =
     workspace.role === 'owner' || workspace.role === 'admin';

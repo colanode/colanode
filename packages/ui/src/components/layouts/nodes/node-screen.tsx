@@ -12,7 +12,7 @@ import { PageContainer } from '@colanode/ui/components/pages/page-container';
 import { RecordContainer } from '@colanode/ui/components/records/record-container';
 import { SpaceContainer } from '@colanode/ui/components/spaces/space-container';
 
-export const NodeContainer = () => {
+export const NodeScreen = () => {
   const { nodeId } = useParams({ from: '/$workspaceId/$nodeId' });
 
   return match(getIdType(nodeId))

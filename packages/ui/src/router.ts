@@ -4,20 +4,20 @@ import {
   createRouter,
 } from '@tanstack/react-router';
 
-import { AccountLogout } from '@colanode/ui/components/accounts/account-logout';
-import { AccountSettings } from '@colanode/ui/components/accounts/account-settings';
-import { Login } from '@colanode/ui/components/accounts/login';
-import { AppAppearanceSettings } from '@colanode/ui/components/app/app-appearance-settings';
-import { AppHome } from '@colanode/ui/components/app-home';
-import { NodeContainer } from '@colanode/ui/components/layouts/nodes/node-container';
+import { AccountLogoutScreen } from '@colanode/ui/components/accounts/account-logout-screen';
+import { AccountSettingsScreen } from '@colanode/ui/components/accounts/account-settings-screen';
+import { LoginScreen } from '@colanode/ui/components/accounts/login-screen';
+import { AppAppearanceSettingsScreen } from '@colanode/ui/components/app/app-appearance-settings-screen';
+import { AppHomeScreen } from '@colanode/ui/components/app/app-home-screen';
+import { NodeScreen } from '@colanode/ui/components/layouts/nodes/node-screen';
 import { RootLayout } from '@colanode/ui/components/layouts/root-layout';
-import { WorkspaceDownloads } from '@colanode/ui/components/workspaces/downloads/workspace-downloads';
-import { WorkspaceStorage } from '@colanode/ui/components/workspaces/storage/workspace-storage';
-import { WorkspaceUploads } from '@colanode/ui/components/workspaces/uploads/workspace-uploads';
-import { WorkspaceContainer } from '@colanode/ui/components/workspaces/workspace-container';
-import { WorkspaceCreate } from '@colanode/ui/components/workspaces/workspace-create';
-import { WorkspaceSettings } from '@colanode/ui/components/workspaces/workspace-settings';
-import { WorkspaceUsers } from '@colanode/ui/components/workspaces/workspace-users';
+import { WorkspaceDownloadsScreen } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-screen';
+import { WorkspaceStorageScreen } from '@colanode/ui/components/workspaces/storage/workspace-storage-screen';
+import { WorkspaceUploadsScreen } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-screen';
+import { WorkspaceCreateScreen } from '@colanode/ui/components/workspaces/workspace-create-screen';
+import { WorkspaceScreen } from '@colanode/ui/components/workspaces/workspace-screen';
+import { WorkspaceSettingsScreen } from '@colanode/ui/components/workspaces/workspace-settings-screen';
+import { WorkspaceUsersScreen } from '@colanode/ui/components/workspaces/workspace-users-screen';
 
 export const rootRoute = createRootRoute({
   component: RootLayout,
@@ -26,79 +26,79 @@ export const rootRoute = createRootRoute({
 export const loginRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/login',
-  component: Login,
+  component: LoginScreen,
 });
 
 export const appHomeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: AppHome,
+  component: AppHomeScreen,
 });
 
 export const workspaceRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/$workspaceId',
-  component: WorkspaceContainer,
+  component: WorkspaceScreen,
 });
 
 export const workspaceCreateRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/create',
-  component: WorkspaceCreate,
+  component: WorkspaceCreateScreen,
 });
 
 export const nodeRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/$nodeId',
-  component: NodeContainer,
+  component: NodeScreen,
 });
 
 export const workspaceSettingsRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/settings',
-  component: WorkspaceSettings,
+  component: WorkspaceSettingsScreen,
 });
 
 export const workspaceUsersRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/users',
-  component: WorkspaceUsers,
+  component: WorkspaceUsersScreen,
 });
 
 export const workspaceStorageRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/storage',
-  component: WorkspaceStorage,
+  component: WorkspaceStorageScreen,
 });
 
 export const workspaceUploadsRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/uploads',
-  component: WorkspaceUploads,
+  component: WorkspaceUploadsScreen,
 });
 
 export const workspaceDownloadsRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/downloads',
-  component: WorkspaceDownloads,
+  component: WorkspaceDownloadsScreen,
 });
 
 export const accountSettingsRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/account/settings',
-  component: AccountSettings,
+  component: AccountSettingsScreen,
 });
 
 export const accountLogoutRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/account/logout',
-  component: AccountLogout,
+  component: AccountLogoutScreen,
 });
 
 export const appAppearanceRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/app/appearance',
-  component: AppAppearanceSettings,
+  component: AppAppearanceSettingsScreen,
 });
 
 export const routeTree = rootRoute.addChildren([

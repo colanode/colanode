@@ -6,7 +6,7 @@ import { useAccount } from '@colanode/ui/contexts/account';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
-export const WorkspaceCreate = () => {
+export const WorkspaceCreateScreen = () => {
   const account = useAccount();
   const { mutate, isPending } = useMutation();
 

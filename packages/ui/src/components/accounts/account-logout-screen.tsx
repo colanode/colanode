@@ -7,7 +7,7 @@ import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
-export const AccountLogout = () => {
+export const AccountLogoutScreen = () => {
   const account = useAccount();
   const { mutate, isPending } = useMutation();
 

@@ -14,7 +14,7 @@ import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 const USERS_PER_PAGE = 50;
 
-export const WorkspaceUsers = () => {
+export const WorkspaceUsersScreen = () => {
   const workspace = useWorkspace();
   const canEditUsers = workspace.role === 'owner' || workspace.role === 'admin';
   const [lastPage, setLastPage] = useState<number>(1);

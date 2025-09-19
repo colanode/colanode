@@ -4,7 +4,7 @@ import { ThemeColor, ThemeMode } from '@colanode/client/types';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { useApp } from '@colanode/ui/contexts/app';
+import { useAppMetadata } from '@colanode/ui/contexts/app-metadata';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface ThemeModeOption {
@@ -50,10 +50,10 @@ const themeColorOptions = [
   { value: 'violet', label: 'Violet', color: 'oklch(0.606 0.25 292.717)' },
 ];
 
-export const AppAppearanceSettings = () => {
-  const app = useApp();
-  const themeMode = app.getMetadata('theme.mode');
-  const themeColor = app.getMetadata('theme.color');
+export const AppAppearanceSettingsScreen = () => {
+  const appMetadata = useAppMetadata();
+  const themeMode = appMetadata.get('theme.mode');
+  const themeColor = appMetadata.get('theme.color');
 
   return (
     <Container>
@@ -75,9 +75,9 @@ export const AppAppearanceSettings = () => {
                 variant="outline"
                 onClick={() => {
                   if (option.value === null) {
-                    app.deleteMetadata('theme.mode');
+                    appMetadata.delete('theme.mode');
                   } else {
-                    app.setMetadata('theme.mode', option.value);
+                    appMetadata.set('theme.mode', option.value);
                   }
                 }}
                 className={cn(
@@ -113,9 +113,9 @@ export const AppAppearanceSettings = () => {
                 variant="outline"
                 onClick={() => {
                   if (isDefault) {
-                    app.deleteMetadata('theme.color');
+                    appMetadata.delete('theme.color');
                   } else {
-                    app.setMetadata('theme.color', option.value as ThemeColor);
+                    appMetadata.set('theme.color', option.value as ThemeColor);
                   }
                 }}
                 className={cn(

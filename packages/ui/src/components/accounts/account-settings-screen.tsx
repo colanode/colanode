@@ -4,7 +4,7 @@ import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useAccount } from '@colanode/ui/contexts/account';
 
-export const AccountSettings = () => {
+export const AccountSettingsScreen = () => {
   const account = useAccount();
 
   return (

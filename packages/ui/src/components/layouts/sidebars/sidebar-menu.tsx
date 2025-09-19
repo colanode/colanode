@@ -4,7 +4,7 @@ import { SidebarMenuType } from '@colanode/client/types';
 import { SidebarMenuFooter } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-footer';
 import { SidebarMenuHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-header';
 import { SidebarMenuIcon } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-icon';
-import { useApp } from '@colanode/ui/contexts/app';
+import { useAppMetadata } from '@colanode/ui/contexts/app-metadata';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
@@ -15,12 +15,12 @@ interface SidebarMenuProps {
 }
 
 export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
-  const app = useApp();
+  const appMetadata = useAppMetadata();
   const workspace = useWorkspace();
   const radar = useRadar();
 
-  const platform = app.getMetadata('platform');
-  const windowSize = app.getMetadata('window.size');
+  const platform = appMetadata.get('platform');
+  const windowSize = appMetadata.get('window.size');
   const showMacOsPlaceholder = platform === 'darwin' && !windowSize?.fullscreen;
 
   const chatsState = radar.getChatsState(workspace.accountId, workspace.id);
