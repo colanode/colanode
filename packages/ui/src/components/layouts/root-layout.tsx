@@ -4,10 +4,8 @@ import { AccountProvider } from '@colanode/ui/components/accounts/account-provid
 
 export const RootLayout = () => {
   return (
-    <div className="w-screen min-w-screen h-screen min-h-screen flex flex-row bg-background">
-      <AccountProvider>
-        <Outlet />
-      </AccountProvider>
-    </div>
+    <AccountProvider>
+      <Outlet />
+    </AccountProvider>
   );
 };

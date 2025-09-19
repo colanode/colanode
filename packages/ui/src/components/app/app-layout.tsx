@@ -1,21 +1,13 @@
-import { createRouter, RouterProvider } from '@tanstack/react-router';
-import { useMemo } from 'react';
-
-import { routeTree } from '@colanode/ui/router';
+import { AppLayoutSingle } from '@colanode/ui/components/app/app-layout-single';
+import { AppLayoutTabs } from '@colanode/ui/components/app/app-layout-tabs';
+import { useApp } from '@colanode/ui/contexts/app';
 
 export const AppLayout = () => {
-  const router = useMemo(
-    () =>
-      createRouter({
-        routeTree,
-        context: {},
-        defaultPreload: 'intent',
-        scrollRestoration: true,
-        defaultStructuralSharing: true,
-        defaultPreloadStaleTime: 0,
-      }),
-    []
-  );
+  const app = useApp();
 
-  return <RouterProvider router={router} />;
+  return (
+    <div className="w-screen min-w-screen h-screen min-h-screen bg-background">
+      {app.type === 'desktop' ? <AppLayoutTabs /> : <AppLayoutSingle />}
+    </div>
+  );
 };

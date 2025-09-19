@@ -25,7 +25,7 @@ export const ContainerHeader = ({
 }: React.HTMLAttributes<HTMLDivElement>) => {
   return (
     <div
-      className={cn('flex flex-row w-full items-center gap-2 px-3', className)}
+      className={cn('flex flex-row w-full items-center gap-2 p-3', className)}
       {...props}
     >
       {children}

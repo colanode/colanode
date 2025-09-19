@@ -7,13 +7,13 @@ import { toast } from 'sonner';
 import { LocalSpaceNode } from '@colanode/client/types';
 import { extractNodeRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { SidebarItem } from '@colanode/ui/components/layouts/sidebars/sidebar-item';
 import { SpaceSidebarDropdown } from '@colanode/ui/components/spaces/space-sidebar-dropdown';
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@colanode/ui/components/ui/collapsible';
+import { WorkspaceSidebarItem } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -113,7 +113,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
                 className="cursor-pointer select-none"
               >
                 {({ isActive }) => (
-                  <SidebarItem
+                  <WorkspaceSidebarItem
                     node={child}
                     isActive={isActive}
                     canDrag={canEdit}
