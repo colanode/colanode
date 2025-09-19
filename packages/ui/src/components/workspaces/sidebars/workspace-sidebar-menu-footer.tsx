@@ -78,7 +78,10 @@ export function WorkspaceSidebarMenuFooter() {
               key={accountItem.id}
               className="p-0"
               onClick={() => {
-                app.openAccount(accountItem.id);
+                navigate({
+                  to: '/acc/$accountId',
+                  params: { accountId: accountItem.id },
+                });
               }}
             >
               <AccountContext.Provider value={accountItem}>

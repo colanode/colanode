@@ -13,7 +13,7 @@ export const CalendarViewRecordCard = () => {
 
   return (
     <Link
-      from="/$workspaceId"
+      from="/acc/$accountId/$workspaceId"
       to="$nodeId"
       params={{ nodeId: record.id }}
       key={record.id}

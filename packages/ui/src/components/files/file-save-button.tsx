@@ -18,7 +18,7 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
   const app = useApp();
   const workspace = useWorkspace();
   const mutation = useMutation();
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
   const [isSaving, setIsSaving] = useState(false);
 
   const handleDownloadDesktop = async () => {
@@ -40,7 +40,6 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
       },
       onSuccess: () => {
         navigate({
-          from: '/$workspaceId',
           to: 'downloads',
         });
       },

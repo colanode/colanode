@@ -14,7 +14,7 @@ export const ViewFullscreenButton = () => {
 
   return (
     <Link
-      from="/$workspaceId"
+      from="/acc/$accountId/$workspaceId"
       to="$nodeId"
       params={{ nodeId: database.id }}
       className="flex cursor-pointer items-center rounded-md p-1.5 hover:bg-accent"

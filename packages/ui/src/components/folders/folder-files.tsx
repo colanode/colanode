@@ -25,7 +25,7 @@ export const FolderFiles = ({
   layout: folderLayout,
 }: FolderFilesProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
 
   const [lastPage] = useState<number>(1);
   const inputs: FileListQueryInput[] = Array.from({
@@ -53,7 +53,6 @@ export const FolderFiles = ({
         },
         onDoubleClick: (_, id) => {
           navigate({
-            from: '/$workspaceId',
             to: '$nodeId',
             params: { nodeId: id },
           });

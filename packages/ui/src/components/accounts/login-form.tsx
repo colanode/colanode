@@ -1,9 +1,11 @@
+import { useRouter } from '@tanstack/react-router';
 import { HouseIcon } from 'lucide-react';
-import { useState, Fragment, useEffect } from 'react';
+import { useState, Fragment, useEffect, useCallback } from 'react';
 import { match } from 'ts-pattern';
 
 import { isFeatureSupported } from '@colanode/client/lib';
 import { Account, ServerDetails } from '@colanode/client/types';
+import { LoginSuccessOutput } from '@colanode/core';
 import { EmailLogin } from '@colanode/ui/components/accounts/email-login';
 import { EmailPasswordResetComplete } from '@colanode/ui/components/accounts/email-password-reset-complete';
 import { EmailPasswordResetInit } from '@colanode/ui/components/accounts/email-password-reset-init';
@@ -12,7 +14,6 @@ import { EmailVerify } from '@colanode/ui/components/accounts/email-verify';
 import { ServerDropdown } from '@colanode/ui/components/servers/server-dropdown';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { useApp } from '@colanode/ui/contexts/app';
 import { ServerContext } from '@colanode/ui/contexts/server';
 
 interface LoginFormProps {
@@ -52,11 +53,12 @@ type PanelState =
   | PasswordResetCompletePanelState;
 
 export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
-  const app = useApp();
+  const router = useRouter();
 
   const [serverDomain, setServerDomain] = useState<string | null>(
     servers[0]?.domain ?? null
   );
+
   const [panel, setPanel] = useState<PanelState>({
     type: 'login',
   });
@@ -72,6 +74,24 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
   const server = serverDomain
     ? servers.find((s) => s.domain === serverDomain)
     : null;
+
+  const handleLoginSuccess = useCallback(
+    (output: LoginSuccessOutput) => {
+      const workspace = output.workspaces[0];
+      if (workspace) {
+        router.navigate({
+          to: '/acc/$accountId/$workspaceId',
+          params: { accountId: output.account.id, workspaceId: workspace.id },
+        });
+      } else {
+        router.navigate({
+          to: '/acc/$accountId/create',
+          params: { accountId: output.account.id },
+        });
+      }
+    },
+    [router]
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -98,7 +118,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
                 <EmailLogin
                   onSuccess={(output) => {
                     if (output.type === 'success') {
-                      app.openAccount(output.account.id);
+                      handleLoginSuccess(output);
                     } else if (output.type === 'verify') {
                       setPanel({
                         type: 'verify',
@@ -123,7 +143,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
                 <EmailRegister
                   onSuccess={(output) => {
                     if (output.type === 'success') {
-                      app.openAccount(output.account.id);
+                      handleLoginSuccess(output);
                     } else if (output.type === 'verify') {
                       setPanel({
                         type: 'verify',
@@ -145,7 +165,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
                   expiresAt={p.expiresAt}
                   onSuccess={(output) => {
                     if (output.type === 'success') {
-                      app.openAccount(output.account.id);
+                      handleLoginSuccess(output);
                     }
                   }}
                   onBack={() => {
@@ -195,7 +215,14 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
             className="w-full text-muted-foreground"
             type="button"
             onClick={() => {
-              app.closeLogin();
+              if (router.history.canGoBack()) {
+                router.history.back();
+              } else {
+                router.navigate({
+                  to: '/acc/$accountId',
+                  params: { accountId: accounts[0]!.id },
+                });
+              }
             }}
           >
             <HouseIcon className="mr-1 size-4" />

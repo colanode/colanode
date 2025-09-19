@@ -35,7 +35,11 @@ export const BoardViewRecordCard = () => {
       key={record.id}
       className="animate-fade-in flex cursor-pointer flex-col gap-1 rounded-md border p-2 text-left hover:bg-accent"
     >
-      <Link from="/$workspaceId" to="$nodeId" params={{ nodeId: record.id }}>
+      <Link
+        from="/acc/$accountId/$workspaceId"
+        to="$nodeId"
+        params={{ nodeId: record.id }}
+      >
         <p className={hasName ? '' : 'text-muted-foreground'}>
           {hasName ? name : 'Unnamed'}
         </p>

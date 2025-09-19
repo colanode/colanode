@@ -25,7 +25,7 @@ export const FolderCreateDialog = ({
   onOpenChange,
 }: FolderCreateDialogProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
   const { mutate, isPending } = useMutation();
 
   return (
@@ -65,8 +65,8 @@ export const FolderCreateDialog = ({
               onSuccess(output) {
                 onOpenChange(false);
                 navigate({
-                  to: '/$workspaceId/$nodeId',
-                  params: { workspaceId: workspace.id, nodeId: output.id },
+                  to: '$nodeId',
+                  params: { nodeId: output.id },
                 });
               },
               onError(error) {

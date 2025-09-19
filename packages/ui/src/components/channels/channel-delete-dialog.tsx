@@ -27,7 +27,7 @@ export const ChannelDeleteDialog = ({
   onOpenChange,
 }: ChannelDeleteDialogProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
   const { mutate, isPending } = useMutation();
 
   return (
@@ -58,8 +58,7 @@ export const ChannelDeleteDialog = ({
                 onSuccess() {
                   onOpenChange(false);
                   navigate({
-                    to: '/$workspaceId',
-                    params: { workspaceId: workspace.id },
+                    to: '/',
                     replace: true,
                   });
                 },

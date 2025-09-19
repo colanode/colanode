@@ -9,7 +9,7 @@ import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const WorkspaceScreen = () => {
   const account = useAccount();
-  const { workspaceId } = useParams({ from: '/$workspaceId' });
+  const { workspaceId } = useParams({ from: '/acc/$accountId/$workspaceId' });
 
   const workspaceQuery = useLiveQuery({
     type: 'workspace.get',

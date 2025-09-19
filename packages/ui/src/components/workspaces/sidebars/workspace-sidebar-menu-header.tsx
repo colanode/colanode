@@ -75,8 +75,11 @@ export const WorkspaceSidebarMenuHeader = () => {
               className="p-0 cursor-pointer"
               onClick={() => {
                 navigate({
-                  to: '/$workspaceId',
-                  params: { workspaceId: workspaceItem.id },
+                  to: '/acc/$accountId/$workspaceId',
+                  params: {
+                    accountId: workspaceItem.accountId,
+                    workspaceId: workspaceItem.id,
+                  },
                 });
               }}
             >
@@ -106,7 +109,10 @@ export const WorkspaceSidebarMenuHeader = () => {
         <DropdownMenuItem
           className="gap-2 p-2 text-muted-foreground hover:text-foreground cursor-pointer"
           onClick={() => {
-            navigate({ to: '/create' });
+            navigate({
+              to: '/acc/$accountId/create',
+              params: { accountId: account.id },
+            });
           }}
         >
           <Plus className="size-4" />

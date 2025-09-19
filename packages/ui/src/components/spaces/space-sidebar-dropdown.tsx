@@ -29,7 +29,7 @@ interface SpaceSidebarDropdownProps {
 }
 
 export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
 
   const [openCreatePage, setOpenCreatePage] = useState(false);
   const [openCreateChannel, setOpenCreateChannel] = useState(false);
@@ -81,7 +81,6 @@ export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
           <DropdownMenuItem
             onClick={() =>
               navigate({
-                from: '/$workspaceId',
                 to: '$nodeId',
                 params: { nodeId: space.id },
               })
@@ -94,7 +93,6 @@ export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
           <DropdownMenuItem
             onClick={() =>
               navigate({
-                from: '/$workspaceId',
                 to: '$nodeId',
                 params: { nodeId: space.id },
               })

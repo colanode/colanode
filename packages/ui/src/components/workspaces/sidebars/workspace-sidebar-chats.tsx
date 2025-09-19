@@ -26,7 +26,7 @@ export const WorkspaceSidebarChats = () => {
         {chats.map((item) => (
           <Link
             key={item.id}
-            from="/$workspaceId"
+            from="/acc/$accountId/$workspaceId"
             to="$nodeId"
             params={{ nodeId: item.id }}
             className="px-2 flex w-full items-center gap-2 overflow-hidden rounded-md text-left text-sm h-7 cursor-pointer text-foreground hover:bg-muted"

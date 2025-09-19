@@ -13,7 +13,9 @@ import { RecordContainer } from '@colanode/ui/components/records/record-containe
 import { SpaceContainer } from '@colanode/ui/components/spaces/space-container';
 
 export const NodeScreen = () => {
-  const { nodeId } = useParams({ from: '/$workspaceId/$nodeId' });
+  const { nodeId } = useParams({
+    from: '/acc/$accountId/$workspaceId/$nodeId',
+  });
 
   return match(getIdType(nodeId))
     .with(IdType.Space, () => <SpaceContainer spaceId={nodeId} />)

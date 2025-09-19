@@ -35,10 +35,7 @@ export const WorkspaceSidebarSettings = () => {
     <div className="flex flex-col gap-4 h-full px-2 group/sidebar">
       <div className="flex w-full min-w-0 flex-col gap-1">
         <WorkspaceSidebarHeader title="Workspace settings" />
-        <Link
-          to="/$workspaceId/settings"
-          params={{ workspaceId: workspace.id }}
-        >
+        <Link from="/acc/$accountId/$workspaceId" to="settings">
           {({ isActive }) => (
             <WorkspaceSidebarSettingsItem
               title="General"
@@ -48,7 +45,7 @@ export const WorkspaceSidebarSettings = () => {
           )}
         </Link>
 
-        <Link to="/$workspaceId/users" params={{ workspaceId: workspace.id }}>
+        <Link from="/acc/$accountId/$workspaceId" to="users">
           {({ isActive }) => (
             <WorkspaceSidebarSettingsItem
               title="Users"
@@ -57,7 +54,7 @@ export const WorkspaceSidebarSettings = () => {
             />
           )}
         </Link>
-        <Link to="/$workspaceId/storage" params={{ workspaceId: workspace.id }}>
+        <Link from="/acc/$accountId/$workspaceId" to="storage">
           {({ isActive }) => (
             <WorkspaceSidebarSettingsItem
               title="Storage"
@@ -66,7 +63,7 @@ export const WorkspaceSidebarSettings = () => {
             />
           )}
         </Link>
-        <Link to="/$workspaceId/uploads" params={{ workspaceId: workspace.id }}>
+        <Link from="/acc/$accountId/$workspaceId" to="uploads">
           {({ isActive }) => (
             <WorkspaceSidebarSettingsItem
               title="Uploads"
@@ -82,10 +79,7 @@ export const WorkspaceSidebarSettings = () => {
           )}
         </Link>
         {app.type === 'desktop' && (
-          <Link
-            to="/$workspaceId/downloads"
-            params={{ workspaceId: workspace.id }}
-          >
+          <Link from="/acc/$accountId/$workspaceId" to="downloads">
             {({ isActive }) => (
               <WorkspaceSidebarSettingsItem
                 title="Downloads"
@@ -98,10 +92,7 @@ export const WorkspaceSidebarSettings = () => {
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
         <WorkspaceSidebarHeader title="Account settings" />
-        <Link
-          to="/$workspaceId/account/settings"
-          params={{ workspaceId: workspace.id }}
-        >
+        <Link from="/acc/$accountId/$workspaceId" to="account/settings">
           {({ isActive }) => (
             <WorkspaceSidebarSettingsItem
               title="General"
@@ -113,10 +104,7 @@ export const WorkspaceSidebarSettings = () => {
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
         <WorkspaceSidebarHeader title="App settings" />
-        <Link
-          to="/$workspaceId/app/appearance"
-          params={{ workspaceId: workspace.id }}
-        >
+        <Link from="/acc/$accountId/$workspaceId" to="app/appearance">
           {({ isActive }) => (
             <WorkspaceSidebarSettingsItem
               title="Appearance"
@@ -128,10 +116,7 @@ export const WorkspaceSidebarSettings = () => {
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
         <Separator className="my-2" />
-        <Link
-          to="/$workspaceId/account/logout"
-          params={{ workspaceId: workspace.id }}
-        >
+        <Link from="/acc/$accountId/$workspaceId" to="account/logout">
           {({ isActive }) => (
             <WorkspaceSidebarSettingsItem
               title="Logout"

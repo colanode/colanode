@@ -27,7 +27,7 @@ export const RecordDeleteDialog = ({
   onOpenChange,
 }: RecordDeleteDialogProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
   const { mutate, isPending } = useMutation();
 
   return (
@@ -58,7 +58,6 @@ export const RecordDeleteDialog = ({
                 onSuccess() {
                   onOpenChange(false);
                   navigate({
-                    from: '/$workspaceId',
                     to: '/',
                   });
                 },

@@ -5,11 +5,11 @@ import {
 } from '@tanstack/react-router';
 
 import { AccountLogoutScreen } from '@colanode/ui/components/accounts/account-logout-screen';
+import { AccountScreen } from '@colanode/ui/components/accounts/account-screen';
 import { AccountSettingsScreen } from '@colanode/ui/components/accounts/account-settings-screen';
 import { LoginScreen } from '@colanode/ui/components/accounts/login-screen';
 import { AppAppearanceSettingsScreen } from '@colanode/ui/components/app/app-appearance-settings-screen';
 import { AppHomeScreen } from '@colanode/ui/components/app/app-home-screen';
-import { RootLayout } from '@colanode/ui/components/layouts/root-layout';
 import { NodeScreen } from '@colanode/ui/components/nodes/node-screen';
 import { WorkspaceDownloadsScreen } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-screen';
 import { WorkspaceStorageScreen } from '@colanode/ui/components/workspaces/storage/workspace-storage-screen';
@@ -20,8 +20,12 @@ import { WorkspaceScreen } from '@colanode/ui/components/workspaces/workspace-sc
 import { WorkspaceSettingsScreen } from '@colanode/ui/components/workspaces/workspace-settings-screen';
 import { WorkspaceUsersScreen } from '@colanode/ui/components/workspaces/workspace-users-screen';
 
-export const rootRoute = createRootRoute({
-  component: RootLayout,
+export const rootRoute = createRootRoute();
+
+export const appHomeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/',
+  component: AppHomeScreen,
 });
 
 export const loginRoute = createRoute({
@@ -30,14 +34,14 @@ export const loginRoute = createRoute({
   component: LoginScreen,
 });
 
-export const appHomeRoute = createRoute({
+export const accountRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: '/',
-  component: AppHomeScreen,
+  path: '/acc/$accountId',
+  component: AccountScreen,
 });
 
 export const workspaceRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => accountRoute,
   path: '/$workspaceId',
   component: WorkspaceScreen,
 });
@@ -49,7 +53,7 @@ export const workspaceHomeRoute = createRoute({
 });
 
 export const workspaceCreateRoute = createRoute({
-  getParentRoute: () => rootRoute,
+  getParentRoute: () => accountRoute,
   path: '/create',
   component: WorkspaceCreateScreen,
 });
@@ -111,18 +115,20 @@ export const appAppearanceRoute = createRoute({
 export const routeTree = rootRoute.addChildren([
   appHomeRoute,
   loginRoute,
-  workspaceCreateRoute,
-  workspaceRoute.addChildren([
-    workspaceHomeRoute,
-    nodeRoute,
-    workspaceDownloadsRoute,
-    workspaceUploadsRoute,
-    workspaceStorageRoute,
-    workspaceUsersRoute,
-    workspaceSettingsRoute,
-    accountSettingsRoute,
-    accountLogoutRoute,
-    appAppearanceRoute,
+  accountRoute.addChildren([
+    workspaceCreateRoute,
+    workspaceRoute.addChildren([
+      workspaceHomeRoute,
+      nodeRoute,
+      workspaceDownloadsRoute,
+      workspaceUploadsRoute,
+      workspaceStorageRoute,
+      workspaceUsersRoute,
+      workspaceSettingsRoute,
+      accountSettingsRoute,
+      accountLogoutRoute,
+      appAppearanceRoute,
+    ]),
   ]),
 ]);
 

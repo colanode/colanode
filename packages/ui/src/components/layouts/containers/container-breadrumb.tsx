@@ -50,7 +50,7 @@ export const ContainerBreadcrumb = ({
               {!isFirst && <BreadcrumbSeparator />}
               <BreadcrumbItem className="cursor-pointer hover:text-foreground">
                 <Link
-                  from="/$workspaceId"
+                  from="/acc/$accountId/$workspaceId"
                   to="$nodeId"
                   params={{ nodeId: item.id }}
                 >
@@ -70,7 +70,7 @@ export const ContainerBreadcrumb = ({
                           return (
                             <DropdownMenuItem key={ellipsisItem.id}>
                               <Link
-                                from="/$workspaceId"
+                                from="/acc/$accountId/$workspaceId"
                                 to="$nodeId"
                                 params={{ nodeId: ellipsisItem.id }}
                               >

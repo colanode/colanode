@@ -105,9 +105,9 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
           {children.map((child) => (
             <li key={child.id}>
               <Link
-                to={'/$workspaceId/$nodeId'}
+                from="/acc/$accountId/$workspaceId"
+                to="$nodeId"
                 params={{
-                  workspaceId: workspace.id,
                   nodeId: child.id,
                 }}
                 className="cursor-pointer select-none"

@@ -23,7 +23,7 @@ interface SpaceBodyProps {
 
 export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
   const { mutate, isPending } = useMutation();
 
   const canEdit = hasNodeRole(role, 'admin');
@@ -95,7 +95,6 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
                     id={space.id}
                     onDeleted={() => {
                       navigate({
-                        from: '/$workspaceId',
                         to: '/',
                       });
                     }}

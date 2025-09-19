@@ -22,7 +22,7 @@ export const WorkspaceDownloadFile = ({
   download,
 }: WorkspaceDownloadFileProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
 
   const fileQuery = useLiveQuery({
     type: 'node.get',
@@ -39,7 +39,6 @@ export const WorkspaceDownloadFile = ({
       onClick={() => {
         if (file) {
           navigate({
-            from: '/$workspaceId',
             to: '$nodeId',
             params: { nodeId: file.id },
           });

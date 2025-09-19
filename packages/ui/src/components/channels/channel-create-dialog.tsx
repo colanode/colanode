@@ -25,7 +25,7 @@ export const ChannelCreateDialog = ({
   onOpenChange,
 }: ChannelCreateDialogProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
   const { mutate, isPending } = useMutation();
 
   return (
@@ -64,9 +64,8 @@ export const ChannelCreateDialog = ({
               onSuccess(output) {
                 onOpenChange(false);
                 navigate({
-                  to: '/$workspaceId/$nodeId',
+                  to: '$nodeId',
                   params: {
-                    workspaceId: workspace.id,
                     nodeId: output.id,
                   },
                 });

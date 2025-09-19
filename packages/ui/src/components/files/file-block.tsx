@@ -31,7 +31,7 @@ export const FileBlock = ({ id }: FileBlockProps) => {
   if (canPreview) {
     return (
       <Link
-        from="/$workspaceId"
+        from="/acc/$accountId/$workspaceId"
         to="$nodeId"
         params={{ nodeId: id }}
         className="flex h-72 max-h-72 max-w-128 w-full cursor-pointer overflow-hidden rounded-md p-2 hover:bg-muted/50"
@@ -43,7 +43,7 @@ export const FileBlock = ({ id }: FileBlockProps) => {
 
   return (
     <Link
-      from="/$workspaceId"
+      from="/acc/$accountId/$workspaceId"
       to="$nodeId"
       params={{ nodeId: id }}
       className="flex flex-row gap-4 items-center w-full cursor-pointer overflow-hidden rounded-md p-2 pl-0 hover:bg-accent"

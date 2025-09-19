@@ -27,7 +27,7 @@ export const PageDeleteDialog = ({
   onOpenChange,
 }: PageDeleteDialogProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate();
+  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
   const { mutate, isPending } = useMutation();
 
   return (
@@ -58,7 +58,6 @@ export const PageDeleteDialog = ({
                 onSuccess() {
                   onOpenChange(false);
                   navigate({
-                    from: '/$workspaceId',
                     to: '/',
                   });
                 },

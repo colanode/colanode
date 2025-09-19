@@ -1,32 +1,28 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
-import { useAccount } from '@colanode/ui/contexts/account';
-
 export const AppHomeScreen = () => {
   const navigate = useNavigate();
-  const account = useAccount();
 
   useEffect(() => {
     (async () => {
-      const workspaces = await window.colanode.executeQuery({
-        type: 'workspace.list',
-        accountId: account.id,
+      const accounts = await window.colanode.executeQuery({
+        type: 'account.list',
       });
 
-      if (workspaces.length === 0) {
-        navigate({ to: '/create', replace: true });
+      if (accounts.length === 0) {
+        navigate({ to: '/login', replace: true });
         return;
       }
 
-      const workspace = workspaces[0]!;
+      const account = accounts[0]!;
       navigate({
-        to: '/$workspaceId',
-        params: { workspaceId: workspace.id },
+        to: '/acc/$accountId',
+        params: { accountId: account.id },
         replace: true,
       });
     })();
-  }, [account.id]);
+  }, []);
 
   return null;
 };
