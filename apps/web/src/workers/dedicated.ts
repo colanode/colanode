@@ -1,7 +1,11 @@
 import * as Comlink from 'comlink';
 
 import { eventBus } from '@colanode/client/lib';
-import { MutationInput, MutationResult } from '@colanode/client/mutations';
+import {
+  MutationInput,
+  MutationResult,
+  TempFileCreateMutationInput,
+} from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
 import { AppMeta, AppService } from '@colanode/client/services';
 import { extractFileSubtype, generateId, IdType } from '@colanode/core';
@@ -184,7 +188,7 @@ const api: ColanodeWorkerApi = {
     }
   },
   executeMutation(input) {
-    if (app) {
+    if (app && appInitialized) {
       return app.mediator.executeMutation(input);
     }
 
@@ -211,7 +215,7 @@ const api: ColanodeWorkerApi = {
     return promise;
   },
   executeQuery(input) {
-    if (app) {
+    if (app && appInitialized) {
       return app.mediator.executeQuery(input);
     }
 
@@ -238,7 +242,7 @@ const api: ColanodeWorkerApi = {
     return promise;
   },
   executeQueryAndSubscribe(key, input) {
-    if (app) {
+    if (app && appInitialized) {
       return app.mediator.executeQueryAndSubscribe(key, windowId, input);
     }
 
@@ -269,7 +273,7 @@ const api: ColanodeWorkerApi = {
     return promise;
   },
   unsubscribeQuery(key) {
-    if (app) {
+    if (app && appInitialized) {
       app.mediator.unsubscribeQuery(key, windowId);
       return Promise.resolve();
     }
@@ -305,38 +309,41 @@ const api: ColanodeWorkerApi = {
     const fileData = new Uint8Array(arrayBuffer);
 
     await fs.writeFile(filePath, fileData);
-    if (app) {
-      await app.database
-        .insertInto('temp_files')
-        .values({
-          id,
-          name: file.name,
-          size: file.size,
-          mime_type: mimeType,
-          subtype,
-          path: filePath,
-          extension,
-          created_at: new Date().toISOString(),
-          opened_at: new Date().toISOString(),
-        })
-        .execute();
+    const input: TempFileCreateMutationInput = {
+      type: 'temp.file.create',
+      id,
+      name: file.name,
+      size: file.size,
+      mimeType,
+      subtype,
+      extension,
+      path: filePath,
+    };
+
+    if (app && appInitialized) {
+      await app.mediator.executeMutation(input);
     } else {
+      const mutationId = generateId(IdType.Mutation);
       const message: BroadcastMutationMessage = {
         type: 'mutation',
-        mutationId: generateId(IdType.Mutation),
-        input: {
-          type: 'temp.file.create',
-          id,
-          name: file.name,
-          size: file.size,
-          mimeType,
-          subtype,
-          extension,
-          path: filePath,
-        },
+        mutationId,
+        input,
       };
 
+      const promise = new Promise<MutationResult<MutationInput>>(
+        (resolve, reject) => {
+          pendingPromises.set(mutationId, {
+            type: 'mutation',
+            mutationId,
+            input,
+            resolve,
+            reject,
+          });
+        }
+      );
+
       broadcastMessage(message);
+      await promise;
     }
 
     const url = await fs.url(filePath);
