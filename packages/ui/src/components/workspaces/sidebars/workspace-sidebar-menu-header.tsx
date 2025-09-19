@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { Check, Plus } from 'lucide-react';
 import { useState } from 'react';
 
@@ -16,10 +17,11 @@ import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
-export const SidebarMenuHeader = () => {
+export const WorkspaceSidebarMenuHeader = () => {
   const workspace = useWorkspace();
   const account = useAccount();
   const radar = useRadar();
+  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
   const workspaceListQuery = useLiveQuery({
@@ -72,7 +74,10 @@ export const SidebarMenuHeader = () => {
               key={workspaceItem.id}
               className="p-0 cursor-pointer"
               onClick={() => {
-                account.openWorkspace(workspaceItem.id);
+                navigate({
+                  to: '/$workspaceId',
+                  params: { workspaceId: workspaceItem.id },
+                });
               }}
             >
               <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
@@ -101,7 +106,7 @@ export const SidebarMenuHeader = () => {
         <DropdownMenuItem
           className="gap-2 p-2 text-muted-foreground hover:text-foreground cursor-pointer"
           onClick={() => {
-            account.openWorkspaceCreate();
+            navigate({ to: '/create' });
           }}
         >
           <Plus className="size-4" />

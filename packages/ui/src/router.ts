@@ -9,12 +9,13 @@ import { AccountSettingsScreen } from '@colanode/ui/components/accounts/account-
 import { LoginScreen } from '@colanode/ui/components/accounts/login-screen';
 import { AppAppearanceSettingsScreen } from '@colanode/ui/components/app/app-appearance-settings-screen';
 import { AppHomeScreen } from '@colanode/ui/components/app/app-home-screen';
-import { NodeScreen } from '@colanode/ui/components/layouts/nodes/node-screen';
 import { RootLayout } from '@colanode/ui/components/layouts/root-layout';
+import { NodeScreen } from '@colanode/ui/components/nodes/node-screen';
 import { WorkspaceDownloadsScreen } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-screen';
 import { WorkspaceStorageScreen } from '@colanode/ui/components/workspaces/storage/workspace-storage-screen';
 import { WorkspaceUploadsScreen } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-screen';
 import { WorkspaceCreateScreen } from '@colanode/ui/components/workspaces/workspace-create-screen';
+import { WorkspaceHomeScreen } from '@colanode/ui/components/workspaces/workspace-home-screen';
 import { WorkspaceScreen } from '@colanode/ui/components/workspaces/workspace-screen';
 import { WorkspaceSettingsScreen } from '@colanode/ui/components/workspaces/workspace-settings-screen';
 import { WorkspaceUsersScreen } from '@colanode/ui/components/workspaces/workspace-users-screen';
@@ -39,6 +40,12 @@ export const workspaceRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/$workspaceId',
   component: WorkspaceScreen,
+});
+
+export const workspaceHomeRoute = createRoute({
+  getParentRoute: () => workspaceRoute,
+  path: '/',
+  component: WorkspaceHomeScreen,
 });
 
 export const workspaceCreateRoute = createRoute({
@@ -106,6 +113,7 @@ export const routeTree = rootRoute.addChildren([
   loginRoute,
   workspaceCreateRoute,
   workspaceRoute.addChildren([
+    workspaceHomeRoute,
     nodeRoute,
     workspaceDownloadsRoute,
     workspaceUploadsRoute,

@@ -4,7 +4,7 @@ import {
 } from '@colanode/ui/components/ui/unread-badge';
 import { cn } from '@colanode/ui/lib/utils';
 
-interface SidebarMenuIconProps {
+interface WorkspaceSidebarMenuIconProps {
   icon: React.ComponentType<{ className?: string }>;
   onClick: () => void;
   isActive?: boolean;
@@ -12,13 +12,13 @@ interface SidebarMenuIconProps {
   className?: string;
 }
 
-export const SidebarMenuIcon = ({
+export const WorkspaceSidebarMenuIcon = ({
   icon: Icon,
   onClick,
   isActive = false,
   unreadBadge,
   className,
-}: SidebarMenuIconProps) => {
+}: WorkspaceSidebarMenuIconProps) => {
   return (
     <div
       className={cn(

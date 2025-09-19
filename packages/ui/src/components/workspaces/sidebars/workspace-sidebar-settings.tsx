@@ -9,14 +9,14 @@ import {
   Users,
 } from 'lucide-react';
 
-import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
-import { SidebarSettingsItem } from '@colanode/ui/components/layouts/sidebars/sidebar-settings-item';
 import { Separator } from '@colanode/ui/components/ui/separator';
+import { WorkspaceSidebarHeader } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-header';
+import { WorkspaceSidebarSettingsItem } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-settings-item';
 import { useApp } from '@colanode/ui/contexts/app';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
-export const SidebarSettings = () => {
+export const WorkspaceSidebarSettings = () => {
   const app = useApp();
   const workspace = useWorkspace();
 
@@ -34,13 +34,13 @@ export const SidebarSettings = () => {
   return (
     <div className="flex flex-col gap-4 h-full px-2 group/sidebar">
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <SidebarHeader title="Workspace settings" />
+        <WorkspaceSidebarHeader title="Workspace settings" />
         <Link
           to="/$workspaceId/settings"
           params={{ workspaceId: workspace.id }}
         >
           {({ isActive }) => (
-            <SidebarSettingsItem
+            <WorkspaceSidebarSettingsItem
               title="General"
               icon={Settings}
               isActive={isActive}
@@ -50,7 +50,7 @@ export const SidebarSettings = () => {
 
         <Link to="/$workspaceId/users" params={{ workspaceId: workspace.id }}>
           {({ isActive }) => (
-            <SidebarSettingsItem
+            <WorkspaceSidebarSettingsItem
               title="Users"
               icon={Users}
               isActive={isActive}
@@ -59,7 +59,7 @@ export const SidebarSettings = () => {
         </Link>
         <Link to="/$workspaceId/storage" params={{ workspaceId: workspace.id }}>
           {({ isActive }) => (
-            <SidebarSettingsItem
+            <WorkspaceSidebarSettingsItem
               title="Storage"
               icon={Cylinder}
               isActive={isActive}
@@ -68,7 +68,7 @@ export const SidebarSettings = () => {
         </Link>
         <Link to="/$workspaceId/uploads" params={{ workspaceId: workspace.id }}>
           {({ isActive }) => (
-            <SidebarSettingsItem
+            <WorkspaceSidebarSettingsItem
               title="Uploads"
               icon={Upload}
               isActive={isActive}
@@ -87,7 +87,7 @@ export const SidebarSettings = () => {
             params={{ workspaceId: workspace.id }}
           >
             {({ isActive }) => (
-              <SidebarSettingsItem
+              <WorkspaceSidebarSettingsItem
                 title="Downloads"
                 icon={Download}
                 isActive={isActive}
@@ -97,13 +97,13 @@ export const SidebarSettings = () => {
         )}
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <SidebarHeader title="Account settings" />
+        <WorkspaceSidebarHeader title="Account settings" />
         <Link
           to="/$workspaceId/account/settings"
           params={{ workspaceId: workspace.id }}
         >
           {({ isActive }) => (
-            <SidebarSettingsItem
+            <WorkspaceSidebarSettingsItem
               title="General"
               icon={Settings}
               isActive={isActive}
@@ -112,13 +112,13 @@ export const SidebarSettings = () => {
         </Link>
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <SidebarHeader title="App settings" />
+        <WorkspaceSidebarHeader title="App settings" />
         <Link
           to="/$workspaceId/app/appearance"
           params={{ workspaceId: workspace.id }}
         >
           {({ isActive }) => (
-            <SidebarSettingsItem
+            <WorkspaceSidebarSettingsItem
               title="Appearance"
               icon={Palette}
               isActive={isActive}
@@ -133,7 +133,7 @@ export const SidebarSettings = () => {
           params={{ workspaceId: workspace.id }}
         >
           {({ isActive }) => (
-            <SidebarSettingsItem
+            <WorkspaceSidebarSettingsItem
               title="Logout"
               icon={LogOut}
               isActive={isActive}

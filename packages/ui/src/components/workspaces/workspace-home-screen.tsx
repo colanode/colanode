@@ -1,4 +1,4 @@
-export const ContainerBlank = () => {
+export const WorkspaceHomeScreen = () => {
   return (
     <div className="h-full w-full flex flex-col gap-1">
       <div className="h-10 app-drag-region"></div>

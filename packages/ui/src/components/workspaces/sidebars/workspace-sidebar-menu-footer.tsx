@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { Check, Plus } from 'lucide-react';
 import { useState } from 'react';
 
@@ -13,14 +14,13 @@ import {
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { AccountContext, useAccount } from '@colanode/ui/contexts/account';
-import { useApp } from '@colanode/ui/contexts/app';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
-export function SidebarMenuFooter() {
-  const app = useApp();
+export function WorkspaceSidebarMenuFooter() {
   const account = useAccount();
   const radar = useRadar();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
 
   const accountListQuery = useLiveQuery({
@@ -81,13 +81,7 @@ export function SidebarMenuFooter() {
                 app.openAccount(accountItem.id);
               }}
             >
-              <AccountContext.Provider
-                value={{
-                  ...accountItem,
-                  openWorkspace: () => {},
-                  openWorkspaceCreate: () => {},
-                }}
-              >
+              <AccountContext.Provider value={accountItem}>
                 <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                   <Avatar
                     className="h-8 w-8 rounded-lg"
@@ -121,7 +115,7 @@ export function SidebarMenuFooter() {
         <DropdownMenuItem
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
           onClick={() => {
-            app.openLogin();
+            navigate({ to: '/login' });
           }}
         >
           <Plus className="size-4" />

@@ -1,9 +1,12 @@
-interface SidebarHeaderProps {
+interface WorkspaceSidebarHeaderProps {
   title: string;
   actions?: React.ReactNode;
 }
 
-export const SidebarHeader = ({ title, actions }: SidebarHeaderProps) => {
+export const WorkspaceSidebarHeader = ({
+  title,
+  actions,
+}: WorkspaceSidebarHeaderProps) => {
   return (
     <div className="flex items-center justify-between h-12 pl-2 pr-1 app-drag-region">
       <p className="font-bold text-muted-foreground flex-grow app-no-drag-region">

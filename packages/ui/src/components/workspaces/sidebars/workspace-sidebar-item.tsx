@@ -10,15 +10,15 @@ import { PageSidebarItem } from '@colanode/ui/components/pages/page-sidebar-item
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
 import { cn } from '@colanode/ui/lib/utils';
 
-interface SidebarItemContentProps {
+interface WorkspaceSidebarItemContentProps {
   node: LocalNode;
   isActive: boolean;
 }
 
-export const SidebarItemContent = ({
+export const WorkspaceSidebarItemContent = ({
   node,
   isActive,
-}: SidebarItemContentProps): React.ReactNode => {
+}: WorkspaceSidebarItemContentProps): React.ReactNode => {
   switch (node.type) {
     case 'space':
       return <SpaceSidebarItem space={node} />;
@@ -37,19 +37,19 @@ export const SidebarItemContent = ({
   }
 };
 
-interface SidebarItemProps {
+interface WorkspaceSidebarItemProps {
   node: LocalNode;
   isActive: boolean;
   canDrag: boolean;
   onDragEnd: (after: string | null) => void;
 }
 
-export const SidebarItem = ({
+export const WorkspaceSidebarItem = ({
   node,
   isActive,
   canDrag,
   onDragEnd,
-}: SidebarItemProps): React.ReactNode => {
+}: WorkspaceSidebarItemProps): React.ReactNode => {
   const [, dragRef] = useDrag({
     type: 'sidebar-item',
     canDrag: () => canDrag,
@@ -96,7 +96,7 @@ export const SidebarItem = ({
       )}
       ref={dragDropRef as RefAttributes<HTMLDivElement>['ref']}
     >
-      <SidebarItemContent node={node} isActive={isActive} />
+      <WorkspaceSidebarItemContent node={node} isActive={isActive} />
     </div>
   );
 };
