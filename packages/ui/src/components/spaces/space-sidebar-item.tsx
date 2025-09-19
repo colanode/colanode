@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { ChevronRight } from 'lucide-react';
 import { RefAttributes, useRef } from 'react';
 import { useDrop } from 'react-dnd';
@@ -13,7 +14,6 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@colanode/ui/components/ui/collapsible';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -26,7 +26,6 @@ interface SpaceSidebarItemProps {
 
 export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
   const mutation = useMutation();
 
   const role = extractNodeRole(space, workspace.userId);
@@ -104,24 +103,26 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
       <CollapsibleContent>
         <ul className="mx-3.5 flex min-w-0 translate-x-px flex-col gap-1 border-l border-sidebar-border px-2.5 py-0.5 mr-0 pr-0">
           {children.map((child) => (
-            <li
-              key={child.id}
-              onClick={() => {
-                layout.preview(child.id);
-              }}
-              onDoubleClick={() => {
-                layout.open(child.id);
-              }}
-              className="cursor-pointer select-none"
-            >
-              <SidebarItem
-                node={child}
-                isActive={layout.activeTab === child.id}
-                canDrag={canEdit}
-                onDragEnd={(after) => {
-                  handleDragEnd(child.id, after);
+            <li key={child.id}>
+              <Link
+                to={'/$workspaceId/$nodeId'}
+                params={{
+                  workspaceId: workspace.id,
+                  nodeId: child.id,
                 }}
-              />
+                className="cursor-pointer select-none"
+              >
+                {({ isActive }) => (
+                  <SidebarItem
+                    node={child}
+                    isActive={isActive}
+                    canDrag={canEdit}
+                    onDragEnd={(after) => {
+                      handleDragEnd(child.id, after);
+                    }}
+                  />
+                )}
+              </Link>
             </li>
           ))}
         </ul>

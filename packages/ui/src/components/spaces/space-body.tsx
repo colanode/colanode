@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import { LocalSpaceNode } from '@colanode/client/types';
@@ -12,7 +13,6 @@ import {
   ScrollViewport,
 } from '@colanode/ui/components/ui/scroll-area';
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -23,9 +23,9 @@ interface SpaceBodyProps {
 
 export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
   const workspace = useWorkspace();
+  const navigate = useNavigate();
   const { mutate, isPending } = useMutation();
 
-  const layout = useLayout();
   const canEdit = hasNodeRole(role, 'admin');
   const canDelete = hasNodeRole(role, 'admin');
 
@@ -94,7 +94,10 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
                   <SpaceDelete
                     id={space.id}
                     onDeleted={() => {
-                      layout.close(space.id);
+                      navigate({
+                        from: '/$workspaceId',
+                        to: '/',
+                      });
                     }}
                   />
                 </div>

@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import isHotkey from 'is-hotkey';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import React, { Fragment } from 'react';
@@ -5,7 +6,6 @@ import { toast } from 'sonner';
 
 import { RecordNode } from '@colanode/core';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -59,7 +59,6 @@ interface TableViewNameCellProps {
 
 export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
   const [isEditing, setIsEditing] = React.useState(false);
 
   const { mutate, isPending } = useMutation();
@@ -106,15 +105,14 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
               <span className="text-muted-foreground">Unnamed</span>
             )}
           </div>
-          <button
-            type="button"
+          <Link
+            from="/$workspaceId"
+            to="$nodeId"
+            params={{ nodeId: record.id }}
             className="absolute right-2 flex h-6 cursor-pointer flex-row items-center gap-1 rounded-md border p-1 text-sm text-muted-foreground opacity-0 hover:bg-accent group-hover:opacity-100"
-            onClick={() => {
-              layout.previewLeft(record.id, true);
-            }}
           >
             <SquareArrowOutUpRight className="mr-1 size-4" /> <p>Open</p>
-          </button>
+          </Link>
           {isPending && (
             <span className="absolute right-2 text-muted-foreground">
               <Spinner size="small" />

@@ -1,15 +1,13 @@
 import { LocalPageNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface PageSidebarItemProps {
   page: LocalPageNode;
+  isActive: boolean;
 }
 
-export const PageSidebarItem = ({ page }: PageSidebarItemProps) => {
-  const layout = useLayout();
-  const isActive = layout.activeTab === page.id;
+export const PageSidebarItem = ({ page, isActive }: PageSidebarItemProps) => {
   const isUnread = false;
   const mentionsCount = 0;
 

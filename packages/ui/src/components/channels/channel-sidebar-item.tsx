@@ -3,21 +3,22 @@ import { InView } from 'react-intersection-observer';
 import { LocalChannelNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface ChannelSidebarItemProps {
   channel: LocalChannelNode;
+  isActive: boolean;
 }
 
-export const ChannelSidebarItem = ({ channel }: ChannelSidebarItemProps) => {
+export const ChannelSidebarItem = ({
+  channel,
+  isActive,
+}: ChannelSidebarItemProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
   const radar = useRadar();
 
-  const isActive = layout.activeTab === channel.id;
   const unreadState = radar.getNodeState(
     workspace.accountId,
     workspace.id,

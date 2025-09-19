@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { Folder, Trash2 } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
@@ -9,7 +10,6 @@ import {
   ContextMenuShortcut,
   ContextMenuTrigger,
 } from '@colanode/ui/components/ui/context-menu';
-import { useLayout } from '@colanode/ui/contexts/layout';
 
 interface FileContextMenuProps {
   id: string;
@@ -17,7 +17,7 @@ interface FileContextMenuProps {
 }
 
 export const FileContextMenu = ({ id, children }: FileContextMenuProps) => {
-  const layout = useLayout();
+  const navigate = useNavigate();
   const [openDelete, setOpenDelete] = useState(false);
 
   return (
@@ -27,7 +27,11 @@ export const FileContextMenu = ({ id, children }: FileContextMenuProps) => {
         <ContextMenuContent className="w-64">
           <ContextMenuItem
             onSelect={() => {
-              layout.previewLeft(id, true);
+              navigate({
+                from: '/$workspaceId',
+                to: '$nodeId',
+                params: { nodeId: id },
+              });
             }}
             className="pl-2"
           >

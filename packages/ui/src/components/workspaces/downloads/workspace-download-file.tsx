@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { Folder } from 'lucide-react';
 
 import { LocalFileNode, Download } from '@colanode/client/types';
@@ -10,7 +11,6 @@ import {
   TooltipTrigger,
 } from '@colanode/ui/components/ui/tooltip';
 import { WorkspaceDownloadStatus } from '@colanode/ui/components/workspaces/downloads/workspace-download-status';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -22,7 +22,7 @@ export const WorkspaceDownloadFile = ({
   download,
 }: WorkspaceDownloadFileProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
+  const navigate = useNavigate();
 
   const fileQuery = useLiveQuery({
     type: 'node.get',
@@ -38,7 +38,11 @@ export const WorkspaceDownloadFile = ({
       className="border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors flex items-center gap-6 cursor-pointer"
       onClick={() => {
         if (file) {
-          layout.previewLeft(file.id, true);
+          navigate({
+            from: '/$workspaceId',
+            to: '$nodeId',
+            params: { nodeId: file.id },
+          });
         }
       }}
     >

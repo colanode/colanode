@@ -1,15 +1,16 @@
 import { LocalFolderNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface FolderSidebarItemProps {
   folder: LocalFolderNode;
+  isActive: boolean;
 }
 
-export const FolderSidebarItem = ({ folder }: FolderSidebarItemProps) => {
-  const layout = useLayout();
-  const isActive = layout.activeTab === folder.id;
+export const FolderSidebarItem = ({
+  folder,
+  isActive,
+}: FolderSidebarItemProps) => {
   const isUnread = false;
   const mentionsCount = 0;
 

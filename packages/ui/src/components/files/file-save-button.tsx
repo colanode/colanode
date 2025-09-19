@@ -1,12 +1,12 @@
+import { useNavigate } from '@tanstack/react-router';
 import { Download } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import { LocalFileNode, SpecialContainerTabPath } from '@colanode/client/types';
+import { LocalFileNode } from '@colanode/client/types';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useApp } from '@colanode/ui/contexts/app';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -18,7 +18,7 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
   const app = useApp();
   const workspace = useWorkspace();
   const mutation = useMutation();
-  const layout = useLayout();
+  const navigate = useNavigate();
   const [isSaving, setIsSaving] = useState(false);
 
   const handleDownloadDesktop = async () => {
@@ -39,7 +39,10 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
         path,
       },
       onSuccess: () => {
-        layout.open(SpecialContainerTabPath.WorkspaceDownloads);
+        navigate({
+          from: '/$workspaceId',
+          to: 'downloads',
+        });
       },
       onError: () => {
         toast.error('Failed to save file');

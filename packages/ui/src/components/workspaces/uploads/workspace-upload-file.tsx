@@ -1,10 +1,10 @@
+import { Link } from '@tanstack/react-router';
 import { BadgeAlert } from 'lucide-react';
 
 import { Upload, LocalFileNode } from '@colanode/client/types';
 import { formatBytes, timeAgo } from '@colanode/core';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import { WorkspaceUploadStatus } from '@colanode/ui/components/workspaces/uploads/workspace-upload-status';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -14,7 +14,6 @@ interface WorkspaceUploadFileProps {
 
 export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
 
   const fileQuery = useLiveQuery({
     type: 'node.get',
@@ -51,14 +50,13 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
   }
 
   return (
-    <div
+    <Link
+      from="/$workspaceId"
+      to="$nodeId"
+      params={{ nodeId: file.id }}
       className="border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors flex items-center gap-6 cursor-pointer"
-      onClick={() => {
-        layout.previewLeft(file.id, true);
-      }}
     >
       <FileThumbnail file={file} className="size-10 text-muted-foreground" />
-
       <div className="flex-grow flex flex-col gap-2 justify-center items-start min-w-0">
         <p className="font-medium text-sm truncate w-full">
           {file.attributes.name}
@@ -82,6 +80,6 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
           />
         </div>
       </div>
-    </div>
+    </Link>
   );
 };

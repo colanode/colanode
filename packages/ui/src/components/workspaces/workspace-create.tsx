@@ -1,20 +1,34 @@
+import { useCanGoBack, useNavigate, useRouter } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
 import { useAccount } from '@colanode/ui/contexts/account';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
-interface WorkspaceCreateProps {
-  onSuccess: (id: string) => void;
-  onCancel: (() => void) | undefined;
-}
-
-export const WorkspaceCreate = ({
-  onSuccess,
-  onCancel,
-}: WorkspaceCreateProps) => {
+export const WorkspaceCreate = () => {
   const account = useAccount();
   const { mutate, isPending } = useMutation();
+
+  const canGoBack = useCanGoBack();
+  const router = useRouter();
+  const navigate = useNavigate();
+
+  const workspacesQuery = useLiveQuery({
+    type: 'workspace.list',
+    accountId: account.id,
+  });
+
+  const workspaces = workspacesQuery.data ?? [];
+  const handleCancel = canGoBack
+    ? () => router.history.back()
+    : workspaces.length > 0
+      ? () =>
+          navigate({
+            to: '/$workspaceId',
+            params: { workspaceId: workspaces[0]!.id },
+          })
+      : undefined;
 
   return (
     <div className="flex flex-row justify-center w-full">
@@ -36,7 +50,7 @@ export const WorkspaceCreate = ({
                   avatar: values.avatar ?? null,
                 },
                 onSuccess(output) {
-                  onSuccess(output.id);
+                  navigate({ to: `/${output.id}` });
                 },
                 onError(error) {
                   toast.error(error.message);
@@ -44,7 +58,7 @@ export const WorkspaceCreate = ({
               });
             }}
             isSaving={isPending}
-            onCancel={onCancel}
+            onCancel={handleCancel}
             saveText="Create"
           />
         </div>

@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import {
   Database,
   Ellipsis,
@@ -22,14 +23,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
-import { useLayout } from '@colanode/ui/contexts/layout';
 
 interface SpaceSidebarDropdownProps {
   space: LocalSpaceNode;
 }
 
 export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
-  const layout = useLayout();
+  const navigate = useNavigate();
 
   const [openCreatePage, setOpenCreatePage] = useState(false);
   const [openCreateChannel, setOpenCreateChannel] = useState(false);
@@ -79,14 +79,26 @@ export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={() => layout.previewLeft(space.id)}
+            onClick={() =>
+              navigate({
+                from: '/$workspaceId',
+                to: '$nodeId',
+                params: { nodeId: space.id },
+              })
+            }
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <Settings className="size-4" />
             <span>Settings</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => layout.previewLeft(space.id)}
+            onClick={() =>
+              navigate({
+                from: '/$workspaceId',
+                to: '$nodeId',
+                params: { nodeId: space.id },
+              })
+            }
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <Plus className="size-4" />

@@ -17,4 +17,4 @@ export const LayoutContext = createContext<LayoutContextProps>(
   {} as LayoutContextProps
 );
 
-export const useLayout = () => useContext(LayoutContext);
+// export const useLayout = () => useContext(LayoutContext);

@@ -3,7 +3,7 @@ import {
   WorkspaceMetadataMap,
   Workspace as WorkspaceType,
 } from '@colanode/client/types';
-import { Layout } from '@colanode/ui/components/layouts/layout';
+import { WorkspaceLayout } from '@colanode/ui/components/workspaces/workspace-layout';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
@@ -65,7 +65,7 @@ export const Workspace = ({ workspace }: WorkspaceProps) => {
         },
       }}
     >
-      <Layout key={workspace.id} />
+      <WorkspaceLayout key={workspace.id} />
     </WorkspaceContext.Provider>
   );
 };

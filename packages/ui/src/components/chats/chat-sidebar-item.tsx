@@ -3,7 +3,6 @@ import { InView } from 'react-intersection-observer';
 import { LocalChatNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
@@ -11,11 +10,11 @@ import { cn } from '@colanode/ui/lib/utils';
 
 interface ChatSidebarItemProps {
   chat: LocalChatNode;
+  isActive: boolean;
 }
 
-export const ChatSidebarItem = ({ chat }: ChatSidebarItemProps) => {
+export const ChatSidebarItem = ({ chat, isActive }: ChatSidebarItemProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
   const radar = useRadar();
 
   const userId =
@@ -40,7 +39,6 @@ export const ChatSidebarItem = ({ chat }: ChatSidebarItemProps) => {
     workspace.id,
     chat.id
   );
-  const isActive = layout.activeTab === chat.id;
 
   return (
     <InView

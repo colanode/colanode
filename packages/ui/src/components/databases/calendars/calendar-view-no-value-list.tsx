@@ -1,9 +1,9 @@
+import { Link } from '@tanstack/react-router';
 import { InView } from 'react-intersection-observer';
 
 import { DatabaseViewFilterAttributes, FieldAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useRecordsQuery } from '@colanode/ui/hooks/use-records-query';
 
 interface CalendarViewNoValueListProps {
@@ -16,7 +16,6 @@ export const CalendarViewNoValueList = ({
   field,
 }: CalendarViewNoValueListProps) => {
   const view = useDatabaseView();
-  const layout = useLayout();
 
   const { records, hasMore, loadMore, isPending } = useRecordsQuery(
     filters,
@@ -33,12 +32,12 @@ export const CalendarViewNoValueList = ({
       {records.map((record) => {
         const name = record.attributes.name ?? 'Unnamed';
         return (
-          <div
+          <Link
+            from="/$workspaceId"
+            to="$nodeId"
+            params={{ nodeId: record.id }}
             key={record.id}
             className="flex flex-row items-center border rounded-md p-1 gap-2 cursor-pointer hover:bg-muted"
-            onClick={() => {
-              layout.previewLeft(record.id, true);
-            }}
           >
             <Avatar
               id={record.id}
@@ -47,7 +46,7 @@ export const CalendarViewNoValueList = ({
               size="small"
             />
             <p>{name}</p>
-          </div>
+          </Link>
         );
       })}
       <InView

@@ -1,16 +1,16 @@
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface DatabaseSidebarItemProps {
   database: LocalDatabaseNode;
+  isActive: boolean;
 }
 
-export const DatabaseSidebarItem = ({ database }: DatabaseSidebarItemProps) => {
-  const layout = useLayout();
-  const isActive = layout.activeTab === database.id;
-
+export const DatabaseSidebarItem = ({
+  database,
+  isActive,
+}: DatabaseSidebarItemProps) => {
   return (
     <button
       key={database.id}

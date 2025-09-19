@@ -1,12 +1,10 @@
 import { useState, useEffect } from 'react';
 
 import { AppType } from '@colanode/client/types';
-import { Account } from '@colanode/ui/components/accounts/account';
-import { Login } from '@colanode/ui/components/accounts/login';
 import { AppThemeProvider } from '@colanode/ui/components/app/app-theme-provider';
+import { AppLayout } from '@colanode/ui/components/app-layout';
 import { AppLoader } from '@colanode/ui/components/app-loader';
 import { RadarProvider } from '@colanode/ui/components/radar-provider';
-import { ServerProvider } from '@colanode/ui/components/servers/server-provider';
 import { AppContext } from '@colanode/ui/contexts/app';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -16,20 +14,10 @@ interface AppProps {
 
 export const App = ({ type }: AppProps) => {
   const [initialized, setInitialized] = useState(false);
-  const [openLogin, setOpenLogin] = useState(false);
 
   const appMetadataListQuery = useLiveQuery(
     {
       type: 'app.metadata.list',
-    },
-    {
-      enabled: initialized,
-    }
-  );
-
-  const accountListQuery = useLiveQuery(
-    {
-      type: 'account.list',
     },
     {
       enabled: initialized,
@@ -42,22 +30,9 @@ export const App = ({ type }: AppProps) => {
     });
   }, []);
 
-  if (
-    !initialized ||
-    appMetadataListQuery.isPending ||
-    accountListQuery.isPending
-  ) {
+  if (!initialized || appMetadataListQuery.isPending) {
     return <AppLoader />;
   }
-
-  const accountMetadata = appMetadataListQuery.data?.find(
-    (metadata) => metadata.key === 'account'
-  );
-
-  const account =
-    accountListQuery.data?.find(
-      (account) => account.id === accountMetadata?.value
-    ) || accountListQuery.data?.[0];
 
   return (
     <AppContext.Provider
@@ -81,10 +56,13 @@ export const App = ({ type }: AppProps) => {
             key,
           });
         },
-        openLogin: () => setOpenLogin(true),
-        closeLogin: () => setOpenLogin(false),
+        openLogin: () => {
+          throw new Error('Not implemented');
+        },
+        closeLogin: () => {
+          throw new Error('Not implemented');
+        },
         openAccount: (id: string) => {
-          setOpenLogin(false);
           window.colanode.executeMutation({
             type: 'app.metadata.update',
             key: 'account',
@@ -95,13 +73,7 @@ export const App = ({ type }: AppProps) => {
     >
       <AppThemeProvider>
         <RadarProvider>
-          {!openLogin && account ? (
-            <ServerProvider domain={account.server}>
-              <Account key={account.id} account={account} />
-            </ServerProvider>
-          ) : (
-            <Login />
-          )}
+          <AppLayout />
         </RadarProvider>
       </AppThemeProvider>
     </AppContext.Provider>

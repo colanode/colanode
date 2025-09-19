@@ -2,25 +2,21 @@ import {
   UnreadBadge,
   UnreadBadgeProps,
 } from '@colanode/ui/components/ui/unread-badge';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface SidebarSettingsItemProps {
   title: string;
-  path: string;
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
   unreadBadge?: UnreadBadgeProps;
+  isActive?: boolean;
 }
 
 export const SidebarSettingsItem = ({
   title,
   icon: Icon,
-  path,
   unreadBadge,
+  isActive,
 }: SidebarSettingsItemProps) => {
-  const layout = useLayout();
-  const isActive = layout.activeTab === path;
-
   return (
     <div
       className={cn(
@@ -28,9 +24,6 @@ export const SidebarSettingsItem = ({
         isActive &&
           'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
       )}
-      onClick={() => {
-        layout.previewLeft(path);
-      }}
     >
       <Icon className="size-4" />
       <span className="line-clamp-1 w-full flex-grow text-left">{title}</span>

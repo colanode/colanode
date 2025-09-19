@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import { match } from 'ts-pattern';
@@ -16,7 +17,6 @@ import { CalendarView } from '@colanode/ui/components/databases/calendars/calend
 import { TableView } from '@colanode/ui/components/databases/tables/table-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { DatabaseViewContext } from '@colanode/ui/contexts/database-view';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import {
   generateFieldValuesFromFilters,
@@ -34,7 +34,7 @@ interface ViewProps {
 export const View = ({ view }: ViewProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
-  const layout = useLayout();
+  const navigate = useNavigate();
 
   const fields: ViewField[] = database.fields
     .map((field) => {
@@ -511,7 +511,10 @@ export const View = ({ view }: ViewProps) => {
           if (!result.success) {
             toast.error(result.error.message);
           } else {
-            layout.previewLeft(result.output.id, true);
+            navigate({
+              to: '/$workspaceId/$nodeId',
+              params: { workspaceId: workspace.id, nodeId: result.output.id },
+            });
           }
         },
       }}
