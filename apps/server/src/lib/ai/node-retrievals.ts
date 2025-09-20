@@ -112,7 +112,6 @@ const semanticSearchNodes = async (
   }
 
   const results = await queryBuilder
-    .distinctOn(['node_embeddings.node_id', 'node_embeddings.chunk'])
     .orderBy('node_embeddings.node_id')
     .orderBy('node_embeddings.chunk')
     .orderBy('similarity', 'desc')

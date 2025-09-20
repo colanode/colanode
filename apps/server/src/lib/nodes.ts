@@ -205,20 +205,22 @@ export const createNode = async (input: CreateNodeInput): Promise<boolean> => {
 
     // Trigger assistant response for question messages
     if (attributes.type === 'message') {
-      const maybeMessage = attributes as Partial<MessageAttributes>;
+      const messageAttributes = attributes as Partial<MessageAttributes>;
       logger.info(
-        `Message created with subtype: ${maybeMessage.subtype} for node ${input.nodeId}`
+        `Message created with subtype: ${messageAttributes.subtype} for node ${input.nodeId}`
       );
 
-      if (maybeMessage.subtype === 'question') {
+      if (messageAttributes.subtype === 'question') {
         try {
           await jobService.addJob({
             type: 'assistant.respond',
             messageId: input.nodeId,
             workspaceId: input.workspaceId,
+            selectedContextNodeIds:
+              messageAttributes.selectedContextNodeIds ?? undefined,
           });
           logger.info(
-            `Assistant response job scheduled for message ${input.nodeId}`
+            `Assistant response job scheduled for message ${input.nodeId} with context: ${messageAttributes.selectedContextNodeIds}`
           );
         } catch (error) {
           logger.error(
@@ -372,17 +374,19 @@ export const tryUpdateNode = async (
 
     // Trigger assistant response for question messages
     if (attributes.type === 'message') {
-      const maybeMessage = attributes as Partial<MessageAttributes>;
+      const messageAttributes = attributes as Partial<MessageAttributes>;
       logger.info(
-        `Message updated with subtype: ${maybeMessage.subtype} for node ${input.nodeId}`
+        `Message updated with subtype: ${messageAttributes.subtype} for node ${input.nodeId}`
       );
 
-      if (maybeMessage.subtype === 'question') {
+      if (messageAttributes.subtype === 'question') {
         try {
           await jobService.addJob({
             type: 'assistant.respond',
             messageId: input.nodeId,
             workspaceId: input.workspaceId,
+            selectedContextNodeIds:
+              messageAttributes.selectedContextNodeIds ?? undefined,
           });
           logger.info(
             `Assistant response job scheduled for updated message ${input.nodeId}`
@@ -525,20 +529,22 @@ export const createNodeFromMutation = async (
 
     // Trigger assistant response for question messages
     if (attributes.type === 'message') {
-      const maybeMessage = attributes as Partial<MessageAttributes>;
+      const messageAttributes = attributes as Partial<MessageAttributes>;
       logger.info(
-        `Message created from mutation with subtype: ${maybeMessage.subtype} for node ${mutation.nodeId}`
+        `Message created from mutation with subtype: ${messageAttributes.subtype} for node ${mutation.nodeId}`
       );
 
-      if (maybeMessage.subtype === 'question') {
+      if (messageAttributes.subtype === 'question') {
         try {
           await jobService.addJob({
             type: 'assistant.respond',
             messageId: mutation.nodeId,
             workspaceId: user.workspace_id,
+            selectedContextNodeIds:
+              messageAttributes.selectedContextNodeIds ?? undefined,
           });
           logger.info(
-            `Assistant response job scheduled for mutation message ${mutation.nodeId}`
+            `Assistant response job scheduled for mutation message ${mutation.nodeId} with context: ${messageAttributes.selectedContextNodeIds}`
           );
         } catch (error) {
           logger.error(
@@ -716,20 +722,22 @@ const tryUpdateNodeFromMutation = async (
 
     // Trigger assistant response for question messages
     if (attributes.type === 'message') {
-      const maybeMessage = attributes as Partial<MessageAttributes>;
+      const messageAttributes = attributes as Partial<MessageAttributes>;
       logger.info(
-        `Message updated from mutation with subtype: ${maybeMessage.subtype} for node ${mutation.nodeId}`
+        `Message updated from mutation with subtype: ${messageAttributes.subtype} for node ${mutation.nodeId}`
       );
 
-      if (maybeMessage.subtype === 'question') {
+      if (messageAttributes.subtype === 'question') {
         try {
           await jobService.addJob({
             type: 'assistant.respond',
             messageId: mutation.nodeId,
             workspaceId: user.workspace_id,
+            selectedContextNodeIds:
+              messageAttributes.selectedContextNodeIds ?? undefined,
           });
           logger.info(
-            `Assistant response job scheduled for updated mutation message ${mutation.nodeId}`
+            `Assistant response job scheduled for updated mutation message ${mutation.nodeId} with context: ${messageAttributes.selectedContextNodeIds}`
           );
         } catch (error) {
           logger.error(

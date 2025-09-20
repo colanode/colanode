@@ -59,6 +59,22 @@ export const retrieveDocuments = async (
         semanticResults.push(...resultsForQuery);
       }
     }
+
+    // Deduplicate semantic results - keep highest scoring result for each unique chunk
+    const deduplicatedSemanticResults: SearchResult[] = [];
+    const semanticChunkMap = new Map<string, SearchResult>();
+
+    for (const result of semanticResults) {
+      const key = `${result.id}-${result.chunkIndex}`;
+      const existing = semanticChunkMap.get(key);
+
+      if (!existing || result.score > existing.score) {
+        semanticChunkMap.set(key, result);
+      }
+    }
+
+    deduplicatedSemanticResults.push(...semanticChunkMap.values());
+    semanticResults = deduplicatedSemanticResults;
   }
 
   const keywordResults: SearchResult[] = doKeyword
