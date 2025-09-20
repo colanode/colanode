@@ -1,3 +1,5 @@
+import { SidebarMobile } from '@colanode/ui/components/layouts/sidebars/sidebar-mobile';
+import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { cn } from '@colanode/ui/lib/utils';
 
 export const Container = ({
@@ -23,11 +25,14 @@ export const ContainerHeader = ({
   className,
   ...props
 }: React.HTMLAttributes<HTMLDivElement>) => {
+  const isMobile = useIsMobile();
+
   return (
     <div
       className={cn('flex flex-row w-full items-center gap-2 p-3', className)}
       {...props}
     >
+      {isMobile && <SidebarMobile />}
       {children}
     </div>
   );
@@ -41,7 +46,7 @@ export const ContainerBody = ({
   return (
     <div
       className={cn(
-        'px-10 py-4 flex-grow max-h-full h-full overflow-hidden',
+        'lg:px-10 px-4 lg:py-4 py-2 flex-grow max-h-full h-full overflow-hidden',
         className
       )}
       {...props}

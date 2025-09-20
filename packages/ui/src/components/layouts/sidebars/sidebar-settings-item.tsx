@@ -4,19 +4,19 @@ import {
 } from '@colanode/ui/components/ui/unread-badge';
 import { cn } from '@colanode/ui/lib/utils';
 
-interface WorkspaceSidebarSettingsItemProps {
+interface SidebarSettingsItemProps {
   title: string;
   icon: React.FC<React.SVGProps<SVGSVGElement>>;
   unreadBadge?: UnreadBadgeProps;
   isActive?: boolean;
 }
 
-export const WorkspaceSidebarSettingsItem = ({
+export const SidebarSettingsItem = ({
   title,
   icon: Icon,
   unreadBadge,
   isActive,
-}: WorkspaceSidebarSettingsItemProps) => {
+}: SidebarSettingsItemProps) => {
   return (
     <div
       className={cn(

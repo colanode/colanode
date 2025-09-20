@@ -9,14 +9,14 @@ import {
   Users,
 } from 'lucide-react';
 
+import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
+import { SidebarSettingsItem } from '@colanode/ui/components/layouts/sidebars/sidebar-settings-item';
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { WorkspaceSidebarHeader } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-header';
-import { WorkspaceSidebarSettingsItem } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-settings-item';
 import { useApp } from '@colanode/ui/contexts/app';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
-export const WorkspaceSidebarSettings = () => {
+export const SidebarSettings = () => {
   const app = useApp();
   const workspace = useWorkspace();
 
@@ -34,10 +34,10 @@ export const WorkspaceSidebarSettings = () => {
   return (
     <div className="flex flex-col gap-4 h-full px-2 group/sidebar">
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <WorkspaceSidebarHeader title="Workspace settings" />
+        <SidebarHeader title="Workspace settings" />
         <Link from="/acc/$accountId/$workspaceId" to="settings">
           {({ isActive }) => (
-            <WorkspaceSidebarSettingsItem
+            <SidebarSettingsItem
               title="General"
               icon={Settings}
               isActive={isActive}
@@ -47,7 +47,7 @@ export const WorkspaceSidebarSettings = () => {
 
         <Link from="/acc/$accountId/$workspaceId" to="users">
           {({ isActive }) => (
-            <WorkspaceSidebarSettingsItem
+            <SidebarSettingsItem
               title="Users"
               icon={Users}
               isActive={isActive}
@@ -56,7 +56,7 @@ export const WorkspaceSidebarSettings = () => {
         </Link>
         <Link from="/acc/$accountId/$workspaceId" to="storage">
           {({ isActive }) => (
-            <WorkspaceSidebarSettingsItem
+            <SidebarSettingsItem
               title="Storage"
               icon={Cylinder}
               isActive={isActive}
@@ -65,7 +65,7 @@ export const WorkspaceSidebarSettings = () => {
         </Link>
         <Link from="/acc/$accountId/$workspaceId" to="uploads">
           {({ isActive }) => (
-            <WorkspaceSidebarSettingsItem
+            <SidebarSettingsItem
               title="Uploads"
               icon={Upload}
               isActive={isActive}
@@ -81,7 +81,7 @@ export const WorkspaceSidebarSettings = () => {
         {app.type === 'desktop' && (
           <Link from="/acc/$accountId/$workspaceId" to="downloads">
             {({ isActive }) => (
-              <WorkspaceSidebarSettingsItem
+              <SidebarSettingsItem
                 title="Downloads"
                 icon={Download}
                 isActive={isActive}
@@ -91,10 +91,10 @@ export const WorkspaceSidebarSettings = () => {
         )}
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <WorkspaceSidebarHeader title="Account settings" />
+        <SidebarHeader title="Account settings" />
         <Link from="/acc/$accountId/$workspaceId" to="account/settings">
           {({ isActive }) => (
-            <WorkspaceSidebarSettingsItem
+            <SidebarSettingsItem
               title="General"
               icon={Settings}
               isActive={isActive}
@@ -103,10 +103,10 @@ export const WorkspaceSidebarSettings = () => {
         </Link>
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <WorkspaceSidebarHeader title="App settings" />
+        <SidebarHeader title="App settings" />
         <Link from="/acc/$accountId/$workspaceId" to="app/appearance">
           {({ isActive }) => (
-            <WorkspaceSidebarSettingsItem
+            <SidebarSettingsItem
               title="Appearance"
               icon={Palette}
               isActive={isActive}
@@ -118,7 +118,7 @@ export const WorkspaceSidebarSettings = () => {
         <Separator className="my-2" />
         <Link from="/acc/$accountId/$workspaceId" to="account/logout">
           {({ isActive }) => (
-            <WorkspaceSidebarSettingsItem
+            <SidebarSettingsItem
               title="Logout"
               icon={LogOut}
               isActive={isActive}

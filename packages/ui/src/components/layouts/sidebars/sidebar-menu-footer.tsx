@@ -17,7 +17,7 @@ import { AccountContext, useAccount } from '@colanode/ui/contexts/account';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useAppStore } from '@colanode/ui/stores/app';
 
-export function WorkspaceSidebarMenuFooter() {
+export function SidebarMenuFooter() {
   const account = useAccount();
   const radar = useRadar();
   const navigate = useNavigate();

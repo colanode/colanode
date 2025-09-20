@@ -10,15 +10,15 @@ import { PageSidebarItem } from '@colanode/ui/components/pages/page-sidebar-item
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
 import { cn } from '@colanode/ui/lib/utils';
 
-interface WorkspaceSidebarItemContentProps {
+interface SidebarItemContentProps {
   node: LocalNode;
   isActive: boolean;
 }
 
-export const WorkspaceSidebarItemContent = ({
+export const SidebarItemContent = ({
   node,
   isActive,
-}: WorkspaceSidebarItemContentProps): React.ReactNode => {
+}: SidebarItemContentProps): React.ReactNode => {
   switch (node.type) {
     case 'space':
       return <SpaceSidebarItem space={node} />;
@@ -96,7 +96,7 @@ export const WorkspaceSidebarItem = ({
       )}
       ref={dragDropRef as RefAttributes<HTMLDivElement>['ref']}
     >
-      <WorkspaceSidebarItemContent node={node} isActive={isActive} />
+      <SidebarItemContent node={node} isActive={isActive} />
     </div>
   );
 };

@@ -10,7 +10,7 @@ import {
   AppMetadataKey,
   Server,
   ServerState,
-  SidebarMetadata,
+  SidebarMenuType,
   ThemeColor,
   ThemeMode,
   WindowSize,
@@ -178,9 +178,11 @@ export const useAppStore = create<AppStore>()(
           return;
         }
 
-        if (metadata.key === 'sidebar') {
-          existingWorkspace.metadata.sidebar =
-            metadata.value as SidebarMetadata;
+        if (metadata.key === 'sidebar.width') {
+          existingWorkspace.metadata.sidebarWidth = metadata.value as number;
+        } else if (metadata.key === 'sidebar.menu') {
+          existingWorkspace.metadata.sidebarMenu =
+            metadata.value as SidebarMenuType;
         } else if (metadata.key === 'location') {
           existingWorkspace.metadata.location = metadata.value as string;
         }
@@ -198,8 +200,10 @@ export const useAppStore = create<AppStore>()(
         }
 
         const existingMetadata = { ...existingWorkspace.metadata };
-        if (key === 'sidebar') {
-          existingMetadata.sidebar = undefined;
+        if (key === 'sidebar.width') {
+          existingMetadata.sidebarWidth = undefined;
+        } else if (key === 'sidebar.menu') {
+          existingMetadata.sidebarMenu = undefined;
         } else if (key === 'location') {
           existingMetadata.location = undefined;
         }

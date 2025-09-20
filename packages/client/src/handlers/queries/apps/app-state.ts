@@ -287,8 +287,12 @@ export class AppStateQueryHandler implements QueryHandler<AppStateQueryInput> {
 
     const metadata = rows.map(mapWorkspaceMetadata);
 
-    const sidebar = metadata.find(
-      (metadata) => metadata.key === 'sidebar'
+    const sidebarWidth = metadata.find(
+      (metadata) => metadata.key === 'sidebar.width'
+    )?.value;
+
+    const sidebarMenu = metadata.find(
+      (metadata) => metadata.key === 'sidebar.menu'
     )?.value;
 
     const location = metadata.find(
@@ -296,7 +300,8 @@ export class AppStateQueryHandler implements QueryHandler<AppStateQueryInput> {
     )?.value;
 
     return {
-      sidebar,
+      sidebarWidth,
+      sidebarMenu,
       location,
     };
   }

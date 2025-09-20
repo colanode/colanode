@@ -14,14 +14,16 @@ export type Workspace = {
 
 export type SidebarMenuType = 'chats' | 'spaces' | 'settings';
 
-export type SidebarMetadata = {
-  menu: SidebarMenuType;
-  width: number;
+export type WorkspaceSidebarMenuMetadata = {
+  key: 'sidebar.menu';
+  value: SidebarMenuType;
+  createdAt: string;
+  updatedAt: string | null;
 };
 
-export type WorkspaceSidebarMetadata = {
-  key: 'sidebar';
-  value: SidebarMetadata;
+export type WorkspaceSidebarWidthMetadata = {
+  key: 'sidebar.width';
+  value: number;
   createdAt: string;
   updatedAt: string | null;
 };
@@ -34,12 +36,14 @@ export type WorkspaceLocationMetadata = {
 };
 
 export type WorkspaceMetadata =
-  | WorkspaceSidebarMetadata
+  | WorkspaceSidebarMenuMetadata
+  | WorkspaceSidebarWidthMetadata
   | WorkspaceLocationMetadata;
 
 export type WorkspaceMetadataKey = WorkspaceMetadata['key'];
 
 export type WorkspaceMetadataMap = {
-  sidebar: WorkspaceSidebarMetadata;
+  'sidebar.menu': WorkspaceSidebarMenuMetadata;
+  'sidebar.width': WorkspaceSidebarWidthMetadata;
   location: WorkspaceLocationMetadata;
 };

@@ -1,10 +1,10 @@
+import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
 import { SpaceCreateButton } from '@colanode/ui/components/spaces/space-create-button';
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
-import { WorkspaceSidebarHeader } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-header';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
-export const WorkspaceSidebarSpaces = () => {
+export const SidebarSpaces = () => {
   const workspace = useWorkspace();
   const canCreateSpace =
     workspace.role !== 'guest' && workspace.role !== 'none';
@@ -22,7 +22,7 @@ export const WorkspaceSidebarSpaces = () => {
 
   return (
     <div className="flex flex-col group/sidebar h-full px-2">
-      <WorkspaceSidebarHeader
+      <SidebarHeader
         title="Spaces"
         actions={canCreateSpace && <SpaceCreateButton />}
       />

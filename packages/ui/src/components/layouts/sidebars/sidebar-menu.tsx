@@ -1,23 +1,20 @@
 import { LayoutGrid, MessageCircle, Settings } from 'lucide-react';
 
 import { SidebarMenuType } from '@colanode/client/types';
-import { WorkspaceSidebarMenuFooter } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-menu-footer';
-import { WorkspaceSidebarMenuHeader } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-menu-header';
-import { WorkspaceSidebarMenuIcon } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-menu-icon';
+import { SidebarMenuFooter } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-footer';
+import { SidebarMenuHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-header';
+import { SidebarMenuIcon } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-icon';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useAppStore } from '@colanode/ui/stores/app';
 
-interface WorkspaceSidebarMenuProps {
+interface SidebarMenuProps {
   value: SidebarMenuType;
   onChange: (value: SidebarMenuType) => void;
 }
 
-export const WorkspaceSidebarMenu = ({
-  value,
-  onChange,
-}: WorkspaceSidebarMenuProps) => {
+export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
   const workspace = useWorkspace();
   const radar = useRadar();
 
@@ -53,9 +50,9 @@ export const WorkspaceSidebarMenu = ({
       ) : (
         <div className="w-full h-4" />
       )}
-      <WorkspaceSidebarMenuHeader />
+      <SidebarMenuHeader />
       <div className="flex flex-col gap-1 mt-2 w-full p-2 items-center flex-grow">
-        <WorkspaceSidebarMenuIcon
+        <SidebarMenuIcon
           icon={MessageCircle}
           onClick={() => {
             onChange('chats');
@@ -67,7 +64,7 @@ export const WorkspaceSidebarMenu = ({
             maxCount: 99,
           }}
         />
-        <WorkspaceSidebarMenuIcon
+        <SidebarMenuIcon
           icon={LayoutGrid}
           onClick={() => {
             onChange('spaces');
@@ -80,7 +77,7 @@ export const WorkspaceSidebarMenu = ({
           }}
         />
         <div className="mt-auto" />
-        <WorkspaceSidebarMenuIcon
+        <SidebarMenuIcon
           icon={Settings}
           onClick={() => {
             onChange('settings');
@@ -95,7 +92,7 @@ export const WorkspaceSidebarMenu = ({
           }}
         />
       </div>
-      <WorkspaceSidebarMenuFooter />
+      <SidebarMenuFooter />
     </div>
   );
 };

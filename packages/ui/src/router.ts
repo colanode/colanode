@@ -11,6 +11,7 @@ import { AccountScreen } from '@colanode/ui/components/accounts/account-screen';
 import { AccountSettingsScreen } from '@colanode/ui/components/accounts/account-settings-screen';
 import { LoginScreen } from '@colanode/ui/components/accounts/login-screen';
 import { AppAppearanceSettingsScreen } from '@colanode/ui/components/app/app-appearance-settings-screen';
+import { NodeErrorScreen } from '@colanode/ui/components/nodes/node-error-screen';
 import { NodeScreen } from '@colanode/ui/components/nodes/node-screen';
 import { WorkspaceDownloadsScreen } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-screen';
 import { WorkspaceStorageScreen } from '@colanode/ui/components/workspaces/storage/workspace-storage-screen';
@@ -166,6 +167,7 @@ export const nodeRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/$nodeId',
   component: NodeScreen,
+  errorComponent: NodeErrorScreen,
 });
 
 export const workspaceSettingsRoute = createRoute({

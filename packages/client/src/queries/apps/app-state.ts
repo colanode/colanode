@@ -2,7 +2,7 @@ import {
   Account,
   Server,
   ServerState,
-  SidebarMetadata,
+  SidebarMenuType,
   ThemeColor,
   ThemeMode,
   WindowSize,
@@ -28,7 +28,8 @@ export type AppAccountState = Account & {
 };
 
 export type AppWorkspaceMetadata = {
-  sidebar?: SidebarMetadata;
+  sidebarMenu?: SidebarMenuType;
+  sidebarWidth?: number;
   location?: string;
 };
 

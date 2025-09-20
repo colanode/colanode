@@ -17,7 +17,7 @@ import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useAppStore } from '@colanode/ui/stores/app';
 
-export const WorkspaceSidebarMenuHeader = () => {
+export const SidebarMenuHeader = () => {
   const workspace = useWorkspace();
   const account = useAccount();
   const radar = useRadar();
