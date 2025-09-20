@@ -1,5 +1,6 @@
 import { LocalChatNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -29,14 +30,16 @@ export const ChatBreadcrumbItem = ({ chat }: ChatBreadcrumbItemProps) => {
   }
 
   return (
-    <div className="flex items-center space-x-2">
-      <Avatar
-        id={userGetQuery.data.id}
-        name={userGetQuery.data.name}
-        avatar={userGetQuery.data.avatar}
-        className="size-4"
-      />
-      <span>{userGetQuery.data.name}</span>
-    </div>
+    <BreadcrumbItem
+      icon={(className) => (
+        <Avatar
+          id={userGetQuery.data!.id}
+          name={userGetQuery.data!.name}
+          avatar={userGetQuery.data!.avatar}
+          className={className}
+        />
+      )}
+      name={userGetQuery.data!.name}
+    />
   );
 };

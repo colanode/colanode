@@ -2,13 +2,9 @@ import { LocalFolderNode } from '@colanode/client/types';
 import { FolderBody } from '@colanode/ui/components/folders/folder-body';
 import { FolderNotFound } from '@colanode/ui/components/folders/folder-not-found';
 import { FolderSettings } from '@colanode/ui/components/folders/folder-settings';
-import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
-import {
-  Container,
-  ContainerBody,
-  ContainerHeader,
-  ContainerSettings,
-} from '@colanode/ui/components/ui/container';
+import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
+import { ContainerSettings } from '@colanode/ui/components/layouts/containers/container-settings';
+import { NodeBreadcrumb } from '@colanode/ui/components/nodes/node-breadcrumb';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
 import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
 
@@ -32,16 +28,14 @@ export const FolderContainer = ({ folderId }: FolderContainerProps) => {
   const { node: folder, role } = data;
 
   return (
-    <Container>
-      <ContainerHeader>
-        <ContainerBreadcrumb breadcrumb={data.breadcrumb} />
-        <ContainerSettings>
-          <FolderSettings folder={folder} role={role} />
-        </ContainerSettings>
-      </ContainerHeader>
-      <ContainerBody>
-        <FolderBody folder={folder} role={role} />
-      </ContainerBody>
-    </Container>
+    <>
+      <Breadcrumb>
+        <NodeBreadcrumb breadcrumb={data.breadcrumb} />
+      </Breadcrumb>
+      <ContainerSettings>
+        <FolderSettings folder={folder} role={role} />
+      </ContainerSettings>
+      <FolderBody folder={folder} role={role} />
+    </>
   );
 };

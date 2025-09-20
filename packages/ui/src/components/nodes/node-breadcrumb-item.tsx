@@ -9,13 +9,11 @@ import { PageBreadcrumbItem } from '@colanode/ui/components/pages/page-breadcrum
 import { RecordBreadcrumbItem } from '@colanode/ui/components/records/record-breadcrumb-item';
 import { SpaceBreadcrumbItem } from '@colanode/ui/components/spaces/space-breadcrumb-item';
 
-interface ContainerBreadcrumbItemProps {
+interface NodeBreadcrumbItemProps {
   node: LocalNode;
 }
 
-export const ContainerBreadcrumbItem = ({
-  node,
-}: ContainerBreadcrumbItemProps) => {
+export const NodeBreadcrumbItem = ({ node }: NodeBreadcrumbItemProps) => {
   switch (node.type) {
     case 'space':
       return <SpaceBreadcrumbItem space={node} />;

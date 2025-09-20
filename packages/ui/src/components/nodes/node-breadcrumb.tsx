@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { Fragment } from 'react';
 
 import { LocalNode } from '@colanode/client/types';
-import { ContainerBreadcrumbItem } from '@colanode/ui/components/layouts/containers/container-breadcrumb-item';
+import { NodeBreadcrumbItem } from '@colanode/ui/components/nodes/node-breadcrumb-item';
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -17,13 +17,11 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 
-interface ContainerBreadcrumbProps {
+interface NodeBreadcrumbProps {
   breadcrumb: LocalNode[];
 }
 
-export const ContainerBreadcrumb = ({
-  breadcrumb,
-}: ContainerBreadcrumbProps) => {
+export const NodeBreadcrumb = ({ breadcrumb }: NodeBreadcrumbProps) => {
   // Show ellipsis if we have more than 3 nodes (first + last two)
   const showEllipsis = breadcrumb.length > 3;
 
@@ -54,7 +52,7 @@ export const ContainerBreadcrumb = ({
                   to="$nodeId"
                   params={{ nodeId: item.id }}
                 >
-                  <ContainerBreadcrumbItem node={item} />
+                  <NodeBreadcrumbItem node={item} />
                 </Link>
               </BreadcrumbItem>
               {showEllipsis && isFirst && (
@@ -75,9 +73,7 @@ export const ContainerBreadcrumb = ({
                                 params={{ nodeId: ellipsisItem.id }}
                               >
                                 <BreadcrumbItem className="cursor-pointer hover:text-foreground">
-                                  <ContainerBreadcrumbItem
-                                    node={ellipsisItem}
-                                  />
+                                  <NodeBreadcrumbItem node={ellipsisItem} />
                                 </BreadcrumbItem>
                               </Link>
                             </DropdownMenuItem>

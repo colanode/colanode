@@ -1,12 +1,8 @@
 import { LocalSpaceNode } from '@colanode/client/types';
-import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
+import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
+import { NodeBreadcrumb } from '@colanode/ui/components/nodes/node-breadcrumb';
 import { SpaceBody } from '@colanode/ui/components/spaces/space-body';
 import { SpaceNotFound } from '@colanode/ui/components/spaces/space-not-found';
-import {
-  Container,
-  ContainerBody,
-  ContainerHeader,
-} from '@colanode/ui/components/ui/container';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
 import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
 
@@ -30,13 +26,11 @@ export const SpaceContainer = ({ spaceId }: SpaceContainerProps) => {
   const { node, role } = data;
 
   return (
-    <Container>
-      <ContainerHeader>
-        <ContainerBreadcrumb breadcrumb={data.breadcrumb} />
-      </ContainerHeader>
-      <ContainerBody>
-        <SpaceBody space={node} role={role} />
-      </ContainerBody>
-    </Container>
+    <>
+      <Breadcrumb>
+        <NodeBreadcrumb breadcrumb={data.breadcrumb} />
+      </Breadcrumb>
+      <SpaceBody space={node} role={role} />
+    </>
   );
 };

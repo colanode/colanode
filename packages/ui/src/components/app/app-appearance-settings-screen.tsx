@@ -1,8 +1,9 @@
-import { Check, Laptop, Moon, Sun } from 'lucide-react';
+import { Check, Laptop, Moon, Palette, Sun } from 'lucide-react';
 
 import { ThemeColor, ThemeMode } from '@colanode/client/types';
+import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb-item';
 import { Button } from '@colanode/ui/components/ui/button';
-import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { cn } from '@colanode/ui/lib/utils';
@@ -59,8 +60,14 @@ export const AppAppearanceSettingsScreen = () => {
   const themeColor = useAppStore((state) => state.metadata.theme.color);
 
   return (
-    <Container>
-      <ContainerBody className="max-w-4xl space-y-8">
+    <>
+      <Breadcrumb>
+        <BreadcrumbItem
+          icon={(className) => <Palette className={className} />}
+          name="Appearance"
+        />
+      </Breadcrumb>
+      <div className="max-w-4xl space-y-8">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight">Appearance</h2>
           <Separator className="mt-3" />
@@ -171,7 +178,7 @@ export const AppAppearanceSettingsScreen = () => {
             );
           })}
         </div>
-      </ContainerBody>
-    </Container>
+      </div>
+    </>
   );
 };

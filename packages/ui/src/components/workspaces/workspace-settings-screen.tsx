@@ -1,6 +1,8 @@
+import { Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
+import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb-item';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { WorkspaceDelete } from '@colanode/ui/components/workspaces/workspace-delete';
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
@@ -23,8 +25,14 @@ export const WorkspaceSettingsScreen = () => {
   }
 
   return (
-    <Container>
-      <ContainerBody className="max-w-4xl space-y-8">
+    <>
+      <Breadcrumb>
+        <BreadcrumbItem
+          icon={(className) => <Settings className={className} />}
+          name="Settings"
+        />
+      </Breadcrumb>
+      <div className="max-w-4xl space-y-8">
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">General</h2>
@@ -69,7 +77,7 @@ export const WorkspaceSettingsScreen = () => {
           </div>
           <WorkspaceDelete />
         </div>
-      </ContainerBody>
-    </Container>
+      </div>
+    </>
   );
 };

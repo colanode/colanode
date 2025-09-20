@@ -1,8 +1,10 @@
 import { useNavigate } from '@tanstack/react-router';
+import { LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb-item';
 import { Button } from '@colanode/ui/components/ui/button';
-import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useAccount } from '@colanode/ui/contexts/account';
@@ -14,8 +16,14 @@ export const AccountLogoutScreen = () => {
   const { mutate, isPending } = useMutation();
 
   return (
-    <Container>
-      <ContainerBody className="max-w-4xl space-y-8">
+    <>
+      <Breadcrumb>
+        <BreadcrumbItem
+          icon={(className) => <LogOut className={className} />}
+          name="Logout"
+        />
+      </Breadcrumb>
+      <div className="max-w-4xl space-y-8">
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">Logout</h2>
@@ -59,7 +67,7 @@ export const AccountLogoutScreen = () => {
             </div>
           </div>
         </div>
-      </ContainerBody>
-    </Container>
+      </div>
+    </>
   );
 };

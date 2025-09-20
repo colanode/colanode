@@ -1,8 +1,10 @@
+import { Upload } from 'lucide-react';
 import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { UploadListQueryInput } from '@colanode/client/queries';
-import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
+import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb-item';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { WorkspaceUploadFile } from '@colanode/ui/components/workspaces/uploads/workspace-upload-file';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -31,8 +33,14 @@ export const WorkspaceUploadsScreen = () => {
   const hasMore = !isPending && uploads.length === lastPage * UPLOADS_PER_PAGE;
 
   return (
-    <Container>
-      <ContainerBody className="overflow-y-auto">
+    <>
+      <Breadcrumb>
+        <BreadcrumbItem
+          icon={(className) => <Upload className={className} />}
+          name="Uploads"
+        />
+      </Breadcrumb>
+      <div className="overflow-y-auto">
         <div className="max-w-4xl space-y-10">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">Uploads</h2>
@@ -52,7 +60,7 @@ export const WorkspaceUploadsScreen = () => {
             }}
           />
         </div>
-      </ContainerBody>
-    </Container>
+      </div>
+    </>
   );
 };

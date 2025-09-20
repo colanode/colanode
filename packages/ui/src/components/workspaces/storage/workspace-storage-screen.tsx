@@ -1,4 +1,7 @@
-import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
+import { Cylinder } from 'lucide-react';
+
+import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb-item';
 import { UserStorageStats } from '@colanode/ui/components/workspaces/storage/user-storage-stats';
 import { WorkspaceStorageStats } from '@colanode/ui/components/workspaces/storage/workspace-storage-stats';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -9,11 +12,17 @@ export const WorkspaceStorageScreen = () => {
     workspace.role === 'owner' || workspace.role === 'admin';
 
   return (
-    <Container>
-      <ContainerBody className="max-w-4xl space-y-10">
+    <>
+      <Breadcrumb>
+        <BreadcrumbItem
+          icon={(className) => <Cylinder className={className} />}
+          name="Storage"
+        />
+      </Breadcrumb>
+      <div className="max-w-4xl space-y-10">
         <UserStorageStats />
         {canManageStorage && <WorkspaceStorageStats />}
-      </ContainerBody>
-    </Container>
+      </div>
+    </>
   );
 };

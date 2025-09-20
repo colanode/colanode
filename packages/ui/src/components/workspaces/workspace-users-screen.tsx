@@ -1,10 +1,12 @@
+import { Users } from 'lucide-react';
 import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { UserListQueryInput } from '@colanode/client/queries';
 import { WorkspaceRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
+import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb-item';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { WorkspaceUserInvite } from '@colanode/ui/components/workspaces/workspace-user-invite';
@@ -35,8 +37,14 @@ export const WorkspaceUsersScreen = () => {
   const hasMore = !isPending && users.length === lastPage * USERS_PER_PAGE;
 
   return (
-    <Container>
-      <ContainerBody className="max-w-4xl space-y-8">
+    <>
+      <Breadcrumb>
+        <BreadcrumbItem
+          icon={(className) => <Users className={className} />}
+          name="Users"
+        />
+      </Breadcrumb>
+      <div className="max-w-4xl space-y-8">
         {canEditUsers && (
           <div className="space-y-6">
             <div>
@@ -94,7 +102,7 @@ export const WorkspaceUsersScreen = () => {
             />
           </div>
         </div>
-      </ContainerBody>
-    </Container>
+      </div>
+    </>
   );
 };

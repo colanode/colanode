@@ -1,12 +1,21 @@
+import { Settings } from 'lucide-react';
+
 import { AccountDelete } from '@colanode/ui/components/accounts/account-delete';
 import { AccountUpdate } from '@colanode/ui/components/accounts/account-update';
-import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
+import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb-item';
 import { Separator } from '@colanode/ui/components/ui/separator';
 
 export const AccountSettingsScreen = () => {
   return (
-    <Container>
-      <ContainerBody className="max-w-4xl space-y-8">
+    <>
+      <Breadcrumb>
+        <BreadcrumbItem
+          icon={(className) => <Settings className={className} />}
+          name="Settings"
+        />
+      </Breadcrumb>
+      <div className="max-w-4xl space-y-8">
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">General</h2>
@@ -24,7 +33,7 @@ export const AccountSettingsScreen = () => {
           </div>
           <AccountDelete />
         </div>
-      </ContainerBody>
-    </Container>
+      </div>
+    </>
   );
 };

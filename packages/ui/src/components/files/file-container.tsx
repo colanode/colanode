@@ -2,13 +2,9 @@ import { LocalFileNode } from '@colanode/client/types';
 import { FileBody } from '@colanode/ui/components/files/file-body';
 import { FileNotFound } from '@colanode/ui/components/files/file-not-found';
 import { FileSettings } from '@colanode/ui/components/files/file-settings';
-import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
-import {
-  Container,
-  ContainerBody,
-  ContainerHeader,
-  ContainerSettings,
-} from '@colanode/ui/components/ui/container';
+import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
+import { ContainerSettings } from '@colanode/ui/components/layouts/containers/container-settings';
+import { NodeBreadcrumb } from '@colanode/ui/components/nodes/node-breadcrumb';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
 import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
 
@@ -29,16 +25,14 @@ export const FileContainer = ({ fileId }: FileContainerProps) => {
   }
 
   return (
-    <Container>
-      <ContainerHeader>
-        <ContainerBreadcrumb breadcrumb={data.breadcrumb} />
-        <ContainerSettings>
-          <FileSettings file={data.node} role={data.role} />
-        </ContainerSettings>
-      </ContainerHeader>
-      <ContainerBody>
-        <FileBody file={data.node} />
-      </ContainerBody>
-    </Container>
+    <>
+      <Breadcrumb>
+        <NodeBreadcrumb breadcrumb={data.breadcrumb} />
+      </Breadcrumb>
+      <ContainerSettings>
+        <FileSettings file={data.node} role={data.role} />
+      </ContainerSettings>
+      <FileBody file={data.node} />
+    </>
   );
 };
