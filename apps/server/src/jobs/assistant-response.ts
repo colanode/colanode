@@ -40,11 +40,6 @@ export const assistantRespondHandler: JobHandler<
   AssistantRespondInput
 > = async (input) => {
   const { messageId, workspaceId, selectedContextNodeIds } = input;
-  console.log('Starting assistant response handler', {
-    messageId,
-    workspaceId,
-    selectedContextNodeIds,
-  });
 
   if (!config.ai.enabled) {
     return;
@@ -206,7 +201,7 @@ const createAndPublishResponse = async (
   await createNode({
     nodeId: id,
     workspaceId,
-    userId: 'colanode_ai',
+    userId: 'ai-assistant',
     rootId: originalMessage.root_id,
     attributes: messageAttributes,
   });
