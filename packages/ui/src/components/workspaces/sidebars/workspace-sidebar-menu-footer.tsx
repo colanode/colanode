@@ -15,19 +15,18 @@ import {
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { AccountContext, useAccount } from '@colanode/ui/contexts/account';
 import { useRadar } from '@colanode/ui/contexts/radar';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useAppStore } from '@colanode/ui/stores/app';
 
 export function WorkspaceSidebarMenuFooter() {
   const account = useAccount();
   const radar = useRadar();
   const navigate = useNavigate();
+
   const [open, setOpen] = useState(false);
 
-  const accountListQuery = useLiveQuery({
-    type: 'account.list',
-  });
-
-  const accounts = accountListQuery.data ?? [];
+  const allAccounts = useAppStore((state) => state.accounts);
+  const accounts = Object.values(allAccounts);
+  const currentAccount = accounts.find((a) => a.id === account.id);
   const otherAccounts = accounts.filter((a) => a.id !== account.id);
   const accountUnreadStates: Record<string, UnreadState> = {};
   for (const accountItem of otherAccounts) {
@@ -43,14 +42,18 @@ export function WorkspaceSidebarMenuFooter() {
     0
   );
 
+  if (!currentAccount) {
+    return null;
+  }
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <button className="flex w-full items-center justify-center relative mb-2 cursor-pointer outline-none">
           <Avatar
-            id={account.id}
-            name={account.name}
-            avatar={account.avatar}
+            id={currentAccount.id}
+            name={currentAccount.name}
+            avatar={currentAccount.avatar}
             className="size-10 rounded-lg shadow-md"
           />
           <UnreadBadge

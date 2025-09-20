@@ -4,10 +4,10 @@ import { SidebarMenuType } from '@colanode/client/types';
 import { WorkspaceSidebarMenuFooter } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-menu-footer';
 import { WorkspaceSidebarMenuHeader } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-menu-header';
 import { WorkspaceSidebarMenuIcon } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-menu-icon';
-import { useAppMetadata } from '@colanode/ui/contexts/app-metadata';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useAppStore } from '@colanode/ui/stores/app';
 
 interface WorkspaceSidebarMenuProps {
   value: SidebarMenuType;
@@ -18,12 +18,11 @@ export const WorkspaceSidebarMenu = ({
   value,
   onChange,
 }: WorkspaceSidebarMenuProps) => {
-  const appMetadata = useAppMetadata();
   const workspace = useWorkspace();
   const radar = useRadar();
 
-  const platform = appMetadata.get('platform');
-  const windowSize = appMetadata.get('window.size');
+  const platform = useAppStore((state) => state.metadata.platform);
+  const windowSize = useAppStore((state) => state.metadata.windowSize);
   const showMacOsPlaceholder = platform === 'darwin' && !windowSize?.fullscreen;
 
   const chatsState = radar.getChatsState(workspace.accountId, workspace.id);

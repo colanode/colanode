@@ -1,53 +1,88 @@
 import { Resizable } from 're-resizable';
-import { useCallback, useState } from 'react';
+import { useCallback } from 'react';
 
 import { SidebarMenuType, SidebarMetadata } from '@colanode/client/types';
 import { WorkspaceSidebarChats } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-chats';
 import { WorkspaceSidebarMenu } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-menu';
 import { WorkspaceSidebarSettings } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-settings';
 import { WorkspaceSidebarSpaces } from '@colanode/ui/components/workspaces/sidebars/workspace-sidebar-spaces';
-import { useWorkspaceMetadata } from '@colanode/ui/contexts/workspace-metadata';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { useAppStore } from '@colanode/ui/stores/app';
 
 export const WorkspaceSidebar = () => {
-  const workspaceMetadata = useWorkspaceMetadata();
-  const [sidebarMetadata, setSidebarMetadata] = useState<SidebarMetadata>(
-    workspaceMetadata.get('sidebar')?.value ?? {
-      menu: 'spaces',
-      width: 300,
+  const workspace = useWorkspace();
+  const sidebarMetadata = useAppStore((state) => {
+    const account = state.accounts[workspace.accountId];
+    if (!account) {
+      return undefined;
     }
+
+    const workspaceState = account.workspaces[workspace.id];
+    if (!workspaceState) {
+      return undefined;
+    }
+
+    return workspaceState.metadata.sidebar;
+  });
+
+  const updateWorkspaceMetadata = useAppStore(
+    (state) => state.updateWorkspaceMetadata
   );
 
-  const menu = sidebarMetadata.menu;
-  const width = sidebarMetadata.width;
+  const mutation = useMutation();
+
+  const menu = sidebarMetadata?.menu ?? 'spaces';
+  const width = sidebarMetadata?.width ?? 300;
 
   const handleSidebarResize = useCallback(
-    (width: number) => {
-      setSidebarMetadata({
-        ...sidebarMetadata,
-        width,
+    (newWidth: number) => {
+      const newSidebarMetadata: SidebarMetadata = {
+        menu,
+        width: newWidth,
+      };
+
+      mutation.mutate({
+        input: {
+          type: 'workspace.metadata.update',
+          key: 'sidebar',
+          value: newSidebarMetadata,
+          accountId: workspace.accountId,
+          workspaceId: workspace.id,
+        },
       });
 
-      workspaceMetadata.set('sidebar', {
-        ...sidebarMetadata,
-        width,
+      updateWorkspaceMetadata(workspace.accountId, workspace.id, {
+        key: 'sidebar',
+        value: newSidebarMetadata,
       });
     },
-    [workspaceMetadata, sidebarMetadata]
+    [workspace.accountId, workspace.id, menu, width]
   );
 
   const handleMenuChange = useCallback(
-    (menu: SidebarMenuType) => {
-      setSidebarMetadata({
-        ...sidebarMetadata,
-        menu,
+    (newMenu: SidebarMenuType) => {
+      const newSidebarMetadata: SidebarMetadata = {
+        menu: newMenu,
+        width: width,
+      };
+
+      mutation.mutate({
+        input: {
+          type: 'workspace.metadata.update',
+          key: 'sidebar',
+          value: newSidebarMetadata,
+          accountId: workspace.accountId,
+          workspaceId: workspace.id,
+        },
       });
 
-      workspaceMetadata.set('sidebar', {
-        ...sidebarMetadata,
-        menu,
+      updateWorkspaceMetadata(workspace.accountId, workspace.id, {
+        key: 'sidebar',
+        value: newSidebarMetadata,
       });
     },
-    [workspaceMetadata, sidebarMetadata]
+    [workspace.accountId, workspace.id, menu, width]
   );
 
   return (

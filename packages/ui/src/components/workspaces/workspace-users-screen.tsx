@@ -43,7 +43,7 @@ export const WorkspaceUsersScreen = () => {
               <h2 className="text-2xl font-semibold tracking-tight">Invite</h2>
               <Separator className="mt-3" />
             </div>
-            <WorkspaceUserInvite workspace={workspace} />
+            <WorkspaceUserInvite />
           </div>
         )}
 

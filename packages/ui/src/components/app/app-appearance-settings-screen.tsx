@@ -4,8 +4,9 @@ import { ThemeColor, ThemeMode } from '@colanode/client/types';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { useAppMetadata } from '@colanode/ui/contexts/app-metadata';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { cn } from '@colanode/ui/lib/utils';
+import { useAppStore } from '@colanode/ui/stores/app';
 
 interface ThemeModeOption {
   key: string;
@@ -51,9 +52,11 @@ const themeColorOptions = [
 ];
 
 export const AppAppearanceSettingsScreen = () => {
-  const appMetadata = useAppMetadata();
-  const themeMode = appMetadata.get('theme.mode');
-  const themeColor = appMetadata.get('theme.color');
+  const mutation = useMutation();
+  const updateAppMetadata = useAppStore((state) => state.updateAppMetadata);
+  const deleteAppMetadata = useAppStore((state) => state.deleteAppMetadata);
+  const themeMode = useAppStore((state) => state.metadata.theme.mode);
+  const themeColor = useAppStore((state) => state.metadata.theme.color);
 
   return (
     <Container>
@@ -75,9 +78,25 @@ export const AppAppearanceSettingsScreen = () => {
                 variant="outline"
                 onClick={() => {
                   if (option.value === null) {
-                    appMetadata.delete('theme.mode');
+                    deleteAppMetadata('theme.mode');
+                    mutation.mutate({
+                      input: {
+                        type: 'app.metadata.delete',
+                        key: 'theme.mode',
+                      },
+                    });
                   } else {
-                    appMetadata.set('theme.mode', option.value);
+                    updateAppMetadata({
+                      key: 'theme.mode',
+                      value: option.value,
+                    });
+                    mutation.mutate({
+                      input: {
+                        type: 'app.metadata.update',
+                        key: 'theme.mode',
+                        value: option.value,
+                      },
+                    });
                   }
                 }}
                 className={cn(
@@ -113,9 +132,25 @@ export const AppAppearanceSettingsScreen = () => {
                 variant="outline"
                 onClick={() => {
                   if (isDefault) {
-                    appMetadata.delete('theme.color');
+                    deleteAppMetadata('theme.color');
+                    mutation.mutate({
+                      input: {
+                        type: 'app.metadata.delete',
+                        key: 'theme.color',
+                      },
+                    });
                   } else {
-                    appMetadata.set('theme.color', option.value as ThemeColor);
+                    updateAppMetadata({
+                      key: 'theme.color',
+                      value: option.value as ThemeColor,
+                    });
+                    mutation.mutate({
+                      input: {
+                        type: 'app.metadata.update',
+                        key: 'theme.color',
+                        value: option.value as ThemeColor,
+                      },
+                    });
                   }
                 }}
                 className={cn(

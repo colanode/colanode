@@ -12,17 +12,6 @@ export type Workspace = {
   storageLimit: string;
 };
 
-export type ContainerTab = {
-  path: string;
-  preview?: boolean;
-  active?: boolean;
-};
-
-export type ContainerMetadata = {
-  tabs: ContainerTab[];
-  width?: number;
-};
-
 export type SidebarMenuType = 'chats' | 'spaces' | 'settings';
 
 export type SidebarMetadata = {
@@ -37,41 +26,20 @@ export type WorkspaceSidebarMetadata = {
   updatedAt: string | null;
 };
 
-export type WorkspaceLeftContainerMetadata = {
-  key: 'container.left';
-  value: ContainerMetadata;
-  createdAt: string;
-  updatedAt: string | null;
-};
-
-export type WorkspaceRightContainerMetadata = {
-  key: 'container.right';
-  value: ContainerMetadata;
+export type WorkspaceLocationMetadata = {
+  key: 'location';
+  value: string;
   createdAt: string;
   updatedAt: string | null;
 };
 
 export type WorkspaceMetadata =
   | WorkspaceSidebarMetadata
-  | WorkspaceRightContainerMetadata
-  | WorkspaceLeftContainerMetadata;
+  | WorkspaceLocationMetadata;
 
 export type WorkspaceMetadataKey = WorkspaceMetadata['key'];
 
 export type WorkspaceMetadataMap = {
   sidebar: WorkspaceSidebarMetadata;
-  'container.right': WorkspaceRightContainerMetadata;
-  'container.left': WorkspaceLeftContainerMetadata;
+  location: WorkspaceLocationMetadata;
 };
-
-export enum SpecialContainerTabPath {
-  WorkspaceSettings = 'workspace/settings',
-  WorkspaceStorage = 'workspace/storage',
-  WorkspaceUsers = 'workspace/users',
-  WorkspaceUploads = 'workspace/uploads',
-  WorkspaceDownloads = 'workspace/downloads',
-  WorkspaceDelete = 'workspace/delete',
-  AccountSettings = 'account/settings',
-  AccountLogout = 'account/logout',
-  AppAppearance = 'app/appearance',
-}

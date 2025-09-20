@@ -4,7 +4,6 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
-import { Account } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -17,9 +16,11 @@ import {
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useAccount } from '@colanode/ui/contexts/account';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { openFileDialog } from '@colanode/ui/lib/files';
 import { cn } from '@colanode/ui/lib/utils';
+import { useAppStore } from '@colanode/ui/stores/app';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),
@@ -27,16 +28,18 @@ const formSchema = z.object({
   email: z.email('Invalid email address'),
 });
 
-export const AccountUpdate = ({ account }: { account: Account }) => {
+export const AccountUpdate = () => {
+  const accountId = useAccount().id;
+  const account = useAppStore((state) => state.accounts[accountId]);
   const { mutate: uploadAvatar, isPending: isUploadingAvatar } = useMutation();
   const { mutate: updateAccount, isPending: isUpdatingAccount } = useMutation();
 
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: account.name,
-      avatar: account.avatar,
-      email: account.email,
+      name: account?.name,
+      avatar: account?.avatar,
+      email: account?.email,
     },
   });
 
@@ -51,7 +54,7 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
     updateAccount({
       input: {
         type: 'account.update',
-        id: account.id,
+        id: accountId,
         name: values.name,
         avatar: values.avatar,
       },
@@ -63,6 +66,10 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
       },
     });
   };
+
+  if (!account) {
+    return <p>Account not found</p>;
+  }
 
   return (
     <Form {...form}>

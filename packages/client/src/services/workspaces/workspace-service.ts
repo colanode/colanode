@@ -24,8 +24,7 @@ import { createDebugger, WorkspaceRole } from '@colanode/core';
 const debug = createDebugger('desktop:service:workspace');
 
 export class WorkspaceService {
-  private readonly workspace: Workspace;
-
+  public readonly workspace: Workspace;
   public readonly database: Kysely<WorkspaceDatabaseSchema>;
   public readonly account: AccountService;
   public readonly nodes: NodeService;

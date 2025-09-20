@@ -2,19 +2,14 @@ import { X } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import { Workspace } from '@colanode/client/types';
 import { isValidEmail } from '@colanode/core';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
-interface WorkspaceUserInviteProps {
-  workspace: Workspace;
-}
-
-export const WorkspaceUserInvite = ({
-  workspace,
-}: WorkspaceUserInviteProps) => {
+export const WorkspaceUserInvite = () => {
+  const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
   const [input, setInput] = useState('');

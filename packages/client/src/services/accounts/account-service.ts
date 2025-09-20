@@ -27,16 +27,15 @@ import {
 const debug = createDebugger('desktop:service:account');
 
 export class AccountService {
-  private readonly workspaces: Map<string, WorkspaceService> = new Map();
-  private readonly account: Account;
-
+  public readonly account: Account;
+  public readonly socket: AccountSocket;
+  public readonly client: KyInstance;
   public readonly app: AppService;
   public readonly server: ServerService;
   public readonly database: Kysely<AccountDatabaseSchema>;
   public readonly avatars: AvatarService;
 
-  public readonly socket: AccountSocket;
-  public readonly client: KyInstance;
+  private readonly workspaces: Map<string, WorkspaceService> = new Map();
   private readonly accountSyncJobScheduleId: string;
   private readonly eventSubscriptionId: string;
 

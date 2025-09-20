@@ -101,6 +101,12 @@ export class ServerService {
       });
     }
 
+    eventBus.publish({
+      type: 'server.state.updated',
+      server: this.server,
+      state: newState,
+    });
+
     debug(
       `Server ${this.server.domain} is ${isAvailable ? 'available' : 'unavailable'}`
     );

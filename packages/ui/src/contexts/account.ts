@@ -1,7 +1,11 @@
 import { createContext, useContext } from 'react';
 
-import { Account } from '@colanode/client/types';
+interface AccountContext {
+  id: string;
+}
 
-export const AccountContext = createContext<Account>({} as Account);
+export const AccountContext = createContext<AccountContext>(
+  {} as AccountContext
+);
 
 export const useAccount = () => useContext(AccountContext);

@@ -19,7 +19,7 @@ import {
   NodeReaction,
   NodeReference,
 } from '@colanode/client/types/nodes';
-import { Server } from '@colanode/client/types/servers';
+import { Server, ServerState } from '@colanode/client/types/servers';
 import { User } from '@colanode/client/types/users';
 import {
   Workspace,
@@ -221,6 +221,12 @@ export type ServerAvailabilityChangedEvent = {
   isAvailable: boolean;
 };
 
+export type ServerStateUpdatedEvent = {
+  type: 'server.state.updated';
+  server: Server;
+  state: ServerState;
+};
+
 export type AccountConnectionOpenedEvent = {
   type: 'account.connection.opened';
   accountId: string;
@@ -378,6 +384,7 @@ export type Event =
   | ServerCreatedEvent
   | ServerUpdatedEvent
   | ServerDeletedEvent
+  | ServerStateUpdatedEvent
   | ServerAvailabilityChangedEvent
   | LocalFileCreatedEvent
   | LocalFileDeletedEvent

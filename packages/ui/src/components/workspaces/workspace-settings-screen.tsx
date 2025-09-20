@@ -4,13 +4,23 @@ import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { WorkspaceDelete } from '@colanode/ui/components/workspaces/workspace-delete';
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
+import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { useAppStore } from '@colanode/ui/stores/app';
 
 export const WorkspaceSettingsScreen = () => {
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
+
+  const currentWorkspace = useAppStore(
+    (state) => state.accounts[workspace.accountId]?.workspaces[workspace.id]
+  );
   const canEdit = workspace.role === 'owner';
+
+  if (!currentWorkspace) {
+    return <WorkspaceNotFound />;
+  }
 
   return (
     <Container>
@@ -23,9 +33,9 @@ export const WorkspaceSettingsScreen = () => {
           <WorkspaceForm
             readOnly={!canEdit}
             values={{
-              name: workspace.name,
-              description: workspace.description ?? '',
-              avatar: workspace.avatar ?? null,
+              name: currentWorkspace.name,
+              description: currentWorkspace.description ?? '',
+              avatar: currentWorkspace.avatar ?? null,
             }}
             onSubmit={(values) => {
               mutate({

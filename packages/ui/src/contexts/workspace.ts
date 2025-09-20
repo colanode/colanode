@@ -1,7 +1,16 @@
 import { createContext, useContext } from 'react';
 
-import { Workspace } from '@colanode/client/types';
+import { WorkspaceRole } from '@colanode/core';
 
-export const WorkspaceContext = createContext<Workspace>({} as Workspace);
+interface WorkspaceContext {
+  id: string;
+  accountId: string;
+  userId: string;
+  role: WorkspaceRole;
+}
+
+export const WorkspaceContext = createContext<WorkspaceContext>(
+  {} as WorkspaceContext
+);
 
 export const useWorkspace = () => useContext(WorkspaceContext);

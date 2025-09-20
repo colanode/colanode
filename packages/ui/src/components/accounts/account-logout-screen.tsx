@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import { Button } from '@colanode/ui/components/ui/button';
@@ -9,6 +10,7 @@ import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export const AccountLogoutScreen = () => {
   const account = useAccount();
+  const navigate = useNavigate();
   const { mutate, isPending } = useMutation();
 
   return (
@@ -38,6 +40,12 @@ export const AccountLogoutScreen = () => {
                     input: {
                       type: 'account.logout',
                       accountId: account.id,
+                    },
+                    onSuccess() {
+                      navigate({
+                        to: '/',
+                        replace: true,
+                      });
                     },
                     onError(error) {
                       toast.error(error.message);

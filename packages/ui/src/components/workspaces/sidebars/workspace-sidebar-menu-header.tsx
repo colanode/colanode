@@ -15,7 +15,7 @@ import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useAppStore } from '@colanode/ui/stores/app';
 
 export const WorkspaceSidebarMenuHeader = () => {
   const workspace = useWorkspace();
@@ -24,12 +24,13 @@ export const WorkspaceSidebarMenuHeader = () => {
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
-  const workspaceListQuery = useLiveQuery({
-    type: 'workspace.list',
-    accountId: account.id,
-  });
 
-  const workspaces = workspaceListQuery.data ?? [];
+  const accountWorkspaces = useAppStore(
+    (state) => state.accounts[account.id]?.workspaces
+  );
+
+  const workspaces = Object.values(accountWorkspaces ?? {});
+  const currentWorkspace = workspaces.find((w) => w.id === workspace.id);
   const otherWorkspaces = workspaces.filter((w) => w.id !== workspace.id);
   const otherWorkspaceStates = otherWorkspaces.map((w) =>
     radar.getWorkspaceState(w.accountId, w.id)
@@ -40,14 +41,18 @@ export const WorkspaceSidebarMenuHeader = () => {
   );
   const hasUnread = otherWorkspaceStates.some((w) => w.state.hasUnread);
 
+  if (!currentWorkspace) {
+    return null;
+  }
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <button className="flex w-full items-center justify-center relative cursor-pointer outline-none">
           <Avatar
-            id={workspace.id}
-            avatar={workspace.avatar}
-            name={workspace.name}
+            id={currentWorkspace.id}
+            avatar={currentWorkspace.avatar}
+            name={currentWorkspace.name}
             className="size-10 rounded-lg shadow-md"
           />
           <UnreadBadge

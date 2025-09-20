@@ -2,43 +2,49 @@ import { useParams } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
 import { WorkspaceLayout } from '@colanode/ui/components/workspaces/workspace-layout';
-import { WorkspaceMetadata } from '@colanode/ui/components/workspaces/workspace-metadata';
 import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
-import { useAccount } from '@colanode/ui/contexts/account';
-import { useAccountMetadata } from '@colanode/ui/contexts/account-metadata';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useLocationTracker } from '@colanode/ui/hooks/use-location-tracker';
+import { useAppStore } from '@colanode/ui/stores/app';
 
 export const WorkspaceScreen = () => {
-  const account = useAccount();
-  const accountMetadata = useAccountMetadata();
-
-  const { workspaceId } = useParams({ from: '/acc/$accountId/$workspaceId' });
-
-  const workspaceQuery = useLiveQuery({
-    type: 'workspace.get',
-    accountId: account.id,
-    workspaceId: workspaceId,
+  const { accountId, workspaceId } = useParams({
+    from: '/acc/$accountId/$workspaceId',
   });
 
+  const userId = useAppStore(
+    (state) => state.accounts[accountId]?.workspaces[workspaceId]?.userId
+  );
+
+  const role = useAppStore(
+    (state) => state.accounts[accountId]?.workspaces[workspaceId]?.role
+  );
+
+  useLocationTracker(accountId, workspaceId);
+
   useEffect(() => {
-    accountMetadata.set('workspace', workspaceId);
-  }, [workspaceId]);
+    useAppStore.getState().updateAccountMetadata(accountId, {
+      key: 'workspace',
+      value: workspaceId,
+    });
 
-  if (workspaceQuery.isPending) {
-    return null;
-  }
+    window.colanode.executeMutation({
+      type: 'account.metadata.update',
+      accountId: accountId,
+      key: 'workspace',
+      value: workspaceId,
+    });
+  }, [accountId, workspaceId]);
 
-  const workspace = workspaceQuery.data;
-  if (!workspace) {
+  if (!userId || !role) {
     return <WorkspaceNotFound />;
   }
 
   return (
-    <WorkspaceContext.Provider value={workspace}>
-      <WorkspaceMetadata>
-        <WorkspaceLayout key={workspace.id} />
-      </WorkspaceMetadata>
+    <WorkspaceContext.Provider
+      value={{ accountId, id: workspaceId, userId, role }}
+    >
+      <WorkspaceLayout />
     </WorkspaceContext.Provider>
   );
 };

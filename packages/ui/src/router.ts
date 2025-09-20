@@ -2,15 +2,15 @@ import {
   createRootRoute,
   createRoute,
   createRouter,
+  notFound,
+  redirect,
 } from '@tanstack/react-router';
 
-import { AccountHomeScreen } from '@colanode/ui/components/accounts/account-home-screen';
 import { AccountLogoutScreen } from '@colanode/ui/components/accounts/account-logout-screen';
 import { AccountScreen } from '@colanode/ui/components/accounts/account-screen';
 import { AccountSettingsScreen } from '@colanode/ui/components/accounts/account-settings-screen';
 import { LoginScreen } from '@colanode/ui/components/accounts/login-screen';
 import { AppAppearanceSettingsScreen } from '@colanode/ui/components/app/app-appearance-settings-screen';
-import { AppHomeScreen } from '@colanode/ui/components/app/app-home-screen';
 import { NodeScreen } from '@colanode/ui/components/nodes/node-screen';
 import { WorkspaceDownloadsScreen } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-screen';
 import { WorkspaceStorageScreen } from '@colanode/ui/components/workspaces/storage/workspace-storage-screen';
@@ -20,13 +20,42 @@ import { WorkspaceHomeScreen } from '@colanode/ui/components/workspaces/workspac
 import { WorkspaceScreen } from '@colanode/ui/components/workspaces/workspace-screen';
 import { WorkspaceSettingsScreen } from '@colanode/ui/components/workspaces/workspace-settings-screen';
 import { WorkspaceUsersScreen } from '@colanode/ui/components/workspaces/workspace-users-screen';
+import { useAppStore } from '@colanode/ui/stores/app';
 
 export const rootRoute = createRootRoute();
 
-export const appHomeRoute = createRoute({
+export const appRedirectRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
-  component: AppHomeScreen,
+  component: () => null,
+  beforeLoad: () => {
+    const accounts = Object.values(useAppStore.getState().accounts);
+    const lastUsedAccountId = useAppStore.getState().metadata.account;
+    if (lastUsedAccountId) {
+      const lastUsedAccount = accounts.find(
+        (account) => account.id === lastUsedAccountId
+      );
+
+      if (lastUsedAccount) {
+        throw redirect({
+          to: '/acc/$accountId',
+          params: { accountId: lastUsedAccount.id },
+          replace: true,
+        });
+      }
+    }
+
+    const defaultAccount = accounts[0];
+    if (defaultAccount) {
+      throw redirect({
+        to: '/acc/$accountId',
+        params: { accountId: defaultAccount.id },
+        replace: true,
+      });
+    }
+
+    throw redirect({ to: '/login', replace: true });
+  },
 });
 
 export const loginRoute = createRoute({
@@ -41,10 +70,51 @@ export const accountRoute = createRoute({
   component: AccountScreen,
 });
 
-export const accountHomeRoute = createRoute({
+export const accountRedirectRoute = createRoute({
   getParentRoute: () => accountRoute,
   path: '/',
-  component: AccountHomeScreen,
+  component: () => null,
+  beforeLoad: (ctx) => {
+    const accountId = ctx.params.accountId;
+    const account = useAppStore.getState().accounts[accountId];
+    if (!account) {
+      throw notFound();
+    }
+
+    const workspaces = Object.values(account.workspaces);
+    const lastUsedWorkspaceId = account.metadata.workspace;
+    if (lastUsedWorkspaceId) {
+      const lastUsedWorkspace = workspaces.find(
+        (workspace) => workspace.id === lastUsedWorkspaceId
+      );
+
+      if (lastUsedWorkspace) {
+        throw redirect({
+          to: '/acc/$accountId/$workspaceId',
+          params: {
+            accountId: account.id,
+            workspaceId: lastUsedWorkspace.id,
+          },
+          replace: true,
+        });
+      }
+    }
+
+    const defaultWorkspace = workspaces[0];
+    if (defaultWorkspace) {
+      throw redirect({
+        to: '/acc/$accountId/$workspaceId',
+        params: { accountId: account.id, workspaceId: defaultWorkspace.id },
+        replace: true,
+      });
+    }
+
+    throw redirect({
+      to: '/acc/$accountId/create',
+      params: { accountId: account.id },
+      replace: true,
+    });
+  },
 });
 
 export const workspaceRoute = createRoute({
@@ -53,9 +123,36 @@ export const workspaceRoute = createRoute({
   component: WorkspaceScreen,
 });
 
-export const workspaceHomeRoute = createRoute({
+export const workspaceRedirectRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/',
+  component: () => null,
+  beforeLoad: (ctx) => {
+    const accountId = ctx.params.accountId;
+    const workspaceId = ctx.params.workspaceId;
+    const workspace =
+      useAppStore.getState().accounts[accountId]?.workspaces[workspaceId];
+
+    if (!workspace) {
+      throw notFound();
+    }
+
+    const lastLocation = workspace.metadata.location;
+    if (lastLocation) {
+      throw redirect({ to: lastLocation, replace: true });
+    }
+
+    throw redirect({
+      from: '/acc/$accountId/$workspaceId',
+      to: 'home',
+      replace: true,
+    });
+  },
+});
+
+export const workspaceHomeRoute = createRoute({
+  getParentRoute: () => workspaceRoute,
+  path: '/home',
   component: WorkspaceHomeScreen,
 });
 
@@ -120,12 +217,13 @@ export const appAppearanceRoute = createRoute({
 });
 
 export const routeTree = rootRoute.addChildren([
-  appHomeRoute,
+  appRedirectRoute,
   loginRoute,
   accountRoute.addChildren([
-    accountHomeRoute,
+    accountRedirectRoute,
     workspaceCreateRoute,
     workspaceRoute.addChildren([
+      workspaceRedirectRoute,
       workspaceHomeRoute,
       nodeRoute,
       workspaceDownloadsRoute,
