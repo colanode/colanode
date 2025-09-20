@@ -4,6 +4,7 @@ import {
   createRouter,
 } from '@tanstack/react-router';
 
+import { AccountHomeScreen } from '@colanode/ui/components/accounts/account-home-screen';
 import { AccountLogoutScreen } from '@colanode/ui/components/accounts/account-logout-screen';
 import { AccountScreen } from '@colanode/ui/components/accounts/account-screen';
 import { AccountSettingsScreen } from '@colanode/ui/components/accounts/account-settings-screen';
@@ -38,6 +39,12 @@ export const accountRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/acc/$accountId',
   component: AccountScreen,
+});
+
+export const accountHomeRoute = createRoute({
+  getParentRoute: () => accountRoute,
+  path: '/',
+  component: AccountHomeScreen,
 });
 
 export const workspaceRoute = createRoute({
@@ -116,6 +123,7 @@ export const routeTree = rootRoute.addChildren([
   appHomeRoute,
   loginRoute,
   accountRoute.addChildren([
+    accountHomeRoute,
     workspaceCreateRoute,
     workspaceRoute.addChildren([
       workspaceHomeRoute,
