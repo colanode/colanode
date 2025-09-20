@@ -42,8 +42,8 @@ export const intentClassificationOutputSchema = z.object({
 });
 
 export const queryRewriteOutputSchema = z.object({
-  semanticQuery: z.string(),
-  keywordQuery: z.string(),
+  semanticQueries: z.array(z.string()).min(1),
+  keywordQuery: z.string().optional().default(''),
   originalQuery: z.string(),
   intent: z.enum(['no_context', 'retrieve']),
 });
@@ -129,8 +129,8 @@ export type AnswerOutput = z.infer<typeof answerOutputSchema>;
 // =========================================================================
 
 export type HybridSearchArgs = {
-  semanticQuery: string;
-  keywordQuery: string;
+  semanticQueries: string[];
+  keywordQuery?: string;
   workspaceId: string;
   userId: string;
   maxResults?: number;

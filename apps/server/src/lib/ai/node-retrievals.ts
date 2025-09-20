@@ -22,35 +22,48 @@ export const retrieveNodes = async (
 
   const maxResults = limit ?? config.ai.retrieval.hybridSearch.maxResults;
 
-  const doSemantic = (rewrittenQuery.semanticQuery || '').trim().length > 0;
-  const doKeyword = (rewrittenQuery.keywordQuery || '').trim().length > 0;
+  const semanticList = Array.isArray((rewrittenQuery as any).semanticQueries)
+    ? ((rewrittenQuery as any).semanticQueries as string[]).filter(
+        (s) => typeof s === 'string' && s.trim().length > 0
+      )
+    : typeof (rewrittenQuery as any).semanticQuery === 'string' &&
+        (rewrittenQuery as any).semanticQuery.trim().length > 0
+      ? [(rewrittenQuery as any).semanticQuery]
+      : [];
+  const doSemantic = semanticList.length > 0;
+  const keywordString = (rewrittenQuery as any).keywordQuery ?? '';
+  const doKeyword =
+    typeof keywordString === 'string' && keywordString.trim().length > 0;
 
   let semanticResults: SearchResult[] = [];
   if (doSemantic) {
     const embeddingModel = getEmbeddingModel();
-    const { embedding } = await embed({
-      model: embeddingModel,
-      value: rewrittenQuery.semanticQuery,
-      providerOptions: {
-        openai: {
-          dimensions: config.ai.embedding.dimensions,
+    for (const q of semanticList) {
+      const { embedding } = await embed({
+        model: embeddingModel,
+        value: q,
+        providerOptions: {
+          openai: {
+            dimensions: config.ai.embedding.dimensions,
+          },
         },
-      },
-    });
-    if (embedding) {
-      semanticResults = await semanticSearchNodes(
-        embedding,
-        workspaceId,
-        userId,
-        maxResults,
-        contextNodeIds
-      );
+      });
+      if (embedding) {
+        const resultsForQuery = await semanticSearchNodes(
+          embedding,
+          workspaceId,
+          userId,
+          maxResults,
+          contextNodeIds
+        );
+        semanticResults.push(...resultsForQuery);
+      }
     }
   }
 
   const keywordResults: SearchResult[] = doKeyword
     ? await keywordSearchNodes(
-        rewrittenQuery.keywordQuery,
+        keywordString,
         workspaceId,
         userId,
         maxResults,

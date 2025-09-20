@@ -20,7 +20,6 @@ class JobService {
   private readonly prefix = `{${config.redis.jobs.prefix}}`;
 
   public async initQueue(): Promise<void> {
-    console.log('initQueue');
     if (this.jobQueue) {
       console.log('jobQueue already initialized');
       return;
@@ -41,12 +40,10 @@ class JobService {
       logger.error(error, `Job queue error`);
     });
 
-    console.log('initRecurringJobs');
     await this.initRecurringJobs();
   }
 
   public async initWorker() {
-    console.log('initWorker');
     if (this.jobWorker) {
       console.log('jobWorker already initialized');
       return;
@@ -66,7 +63,6 @@ class JobService {
       throw new Error('Job queue not initialized.');
     }
 
-    console.log('adding job', job.type);
     await this.jobQueue.add(job.type, job, options);
   }
 
@@ -75,7 +71,6 @@ class JobService {
       throw new Error('Job queue not initialized.');
     }
 
-    console.log(`Removing job ${jobId}`);
     const job = await this.jobQueue.getJob(jobId);
     if (job) {
       await job.remove();

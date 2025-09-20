@@ -47,7 +47,7 @@ const ClassifiedInputSchema = AssistantInput.extend({
 });
 
 const RewriteSchema = ClassifiedInputSchema.extend({
-  rewrittenQuery: RewriteOut, // { semanticQuery, keywordQuery, originalQuery, intent }
+  rewrittenQuery: RewriteOut, // { semanticQueries, keywordQuery?, originalQuery, intent }
 });
 
 const HybridResultsSchema = RewriteSchema.extend({
@@ -126,7 +126,8 @@ Respond with JSON in this exact format:
 // ---------- step: rewrite query (only for retrieve path) ----------
 const rewriteQueryStep = createStep({
   id: 'rewrite-query',
-  description: 'Rewrite the user query into semantic + keyword flavors.',
+  description:
+    'Rewrite the user query into multiple semantic queries + optional keyword.',
   inputSchema: ClassifiedInputSchema as any,
   outputSchema: RewriteSchema as any,
   async execute({ inputData }) {
@@ -135,20 +136,41 @@ Rewrite this query for search: "${inputData.userInput}"
 
 Respond with JSON in this exact format:
 {
-  "semanticQuery": "natural language search query with expanded terms",
-  "keywordQuery": "postgres websearch_to_tsquery compatible string"
+  "semanticQueries": [
+    "natural language search query with expanded terms",
+    "alternative phrasing capturing synonyms and intent"
+  ],
+  "keywordQuery": "postgres websearch_to_tsquery compatible string or empty string if not applicable"
 }
 `.trim();
 
     console.log('rewriting query');
     const res = await queryRewriteAgent.generateVNext(prompt);
 
-    let semanticQuery = inputData.userInput;
-    let keywordQuery = inputData.userInput;
+    let semanticQueries: string[] = [inputData.userInput];
+    let keywordQuery: string | undefined = undefined;
     try {
       const raw = JSON.parse(res.text);
-      semanticQuery = raw.semanticQuery || semanticQuery;
-      keywordQuery = raw.keywordQuery || keywordQuery;
+      if (
+        Array.isArray(raw.semanticQueries) &&
+        raw.semanticQueries.length > 0
+      ) {
+        semanticQueries = raw.semanticQueries.filter(
+          (s: any) => typeof s === 'string' && s.trim().length > 0
+        );
+      } else if (
+        typeof raw.semanticQuery === 'string' &&
+        raw.semanticQuery.trim().length > 0
+      ) {
+        // backward compatibility if the model returns a single semanticQuery
+        semanticQueries = [raw.semanticQuery];
+      }
+      if (
+        typeof raw.keywordQuery === 'string' &&
+        raw.keywordQuery.trim().length > 0
+      ) {
+        keywordQuery = raw.keywordQuery;
+      }
     } catch {
       // best-effort fallback – use original
     }
@@ -156,7 +178,7 @@ Respond with JSON in this exact format:
     return {
       ...inputData,
       rewrittenQuery: {
-        semanticQuery,
+        semanticQueries,
         keywordQuery,
         originalQuery: inputData.userInput,
         intent: 'retrieve',
@@ -302,7 +324,7 @@ const answerWithContextStep = createStep({
     const answer = await answerAgent.generateVNext([
       {
         role: 'system',
-        content: `You are a precise, helpful assistant for the ${inputData.workspaceName} workspace. User: ${inputData.userDetails.name}. When you state a fact from context, add [Source N]. If unsure, say so briefly.`,
+        content: `You are a precise, helpful assistant for the ${inputData.workspaceName} workspace. User: ${inputData.userDetails.name}.`,
       },
       {
         role: 'user',

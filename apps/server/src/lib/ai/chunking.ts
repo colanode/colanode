@@ -1,8 +1,7 @@
-import { generateText } from 'ai';
 import type { NodeType } from '@colanode/core';
 import { config } from '@colanode/server/lib/config';
 import { TextChunk } from '@colanode/server/types/chunking';
-import { ModelConfig } from './models';
+import { chunkEnricherAgent } from './agents';
 
 export const chunkText = async (
   text: string,
@@ -43,66 +42,28 @@ export const chunkText = async (
       continue;
     }
 
-    const summary = await enrichChunk(chunk.text, text, nodeType);
+    const summary = await enrichChunkWithAgent(chunk.text, text, nodeType);
     enrichedChunks.push({ text: chunk.text, summary });
   }
 
   return enrichedChunks;
 };
 
-const enrichChunk = async (
+const enrichChunkWithAgent = async (
   chunk: string,
   fullText: string,
   nodeType: NodeType
 ): Promise<string | undefined> => {
   try {
-    const prompt = `<task>
-Generate a concise summary of the following text chunk that is part of a larger document.
-This summary will be used to enhance vector search retrieval by providing additional context about this specific chunk.
-</task>
+    const prompt = `Content Type: ${nodeType}
 
-<context>
-Content Type: ${nodeType}
-</context>
-
-<guidelines>
-1. Create a brief (30-50 words) summary that captures the key points and main idea of the chunk
-2. Consider how this chunk fits into the overall document provided
-3. If the chunk appears to be part of a specific section, identify its role or purpose
-4. If the chunk contains structured data (like a database record), identify the type of information it represents
-5. Use neutral, descriptive language
-6. Consider the content type ("${nodeType}") when creating the summary - different types have different purposes:
-   - "message": Communication content in a conversation
-   - "page": Document-like content with structured information
-   - "record": Database record with specific fields and values
-   - Other types: Adapt your summary accordingly
-</guidelines>
-
-<complete_document>
+Complete Document:
 ${fullText}
-</complete_document>
 
-<chunk_to_summarize>
-${chunk}
-</chunk_to_summarize>
+Chunk to Summarize:
+${chunk}`;
 
-<output_format>
-Provide only the summary with no additional commentary or explanations.
-</output_format>`;
-
-    const { text } = await generateText({
-      model: ModelConfig.forContextEnhancer(),
-      prompt,
-      experimental_telemetry: {
-        isEnabled: true,
-        functionId: 'chunk-enrichment',
-        metadata: {
-          stage: 'chunk-enrichment',
-          nodeType,
-          chunkLength: chunk.length,
-        },
-      },
-    });
+    const { text } = await chunkEnricherAgent.generateVNext(prompt);
 
     return text.trim();
   } catch (error) {
