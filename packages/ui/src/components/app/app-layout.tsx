@@ -7,7 +7,6 @@ export const AppLayout = () => {
 
   return (
     <div className="w-screen min-w-screen h-full bg-background">
-      {app.type === 'mobile' && <div className="h-10" />}
       {app.type === 'desktop' ? <AppLayoutTabs /> : <AppLayoutSingle />}
     </div>
   );

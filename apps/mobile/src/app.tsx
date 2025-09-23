@@ -1,7 +1,8 @@
 import { Asset } from 'expo-asset';
 import { modelName } from 'expo-device';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { View, ActivityIndicator, Platform } from 'react-native';
+import { View, ActivityIndicator, Platform, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 
 import { eventBus } from '@colanode/client/lib';
@@ -12,6 +13,10 @@ import { Message } from '@colanode/mobile/lib/types';
 import { MobileFileSystem } from '@colanode/mobile/services/file-system';
 import { MobileKyselyService } from '@colanode/mobile/services/kysely-service';
 import { MobilePathService } from '@colanode/mobile/services/path-service';
+
+const styles = StyleSheet.create({
+  container: { flex: 1, backgroundColor: '#0a0a0a' },
+});
 
 export const App = () => {
   const windowId = useRef<string>(generateId(IdType.Window));
@@ -161,20 +166,24 @@ export const App = () => {
   }
 
   return (
-    <WebView
-      ref={webViewRef}
-      style={{ flex: 1 }}
-      originWhitelist={['*']}
-      allowFileAccess
-      allowFileAccessFromFileURLs
-      allowingReadAccessToURL={
-        Platform.OS === 'ios' ? (baseDir ?? uri) : undefined
-      }
-      source={{ uri }}
-      javaScriptEnabled
-      domStorageEnabled
-      setSupportMultipleWindows={false}
-      onMessage={handleMessage}
-    />
+    <SafeAreaView
+      edges={['top', 'bottom', 'left', 'right']}
+      style={styles.container}
+    >
+      <WebView
+        ref={webViewRef}
+        style={{ flex: 1 }}
+        originWhitelist={['*']}
+        allowFileAccess
+        allowFileAccessFromFileURLs
+        allowingReadAccessToURL={
+          Platform.OS === 'ios' ? (baseDir ?? uri) : undefined
+        }
+        source={{ uri }}
+        javaScriptEnabled
+        setSupportMultipleWindows={false}
+        onMessage={handleMessage}
+      />
+    </SafeAreaView>
   );
 };

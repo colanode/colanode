@@ -20,7 +20,7 @@ const windowId = generateId(IdType.Window);
 const pendingPromises = new Map<string, PendingPromise>();
 
 const postMessage = (message: Message) => {
-  window.ReactNativeWebView.postMessage(JSON.stringify(message));
+  window.ReactNativeWebView?.postMessage(JSON.stringify(message));
 };
 
 window.colanode = {
