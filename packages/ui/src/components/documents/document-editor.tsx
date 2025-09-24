@@ -22,7 +22,7 @@ import {
   DocumentUpdate,
 } from '@colanode/client/types';
 import { RichTextContent, richTextContentSchema } from '@colanode/core';
-import { YDoc } from '@colanode/crdt';
+import { encodeState, YDoc } from '@colanode/crdt';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import {
   BlockquoteCommand,
@@ -157,7 +157,7 @@ export const DocumentEditor = ({
           accountId: workspace.accountId,
           workspaceId: workspace.id,
           documentId: node.id,
-          update,
+          update: encodeState(update),
         });
 
         if (!result.success) {
@@ -355,7 +355,7 @@ export const DocumentEditor = ({
       accountId: workspace.accountId,
       workspaceId: workspace.id,
       documentId: node.id,
-      update,
+      update: encodeState(update),
     });
 
     if (!result.success) {
@@ -389,7 +389,7 @@ export const DocumentEditor = ({
       accountId: workspace.accountId,
       workspaceId: workspace.id,
       documentId: node.id,
-      update,
+      update: encodeState(update),
     });
 
     if (!result.success) {

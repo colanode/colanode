@@ -60,6 +60,7 @@ import {
   WorkspaceMetadataKey,
 } from '@colanode/client/types/workspaces';
 import { Mutation } from '@colanode/core';
+import { encodeState } from '@colanode/crdt';
 
 export const mapUser = (row: SelectUser): User => {
   return {
@@ -108,7 +109,7 @@ export const mapDocumentState = (row: SelectDocumentState): DocumentState => {
   return {
     id: row.id,
     revision: row.revision,
-    state: row.state,
+    state: encodeState(row.state),
   };
 };
 
@@ -118,7 +119,7 @@ export const mapDocumentUpdate = (
   return {
     id: row.id,
     documentId: row.document_id,
-    data: row.data,
+    data: encodeState(row.data),
   };
 };
 

@@ -3,7 +3,7 @@ export type DocumentUpdateMutationInput = {
   accountId: string;
   workspaceId: string;
   documentId: string;
-  update: Uint8Array;
+  update: string;
 };
 
 export type DocumentUpdateMutationOutput = {
