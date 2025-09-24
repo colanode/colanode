@@ -1,6 +1,7 @@
 import {
   createRootRoute,
   createRoute,
+  createRouteMask,
   createRouter,
   notFound,
   redirect,
@@ -30,8 +31,9 @@ export const appRedirectRoute = createRoute({
   path: '/',
   component: () => null,
   beforeLoad: () => {
-    const accounts = Object.values(useAppStore.getState().accounts);
-    const lastUsedAccountId = useAppStore.getState().metadata.account;
+    const state = useAppStore.getState();
+    const accounts = Object.values(state.accounts);
+    const lastUsedAccountId = state.metadata.account;
     if (lastUsedAccountId) {
       const lastUsedAccount = accounts.find(
         (account) => account.id === lastUsedAccountId
@@ -77,7 +79,8 @@ export const accountRedirectRoute = createRoute({
   component: () => null,
   beforeLoad: (ctx) => {
     const accountId = ctx.params.accountId;
-    const account = useAppStore.getState().accounts[accountId];
+    const state = useAppStore.getState();
+    const account = state.accounts[accountId];
     if (!account) {
       throw notFound();
     }
@@ -122,6 +125,45 @@ export const workspaceRoute = createRoute({
   getParentRoute: () => accountRoute,
   path: '/$workspaceId',
   component: WorkspaceScreen,
+});
+
+export const workspaceCatchAllRoute = createRoute({
+  getParentRoute: () => workspaceRoute,
+  path: '$',
+  component: () => null,
+  beforeLoad: () => {
+    throw notFound();
+  },
+});
+
+export const workspaceMaskRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/$workspaceId',
+  component: () => null,
+  beforeLoad: (ctx) => {
+    const state = useAppStore.getState();
+    const accounts = Object.values(state.accounts);
+    for (const account of accounts) {
+      const workspaces = Object.values(account.workspaces);
+      for (const workspace of workspaces) {
+        if (workspace.id === ctx.params.workspaceId) {
+          throw redirect({
+            to: '/acc/$accountId/$workspaceId',
+            params: { accountId: account.id, workspaceId: workspace.id },
+            replace: true,
+          });
+        }
+      }
+    }
+
+    throw notFound();
+  },
+});
+
+export const workspaceMaskCatchAllMaskRoute = createRoute({
+  getParentRoute: () => workspaceMaskRoute,
+  path: '$',
+  component: () => null,
 });
 
 export const workspaceRedirectRoute = createRoute({
@@ -221,11 +263,13 @@ export const appAppearanceRoute = createRoute({
 export const routeTree = rootRoute.addChildren([
   appRedirectRoute,
   loginRoute,
+  workspaceMaskRoute.addChildren([workspaceMaskCatchAllMaskRoute]),
   accountRoute.addChildren([
     accountRedirectRoute,
     workspaceCreateRoute,
     workspaceRoute.addChildren([
       workspaceRedirectRoute,
+      workspaceCatchAllRoute,
       workspaceHomeRoute,
       nodeRoute,
       workspaceDownloadsRoute,
@@ -239,6 +283,20 @@ export const routeTree = rootRoute.addChildren([
     ]),
   ]),
 ]);
+
+export const workspaceRouteMask = createRouteMask({
+  routeTree: routeTree,
+  from: '/acc/$accountId/$workspaceId',
+  to: '/$workspaceId',
+});
+
+export const workspaceCatchAllRouteMask = createRouteMask({
+  routeTree: routeTree,
+  from: '/acc/$accountId/$workspaceId/$',
+  to: '/$workspaceId/$',
+});
+
+export const routeMasks = [workspaceRouteMask, workspaceCatchAllRouteMask];
 
 export const router = createRouter({ routeTree });
 
