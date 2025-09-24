@@ -154,10 +154,11 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
           <div className="max-h-72 flex-grow overflow-y-auto">
             {conversation.canCreateMessage ? (
               <MessageEditor
+                key={conversation.id}
+                ref={messageEditorRef}
                 userId={workspace.userId}
                 accountId={workspace.accountId}
                 workspaceId={workspace.id}
-                ref={messageEditorRef}
                 conversationId={conversation.id}
                 rootId={conversation.rootId}
                 onChange={setContent}

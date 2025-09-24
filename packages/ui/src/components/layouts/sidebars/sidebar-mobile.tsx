@@ -4,10 +4,10 @@ import { Menu } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Sidebar } from '@colanode/ui/components/layouts/sidebars/sidebar';
-import { Button } from '@colanode/ui/components/ui/button';
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetTitle,
   SheetTrigger,
 } from '@colanode/ui/components/ui/sheet';
@@ -24,16 +24,12 @@ export const SidebarMobile = () => {
     <Sheet open={open} onOpenChange={setOpen}>
       <VisuallyHidden>
         <SheetTitle>Sidebar</SheetTitle>
+        <SheetDescription>Colanode sidebar for mobile devices</SheetDescription>
       </VisuallyHidden>
       <SheetTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="size-9"
-          aria-label="Open sidebar"
-        >
-          <Menu className="h-5 w-5" />
-        </Button>
+        <button className="px-1 outline-none" aria-label="Open sidebar">
+          <Menu className="size-4 text-muted-foreground" />
+        </button>
       </SheetTrigger>
       <SheetContent
         side="left"
