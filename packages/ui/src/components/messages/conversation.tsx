@@ -7,11 +7,7 @@ import {
   MessageCreateRefProps,
 } from '@colanode/ui/components/messages/message-create';
 import { MessageList } from '@colanode/ui/components/messages/message-list';
-import {
-  ScrollArea,
-  ScrollBar,
-  ScrollViewport,
-} from '@colanode/ui/components/ui/scroll-area';
+import { useContainer } from '@colanode/ui/contexts/container';
 import { ConversationContext } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
@@ -27,9 +23,10 @@ export const Conversation = ({
   role,
 }: ConversationProps) => {
   const workspace = useWorkspace();
+  const container = useContainer();
 
-  const viewportRef = useRef<HTMLDivElement>(null);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const scrollAreaRef = container.scrollAreaRef;
+  const messageListRef = useRef<HTMLDivElement>(null);
   const observerRef = useRef<ResizeObserver | null>(null);
   const scrollPositionRef = useRef<number>(0);
   const bottomRef = useRef<HTMLDivElement>(null);
@@ -42,24 +39,29 @@ export const Conversation = ({
       bottomRef.current.scrollIntoView();
     }
 
-    if (containerRef.current && viewportRef.current) {
+    if (messageListRef.current && scrollAreaRef.current) {
       // observe resize of container when new messages are appended or internal elements are loaded (e.g. images)
       observerRef.current = new ResizeObserver(() => {
-        if (viewportRef.current) {
+        if (scrollAreaRef.current) {
           if (shouldScrollToBottomRef.current) {
             bottomRef.current?.scrollIntoView();
           } else {
-            viewportRef.current.scrollTop =
-              viewportRef.current.scrollHeight - scrollPositionRef.current;
+            scrollAreaRef.current.scrollTop =
+              scrollAreaRef.current.scrollHeight - scrollPositionRef.current;
           }
         }
       });
 
-      observerRef.current.observe(containerRef.current);
+      observerRef.current.observe(messageListRef.current);
+      scrollAreaRef.current.addEventListener('scroll', handleScroll);
 
       return () => {
         if (observerRef.current) {
           observerRef.current.disconnect();
+        }
+
+        if (scrollAreaRef.current) {
+          scrollAreaRef.current.removeEventListener('scroll', handleScroll);
         }
       };
     }
@@ -68,9 +70,9 @@ export const Conversation = ({
   }, [conversationId]);
 
   const handleScroll = () => {
-    if (viewportRef.current) {
+    if (scrollAreaRef.current) {
       scrollPositionRef.current =
-        viewportRef.current.scrollHeight - viewportRef.current.scrollTop;
+        scrollAreaRef.current.scrollHeight - scrollAreaRef.current.scrollTop;
 
       shouldScrollToBottomRef.current = bottomVisibleRef.current;
     }
@@ -101,29 +103,22 @@ export const Conversation = ({
         },
       }}
     >
-      <div className="h-full min-h-full w-full min-w-full flex flex-col">
-        <ScrollArea
-          ref={viewportRef}
-          onScroll={handleScroll}
-          className="flex-grow overflow-y-auto"
+      <div className="flex flex-col h-full">
+        <div className="flex-1 min-h-0" ref={messageListRef}>
+          <MessageList />
+        </div>
+        <InView
+          className="h-4"
+          rootMargin="20px"
+          onChange={(inView) => {
+            bottomVisibleRef.current = inView;
+          }}
         >
-          <ScrollViewport>
-            <div ref={containerRef}>
-              <MessageList />
-            </div>
-            <InView
-              className="h-4"
-              rootMargin="20px"
-              onChange={(inView) => {
-                bottomVisibleRef.current = inView;
-              }}
-            >
-              <div ref={bottomRef} className="h-4"></div>
-            </InView>
-            <ScrollBar orientation="vertical" />
-          </ScrollViewport>
-        </ScrollArea>
-        <MessageCreate ref={messageCreateRef} />
+          <div ref={bottomRef} className="h-4"></div>
+        </InView>
+        <div className="sticky bottom-0 bg-background">
+          <MessageCreate ref={messageCreateRef} />
+        </div>
       </div>
     </ConversationContext.Provider>
   );

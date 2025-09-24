@@ -1,11 +1,6 @@
 import { useEffect, useState } from 'react';
 
 import { View } from '@colanode/ui/components/databases/view';
-import {
-  ScrollArea,
-  ScrollBar,
-  ScrollViewport,
-} from '@colanode/ui/components/ui/scroll-area';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { DatabaseViewsContext } from '@colanode/ui/contexts/database-views';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -45,13 +40,7 @@ export const DatabaseViews = ({ inline = false }: DatabaseViewsProps) => {
         inline,
       }}
     >
-      <ScrollArea className="relative overflow-hidden">
-        <ScrollViewport className="group/database h-full max-h-[calc(100vh-100px)] w-full overflow-y-auto rounded-[inherit]">
-          {activeView && <View view={activeView} />}
-        </ScrollViewport>
-        <ScrollBar orientation="horizontal" />
-        <ScrollBar orientation="vertical" />
-      </ScrollArea>
+      {activeView && <View view={activeView} />}
     </DatabaseViewsContext.Provider>
   );
 };

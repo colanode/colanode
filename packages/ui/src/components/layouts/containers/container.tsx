@@ -1,7 +1,12 @@
 import { Outlet } from '@tanstack/react-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import { SidebarMobile } from '@colanode/ui/components/layouts/sidebars/sidebar-mobile';
+import {
+  ScrollArea,
+  ScrollBar,
+  ScrollViewport,
+} from '@colanode/ui/components/ui/scroll-area';
 import { useApp } from '@colanode/ui/contexts/app';
 import { ContainerContext } from '@colanode/ui/contexts/container';
 import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
@@ -13,6 +18,9 @@ export const Container = () => {
   const [settings, setSettings] = useState<React.ReactNode>(null);
   const [breadcrumb, setBreadcrumb] = useState<React.ReactNode>(null);
 
+  const scrollAreaRef = useRef<HTMLDivElement>(null!);
+  const scrollViewportRef = useRef<HTMLDivElement>(null!);
+
   return (
     <ContainerContext.Provider
       value={{
@@ -20,12 +28,14 @@ export const Container = () => {
         setBreadcrumb,
         resetSettings: () => setSettings(null),
         resetBreadcrumb: () => setBreadcrumb(null),
+        scrollAreaRef,
+        scrollViewportRef,
       }}
     >
-      <div className="flex flex-col w-full h-full min-w-full min-h-full">
+      <div className="flex h-full flex-col">
         <div
           className={cn(
-            'flex flex-row w-full items-center gap-2 p-3',
+            'sticky top-0 z-20 flex flex-row w-full items-center gap-2 p-3 h-10 mb-2 flex-shrink-0 bg-background/80 backdrop-blur',
             app.type === 'mobile' && 'p-0 pr-2'
           )}
         >
@@ -33,9 +43,15 @@ export const Container = () => {
           {breadcrumb && <div className="flex-1">{breadcrumb}</div>}
           {settings}
         </div>
-        <div className="lg:px-10 px-4 lg:py-4 py-2 flex-grow max-h-full h-full overflow-hidden">
-          <Outlet />
-        </div>
+        <ScrollArea ref={scrollAreaRef} className="overflow-hidden h-full">
+          <ScrollViewport ref={scrollViewportRef} className="h-full">
+            <div className="lg:px-10 px-4 min-h-0 flex-1 h-full">
+              <Outlet />
+            </div>
+          </ScrollViewport>
+          <ScrollBar orientation="horizontal" />
+          <ScrollBar orientation="vertical" />
+        </ScrollArea>
       </div>
     </ContainerContext.Provider>
   );

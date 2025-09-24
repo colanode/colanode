@@ -5,6 +5,8 @@ interface ContainerContext {
   resetSettings: () => void;
   setBreadcrumb: (breadcrumb: React.ReactNode) => void;
   resetBreadcrumb: () => void;
+  scrollAreaRef: React.RefObject<HTMLDivElement>;
+  scrollViewportRef: React.RefObject<HTMLDivElement>;
 }
 
 export const ContainerContext = createContext<ContainerContext>(

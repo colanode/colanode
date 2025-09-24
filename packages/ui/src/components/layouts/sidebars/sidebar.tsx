@@ -60,7 +60,7 @@ export const Sidebar = () => {
   return (
     <div
       className={cn(
-        'flex h-screen min-h-screen max-h-screen w-full min-w-full flex-row',
+        'flex h-full min-h-full max-h-full w-full min-w-full flex-row',
         app.type === 'mobile' ? 'bg-background' : 'bg-sidebar'
       )}
     >

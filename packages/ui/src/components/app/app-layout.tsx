@@ -6,7 +6,7 @@ export const AppLayout = () => {
   const app = useApp();
 
   return (
-    <div className="w-screen min-w-screen h-full bg-background">
+    <div className="h-[100dvh] w-[100dvw] bg-background text-foreground">
       {app.type === 'desktop' ? <AppLayoutTabs /> : <AppLayoutSingle />}
     </div>
   );

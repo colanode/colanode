@@ -6,11 +6,11 @@ export const Layout = () => {
   const isMobile = useIsMobile();
 
   return (
-    <div className="w-screen min-w-screen h-screen min-h-screen flex flex-row bg-background">
+    <div className="w-full h-full flex">
       {!isMobile && <SidebarDesktop />}
-      <div className="h-full max-h-screen w-full flex-grow overflow-hidden">
+      <section className="min-w-0 flex-1">
         <Container />
-      </div>
+      </section>
     </div>
   );
 };

@@ -53,7 +53,7 @@ export const SidebarDesktop = () => {
   return (
     <Resizable
       as="aside"
-      size={{ width, height: '100vh' }}
+      size={{ width, height: '100dvh' }}
       className="border-r border-sidebar-border"
       minWidth={200}
       maxWidth={500}
