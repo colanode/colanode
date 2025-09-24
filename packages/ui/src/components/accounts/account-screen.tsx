@@ -1,12 +1,15 @@
 import { Outlet, useParams } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
+import { ServerProvider } from '@colanode/ui/components/servers/server-provider';
 import { AccountContext } from '@colanode/ui/contexts/account';
 import { useAppStore } from '@colanode/ui/stores/app';
 
 export const AccountScreen = () => {
   const { accountId } = useParams({ from: '/acc/$accountId' });
-  const accountExists = useAppStore((state) => !!state.accounts[accountId]);
+  const accountServer = useAppStore(
+    (state) => state.accounts[accountId]?.server
+  );
 
   useEffect(() => {
     useAppStore.getState().updateAppMetadata({
@@ -21,13 +24,15 @@ export const AccountScreen = () => {
     });
   }, [accountId]);
 
-  if (!accountExists) {
+  if (!accountServer) {
     return <p>Account not found</p>;
   }
 
   return (
-    <AccountContext.Provider value={{ id: accountId }}>
-      <Outlet />
-    </AccountContext.Provider>
+    <ServerProvider domain={accountServer}>
+      <AccountContext.Provider value={{ id: accountId }}>
+        <Outlet />
+      </AccountContext.Provider>
+    </ServerProvider>
   );
 };

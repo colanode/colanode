@@ -1,19 +1,6 @@
 import { LoginForm } from '@colanode/ui/components/accounts/login-form';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const LoginScreen = () => {
-  const accountListQuery = useLiveQuery({
-    type: 'account.list',
-  });
-
-  const serverListQuery = useLiveQuery({
-    type: 'server.list',
-  });
-
-  if (accountListQuery.isPending || serverListQuery.isPending) {
-    return null;
-  }
-
   return (
     <div className="grid h-screen min-h-screen w-full grid-cols-1 lg:grid-cols-5">
       <div className="items-center justify-center bg-foreground hidden lg:flex lg:col-span-2">
@@ -29,10 +16,7 @@ export const LoginScreen = () => {
               Use one of the following methods to login
             </p>
           </div>
-          <LoginForm
-            accounts={accountListQuery.data ?? []}
-            servers={serverListQuery.data ?? []}
-          />
+          <LoginForm />
         </div>
       </div>
     </div>

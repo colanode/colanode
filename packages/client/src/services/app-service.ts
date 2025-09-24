@@ -5,11 +5,12 @@ import semver from 'semver';
 
 import {
   AppDatabaseSchema,
+  SelectServer,
   appDatabaseMigrations,
 } from '@colanode/client/databases/app';
 import { Mediator } from '@colanode/client/handlers';
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { mapServer, mapAccount } from '@colanode/client/lib/mappers';
+import { mapAccount } from '@colanode/client/lib/mappers';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { AppMeta } from '@colanode/client/services/app-meta';
 import { AssetService } from '@colanode/client/services/asset-service';
@@ -20,7 +21,7 @@ import { MetadataService } from '@colanode/client/services/metadata-service';
 import { PathService } from '@colanode/client/services/path-service';
 import { ServerService } from '@colanode/client/services/server-service';
 import { Account } from '@colanode/client/types/accounts';
-import { Server, ServerAttributes } from '@colanode/client/types/servers';
+import { ServerAttributes } from '@colanode/client/types/servers';
 import { ApiHeader, build, createDebugger } from '@colanode/core';
 
 const debug = createDebugger('desktop:service:app');
@@ -148,7 +149,7 @@ export class AppService {
       .execute();
 
     for (const server of servers) {
-      await this.initServer(mapServer(server));
+      await this.initServer(server);
     }
   }
 
@@ -180,7 +181,7 @@ export class AppService {
     return accountService;
   }
 
-  public async initServer(server: Server): Promise<ServerService> {
+  public async initServer(server: SelectServer): Promise<ServerService> {
     if (this.servers.has(server.domain)) {
       return this.servers.get(server.domain)!;
     }
@@ -234,12 +235,11 @@ export class AppService {
       return null;
     }
 
-    const server = mapServer(createdServer);
-    const serverService = await this.initServer(server);
+    const serverService = await this.initServer(createdServer);
 
     eventBus.publish({
       type: 'server.created',
-      server,
+      server: serverService.server,
     });
 
     return serverService;
@@ -268,7 +268,7 @@ export class AppService {
     if (deletedServer) {
       eventBus.publish({
         type: 'server.deleted',
-        server: mapServer(deletedServer),
+        server: server.server,
       });
     }
   }

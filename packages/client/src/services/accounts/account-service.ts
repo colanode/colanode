@@ -69,7 +69,7 @@ export class AccountService {
         this.handleMessage(event.message);
       } else if (
         event.type === 'server.availability.changed' &&
-        event.server.domain === this.server.domain
+        event.domain === this.server.domain
       ) {
         this.app.jobs.triggerJobSchedule(this.accountSyncJobScheduleId);
       }

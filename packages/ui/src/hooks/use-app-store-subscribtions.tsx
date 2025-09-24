@@ -58,10 +58,6 @@ export const useAppStoreSubscriptions = () => {
         useAppStore.getState().upsertServer(event.server);
       } else if (event.type === 'server.deleted') {
         useAppStore.getState().deleteServer(event.server.domain);
-      } else if (event.type === 'server.state.updated') {
-        useAppStore
-          .getState()
-          .updateServerState(event.server.domain, event.state);
       }
     });
 

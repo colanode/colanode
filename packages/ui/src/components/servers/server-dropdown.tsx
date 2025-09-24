@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
-import { ServerDetails } from '@colanode/client/types';
+import { Server } from '@colanode/client/types';
 import { ServerAvatar } from '@colanode/ui/components/servers/server-avatar';
 import { ServerCreateDialog } from '@colanode/ui/components/servers/server-create-dialog';
 import { ServerDeleteDialog } from '@colanode/ui/components/servers/server-delete-dialog';
@@ -22,7 +22,7 @@ import {
 interface ServerDropdownProps {
   value: string | null;
   onChange: (server: string) => void;
-  servers: ServerDetails[];
+  servers: Server[];
   readonly?: boolean;
 }
 

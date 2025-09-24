@@ -210,20 +210,7 @@ export const useAppStore = create<AppStore>()(
       }),
     upsertServer: (server) =>
       set((state) => {
-        const existingServer = state.servers[server.domain];
-        if (existingServer) {
-          state.servers[server.domain] = { ...existingServer, ...server };
-        } else {
-          state.servers[server.domain] = {
-            ...server,
-            state: {
-              isAvailable: false,
-              lastCheckedAt: new Date(),
-              lastCheckedSuccessfullyAt: null,
-              count: 0,
-            },
-          };
-        }
+        state.servers[server.domain] = server;
       }),
     deleteServer: (domain) =>
       set((state) => {

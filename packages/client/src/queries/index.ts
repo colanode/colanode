@@ -28,7 +28,6 @@ export * from './nodes/node-reactions-aggregate';
 export * from './nodes/node-tree-get';
 export * from './records/record-list';
 export * from './records/record-search';
-export * from './servers/server-list';
 export * from './spaces/space-list';
 export * from './users/user-get';
 export * from './users/user-list';

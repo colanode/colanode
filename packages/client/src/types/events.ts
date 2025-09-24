@@ -19,7 +19,7 @@ import {
   NodeReaction,
   NodeReference,
 } from '@colanode/client/types/nodes';
-import { Server, ServerState } from '@colanode/client/types/servers';
+import { Server } from '@colanode/client/types/servers';
 import { User } from '@colanode/client/types/users';
 import {
   Workspace,
@@ -191,6 +191,12 @@ export type ServerDeletedEvent = {
   server: Server;
 };
 
+export type ServerAvailabilityChangedEvent = {
+  type: 'server.availability.changed';
+  domain: string;
+  isAvailable: boolean;
+};
+
 export type QueryResultUpdatedEvent = {
   type: 'query.result.updated';
   id: string;
@@ -213,18 +219,6 @@ export type CollaborationDeletedEvent = {
   accountId: string;
   workspaceId: string;
   nodeId: string;
-};
-
-export type ServerAvailabilityChangedEvent = {
-  type: 'server.availability.changed';
-  server: Server;
-  isAvailable: boolean;
-};
-
-export type ServerStateUpdatedEvent = {
-  type: 'server.state.updated';
-  server: Server;
-  state: ServerState;
 };
 
 export type AccountConnectionOpenedEvent = {
@@ -384,7 +378,6 @@ export type Event =
   | ServerCreatedEvent
   | ServerUpdatedEvent
   | ServerDeletedEvent
-  | ServerStateUpdatedEvent
   | ServerAvailabilityChangedEvent
   | LocalFileCreatedEvent
   | LocalFileDeletedEvent

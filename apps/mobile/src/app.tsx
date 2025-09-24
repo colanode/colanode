@@ -2,7 +2,7 @@ import { Asset } from 'expo-asset';
 import { modelName } from 'expo-device';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { View, ActivityIndicator, Platform, StyleSheet } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { WebView, WebViewMessageEvent } from 'react-native-webview';
 
 import { eventBus } from '@colanode/client/lib';
@@ -15,7 +15,7 @@ import { MobileKyselyService } from '@colanode/mobile/services/kysely-service';
 import { MobilePathService } from '@colanode/mobile/services/path-service';
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0a0a0a' },
+  container: { flex: 1, backgroundColor: '#0a0a0a', padding: 0, margin: 0 },
 });
 
 export const App = () => {
@@ -166,24 +166,27 @@ export const App = () => {
   }
 
   return (
-    <SafeAreaView
-      edges={['top', 'bottom', 'left', 'right']}
-      style={styles.container}
-    >
-      <WebView
-        ref={webViewRef}
-        style={{ flex: 1 }}
-        originWhitelist={['*']}
-        allowFileAccess
-        allowFileAccessFromFileURLs
-        allowingReadAccessToURL={
-          Platform.OS === 'ios' ? (baseDir ?? uri) : undefined
-        }
-        source={{ uri }}
-        javaScriptEnabled
-        setSupportMultipleWindows={false}
-        onMessage={handleMessage}
-      />
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView
+        edges={['top', 'bottom', 'left', 'right']}
+        style={styles.container}
+      >
+        <WebView
+          ref={webViewRef}
+          style={{ flex: 1, padding: 0, margin: 0, backgroundColor: '#0a0a0a' }}
+          originWhitelist={['*']}
+          allowFileAccess
+          allowFileAccessFromFileURLs
+          allowingReadAccessToURL={
+            Platform.OS === 'ios' ? (baseDir ?? uri) : undefined
+          }
+          source={{ uri }}
+          javaScriptEnabled
+          setSupportMultipleWindows={false}
+          onMessage={handleMessage}
+          allowsBackForwardNavigationGestures={true}
+        />
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };

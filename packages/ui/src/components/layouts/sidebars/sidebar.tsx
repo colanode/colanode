@@ -5,13 +5,16 @@ import { SidebarChats } from '@colanode/ui/components/layouts/sidebars/sidebar-c
 import { SidebarMenu } from '@colanode/ui/components/layouts/sidebars/sidebar-menu';
 import { SidebarSettings } from '@colanode/ui/components/layouts/sidebars/sidebar-settings';
 import { SidebarSpaces } from '@colanode/ui/components/layouts/sidebars/sidebar-spaces';
+import { useApp } from '@colanode/ui/contexts/app';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { cn } from '@colanode/ui/lib/utils';
 import { useAppStore } from '@colanode/ui/stores/app';
 
 const DEFAULT_MENU = 'spaces';
 
 export const Sidebar = () => {
+  const app = useApp();
   const workspace = useWorkspace();
   const mutation = useMutation();
 
@@ -55,7 +58,12 @@ export const Sidebar = () => {
   );
 
   return (
-    <div className="flex h-screen min-h-screen max-h-screen w-full min-w-full flex-row bg-sidebar">
+    <div
+      className={cn(
+        'flex h-screen min-h-screen max-h-screen w-full min-w-full flex-row',
+        app.type === 'mobile' ? 'bg-background' : 'bg-sidebar'
+      )}
+    >
       <SidebarMenu value={menu} onChange={handleMenuChange} />
       <div className="min-h-0 flex-grow overflow-auto border-l border-sidebar-border">
         {menu === 'spaces' && <SidebarSpaces />}

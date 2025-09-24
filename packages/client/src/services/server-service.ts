@@ -1,9 +1,9 @@
 import ky from 'ky';
 import ms from 'ms';
 
+import { SelectServer } from '@colanode/client/databases';
 import { FeatureKey, isFeatureSupported } from '@colanode/client/lib';
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { mapServer } from '@colanode/client/lib/mappers';
 import { isServerOutdated } from '@colanode/client/lib/servers';
 import { AppService } from '@colanode/client/services/app-service';
 import {
@@ -18,17 +18,29 @@ const debug = createDebugger('desktop:service:server');
 export class ServerService {
   private readonly app: AppService;
 
-  public state: ServerState;
-  public isOutdated: boolean;
+  private name: string;
+  private avatar: string;
+  private attributes: ServerAttributes;
+  private createdAt: Date;
+  private syncedAt: Date | null;
+  private version: string;
+  private state: ServerState;
+  private isOutdated: boolean;
 
-  public readonly server: Server;
+  public readonly domain: string;
   public readonly configUrl: string;
   public readonly socketBaseUrl: string;
   public readonly httpBaseUrl: string;
 
-  constructor(app: AppService, server: Server) {
+  constructor(app: AppService, server: SelectServer) {
     this.app = app;
-    this.server = server;
+    this.domain = server.domain;
+    this.name = server.name;
+    this.avatar = server.avatar;
+    this.attributes = JSON.parse(server.attributes) ?? {};
+    this.version = server.version;
+    this.createdAt = new Date(server.created_at);
+    this.syncedAt = server.synced_at ? new Date(server.synced_at) : null;
     this.configUrl = this.buildConfigUrl();
     this.socketBaseUrl = this.buildSocketBaseUrl();
     this.httpBaseUrl = this.buildHttpBaseUrl();
@@ -42,16 +54,23 @@ export class ServerService {
     };
   }
 
+  public get server(): Server {
+    return {
+      domain: this.domain,
+      name: this.name,
+      avatar: this.avatar,
+      attributes: this.attributes,
+      version: this.version,
+      createdAt: this.createdAt,
+      syncedAt: this.syncedAt,
+      state: this.state,
+      configUrl: this.configUrl,
+      isOutdated: this.isOutdated,
+    };
+  }
+
   public get isAvailable() {
-    return !this.isOutdated && (this.state?.isAvailable ?? false);
-  }
-
-  public get domain() {
-    return this.server.domain;
-  }
-
-  public get version() {
-    return this.server.version;
+    return this.state.isAvailable;
   }
 
   public isFeatureSupported(feature: FeatureKey) {
@@ -80,40 +99,9 @@ export class ServerService {
 
   public async sync() {
     const config = await ServerService.fetchServerConfig(this.configUrl);
-    const existingState = this.state;
-
-    const newState: ServerState = {
-      isAvailable: config !== null,
-      lastCheckedAt: new Date(),
-      lastCheckedSuccessfullyAt: config !== null ? new Date() : null,
-      count: existingState ? existingState.count + 1 : 1,
-    };
-
-    this.state = newState;
-
-    const wasAvailable = existingState?.isAvailable ?? false;
-    const isAvailable = newState.isAvailable;
-    if (wasAvailable !== isAvailable) {
-      eventBus.publish({
-        type: 'server.availability.changed',
-        server: this.server,
-        isAvailable,
-      });
-    }
-
-    eventBus.publish({
-      type: 'server.state.updated',
-      server: this.server,
-      state: newState,
-    });
-
-    debug(
-      `Server ${this.server.domain} is ${isAvailable ? 'available' : 'unavailable'}`
-    );
-
     if (config) {
       const attributes: ServerAttributes = {
-        ...this.server.attributes,
+        ...this.attributes,
         sha: config.sha,
         account: config.account?.google.enabled
           ? {
@@ -125,7 +113,14 @@ export class ServerService {
           : undefined,
       };
 
-      const updatedServer = await this.app.database
+      this.attributes = attributes;
+      this.avatar = config.avatar;
+      this.name = config.name;
+      this.version = config.version;
+      this.syncedAt = new Date();
+      this.isOutdated = isServerOutdated(config.version);
+
+      await this.app.database
         .updateTable('servers')
         .returningAll()
         .set({
@@ -135,22 +130,34 @@ export class ServerService {
           version: config.version,
           attributes: JSON.stringify(attributes),
         })
-        .where('domain', '=', this.server.domain)
+        .where('domain', '=', this.domain)
         .executeTakeFirst();
-
-      this.server.avatar = config.avatar;
-      this.server.name = config.name;
-      this.server.version = config.version;
-      this.server.attributes = attributes;
-      this.isOutdated = isServerOutdated(config.version);
-
-      if (updatedServer) {
-        eventBus.publish({
-          type: 'server.updated',
-          server: mapServer(updatedServer),
-        });
-      }
     }
+
+    const existingState = this.state;
+    const newState: ServerState = {
+      isAvailable: config !== null,
+      lastCheckedAt: new Date(),
+      lastCheckedSuccessfullyAt: config !== null ? new Date() : null,
+      count: existingState ? existingState.count + 1 : 1,
+    };
+
+    const wasAvailable = existingState?.isAvailable ?? false;
+    const isAvailable = newState.isAvailable;
+    if (wasAvailable !== isAvailable) {
+      eventBus.publish({
+        type: 'server.availability.changed',
+        domain: this.domain,
+        isAvailable,
+      });
+    }
+
+    this.state = newState;
+
+    eventBus.publish({
+      type: 'server.updated',
+      server: this.server,
+    });
   }
 
   public static async fetchServerConfig(configUrl: URL | string) {
@@ -167,25 +174,25 @@ export class ServerService {
   }
 
   private buildConfigUrl() {
-    const protocol = this.server.attributes.insecure ? 'http' : 'https';
+    const protocol = this.attributes.insecure ? 'http' : 'https';
     return this.buildBaseUrl(protocol) + '/config';
   }
 
   private buildHttpBaseUrl() {
-    const protocol = this.server.attributes.insecure ? 'http' : 'https';
+    const protocol = this.attributes.insecure ? 'http' : 'https';
     return this.buildBaseUrl(protocol) + '/client';
   }
 
   private buildSocketBaseUrl() {
-    const protocol = this.server.attributes.insecure ? 'ws' : 'wss';
+    const protocol = this.attributes.insecure ? 'ws' : 'wss';
     return this.buildBaseUrl(protocol) + '/client';
   }
 
   private buildBaseUrl(protocol: string) {
-    const prefix = this.server.attributes.pathPrefix
-      ? `/${this.server.attributes.pathPrefix}`
+    const prefix = this.attributes.pathPrefix
+      ? `/${this.attributes.pathPrefix}`
       : '';
 
-    return `${protocol}://${this.server.domain}${prefix}`;
+    return `${protocol}://${this.domain}${prefix}`;
   }
 }

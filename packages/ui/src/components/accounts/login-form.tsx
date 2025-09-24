@@ -4,7 +4,6 @@ import { useState, Fragment, useEffect, useCallback } from 'react';
 import { match } from 'ts-pattern';
 
 import { isFeatureSupported } from '@colanode/client/lib';
-import { Account, ServerDetails } from '@colanode/client/types';
 import { LoginSuccessOutput } from '@colanode/core';
 import { EmailLogin } from '@colanode/ui/components/accounts/email-login';
 import { EmailPasswordResetComplete } from '@colanode/ui/components/accounts/email-password-reset-complete';
@@ -15,11 +14,7 @@ import { ServerDropdown } from '@colanode/ui/components/servers/server-dropdown'
 import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { ServerContext } from '@colanode/ui/contexts/server';
-
-interface LoginFormProps {
-  accounts: Account[];
-  servers: ServerDetails[];
-}
+import { useAppStore } from '@colanode/ui/stores/app';
 
 type LoginPanelState = {
   type: 'login';
@@ -52,8 +47,13 @@ type PanelState =
   | PasswordResetInitPanelState
   | PasswordResetCompletePanelState;
 
-export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
+export const LoginForm = () => {
   const router = useRouter();
+  const storeServers = useAppStore((state) => state.servers);
+  const servers = Object.values(storeServers);
+
+  const storeAccounts = useAppStore((state) => state.accounts);
+  const accounts = Object.values(storeAccounts);
 
   const [serverDomain, setServerDomain] = useState<string | null>(
     servers[0]?.domain ?? null

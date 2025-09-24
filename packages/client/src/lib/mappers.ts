@@ -6,7 +6,6 @@ import {
 import {
   SelectAccount,
   SelectAppMetadata,
-  SelectServer,
   SelectTempFile,
 } from '@colanode/client/databases/app';
 import { SelectEmoji } from '@colanode/client/databases/emojis';
@@ -52,7 +51,6 @@ import {
   NodeReaction,
   NodeReference,
 } from '@colanode/client/types/nodes';
-import { Server } from '@colanode/client/types/servers';
 import { User } from '@colanode/client/types/users';
 import {
   Workspace,
@@ -158,18 +156,6 @@ export const mapMutation = (row: SelectMutation): Mutation => {
     type: row.type,
     data: JSON.parse(row.data),
     createdAt: row.created_at,
-  };
-};
-
-export const mapServer = (row: SelectServer): Server => {
-  return {
-    domain: row.domain,
-    name: row.name,
-    avatar: row.avatar,
-    attributes: JSON.parse(row.attributes),
-    version: row.version,
-    createdAt: new Date(row.created_at),
-    syncedAt: row.synced_at ? new Date(row.synced_at) : null,
   };
 };
 

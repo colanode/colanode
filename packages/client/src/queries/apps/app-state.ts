@@ -1,7 +1,6 @@
 import {
   Account,
   Server,
-  ServerState,
   SidebarMenuType,
   ThemeColor,
   ThemeMode,
@@ -11,10 +10,6 @@ import {
 
 export type AppStateQueryInput = {
   type: 'app.state';
-};
-
-export type AppServerState = Server & {
-  state: ServerState;
 };
 
 export type AppAccountMetadata = {
@@ -50,7 +45,7 @@ export type AppMetadataState = {
 
 export type AppStateOutput = {
   metadata: AppMetadataState;
-  servers: Record<string, AppServerState>;
+  servers: Record<string, Server>;
   accounts: Record<string, AppAccountState>;
 };
 

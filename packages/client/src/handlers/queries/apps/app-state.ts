@@ -4,7 +4,6 @@ import {
   AppAccountMetadata,
   AppAccountState,
   AppMetadataState,
-  AppServerState,
   AppStateOutput,
   AppStateQueryInput,
   AppWorkspaceMetadata,
@@ -13,6 +12,7 @@ import {
 import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { AppService } from '@colanode/client/services/app-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
+import { Server } from '@colanode/client/types';
 import { Event } from '@colanode/client/types/events';
 import { build } from '@colanode/core';
 
@@ -201,17 +201,12 @@ export class AppStateQueryHandler implements QueryHandler<AppStateQueryInput> {
     };
   }
 
-  private buildServersState(): Record<string, AppServerState> {
+  private buildServersState(): Record<string, Server> {
     const servers = this.app.getServers();
-    const output: Record<string, AppServerState> = {};
+    const output: Record<string, Server> = {};
 
     for (const server of servers) {
-      const serverState: AppServerState = {
-        ...server.server,
-        state: server.state,
-      };
-
-      output[server.server.domain] = serverState;
+      output[server.server.domain] = server.server;
     }
 
     return output;

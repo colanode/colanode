@@ -2,10 +2,13 @@ import { Outlet } from '@tanstack/react-router';
 import { useState } from 'react';
 
 import { SidebarMobile } from '@colanode/ui/components/layouts/sidebars/sidebar-mobile';
+import { useApp } from '@colanode/ui/contexts/app';
 import { ContainerContext } from '@colanode/ui/contexts/container';
 import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
+import { cn } from '@colanode/ui/lib/utils';
 
 export const Container = () => {
+  const app = useApp();
   const isMobile = useIsMobile();
   const [settings, setSettings] = useState<React.ReactNode>(null);
   const [breadcrumb, setBreadcrumb] = useState<React.ReactNode>(null);
@@ -20,7 +23,12 @@ export const Container = () => {
       }}
     >
       <div className="flex flex-col w-full h-full min-w-full min-h-full">
-        <div className="flex flex-row w-full items-center gap-2 p-3">
+        <div
+          className={cn(
+            'flex flex-row w-full items-center gap-2 p-3',
+            app.type === 'mobile' && 'p-0 pr-2'
+          )}
+        >
           {isMobile && <SidebarMobile />}
           {breadcrumb && <div className="flex-1">{breadcrumb}</div>}
           {settings}

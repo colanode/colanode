@@ -1,7 +1,7 @@
 import { isFeatureSupported } from '@colanode/client/lib';
 import { ServerNotFound } from '@colanode/ui/components/servers/server-not-found';
 import { ServerContext } from '@colanode/ui/contexts/server';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useAppStore } from '@colanode/ui/stores/app';
 
 interface ServerProviderProps {
   domain: string;
@@ -9,17 +9,7 @@ interface ServerProviderProps {
 }
 
 export const ServerProvider = ({ domain, children }: ServerProviderProps) => {
-  const serverListQuery = useLiveQuery({
-    type: 'server.list',
-  });
-
-  const server = serverListQuery.data?.find(
-    (server) => server.domain === domain
-  );
-
-  if (serverListQuery.isPending) {
-    return null;
-  }
+  const server = useAppStore((state) => state.servers[domain]);
 
   if (!server) {
     return <ServerNotFound domain={domain} />;
