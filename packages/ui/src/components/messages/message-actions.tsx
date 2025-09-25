@@ -1,12 +1,11 @@
-import { MessagesSquare, Reply } from 'lucide-react';
+import { MessagesSquare, Reply, Trash2 } from 'lucide-react';
 import { useCallback } from 'react';
 import { toast } from 'sonner';
 
-import { LocalMessageNode } from '@colanode/client/types';
-import { MessageDeleteButton } from '@colanode/ui/components/messages/message-delete-button';
 import { MessageQuickReaction } from '@colanode/ui/components/messages/message-quick-reaction';
 import { MessageReactionCreatePopover } from '@colanode/ui/components/messages/message-reaction-create-popover';
 import { useConversation } from '@colanode/ui/contexts/conversation';
+import { useMessage } from '@colanode/ui/contexts/message';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { defaultEmojis } from '@colanode/ui/lib/assets';
@@ -19,17 +18,11 @@ const MessageAction = ({ children }: { children: React.ReactNode }) => {
   );
 };
 
-interface MessageActionsProps {
-  message: LocalMessageNode;
-}
-
-export const MessageActions = ({ message }: MessageActionsProps) => {
+export const MessageActions = () => {
+  const message = useMessage();
   const workspace = useWorkspace();
   const conversation = useConversation();
   const { mutate, isPending } = useMutation();
-
-  const canDelete = conversation.canDeleteMessage(message);
-  const canReplyInThread = false;
 
   const handleReactionClick = useCallback(
     (reaction: string) => {
@@ -75,7 +68,7 @@ export const MessageActions = ({ message }: MessageActionsProps) => {
         />
       </MessageAction>
       <div className="mx-1 h-6 w-[1px] bg-border" />
-      {canReplyInThread && (
+      {message.canReplyInThread && (
         <MessageAction>
           <MessagesSquare className="size-4 cursor-pointer" />
         </MessageAction>
@@ -113,9 +106,14 @@ export const MessageActions = ({ message }: MessageActionsProps) => {
           />
         </MessageAction>
       )}
-      {canDelete && (
+      {message.canDelete && (
         <MessageAction>
-          <MessageDeleteButton id={message.id} />
+          <Trash2
+            className="size-4 cursor-pointer"
+            onClick={() => {
+              message.openDelete();
+            }}
+          />
         </MessageAction>
       )}
     </ul>

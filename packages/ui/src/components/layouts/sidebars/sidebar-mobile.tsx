@@ -33,7 +33,8 @@ export const SidebarMobile = () => {
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="w-full p-0 border-0"
+        className="w-[90%] max-w-sm p-0 border-0"
+        showCloseButton={false}
         aria-describedby="mobile-sidebar-description"
       >
         <Sidebar />

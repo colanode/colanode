@@ -116,7 +116,7 @@ export const Conversation = ({
         >
           <div ref={bottomRef} className="h-4"></div>
         </InView>
-        <div className="sticky bottom-0 bg-background">
+        <div className="sticky bottom-0 bg-background pb-4 pt-2">
           <MessageCreate ref={messageCreateRef} />
         </div>
       </div>
