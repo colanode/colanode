@@ -29,7 +29,7 @@ export const AccountLogoutScreen = () => {
             <h2 className="text-2xl font-semibold tracking-tight">Logout</h2>
             <Separator className="mt-3" />
           </div>
-          <div className="flex items-center justify-between gap-6">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="flex-1 space-y-2">
               <h3 className="font-semibold">Sign out of your account</h3>
               <p className="text-sm text-muted-foreground">
@@ -38,11 +38,11 @@ export const AccountLogoutScreen = () => {
                 data will be re-synced.
               </p>
             </div>
-            <div className="flex-shrink-0">
+            <div className="w-full md:w-auto md:flex-shrink-0">
               <Button
                 variant="destructive"
                 disabled={isPending}
-                className="w-20 cursor-pointer"
+                className="w-full cursor-pointer md:w-20"
                 onClick={async () => {
                   mutate({
                     input: {

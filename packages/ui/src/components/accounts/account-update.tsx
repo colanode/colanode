@@ -17,6 +17,7 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useAccount } from '@colanode/ui/contexts/account';
+import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { openFileDialog } from '@colanode/ui/lib/files';
 import { cn } from '@colanode/ui/lib/utils';
@@ -31,6 +32,7 @@ const formSchema = z.object({
 export const AccountUpdate = () => {
   const accountId = useAccount().id;
   const account = useAppStore((state) => state.accounts[accountId]);
+  const isMobile = useIsMobile();
   const { mutate: uploadAvatar, isPending: isUploadingAvatar } = useMutation();
   const { mutate: updateAccount, isPending: isUpdatingAccount } = useMutation();
 
@@ -74,8 +76,13 @@ export const AccountUpdate = () => {
   return (
     <Form {...form}>
       <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex flex-row gap-1">
-          <div className="h-40 w-40 pt-3">
+        <div className={cn('flex gap-1', isMobile ? 'flex-col' : 'flex-row')}>
+          <div
+            className={cn(
+              'pt-3',
+              isMobile ? 'flex justify-center pb-4' : 'size-40'
+            )}
+          >
             <div
               className="group relative cursor-pointer"
               onClick={async () => {
@@ -117,11 +124,12 @@ export const AccountUpdate = () => {
                 id={account.id}
                 name={name}
                 avatar={avatar}
-                className="h-32 w-32"
+                className={isMobile ? 'size-24' : 'size-32'}
               />
               <div
                 className={cn(
-                  `absolute left-0 top-0 hidden h-32 w-32 items-center justify-center overflow-hidden bg-accent/50 group-hover:inline-flex`,
+                  `absolute left-0 top-0 hidden items-center justify-center overflow-hidden bg-accent/50 group-hover:inline-flex`,
+                  isMobile ? 'size-24' : 'size-32',
                   isUploadingAvatar ? 'inline-flex' : 'hidden'
                 )}
               >
@@ -133,7 +141,12 @@ export const AccountUpdate = () => {
               </div>
             </div>
           </div>
-          <div className="flex-grow space-y-4 py-2 pb-4">
+          <div
+            className={cn(
+              'space-y-4 py-2 pb-4',
+              isMobile ? 'w-full' : 'flex-grow'
+            )}
+          >
             <FormField
               control={form.control}
               name="name"

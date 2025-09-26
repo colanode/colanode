@@ -73,7 +73,7 @@ export const AppAppearanceSettingsScreen = () => {
           <Separator className="mt-3" />
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {themeModeOptions.map((option) => {
             const isActive =
               option.value === null ? !themeMode : themeMode === option.value;
@@ -107,7 +107,7 @@ export const AppAppearanceSettingsScreen = () => {
                   }
                 }}
                 className={cn(
-                  'h-10 min-w-32 justify-center gap-2 relative',
+                  'h-10 w-full justify-start gap-2 relative',
                   isActive && 'ring-1 ring-ring border-primary'
                 )}
                 title={option.title}
@@ -126,7 +126,7 @@ export const AppAppearanceSettingsScreen = () => {
           <h2 className="text-2xl font-semibold tracking-tight">Color</h2>
           <Separator className="mt-3" />
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-w-2xl">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 max-w-2xl">
           {themeColorOptions.map((option) => {
             const isDefault = option.value === 'default';
             const isActive = isDefault
