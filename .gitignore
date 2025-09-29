@@ -157,9 +157,9 @@ apps/desktop/assets/icons.db
 apps/desktop/assets/emojis.svg
 apps/desktop/assets/icons.svg
 apps/desktop/assets/fonts/neotrax.otf
-apps/desktop/assets/colanode-logo-black.png
-apps/desktop/assets/colanode-logo-black.ico
-apps/desktop/assets/colanode-logo-black.icns
+apps/desktop/assets/colanode-logo.png
+apps/desktop/assets/colanode-logo.ico
+apps/desktop/assets/colanode-logo.icns
 
 # Ignore web assets
 apps/web/public/assets/emojis.db
@@ -167,5 +167,5 @@ apps/web/public/assets/icons.db
 apps/web/public/assets/emojis.svg
 apps/web/public/assets/icons.svg
 apps/web/public/assets/fonts/neotrax.otf
-apps/web/public/assets/colanode-logo-black-192.png
-apps/web/public/assets/colanode-logo-black-512.png
+apps/web/public/assets/colanode-logo-192.jpg
+apps/web/public/assets/colanode-logo-512.jpg
