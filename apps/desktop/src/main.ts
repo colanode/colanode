@@ -6,6 +6,7 @@ import {
   shell,
   globalShortcut,
   dialog,
+  nativeTheme,
 } from 'electron';
 
 import started from 'electron-squirrel-startup';
@@ -46,6 +47,11 @@ updateElectronApp({
 
 const createWindow = async () => {
   await app.migrate();
+
+  const themeMode = (await app.metadata.get('theme.mode'))?.value;
+  if (themeMode) {
+    nativeTheme.themeSource = themeMode;
+  }
 
   // Create the browser window.
   let windowSize = (await app.metadata.get('window.size'))?.value;
@@ -114,6 +120,16 @@ const createWindow = async () => {
   const subscriptionId = eventBus.subscribe((event) => {
     if (event.type === 'query.result.updated') {
       mainWindow.webContents.send('event', event);
+    } else if (
+      event.type === 'app.metadata.updated' &&
+      event.metadata.key === 'theme.mode'
+    ) {
+      nativeTheme.themeSource = event.metadata.value;
+    } else if (
+      event.type === 'app.metadata.deleted' &&
+      event.metadata.key === 'theme.mode'
+    ) {
+      nativeTheme.themeSource = 'system';
     }
   });
 
