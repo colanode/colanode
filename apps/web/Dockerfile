@@ -19,7 +19,7 @@ COPY ../../packages/ui/package.json packages/ui/package.json
 COPY ../../apps/web/package.json apps/web/package.json
 
 # Install dependencies
-RUN npm ci
+RUN npm ci && npm i --save-dev lightningcss-linux-x64-musl
 
 # Copy source files
 COPY ../../packages/core packages/core
