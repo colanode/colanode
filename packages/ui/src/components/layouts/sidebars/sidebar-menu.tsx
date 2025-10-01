@@ -7,6 +7,7 @@ import { SidebarMenuIcon } from '@colanode/ui/components/layouts/sidebars/sideba
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { cn } from '@colanode/ui/lib/utils';
 import { useAppStore } from '@colanode/ui/stores/app';
 
 interface SidebarMenuProps {
@@ -41,15 +42,7 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
 
   return (
     <div className="flex flex-col h-full w-[65px] min-w-[65px] items-center">
-      {showMacOsPlaceholder ? (
-        <div className="w-full h-8 flex gap-[8px] px-[6px] py-[7px]">
-          <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-          <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-          <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
-        </div>
-      ) : (
-        <div className="w-full h-4" />
-      )}
+      <div className={cn('w-full', showMacOsPlaceholder ? 'h-8' : 'h-4')} />
       <SidebarMenuHeader />
       <div className="flex flex-col gap-1 mt-2 w-full p-2 items-center flex-grow">
         <SidebarMenuIcon

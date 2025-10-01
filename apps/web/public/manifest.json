@@ -8,14 +8,14 @@
       "type": "image/x-icon"
     },
     {
-      "src": "assets/colanode-logo-black-192.png",
-      "type": "image/png",
+      "src": "assets/colanode-logo-192.jpg",
+      "type": "image/jpeg",
       "sizes": "192x192",
       "purpose": "any maskable"
     },
     {
-      "src": "assets/colanode-logo-black-512.png",
-      "type": "image/png",
+      "src": "assets/colanode-logo-512.jpg",
+      "type": "image/jpeg",
       "sizes": "512x512",
       "purpose": "any maskable"
     }
