@@ -1,9 +1,9 @@
-import { Link } from '@tanstack/react-router';
 import { useRef } from 'react';
 import { useDrag } from 'react-dnd';
 
 import { FieldValue } from '@colanode/core';
 import { RecordFieldValue } from '@colanode/ui/components/records/record-field-value';
+import { Link } from '@colanode/ui/components/ui/link';
 import { useBoardView } from '@colanode/ui/contexts/board-view';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useRecord } from '@colanode/ui/contexts/record';

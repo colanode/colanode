@@ -1,8 +1,7 @@
-import { Link } from '@tanstack/react-router';
-
 import { LocalFileNode } from '@colanode/client/types';
 import { FileIcon } from '@colanode/ui/components/files/file-icon';
 import { FilePreview } from '@colanode/ui/components/files/file-preview';
+import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { canPreviewFile } from '@colanode/ui/lib/files';

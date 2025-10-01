@@ -1,6 +1,6 @@
-import { Link } from '@tanstack/react-router';
 import { Fullscreen } from 'lucide-react';
 
+import { Link } from '@colanode/ui/components/ui/link';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseViews } from '@colanode/ui/contexts/database-views';
 

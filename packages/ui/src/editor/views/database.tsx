@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router';
 import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewWrapper } from '@tiptap/react';
 
@@ -6,6 +5,7 @@ import { LocalDatabaseNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Database } from '@colanode/ui/components/databases/database';
 import { DatabaseViews } from '@colanode/ui/components/databases/database-views';
+import { Link } from '@colanode/ui/components/ui/link';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
 
 export const DatabaseNodeView = ({ node }: NodeViewProps) => {

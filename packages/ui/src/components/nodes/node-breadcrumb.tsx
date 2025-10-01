@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router';
 import { Fragment } from 'react';
 
 import { LocalNode } from '@colanode/client/types';
@@ -16,6 +15,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
+import { Link } from '@colanode/ui/components/ui/link';
 
 interface NodeBreadcrumbProps {
   breadcrumb: LocalNode[];

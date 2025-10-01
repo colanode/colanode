@@ -1,4 +1,3 @@
-import { Link } from '@tanstack/react-router';
 import { ChevronRight } from 'lucide-react';
 import { RefAttributes, useRef } from 'react';
 import { useDrop } from 'react-dnd';
@@ -14,6 +13,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@colanode/ui/components/ui/collapsible';
+import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';

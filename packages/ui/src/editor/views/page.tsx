@@ -1,9 +1,9 @@
-import { Link } from '@tanstack/react-router';
 import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewWrapper } from '@tiptap/react';
 
 import { LocalPageNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 

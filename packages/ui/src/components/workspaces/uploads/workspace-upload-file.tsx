@@ -1,9 +1,9 @@
-import { Link } from '@tanstack/react-router';
 import { BadgeAlert } from 'lucide-react';
 
 import { Upload, LocalFileNode } from '@colanode/client/types';
 import { formatBytes, timeAgo } from '@colanode/core';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
+import { Link } from '@colanode/ui/components/ui/link';
 import { WorkspaceUploadStatus } from '@colanode/ui/components/workspaces/uploads/workspace-upload-status';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';

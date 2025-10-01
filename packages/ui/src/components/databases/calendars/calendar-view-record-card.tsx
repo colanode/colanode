@@ -1,6 +1,5 @@
-import { Link } from '@tanstack/react-router';
-
 import { RecordFieldValue } from '@colanode/ui/components/records/record-field-value';
+import { Link } from '@colanode/ui/components/ui/link';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useRecord } from '@colanode/ui/contexts/record';
 

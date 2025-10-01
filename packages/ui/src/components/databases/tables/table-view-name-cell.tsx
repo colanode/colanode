@@ -1,10 +1,10 @@
-import { Link } from '@tanstack/react-router';
 import isHotkey from 'is-hotkey';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import React, { Fragment } from 'react';
 import { toast } from 'sonner';
 
 import { RecordNode } from '@colanode/core';
+import { Link } from '@colanode/ui/components/ui/link';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
