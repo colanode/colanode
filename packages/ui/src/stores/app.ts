@@ -8,6 +8,7 @@ import {
   AccountMetadataKey,
   AppMetadata,
   AppMetadataKey,
+  AppTab,
   Server,
   ServerState,
   SidebarMenuType,
@@ -55,6 +56,7 @@ export const useAppStore = create<AppStore>()(
       platform: '',
       version: '',
       theme: {},
+      tabs: [],
     },
     servers: {},
     accounts: {},
@@ -73,6 +75,8 @@ export const useAppStore = create<AppStore>()(
           state.metadata.account = metadata.value as string;
         } else if (metadata.key === 'window.size') {
           state.metadata.windowSize = metadata.value as WindowSize;
+        } else if (metadata.key === 'tabs') {
+          state.metadata.tabs = metadata.value as AppTab[];
         }
       }),
     deleteAppMetadata: (key) =>
@@ -85,6 +89,8 @@ export const useAppStore = create<AppStore>()(
           state.metadata.account = undefined;
         } else if (key === 'window.size') {
           state.metadata.windowSize = undefined;
+        } else if (key === 'tabs') {
+          state.metadata.tabs = [];
         }
       }),
     upsertAccount: (account) =>

@@ -3,8 +3,8 @@ import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { UploadListQueryInput } from '@colanode/client/queries';
-import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
-import { BreadcrumbItem } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb-item';
+import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
+import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { WorkspaceUploadFile } from '@colanode/ui/components/workspaces/uploads/workspace-upload-file';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';

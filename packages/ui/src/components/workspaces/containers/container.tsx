@@ -1,7 +1,7 @@
 import { Outlet } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 
-import { SidebarMobile } from '@colanode/ui/components/layouts/sidebars/sidebar-mobile';
+import { SidebarMobile } from '@colanode/ui/components/workspaces/sidebars/sidebar-mobile';
 import {
   ScrollArea,
   ScrollBar,

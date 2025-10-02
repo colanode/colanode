@@ -6,7 +6,7 @@ import { toast } from 'sonner';
 import { LocalSpaceNode } from '@colanode/client/types';
 import { extractNodeRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { WorkspaceSidebarItem } from '@colanode/ui/components/layouts/sidebars/sidebar-item';
+import { WorkspaceSidebarItem } from '@colanode/ui/components/workspaces/sidebars/sidebar-item';
 import { SpaceSidebarDropdown } from '@colanode/ui/components/spaces/space-sidebar-dropdown';
 import {
   Collapsible,

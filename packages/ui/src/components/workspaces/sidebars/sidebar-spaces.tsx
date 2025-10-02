@@ -1,4 +1,4 @@
-import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
+import { SidebarHeader } from '@colanode/ui/components/workspaces/sidebars/sidebar-header';
 import { SpaceCreateButton } from '@colanode/ui/components/spaces/space-create-button';
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';

@@ -5,10 +5,10 @@ import { DndProvider } from 'react-dnd';
 import { AppType } from '@colanode/client/types';
 import { build } from '@colanode/core';
 import { AppAssets } from '@colanode/ui/components/app/app-assets';
-import { AppLayout } from '@colanode/ui/components/app/app-layout';
 import { AppLoadingScreen } from '@colanode/ui/components/app/app-loading-screen';
 import { AppThemeProvider } from '@colanode/ui/components/app/app-theme-provider';
 import { RadarProvider } from '@colanode/ui/components/app/radar-provider';
+import { Layout } from '@colanode/ui/components/layouts/layout';
 import { Toaster } from '@colanode/ui/components/ui/sonner';
 import { TooltipProvider } from '@colanode/ui/components/ui/tooltip';
 import { AppContext } from '@colanode/ui/contexts/app';
@@ -51,7 +51,7 @@ export const App = ({ type }: AppProps) => {
             <AppAssets />
             <AppThemeProvider>
               <RadarProvider>
-                <AppLayout />
+                <Layout />
               </RadarProvider>
             </AppThemeProvider>
           </TooltipProvider>

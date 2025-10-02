@@ -1,16 +1,13 @@
-import { Container } from '@colanode/ui/components/layouts/containers/container';
-import { SidebarDesktop } from '@colanode/ui/components/layouts/sidebars/sidebar-desktop';
-import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
+import { LayoutSingle } from '@colanode/ui/components/layouts/layout-single';
+import { LayoutTabs } from '@colanode/ui/components/layouts/layout-tabs';
+import { useApp } from '@colanode/ui/contexts/app';
 
 export const Layout = () => {
-  const isMobile = useIsMobile();
+  const app = useApp();
 
   return (
-    <div className="w-full h-full flex">
-      {!isMobile && <SidebarDesktop />}
-      <section className="min-w-0 flex-1">
-        <Container />
-      </section>
+    <div className="h-[100dvh] w-[100dvw] bg-background text-foreground">
+      {app.type === 'desktop' ? <LayoutTabs /> : <LayoutSingle />}
     </div>
   );
 };

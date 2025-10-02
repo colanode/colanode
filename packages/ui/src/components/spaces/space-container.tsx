@@ -1,5 +1,5 @@
 import { LocalSpaceNode } from '@colanode/client/types';
-import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
+import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
 import { NodeBreadcrumb } from '@colanode/ui/components/nodes/node-breadcrumb';
 import { SpaceBody } from '@colanode/ui/components/spaces/space-body';
 import { SpaceNotFound } from '@colanode/ui/components/spaces/space-not-found';

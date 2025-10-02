@@ -1,5 +1,6 @@
 import {
   Account,
+  AppTab,
   Server,
   SidebarMenuType,
   ThemeColor,
@@ -41,6 +42,7 @@ export type AppMetadataState = {
     mode?: ThemeMode;
     color?: ThemeColor;
   };
+  tabs: AppTab[];
 };
 
 export type AppStateOutput = {

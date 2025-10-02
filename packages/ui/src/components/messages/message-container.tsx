@@ -1,5 +1,5 @@
 import { LocalMessageNode } from '@colanode/client/types';
-import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
+import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
 import { Message } from '@colanode/ui/components/messages/message';
 import { MessageNotFound } from '@colanode/ui/components/messages/message-not-found';
 import { NodeBreadcrumb } from '@colanode/ui/components/nodes/node-breadcrumb';

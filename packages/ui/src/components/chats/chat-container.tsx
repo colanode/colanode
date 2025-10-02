@@ -1,8 +1,8 @@
 import { LocalChatNode } from '@colanode/client/types';
 import { ChatNotFound } from '@colanode/ui/components/chats/chat-not-found';
 import { NodeCollaboratorsPopover } from '@colanode/ui/components/collaborators/node-collaborators-popover';
-import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
-import { ContainerSettings } from '@colanode/ui/components/layouts/containers/container-settings';
+import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
+import { ContainerSettings } from '@colanode/ui/components/workspaces/containers/container-settings';
 import { Conversation } from '@colanode/ui/components/messages/conversation';
 import { NodeBreadcrumb } from '@colanode/ui/components/nodes/node-breadcrumb';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';

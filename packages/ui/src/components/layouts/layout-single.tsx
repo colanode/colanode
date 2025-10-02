@@ -9,7 +9,7 @@ import { useMemo } from 'react';
 import { useApp } from '@colanode/ui/contexts/app';
 import { routeMasks, routeTree } from '@colanode/ui/router';
 
-export const AppLayoutSingle = () => {
+export const LayoutSingle = () => {
   const app = useApp();
 
   const router = useMemo(() => {

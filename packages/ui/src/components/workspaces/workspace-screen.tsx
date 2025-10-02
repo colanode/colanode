@@ -1,7 +1,7 @@
 import { useParams } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
-import { Layout } from '@colanode/ui/components/layouts/layout';
+import { WorkspaceLayout } from '@colanode/ui/components/workspaces/workspace-layout';
 import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
 import { useLocationTracker } from '@colanode/ui/hooks/use-location-tracker';
@@ -44,7 +44,7 @@ export const WorkspaceScreen = () => {
     <WorkspaceContext.Provider
       value={{ accountId, id: workspaceId, userId, role }}
     >
-      <Layout />
+      <WorkspaceLayout />
     </WorkspaceContext.Provider>
   );
 };

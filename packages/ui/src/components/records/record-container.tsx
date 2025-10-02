@@ -1,6 +1,6 @@
 import { LocalRecordNode } from '@colanode/client/types';
-import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
-import { ContainerSettings } from '@colanode/ui/components/layouts/containers/container-settings';
+import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
+import { ContainerSettings } from '@colanode/ui/components/workspaces/containers/container-settings';
 import { NodeBreadcrumb } from '@colanode/ui/components/nodes/node-breadcrumb';
 import { RecordBody } from '@colanode/ui/components/records/record-body';
 import { RecordNotFound } from '@colanode/ui/components/records/record-not-found';

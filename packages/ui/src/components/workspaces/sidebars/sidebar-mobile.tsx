@@ -3,7 +3,7 @@ import { useLocation } from '@tanstack/react-router';
 import { Menu } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { Sidebar } from '@colanode/ui/components/layouts/sidebars/sidebar';
+import { Sidebar } from '@colanode/ui/components/workspaces/sidebars/sidebar';
 import {
   Sheet,
   SheetContent,

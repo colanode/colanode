@@ -1,8 +1,8 @@
 import { LocalChannelNode } from '@colanode/client/types';
 import { ChannelNotFound } from '@colanode/ui/components/channels/channel-not-found';
 import { ChannelSettings } from '@colanode/ui/components/channels/channel-settings';
-import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
-import { ContainerSettings } from '@colanode/ui/components/layouts/containers/container-settings';
+import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
+import { ContainerSettings } from '@colanode/ui/components/workspaces/containers/container-settings';
 import { Conversation } from '@colanode/ui/components/messages/conversation';
 import { NodeBreadcrumb } from '@colanode/ui/components/nodes/node-breadcrumb';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';

@@ -189,6 +189,8 @@ export class AppStateQueryHandler implements QueryHandler<AppStateQueryInput> {
       (metadata) => metadata.key === 'window.size'
     )?.value;
 
+    const tabs = appMetadata.find((metadata) => metadata.key === 'tabs')?.value;
+
     return {
       account,
       theme: {
@@ -198,6 +200,7 @@ export class AppStateQueryHandler implements QueryHandler<AppStateQueryInput> {
       platform: platform ?? '',
       version: version ?? build.version,
       windowSize,
+      tabs: tabs ?? [],
     };
   }
 

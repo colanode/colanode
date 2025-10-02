@@ -1,7 +1,7 @@
 import { Resizable } from 're-resizable';
 import { useCallback } from 'react';
 
-import { Sidebar } from '@colanode/ui/components/layouts/sidebars/sidebar';
+import { Sidebar } from '@colanode/ui/components/workspaces/sidebars/sidebar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { useAppStore } from '@colanode/ui/stores/app';
@@ -53,7 +53,7 @@ export const SidebarDesktop = () => {
   return (
     <Resizable
       as="aside"
-      size={{ width, height: '100dvh' }}
+      size={{ width, height: '100%' }}
       className="border-r border-sidebar-border"
       minWidth={200}
       maxWidth={500}

@@ -1,6 +1,6 @@
 import { LocalChatNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { BreadcrumbItem } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb-item';
+import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 

@@ -1,10 +1,10 @@
 import { useCallback } from 'react';
 
 import { SidebarMenuType } from '@colanode/client/types';
-import { SidebarChats } from '@colanode/ui/components/layouts/sidebars/sidebar-chats';
-import { SidebarMenu } from '@colanode/ui/components/layouts/sidebars/sidebar-menu';
-import { SidebarSettings } from '@colanode/ui/components/layouts/sidebars/sidebar-settings';
-import { SidebarSpaces } from '@colanode/ui/components/layouts/sidebars/sidebar-spaces';
+import { SidebarChats } from '@colanode/ui/components/workspaces/sidebars/sidebar-chats';
+import { SidebarMenu } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu';
+import { SidebarSettings } from '@colanode/ui/components/workspaces/sidebars/sidebar-settings';
+import { SidebarSpaces } from '@colanode/ui/components/workspaces/sidebars/sidebar-spaces';
 import { useApp } from '@colanode/ui/contexts/app';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';

@@ -22,6 +22,7 @@ export class AccountSocket {
   }
 
   public async init(): Promise<void> {
+    return;
     if (!this.account.server.isAvailable) {
       return;
     }

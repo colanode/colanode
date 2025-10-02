@@ -8,8 +8,8 @@ import {
   Users,
 } from 'lucide-react';
 
-import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
-import { SidebarSettingsItem } from '@colanode/ui/components/layouts/sidebars/sidebar-settings-item';
+import { SidebarHeader } from '@colanode/ui/components/workspaces/sidebars/sidebar-header';
+import { SidebarSettingsItem } from '@colanode/ui/components/workspaces/sidebars/sidebar-settings-item';
 import { Link } from '@colanode/ui/components/ui/link';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useApp } from '@colanode/ui/contexts/app';

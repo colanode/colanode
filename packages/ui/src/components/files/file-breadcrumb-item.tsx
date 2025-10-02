@@ -1,6 +1,6 @@
 import { LocalFileNode } from '@colanode/client/types';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
-import { BreadcrumbItem } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb-item';
+import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 
 interface FileBreadcrumbItemProps {
   file: LocalFileNode;

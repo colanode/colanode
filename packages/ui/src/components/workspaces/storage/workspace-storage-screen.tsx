@@ -1,7 +1,7 @@
 import { Cylinder } from 'lucide-react';
 
-import { Breadcrumb } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb';
-import { BreadcrumbItem } from '@colanode/ui/components/layouts/breadcrumbs/breadcrumb-item';
+import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
+import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { UserStorageStats } from '@colanode/ui/components/workspaces/storage/user-storage-stats';
 import { WorkspaceStorageStats } from '@colanode/ui/components/workspaces/storage/workspace-storage-stats';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
