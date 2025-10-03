@@ -2,9 +2,8 @@ import {
   useQuery as useTanstackQuery,
   UseQueryOptions as TanstackUseQueryOptions,
 } from '@tanstack/react-query';
-import { sha256 } from 'js-sha256';
 
-import { QueryInput, QueryMap } from '@colanode/client/queries';
+import { QueryInput, QueryMap, buildQueryKey } from '@colanode/client/queries';
 
 type UseLiveQueryOptions<T extends QueryInput> = Omit<
   TanstackUseQueryOptions<QueryMap[T['type']]['output']>,
@@ -15,12 +14,11 @@ export const useLiveQuery = <T extends QueryInput>(
   input: T,
   options?: UseLiveQueryOptions<T>
 ) => {
-  const inputJson = JSON.stringify(input);
-  const hash = sha256(inputJson);
+  const key = buildQueryKey(input);
 
   const result = useTanstackQuery({
-    queryKey: [hash],
-    queryFn: () => window.colanode.executeQueryAndSubscribe(hash, input),
+    queryKey: [key],
+    queryFn: () => window.colanode.executeQueryAndSubscribe(key, input),
     ...options,
   });
 

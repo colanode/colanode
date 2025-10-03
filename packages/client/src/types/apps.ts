@@ -50,15 +50,9 @@ export type AppThemeColorMetadata = {
   updatedAt: string | null;
 };
 
-export type AppTab = {
-  id: string;
-  location: string;
-  active: boolean;
-};
-
-export type AppTabsMetadata = {
-  key: 'tabs';
-  value: AppTab[];
+export type AppTabMetadata = {
+  key: 'tab';
+  value: string;
   createdAt: string;
   updatedAt: string | null;
 };
@@ -70,7 +64,7 @@ export type AppMetadata =
   | AppAccountMetadata
   | AppThemeModeMetadata
   | AppThemeColorMetadata
-  | AppTabsMetadata;
+  | AppTabMetadata;
 
 export type AppMetadataKey = AppMetadata['key'];
 
@@ -81,5 +75,13 @@ export type AppMetadataMap = {
   account: AppAccountMetadata;
   'theme.mode': AppThemeModeMetadata;
   'theme.color': AppThemeColorMetadata;
-  tabs: AppTabsMetadata;
+  tab: AppTabMetadata;
+};
+
+export type Tab = {
+  id: string;
+  location: string;
+  index: string;
+  createdAt: string;
+  updatedAt: string | null;
 };

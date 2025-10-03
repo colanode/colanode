@@ -1,5 +1,5 @@
 import { Account, AccountMetadata } from '@colanode/client/types/accounts';
-import { AppMetadata } from '@colanode/client/types/apps';
+import { AppMetadata, Tab } from '@colanode/client/types/apps';
 import { Avatar } from '@colanode/client/types/avatars';
 import {
   Document,
@@ -359,6 +359,21 @@ export type TempFileDeletedEvent = {
   tempFile: TempFile;
 };
 
+export type TabCreatedEvent = {
+  type: 'tab.created';
+  tab: Tab;
+};
+
+export type TabUpdatedEvent = {
+  type: 'tab.updated';
+  tab: Tab;
+};
+
+export type TabDeletedEvent = {
+  type: 'tab.deleted';
+  tab: Tab;
+};
+
 export type Event =
   | UserCreatedEvent
   | UserUpdatedEvent
@@ -412,4 +427,7 @@ export type Event =
   | AvatarCreatedEvent
   | AvatarDeletedEvent
   | TempFileCreatedEvent
-  | TempFileDeletedEvent;
+  | TempFileDeletedEvent
+  | TabCreatedEvent
+  | TabUpdatedEvent
+  | TabDeletedEvent;

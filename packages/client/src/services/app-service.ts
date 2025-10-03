@@ -22,7 +22,14 @@ import { PathService } from '@colanode/client/services/path-service';
 import { ServerService } from '@colanode/client/services/server-service';
 import { Account } from '@colanode/client/types/accounts';
 import { ServerAttributes } from '@colanode/client/types/servers';
-import { ApiHeader, build, createDebugger } from '@colanode/core';
+import {
+  ApiHeader,
+  build,
+  createDebugger,
+  generateFractionalIndex,
+  generateId,
+  IdType,
+} from '@colanode/core';
 
 const debug = createDebugger('desktop:service:app');
 
@@ -125,6 +132,22 @@ export class AppService {
     await this.initAccounts();
     await this.fs.makeDirectory(this.path.temp);
     await this.jobs.init();
+
+    // make sure there is at least one tab in desktop app
+    if (this.meta.type === 'desktop') {
+      const tabs = await this.database.selectFrom('tabs').selectAll().execute();
+      if (tabs.length === 0) {
+        await this.database
+          .insertInto('tabs')
+          .values({
+            id: generateId(IdType.Tab),
+            location: '/',
+            index: generateFractionalIndex(),
+            created_at: new Date().toISOString(),
+          })
+          .execute();
+      }
+    }
 
     const scheduleId = 'temp.files.clean';
     await this.jobs.upsertJobSchedule(

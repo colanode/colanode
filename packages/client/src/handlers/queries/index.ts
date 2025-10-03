@@ -7,6 +7,7 @@ import { AccountMetadataListQueryHandler } from './accounts/account-metadata-lis
 import { AccountListQueryHandler } from './accounts/accounts-list';
 import { AppMetadataListQueryHandler } from './apps/app-metadata-list';
 import { AppStateQueryHandler } from './apps/app-state';
+import { TabsListQueryHandler } from './apps/tabs-list';
 import { AvatarGetQueryHandler } from './avatars/avatar-get';
 import { ChatListQueryHandler } from './chats/chat-list';
 import { DatabaseListQueryHandler } from './databases/database-list';
@@ -105,5 +106,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'temp.file.get': new TempFileGetQueryHandler(app),
     'icon.svg.get': new IconSvgGetQueryHandler(app),
     'emoji.svg.get': new EmojiSvgGetQueryHandler(app),
+    'tabs.list': new TabsListQueryHandler(app),
   };
 };

@@ -8,6 +8,7 @@ import { createJobsTable } from './00005-create-jobs-table';
 import { createJobSchedulesTable } from './00006-create-job-schedules-table';
 import { dropDeletedTokensTable } from './00007-drop-deleted-tokens-table';
 import { createTempFilesTable } from './00008-create-temp-files-table';
+import { createTabsTable } from './00009-create-tabs-table';
 
 export const appDatabaseMigrations: Record<string, Migration> = {
   '00001-create-servers-table': createServersTable,
@@ -18,4 +19,5 @@ export const appDatabaseMigrations: Record<string, Migration> = {
   '00006-create-job-schedules-table': createJobSchedulesTable,
   '00007-drop-deleted-tokens-table': dropDeletedTokensTable,
   '00008-create-temp-files-table': createTempFilesTable,
+  '00009-create-tabs-table': createTabsTable,
 };

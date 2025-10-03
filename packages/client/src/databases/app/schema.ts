@@ -97,6 +97,18 @@ export type SelectTempFile = Selectable<TempFileTable>;
 export type InsertTempFile = Insertable<TempFileTable>;
 export type UpdateTempFile = Updateable<TempFileTable>;
 
+interface TabTable {
+  id: ColumnType<string, string, never>;
+  location: ColumnType<string, string, string>;
+  index: ColumnType<string, string, string>;
+  created_at: ColumnType<string, string, string>;
+  updated_at: ColumnType<string | null, string | null, string | null>;
+}
+
+export type SelectTab = Selectable<TabTable>;
+export type InsertTab = Insertable<TabTable>;
+export type UpdateTab = Updateable<TabTable>;
+
 export interface AppDatabaseSchema {
   servers: ServerTable;
   accounts: AccountTable;
@@ -104,4 +116,5 @@ export interface AppDatabaseSchema {
   jobs: JobTableSchema;
   job_schedules: JobScheduleTableSchema;
   temp_files: TempFileTable;
+  tabs: TabTable;
 }

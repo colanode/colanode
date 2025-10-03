@@ -6,6 +6,7 @@ import {
 import {
   SelectAccount,
   SelectAppMetadata,
+  SelectTab,
   SelectTempFile,
 } from '@colanode/client/databases/app';
 import { SelectEmoji } from '@colanode/client/databases/emojis';
@@ -30,7 +31,7 @@ import {
   AccountMetadata,
   AccountMetadataKey,
 } from '@colanode/client/types/accounts';
-import { AppMetadata, AppMetadataKey } from '@colanode/client/types/apps';
+import { AppMetadata, AppMetadataKey, Tab } from '@colanode/client/types/apps';
 import { Avatar } from '@colanode/client/types/avatars';
 import {
   Document,
@@ -271,6 +272,16 @@ export const mapAppMetadata = (row: SelectAppMetadata): AppMetadata => {
   return {
     key: row.key as AppMetadataKey,
     value: JSON.parse(row.value),
+    createdAt: row.created_at,
+    updatedAt: row.updated_at,
+  };
+};
+
+export const mapTab = (row: SelectTab): Tab => {
+  return {
+    id: row.id,
+    location: row.location,
+    index: row.index,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

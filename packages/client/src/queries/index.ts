@@ -1,3 +1,5 @@
+import { sha256 } from 'js-sha256';
+
 export * from './accounts/account-get';
 export * from './accounts/account-list';
 export * from './accounts/account-metadata-list';
@@ -46,6 +48,7 @@ export * from './files/upload-list-pending';
 export * from './icons/icon-svg-get';
 export * from './emojis/emoji-svg-get';
 export * from './apps/app-state';
+export * from './apps/tabs-list';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface QueryMap {}
@@ -67,3 +70,9 @@ export enum QueryErrorCode {
   WorkspaceNotFound = 'workspace_not_found',
   ApiError = 'api_error',
 }
+
+export const buildQueryKey = <T extends QueryInput>(input: T): string => {
+  const inputJson = JSON.stringify(input);
+  const hash = sha256(inputJson);
+  return hash;
+};

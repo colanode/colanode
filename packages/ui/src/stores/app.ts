@@ -8,10 +8,9 @@ import {
   AccountMetadataKey,
   AppMetadata,
   AppMetadataKey,
-  AppTab,
   Server,
   ServerState,
-  SidebarMenuType,
+  Tab,
   ThemeColor,
   ThemeMode,
   WindowSize,
@@ -47,6 +46,8 @@ interface AppStore extends AppStateOutput {
   upsertServer: (server: Server) => void;
   deleteServer: (domain: string) => void;
   updateServerState: (domain: string, state: ServerState) => void;
+  upsertTab: (tab: Tab) => void;
+  deleteTab: (id: string) => void;
 }
 
 export const useAppStore = create<AppStore>()(
@@ -60,6 +61,7 @@ export const useAppStore = create<AppStore>()(
     },
     servers: {},
     accounts: {},
+    tabs: {},
     initialize: (appState) => set({ ...appState, initialized: true }),
     updateAppMetadata: (metadata) =>
       set((state) => {
@@ -75,8 +77,8 @@ export const useAppStore = create<AppStore>()(
           state.metadata.account = metadata.value as string;
         } else if (metadata.key === 'window.size') {
           state.metadata.windowSize = metadata.value as WindowSize;
-        } else if (metadata.key === 'tabs') {
-          state.metadata.tabs = metadata.value as AppTab[];
+        } else if (metadata.key === 'tab') {
+          state.metadata.tab = metadata.value as string;
         }
       }),
     deleteAppMetadata: (key) =>
@@ -89,8 +91,8 @@ export const useAppStore = create<AppStore>()(
           state.metadata.account = undefined;
         } else if (key === 'window.size') {
           state.metadata.windowSize = undefined;
-        } else if (key === 'tabs') {
-          state.metadata.tabs = [];
+        } else if (key === 'tab') {
+          state.metadata.tab = undefined;
         }
       }),
     upsertAccount: (account) =>
@@ -186,9 +188,6 @@ export const useAppStore = create<AppStore>()(
 
         if (metadata.key === 'sidebar.width') {
           existingWorkspace.metadata.sidebarWidth = metadata.value as number;
-        } else if (metadata.key === 'sidebar.menu') {
-          existingWorkspace.metadata.sidebarMenu =
-            metadata.value as SidebarMenuType;
         } else if (metadata.key === 'location') {
           existingWorkspace.metadata.location = metadata.value as string;
         }
@@ -208,8 +207,6 @@ export const useAppStore = create<AppStore>()(
         const existingMetadata = { ...existingWorkspace.metadata };
         if (key === 'sidebar.width') {
           existingMetadata.sidebarWidth = undefined;
-        } else if (key === 'sidebar.menu') {
-          existingMetadata.sidebarMenu = undefined;
         } else if (key === 'location') {
           existingMetadata.location = undefined;
         }
@@ -231,6 +228,15 @@ export const useAppStore = create<AppStore>()(
         }
 
         server.state = serverState;
+      }),
+    upsertTab: (tab) =>
+      set((state) => {
+        state.tabs[tab.id] = tab;
+      }),
+    deleteTab: (id) =>
+      set((state) => {
+        const { tabs } = state;
+        delete tabs[id];
       }),
   }))
 );

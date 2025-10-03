@@ -1,4 +1,8 @@
-import { mapAccountMetadata, mapWorkspaceMetadata } from '@colanode/client/lib';
+import {
+  mapAccountMetadata,
+  mapTab,
+  mapWorkspaceMetadata,
+} from '@colanode/client/lib';
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
 import {
   AppAccountMetadata,
@@ -12,7 +16,7 @@ import {
 import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { AppService } from '@colanode/client/services/app-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
-import { Server } from '@colanode/client/types';
+import { Server, Tab } from '@colanode/client/types';
 import { Event } from '@colanode/client/types/events';
 import { build } from '@colanode/core';
 
@@ -154,11 +158,13 @@ export class AppStateQueryHandler implements QueryHandler<AppStateQueryInput> {
     const metadata = await this.buildAppMetadataState();
     const servers = this.buildServersState();
     const accounts = await this.buildAccountsState();
+    const tabs = await this.buildTabsState();
 
     return {
       metadata,
       servers,
       accounts,
+      tabs,
     };
   }
 
@@ -189,7 +195,7 @@ export class AppStateQueryHandler implements QueryHandler<AppStateQueryInput> {
       (metadata) => metadata.key === 'window.size'
     )?.value;
 
-    const tabs = appMetadata.find((metadata) => metadata.key === 'tabs')?.value;
+    const tab = appMetadata.find((metadata) => metadata.key === 'tab')?.value;
 
     return {
       account,
@@ -200,7 +206,7 @@ export class AppStateQueryHandler implements QueryHandler<AppStateQueryInput> {
       platform: platform ?? '',
       version: version ?? build.version,
       windowSize,
-      tabs: tabs ?? [],
+      tab,
     };
   }
 
@@ -289,18 +295,28 @@ export class AppStateQueryHandler implements QueryHandler<AppStateQueryInput> {
       (metadata) => metadata.key === 'sidebar.width'
     )?.value;
 
-    const sidebarMenu = metadata.find(
-      (metadata) => metadata.key === 'sidebar.menu'
-    )?.value;
-
     const location = metadata.find(
       (metadata) => metadata.key === 'location'
     )?.value;
 
     return {
       sidebarWidth,
-      sidebarMenu,
       location,
     };
+  }
+
+  private async buildTabsState(): Promise<Record<string, Tab>> {
+    const tabs = await this.app.database
+      .selectFrom('tabs')
+      .selectAll()
+      .execute();
+
+    const output: Record<string, Tab> = {};
+
+    for (const tab of tabs) {
+      output[tab.id] = mapTab(tab);
+    }
+
+    return output;
   }
 }

@@ -21,6 +21,7 @@ import { WorkspaceCreateScreen } from '@colanode/ui/components/workspaces/worksp
 import { WorkspaceHomeScreen } from '@colanode/ui/components/workspaces/workspace-home-screen';
 import { WorkspaceScreen } from '@colanode/ui/components/workspaces/workspace-screen';
 import { WorkspaceSettingsScreen } from '@colanode/ui/components/workspaces/workspace-settings-screen';
+import { WorkspaceTab } from '@colanode/ui/components/workspaces/workspace-tab';
 import { WorkspaceUsersScreen } from '@colanode/ui/components/workspaces/workspace-users-screen';
 import { useAppStore } from '@colanode/ui/stores/app';
 
@@ -140,6 +141,11 @@ export const workspaceRoute = createRoute({
   getParentRoute: () => accountRoute,
   path: '/$workspaceId',
   component: WorkspaceScreen,
+  context: (ctx) => {
+    return {
+      tab: <WorkspaceTab workspaceId={ctx.params.workspaceId} />,
+    };
+  },
 });
 
 export const workspaceMaskRoute = createRoute({

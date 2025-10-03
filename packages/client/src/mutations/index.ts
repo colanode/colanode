@@ -69,6 +69,9 @@ export * from './users/user-role-update';
 export * from './users/user-storage-update';
 export * from './users/users-create';
 export * from './files/temp-file-create';
+export * from './apps/tab-create';
+export * from './apps/tab-update';
+export * from './apps/tab-delete';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MutationMap {}

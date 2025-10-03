@@ -67,10 +67,10 @@ export class JobService {
       .set({ status: JobStatus.Waiting })
       .execute();
 
-    // this.jobLoop().catch((err) => console.error('Job loop error:', err));
-    // this.scheduleLoop().catch((err) =>
-    //   console.error('Schedule loop error:', err)
-    // );
+    this.jobLoop().catch((err) => console.error('Job loop error:', err));
+    this.scheduleLoop().catch((err) =>
+      console.error('Schedule loop error:', err)
+    );
   }
 
   public async addJob(

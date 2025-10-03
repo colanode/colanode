@@ -14,6 +14,9 @@ import { EmailVerifyMutationHandler } from './accounts/email-verify';
 import { GoogleLoginMutationHandler } from './accounts/google-login';
 import { AppMetadataDeleteMutationHandler } from './apps/app-metadata-delete';
 import { AppMetadataUpdateMutationHandler } from './apps/app-metadata-update';
+import { TabCreateMutationHandler } from './apps/tab-create';
+import { TabDeleteMutationHandler } from './apps/tab-delete';
+import { TabUpdateMutationHandler } from './apps/tab-update';
 import { AvatarUploadMutationHandler } from './avatars/avatar-upload';
 import { ChannelCreateMutationHandler } from './channels/channel-create';
 import { ChannelDeleteMutationHandler } from './channels/channel-delete';
@@ -160,5 +163,8 @@ export const buildMutationHandlerMap = (
     'workspace.delete': new WorkspaceDeleteMutationHandler(app),
     'user.storage.update': new UserStorageUpdateMutationHandler(app),
     'temp.file.create': new TempFileCreateMutationHandler(app),
+    'tab.create': new TabCreateMutationHandler(app),
+    'tab.update': new TabUpdateMutationHandler(app),
+    'tab.delete': new TabDeleteMutationHandler(app),
   };
 };

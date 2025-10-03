@@ -1,12 +1,12 @@
 import { Outlet } from '@tanstack/react-router';
 import { useRef, useState } from 'react';
 
-import { SidebarMobile } from '@colanode/ui/components/workspaces/sidebars/sidebar-mobile';
 import {
   ScrollArea,
   ScrollBar,
   ScrollViewport,
 } from '@colanode/ui/components/ui/scroll-area';
+import { SidebarMobile } from '@colanode/ui/components/workspaces/sidebars/sidebar-mobile';
 import { useApp } from '@colanode/ui/contexts/app';
 import { ContainerContext } from '@colanode/ui/contexts/container';
 import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';

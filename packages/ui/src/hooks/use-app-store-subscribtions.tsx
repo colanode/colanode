@@ -58,6 +58,12 @@ export const useAppStoreSubscriptions = () => {
         useAppStore.getState().upsertServer(event.server);
       } else if (event.type === 'server.deleted') {
         useAppStore.getState().deleteServer(event.server.domain);
+      } else if (event.type === 'tab.created') {
+        useAppStore.getState().upsertTab(event.tab);
+      } else if (event.type === 'tab.updated') {
+        useAppStore.getState().upsertTab(event.tab);
+      } else if (event.type === 'tab.deleted') {
+        useAppStore.getState().deleteTab(event.tab.id);
       }
     });
 

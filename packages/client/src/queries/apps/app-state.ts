@@ -1,8 +1,7 @@
 import {
   Account,
-  AppTab,
   Server,
-  SidebarMenuType,
+  Tab,
   ThemeColor,
   ThemeMode,
   WindowSize,
@@ -24,7 +23,6 @@ export type AppAccountState = Account & {
 };
 
 export type AppWorkspaceMetadata = {
-  sidebarMenu?: SidebarMenuType;
   sidebarWidth?: number;
   location?: string;
 };
@@ -42,13 +40,14 @@ export type AppMetadataState = {
     mode?: ThemeMode;
     color?: ThemeColor;
   };
-  tabs: AppTab[];
+  tab?: string;
 };
 
 export type AppStateOutput = {
   metadata: AppMetadataState;
   servers: Record<string, Server>;
   accounts: Record<string, AppAccountState>;
+  tabs: Record<string, Tab>;
 };
 
 declare module '@colanode/client/queries' {
