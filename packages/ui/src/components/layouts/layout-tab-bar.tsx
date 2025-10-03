@@ -3,7 +3,7 @@ import { X } from 'lucide-react';
 import { Tab } from '@colanode/client/types';
 import { LayoutTabBarContent } from '@colanode/ui/components/layouts/layout-tab-bar-content';
 import { cn } from '@colanode/ui/lib/utils';
-import { router } from '@colanode/ui/router';
+import { router } from '@colanode/ui/routes';
 
 interface LayoutTabBarProps {
   tab: Tab;

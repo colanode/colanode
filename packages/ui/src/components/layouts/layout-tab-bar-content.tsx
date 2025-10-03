@@ -1,6 +1,6 @@
 import { useMemo } from 'react';
 
-import { router } from '@colanode/ui/router';
+import { router } from '@colanode/ui/routes';
 
 interface TabBarContentProps {
   location: string;

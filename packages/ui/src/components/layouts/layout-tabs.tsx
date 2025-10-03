@@ -15,7 +15,7 @@ import {
 import { LayoutAddTabButton } from '@colanode/ui/components/layouts/layout-add-tab-button';
 import { LayoutTabBar } from '@colanode/ui/components/layouts/layout-tab-bar';
 import { cn } from '@colanode/ui/lib/utils';
-import { router, routeTree } from '@colanode/ui/router';
+import { router, routeTree } from '@colanode/ui/routes';
 import { useAppStore } from '@colanode/ui/stores/app';
 
 export const LayoutTabs = () => {
