@@ -1,27 +1,18 @@
 import {
-  createBrowserHistory,
   createMemoryHistory,
   createRouter,
   RouterProvider,
 } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
-import { useApp } from '@colanode/ui/contexts/app';
 import { routeTree } from '@colanode/ui/routes';
-import { routeMasks } from '@colanode/ui/routes/masks';
 
-export const LayoutSingle = () => {
-  const app = useApp();
-
+export const LayoutMobile = () => {
   const router = useMemo(() => {
-    const history =
-      app.type === 'web' ? createBrowserHistory() : createMemoryHistory();
-
     return createRouter({
       routeTree,
-      routeMasks: app.type === 'web' ? routeMasks : [],
       context: {},
-      history,
+      history: createMemoryHistory(),
       defaultPreload: 'intent',
       scrollRestoration: true,
       defaultStructuralSharing: true,

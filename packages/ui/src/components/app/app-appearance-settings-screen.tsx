@@ -1,10 +1,10 @@
 import { Check, Laptop, Moon, Palette, Sun } from 'lucide-react';
 
 import { ThemeColor, ThemeMode } from '@colanode/client/types';
-import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
-import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
+import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
+import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { cn } from '@colanode/ui/lib/utils';
 import { useAppStore } from '@colanode/ui/stores/app';

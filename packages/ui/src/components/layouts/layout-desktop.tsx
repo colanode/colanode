@@ -12,13 +12,13 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
-import { LayoutAddTabButton } from '@colanode/ui/components/layouts/layout-add-tab-button';
 import { LayoutTabBar } from '@colanode/ui/components/layouts/layout-tab-bar';
+import { TabAddButton } from '@colanode/ui/components/layouts/tabs/tab-add-button';
 import { cn } from '@colanode/ui/lib/utils';
 import { router, routeTree } from '@colanode/ui/routes';
 import { useAppStore } from '@colanode/ui/stores/app';
 
-export const LayoutTabs = () => {
+export const LayoutDesktop = () => {
   const allTabs = useAppStore((state) => state.tabs);
   const activeTabId = useAppStore((state) => state.metadata.tab);
   const tabs = Object.values(allTabs).sort((a, b) =>
@@ -146,7 +146,7 @@ export const LayoutTabs = () => {
           );
         })}
 
-        <LayoutAddTabButton onAddTab={addTab} />
+        <TabAddButton onClick={addTab} />
         <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-background/5 to-border/10" />
       </div>
 
