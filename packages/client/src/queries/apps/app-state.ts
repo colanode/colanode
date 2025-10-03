@@ -47,7 +47,7 @@ export type AppStateOutput = {
   metadata: AppMetadataState;
   servers: Record<string, Server>;
   accounts: Record<string, AppAccountState>;
-  tabs: Record<string, Tab>;
+  tabs: Tab[];
 };
 
 declare module '@colanode/client/queries' {

@@ -116,9 +116,8 @@ const createWindow = async () => {
   }
 
   const subscriptionId = eventBus.subscribe((event) => {
-    if (event.type === 'query.result.updated') {
-      mainWindow.webContents.send('event', event);
-    } else if (
+    mainWindow.webContents.send('event', event);
+    if (
       event.type === 'app.metadata.updated' &&
       event.metadata.key === 'theme.mode'
     ) {

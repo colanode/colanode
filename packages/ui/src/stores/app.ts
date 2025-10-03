@@ -61,7 +61,7 @@ export const useAppStore = create<AppStore>()(
     },
     servers: {},
     accounts: {},
-    tabs: {},
+    tabs: [],
     initialize: (appState) => set({ ...appState, initialized: true }),
     updateAppMetadata: (metadata) =>
       set((state) => {
@@ -231,12 +231,20 @@ export const useAppStore = create<AppStore>()(
       }),
     upsertTab: (tab) =>
       set((state) => {
-        state.tabs[tab.id] = tab;
+        console.log('upsertTab', tab);
+        const existingTab = state.tabs.find((t) => t.id === tab.id);
+        if (existingTab) {
+          state.tabs[state.tabs.indexOf(existingTab)] = tab;
+        } else {
+          state.tabs.push(tab);
+        }
       }),
     deleteTab: (id) =>
       set((state) => {
-        const { tabs } = state;
-        delete tabs[id];
+        const index = state.tabs.findIndex((t) => t.id === id);
+        if (index !== -1) {
+          state.tabs.splice(index, 1);
+        }
       }),
   }))
 );

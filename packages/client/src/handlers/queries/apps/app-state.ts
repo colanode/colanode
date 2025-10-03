@@ -305,18 +305,12 @@ export class AppStateQueryHandler implements QueryHandler<AppStateQueryInput> {
     };
   }
 
-  private async buildTabsState(): Promise<Record<string, Tab>> {
+  private async buildTabsState(): Promise<Tab[]> {
     const tabs = await this.app.database
       .selectFrom('tabs')
       .selectAll()
       .execute();
 
-    const output: Record<string, Tab> = {};
-
-    for (const tab of tabs) {
-      output[tab.id] = mapTab(tab);
-    }
-
-    return output;
+    return tabs.map(mapTab);
   }
 }
