@@ -14,6 +14,7 @@ import { LoginScreen } from '@colanode/ui/components/accounts/login-screen';
 import { AppAppearanceSettingsScreen } from '@colanode/ui/components/app/app-appearance-settings-screen';
 import { NodeErrorScreen } from '@colanode/ui/components/nodes/node-error-screen';
 import { NodeScreen } from '@colanode/ui/components/nodes/node-screen';
+import { NodeTab } from '@colanode/ui/components/nodes/node-tab';
 import { WorkspaceDownloadsScreen } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-screen';
 import { WorkspaceStorageScreen } from '@colanode/ui/components/workspaces/storage/workspace-storage-screen';
 import { WorkspaceUploadsScreen } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-screen';
@@ -143,7 +144,12 @@ export const workspaceRoute = createRoute({
   component: WorkspaceScreen,
   context: (ctx) => {
     return {
-      tab: <WorkspaceTab workspaceId={ctx.params.workspaceId} />,
+      tab: (
+        <WorkspaceTab
+          accountId={ctx.params.accountId}
+          workspaceId={ctx.params.workspaceId}
+        />
+      ),
     };
   },
 });
@@ -252,6 +258,17 @@ export const nodeRoute = createRoute({
   path: '/$nodeId',
   component: NodeScreen,
   errorComponent: NodeErrorScreen,
+  context: (ctx) => {
+    return {
+      tab: (
+        <NodeTab
+          accountId={ctx.params.accountId}
+          workspaceId={ctx.params.workspaceId}
+          nodeId={ctx.params.nodeId}
+        />
+      ),
+    };
+  },
 });
 
 export const nodeMaskRoute = createRoute({
