@@ -58,7 +58,7 @@ If you prefer to host your own Colanode server, check out the [`hosting/`](hosti
 
 - **Postgres** with the **pgvector** extension.
 - **Redis** (any Redis-compatible service will work, e.g., Valkey).
-- **S3-compatible storage** (supporting basic file operations: PUT, GET, DELETE).
+- **Storage backend** for user files. Colanode defaults to local filesystem storage, but you can switch to **S3-compatible**, **Google Cloud Storage**, or **Azure Blob Storage** backends by setting `STORAGE_TYPE`.
 - **Colanode server API**, provided as a Docker image.
 
 All required environment variables for the Colanode server can be found in the [`hosting/docker/docker-compose.yaml`](hosting/docker/docker-compose.yaml) file or [`hosting/kubernetes/README.md`](hosting/kubernetes/README.md) for Kubernetes deployments.
@@ -93,11 +93,18 @@ To run Colanode locally in development mode:
    npm run dev
    ```
 
-   To spin up the local dependencies (Postgres, Redis, Minio & Mail server) with Docker Compose, run this from
+   To spin up the local dependencies (Postgres, Redis, and Mail server) with Docker Compose—using filesystem storage
+   by default—run this from
    the project root:
 
    ```bash
    docker compose -f hosting/docker/docker-compose.yaml up -d
+   ```
+
+   When you prefer an S3-compatible backend locally, enable the optional MinIO service with the `s3` profile:
+
+   ```bash
+   docker compose -f hosting/docker/docker-compose.yaml --profile s3 up -d
    ```
 
    The compose file includes a `server` service. When you want to run the API locally with `npm run dev`, comment

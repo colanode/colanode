@@ -28,7 +28,12 @@ services:
     networks:
       - colanode_network
 
+  # ---------------------------------------------------------------
+  # Optional MinIO Object Storage (Enable when using S3 storage)
+  # ---------------------------------------------------------------
   minio:
+    profiles:
+      - s3
     image: minio/minio:RELEASE.2025-04-08T15-41-24Z
     container_name: colanode_minio
     restart: always
@@ -77,7 +82,6 @@ services:
     depends_on:
       - postgres
       - valkey
-      - minio
       # - smtp # Optional
     environment:
       # ───────────────────────────────────────────────────────────────
@@ -158,15 +162,20 @@ services:
       # REDIS_EVENTS_CHANNEL: 'events'
 
       # ───────────────────────────────────────────────────────────────
-      # S3 configuration for files.
-      # In the future we will support other storage providers.
+      # Storage configuration
+      # Supported storage types: 'file', 's3', 'gcs', 'azure'
+      # By default we store files on the local filesystem.
       # ───────────────────────────────────────────────────────────────
-      STORAGE_S3_ENDPOINT: 'http://minio:9000'
-      STORAGE_S3_ACCESS_KEY: 'minioadmin'
-      STORAGE_S3_SECRET_KEY: 'your_minio_password'
-      STORAGE_S3_BUCKET: 'colanode'
-      STORAGE_S3_REGION: 'us-east-1'
-      STORAGE_S3_FORCE_PATH_STYLE: 'true'
+      STORAGE_TYPE: 'file'
+      STORAGE_FILE_DIRECTORY: '/var/lib/colanode/storage'
+      # To use the optional MinIO service (or any S3-compatible storage):
+      # STORAGE_TYPE: 's3'
+      # STORAGE_S3_ENDPOINT: 'http://minio:9000'
+      # STORAGE_S3_ACCESS_KEY: 'minioadmin'
+      # STORAGE_S3_SECRET_KEY: 'your_minio_password'
+      # STORAGE_S3_BUCKET: 'colanode'
+      # STORAGE_S3_REGION: 'us-east-1'
+      # STORAGE_S3_FORCE_PATH_STYLE: 'true'
 
       # ───────────────────────────────────────────────────────────────
       # SMTP configuration
@@ -196,6 +205,8 @@ services:
 
     ports:
       - '3000:3000'
+    volumes:
+      - server_storage:/var/lib/colanode/storage
     networks:
       - colanode_network
 
@@ -212,6 +223,7 @@ volumes:
   postgres_data:
   valkey_data:
   minio_data:
+  server_storage:
 
 networks:
   colanode_network:

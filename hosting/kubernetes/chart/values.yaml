@@ -114,14 +114,6 @@ colanode:
     REDIS_TUS_KV_PREFIX: 'colanode:tus:kv'
     REDIS_EVENTS_CHANNEL: 'events'
 
-    # S3 storage for files
-    STORAGE_S3_ENDPOINT: 'http://{{ .Release.Name }}-minio:9000'
-    STORAGE_S3_ACCESS_KEY: 'minioadmin'
-    STORAGE_S3_SECRET_KEY: '$(MINIO_ROOT_PASSWORD)'
-    STORAGE_S3_BUCKET: 'colanode'
-    STORAGE_S3_REGION: 'us-east-1'
-    STORAGE_S3_FORCE_PATH_STYLE: 'true'
-
     # Email configuration
     SMTP_ENABLED: 'false'
     # SMTP_HOST: ""
@@ -130,6 +122,80 @@ colanode:
     # SMTP_PASSWORD: ""
     # SMTP_EMAIL_FROM: ""
     # SMTP_EMAIL_FROM_NAME: "Colanode"
+
+  storage:
+    # -- Storage backend type. Supported values: file, s3, gcs, azure
+    type: file
+
+    file:
+      # -- Directory inside the pod where files are stored when using file storage
+      directory: /var/lib/colanode/storage
+      persistence:
+        # -- Enable a PersistentVolumeClaim for file storage
+        enabled: true
+        # -- Use an existing PVC instead of creating one
+        existingClaim: ''
+        # -- Requested storage size for the PVC (only when creating a new claim)
+        size: 20Gi
+        # -- Storage class for the PVC. Leave empty to use the cluster default
+        storageClass: ''
+        # -- Access modes for the PVC
+        accessModes:
+          - ReadWriteOnce
+
+    s3:
+      # -- Custom endpoint for S3-compatible storage. Leave empty to use the bundled MinIO service hostname
+      endpoint: ''
+      # -- Bucket name to use when STORAGE_TYPE is s3
+      bucket: colanode
+      # -- Region for the S3 bucket
+      region: us-east-1
+      # -- Force path-style URLs (required for MinIO and most S3-compatible providers)
+      forcePathStyle: true
+      accessKey:
+        # -- Optional plain-text access key (prefer using secrets in production)
+        value: ''
+        # -- Name of an existing secret that stores the access key (takes precedence over value)
+        existingSecret: ''
+        # -- Key within the existing secret that stores the access key
+        secretKey: ''
+      secretKey:
+        # -- Optional plain-text secret key (prefer using secrets in production)
+        value: ''
+        # -- Name of an existing secret that stores the secret key (takes precedence over value)
+        existingSecret: ''
+        # -- Key within the existing secret that stores the secret key
+        secretKey: ''
+
+    gcs:
+      # -- Bucket name when STORAGE_TYPE is gcs
+      bucket: ''
+      # -- GCP project ID associated with the bucket
+      projectId: ''
+      # -- Optional direct path to the credentials file (used when credentialsSecret.name is empty)
+      credentialsPath: ''
+      credentialsSecret:
+        # -- Name of the secret that contains the GCP service account JSON key
+        name: ''
+        # -- Key inside the secret that stores the JSON key
+        key: ''
+        # -- Directory where the secret will be mounted
+        mountPath: /var/secrets/gcp
+        # -- File name to use when mounting the JSON key
+        fileName: service-account.json
+
+    azure:
+      # -- Storage account name when STORAGE_TYPE is azure
+      account: ''
+      # -- Blob container name when STORAGE_TYPE is azure
+      containerName: ''
+      accountKey:
+        # -- Optional plain-text storage account key
+        value: ''
+        # -- Name of an existing secret that stores the account key (takes precedence over value)
+        existingSecret: ''
+        # -- Key within the existing secret that stores the account key
+        secretKey: ''
 
 global:
   security:
@@ -178,6 +244,7 @@ redis:
 
 # MinIO object storage
 minio:
+  enabled: false
   auth:
     rootUser: 'minioadmin'
     # password: ""  # Leave empty to auto-generate

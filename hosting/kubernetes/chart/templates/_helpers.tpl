@@ -83,6 +83,13 @@ Return the MinIO hostname
 {{- end }}
 
 {{/*
+Return the default PVC name used for file storage
+*/}}
+{{- define "colanode.storagePvcName" -}}
+{{- printf "%s-storage" (include "colanode.fullname" .) -}}
+{{- end }}
+
+{{/*
 Helper to get value from secret key reference or direct value
 Usage: {{ include "colanode.getValueOrSecret" (dict "key" "theKey" "value" .Values.path.to.value) }}
 */}}
@@ -210,34 +217,81 @@ Colanode Server Environment Variables
   value: {{ .Values.colanode.config.REDIS_EVENTS_CHANNEL | quote }}
 
 # ───────────────────────────────────────────────────────────────
-# S3 Configuration for Storage
+# Storage Configuration
 # ───────────────────────────────────────────────────────────────
+- name: STORAGE_TYPE
+  value: {{ default "file" .Values.colanode.storage.type | quote }}
+{{- $storageType := default "file" .Values.colanode.storage.type }}
+{{- if eq $storageType "file" }}
+- name: STORAGE_FILE_DIRECTORY
+  value: {{ required "colanode.storage.file.directory must be set when STORAGE_TYPE is file" .Values.colanode.storage.file.directory | quote }}
+{{- end }}
+{{- if eq $storageType "s3" }}
+{{- $s3 := .Values.colanode.storage.s3 }}
+{{- $endpoint := $s3.endpoint }}
+{{- if and (not $endpoint) (not .Values.minio.enabled) }}
+{{- fail "colanode.storage.s3.endpoint must be provided when MinIO is disabled" }}
+{{- end }}
 - name: STORAGE_S3_ENDPOINT
-  value: "http://{{ include "colanode.minio.hostname" . }}:9000"
-- name: STORAGE_S3_ACCESS_KEY
-  {{- if .Values.minio.auth.existingSecret }}
-  {{- include "colanode.getRequiredValueOrSecret" (dict "key" "minio.auth.rootUser" "value" (dict "value" .Values.minio.auth.rootUser "existingSecret" .Values.minio.auth.existingSecret "secretKey" .Values.minio.auth.rootUserKey )) | nindent 2 }}
-  {{- else }}
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Release.Name }}-minio
-      key: {{ .Values.minio.auth.rootUserKey }}
-  {{- end }}
-- name: STORAGE_S3_SECRET_KEY
-  {{- if .Values.minio.auth.existingSecret }}
-  {{- include "colanode.getRequiredValueOrSecret" (dict "key" "minio.auth.rootPassword" "value" (dict "value" .Values.minio.auth.rootPassword "existingSecret" .Values.minio.auth.existingSecret "secretKey" .Values.minio.auth.rootPasswordKey )) | nindent 2 }}
-  {{- else }}
-  valueFrom:
-    secretKeyRef:
-      name: {{ .Release.Name }}-minio
-      key: {{ .Values.minio.auth.rootPasswordKey }}
-  {{- end }}
+  value: {{ if $endpoint }}{{ $endpoint | quote }}{{ else }}{{ printf "http://%s:9000" (include "colanode.minio.hostname" .) | quote }}{{ end }}
 - name: STORAGE_S3_BUCKET
-  value: "colanode"
+  value: {{ required "colanode.storage.s3.bucket must be set when STORAGE_TYPE is s3" $s3.bucket | quote }}
 - name: STORAGE_S3_REGION
-  value: "us-east-1"
+  value: {{ required "colanode.storage.s3.region must be set when STORAGE_TYPE is s3" $s3.region | quote }}
 - name: STORAGE_S3_FORCE_PATH_STYLE
-  value: "true"
+  value: {{ ternary "true" "false" (default true $s3.forcePathStyle) | quote }}
+- name: STORAGE_S3_ACCESS_KEY
+{{- if or $s3.accessKey.value $s3.accessKey.existingSecret }}
+  {{- include "colanode.getRequiredValueOrSecret" (dict "key" "colanode.storage.s3.accessKey" "value" $s3.accessKey) | nindent 2 }}
+{{- else if .Values.minio.enabled }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ if .Values.minio.auth.existingSecret }}{{ .Values.minio.auth.existingSecret }}{{ else }}{{ printf "%s-minio" .Release.Name }}{{ end }}
+      key: {{ .Values.minio.auth.rootUserKey }}
+{{- else }}
+  {{- fail "An S3 access key must be provided via colanode.storage.s3.accessKey when STORAGE_TYPE is s3 and MinIO is disabled" }}
+{{- end }}
+- name: STORAGE_S3_SECRET_KEY
+{{- if or $s3.secretKey.value $s3.secretKey.existingSecret }}
+  {{- include "colanode.getRequiredValueOrSecret" (dict "key" "colanode.storage.s3.secretKey" "value" $s3.secretKey) | nindent 2 }}
+{{- else if .Values.minio.enabled }}
+  valueFrom:
+    secretKeyRef:
+      name: {{ if .Values.minio.auth.existingSecret }}{{ .Values.minio.auth.existingSecret }}{{ else }}{{ printf "%s-minio" .Release.Name }}{{ end }}
+      key: {{ .Values.minio.auth.rootPasswordKey }}
+{{- else }}
+  {{- fail "An S3 secret key must be provided via colanode.storage.s3.secretKey when STORAGE_TYPE is s3 and MinIO is disabled" }}
+{{- end }}
+{{- end }}
+{{- if eq $storageType "gcs" }}
+{{- $gcs := .Values.colanode.storage.gcs }}
+- name: STORAGE_GCS_BUCKET
+  value: {{ required "colanode.storage.gcs.bucket must be set when STORAGE_TYPE is gcs" $gcs.bucket | quote }}
+- name: STORAGE_GCS_PROJECT_ID
+  value: {{ required "colanode.storage.gcs.projectId must be set when STORAGE_TYPE is gcs" $gcs.projectId | quote }}
+{{- if $gcs.credentialsSecret.name }}
+- name: STORAGE_GCS_CREDENTIALS
+  value: {{ printf "%s/%s" (trimSuffix "/" $gcs.credentialsSecret.mountPath) $gcs.credentialsSecret.fileName | quote }}
+{{- else if $gcs.credentialsPath }}
+- name: STORAGE_GCS_CREDENTIALS
+  value: {{ $gcs.credentialsPath | quote }}
+{{- else }}
+{{- fail "Provide colanode.storage.gcs.credentialsSecret or credentialsPath when STORAGE_TYPE is gcs" }}
+{{- end }}
+{{- end }}
+{{- if eq $storageType "azure" }}
+{{- $azure := .Values.colanode.storage.azure }}
+- name: STORAGE_AZURE_ACCOUNT
+  value: {{ required "colanode.storage.azure.account must be set when STORAGE_TYPE is azure" $azure.account | quote }}
+- name: STORAGE_AZURE_CONTAINER_NAME
+  value: {{ required "colanode.storage.azure.containerName must be set when STORAGE_TYPE is azure" $azure.containerName | quote }}
+- name: STORAGE_AZURE_ACCOUNT_KEY
+{{- if or $azure.accountKey.value $azure.accountKey.existingSecret }}
+  {{- include "colanode.getRequiredValueOrSecret" (dict "key" "colanode.storage.azure.accountKey" "value" $azure.accountKey) | nindent 2 }}
+{{- else }}
+  {{- fail "An Azure storage account key must be provided via colanode.storage.azure.accountKey when STORAGE_TYPE is azure" }}
+{{- end }}
+{{- end }}
 
 # ───────────────────────────────────────────────────────────────
 # SMTP configuration

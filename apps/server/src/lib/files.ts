@@ -1,8 +1,5 @@
-import { DeleteObjectCommand } from '@aws-sdk/client-s3';
-
 import { FileAttributes } from '@colanode/core';
-import { s3Client } from '@colanode/server/data/storage';
-import { config } from '@colanode/server/lib/config';
+import { getStorage } from '@colanode/server/lib/storage';
 
 export const buildFilePath = (
   workspaceId: string,
@@ -13,10 +10,6 @@ export const buildFilePath = (
 };
 
 export const deleteFile = async (path: string) => {
-  const command = new DeleteObjectCommand({
-    Bucket: config.storage.bucket,
-    Key: path,
-  });
-
-  await s3Client.send(command);
+  const storage = getStorage();
+  await storage.delete(path);
 };
