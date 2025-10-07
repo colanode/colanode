@@ -18,7 +18,7 @@ import {
   buildLoginVerifyOutput,
 } from '@colanode/server/lib/accounts';
 import { config } from '@colanode/server/lib/config';
-import { getStorage } from '@colanode/server/lib/storage';
+import { storage } from '@colanode/server/lib/storage';
 import { AccountAttributes } from '@colanode/server/types/accounts';
 
 const GoogleUserInfoUrl = 'https://www.googleapis.com/oauth2/v1/userinfo';
@@ -112,7 +112,6 @@ const uploadGooglePictureAsAvatar = async (
       .toBuffer();
 
     const avatarId = generateId(IdType.Avatar);
-    const storage = getStorage();
     await storage.upload(`avatars/${avatarId}.jpeg`, jpegBuffer, 'image/jpeg');
 
     return avatarId;

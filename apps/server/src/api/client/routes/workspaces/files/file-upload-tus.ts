@@ -10,10 +10,10 @@ import { fetchCounter } from '@colanode/server/lib/counters';
 import { generateUrl } from '@colanode/server/lib/fastify';
 import { buildFilePath, deleteFile } from '@colanode/server/lib/files';
 import { mapNode, updateNode } from '@colanode/server/lib/nodes';
+import { storage } from '@colanode/server/lib/storage';
 import { RedisLocker } from '@colanode/server/lib/tus/redis-locker';
-import { createTusStore } from '@colanode/server/lib/tus/storage-factory';
 
-const tusStore = await createTusStore(redis);
+const tusStore = await storage.tusDataStore(redis);
 
 export const fileUploadTusRoute: FastifyPluginCallbackZod = (
   instance,

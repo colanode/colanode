@@ -9,7 +9,7 @@ import {
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
-import { getStorage } from '@colanode/server/lib/storage';
+import { storage } from '@colanode/server/lib/storage';
 
 export const fileDownloadRoute: FastifyPluginCallbackZod = (
   instance,
@@ -81,7 +81,6 @@ export const fileDownloadRoute: FastifyPluginCallbackZod = (
       }
 
       try {
-        const storage = getStorage();
         const { stream, contentType } = await storage.download(upload.path);
 
         if (contentType) {

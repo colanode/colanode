@@ -8,7 +8,7 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
-import { getStorage } from '@colanode/server/lib/storage';
+import { storage } from '@colanode/server/lib/storage';
 
 const ALLOWED_MIME_TYPES = [
   'image/jpeg',
@@ -68,7 +68,6 @@ export const avatarUploadRoute: FastifyPluginCallbackZod = (
           .toBuffer();
 
         const avatarId = generateId(IdType.Avatar);
-        const storage = getStorage();
         await storage.upload(`avatars/${avatarId}.jpeg`, jpegBuffer, 'image/jpeg');
 
         return { success: true, id: avatarId };

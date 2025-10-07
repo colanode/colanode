@@ -12,7 +12,7 @@ import { database } from '@colanode/server/data/database';
 import { fetchCounter } from '@colanode/server/lib/counters';
 import { buildFilePath } from '@colanode/server/lib/files';
 import { mapNode, updateNode } from '@colanode/server/lib/nodes';
-import { getStorage } from '@colanode/server/lib/storage';
+import { storage } from '@colanode/server/lib/storage';
 
 export const fileUploadRoute: FastifyPluginCallbackZod = (
   instance,
@@ -148,8 +148,6 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
       const path = buildFilePath(workspaceId, fileId, file.attributes);
 
       const stream = request.raw;
-      const storage = getStorage();
-
       try {
         await storage.upload(
           path,

@@ -2,7 +2,7 @@ import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
 import { ApiErrorCode } from '@colanode/core';
-import { getStorage } from '@colanode/server/lib/storage';
+import { storage } from '@colanode/server/lib/storage';
 
 export const avatarDownloadRoute: FastifyPluginCallbackZod = (
   instance,
@@ -20,7 +20,6 @@ export const avatarDownloadRoute: FastifyPluginCallbackZod = (
     handler: async (request, reply) => {
       try {
         const avatarId = request.params.avatarId;
-        const storage = getStorage();
         const { stream } = await storage.download(`avatars/${avatarId}.jpeg`);
 
         reply.header('Content-Type', 'image/jpeg');

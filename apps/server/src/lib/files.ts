@@ -1,5 +1,5 @@
 import { FileAttributes } from '@colanode/core';
-import { getStorage } from '@colanode/server/lib/storage';
+import { storage } from '@colanode/server/lib/storage';
 
 export const buildFilePath = (
   workspaceId: string,
@@ -10,6 +10,5 @@ export const buildFilePath = (
 };
 
 export const deleteFile = async (path: string) => {
-  const storage = getStorage();
   await storage.delete(path);
 };
