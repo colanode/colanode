@@ -1,11 +1,11 @@
 import { createRoute, notFound, redirect } from '@tanstack/react-router';
 
+import { database } from '@colanode/ui/data';
 import {
   workspaceMaskRoute,
   workspaceRoute,
 } from '@colanode/ui/routes/account/workspace';
 import { getAccountForWorkspace } from '@colanode/ui/routes/utils';
-import { useAppStore } from '@colanode/ui/stores/app';
 
 export const workspaceRedirectRoute = createRoute({
   getParentRoute: () => workspaceRoute,
@@ -14,14 +14,16 @@ export const workspaceRedirectRoute = createRoute({
   beforeLoad: (ctx) => {
     const accountId = ctx.params.accountId;
     const workspaceId = ctx.params.workspaceId;
-    const workspace =
-      useAppStore.getState().accounts[accountId]?.workspaces[workspaceId];
+    const workspace = database.accountWorkspaces(accountId).get(workspaceId);
 
     if (!workspace) {
       throw notFound();
     }
 
-    const lastLocation = workspace.metadata.location;
+    const lastLocation = database
+      .workspaceMetadata(accountId, workspaceId)
+      .get('location')?.value as string | undefined;
+
     if (lastLocation) {
       throw redirect({ to: lastLocation, replace: true });
     }
@@ -43,7 +45,7 @@ export const workspaceRedirectMaskRoute = createRoute({
     if (account) {
       throw redirect({
         to: '/acc/$accountId/$workspaceId/home',
-        params: { accountId: account.id, workspaceId: ctx.params.workspaceId },
+        params: { accountId: account, workspaceId: ctx.params.workspaceId },
         replace: true,
       });
     }

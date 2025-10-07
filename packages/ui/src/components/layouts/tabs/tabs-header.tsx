@@ -1,20 +1,26 @@
-import { useMemo } from 'react';
+import { useLiveQuery } from '@tanstack/react-db';
 
-import { compareString } from '@colanode/core';
 import { TabAddButton } from '@colanode/ui/components/layouts/tabs/tab-add-button';
 import { TabsHeaderItem } from '@colanode/ui/components/layouts/tabs/tabs-header-item';
-import { useAppStore } from '@colanode/ui/stores/app';
+import { database } from '@colanode/ui/data';
 
 export const TabsHeader = () => {
-  const tabs = useAppStore((state) => state.tabs);
+  const tabsQuery = useLiveQuery((q) =>
+    q
+      .from({ tabs: database.tabs })
+      .orderBy(({ tabs }) => tabs.index, `asc`)
+      .select(({ tabs }) => {
+        return {
+          id: tabs.id,
+          index: tabs.index,
+        };
+      })
+  );
 
-  const sortedTabs = useMemo(() => {
-    return tabs.toSorted((a, b) => compareString(a.index, b.index));
-  }, [tabs]);
-
+  const tabs = tabsQuery.data;
   return (
     <div className="relative flex bg-sidebar border-b border-border h-10 overflow-hidden">
-      {sortedTabs.map((tab, index) => {
+      {tabs.map((tab, index) => {
         const isLast = index === tabs.length - 1;
 
         return (

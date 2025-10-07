@@ -22,7 +22,7 @@ export const workspaceDownloadsMaskRoute = createRoute({
     if (account) {
       throw redirect({
         to: '/acc/$accountId/$workspaceId/downloads',
-        params: { accountId: account.id, workspaceId: ctx.params.workspaceId },
+        params: { accountId: account, workspaceId: ctx.params.workspaceId },
         replace: true,
       });
     }

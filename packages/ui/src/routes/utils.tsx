@@ -1,20 +1,16 @@
-import { useAppStore } from '@colanode/ui/stores/app';
+import { database } from '@colanode/ui/data';
 
 export const getDefaultAccount = () => {
-  const state = useAppStore.getState();
-  const accounts = Object.values(state.accounts);
-  const lastUsedAccountId = state.metadata.account;
-  if (lastUsedAccountId) {
-    const lastUsedAccount = accounts.find(
-      (account) => account.id === lastUsedAccountId
-    );
+  const accountsIds = database.accounts.map((account) => account.id);
+  const lastUsedAccountId = database.metadata.get('account')?.value as
+    | string
+    | undefined;
 
-    if (lastUsedAccount) {
-      return lastUsedAccount;
-    }
+  if (lastUsedAccountId && accountsIds.includes(lastUsedAccountId)) {
+    return lastUsedAccountId;
   }
 
-  const defaultAccount = accounts[0];
+  const defaultAccount = accountsIds[0];
   if (defaultAccount) {
     return defaultAccount;
   }
@@ -23,11 +19,18 @@ export const getDefaultAccount = () => {
 };
 
 export const getAccountForWorkspace = (workspaceId: string) => {
-  const state = useAppStore.getState();
-  const accounts = Object.values(state.accounts);
-  return accounts.find((account) =>
-    Object.values(account.workspaces).some(
-      (workspace) => workspace.id === workspaceId
-    )
-  );
+  console.log('Colanode | Getting account for workspace', workspaceId);
+  const accountsIds = database.accounts.map((account) => account.id);
+  console.log('Colanode | Accounts ids', accountsIds);
+  for (const accountId of accountsIds) {
+    const workspaceIds = database
+      .accountWorkspaces(accountId)
+      .map((workspace) => workspace.id);
+
+    if (workspaceIds.includes(workspaceId)) {
+      return accountId;
+    }
+  }
+
+  return undefined;
 };

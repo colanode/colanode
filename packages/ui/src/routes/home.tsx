@@ -12,7 +12,7 @@ export const homeRoute = createRoute({
     if (defaultAccount) {
       throw redirect({
         to: '/acc/$accountId',
-        params: { accountId: defaultAccount.id },
+        params: { accountId: defaultAccount },
         replace: true,
       });
     }

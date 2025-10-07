@@ -1,3 +1,4 @@
+import { useLiveQuery } from '@tanstack/react-db';
 import { useRouter } from '@tanstack/react-router';
 import { HouseIcon } from 'lucide-react';
 import { useState, Fragment, useEffect, useCallback } from 'react';
@@ -14,7 +15,7 @@ import { ServerDropdown } from '@colanode/ui/components/servers/server-dropdown'
 import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { ServerContext } from '@colanode/ui/contexts/server';
-import { useAppStore } from '@colanode/ui/stores/app';
+import { database } from '@colanode/ui/data';
 
 type LoginPanelState = {
   type: 'login';
@@ -49,11 +50,17 @@ type PanelState =
 
 export const LoginForm = () => {
   const router = useRouter();
-  const storeServers = useAppStore((state) => state.servers);
-  const servers = Object.values(storeServers);
+  const serversQuery = useLiveQuery((q) =>
+    q.from({ servers: database.servers })
+  );
+  const servers = serversQuery.data;
 
-  const storeAccounts = useAppStore((state) => state.accounts);
-  const accounts = Object.values(storeAccounts);
+  const accountsQuery = useLiveQuery((q) =>
+    q.from({ accounts: database.accounts }).select(({ accounts }) => ({
+      id: accounts.id,
+    }))
+  );
+  const accounts = accountsQuery.data;
 
   const [serverDomain, setServerDomain] = useState<string | null>(
     servers[0]?.domain ?? null

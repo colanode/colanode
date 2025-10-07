@@ -22,7 +22,7 @@ export const workspaceHomeMaskRoute = createRoute({
     if (account) {
       throw redirect({
         to: '/acc/$accountId/$workspaceId/home',
-        params: { accountId: account.id, workspaceId: ctx.params.workspaceId },
+        params: { accountId: account, workspaceId: ctx.params.workspaceId },
         replace: true,
       });
     }

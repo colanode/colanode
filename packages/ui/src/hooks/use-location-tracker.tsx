@@ -1,7 +1,7 @@
 import { useRouter } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
-import { useAppStore } from '@colanode/ui/stores/app';
+import { database } from '@colanode/ui/data';
 
 export const useLocationTracker = (accountId: string, workspaceId: string) => {
   const router = useRouter();
@@ -17,18 +17,23 @@ export const useLocationTracker = (accountId: string, workspaceId: string) => {
         return;
       }
 
-      useAppStore.getState().updateWorkspaceMetadata(accountId, workspaceId, {
-        key: 'location',
-        value: location,
-      });
-
-      window.colanode.executeMutation({
-        type: 'workspace.metadata.update',
-        accountId: accountId,
-        workspaceId: workspaceId,
-        key: 'location',
-        value: location,
-      });
+      const workspaceMetadata = database.workspaceMetadata(
+        accountId,
+        workspaceId
+      );
+      const currentLocation = workspaceMetadata.get('location');
+      if (currentLocation) {
+        workspaceMetadata.update('location', (metadata) => {
+          metadata.value = location;
+        });
+      } else {
+        workspaceMetadata.insert({
+          key: 'location',
+          value: location,
+          createdAt: new Date().toISOString(),
+          updatedAt: null,
+        });
+      }
     });
   }, [accountId, workspaceId, router]);
 };

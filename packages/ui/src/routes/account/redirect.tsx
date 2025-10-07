@@ -1,7 +1,7 @@
 import { createRoute, notFound, redirect } from '@tanstack/react-router';
 
+import { database } from '@colanode/ui/data';
 import { accountRoute } from '@colanode/ui/routes/account';
-import { useAppStore } from '@colanode/ui/stores/app';
 
 export const accountRedirectRoute = createRoute({
   getParentRoute: () => accountRoute,
@@ -9,36 +9,35 @@ export const accountRedirectRoute = createRoute({
   component: () => null,
   beforeLoad: (ctx) => {
     const accountId = ctx.params.accountId;
-    const state = useAppStore.getState();
-    const account = state.accounts[accountId];
+    const account = database.accounts.get(accountId);
     if (!account) {
       throw notFound();
     }
 
-    const workspaces = Object.values(account.workspaces);
-    const lastUsedWorkspaceId = account.metadata.workspace;
-    if (lastUsedWorkspaceId) {
-      const lastUsedWorkspace = workspaces.find(
-        (workspace) => workspace.id === lastUsedWorkspaceId
-      );
+    const workspaceIds = database
+      .accountWorkspaces(accountId)
+      .map((workspace) => workspace.id);
 
-      if (lastUsedWorkspace) {
-        throw redirect({
-          to: '/acc/$accountId/$workspaceId',
-          params: {
-            accountId: account.id,
-            workspaceId: lastUsedWorkspace.id,
-          },
-          replace: true,
-        });
-      }
+    const lastUsedWorkspaceId = database
+      .accountMetadata(accountId)
+      .get('workspace')?.value as string | undefined;
+
+    if (lastUsedWorkspaceId && workspaceIds.includes(lastUsedWorkspaceId)) {
+      throw redirect({
+        to: '/acc/$accountId/$workspaceId',
+        params: {
+          accountId: account.id,
+          workspaceId: lastUsedWorkspaceId,
+        },
+        replace: true,
+      });
     }
 
-    const defaultWorkspace = workspaces[0];
+    const defaultWorkspace = workspaceIds[0];
     if (defaultWorkspace) {
       throw redirect({
         to: '/acc/$accountId/$workspaceId',
-        params: { accountId: account.id, workspaceId: defaultWorkspace.id },
+        params: { accountId: account.id, workspaceId: defaultWorkspace },
         replace: true,
       });
     }

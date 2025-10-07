@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Upload } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
@@ -17,11 +18,11 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useAccount } from '@colanode/ui/contexts/account';
+import { database } from '@colanode/ui/data';
 import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { openFileDialog } from '@colanode/ui/lib/files';
 import { cn } from '@colanode/ui/lib/utils';
-import { useAppStore } from '@colanode/ui/stores/app';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),
@@ -30,18 +31,29 @@ const formSchema = z.object({
 });
 
 export const AccountUpdate = () => {
-  const accountId = useAccount().id;
-  const account = useAppStore((state) => state.accounts[accountId]);
+  const account = useAccount();
+  const accountQuery = useLiveQuery((q) =>
+    q
+      .from({ accounts: database.accounts })
+      .where(({ accounts }) => eq(accounts.id, account.id))
+      .select(({ accounts }) => ({
+        name: accounts.name,
+        avatar: accounts.avatar,
+        email: accounts.email,
+      }))
+  );
+
   const isMobile = useIsMobile();
   const { mutate: uploadAvatar, isPending: isUploadingAvatar } = useMutation();
   const { mutate: updateAccount, isPending: isUpdatingAccount } = useMutation();
 
+  const accountData = accountQuery.data?.[0];
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: account?.name,
-      avatar: account?.avatar,
-      email: account?.email,
+      name: accountData?.name,
+      avatar: accountData?.avatar,
+      email: accountData?.email,
     },
   });
 
@@ -56,7 +68,7 @@ export const AccountUpdate = () => {
     updateAccount({
       input: {
         type: 'account.update',
-        id: accountId,
+        id: account.id,
         name: values.name,
         avatar: values.avatar,
       },

@@ -1,10 +1,11 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { X } from 'lucide-react';
 import { useMemo } from 'react';
-import { useShallow } from 'zustand/shallow';
 
 import { useTabManager } from '@colanode/ui/contexts/tab-manager';
+import { database } from '@colanode/ui/data';
+import { useAppMetadata } from '@colanode/ui/hooks/use-app-metadata';
 import { cn } from '@colanode/ui/lib/utils';
-import { useAppStore } from '@colanode/ui/stores/app';
 
 interface TabsHeaderItemProps {
   id: string;
@@ -15,12 +16,19 @@ interface TabsHeaderItemProps {
 export const TabsHeaderItem = ({ id, index, isLast }: TabsHeaderItemProps) => {
   const tabManager = useTabManager();
 
-  const location = useAppStore(
-    useShallow((state) => state.tabs.find((tab) => tab.id === id)!.location)
+  const tabQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ tabs: database.tabs })
+        .where(({ tabs }) => eq(tabs.id, id))
+        .select(({ tabs }) => ({
+          location: tabs.location,
+        })),
+    [id]
   );
-  console.log('location', id, location);
+  const activeTabId = useAppMetadata('tab');
 
-  const activeTabId = useAppStore(useShallow((state) => state.metadata.tab));
+  const location = tabQuery.data[0]!.location;
   const isActive = id === activeTabId;
 
   const tabComponent = useMemo(() => {

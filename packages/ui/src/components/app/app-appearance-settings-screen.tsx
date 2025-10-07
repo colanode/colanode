@@ -5,9 +5,9 @@ import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
 import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { database } from '@colanode/ui/data';
+import { useAppMetadata } from '@colanode/ui/hooks/use-app-metadata';
 import { cn } from '@colanode/ui/lib/utils';
-import { useAppStore } from '@colanode/ui/stores/app';
 
 interface ThemeModeOption {
   key: string;
@@ -53,11 +53,8 @@ const themeColorOptions = [
 ];
 
 export const AppAppearanceSettingsScreen = () => {
-  const mutation = useMutation();
-  const updateAppMetadata = useAppStore((state) => state.updateAppMetadata);
-  const deleteAppMetadata = useAppStore((state) => state.deleteAppMetadata);
-  const themeMode = useAppStore((state) => state.metadata.theme.mode);
-  const themeColor = useAppStore((state) => state.metadata.theme.color);
+  const themeMode = useAppMetadata('theme.mode');
+  const themeColor = useAppMetadata('theme.color');
 
   return (
     <>
@@ -85,25 +82,23 @@ export const AppAppearanceSettingsScreen = () => {
                 variant="outline"
                 onClick={() => {
                   if (option.value === null) {
-                    deleteAppMetadata('theme.mode');
-                    mutation.mutate({
-                      input: {
-                        type: 'app.metadata.delete',
-                        key: 'theme.mode',
-                      },
-                    });
+                    database.metadata.delete('theme.mode');
                   } else {
-                    updateAppMetadata({
-                      key: 'theme.mode',
-                      value: option.value,
-                    });
-                    mutation.mutate({
-                      input: {
-                        type: 'app.metadata.update',
+                    const currentThemeMpde =
+                      database.metadata.get('theme.mode');
+                    if (currentThemeMpde) {
+                      database.metadata.update('theme.mode', (metadata) => {
+                        metadata.value = option.value as ThemeMode;
+                        metadata.updatedAt = new Date().toISOString();
+                      });
+                    } else {
+                      database.metadata.insert({
                         key: 'theme.mode',
                         value: option.value,
-                      },
-                    });
+                        createdAt: new Date().toISOString(),
+                        updatedAt: null,
+                      });
+                    }
                   }
                 }}
                 className={cn(
@@ -139,25 +134,23 @@ export const AppAppearanceSettingsScreen = () => {
                 variant="outline"
                 onClick={() => {
                   if (isDefault) {
-                    deleteAppMetadata('theme.color');
-                    mutation.mutate({
-                      input: {
-                        type: 'app.metadata.delete',
-                        key: 'theme.color',
-                      },
-                    });
+                    database.metadata.delete('theme.color');
                   } else {
-                    updateAppMetadata({
-                      key: 'theme.color',
-                      value: option.value as ThemeColor,
-                    });
-                    mutation.mutate({
-                      input: {
-                        type: 'app.metadata.update',
+                    const currentThemeColor =
+                      database.metadata.get('theme.color');
+                    if (currentThemeColor) {
+                      database.metadata.update('theme.color', (metadata) => {
+                        metadata.value = option.value as ThemeColor;
+                        metadata.updatedAt = new Date().toISOString();
+                      });
+                    } else {
+                      database.metadata.insert({
                         key: 'theme.color',
                         value: option.value as ThemeColor,
-                      },
-                    });
+                        createdAt: new Date().toISOString(),
+                        updatedAt: null,
+                      });
+                    }
                   }
                 }}
                 className={cn(

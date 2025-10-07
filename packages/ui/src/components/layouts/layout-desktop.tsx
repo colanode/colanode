@@ -11,15 +11,15 @@ import {
 import { TabsContent } from '@colanode/ui/components/layouts/tabs/tabs-content';
 import { TabsHeader } from '@colanode/ui/components/layouts/tabs/tabs-header';
 import { TabManagerContext } from '@colanode/ui/contexts/tab-manager';
+import { database } from '@colanode/ui/data';
 import { router, routeTree } from '@colanode/ui/routes';
-import { useAppStore } from '@colanode/ui/stores/app';
 
 export const LayoutDesktop = () => {
   const routersRef = useRef<Map<string, typeof router>>(new Map());
 
   const handleTabAdd = useCallback((location: string) => {
-    const store = useAppStore.getState();
-    const orderedTabs = store.tabs.toSorted((a, b) =>
+    const tabs = database.tabs.map((tab) => tab);
+    const orderedTabs = tabs.toSorted((a, b) =>
       compareString(a.index, b.index)
     );
 
@@ -32,25 +32,19 @@ export const LayoutDesktop = () => {
       updatedAt: null,
     };
 
-    store.upsertTab(tab);
-
-    window.colanode.executeMutation?.({
-      type: 'tab.create',
-      id: tab.id,
-      location: tab.location,
-      index: tab.index,
-    });
+    database.tabs.insert(tab);
   }, []);
 
   const handleTabDelete = useCallback((id: string) => {
-    const store = useAppStore.getState();
+    const tabs = database.tabs.map((tab) => tab);
+    const tabMetadata = database.metadata.get('tab');
 
-    if (store.tabs.length === 1) {
+    if (tabs.length === 1) {
       return;
     }
 
-    if (store.metadata.tab === id) {
-      const nextTab = store.tabs
+    if (tabMetadata?.value === id) {
+      const nextTab = tabs
         .filter((tab) => tab.id !== id)
         .toSorted((a, b) => {
           const aDate = new Date(a.updatedAt ?? a.createdAt);
@@ -62,31 +56,39 @@ export const LayoutDesktop = () => {
         return;
       }
 
-      store.updateAppMetadata({
-        key: 'tab',
-        value: nextTab,
-      });
-
-      window.colanode.executeMutation?.({
-        type: 'app.metadata.update',
-        key: 'tab',
-        value: nextTab,
-      });
+      const tabMetadata = database.metadata.get('tab');
+      if (tabMetadata) {
+        database.metadata.update('tab', (tab) => {
+          tab.value = nextTab;
+          tab.updatedAt = new Date().toISOString();
+        });
+      } else {
+        database.metadata.insert({
+          key: 'tab',
+          value: nextTab,
+          createdAt: new Date().toISOString(),
+          updatedAt: null,
+        });
+      }
     }
 
-    store.deleteTab(id);
-    window.colanode.executeMutation?.({
-      type: 'tab.delete',
-      id,
-    });
+    database.tabs.delete(id);
   }, []);
 
   const handleTabSwitch = useCallback((id: string) => {
-    const store = useAppStore.getState();
-    store.updateAppMetadata({
-      key: 'tab',
-      value: id,
-    });
+    const tabMetadata = database.metadata.get('tab');
+    if (!tabMetadata) {
+      database.metadata.insert({
+        key: 'tab',
+        value: id,
+        createdAt: new Date().toISOString(),
+        updatedAt: null,
+      });
+    } else {
+      database.metadata.update('tab', (metadata) => {
+        metadata.value = id;
+      });
+    }
   }, []);
 
   const handleTabGetRouter = useCallback((id: string) => {
@@ -94,8 +96,7 @@ export const LayoutDesktop = () => {
       return routersRef.current.get(id)!;
     }
 
-    const store = useAppStore.getState();
-    const tab = store.tabs.find((tab) => tab.id === id);
+    const tab = database.tabs.get(id);
     if (!tab) {
       throw new Error(`Tab ${id} not found`);
     }
@@ -117,7 +118,6 @@ export const LayoutDesktop = () => {
       }
 
       const location = event.toLocation.href;
-      console.log('onRendered', id, location);
       window.colanode.executeMutation({
         type: 'tab.update',
         id,

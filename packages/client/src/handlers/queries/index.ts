@@ -6,7 +6,6 @@ import { AccountGetQueryHandler } from './accounts/account-get';
 import { AccountMetadataListQueryHandler } from './accounts/account-metadata-list';
 import { AccountListQueryHandler } from './accounts/accounts-list';
 import { AppMetadataListQueryHandler } from './apps/app-metadata-list';
-import { AppStateQueryHandler } from './apps/app-state';
 import { TabsListQueryHandler } from './apps/tabs-list';
 import { AvatarGetQueryHandler } from './avatars/avatar-get';
 import { ChatListQueryHandler } from './chats/chat-list';
@@ -42,6 +41,7 @@ import { NodeTreeGetQueryHandler } from './nodes/node-tree-get';
 import { RecordFieldValueCountQueryHandler } from './records/record-field-value-count';
 import { RecordListQueryHandler } from './records/record-list';
 import { RecordSearchQueryHandler } from './records/record-search';
+import { ServerListQueryHandler } from './servers/server-list';
 import { SpaceListQueryHandler } from './spaces/space-list';
 import { UserGetQueryHandler } from './users/user-get';
 import { UserListQueryHandler } from './users/user-list';
@@ -59,7 +59,6 @@ export type QueryHandlerMap = {
 export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
   return {
     'app.metadata.list': new AppMetadataListQueryHandler(app),
-    'app.state': new AppStateQueryHandler(app),
     'avatar.get': new AvatarGetQueryHandler(app),
     'account.list': new AccountListQueryHandler(app),
     'message.list': new MessageListQueryHandler(app),
@@ -107,5 +106,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'icon.svg.get': new IconSvgGetQueryHandler(app),
     'emoji.svg.get': new EmojiSvgGetQueryHandler(app),
     'tabs.list': new TabsListQueryHandler(app),
+    'server.list': new ServerListQueryHandler(app),
   };
 };

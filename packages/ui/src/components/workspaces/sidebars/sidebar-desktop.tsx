@@ -3,49 +3,37 @@ import { useCallback } from 'react';
 
 import { Sidebar } from '@colanode/ui/components/workspaces/sidebars/sidebar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { useAppStore } from '@colanode/ui/stores/app';
+import { database } from '@colanode/ui/data';
+import { useWorkspaceMetadata } from '@colanode/ui/hooks/use-workspace-metadata';
 
 const DEFAULT_WIDTH = 300;
 
 export const SidebarDesktop = () => {
   const workspace = useWorkspace();
-  const mutation = useMutation();
-  const updateWorkspaceMetadata = useAppStore(
-    (state) => state.updateWorkspaceMetadata
-  );
 
-  const width =
-    useAppStore((state) => {
-      const account = state.accounts[workspace.accountId];
-      if (!account) {
-        return undefined;
-      }
-
-      const workspaceState = account.workspaces[workspace.id];
-      if (!workspaceState) {
-        return undefined;
-      }
-
-      return workspaceState.metadata.sidebarWidth;
-    }) ?? DEFAULT_WIDTH;
+  const width = useWorkspaceMetadata('sidebar.width') ?? DEFAULT_WIDTH;
 
   const handleResize = useCallback(
     (newWidth: number) => {
-      mutation.mutate({
-        input: {
-          type: 'workspace.metadata.update',
+      const workspaceMetadata = database.workspaceMetadata(
+        workspace.accountId,
+        workspace.id
+      );
+
+      const currentWidth = workspaceMetadata.get('sidebar.width');
+      if (currentWidth) {
+        workspaceMetadata.update('sidebar.width', (metadata) => {
+          metadata.value = newWidth;
+          metadata.updatedAt = new Date().toISOString();
+        });
+      } else {
+        workspaceMetadata.insert({
           key: 'sidebar.width',
           value: newWidth,
-          accountId: workspace.accountId,
-          workspaceId: workspace.id,
-        },
-      });
-
-      updateWorkspaceMetadata(workspace.accountId, workspace.id, {
-        key: 'sidebar.width',
-        value: newWidth,
-      });
+          createdAt: new Date().toISOString(),
+          updatedAt: null,
+        });
+      }
     },
     [workspace.accountId, workspace.id]
   );

@@ -1,3 +1,4 @@
+import { useLiveQuery } from '@tanstack/react-db';
 import { useNavigate } from '@tanstack/react-router';
 import { Check, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -15,7 +16,7 @@ import {
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { AccountContext, useAccount } from '@colanode/ui/contexts/account';
 import { useRadar } from '@colanode/ui/contexts/radar';
-import { useAppStore } from '@colanode/ui/stores/app';
+import { database } from '@colanode/ui/data';
 
 export function SidebarMenuFooter() {
   const account = useAccount();
@@ -24,8 +25,10 @@ export function SidebarMenuFooter() {
 
   const [open, setOpen] = useState(false);
 
-  const allAccounts = useAppStore((state) => state.accounts);
-  const accounts = Object.values(allAccounts);
+  const accountsQuery = useLiveQuery((q) =>
+    q.from({ accounts: database.accounts })
+  );
+  const accounts = accountsQuery.data ?? [];
   const currentAccount = accounts.find((a) => a.id === account.id);
   const otherAccounts = accounts.filter((a) => a.id !== account.id);
   const accountUnreadStates: Record<string, UnreadState> = {};

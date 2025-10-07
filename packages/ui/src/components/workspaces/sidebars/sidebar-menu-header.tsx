@@ -1,3 +1,4 @@
+import { useLiveQuery } from '@tanstack/react-db';
 import { useNavigate } from '@tanstack/react-router';
 import { Check, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -15,7 +16,7 @@ import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useAccount } from '@colanode/ui/contexts/account';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useAppStore } from '@colanode/ui/stores/app';
+import { database } from '@colanode/ui/data';
 
 export const SidebarMenuHeader = () => {
   const workspace = useWorkspace();
@@ -25,11 +26,11 @@ export const SidebarMenuHeader = () => {
 
   const [open, setOpen] = useState(false);
 
-  const accountWorkspaces = useAppStore(
-    (state) => state.accounts[account.id]?.workspaces
+  const workspacesQuery = useLiveQuery((q) =>
+    q.from({ workspaces: database.accountWorkspaces(account.id) })
   );
 
-  const workspaces = Object.values(accountWorkspaces ?? {});
+  const workspaces = workspacesQuery.data;
   const currentWorkspace = workspaces.find((w) => w.id === workspace.id);
   const otherWorkspaces = workspaces.filter((w) => w.id !== workspace.id);
   const otherWorkspaceStates = otherWorkspaces.map((w) =>

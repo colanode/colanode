@@ -1,18 +1,22 @@
-import { useMemo } from 'react';
+import { useLiveQuery } from '@tanstack/react-db';
 
-import { compareString } from '@colanode/core';
 import { TabsContentItem } from '@colanode/ui/components/layouts/tabs/tabs-content-item';
-import { useAppStore } from '@colanode/ui/stores/app';
+import { database } from '@colanode/ui/data';
 
 export const TabsContent = () => {
-  const tabs = useAppStore((state) => state.tabs);
-  const sortedTabs = useMemo(() => {
-    return tabs.toSorted((a, b) => compareString(a.index, b.index));
-  }, [tabs]);
+  const tabsQuery = useLiveQuery((q) =>
+    q
+      .from({ tabs: database.tabs })
+      .orderBy(({ tabs }) => tabs.index, `asc`)
+      .select(({ tabs }) => ({
+        id: tabs.id,
+      }))
+  );
 
+  const tabs = tabsQuery.data;
   return (
     <div className="flex-1 overflow-hidden relative">
-      {sortedTabs.map((tab) => {
+      {tabs.map((tab) => {
         return <TabsContentItem key={tab.id} id={tab.id} />;
       })}
     </div>

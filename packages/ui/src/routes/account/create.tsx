@@ -20,7 +20,7 @@ export const workspaceCreateMaskRoute = createRoute({
     if (account) {
       throw redirect({
         to: '/acc/$accountId/create',
-        params: { accountId: account.id },
+        params: { accountId: account },
         replace: true,
       });
     }

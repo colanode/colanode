@@ -1,23 +1,33 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { Separator } from '@colanode/ui/components/ui/separator';
 import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
 import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
-import { Separator } from '@colanode/ui/components/ui/separator';
 import { WorkspaceDelete } from '@colanode/ui/components/workspaces/workspace-delete';
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
 import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { database } from '@colanode/ui/data';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { useAppStore } from '@colanode/ui/stores/app';
 
 export const WorkspaceSettingsScreen = () => {
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
-  const currentWorkspace = useAppStore(
-    (state) => state.accounts[workspace.accountId]?.workspaces[workspace.id]
+  const currentWorkspaceQuery = useLiveQuery((q) =>
+    q
+      .from({ workspaces: database.accountWorkspaces(workspace.accountId) })
+      .where(({ workspaces }) => eq(workspaces.id, workspace.id))
+      .select(({ workspaces }) => ({
+        name: workspaces.name,
+        description: workspaces.description,
+        avatar: workspaces.avatar,
+      }))
   );
+
+  const currentWorkspace = currentWorkspaceQuery.data?.[0];
   const canEdit = workspace.role === 'owner';
 
   if (!currentWorkspace) {

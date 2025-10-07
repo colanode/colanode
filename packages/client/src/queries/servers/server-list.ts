@@ -1,0 +1,14 @@
+import { Server } from '@colanode/client/types';
+
+export type ServerListQueryInput = {
+  type: 'server.list';
+};
+
+declare module '@colanode/client/queries' {
+  interface QueryMap {
+    'server.list': {
+      input: ServerListQueryInput;
+      output: Server[];
+    };
+  }
+}

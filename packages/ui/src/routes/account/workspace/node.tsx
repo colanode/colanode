@@ -32,12 +32,13 @@ export const nodeMaskRoute = createRoute({
   path: '/$nodeId',
   component: () => null,
   beforeLoad: (ctx) => {
+    console.log('Colanode | Node mask route before load', ctx.params);
     const account = getAccountForWorkspace(ctx.params.workspaceId);
     if (account) {
       throw redirect({
         to: '/acc/$accountId/$workspaceId/$nodeId',
         params: {
-          accountId: account.id,
+          accountId: account,
           workspaceId: ctx.params.workspaceId,
           nodeId: ctx.params.nodeId,
         },
