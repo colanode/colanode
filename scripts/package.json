@@ -19,8 +19,8 @@
     "@colanode/core": "*",
     "@colanode/crdt": "*",
     "adm-zip": "^0.5.16",
-    "better-sqlite3": "^12.2.0",
-    "ky": "^1.10.0",
+    "better-sqlite3": "^12.4.1",
+    "ky": "^1.11.0",
     "svg-sprite": "^2.0.4",
     "svgo": "^4.0.0"
   }
