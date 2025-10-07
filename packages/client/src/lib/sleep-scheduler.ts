@@ -1,45 +1,63 @@
 interface SleepState {
-  date: Date;
+  timestamp: number;
   timeout: NodeJS.Timeout;
   resolve: () => void;
+  promise: Promise<void>;
 }
 
 export class SleepScheduler {
   private sleepMap = new Map<string, SleepState>();
 
-  public sleepUntil(id: string, date: Date): Promise<void> {
-    if (this.sleepMap.has(id)) {
-      throw new Error(`Sleep already exists for id: ${id}`);
+  public sleepUntil(id: string, timestamp: number): Promise<void> {
+    const now = Date.now();
+    if (timestamp <= now) {
+      return Promise.resolve();
     }
 
-    return new Promise<void>((resolve) => {
-      const delay = date.getTime() - Date.now();
-      const timeout = setTimeout(() => {
-        this.sleepMap.delete(id);
-        resolve();
-      }, delay);
+    const existing = this.sleepMap.get(id);
+    if (existing) {
+      this.updateResolveTimeIfEarlier(id, timestamp);
+      return existing.promise;
+    }
 
-      this.sleepMap.set(id, {
-        date,
-        timeout,
-        resolve,
-      });
-    });
+    let resolve!: () => void;
+    const promise = new Promise<void>((res) => (resolve = res));
+
+    const state: SleepState = {
+      timestamp,
+      timeout: undefined as unknown as NodeJS.Timeout,
+      resolve,
+      promise,
+    };
+
+    const delay = Math.max(0, timestamp - Date.now());
+    if (delay === 0) {
+      state.resolve();
+      return promise;
+    }
+
+    state.timeout = setTimeout(() => {
+      this.sleepMap.delete(id);
+      state.resolve();
+    }, delay);
+
+    this.sleepMap.set(id, state);
+    return promise;
   }
 
-  public updateResolveTimeIfEarlier(id: string, date: Date): boolean {
+  public updateResolveTimeIfEarlier(id: string, timestamp: number): boolean {
     const existingSleep = this.sleepMap.get(id);
     if (!existingSleep) {
       return false;
     }
 
-    if (date >= existingSleep.date) {
+    if (timestamp >= existingSleep.timestamp) {
       return false;
     }
 
     clearTimeout(existingSleep.timeout);
 
-    const delay = Math.max(0, date.getTime() - Date.now());
+    const delay = Math.max(0, timestamp - Date.now());
     if (delay === 0) {
       this.sleepMap.delete(id);
       existingSleep.resolve();
@@ -51,7 +69,7 @@ export class SleepScheduler {
       existingSleep.resolve();
     }, delay);
 
-    existingSleep.date = date;
+    existingSleep.timestamp = timestamp;
     existingSleep.timeout = newTimeout;
 
     return true;
