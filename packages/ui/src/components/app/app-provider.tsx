@@ -26,8 +26,6 @@ export const AppProvider = ({ type }: AppProviderProps) => {
       database
         .preload()
         .then(() => {
-          console.log('Colanode | Database', database);
-          console.log('Colanode | Preloaded');
           setIsInitialized(true);
         })
         .catch((err) => {

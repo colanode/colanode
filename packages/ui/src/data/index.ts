@@ -85,10 +85,10 @@ class WorkspaceDatabase {
 }
 
 class AppDatabase {
-  public readonly servers = createServersCollection(queryClient);
-  public readonly accounts = createAccountsCollection(queryClient);
-  public readonly tabs = createTabsCollection(queryClient);
-  public readonly metadata = createAppMetadataCollection(queryClient);
+  public readonly servers = createServersCollection();
+  public readonly accounts = createAccountsCollection();
+  public readonly tabs = createTabsCollection();
+  public readonly metadata = createAppMetadataCollection();
 
   private readonly accountDatabases: Map<string, AccountDatabase> = new Map();
 

@@ -105,7 +105,7 @@ export const LayoutDesktop = () => {
       routeTree,
       context: {},
       history: createMemoryHistory({
-        initialEntries: [tab.location],
+        initialEntries: [tab.location ?? '/'],
       }),
       defaultPreload: 'intent',
       scrollRestoration: true,

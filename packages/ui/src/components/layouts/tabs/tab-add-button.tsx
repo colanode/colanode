@@ -2,21 +2,19 @@ import { Plus } from 'lucide-react';
 import { useMemo } from 'react';
 
 import { useTabManager } from '@colanode/ui/contexts/tab-manager';
-import { useAccountMetadata } from '@colanode/ui/hooks/use-account-metadata';
 import { useAppMetadata } from '@colanode/ui/hooks/use-app-metadata';
 
 export const TabAddButton = () => {
   const tabManager = useTabManager();
   const lastActiveAccount = useAppMetadata('account');
-  const lastActiveWorkspace = useAccountMetadata('workspace');
 
   const location = useMemo(() => {
-    if (lastActiveAccount && lastActiveWorkspace) {
-      return `/acc/${lastActiveAccount}/${lastActiveWorkspace}/home`;
+    if (lastActiveAccount) {
+      return `/acc/${lastActiveAccount}`;
     }
 
     return '/';
-  }, [lastActiveAccount, lastActiveWorkspace]);
+  }, [lastActiveAccount]);
 
   return (
     <button

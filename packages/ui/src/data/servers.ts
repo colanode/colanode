@@ -1,26 +1,43 @@
-import { queryCollectionOptions } from '@tanstack/query-db-collection';
 import { createCollection } from '@tanstack/react-db';
-import { QueryClient } from '@tanstack/react-query';
 
-import { buildQueryKey, ServerListQueryInput } from '@colanode/client/queries';
+import { Server } from '@colanode/client/types';
 
-export const createServersCollection = (queryClient: QueryClient) => {
-  const input: ServerListQueryInput = {
-    type: 'server.list',
-  };
+export const createServersCollection = () => {
+  return createCollection<Server, string>({
+    getKey(item) {
+      return item.domain;
+    },
+    sync: {
+      async sync({ begin, write, commit, markReady }) {
+        const servers = await window.colanode.executeQuery({
+          type: 'server.list',
+        });
 
-  const key = buildQueryKey(input);
+        begin();
 
-  return createCollection(
-    queryCollectionOptions({
-      id: 'servers',
-      queryKey: [key],
-      queryClient,
-      getKey: (item) => item.domain,
-      queryFn: async () => {
-        console.log('Colanode | Executing query', key, input);
-        return await window.colanode.executeQueryAndSubscribe(key, input);
+        for (const server of servers) {
+          write({ type: 'insert', value: server });
+        }
+
+        commit();
+        markReady();
+
+        window.eventBus.subscribe((event) => {
+          if (event.type === 'server.created') {
+            begin();
+            write({ type: 'insert', value: event.server });
+            commit();
+          } else if (event.type === 'server.updated') {
+            begin();
+            write({ type: 'update', value: event.server });
+            commit();
+          } else if (event.type === 'server.deleted') {
+            begin();
+            write({ type: 'delete', value: event.server });
+            commit();
+          }
+        });
       },
-    })
-  );
+    },
+  });
 };
