@@ -1,4 +1,5 @@
 import { config } from '@colanode/server/lib/config';
+import { redis } from '@colanode/server/data/redis';
 
 import type { StorageConfig } from '../config/storage';
 
@@ -22,6 +23,7 @@ const buildStorage = (storageConfig: StorageConfig): Storage => {
         bucket: storageConfig.bucket,
         region: storageConfig.region,
         forcePathStyle: storageConfig.forcePathStyle,
+        redis,
       });
     case 'gcs':
       return new GCSStorage({

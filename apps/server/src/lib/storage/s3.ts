@@ -23,27 +23,45 @@ interface S3StorageConfig {
   bucket: string;
   region: string;
   forcePathStyle?: boolean;
+  redis: RedisClientType;
 }
 
 export class S3Storage implements Storage {
   private readonly client: S3Client;
   private readonly bucket: string;
-  private readonly config: S3StorageConfig;
-  private tusStore: DataStore | null = null;
+  private readonly s3Config: S3StorageConfig;
+  private readonly redis: RedisClientType;
+  private readonly tusStore: DataStore;
 
-  constructor(config: S3StorageConfig) {
-    this.config = { ...config };
+  constructor(s3Config: S3StorageConfig) {
+    this.s3Config = { ...s3Config };
+    this.redis = s3Config.redis;
     this.client = new S3Client({
-      endpoint: this.config.endpoint,
-      region: this.config.region,
+      endpoint: this.s3Config.endpoint,
+      region: this.s3Config.region,
       credentials: {
-        accessKeyId: this.config.accessKey,
-        secretAccessKey: this.config.secretKey,
+        accessKeyId: this.s3Config.accessKey,
+        secretAccessKey: this.s3Config.secretKey,
       },
-      forcePathStyle: this.config.forcePathStyle,
+      forcePathStyle: this.s3Config.forcePathStyle,
     });
 
-    this.bucket = this.config.bucket;
+    this.bucket = this.s3Config.bucket;
+
+    this.tusStore = new S3Store({
+      partSize: FILE_UPLOAD_PART_SIZE,
+      cache: new RedisKvStore(this.redis, config.redis.tus.kvPrefix),
+      s3ClientConfig: {
+        bucket: this.bucket,
+        endpoint: this.s3Config.endpoint,
+        region: this.s3Config.region,
+        forcePathStyle: this.s3Config.forcePathStyle,
+        credentials: {
+          accessKeyId: this.s3Config.accessKey,
+          secretAccessKey: this.s3Config.secretKey,
+        },
+      },
+    });
   }
 
   async download(
@@ -84,26 +102,7 @@ export class S3Storage implements Storage {
     await this.client.send(command);
   }
 
-  async tusDataStore(redis: RedisClientType): Promise<DataStore> {
-    if (this.tusStore) {
-      return this.tusStore;
-    }
-
-    this.tusStore = new S3Store({
-      partSize: FILE_UPLOAD_PART_SIZE,
-      cache: new RedisKvStore(redis, config.redis.tus.kvPrefix),
-      s3ClientConfig: {
-        bucket: this.bucket,
-        endpoint: this.config.endpoint,
-        region: this.config.region,
-        forcePathStyle: this.config.forcePathStyle,
-        credentials: {
-          accessKeyId: this.config.accessKey,
-          secretAccessKey: this.config.secretKey,
-        },
-      },
-    });
-
+  tusDataStore(): DataStore {
     return this.tusStore;
   }
 }

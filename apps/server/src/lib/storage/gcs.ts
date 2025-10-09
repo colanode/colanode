@@ -15,7 +15,7 @@ interface GCSStorageConfig {
 
 export class GCSStorage implements StorageInterface {
   private readonly bucket: Bucket;
-  private tusStore: DataStore | null = null;
+  private readonly tusStore: DataStore;
 
   constructor(config: GCSStorageConfig) {
     const storage = new Storage({
@@ -24,6 +24,7 @@ export class GCSStorage implements StorageInterface {
     });
 
     this.bucket = storage.bucket(config.bucket);
+    this.tusStore = new GCSStore({ bucket: this.bucket });
   }
 
   private getFile(path: string): File {
@@ -72,11 +73,7 @@ export class GCSStorage implements StorageInterface {
     });
   }
 
-  async tusDataStore(_redis: RedisClientType): Promise<DataStore> {
-    if (!this.tusStore) {
-      this.tusStore = new GCSStore({ bucket: this.bucket });
-    }
-
+  tusDataStore(): DataStore {
     return this.tusStore;
   }
 }

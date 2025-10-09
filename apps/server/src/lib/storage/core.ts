@@ -12,5 +12,5 @@ export interface Storage {
     contentType: string,
     contentLength?: bigint
   ): Promise<void>;
-  tusDataStore(redis: RedisClientType): Promise<DataStore>;
+  tusDataStore(): DataStore;
 }

@@ -21,7 +21,7 @@ export class AzureBlobStorage implements Storage {
   private readonly containerName: string;
   private readonly blobServiceClient: BlobServiceClient;
   private readonly config: AzureStorageConfig;
-  private tusStore: DataStore | null = null;
+  private readonly tusStore: DataStore;
 
   constructor(config: AzureStorageConfig) {
     this.config = { ...config };
@@ -35,6 +35,12 @@ export class AzureBlobStorage implements Storage {
       sharedKeyCredential
     );
     this.containerName = this.config.containerName;
+
+    this.tusStore = new AzureStore({
+      account: this.config.account,
+      accountKey: this.config.accountKey,
+      containerName: this.containerName,
+    });
   }
 
   private getBlockBlobClient(path: string): BlockBlobClient {
@@ -101,15 +107,7 @@ export class AzureBlobStorage implements Storage {
     });
   }
 
-  async tusDataStore(_redis: RedisClientType): Promise<DataStore> {
-    if (!this.tusStore) {
-      this.tusStore = new AzureStore({
-        account: this.config.account,
-        accountKey: this.config.accountKey,
-        containerName: this.containerName,
-      });
-    }
-
+  tusDataStore(): DataStore {
     return this.tusStore;
   }
 }

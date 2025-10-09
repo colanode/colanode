@@ -13,10 +13,11 @@ interface FileStorageConfig {
 
 export class FileSystemStorage implements Storage {
   private readonly directory: string;
-  private tusStore: DataStore | null = null;
+  private readonly tusStore: DataStore;
 
   constructor(config: FileStorageConfig) {
     this.directory = config.directory;
+    this.tusStore = new FileStore({ directory: this.directory });
   }
 
   async download(
@@ -59,11 +60,7 @@ export class FileSystemStorage implements Storage {
     });
   }
 
-  async tusDataStore(_redis: RedisClientType): Promise<DataStore> {
-    if (!this.tusStore) {
-      this.tusStore = new FileStore({ directory: this.directory });
-    }
-
+  tusDataStore(): DataStore {
     return this.tusStore;
   }
 }

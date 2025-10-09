@@ -13,7 +13,7 @@ import { mapNode, updateNode } from '@colanode/server/lib/nodes';
 import { storage } from '@colanode/server/lib/storage';
 import { RedisLocker } from '@colanode/server/lib/tus/redis-locker';
 
-const tusStore = await storage.tusDataStore(redis);
+const tusStore = storage.tusDataStore();
 
 export const fileUploadTusRoute: FastifyPluginCallbackZod = (
   instance,
