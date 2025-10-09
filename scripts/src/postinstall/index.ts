@@ -19,7 +19,8 @@ const FONTS_DIR = path.resolve(ASSETS_DIR, 'fonts');
 const FONTS_OTF_PATH = path.resolve(FONTS_DIR, NEOTRAX_FONT_NAME);
 
 const DESKTOP_ASSETS_DIR = path.resolve('apps', 'desktop', 'assets');
-const WEB_ASSETS_DIR = path.resolve('apps', 'web', 'public', 'assets');
+const WEB_PUBLIC_DIR = path.resolve('apps', 'web', 'public');
+const WEB_ASSETS_DIR = path.resolve(WEB_PUBLIC_DIR, 'assets');
 
 const copyFile = (source: string, target: string | string[]) => {
   if (!fs.existsSync(source)) {
@@ -61,28 +62,33 @@ const execute = () => {
   ]);
 
   copyFile(
-    path.resolve(IMAGES_DIR, 'colanode-logo-black-192.png'),
-    path.resolve(WEB_ASSETS_DIR, 'colanode-logo-black-192.png')
+    path.resolve(IMAGES_DIR, 'colanode-logo.ico'),
+    path.resolve(WEB_PUBLIC_DIR, 'favicon.ico')
   );
 
   copyFile(
-    path.resolve(IMAGES_DIR, 'colanode-logo-black-512.png'),
-    path.resolve(WEB_ASSETS_DIR, 'colanode-logo-black-512.png')
+    path.resolve(IMAGES_DIR, 'colanode-logo-192.jpg'),
+    path.resolve(WEB_ASSETS_DIR, 'colanode-logo-192.jpg')
   );
 
   copyFile(
-    path.resolve(IMAGES_DIR, 'colanode-logo-black.png'),
-    path.resolve(DESKTOP_ASSETS_DIR, 'colanode-logo-black.png')
+    path.resolve(IMAGES_DIR, 'colanode-logo-512.jpg'),
+    path.resolve(WEB_ASSETS_DIR, 'colanode-logo-512.jpg')
   );
 
   copyFile(
-    path.resolve(IMAGES_DIR, 'colanode-logo-black.ico'),
-    path.resolve(DESKTOP_ASSETS_DIR, 'colanode-logo-black.ico')
+    path.resolve(IMAGES_DIR, 'colanode-logo.png'),
+    path.resolve(DESKTOP_ASSETS_DIR, 'colanode-logo.png')
   );
 
   copyFile(
-    path.resolve(IMAGES_DIR, 'colanode-logo-black.icns'),
-    path.resolve(DESKTOP_ASSETS_DIR, 'colanode-logo-black.icns')
+    path.resolve(IMAGES_DIR, 'colanode-logo.ico'),
+    path.resolve(DESKTOP_ASSETS_DIR, 'colanode-logo.ico')
+  );
+
+  copyFile(
+    path.resolve(IMAGES_DIR, 'colanode-logo.icns'),
+    path.resolve(DESKTOP_ASSETS_DIR, 'colanode-logo.icns')
   );
 };
 

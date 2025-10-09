@@ -28,20 +28,20 @@
   "devDependencies": {
     "@types/debug": "^4.1.12",
     "@types/lodash-es": "^4.17.12",
-    "@typescript-eslint/eslint-plugin": "^8.43.0",
-    "@typescript-eslint/parser": "^8.43.0",
+    "@typescript-eslint/eslint-plugin": "^8.46.0",
+    "@typescript-eslint/parser": "^8.46.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react": "^7.37.5",
     "prettier": "^3.6.2",
-    "tsx": "^4.20.5",
-    "turbo": "^2.5.6",
-    "typescript": "^5.9.2",
+    "tsx": "^4.20.6",
+    "turbo": "^2.5.8",
+    "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   },
   "dependencies": {
-    "debug": "^4.4.1",
+    "debug": "^4.4.3",
     "lodash-es": "^4.17.21"
   }
 }

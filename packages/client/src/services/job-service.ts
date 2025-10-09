@@ -128,8 +128,8 @@ export class JobService {
       });
 
       if (result) {
-        const date = new Date(result.scheduled_at);
-        this.sleepScheduler.updateResolveTimeIfEarlier(JOB_LOOP_ID, date);
+        const timestamp = new Date(result.scheduled_at).getTime();
+        this.sleepScheduler.updateResolveTimeIfEarlier(JOB_LOOP_ID, timestamp);
         return result;
       }
     }
@@ -155,8 +155,8 @@ export class JobService {
       .executeTakeFirst();
 
     if (job) {
-      const date = new Date(job.scheduled_at);
-      this.sleepScheduler.updateResolveTimeIfEarlier(JOB_LOOP_ID, date);
+      const timestamp = new Date(job.scheduled_at).getTime();
+      this.sleepScheduler.updateResolveTimeIfEarlier(JOB_LOOP_ID, timestamp);
     }
 
     return job ?? null;
@@ -198,8 +198,11 @@ export class JobService {
       .executeTakeFirst();
 
     if (schedule) {
-      const date = new Date(schedule.next_run_at);
-      this.sleepScheduler.updateResolveTimeIfEarlier(SCHEDULE_LOOP_ID, date);
+      const timestamp = new Date(schedule.next_run_at).getTime();
+      this.sleepScheduler.updateResolveTimeIfEarlier(
+        SCHEDULE_LOOP_ID,
+        timestamp
+      );
     }
 
     return schedule ?? null;
@@ -237,8 +240,8 @@ export class JobService {
   private async jobLoop() {
     while (!this.stopped) {
       if (this.runningJobs >= MAX_CONCURRENCY) {
-        const date = new Date(Date.now() + JOBS_CONCURRENCY_TIMEOUT);
-        await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, date);
+        const timestamp = Date.now() + JOBS_CONCURRENCY_TIMEOUT;
+        await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, timestamp);
         continue;
       }
 
@@ -284,11 +287,13 @@ export class JobService {
           .executeTakeFirst();
 
         if (nextScheduledJob) {
-          const date = new Date(nextScheduledJob.scheduled_at);
-          await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, date);
+          const timestamp = new Date(nextScheduledJob.scheduled_at).getTime();
+          await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, timestamp);
         } else {
-          const date = new Date(now.getTime() + JOBS_MAX_TIMEOUT);
-          await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, date);
+          const timestamp = new Date(
+            now.getTime() + JOBS_MAX_TIMEOUT
+          ).getTime();
+          await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, timestamp);
         }
 
         continue;
@@ -356,11 +361,13 @@ export class JobService {
         .executeTakeFirst();
 
       if (nextSchedule) {
-        const date = new Date(nextSchedule.next_run_at);
-        await this.sleepScheduler.sleepUntil(SCHEDULE_LOOP_ID, date);
+        const timestamp = new Date(nextSchedule.next_run_at).getTime();
+        await this.sleepScheduler.sleepUntil(SCHEDULE_LOOP_ID, timestamp);
       } else {
-        const date = new Date(now.getTime() + SCHEDULES_MAX_TIMEOUT);
-        await this.sleepScheduler.sleepUntil(SCHEDULE_LOOP_ID, date);
+        const timestamp = new Date(
+          now.getTime() + SCHEDULES_MAX_TIMEOUT
+        ).getTime();
+        await this.sleepScheduler.sleepUntil(SCHEDULE_LOOP_ID, timestamp);
       }
     }
   }
