@@ -4,8 +4,8 @@ import { CreateNodeTombstone } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
 import { updateDocument } from '@colanode/server/lib/documents';
 import { eventBus } from '@colanode/server/lib/event-bus';
-import { deleteFile } from '@colanode/server/lib/files';
 import { createLogger } from '@colanode/server/lib/logger';
+import { storage } from '@colanode/server/lib/storage';
 
 const BATCH_SIZE = 100;
 const logger = createLogger('server:job:clean-node-data');
@@ -162,7 +162,7 @@ const cleanNodeFiles = async (nodeIds: string[]) => {
 
   if (uploads.length > 0) {
     for (const upload of uploads) {
-      await deleteFile(upload.path);
+      await storage.delete(upload.path);
     }
 
     await database

@@ -1,5 +1,4 @@
 import { config } from '@colanode/server/lib/config';
-import { redis } from '@colanode/server/data/redis';
 
 import type { StorageConfig } from '../config/storage';
 
@@ -12,33 +11,17 @@ import { S3Storage } from './s3';
 const buildStorage = (storageConfig: StorageConfig): Storage => {
   switch (storageConfig.type) {
     case 'file':
-      return new FileSystemStorage({
-        directory: storageConfig.directory,
-      });
+      return new FileSystemStorage(storageConfig);
     case 's3':
-      return new S3Storage({
-        endpoint: storageConfig.endpoint,
-        accessKey: storageConfig.accessKey,
-        secretKey: storageConfig.secretKey,
-        bucket: storageConfig.bucket,
-        region: storageConfig.region,
-        forcePathStyle: storageConfig.forcePathStyle,
-        redis,
-      });
+      return new S3Storage(storageConfig);
     case 'gcs':
-      return new GCSStorage({
-        bucket: storageConfig.bucket,
-        projectId: storageConfig.projectId,
-        credentials: storageConfig.credentials,
-      });
+      return new GCSStorage(storageConfig);
     case 'azure':
-      return new AzureBlobStorage({
-        account: storageConfig.account,
-        accountKey: storageConfig.accountKey,
-        containerName: storageConfig.containerName,
-      });
+      return new AzureBlobStorage(storageConfig);
     default:
-      throw new Error(`Unsupported storage type: ${(storageConfig as any).type}`);
+      throw new Error(
+        `Unsupported storage type: ${(storageConfig as any).type}`
+      );
   }
 };
 

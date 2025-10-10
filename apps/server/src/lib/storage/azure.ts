@@ -1,6 +1,5 @@
 import { Readable } from 'stream';
 
-import { RedisClientType } from '@redis/client';
 import { DataStore } from '@tus/server';
 import { AzureStore } from '@tus/azure-store';
 import {
@@ -8,20 +7,15 @@ import {
   StorageSharedKeyCredential,
   BlockBlobClient,
 } from '@azure/storage-blob';
+import type { AzureStorageConfig } from '@colanode/server/lib/config/storage';
 
 import type { Storage } from './core';
-
-interface AzureStorageConfig {
-  account: string;
-  accountKey: string;
-  containerName: string;
-}
 
 export class AzureBlobStorage implements Storage {
   private readonly containerName: string;
   private readonly blobServiceClient: BlobServiceClient;
   private readonly config: AzureStorageConfig;
-  private readonly tusStore: DataStore;
+  public readonly tusStore: DataStore;
 
   constructor(config: AzureStorageConfig) {
     this.config = { ...config };
@@ -105,9 +99,5 @@ export class AzureBlobStorage implements Storage {
         blobContentType: contentType,
       },
     });
-  }
-
-  tusDataStore(): DataStore {
-    return this.tusStore;
   }
 }

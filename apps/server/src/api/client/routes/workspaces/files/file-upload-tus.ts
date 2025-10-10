@@ -8,12 +8,12 @@ import { redis } from '@colanode/server/data/redis';
 import { config } from '@colanode/server/lib/config';
 import { fetchCounter } from '@colanode/server/lib/counters';
 import { generateUrl } from '@colanode/server/lib/fastify';
-import { buildFilePath, deleteFile } from '@colanode/server/lib/files';
+import { buildFilePath } from '@colanode/server/lib/files';
 import { mapNode, updateNode } from '@colanode/server/lib/nodes';
 import { storage } from '@colanode/server/lib/storage';
-import { RedisLocker } from '@colanode/server/lib/tus/redis-locker';
+import { RedisLocker } from '@colanode/server/lib/storage/tus/redis-locker';
 
-const tusStore = storage.tusDataStore();
+const tusStore = storage.tusStore;
 
 export const fileUploadTusRoute: FastifyPluginCallbackZod = (
   instance,
@@ -262,7 +262,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
           }
 
           const tusInfoPath = `${path}.info`;
-          await deleteFile(tusInfoPath);
+          await storage.delete(tusInfoPath);
 
           return {
             status_code: 200,

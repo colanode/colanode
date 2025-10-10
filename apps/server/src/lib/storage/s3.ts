@@ -12,30 +12,19 @@ import { DataStore } from '@tus/server';
 import { S3Store } from '@tus/s3-store';
 
 import { config } from '@colanode/server/lib/config';
-import { RedisKvStore } from '@colanode/server/lib/tus/redis-kv';
-
+import { RedisKvStore } from '@colanode/server/lib/storage/tus/redis-kv';
+import type { S3StorageConfig } from '@colanode/server/lib/config/storage';
+import { redis } from '@colanode/server/data/redis';
 import type { Storage } from './core';
-
-interface S3StorageConfig {
-  endpoint: string;
-  accessKey: string;
-  secretKey: string;
-  bucket: string;
-  region: string;
-  forcePathStyle?: boolean;
-  redis: RedisClientType;
-}
 
 export class S3Storage implements Storage {
   private readonly client: S3Client;
   private readonly bucket: string;
   private readonly s3Config: S3StorageConfig;
-  private readonly redis: RedisClientType;
-  private readonly tusStore: DataStore;
+  public readonly tusStore: DataStore;
 
   constructor(s3Config: S3StorageConfig) {
     this.s3Config = { ...s3Config };
-    this.redis = s3Config.redis;
     this.client = new S3Client({
       endpoint: this.s3Config.endpoint,
       region: this.s3Config.region,
@@ -50,7 +39,7 @@ export class S3Storage implements Storage {
 
     this.tusStore = new S3Store({
       partSize: FILE_UPLOAD_PART_SIZE,
-      cache: new RedisKvStore(this.redis, config.redis.tus.kvPrefix),
+      cache: new RedisKvStore(redis, config.redis.tus.kvPrefix),
       s3ClientConfig: {
         bucket: this.bucket,
         endpoint: this.s3Config.endpoint,
@@ -100,9 +89,5 @@ export class S3Storage implements Storage {
     });
 
     await this.client.send(command);
-  }
-
-  tusDataStore(): DataStore {
-    return this.tusStore;
   }
 }

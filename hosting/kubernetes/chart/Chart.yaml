@@ -2,7 +2,8 @@ apiVersion: v2
 name: colanode
 description: A Helm chart for Colanode - open-source & local-first collaboration workspace
 type: application
-version: 0.1.0
+version: 0.2.0
+# appVersion is auto-updated by the release workflow
 appVersion: '1.0.0'
 
 dependencies:

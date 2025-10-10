@@ -4,9 +4,9 @@ import { database } from '@colanode/server/data/database';
 import { redis } from '@colanode/server/data/redis';
 import { JobHandler } from '@colanode/server/jobs';
 import { config } from '@colanode/server/lib/config';
-import { deleteFile } from '@colanode/server/lib/files';
 import { createLogger } from '@colanode/server/lib/logger';
-import { RedisKvStore } from '@colanode/server/lib/tus/redis-kv';
+import { storage } from '@colanode/server/lib/storage';
+import { RedisKvStore } from '@colanode/server/lib/storage/tus/redis-kv';
 
 const logger = createLogger('server:job:uploads-clean');
 
@@ -42,11 +42,11 @@ export const uploadsCleanHandler: JobHandler<UploadsCleanInput> = async () => {
 
     const redisKv = new RedisKvStore(redis, config.redis.tus.kvPrefix);
     for (const upload of expiredUploads) {
-      await deleteFile(upload.path);
+      await storage.delete(upload.path);
       await redisKv.delete(upload.path);
 
       const infoPath = `${upload.path}.info`;
-      await deleteFile(infoPath);
+      await storage.delete(infoPath);
 
       await database
         .deleteFrom('uploads')

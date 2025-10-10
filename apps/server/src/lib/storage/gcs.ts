@@ -1,21 +1,15 @@
 import { Readable } from 'stream';
 
-import { RedisClientType } from '@redis/client';
 import { Storage, Bucket, File } from '@google-cloud/storage';
 import { DataStore } from '@tus/server';
 import { GCSStore } from '@tus/gcs-store';
+import type { GCSStorageConfig } from '@colanode/server/lib/config/storage';
 
 import type { Storage as StorageInterface } from './core';
 
-interface GCSStorageConfig {
-  bucket: string;
-  projectId: string;
-  credentials: string;
-}
-
 export class GCSStorage implements StorageInterface {
   private readonly bucket: Bucket;
-  private readonly tusStore: DataStore;
+  public readonly tusStore: DataStore;
 
   constructor(config: GCSStorageConfig) {
     const storage = new Storage({
@@ -71,9 +65,5 @@ export class GCSStorage implements StorageInterface {
       writeStream.on('finish', resolve);
       writeStream.on('error', reject);
     });
-  }
-
-  tusDataStore(): DataStore {
-    return this.tusStore;
   }
 }

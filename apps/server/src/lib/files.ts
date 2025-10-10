@@ -8,7 +8,3 @@ export const buildFilePath = (
 ) => {
   return `files/${workspaceId}/${fileId}_${fileAttributes.version}${fileAttributes.extension}`;
 };
-
-export const deleteFile = async (path: string) => {
-  await storage.delete(path);
-};

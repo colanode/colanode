@@ -37,6 +37,10 @@ export const storageConfigSchema = z.discriminatedUnion('type', [
 ]);
 
 export type StorageConfig = z.infer<typeof storageConfigSchema>;
+export type S3StorageConfig = z.infer<typeof s3StorageConfigSchema>;
+export type FileStorageConfig = z.infer<typeof fileStorageConfigSchema>;
+export type GCSStorageConfig = z.infer<typeof gcsStorageConfigSchema>;
+export type AzureStorageConfig = z.infer<typeof azureStorageConfigSchema>;
 
 export const readStorageConfigVariables = (): StorageConfig => {
   const storageType = process.env.STORAGE_TYPE || 's3';

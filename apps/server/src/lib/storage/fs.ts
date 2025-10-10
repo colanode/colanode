@@ -1,19 +1,15 @@
 import { createReadStream, createWriteStream, promises as fs } from 'fs';
 import { Readable } from 'stream';
 
-import { RedisClientType } from '@redis/client';
 import { DataStore } from '@tus/server';
 import { FileStore } from '@tus/file-store';
+import type { FileStorageConfig } from '@colanode/server/lib/config/storage';
 
 import type { Storage } from './core';
 
-interface FileStorageConfig {
-  directory: string;
-}
-
 export class FileSystemStorage implements Storage {
   private readonly directory: string;
-  private readonly tusStore: DataStore;
+  public readonly tusStore: DataStore;
 
   constructor(config: FileStorageConfig) {
     this.directory = config.directory;
@@ -58,9 +54,5 @@ export class FileSystemStorage implements Storage {
       writeStream.on('finish', resolve);
       writeStream.on('error', reject);
     });
-  }
-
-  tusDataStore(): DataStore {
-    return this.tusStore;
   }
 }

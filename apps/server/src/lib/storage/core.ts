@@ -1,6 +1,4 @@
 import { Readable } from 'stream';
-
-import { RedisClientType } from '@redis/client';
 import { DataStore } from '@tus/server';
 
 export interface Storage {
@@ -12,5 +10,5 @@ export interface Storage {
     contentType: string,
     contentLength?: bigint
   ): Promise<void>;
-  tusDataStore(): DataStore;
+  readonly tusStore: DataStore;
 }
