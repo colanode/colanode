@@ -35,8 +35,7 @@ export const RecordSearch = ({
   const recordSearchQuery = useLiveQuery({
     type: 'record.search',
     searchQuery: query,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     exclude,
     databaseId,
   });

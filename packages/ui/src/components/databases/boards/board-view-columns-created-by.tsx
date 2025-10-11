@@ -29,8 +29,7 @@ export const BoardViewColumnsCreatedBy = ({
     databaseId: database.id,
     filters: view.filters,
     fieldId: field.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (createdByCountQuery.isPending) {
@@ -91,9 +90,8 @@ const BoardViewColumnCreatedByHeader = ({
 
   const userQuery = useLiveQuery({
     type: 'user.get',
-    userId: createdBy,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    id: createdBy,
+    userId: workspace.userId,
   });
 
   if (userQuery.isPending) {

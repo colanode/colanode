@@ -17,8 +17,7 @@ export const WorkspaceStorageStats = () => {
   const workspaceStorageGetQuery = useQuery(
     {
       type: 'workspace.storage.get',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
+      userId: workspace.userId,
     },
     {
       enabled: isFeatureSupported,

@@ -1,7 +1,6 @@
 export type FolderUpdateMutationInput = {
   type: 'folder.update';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   folderId: string;
   name: string;
   avatar?: string | null;

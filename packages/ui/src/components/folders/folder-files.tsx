@@ -25,15 +25,14 @@ export const FolderFiles = ({
   layout: folderLayout,
 }: FolderFilesProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
+  const navigate = useNavigate({ from: '/workspace/$userId' });
 
   const [lastPage] = useState<number>(1);
   const inputs: FileListQueryInput[] = Array.from({
     length: lastPage,
   }).map((_, i) => ({
     type: 'file.list',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     parentId: id,
     count: FILES_PER_PAGE,
     page: i + 1,

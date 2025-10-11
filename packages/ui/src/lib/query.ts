@@ -1,10 +1,8 @@
 import { QueryClient } from '@tanstack/react-query';
 
-import { eventBus } from '@colanode/client/lib';
 import { Event } from '@colanode/client/types';
 
-const buildQueryClient = () => {
-  console.log('Building query client');
+export const buildQueryClient = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
@@ -16,7 +14,7 @@ const buildQueryClient = () => {
     },
   });
 
-  eventBus.subscribe((event: Event) => {
+  window.eventBus.subscribe((event: Event) => {
     if (event.type === 'query.result.updated') {
       const result = event.result;
       const queryId = event.id;
@@ -42,5 +40,3 @@ const buildQueryClient = () => {
 
   return queryClient;
 };
-
-export const queryClient = buildQueryClient();

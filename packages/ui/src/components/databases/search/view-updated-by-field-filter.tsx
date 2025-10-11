@@ -71,9 +71,8 @@ export const ViewUpdatedByFieldFilter = ({
   const results = useLiveQueries(
     collaboratorIds.map((id) => ({
       type: 'user.get',
-      userId: id,
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
+      userId: workspace.userId,
+      id: id,
     }))
   );
 

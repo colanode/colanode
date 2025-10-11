@@ -1,11 +1,8 @@
 import {
-  SelectAccountMetadata,
   SelectAvatar,
   SelectWorkspace,
-} from '@colanode/client/databases/account';
-import {
   SelectAccount,
-  SelectAppMetadata,
+  SelectMetadata,
   SelectTab,
   SelectTempFile,
 } from '@colanode/client/databases/app';
@@ -17,7 +14,6 @@ import {
   SelectUser,
   SelectNodeInteraction,
   SelectNodeReaction,
-  SelectWorkspaceMetadata,
   SelectDocument,
   SelectDocumentState,
   SelectDocumentUpdate,
@@ -26,12 +22,8 @@ import {
   SelectDownload,
   SelectUpload,
 } from '@colanode/client/databases/workspace';
-import {
-  Account,
-  AccountMetadata,
-  AccountMetadataKey,
-} from '@colanode/client/types/accounts';
-import { AppMetadata, AppMetadataKey, Tab } from '@colanode/client/types/apps';
+import { Account } from '@colanode/client/types/accounts';
+import { Metadata, Tab } from '@colanode/client/types/apps';
 import { Avatar } from '@colanode/client/types/avatars';
 import {
   Document,
@@ -53,11 +45,7 @@ import {
   NodeReference,
 } from '@colanode/client/types/nodes';
 import { User } from '@colanode/client/types/users';
-import {
-  Workspace,
-  WorkspaceMetadata,
-  WorkspaceMetadataKey,
-} from '@colanode/client/types/workspaces';
+import { Workspace } from '@colanode/client/types/workspaces';
 import { Mutation } from '@colanode/core';
 import { encodeState } from '@colanode/crdt';
 
@@ -139,15 +127,15 @@ export const mapAccount = (row: SelectAccount): Account => {
 
 export const mapWorkspace = (row: SelectWorkspace): Workspace => {
   return {
-    id: row.id,
+    workspaceId: row.workspace_id,
+    userId: row.user_id,
     name: row.name,
     accountId: row.account_id,
     role: row.role,
-    userId: row.user_id,
     avatar: row.avatar,
     description: row.description,
-    maxFileSize: row.max_file_size,
-    storageLimit: row.storage_limit,
+    maxFileSize: row.max_file_size.toString(),
+    storageLimit: row.storage_limit.toString(),
   };
 };
 
@@ -268,10 +256,11 @@ export const mapIcon = (row: SelectIcon): Icon => {
   };
 };
 
-export const mapAppMetadata = (row: SelectAppMetadata): AppMetadata => {
+export const mapMetadata = (row: SelectMetadata): Metadata => {
   return {
-    key: row.key as AppMetadataKey,
-    value: JSON.parse(row.value),
+    namespace: row.namespace,
+    key: row.key,
+    value: row.value,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
@@ -282,28 +271,6 @@ export const mapTab = (row: SelectTab): Tab => {
     id: row.id,
     location: row.location,
     index: row.index,
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-};
-
-export const mapAccountMetadata = (
-  row: SelectAccountMetadata
-): AccountMetadata => {
-  return {
-    key: row.key as AccountMetadataKey,
-    value: JSON.parse(row.value),
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-};
-
-export const mapWorkspaceMetadata = (
-  row: SelectWorkspaceMetadata
-): WorkspaceMetadata => {
-  return {
-    key: row.key as WorkspaceMetadataKey,
-    value: JSON.parse(row.value),
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

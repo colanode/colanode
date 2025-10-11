@@ -55,12 +55,12 @@ export const LoginForm = () => {
   );
   const servers = serversQuery.data;
 
-  const accountsQuery = useLiveQuery((q) =>
-    q.from({ accounts: database.accounts }).select(({ accounts }) => ({
-      id: accounts.id,
+  const workspacesQuery = useLiveQuery((q) =>
+    q.from({ workspaces: database.workspaces }).select(({ workspaces }) => ({
+      userId: workspaces.userId,
     }))
   );
-  const accounts = accountsQuery.data;
+  const workspaces = workspacesQuery.data;
 
   const [serverDomain, setServerDomain] = useState<string | null>(
     servers[0]?.domain ?? null
@@ -87,13 +87,12 @@ export const LoginForm = () => {
       const workspace = output.workspaces[0];
       if (workspace) {
         router.navigate({
-          to: '/acc/$accountId/$workspaceId',
-          params: { accountId: output.account.id, workspaceId: workspace.id },
+          to: '/workspace/$userId',
+          params: { userId: workspace.user.id },
         });
       } else {
         router.navigate({
-          to: '/acc/$accountId/create',
-          params: { accountId: output.account.id },
+          to: '/create',
         });
       }
     },
@@ -214,7 +213,7 @@ export const LoginForm = () => {
         </ServerContext.Provider>
       )}
 
-      {accounts.length > 0 && (
+      {workspaces.length > 0 && (
         <Fragment>
           <Separator className="w-full" />
           <Button
@@ -226,8 +225,8 @@ export const LoginForm = () => {
                 router.history.back();
               } else {
                 router.navigate({
-                  to: '/acc/$accountId',
-                  params: { accountId: accounts[0]!.id },
+                  to: '/workspace/$userId',
+                  params: { userId: workspaces[0]!.userId },
                 });
               }
             }}

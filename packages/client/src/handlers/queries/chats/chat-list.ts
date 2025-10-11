@@ -24,8 +24,7 @@ export class ChatListQueryHandler
   ): Promise<ChangeCheckResult<ChatListQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -35,8 +34,7 @@ export class ChatListQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'chat'
     ) {
       const newChildren = [...output, event.node];
@@ -48,8 +46,7 @@ export class ChatListQueryHandler
 
     if (
       event.type === 'node.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'chat'
     ) {
       const node = output.find((node) => node.id === event.node.id);
@@ -67,8 +64,7 @@ export class ChatListQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'chat'
     ) {
       const node = output.find((node) => node.id === event.node.id);
@@ -89,7 +85,7 @@ export class ChatListQueryHandler
   private async fetchChildren(
     input: ChatListQueryInput
   ): Promise<SelectNode[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const rows = await workspace.database
       .selectFrom('nodes')

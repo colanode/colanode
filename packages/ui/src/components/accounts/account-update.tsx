@@ -17,7 +17,7 @@ import {
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { useAccount } from '@colanode/ui/contexts/account';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { database } from '@colanode/ui/data';
 import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -31,11 +31,11 @@ const formSchema = z.object({
 });
 
 export const AccountUpdate = () => {
-  const account = useAccount();
+  const workspace = useWorkspace();
   const accountQuery = useLiveQuery((q) =>
     q
       .from({ accounts: database.accounts })
-      .where(({ accounts }) => eq(accounts.id, account.id))
+      .where(({ accounts }) => eq(accounts.id, workspace.accountId))
       .select(({ accounts }) => ({
         name: accounts.name,
         avatar: accounts.avatar,
@@ -68,7 +68,7 @@ export const AccountUpdate = () => {
     updateAccount({
       input: {
         type: 'account.update',
-        id: account.id,
+        id: workspace.accountId,
         name: values.name,
         avatar: values.avatar,
       },
@@ -81,7 +81,7 @@ export const AccountUpdate = () => {
     });
   };
 
-  if (!account) {
+  if (!accountData) {
     return <p>Account not found</p>;
   }
 
@@ -115,7 +115,7 @@ export const AccountUpdate = () => {
                   uploadAvatar({
                     input: {
                       type: 'avatar.upload',
-                      accountId: account.id,
+                      accountId: workspace.accountId,
                       file,
                     },
                     onSuccess(output) {
@@ -133,7 +133,7 @@ export const AccountUpdate = () => {
               }}
             >
               <Avatar
-                id={account.id}
+                id={workspace.accountId}
                 name={name}
                 avatar={avatar}
                 className={isMobile ? 'size-24' : 'size-32'}

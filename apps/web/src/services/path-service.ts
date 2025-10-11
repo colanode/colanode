@@ -2,9 +2,10 @@ import { PathService } from '@colanode/client/services';
 
 export class WebPathService implements PathService {
   private readonly appPath = '';
-  private readonly appDatabasePath = this.join(this.appPath, 'app.db');
-  private readonly accountsDirectoryPath = this.join(this.appPath, 'accounts');
   private readonly assetsSourcePath = 'assets';
+  private readonly appDatabasePath = this.join(this.appPath, 'app.db');
+  private readonly avatarsPath = this.join(this.appPath, 'avatars');
+  private readonly workspacesPath = this.join(this.appPath, 'workspaces');
 
   public get app() {
     return this.appPath;
@@ -14,8 +15,8 @@ export class WebPathService implements PathService {
     return this.appDatabasePath;
   }
 
-  public get accounts() {
-    return this.accountsDirectoryPath;
+  public get avatars() {
+    return this.avatarsPath;
   }
 
   public get temp() {
@@ -42,44 +43,28 @@ export class WebPathService implements PathService {
     return this.join(this.appPath, 'temp', name);
   }
 
-  public account(accountId: string): string {
-    return this.join(this.accountsDirectoryPath, accountId);
+  public avatar(avatarId: string): string {
+    return this.join(this.avatarsPath, avatarId + '.jpeg');
   }
 
-  public accountDatabase(accountId: string): string {
-    return this.join(this.account(accountId), 'account.db');
+  public workspace(userId: string): string {
+    return this.join(this.workspacesPath, userId);
   }
 
-  public workspace(accountId: string, workspaceId: string): string {
-    return this.join(this.account(accountId), 'workspaces', workspaceId);
+  public workspaceDatabase(userId: string): string {
+    return this.join(this.workspace(userId), 'workspace.db');
   }
 
-  public workspaceDatabase(accountId: string, workspaceId: string): string {
-    return this.join(this.workspace(accountId, workspaceId), 'workspace.db');
-  }
-
-  public workspaceFiles(accountId: string, workspaceId: string): string {
-    return this.join(this.workspace(accountId, workspaceId), 'files');
+  public workspaceFiles(userId: string): string {
+    return this.join(this.workspace(userId), 'files');
   }
 
   public workspaceFile(
-    accountId: string,
-    workspaceId: string,
+    userId: string,
     fileId: string,
     extension: string
   ): string {
-    return this.join(
-      this.workspaceFiles(accountId, workspaceId),
-      fileId + extension
-    );
-  }
-
-  public accountAvatars(accountId: string): string {
-    return this.join(this.account(accountId), 'avatars');
-  }
-
-  public accountAvatar(accountId: string, avatarId: string): string {
-    return this.join(this.accountAvatars(accountId), avatarId + '.jpeg');
+    return this.join(this.workspaceFiles(userId), fileId + extension);
   }
 
   public dirname(path: string): string {

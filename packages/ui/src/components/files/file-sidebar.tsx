@@ -25,9 +25,8 @@ export const FileSidebar = ({ file }: FileSidebarProps) => {
 
   const userQuery = useLiveQuery({
     type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: file.createdBy,
+    userId: workspace.userId,
+    id: file.createdBy,
   });
 
   const user = userQuery.data ?? null;

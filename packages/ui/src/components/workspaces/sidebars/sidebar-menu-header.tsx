@@ -1,4 +1,4 @@
-import { useLiveQuery } from '@tanstack/react-db';
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { useNavigate } from '@tanstack/react-router';
 import { Check, Plus } from 'lucide-react';
 import { useState } from 'react';
@@ -13,28 +13,32 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
-import { useAccount } from '@colanode/ui/contexts/account';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { database } from '@colanode/ui/data';
 
 export const SidebarMenuHeader = () => {
   const workspace = useWorkspace();
-  const account = useAccount();
   const radar = useRadar();
   const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
 
   const workspacesQuery = useLiveQuery((q) =>
-    q.from({ workspaces: database.accountWorkspaces(account.id) })
+    q
+      .from({ workspaces: database.workspaces })
+      .where(({ workspaces }) => eq(workspaces.accountId, workspace.accountId))
   );
 
   const workspaces = workspacesQuery.data;
-  const currentWorkspace = workspaces.find((w) => w.id === workspace.id);
-  const otherWorkspaces = workspaces.filter((w) => w.id !== workspace.id);
+  const currentWorkspace = workspaces.find(
+    (w) => w.userId === workspace.userId
+  );
+  const otherWorkspaces = workspaces.filter(
+    (w) => w.userId !== workspace.userId
+  );
   const otherWorkspaceStates = otherWorkspaces.map((w) =>
-    radar.getWorkspaceState(w.accountId, w.id)
+    radar.getWorkspaceState(w.userId)
   );
   const unreadCount = otherWorkspaceStates.reduce(
     (acc, curr) => acc + curr.state.unreadCount,
@@ -51,7 +55,7 @@ export const SidebarMenuHeader = () => {
       <DropdownMenuTrigger asChild>
         <button className="flex w-full items-center justify-center relative cursor-pointer outline-none">
           <Avatar
-            id={currentWorkspace.id}
+            id={currentWorkspace.workspaceId}
             avatar={currentWorkspace.avatar}
             name={currentWorkspace.name}
             className="size-10 rounded-lg shadow-md"
@@ -72,19 +76,17 @@ export const SidebarMenuHeader = () => {
         <DropdownMenuLabel className="mb-1">Workspaces</DropdownMenuLabel>
         {workspaces.map((workspaceItem) => {
           const workspaceUnreadState = radar.getWorkspaceState(
-            workspaceItem.accountId,
-            workspaceItem.id
+            workspaceItem.userId
           );
           return (
             <DropdownMenuItem
-              key={workspaceItem.id}
+              key={workspaceItem.userId}
               className="p-0 cursor-pointer"
               onClick={() => {
                 navigate({
-                  to: '/acc/$accountId/$workspaceId',
+                  to: '/workspace/$userId',
                   params: {
-                    accountId: workspaceItem.accountId,
-                    workspaceId: workspaceItem.id,
+                    userId: workspaceItem.userId,
                   },
                 });
               }}
@@ -92,14 +94,14 @@ export const SidebarMenuHeader = () => {
               <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar
                   className="h-8 w-8 rounded-lg"
-                  id={workspaceItem.id}
+                  id={workspaceItem.workspaceId}
                   name={workspaceItem.name}
                   avatar={workspaceItem.avatar}
                 />
                 <p className="flex-1 text-left text-sm leading-tight truncate font-normal">
                   {workspaceItem.name}
                 </p>
-                {workspaceItem.id === workspace.id ? (
+                {workspaceItem.userId === workspace.userId ? (
                   <Check className="size-4" />
                 ) : (
                   <UnreadBadge
@@ -116,8 +118,7 @@ export const SidebarMenuHeader = () => {
           className="gap-2 p-2 text-muted-foreground hover:text-foreground cursor-pointer"
           onClick={() => {
             navigate({
-              to: '/acc/$accountId/create',
-              params: { accountId: account.id },
+              to: '/create',
             });
           }}
         >

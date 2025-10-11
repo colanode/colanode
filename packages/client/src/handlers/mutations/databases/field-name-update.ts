@@ -14,7 +14,7 @@ export class FieldNameUpdateMutationHandler
   async handleMutation(
     input: FieldNameUpdateMutationInput
   ): Promise<FieldNameUpdateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const result = await workspace.nodes.updateNode<DatabaseAttributes>(
       input.databaseId,

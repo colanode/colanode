@@ -27,7 +27,7 @@ export const FolderDeleteDialog = ({
   onOpenChange,
 }: FolderDeleteDialogProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   return (
@@ -52,8 +52,7 @@ export const FolderDeleteDialog = ({
                 input: {
                   type: 'folder.delete',
                   folderId: folderId,
-                  accountId: workspace.accountId,
-                  workspaceId: workspace.id,
+                  userId: workspace.userId,
                 },
                 onSuccess() {
                   onOpenChange(false);

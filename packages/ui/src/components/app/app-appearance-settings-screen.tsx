@@ -5,8 +5,7 @@ import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
 import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
-import { database } from '@colanode/ui/data';
-import { useAppMetadata } from '@colanode/ui/hooks/use-app-metadata';
+import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface ThemeModeOption {
@@ -53,8 +52,8 @@ const themeColorOptions = [
 ];
 
 export const AppAppearanceSettingsScreen = () => {
-  const themeMode = useAppMetadata('theme.mode');
-  const themeColor = useAppMetadata('theme.color');
+  const [themeMode, setThemeMode] = useMetadata('app', 'theme.mode');
+  const [themeColor, setThemeColor] = useMetadata('app', 'theme.color');
 
   return (
     <>
@@ -81,25 +80,7 @@ export const AppAppearanceSettingsScreen = () => {
                 key={option.key}
                 variant="outline"
                 onClick={() => {
-                  if (option.value === null) {
-                    database.metadata.delete('theme.mode');
-                  } else {
-                    const currentThemeMpde =
-                      database.metadata.get('theme.mode');
-                    if (currentThemeMpde) {
-                      database.metadata.update('theme.mode', (metadata) => {
-                        metadata.value = option.value as ThemeMode;
-                        metadata.updatedAt = new Date().toISOString();
-                      });
-                    } else {
-                      database.metadata.insert({
-                        key: 'theme.mode',
-                        value: option.value,
-                        createdAt: new Date().toISOString(),
-                        updatedAt: null,
-                      });
-                    }
-                  }
+                  setThemeMode(option.value ?? undefined);
                 }}
                 className={cn(
                   'h-10 w-full justify-start gap-2 relative',
@@ -134,23 +115,9 @@ export const AppAppearanceSettingsScreen = () => {
                 variant="outline"
                 onClick={() => {
                   if (isDefault) {
-                    database.metadata.delete('theme.color');
+                    setThemeColor(undefined);
                   } else {
-                    const currentThemeColor =
-                      database.metadata.get('theme.color');
-                    if (currentThemeColor) {
-                      database.metadata.update('theme.color', (metadata) => {
-                        metadata.value = option.value as ThemeColor;
-                        metadata.updatedAt = new Date().toISOString();
-                      });
-                    } else {
-                      database.metadata.insert({
-                        key: 'theme.color',
-                        value: option.value as ThemeColor,
-                        createdAt: new Date().toISOString(),
-                        updatedAt: null,
-                      });
-                    }
+                    setThemeColor(option.value as ThemeColor);
                   }
                 }}
                 className={cn(

@@ -8,21 +8,23 @@ export const createTabsCollection = () => {
       return item.id;
     },
     sync: {
-      async sync({ begin, write, commit, markReady }) {
-        const tabs = await window.colanode.executeQuery({
-          type: 'tabs.list',
-        });
+      sync({ begin, write, commit, markReady }) {
+        window.colanode
+          .executeQuery({
+            type: 'tabs.list',
+          })
+          .then((tabs) => {
+            begin();
 
-        begin();
+            for (const tab of tabs) {
+              write({ type: 'insert', value: tab });
+            }
 
-        for (const tab of tabs) {
-          write({ type: 'insert', value: tab });
-        }
+            commit();
+            markReady();
+          });
 
-        commit();
-        markReady();
-
-        window.eventBus.subscribe((event) => {
+        const subscriptionId = window.eventBus.subscribe((event) => {
           if (event.type === 'tab.created') {
             begin();
             write({ type: 'insert', value: event.tab });
@@ -37,6 +39,12 @@ export const createTabsCollection = () => {
             commit();
           }
         });
+
+        return {
+          cleanup: () => {
+            window.eventBus.unsubscribe(subscriptionId);
+          },
+        };
       },
     },
     onInsert: async ({ transaction }) => {

@@ -5,10 +5,10 @@ import { InView } from 'react-intersection-observer';
 import { UserListQueryInput } from '@colanode/client/queries';
 import { WorkspaceRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
-import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
+import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { WorkspaceUserInvite } from '@colanode/ui/components/workspaces/workspace-user-invite';
 import { WorkspaceUserRoleDropdown } from '@colanode/ui/components/workspaces/workspace-user-role-dropdown';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -27,8 +27,7 @@ export const WorkspaceUsersScreen = () => {
     type: 'user.list',
     page: i + 1,
     count: USERS_PER_PAGE,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   }));
 
   const result = useLiveQueries(inputs);

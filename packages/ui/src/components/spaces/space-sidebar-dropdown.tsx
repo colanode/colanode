@@ -29,7 +29,7 @@ interface SpaceSidebarDropdownProps {
 }
 
 export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
-  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
+  const navigate = useNavigate({ from: '/workspace/$userId' });
 
   const [openCreatePage, setOpenCreatePage] = useState(false);
   const [openCreateChannel, setOpenCreateChannel] = useState(false);

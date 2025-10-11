@@ -22,8 +22,7 @@ export class UserListQueryHandler
   ): Promise<ChangeCheckResult<UserListQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -33,8 +32,7 @@ export class UserListQueryHandler
 
     if (
       event.type === 'user.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       const newResult = await this.handleQuery(input);
       return {
@@ -45,8 +43,7 @@ export class UserListQueryHandler
 
     if (
       event.type === 'user.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       const user = output.find((user) => user.id === event.user.id);
       if (user) {
@@ -66,8 +63,7 @@ export class UserListQueryHandler
 
     if (
       event.type === 'user.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       const newResult = await this.handleQuery(input);
       return {
@@ -82,7 +78,7 @@ export class UserListQueryHandler
   }
 
   private async fetchUsers(input: UserListQueryInput): Promise<SelectUser[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const offset = (input.page - 1) * input.count;
     const rows = await workspace.database

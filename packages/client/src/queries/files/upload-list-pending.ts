@@ -2,8 +2,7 @@ import { Upload } from '@colanode/client/types/files';
 
 export type UploadListPendingQueryInput = {
   type: 'upload.list.pending';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   page: number;
   count: number;
 };

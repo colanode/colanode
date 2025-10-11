@@ -89,8 +89,7 @@ export const FieldCreatePopover = ({
         databaseId: database.id,
         name: values.name,
         fieldType: values.type,
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        userId: workspace.userId,
         relationDatabaseId: values.relationDatabaseId,
       },
       onSuccess: (output) => {

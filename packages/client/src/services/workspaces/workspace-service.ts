@@ -42,16 +42,13 @@ export class WorkspaceService {
   private readonly workspaceFilesCleanJobScheduleId: string;
 
   constructor(workspace: Workspace, account: AccountService) {
-    debug(`Initializing workspace service ${workspace.id}`);
+    debug(`Initializing workspace service ${workspace.workspaceId}`);
 
     this.workspace = workspace;
     this.account = account;
 
     this.database = account.app.kysely.build<WorkspaceDatabaseSchema>({
-      path: account.app.path.workspaceDatabase(
-        this.account.id,
-        this.workspace.id
-      ),
+      path: account.app.path.workspaceDatabase(this.workspace.userId),
       readonly: false,
     });
 
@@ -67,11 +64,11 @@ export class WorkspaceService {
     this.radar = new RadarService(this);
     this.nodeCounters = new NodeCountersService(this);
 
-    this.workspaceFilesCleanJobScheduleId = `workspace.files.clean.${this.account.id}.${this.workspace.id}`;
+    this.workspaceFilesCleanJobScheduleId = `workspace.files.clean.${this.account.id}.${this.workspace.workspaceId}`;
   }
 
-  public get id(): string {
-    return this.workspace.id;
+  public get workspaceId(): string {
+    return this.workspace.workspaceId;
   }
 
   public get accountId(): string {
@@ -112,8 +109,7 @@ export class WorkspaceService {
       this.workspaceFilesCleanJobScheduleId,
       {
         type: 'workspace.files.clean',
-        accountId: this.account.id,
-        workspaceId: this.workspace.id,
+        userId: this.workspace.userId,
       },
       ms('1 minute'),
       {
@@ -126,7 +122,9 @@ export class WorkspaceService {
   }
 
   private async migrate(): Promise<void> {
-    debug(`Migrating workspace database for workspace ${this.workspace.id}`);
+    debug(
+      `Migrating workspace database for workspace ${this.workspace.workspaceId}`
+    );
 
     const migrator = new Migrator({
       db: this.database,
@@ -147,22 +145,20 @@ export class WorkspaceService {
       this.radar.destroy();
 
       const databasePath = this.account.app.path.workspaceDatabase(
-        this.account.id,
-        this.workspace.id
+        this.workspace.userId
       );
 
       await this.account.app.kysely.delete(databasePath);
 
       const workspacePath = this.account.app.path.workspace(
-        this.account.id,
-        this.workspace.id
+        this.workspace.userId
       );
 
       await this.account.app.fs.delete(workspacePath);
 
-      await this.account.database
+      await this.account.app.database
         .deleteFrom('workspaces')
-        .where('id', '=', this.workspace.id)
+        .where('user_id', '=', this.workspace.userId)
         .execute();
 
       await this.account.app.jobs.removeJobSchedule(
@@ -174,7 +170,7 @@ export class WorkspaceService {
         workspace: this.workspace,
       });
     } catch (error) {
-      debug(`Error deleting workspace ${this.workspace.id}: ${error}`);
+      debug(`Error deleting workspace ${this.workspace.workspaceId}: ${error}`);
     }
   }
 }

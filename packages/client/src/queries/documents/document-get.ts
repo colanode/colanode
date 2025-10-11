@@ -3,8 +3,7 @@ import { Document } from '@colanode/client/types/documents';
 export type DocumentGetQueryInput = {
   type: 'document.get';
   documentId: string;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 declare module '@colanode/client/queries' {

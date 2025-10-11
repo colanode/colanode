@@ -16,9 +16,8 @@ export const NodeCollaboratorAudit = ({
 
   const userGetQuery = useLiveQuery({
     type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: collaboratorId,
+    userId: workspace.userId,
+    id: collaboratorId,
   });
 
   if (userGetQuery.isPending || !userGetQuery.data) {

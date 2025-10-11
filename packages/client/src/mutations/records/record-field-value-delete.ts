@@ -1,7 +1,6 @@
 export type RecordFieldValueDeleteMutationInput = {
   type: 'record.field.value.delete';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   recordId: string;
   fieldId: string;
 };

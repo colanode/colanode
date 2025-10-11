@@ -12,17 +12,14 @@ import { createDocumentStatesTable } from './00009-create-document-states-table'
 import { createDocumentUpdatesTable } from './00010-create-document-updates-table';
 import { createDocumentTextsTable } from './00011-create-document-texts-table';
 import { createCollaborationsTable } from './00012-create-collaborations-table';
-import { createFileStatesTable } from './00013-create-file-states-table';
-import { createMutationsTable } from './00014-create-mutations-table';
-import { createTombstonesTable } from './00015-create-tombstones-table';
-import { createCursorsTable } from './00016-create-cursors-table';
-import { createMetadataTable } from './00017-create-metadata-table';
-import { createNodeReferencesTable } from './00018-create-node-references-table';
-import { createNodeCountersTable } from './00019-create-node-counters-table';
-import { createLocalFilesTable } from './00020-create-local-files-table';
-import { createUploadsTable } from './00021-create-uploads-table';
-import { createDownloadsTable } from './00022-create-downloads-table';
-import { dropFileStatesTable } from './00023-drop-file-states-table';
+import { createMutationsTable } from './00013-create-mutations-table';
+import { createTombstonesTable } from './00014-create-tombstones-table';
+import { createCursorsTable } from './00015-create-cursors-table';
+import { createNodeReferencesTable } from './00016-create-node-references-table';
+import { createNodeCountersTable } from './00017-create-node-counters-table';
+import { createLocalFilesTable } from './00018-create-local-files-table';
+import { createUploadsTable } from './00019-create-uploads-table';
+import { createDownloadsTable } from './00020-create-downloads-table';
 
 export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00001-create-users-table': createUsersTable,
@@ -37,15 +34,12 @@ export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00010-create-document-updates-table': createDocumentUpdatesTable,
   '00011-create-document-texts-table': createDocumentTextsTable,
   '00012-create-collaborations-table': createCollaborationsTable,
-  '00013-create-file-states-table': createFileStatesTable,
-  '00014-create-mutations-table': createMutationsTable,
-  '00015-create-tombstones-table': createTombstonesTable,
-  '00016-create-cursors-table': createCursorsTable,
-  '00017-create-metadata-table': createMetadataTable,
-  '00018-create-node-references-table': createNodeReferencesTable,
-  '00019-create-node-counters-table': createNodeCountersTable,
-  '00020-create-local-files-table': createLocalFilesTable,
-  '00021-create-uploads-table': createUploadsTable,
-  '00022-create-downloads-table': createDownloadsTable,
-  '00023-drop-file-states-table': dropFileStatesTable,
+  '00013-create-mutations-table': createMutationsTable,
+  '00014-create-tombstones-table': createTombstonesTable,
+  '00015-create-cursors-table': createCursorsTable,
+  '00016-create-node-references-table': createNodeReferencesTable,
+  '00017-create-node-counters-table': createNodeCountersTable,
+  '00018-create-local-files-table': createLocalFilesTable,
+  '00019-create-uploads-table': createUploadsTable,
+  '00020-create-downloads-table': createDownloadsTable,
 };

@@ -20,7 +20,7 @@ export class SelectOptionCreateMutationHandler
   async handleMutation(
     input: SelectOptionCreateMutationInput
   ): Promise<SelectOptionCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const id = generateId(IdType.SelectOption);
     const result = await workspace.nodes.updateNode<DatabaseAttributes>(

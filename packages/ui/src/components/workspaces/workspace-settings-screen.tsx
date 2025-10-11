@@ -18,8 +18,8 @@ export const WorkspaceSettingsScreen = () => {
 
   const currentWorkspaceQuery = useLiveQuery((q) =>
     q
-      .from({ workspaces: database.accountWorkspaces(workspace.accountId) })
-      .where(({ workspaces }) => eq(workspaces.id, workspace.id))
+      .from({ workspaces: database.workspaces })
+      .where(({ workspaces }) => eq(workspaces.accountId, workspace.accountId))
       .select(({ workspaces }) => ({
         name: workspaces.name,
         description: workspaces.description,
@@ -59,8 +59,8 @@ export const WorkspaceSettingsScreen = () => {
               mutate({
                 input: {
                   type: 'workspace.update',
-                  id: workspace.id,
-                  accountId: workspace.accountId,
+                  id: workspace.workspaceId,
+                  userId: workspace.userId,
                   name: values.name,
                   description: values.description,
                   avatar: values.avatar ?? null,

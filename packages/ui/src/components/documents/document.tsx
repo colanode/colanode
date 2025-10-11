@@ -17,15 +17,13 @@ export const Document = ({ node, canEdit, autoFocus }: DocumentProps) => {
   const documentStateQuery = useLiveQuery({
     type: 'document.state.get',
     documentId: node.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   const documentUpdatesQuery = useLiveQuery({
     type: 'document.updates.list',
     documentId: node.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (documentStateQuery.isPending || documentUpdatesQuery.isPending) {

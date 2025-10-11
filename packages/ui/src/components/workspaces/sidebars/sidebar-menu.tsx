@@ -1,13 +1,13 @@
 import { LayoutGrid, MessageCircle, Settings } from 'lucide-react';
 
-import { SidebarMenuType } from '@colanode/client/types';
+import { SidebarMenuType, WindowSize } from '@colanode/client/types';
 import { SidebarMenuFooter } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu-footer';
 import { SidebarMenuHeader } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu-header';
 import { SidebarMenuIcon } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu-icon';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useAppMetadata } from '@colanode/ui/hooks/use-app-metadata';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface SidebarMenuProps {
@@ -19,20 +19,16 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
   const workspace = useWorkspace();
   const radar = useRadar();
 
-  const platform = useAppMetadata('platform');
-  const windowSize = useAppMetadata('window.size');
+  const [platform] = useMetadata<string>('app', 'platform');
+  const [windowSize] = useMetadata<WindowSize>('app', 'window.size');
   const showMacOsPlaceholder = platform === 'darwin' && !windowSize?.fullscreen;
 
-  const chatsState = radar.getChatsState(workspace.accountId, workspace.id);
-  const channelsState = radar.getChannelsState(
-    workspace.accountId,
-    workspace.id
-  );
+  const chatsState = radar.getChatsState(workspace.userId);
+  const channelsState = radar.getChannelsState(workspace.userId);
 
   const pendingUploadsQuery = useLiveQuery({
     type: 'upload.list.pending',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     page: 1,
     count: 21,
   });

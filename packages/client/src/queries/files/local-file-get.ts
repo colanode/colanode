@@ -3,8 +3,7 @@ import { Download, LocalFile } from '@colanode/client/types';
 export type LocalFileGetQueryInput = {
   type: 'local.file.get';
   fileId: string;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   autoDownload?: boolean;
 };
 

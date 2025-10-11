@@ -13,8 +13,7 @@ export const RecordContainerTab = ({ recordId }: RecordContainerTabProps) => {
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: recordId,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (nodeGetQuery.isPending) {

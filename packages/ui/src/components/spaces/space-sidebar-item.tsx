@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { LocalSpaceNode } from '@colanode/client/types';
 import { extractNodeRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { WorkspaceSidebarItem } from '@colanode/ui/components/workspaces/sidebars/sidebar-item';
 import { SpaceSidebarDropdown } from '@colanode/ui/components/spaces/space-sidebar-dropdown';
 import {
   Collapsible,
@@ -14,6 +13,7 @@ import {
   CollapsibleTrigger,
 } from '@colanode/ui/components/ui/collapsible';
 import { Link } from '@colanode/ui/components/ui/link';
+import { WorkspaceSidebarItem } from '@colanode/ui/components/workspaces/sidebars/sidebar-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -34,8 +34,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const nodeChildrenGetQuery = useLiveQuery({
     type: 'node.children.get',
     nodeId: space.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     types: ['page', 'channel', 'database', 'folder'],
   });
 
@@ -59,8 +58,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
     mutation.mutate({
       input: {
         type: 'space.child.reorder',
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        userId: workspace.userId,
         spaceId: space.id,
         childId,
         after,
@@ -105,7 +103,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
           {children.map((child) => (
             <li key={child.id}>
               <Link
-                from="/acc/$accountId/$workspaceId"
+                from="/workspace/$userId"
                 to="$nodeId"
                 params={{
                   nodeId: child.id,

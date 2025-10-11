@@ -18,7 +18,7 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
   const app = useApp();
   const workspace = useWorkspace();
   const mutation = useMutation();
-  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const [isSaving, setIsSaving] = useState(false);
 
   const handleDownloadDesktop = async () => {
@@ -33,8 +33,7 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
     mutation.mutate({
       input: {
         type: 'file.download',
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        userId: workspace.userId,
         fileId: file.id,
         path,
       },
@@ -56,8 +55,7 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
       const localFileQuery = await window.colanode.executeQuery({
         type: 'local.file.get',
         fileId: file.id,
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        userId: workspace.userId,
       });
 
       if (localFileQuery.localFile) {
@@ -76,8 +74,7 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
       const request = await window.colanode.executeQuery({
         type: 'file.download.request.get',
         id: file.id,
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        userId: workspace.userId,
       });
 
       if (!request) {

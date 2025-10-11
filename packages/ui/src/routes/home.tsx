@@ -1,18 +1,18 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
 import { rootRoute } from '@colanode/ui/routes/root';
-import { getDefaultAccount } from '@colanode/ui/routes/utils';
+import { getDefaultWorkspaceUserId } from '@colanode/ui/routes/utils';
 
 export const homeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/',
   component: () => null,
   beforeLoad: () => {
-    const defaultAccount = getDefaultAccount();
-    if (defaultAccount) {
+    const defaultWorkspaceUserId = getDefaultWorkspaceUserId();
+    if (defaultWorkspaceUserId) {
       throw redirect({
-        to: '/acc/$accountId',
-        params: { accountId: defaultAccount },
+        to: '/workspace/$userId',
+        params: { userId: defaultWorkspaceUserId },
         replace: true,
       });
     }

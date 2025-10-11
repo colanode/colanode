@@ -63,8 +63,7 @@ export const WorkspaceDelete = () => {
                 mutate({
                   input: {
                     type: 'workspace.delete',
-                    accountId: workspace.accountId,
-                    workspaceId: workspace.id,
+                    userId: workspace.userId,
                   },
                   onSuccess() {
                     setShowDeleteModal(false);

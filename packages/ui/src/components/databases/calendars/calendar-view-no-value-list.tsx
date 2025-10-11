@@ -33,7 +33,7 @@ export const CalendarViewNoValueList = ({
         const name = record.attributes.name ?? 'Unnamed';
         return (
           <Link
-            from="/acc/$accountId/$workspaceId"
+            from="/workspace/$userId"
             to="$nodeId"
             params={{ nodeId: record.id }}
             key={record.id}

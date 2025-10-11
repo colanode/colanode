@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { DownloadListManualQueryInput } from '@colanode/client/queries';
+import { Separator } from '@colanode/ui/components/ui/separator';
 import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
 import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
-import { Separator } from '@colanode/ui/components/ui/separator';
 import { WorkspaceDownloadFile } from '@colanode/ui/components/workspaces/downloads/workspace-download-file';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
@@ -20,8 +20,7 @@ export const WorkspaceDownloadsScreen = () => {
     length: lastPage,
   }).map((_, i) => ({
     type: 'download.list.manual',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     count: DOWNLOADS_PER_PAGE,
     page: i + 1,
   }));

@@ -12,9 +12,8 @@ export const MentionNodeView = ({ node }: NodeViewProps) => {
   const target = node.attrs.target;
   const userGetQuery = useLiveQuery({
     type: 'user.get',
-    userId: target,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
+    id: target,
   });
 
   const user = userGetQuery.data;

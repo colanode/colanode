@@ -43,7 +43,10 @@ export class AvatarDownloadJobHandler
       };
     }
 
-    const result = await account.avatars.downloadAvatar(input.avatar);
+    const result = await this.app.assets.downloadAvatar(
+      account.id,
+      input.avatar
+    );
     if (result === null) {
       return {
         type: 'retry',

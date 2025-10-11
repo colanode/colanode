@@ -67,8 +67,7 @@ export const SpaceDelete = ({ id, onDeleted }: SpaceDeleteProps) => {
                 mutate({
                   input: {
                     type: 'space.delete',
-                    accountId: workspace.accountId,
-                    workspaceId: workspace.id,
+                    userId: workspace.userId,
                     spaceId: id,
                   },
                   onSuccess() {

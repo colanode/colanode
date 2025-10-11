@@ -19,8 +19,7 @@ import { FileStatus } from '@colanode/core';
 
 export type FileDownloadInput = {
   type: 'file.download';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   downloadId: string;
 };
 
@@ -47,15 +46,15 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
   };
 
   public async handleJob(input: FileDownloadInput): Promise<JobOutput> {
-    const account = this.app.getAccount(input.accountId);
-    if (!account) {
+    const workspace = this.app.getWorkspace(input.userId);
+    if (!workspace) {
       return {
         type: 'cancel',
       };
     }
 
-    const workspace = account.getWorkspace(input.workspaceId);
-    if (!workspace) {
+    const account = this.app.getAccount(workspace.accountId);
+    if (!account) {
       return {
         type: 'cancel',
       };
@@ -110,7 +109,7 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
       });
 
       const response = await workspace.account.client.get(
-        `v1/workspaces/${workspace.id}/files/${file.id}`,
+        `v1/workspaces/${workspace.workspaceId}/files/${file.id}`,
         {
           onDownloadProgress: async (progress, _chunk) => {
             const percentage = Math.round((progress.percent || 0) * 100);
@@ -167,8 +166,11 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
       const url = await this.app.fs.url(createdLocalFile.path);
       eventBus.publish({
         type: 'local.file.created',
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        workspace: {
+          workspaceId: workspace.workspaceId,
+          userId: workspace.userId,
+          accountId: workspace.accountId,
+        },
         localFile: mapLocalFile(createdLocalFile, url),
       });
 
@@ -262,8 +264,11 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
 
     eventBus.publish({
       type: 'download.updated',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
+      workspace: {
+        workspaceId: workspace.workspaceId,
+        userId: workspace.userId,
+        accountId: workspace.accountId,
+      },
       download: mapDownload(updatedDownload),
     });
   }

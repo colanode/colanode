@@ -16,63 +16,70 @@ export abstract class AccountMutationHandlerBase {
     login: LoginSuccessOutput,
     server: ServerService
   ): Promise<void> {
-    const createdAccount = await this.app.database
-      .insertInto('accounts')
-      .returningAll()
-      .values({
-        id: login.account.id,
-        email: login.account.email,
-        name: login.account.name,
-        server: server.domain,
-        token: login.token,
-        device_id: login.deviceId,
-        avatar: login.account.avatar,
-        created_at: new Date().toISOString(),
-      })
-      .executeTakeFirst();
+    const { createdAccount, createdWorkspaces } = await this.app.database
+      .transaction()
+      .execute(async (trx) => {
+        const createdAccount = await trx
+          .insertInto('accounts')
+          .returningAll()
+          .values({
+            id: login.account.id,
+            email: login.account.email,
+            name: login.account.name,
+            server: server.domain,
+            token: login.token,
+            device_id: login.deviceId,
+            avatar: login.account.avatar,
+            created_at: new Date().toISOString(),
+          })
+          .executeTakeFirst();
 
-    if (!createdAccount) {
-      throw new MutationError(
-        MutationErrorCode.AccountLoginFailed,
-        'Account login failed, please try again.'
-      );
-    }
+        if (!createdAccount) {
+          throw new MutationError(
+            MutationErrorCode.AccountLoginFailed,
+            'Account login failed, please try again.'
+          );
+        }
+
+        const createdWorkspaces = [];
+        if (login.workspaces.length > 0) {
+          for (const workspace of login.workspaces) {
+            const createdWorkspace = await trx
+              .insertInto('workspaces')
+              .returningAll()
+              .values({
+                workspace_id: workspace.id,
+                name: workspace.name,
+                user_id: workspace.user.id,
+                account_id: createdAccount.id,
+                role: workspace.user.role,
+                storage_limit: workspace.user.storageLimit,
+                max_file_size: workspace.user.maxFileSize,
+                avatar: workspace.avatar,
+                description: workspace.description,
+                created_at: new Date().toISOString(),
+              })
+              .executeTakeFirst();
+
+            if (createdWorkspace) {
+              createdWorkspaces.push(createdWorkspace);
+            }
+          }
+        }
+
+        return { createdAccount, createdWorkspaces };
+      });
 
     const account = mapAccount(createdAccount);
-    const accountService = await this.app.initAccount(account);
+    await this.app.initAccount(account);
 
     eventBus.publish({
       type: 'account.created',
       account: account,
     });
 
-    if (login.workspaces.length === 0) {
-      return;
-    }
-
-    for (const workspace of login.workspaces) {
-      const createdWorkspace = await accountService.database
-        .insertInto('workspaces')
-        .returningAll()
-        .values({
-          id: workspace.id,
-          name: workspace.name,
-          user_id: workspace.user.id,
-          account_id: account.id,
-          role: workspace.user.role,
-          storage_limit: workspace.user.storageLimit,
-          max_file_size: workspace.user.maxFileSize,
-          avatar: workspace.avatar,
-          description: workspace.description,
-          created_at: new Date().toISOString(),
-        })
-        .executeTakeFirst();
-
-      if (!createdWorkspace) {
-        continue;
-      }
-
-      await accountService.initWorkspace(mapWorkspace(createdWorkspace));
+    for (const createdWorkspace of createdWorkspaces) {
+      await this.app.initWorkspace(createdWorkspace);
       eventBus.publish({
         type: 'workspace.created',
         workspace: mapWorkspace(createdWorkspace),

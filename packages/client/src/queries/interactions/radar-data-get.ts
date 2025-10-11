@@ -4,10 +4,7 @@ export type RadarDataGetQueryInput = {
   type: 'radar.data.get';
 };
 
-export type RadarDataGetQueryOutput = Record<
-  string,
-  Record<string, WorkspaceRadarData>
->;
+export type RadarDataGetQueryOutput = Record<string, WorkspaceRadarData>;
 
 declare module '@colanode/client/queries' {
   interface QueryMap {

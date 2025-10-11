@@ -14,7 +14,7 @@ import { SpaceContainer } from '@colanode/ui/components/spaces/space-container';
 
 export const NodeScreen = () => {
   const { nodeId } = useParams({
-    from: '/acc/$accountId/$workspaceId/$nodeId',
+    from: '/workspace/$userId/$nodeId',
   });
 
   return match(getIdType(nodeId))

@@ -1,22 +1,14 @@
 export interface PathService {
   app: string;
   appDatabase: string;
-  accounts: string;
+  avatars: string;
   temp: string;
   tempFile: (name: string) => string;
-  account: (accountId: string) => string;
-  accountDatabase: (accountId: string) => string;
-  workspace: (accountId: string, workspaceId: string) => string;
-  workspaceDatabase: (accountId: string, workspaceId: string) => string;
-  workspaceFiles: (accountId: string, workspaceId: string) => string;
-  workspaceFile: (
-    accountId: string,
-    workspaceId: string,
-    fileId: string,
-    extension: string
-  ) => string;
-  accountAvatars: (accountId: string) => string;
-  accountAvatar: (accountId: string, avatarId: string) => string;
+  avatar: (avatarId: string) => string;
+  workspace: (userId: string) => string;
+  workspaceDatabase: (userId: string) => string;
+  workspaceFiles: (userId: string) => string;
+  workspaceFile: (userId: string, fileId: string, extension: string) => string;
   dirname: (path: string) => string;
   filename: (path: string) => string;
   extension: (path: string) => string;

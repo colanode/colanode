@@ -15,9 +15,8 @@ export const MessageAuthorAvatar = ({
   const workspace = useWorkspace();
   const userGetQuery = useLiveQuery({
     type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: message.createdBy,
+    userId: workspace.userId,
+    id: message.createdBy,
   });
 
   if (userGetQuery.isPending || !userGetQuery.data) {

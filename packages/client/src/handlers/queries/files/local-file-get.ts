@@ -31,8 +31,7 @@ export class LocalFileGetQueryHandler
   ): Promise<ChangeCheckResult<LocalFileGetQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -45,8 +44,7 @@ export class LocalFileGetQueryHandler
 
     if (
       event.type === 'local.file.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.localFile.id === input.fileId
     ) {
       const output = await this.handleQuery(input);
@@ -58,8 +56,7 @@ export class LocalFileGetQueryHandler
 
     if (
       event.type === 'local.file.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.localFile.id === input.fileId
     ) {
       return {
@@ -73,8 +70,7 @@ export class LocalFileGetQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.id === input.fileId
     ) {
       return {
@@ -88,8 +84,7 @@ export class LocalFileGetQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.id === input.fileId
     ) {
       const newOutput = await this.handleQuery(input);
@@ -101,8 +96,7 @@ export class LocalFileGetQueryHandler
 
     if (
       event.type === 'node.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.id === input.fileId
     ) {
       const newOutput = await this.handleQuery(input);
@@ -120,7 +114,7 @@ export class LocalFileGetQueryHandler
   private async fetchLocalFile(
     input: LocalFileGetQueryInput
   ): Promise<LocalFileGetQueryOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const localFile = await workspace.database
       .updateTable('local_files')

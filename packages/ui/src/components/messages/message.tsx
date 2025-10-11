@@ -112,11 +112,7 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
             rootMargin="50px"
             onChange={(inView) => {
               if (inView) {
-                radar.markNodeAsSeen(
-                  workspace.accountId,
-                  workspace.id,
-                  message.id
-                );
+                radar.markNodeAsSeen(workspace.userId, message.id);
               }
             }}
           >

@@ -50,8 +50,7 @@ export const MessageDeleteDialog = ({
                 input: {
                   type: 'message.delete',
                   messageId: id,
-                  accountId: workspace.accountId,
-                  workspaceId: workspace.id,
+                  userId: workspace.userId,
                 },
                 onSuccess() {
                   onOpenChange(false);

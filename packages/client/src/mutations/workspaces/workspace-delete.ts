@@ -1,7 +1,6 @@
 export type WorkspaceDeleteMutationInput = {
   type: 'workspace.delete';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 export type WorkspaceDeleteMutationOutput = {

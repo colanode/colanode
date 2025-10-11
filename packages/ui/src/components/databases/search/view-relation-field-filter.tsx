@@ -68,8 +68,7 @@ export const ViewRelationFieldFilter = ({
     relationIds.map((id) => ({
       type: 'node.get',
       nodeId: id,
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
+      userId: workspace.userId,
     }))
   );
 

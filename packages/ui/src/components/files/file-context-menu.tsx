@@ -28,7 +28,7 @@ export const FileContextMenu = ({ id, children }: FileContextMenuProps) => {
           <ContextMenuItem
             onSelect={() => {
               navigate({
-                from: '/acc/$accountId/$workspaceId',
+                from: '/workspace/$userId',
                 to: '$nodeId',
                 params: { nodeId: id },
               });

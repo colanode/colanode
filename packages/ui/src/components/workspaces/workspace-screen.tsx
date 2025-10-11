@@ -1,53 +1,64 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 import { useParams } from '@tanstack/react-router';
-import { useEffect } from 'react';
+// import { useEffect } from 'react';
 
 import { WorkspaceLayout } from '@colanode/ui/components/workspaces/workspace-layout';
 import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
-import { useAccount } from '@colanode/ui/contexts/account';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
 import { database } from '@colanode/ui/data';
 import { useLocationTracker } from '@colanode/ui/hooks/use-location-tracker';
 
 export const WorkspaceScreen = () => {
-  const { workspaceId } = useParams({
-    from: '/acc/$accountId/$workspaceId',
+  const { userId } = useParams({
+    from: '/workspace/$userId',
   });
 
-  const account = useAccount();
-  const workspacesQuery = useLiveQuery((q) =>
+  const workspaceQuery = useLiveQuery((q) =>
     q
-      .from({ workspaces: database.accountWorkspaces(account.id) })
-      .where(({ workspaces }) => eq(workspaces.id, workspaceId))
+      .from({ workspaces: database.workspaces })
+      .where(({ workspaces }) => eq(workspaces.userId, userId))
       .select(({ workspaces }) => ({
         userId: workspaces.userId,
+        workspaceId: workspaces.workspaceId,
         role: workspaces.role,
+        accountId: workspaces.accountId,
       }))
+      .findOne()
   );
 
-  const userId = workspacesQuery.data?.[0]?.userId;
-  const role = workspacesQuery.data?.[0]?.role;
+  const role = workspaceQuery.data?.role;
+  const workspaceId = workspaceQuery.data?.workspaceId;
+  const accountId = workspaceQuery.data?.accountId;
 
-  useLocationTracker(account.id, workspaceId);
+  useLocationTracker(userId!);
 
-  useEffect(() => {
-    const accountMetadataCollection = database.accountMetadata(account.id);
-    const workspaceMetadata = accountMetadataCollection.get('workspace');
-    if (workspaceMetadata) {
-      if (workspaceMetadata.value !== workspaceId) {
-        accountMetadataCollection.update('workspace', (metadata) => {
-          metadata.value = workspaceId;
-        });
-      }
-    } else {
-      accountMetadataCollection.insert({
-        key: 'workspace',
-        value: workspaceId,
-        createdAt: new Date().toISOString(),
-        updatedAt: null,
-      });
-    }
-  }, [workspaceId]);
+  if (!workspaceId || !accountId) {
+    return <WorkspaceNotFound />;
+  }
+
+  // useEffect(() => {
+  //   if (!accountId) {
+  //     return;
+  //   }
+
+  //   const accountMetadataCollection = database.accountMetadata;
+  //   const workspaceMetadata = accountMetadataCollection.get('workspace');
+  //   if (workspaceMetadata) {
+  //     if (workspaceMetadata.value !== userId) {
+  //       accountMetadataCollection.update('workspace', (metadata) => {
+  //         metadata.value = userId;
+  //       });
+  //     }
+  //   } else {
+  //     accountMetadataCollection.insert({
+  //       key: 'workspace',
+  //       accountId: accountId,
+  //       value: userId,
+  //       createdAt: new Date().toISOString(),
+  //       updatedAt: null,
+  //     });
+  //   }
+  // }, [userId]);
 
   if (!userId || !role) {
     return <WorkspaceNotFound />;
@@ -55,7 +66,7 @@ export const WorkspaceScreen = () => {
 
   return (
     <WorkspaceContext.Provider
-      value={{ accountId: account.id, id: workspaceId, userId, role }}
+      value={{ accountId: accountId, workspaceId: workspaceId, userId, role }}
     >
       <WorkspaceLayout />
     </WorkspaceContext.Provider>

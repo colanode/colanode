@@ -4,7 +4,11 @@ import { TabAddButton } from '@colanode/ui/components/layouts/tabs/tab-add-butto
 import { TabsHeaderItem } from '@colanode/ui/components/layouts/tabs/tabs-header-item';
 import { database } from '@colanode/ui/data';
 
-export const TabsHeader = () => {
+interface TabsHeaderProps {
+  activeTabId?: string;
+}
+
+export const TabsHeader = ({ activeTabId }: TabsHeaderProps) => {
   const tabsQuery = useLiveQuery((q) =>
     q
       .from({ tabs: database.tabs })
@@ -22,6 +26,7 @@ export const TabsHeader = () => {
     <div className="relative flex bg-sidebar border-b border-border h-10 overflow-hidden">
       {tabs.map((tab, index) => {
         const isLast = index === tabs.length - 1;
+        const isActive = activeTabId ? tab.id === activeTabId : index === 0;
 
         return (
           <TabsHeaderItem
@@ -29,6 +34,7 @@ export const TabsHeader = () => {
             id={tab.id}
             index={index}
             isLast={isLast}
+            isActive={isActive}
           />
         );
       })}

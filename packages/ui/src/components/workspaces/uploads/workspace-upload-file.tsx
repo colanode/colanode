@@ -17,8 +17,7 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
 
   const fileQuery = useLiveQuery({
     type: 'node.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     nodeId: upload.fileId,
   });
 
@@ -51,7 +50,7 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
 
   return (
     <Link
-      from="/acc/$accountId/$workspaceId"
+      from="/workspace/$userId"
       to="$nodeId"
       params={{ nodeId: file.id }}
       className="border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors flex items-center gap-6 cursor-pointer"

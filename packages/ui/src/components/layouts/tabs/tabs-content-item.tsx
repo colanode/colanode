@@ -2,18 +2,15 @@ import { RouterProvider } from '@tanstack/react-router';
 import { useRef } from 'react';
 
 import { useTabManager } from '@colanode/ui/contexts/tab-manager';
-import { useAppMetadata } from '@colanode/ui/hooks/use-app-metadata';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface TabsContentItemProps {
   id: string;
+  isActive: boolean;
 }
 
-export const TabsContentItem = ({ id }: TabsContentItemProps) => {
+export const TabsContentItem = ({ id, isActive }: TabsContentItemProps) => {
   const tabManager = useTabManager();
-  const activeTabId = useAppMetadata('tab');
-  const isActive = id === activeTabId;
-
   const routerRef = useRef(tabManager.getRouter(id));
 
   return (

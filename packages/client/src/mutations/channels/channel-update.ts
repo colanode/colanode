@@ -1,7 +1,6 @@
 export type ChannelUpdateMutationInput = {
   type: 'channel.update';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   channelId: string;
   name: string;
   avatar?: string | null;

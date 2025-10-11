@@ -3,7 +3,7 @@ import { createContext, useContext } from 'react';
 import { WorkspaceRole } from '@colanode/core';
 
 interface WorkspaceContext {
-  id: string;
+  workspaceId: string;
   accountId: string;
   userId: string;
   role: WorkspaceRole;

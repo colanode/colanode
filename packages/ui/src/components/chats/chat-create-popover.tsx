@@ -14,7 +14,7 @@ import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export const ChatCreatePopover = () => {
   const workspace = useWorkspace();
-  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   const [open, setOpen] = useState(false);
@@ -33,9 +33,8 @@ export const ChatCreatePopover = () => {
             mutate({
               input: {
                 type: 'chat.create',
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
-                userId: user.id,
+                userId: workspace.userId,
+                collaboratorId: user.id,
               },
               onSuccess(output) {
                 navigate({

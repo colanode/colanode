@@ -2,8 +2,9 @@ import { useRouter } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
 import { database } from '@colanode/ui/data';
+import { buildMetadataKey } from '@colanode/ui/data/metadata';
 
-export const useLocationTracker = (accountId: string, workspaceId: string) => {
+export const useLocationTracker = (userId: string) => {
   const router = useRouter();
 
   useEffect(() => {
@@ -13,21 +14,20 @@ export const useLocationTracker = (accountId: string, workspaceId: string) => {
       }
 
       const location = event.toLocation.href;
-      if (!location.includes(`/acc/${accountId}/${workspaceId}`)) {
+      if (!location.includes(`/workspace/${userId}/`)) {
         return;
       }
 
-      const workspaceMetadata = database.workspaceMetadata(
-        accountId,
-        workspaceId
-      );
-      const currentLocation = workspaceMetadata.get('location');
+      const metadataKey = buildMetadataKey(userId, 'location');
+      const currentLocation = database.metadata.get(metadataKey);
       if (currentLocation) {
-        workspaceMetadata.update('location', (metadata) => {
+        database.metadata.update(metadataKey, (metadata) => {
           metadata.value = location;
+          metadata.updatedAt = new Date().toISOString();
         });
       } else {
-        workspaceMetadata.insert({
+        database.metadata.insert({
+          namespace: userId,
           key: 'location',
           value: location,
           createdAt: new Date().toISOString(),
@@ -35,5 +35,5 @@ export const useLocationTracker = (accountId: string, workspaceId: string) => {
         });
       }
     });
-  }, [accountId, workspaceId, router]);
+  }, [userId, router]);
 };

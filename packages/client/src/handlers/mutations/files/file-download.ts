@@ -12,7 +12,7 @@ export class FileDownloadMutationHandler
   async handleMutation(
     input: FileDownloadMutationInput
   ): Promise<FileDownloadMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     const path = input.path;
 
     if (!path) {

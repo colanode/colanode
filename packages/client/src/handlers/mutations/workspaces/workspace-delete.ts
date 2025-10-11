@@ -20,16 +20,7 @@ export class WorkspaceDeleteMutationHandler
   async handleMutation(
     input: WorkspaceDeleteMutationInput
   ): Promise<WorkspaceDeleteMutationOutput> {
-    const accountService = this.app.getAccount(input.accountId);
-
-    if (!accountService) {
-      throw new MutationError(
-        MutationErrorCode.AccountNotFound,
-        'Account not found or has been logged out.'
-      );
-    }
-
-    const workspaceService = accountService.getWorkspace(input.workspaceId);
+    const workspaceService = this.app.getWorkspace(input.userId);
     if (!workspaceService) {
       throw new MutationError(
         MutationErrorCode.WorkspaceNotFound,
@@ -37,12 +28,20 @@ export class WorkspaceDeleteMutationHandler
       );
     }
 
+    const accountService = this.app.getAccount(workspaceService.accountId);
+    if (!accountService) {
+      throw new MutationError(
+        MutationErrorCode.AccountNotFound,
+        'Account not found or has been logged out.'
+      );
+    }
+
     try {
       const response = await accountService.client
-        .delete(`v1/workspaces/${input.workspaceId}`)
+        .delete(`v1/workspaces/${workspaceService.workspaceId}`)
         .json<WorkspaceOutput>();
 
-      await accountService.deleteWorkspace(response.id);
+      await workspaceService.delete();
 
       return {
         id: response.id,

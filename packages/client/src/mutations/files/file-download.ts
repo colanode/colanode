@@ -1,7 +1,6 @@
 export type FileDownloadMutationInput = {
   type: 'file.download';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   fileId: string;
   path: string | null;
 };

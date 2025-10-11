@@ -13,8 +13,7 @@ export const SpaceContainerTab = ({ spaceId }: SpaceContainerTabProps) => {
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: spaceId,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (nodeGetQuery.isPending) {

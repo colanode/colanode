@@ -3,39 +3,22 @@ import { Paths, File, Directory } from 'expo-file-system';
 import { PathService } from '@colanode/client/services';
 
 export class MobilePathService implements PathService {
-  private readonly accountsDirectoryPath = new Directory(
+  private readonly avatarsDirectoryPath = new Directory(
     Paths.document,
-    'accounts'
+    'avatars'
   );
 
-  private getAccountDirectoryPath(accountId: string): string {
-    return new Directory(this.accountsDirectoryPath, accountId).uri;
+  private readonly workspacesDirectoryPath = new Directory(
+    Paths.document,
+    'workspaces'
+  );
+
+  private getWorkspaceDirectoryPath(userId: string): string {
+    return new Directory(this.workspacesDirectoryPath, userId).uri;
   }
 
-  private getWorkspaceDirectoryPath(
-    accountId: string,
-    workspaceId: string
-  ): string {
-    return new Directory(
-      this.getAccountDirectoryPath(accountId),
-      'workspaces',
-      workspaceId
-    ).uri;
-  }
-
-  private getWorkspaceFilesDirectoryPath(
-    accountId: string,
-    workspaceId: string
-  ): string {
-    return new Directory(
-      this.getWorkspaceDirectoryPath(accountId, workspaceId),
-      'files'
-    ).uri;
-  }
-
-  private getAccountAvatarsDirectoryPath(accountId: string): string {
-    return new Directory(this.getAccountDirectoryPath(accountId), 'avatars')
-      .uri;
+  private getWorkspaceFilesDirectoryPath(userId: string): string {
+    return new Directory(this.getWorkspaceDirectoryPath(userId), 'files').uri;
   }
 
   private getAssetsSourcePath(): string {
@@ -50,61 +33,42 @@ export class MobilePathService implements PathService {
     return new File(Paths.document, 'app.db').uri;
   }
 
-  public get accounts(): string {
-    return this.accountsDirectoryPath.uri;
+  public get avatars(): string {
+    return this.avatarsDirectoryPath.uri;
   }
 
   public get temp(): string {
     return new Directory(Paths.document, 'temp').uri;
   }
 
+  public avatar(avatarId: string): string {
+    return new File(this.avatarsDirectoryPath, avatarId + '.jpeg').uri;
+  }
+
   public tempFile(name: string): string {
     return new File(Paths.document, 'temp', name).uri;
   }
 
-  public account(accountId: string): string {
-    return this.getAccountDirectoryPath(accountId);
+  public workspace(userId: string): string {
+    return this.getWorkspaceDirectoryPath(userId);
   }
 
-  public accountDatabase(accountId: string): string {
-    return new File(this.getAccountDirectoryPath(accountId), 'account.db').uri;
+  public workspaceDatabase(userId: string): string {
+    return new File(this.getWorkspaceDirectoryPath(userId), 'workspace.db').uri;
   }
 
-  public workspace(accountId: string, workspaceId: string): string {
-    return this.getWorkspaceDirectoryPath(accountId, workspaceId);
-  }
-
-  public workspaceDatabase(accountId: string, workspaceId: string): string {
-    return new File(
-      this.getWorkspaceDirectoryPath(accountId, workspaceId),
-      'workspace.db'
-    ).uri;
-  }
-
-  public workspaceFiles(accountId: string, workspaceId: string): string {
-    return this.getWorkspaceFilesDirectoryPath(accountId, workspaceId);
+  public workspaceFiles(userId: string): string {
+    return this.getWorkspaceFilesDirectoryPath(userId);
   }
 
   public workspaceFile(
-    accountId: string,
-    workspaceId: string,
+    userId: string,
     fileId: string,
     extension: string
   ): string {
     return new File(
-      this.getWorkspaceFilesDirectoryPath(accountId, workspaceId),
+      this.getWorkspaceFilesDirectoryPath(userId),
       fileId + extension
-    ).uri;
-  }
-
-  public accountAvatars(accountId: string): string {
-    return this.getAccountAvatarsDirectoryPath(accountId);
-  }
-
-  public accountAvatar(accountId: string, avatarId: string): string {
-    return new File(
-      this.getAccountAvatarsDirectoryPath(accountId),
-      avatarId + '.jpeg'
     ).uri;
   }
 

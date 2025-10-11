@@ -1,7 +1,6 @@
 export type ChannelDeleteMutationInput = {
   type: 'channel.delete';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   channelId: string;
 };
 

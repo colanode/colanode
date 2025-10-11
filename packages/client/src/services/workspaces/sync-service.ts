@@ -84,21 +84,21 @@ export class SyncService {
   private handleEvent(event: Event): void {
     if (
       event.type === 'collaboration.created' &&
-      event.accountId === this.workspace.accountId &&
-      event.workspaceId === this.workspace.id
+      event.workspace.userId === this.workspace.userId
     ) {
       this.initRootSynchronizers(event.nodeId);
     } else if (
       event.type === 'collaboration.deleted' &&
-      event.accountId === this.workspace.accountId &&
-      event.workspaceId === this.workspace.id
+      event.workspace.userId === this.workspace.userId
     ) {
       this.removeRootSynchronizers(event.nodeId);
     }
   }
 
   public async init() {
-    debug(`Initializing sync service for workspace ${this.workspace.id}`);
+    debug(
+      `Initializing sync service for workspace ${this.workspace.workspaceId}`
+    );
 
     if (!this.userSynchronizer) {
       this.userSynchronizer = new Synchronizer(
@@ -153,7 +153,7 @@ export class SyncService {
     }
 
     debug(
-      `Initializing root synchronizers for root ${rootId} in workspace ${this.workspace.id}`
+      `Initializing root synchronizers for root ${rootId} in workspace ${this.workspace.workspaceId}`
     );
 
     const rootSynchronizers = {

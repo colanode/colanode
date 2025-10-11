@@ -29,8 +29,7 @@ export class NodeReactionsAggregateQueryHandler
   ): Promise<ChangeCheckResult<NodeReactionsAggregateQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -40,8 +39,7 @@ export class NodeReactionsAggregateQueryHandler
 
     if (
       event.type === 'node.reaction.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.nodeReaction.nodeId === input.nodeId
     ) {
       const newResult = await this.handleQuery(input);
@@ -54,8 +52,7 @@ export class NodeReactionsAggregateQueryHandler
 
     if (
       event.type === 'node.reaction.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.nodeReaction.nodeId === input.nodeId
     ) {
       const newResult = await this.handleQuery(input);
@@ -68,8 +65,7 @@ export class NodeReactionsAggregateQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.id === input.nodeId
     ) {
       const newResult = await this.handleQuery(input);
@@ -82,8 +78,7 @@ export class NodeReactionsAggregateQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.id === input.nodeId
     ) {
       return {
@@ -100,7 +95,7 @@ export class NodeReactionsAggregateQueryHandler
   private async fetchNodeReactions(
     input: NodeReactionsAggregateQueryInput
   ): Promise<NodeReactionCount[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const result = await sql<NodeReactionsAggregateRow>`
       SELECT 

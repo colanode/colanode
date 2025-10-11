@@ -6,11 +6,12 @@ import semver from 'semver';
 import {
   AppDatabaseSchema,
   SelectServer,
+  SelectWorkspace,
   appDatabaseMigrations,
 } from '@colanode/client/databases/app';
 import { Mediator } from '@colanode/client/handlers';
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { mapAccount } from '@colanode/client/lib/mappers';
+import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { AppMeta } from '@colanode/client/services/app-meta';
 import { AssetService } from '@colanode/client/services/asset-service';
@@ -20,6 +21,7 @@ import { KyselyService } from '@colanode/client/services/kysely-service';
 import { MetadataService } from '@colanode/client/services/metadata-service';
 import { PathService } from '@colanode/client/services/path-service';
 import { ServerService } from '@colanode/client/services/server-service';
+import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import { Account } from '@colanode/client/types/accounts';
 import { ServerAttributes } from '@colanode/client/types/servers';
 import {
@@ -36,6 +38,7 @@ const debug = createDebugger('desktop:service:app');
 export class AppService {
   private readonly servers: Map<string, ServerService> = new Map();
   private readonly accounts: Map<string, AccountService> = new Map();
+  private readonly workspaces: Map<string, WorkspaceService> = new Map();
   private readonly eventSubscriptionId: string;
 
   public readonly meta: AppMeta;
@@ -101,18 +104,22 @@ export class AppService {
 
     await migrator.migrateToLatest();
 
-    const versionMetadata = await this.metadata.get('version');
+    const versionMetadata = await this.metadata.get('app', 'version');
     const version = semver.parse(versionMetadata?.value);
     if (version && semver.lt(version, '0.2.0')) {
       await this.deleteAllData();
     }
 
-    await this.metadata.set('version', build.version);
-    await this.metadata.set('platform', this.meta.platform);
+    await this.metadata.set('app', 'version', build.version);
+    await this.metadata.set('app', 'platform', this.meta.platform);
   }
 
   public getAccount(id: string): AccountService | null {
     return this.accounts.get(id) ?? null;
+  }
+
+  public getWorkspace(userId: string): WorkspaceService | null {
+    return this.workspaces.get(userId) ?? null;
   }
 
   public getAccounts(): AccountService[] {
@@ -123,6 +130,10 @@ export class AppService {
     return Array.from(this.servers.values());
   }
 
+  public getWorkspaces(): WorkspaceService[] {
+    return Array.from(this.workspaces.values());
+  }
+
   public getServer(domain: string): ServerService | null {
     return this.servers.get(domain) ?? null;
   }
@@ -130,8 +141,10 @@ export class AppService {
   public async init(): Promise<void> {
     await this.initServers();
     await this.initAccounts();
+    await this.initWorkspaces();
     await this.fs.makeDirectory(this.path.temp);
     await this.jobs.init();
+    await this.initJobSchedules();
 
     // make sure there is at least one tab in desktop app
     if (this.meta.type === 'desktop') {
@@ -148,21 +161,6 @@ export class AppService {
           .execute();
       }
     }
-
-    const scheduleId = 'temp.files.clean';
-    await this.jobs.upsertJobSchedule(
-      scheduleId,
-      {
-        type: 'temp.files.clean',
-      },
-      ms('5 minutes'),
-      {
-        deduplication: {
-          key: scheduleId,
-          replace: true,
-        },
-      }
-    );
   }
 
   private async initServers(): Promise<void> {
@@ -184,6 +182,17 @@ export class AppService {
 
     for (const account of accounts) {
       await this.initAccount(mapAccount(account));
+    }
+  }
+
+  private async initWorkspaces(): Promise<void> {
+    const workspaces = await this.database
+      .selectFrom('workspaces')
+      .selectAll()
+      .execute();
+
+    for (const workspace of workspaces) {
+      await this.initWorkspace(workspace);
     }
   }
 
@@ -214,6 +223,28 @@ export class AppService {
 
     this.servers.set(server.domain, serverService);
     return serverService;
+  }
+
+  public async initWorkspace(
+    workspace: SelectWorkspace
+  ): Promise<WorkspaceService> {
+    if (this.workspaces.has(workspace.user_id)) {
+      return this.workspaces.get(workspace.user_id)!;
+    }
+
+    const account = this.accounts.get(workspace.account_id);
+    if (!account) {
+      throw new Error('Account not found');
+    }
+
+    const workspaceService = new WorkspaceService(
+      mapWorkspace(workspace),
+      account
+    );
+    await workspaceService.init();
+
+    this.workspaces.set(workspace.user_id, workspaceService);
+    return workspaceService;
   }
 
   public async createServer(url: URL): Promise<ServerService | null> {
@@ -301,6 +332,44 @@ export class AppService {
     await this.database.deleteFrom('metadata').execute();
     await this.database.deleteFrom('job_schedules').execute();
     await this.database.deleteFrom('jobs').execute();
-    await this.fs.delete(this.path.accounts);
+  }
+
+  private async initJobSchedules(): Promise<void> {
+    await this.initTempFilesCleanJobSchedule();
+    await this.initAvatarsCleanJobSchedule();
+  }
+
+  private async initTempFilesCleanJobSchedule(): Promise<void> {
+    const scheduleId = 'temp.files.clean';
+    await this.jobs.upsertJobSchedule(
+      scheduleId,
+      {
+        type: 'temp.files.clean',
+      },
+      ms('5 minutes'),
+      {
+        deduplication: {
+          key: scheduleId,
+          replace: true,
+        },
+      }
+    );
+  }
+
+  private async initAvatarsCleanJobSchedule(): Promise<void> {
+    const scheduleId = 'avatars.clean';
+    await this.jobs.upsertJobSchedule(
+      scheduleId,
+      {
+        type: 'avatars.clean',
+      },
+      ms('1 day'),
+      {
+        deduplication: {
+          key: scheduleId,
+          replace: true,
+        },
+      }
+    );
   }
 }

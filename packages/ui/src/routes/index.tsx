@@ -1,84 +1,72 @@
 import { createRouter } from '@tanstack/react-router';
 
-import { accountRoute } from '@colanode/ui/routes/account';
-import {
-  workspaceCreateRoute,
-  workspaceCreateMaskRoute,
-} from '@colanode/ui/routes/account/create';
-import { accountRedirectRoute } from '@colanode/ui/routes/account/redirect';
-import {
-  workspaceRoute,
-  workspaceMaskRoute,
-} from '@colanode/ui/routes/account/workspace';
-import {
-  accountLogoutMaskRoute,
-  accountLogoutRoute,
-} from '@colanode/ui/routes/account/workspace/account-logout';
-import {
-  accountSettingsMaskRoute,
-  accountSettingsRoute,
-} from '@colanode/ui/routes/account/workspace/account-settings';
-import {
-  appAppearanceMaskRoute,
-  appAppearanceRoute,
-} from '@colanode/ui/routes/account/workspace/app-appearance';
-import {
-  workspaceDownloadsMaskRoute,
-  workspaceDownloadsRoute,
-} from '@colanode/ui/routes/account/workspace/downloads';
-import {
-  workspaceHomeMaskRoute,
-  workspaceHomeRoute,
-} from '@colanode/ui/routes/account/workspace/home';
-import {
-  nodeMaskRoute,
-  nodeRoute,
-} from '@colanode/ui/routes/account/workspace/node';
-import {
-  workspaceRedirectMaskRoute,
-  workspaceRedirectRoute,
-} from '@colanode/ui/routes/account/workspace/redirect';
-import {
-  workspaceSettingsMaskRoute,
-  workspaceSettingsRoute,
-} from '@colanode/ui/routes/account/workspace/settings';
-import {
-  workspaceStorageMaskRoute,
-  workspaceStorageRoute,
-} from '@colanode/ui/routes/account/workspace/storage';
-import {
-  workspaceUploadsMaskRoute,
-  workspaceUploadsRoute,
-} from '@colanode/ui/routes/account/workspace/uploads';
-import {
-  workspaceUsersMaskRoute,
-  workspaceUsersRoute,
-} from '@colanode/ui/routes/account/workspace/users';
+import { workspaceCreateRoute } from '@colanode/ui/routes/create';
 import { homeRoute } from '@colanode/ui/routes/home';
 import { loginRoute } from '@colanode/ui/routes/login';
 import { rootRoute } from '@colanode/ui/routes/root';
+import {
+  workspaceRoute,
+  workspaceMaskRoute,
+} from '@colanode/ui/routes/workspace';
+import {
+  accountLogoutMaskRoute,
+  accountLogoutRoute,
+} from '@colanode/ui/routes/workspace/account-logout';
+import {
+  accountSettingsMaskRoute,
+  accountSettingsRoute,
+} from '@colanode/ui/routes/workspace/account-settings';
+import {
+  appAppearanceMaskRoute,
+  appAppearanceRoute,
+} from '@colanode/ui/routes/workspace/app-appearance';
+import {
+  workspaceDownloadsMaskRoute,
+  workspaceDownloadsRoute,
+} from '@colanode/ui/routes/workspace/downloads';
+import {
+  workspaceHomeMaskRoute,
+  workspaceHomeRoute,
+} from '@colanode/ui/routes/workspace/home';
+import { nodeMaskRoute, nodeRoute } from '@colanode/ui/routes/workspace/node';
+import {
+  workspaceRedirectMaskRoute,
+  workspaceRedirectRoute,
+} from '@colanode/ui/routes/workspace/redirect';
+import {
+  workspaceSettingsMaskRoute,
+  workspaceSettingsRoute,
+} from '@colanode/ui/routes/workspace/settings';
+import {
+  workspaceStorageMaskRoute,
+  workspaceStorageRoute,
+} from '@colanode/ui/routes/workspace/storage';
+import {
+  workspaceUploadsMaskRoute,
+  workspaceUploadsRoute,
+} from '@colanode/ui/routes/workspace/uploads';
+import {
+  workspaceUsersMaskRoute,
+  workspaceUsersRoute,
+} from '@colanode/ui/routes/workspace/users';
 
 export const routeTree = rootRoute.addChildren([
   homeRoute,
   loginRoute,
-  accountRoute.addChildren([
-    accountRedirectRoute,
-    workspaceCreateRoute,
-    workspaceRoute.addChildren([
-      workspaceRedirectRoute,
-      workspaceHomeRoute,
-      nodeRoute,
-      workspaceDownloadsRoute,
-      workspaceUploadsRoute,
-      workspaceStorageRoute,
-      workspaceUsersRoute,
-      workspaceSettingsRoute,
-      accountSettingsRoute,
-      accountLogoutRoute,
-      appAppearanceRoute,
-    ]),
+  workspaceCreateRoute,
+  workspaceRoute.addChildren([
+    workspaceRedirectRoute,
+    workspaceHomeRoute,
+    nodeRoute,
+    workspaceDownloadsRoute,
+    workspaceUploadsRoute,
+    workspaceStorageRoute,
+    workspaceUsersRoute,
+    workspaceSettingsRoute,
+    accountSettingsRoute,
+    accountLogoutRoute,
+    appAppearanceRoute,
   ]),
-  workspaceCreateMaskRoute,
   workspaceMaskRoute.addChildren([
     workspaceRedirectMaskRoute,
     workspaceHomeMaskRoute,

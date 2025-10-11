@@ -12,7 +12,7 @@ export class DatabaseDeleteMutationHandler
   async handleMutation(
     input: DatabaseDeleteMutationInput
   ): Promise<DatabaseDeleteMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     await workspace.nodes.deleteNode(input.databaseId);
 
     return {

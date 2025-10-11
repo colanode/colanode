@@ -5,8 +5,7 @@ export type FileListQueryInput = {
   parentId: string;
   page: number;
   count: number;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 declare module '@colanode/client/queries' {

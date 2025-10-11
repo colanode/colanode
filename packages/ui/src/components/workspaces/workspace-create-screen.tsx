@@ -2,18 +2,18 @@ import { useRouter } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
-import { useAccount } from '@colanode/ui/contexts/account';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export const WorkspaceCreateScreen = () => {
-  const account = useAccount();
+  const workspace = useWorkspace();
   const router = useRouter();
   const { mutate, isPending } = useMutation();
 
   const workspacesQuery = useLiveQuery({
     type: 'workspace.list',
-    accountId: account.id,
+    accountId: workspace.accountId,
   });
 
   const workspaces = workspacesQuery.data ?? [];
@@ -22,8 +22,8 @@ export const WorkspaceCreateScreen = () => {
     : workspaces.length > 0
       ? () =>
           router.navigate({
-            to: '/acc/$accountId/$workspaceId',
-            params: { accountId: account.id, workspaceId: workspaces[0]!.id },
+            to: '/workspace/$userId',
+            params: { userId: workspaces[0]!.userId },
           })
       : undefined;
 
@@ -43,13 +43,13 @@ export const WorkspaceCreateScreen = () => {
                   type: 'workspace.create',
                   name: values.name,
                   description: values.description,
-                  accountId: account.id,
+                  accountId: workspace.accountId,
                   avatar: values.avatar ?? null,
                 },
                 onSuccess(output) {
                   router.navigate({
-                    to: '/acc/$accountId/$workspaceId',
-                    params: { accountId: account.id, workspaceId: output.id },
+                    to: '/workspace/$userId',
+                    params: { userId: output.userId },
                   });
                 },
                 onError(error) {

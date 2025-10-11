@@ -13,7 +13,7 @@ export class DocumentUpdateMutationHandler
   async handleMutation(
     input: DocumentUpdateMutationInput
   ): Promise<DocumentUpdateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     await workspace.documents.updateDocument(
       input.documentId,
       decodeState(input.update)

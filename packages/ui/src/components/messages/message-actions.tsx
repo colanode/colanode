@@ -34,8 +34,7 @@ export const MessageActions = () => {
         input: {
           type: 'node.reaction.create',
           nodeId: message.id,
-          accountId: workspace.accountId,
-          workspaceId: workspace.id,
+          userId: workspace.userId,
           reaction,
           rootId: conversation.rootId,
         },
@@ -84,8 +83,7 @@ export const MessageActions = () => {
               input: {
                 type: 'node.reaction.create',
                 nodeId: message.id,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
                 reaction,
                 rootId: conversation.rootId,
               },

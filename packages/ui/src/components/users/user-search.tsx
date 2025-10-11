@@ -30,8 +30,7 @@ export const UserSearch = ({ exclude, onSelect }: UserSearchProps) => {
   const userSearchQuery = useLiveQuery({
     type: 'user.search',
     searchQuery: query,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     exclude,
   });
 

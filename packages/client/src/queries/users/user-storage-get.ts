@@ -2,8 +2,7 @@ import { FileSubtype } from '@colanode/core';
 
 export type UserStorageGetQueryInput = {
   type: 'user.storage.get';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 export type UserStorageGetQueryOutput = {

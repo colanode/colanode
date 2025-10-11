@@ -8,21 +8,23 @@ export const createServersCollection = () => {
       return item.domain;
     },
     sync: {
-      async sync({ begin, write, commit, markReady }) {
-        const servers = await window.colanode.executeQuery({
-          type: 'server.list',
-        });
+      sync({ begin, write, commit, markReady }) {
+        window.colanode
+          .executeQuery({
+            type: 'server.list',
+          })
+          .then((servers) => {
+            begin();
 
-        begin();
+            for (const server of servers) {
+              write({ type: 'insert', value: server });
+            }
 
-        for (const server of servers) {
-          write({ type: 'insert', value: server });
-        }
+            commit();
+            markReady();
+          });
 
-        commit();
-        markReady();
-
-        window.eventBus.subscribe((event) => {
+        const subscriptionId = window.eventBus.subscribe((event) => {
           if (event.type === 'server.created') {
             begin();
             write({ type: 'insert', value: event.server });
@@ -37,6 +39,12 @@ export const createServersCollection = () => {
             commit();
           }
         });
+
+        return {
+          cleanup: () => {
+            window.eventBus.unsubscribe(subscriptionId);
+          },
+        };
       },
     },
   });

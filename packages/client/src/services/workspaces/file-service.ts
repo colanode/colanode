@@ -44,8 +44,7 @@ export class FileService {
     this.app = workspace.account.app;
     this.workspace = workspace;
     this.filesDir = this.workspace.account.app.path.workspaceFiles(
-      this.workspace.accountId,
-      this.workspace.id
+      this.workspace.userId
     );
 
     this.app.fs.makeDirectory(this.filesDir);
@@ -195,23 +194,28 @@ export class FileService {
     const url = await this.app.fs.url(createdLocalFile.path);
     eventBus.publish({
       type: 'local.file.created',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       localFile: mapLocalFile(createdLocalFile, url),
     });
 
     eventBus.publish({
       type: 'upload.created',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       upload: mapUpload(createdUpload),
     });
 
     this.app.jobs.addJob(
       {
         type: 'file.upload',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        userId: this.workspace.userId,
         fileId: fileId,
       },
       {
@@ -306,15 +310,17 @@ export class FileService {
     if (result.createdDownload) {
       await this.app.jobs.addJob({
         type: 'file.download',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        userId: this.workspace.userId,
         downloadId: result.createdDownload.id,
       });
 
       eventBus.publish({
         type: 'download.created',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         download: mapDownload(result.createdDownload),
       });
     }
@@ -373,15 +379,17 @@ export class FileService {
 
     await this.app.jobs.addJob({
       type: 'file.download',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      userId: this.workspace.userId,
       downloadId: createdDownload.id,
     });
 
     eventBus.publish({
       type: 'download.created',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       download: mapDownload(createdDownload),
     });
 
@@ -389,12 +397,7 @@ export class FileService {
   }
 
   private buildFilePath(id: string, extension: string): string {
-    return this.app.path.workspaceFile(
-      this.workspace.accountId,
-      this.workspace.id,
-      id,
-      extension
-    );
+    return this.app.path.workspaceFile(this.workspace.userId, id, extension);
   }
 
   public async cleanupFiles(): Promise<void> {
@@ -403,7 +406,7 @@ export class FileService {
   }
 
   private async cleanDeletedFiles(): Promise<void> {
-    debug(`Checking deleted files for workspace ${this.workspace.id}`);
+    debug(`Checking deleted files for workspace ${this.workspace.workspaceId}`);
 
     const fsFiles = await this.app.fs.listFiles(this.filesDir);
     while (fsFiles.length > 0) {
@@ -432,8 +435,7 @@ export class FileService {
         const name = this.app.path.filename(fsFile);
         const extension = this.app.path.extension(fsFile);
         const filePath = this.app.path.workspaceFile(
-          this.workspace.accountId,
-          this.workspace.id,
+          this.workspace.userId,
           name,
           extension
         );
@@ -443,7 +445,9 @@ export class FileService {
   }
 
   private async cleanUnopenedFiles(): Promise<void> {
-    debug(`Cleaning unopened files for workspace ${this.workspace.id}`);
+    debug(
+      `Cleaning unopened files for workspace ${this.workspace.workspaceId}`
+    );
 
     const sevenDaysAgo = new Date(Date.now() - ms('7 days')).toISOString();
     const unopenedFiles = await this.workspace.database
@@ -457,8 +461,11 @@ export class FileService {
 
       eventBus.publish({
         type: 'local.file.deleted',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         localFile: mapLocalFile(localFile, ''),
       });
     }

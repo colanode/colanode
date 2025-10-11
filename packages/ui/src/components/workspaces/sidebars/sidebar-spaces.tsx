@@ -1,6 +1,6 @@
-import { SidebarHeader } from '@colanode/ui/components/workspaces/sidebars/sidebar-header';
 import { SpaceCreateButton } from '@colanode/ui/components/spaces/space-create-button';
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
+import { SidebarHeader } from '@colanode/ui/components/workspaces/sidebars/sidebar-header';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -11,9 +11,8 @@ export const SidebarSpaces = () => {
 
   const spaceListQuery = useLiveQuery({
     type: 'space.list',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    parentId: workspace.id,
+    userId: workspace.userId,
+    parentId: workspace.workspaceId,
     page: 0,
     count: 100,
   });

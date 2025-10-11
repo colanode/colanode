@@ -14,8 +14,7 @@ export const PageNodeView = ({ node }: NodeViewProps) => {
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (!id) {
@@ -37,7 +36,7 @@ export const PageNodeView = ({ node }: NodeViewProps) => {
   return (
     <NodeViewWrapper data-id={node.attrs.id}>
       <Link
-        from="/acc/$accountId/$workspaceId"
+        from="/workspace/$userId"
         to="$nodeId"
         params={{ nodeId: id }}
         className="my-0.5 flex h-10 w-full cursor-pointer flex-row items-center gap-1 rounded-md p-1 hover:bg-accent"

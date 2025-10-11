@@ -20,8 +20,7 @@ export const ChannelContainerTab = ({
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: channelId,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (nodeGetQuery.isPending) {
@@ -38,11 +37,7 @@ export const ChannelContainerTab = ({
       ? channel.attributes.name
       : 'Unnamed';
 
-  const unreadState = radar.getNodeState(
-    workspace.accountId,
-    workspace.id,
-    channel.id
-  );
+  const unreadState = radar.getNodeState(workspace.userId, channel.id);
 
   return (
     <div className="flex items-center space-x-2">

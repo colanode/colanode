@@ -1,18 +1,18 @@
 import { useState } from 'react';
 
 import { AvatarFallback } from '@colanode/ui/components/avatars/avatar-fallback';
-import { useAccount } from '@colanode/ui/contexts/account';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { AvatarProps, getAvatarSizeClasses } from '@colanode/ui/lib/avatars';
 import { cn } from '@colanode/ui/lib/utils';
 
 export const AvatarImage = (props: AvatarProps) => {
-  const account = useAccount();
+  const workspace = useWorkspace();
   const [failed, setFailed] = useState(false);
 
   const avatarQuery = useLiveQuery({
     type: 'avatar.get',
-    accountId: account.id,
+    accountId: workspace.accountId,
     avatarId: props.avatar!,
   });
 

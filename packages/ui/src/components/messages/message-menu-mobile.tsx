@@ -69,8 +69,7 @@ export const MessageMenuMobile = ({
         input: {
           type: 'node.reaction.create',
           nodeId: message.id,
-          accountId: workspace.accountId,
-          workspaceId: workspace.id,
+          userId: workspace.userId,
           reaction,
           rootId: conversation.rootId,
         },

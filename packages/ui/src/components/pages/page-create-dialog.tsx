@@ -25,7 +25,7 @@ export const PageCreateDialog = ({
   onOpenChange,
 }: PageCreateDialogProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   return (
@@ -58,8 +58,7 @@ export const PageCreateDialog = ({
                 parentId: spaceId,
                 name: values.name,
                 avatar: values.avatar,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
                 generateIndex: true,
               },
               onSuccess(output) {

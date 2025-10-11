@@ -16,7 +16,7 @@ import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
 import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationMap } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
-import { TempFile } from '@colanode/client/types';
+import { TempFile, ThemeMode, WindowSize } from '@colanode/client/types';
 import {
   createDebugger,
   extractFileSubtype,
@@ -49,13 +49,19 @@ updateElectronApp({
 const createWindow = async () => {
   await app.migrate();
 
-  const themeMode = (await app.metadata.get('theme.mode'))?.value;
-  if (themeMode) {
+  const themeMetadata = await app.metadata.get('app', 'theme.mode');
+  if (themeMetadata) {
+    const themeMode = JSON.parse(themeMetadata.value) as ThemeMode;
     nativeTheme.themeSource = themeMode;
   }
 
+  let windowSize: WindowSize | undefined;
+  const windowSizeMetadata = await app.metadata.get('app', 'window.size');
+  if (windowSizeMetadata) {
+    windowSize = JSON.parse(windowSizeMetadata.value) as WindowSize;
+  }
+
   // Create the browser window.
-  let windowSize = (await app.metadata.get('window.size'))?.value;
   const mainWindow = new BrowserWindow({
     width: windowSize?.width ?? 1200,
     height: windowSize?.height ?? 800,
@@ -81,7 +87,7 @@ const createWindow = async () => {
       fullscreen: false,
     };
 
-    app.metadata.set('window.size', windowSize);
+    app.metadata.set('app', 'window.size', JSON.stringify(windowSize));
   });
 
   mainWindow.on('enter-full-screen', () => {
@@ -91,7 +97,7 @@ const createWindow = async () => {
       fullscreen: true,
     };
 
-    app.metadata.set('window.size', windowSize);
+    app.metadata.set('app', 'window.size', JSON.stringify(windowSize));
   });
 
   mainWindow.on('leave-full-screen', () => {
@@ -101,7 +107,7 @@ const createWindow = async () => {
       fullscreen: false,
     };
 
-    app.metadata.set('window.size', windowSize);
+    app.metadata.set('app', 'window.size', JSON.stringify(windowSize));
   });
 
   // and load the index.html of the app.
@@ -118,12 +124,13 @@ const createWindow = async () => {
   const subscriptionId = eventBus.subscribe((event) => {
     mainWindow.webContents.send('event', event);
     if (
-      event.type === 'app.metadata.updated' &&
+      event.type === 'metadata.updated' &&
       event.metadata.key === 'theme.mode'
     ) {
-      nativeTheme.themeSource = event.metadata.value;
+      const themeMode = JSON.parse(event.metadata.value) as ThemeMode;
+      nativeTheme.themeSource = themeMode;
     } else if (
-      event.type === 'app.metadata.deleted' &&
+      event.type === 'metadata.deleted' &&
       event.metadata.key === 'theme.mode'
     ) {
       nativeTheme.themeSource = 'system';

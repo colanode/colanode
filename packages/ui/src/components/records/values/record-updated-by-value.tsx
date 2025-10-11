@@ -17,9 +17,8 @@ export const RecordUpdatedByValue = ({ field }: RecordUpdatedByValueProps) => {
   const { data } = useLiveQuery(
     {
       type: 'user.get',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
-      userId: record.updatedBy!,
+      userId: workspace.userId,
+      id: record.updatedBy!,
     },
     {
       enabled: !!record.updatedBy,

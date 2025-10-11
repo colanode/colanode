@@ -4,16 +4,21 @@ import { useMemo } from 'react';
 
 import { useTabManager } from '@colanode/ui/contexts/tab-manager';
 import { database } from '@colanode/ui/data';
-import { useAppMetadata } from '@colanode/ui/hooks/use-app-metadata';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface TabsHeaderItemProps {
   id: string;
   index: number;
   isLast: boolean;
+  isActive: boolean;
 }
 
-export const TabsHeaderItem = ({ id, index, isLast }: TabsHeaderItemProps) => {
+export const TabsHeaderItem = ({
+  id,
+  index,
+  isLast,
+  isActive,
+}: TabsHeaderItemProps) => {
   const tabManager = useTabManager();
 
   const tabQuery = useLiveQuery(
@@ -26,10 +31,8 @@ export const TabsHeaderItem = ({ id, index, isLast }: TabsHeaderItemProps) => {
         })),
     [id]
   );
-  const activeTabId = useAppMetadata('tab');
 
   const location = tabQuery.data[0]!.location;
-  const isActive = id === activeTabId;
 
   const tabComponent = useMemo(() => {
     const router = tabManager.getRouter(id);

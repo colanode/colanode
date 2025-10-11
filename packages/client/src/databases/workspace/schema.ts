@@ -227,17 +227,6 @@ export type SelectCursor = Selectable<CursorTable>;
 export type CreateCursor = Insertable<CursorTable>;
 export type UpdateCursor = Updateable<CursorTable>;
 
-interface MetadataTable {
-  key: ColumnType<string, string, never>;
-  value: ColumnType<string, string, string>;
-  created_at: ColumnType<string, string, never>;
-  updated_at: ColumnType<string | null, string | null, string | null>;
-}
-
-export type SelectWorkspaceMetadata = Selectable<MetadataTable>;
-export type CreateWorkspaceMetadata = Insertable<MetadataTable>;
-export type UpdateWorkspaceMetadata = Updateable<MetadataTable>;
-
 interface LocalFileTable {
   id: ColumnType<string, string, never>;
   version: ColumnType<string, string, string>;
@@ -314,5 +303,4 @@ export interface WorkspaceDatabaseSchema {
   mutations: MutationTable;
   tombstones: TombstoneTable;
   cursors: CursorTable;
-  metadata: MetadataTable;
 }

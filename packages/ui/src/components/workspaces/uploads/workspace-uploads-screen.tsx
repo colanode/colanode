@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { UploadListQueryInput } from '@colanode/client/queries';
+import { Separator } from '@colanode/ui/components/ui/separator';
 import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
 import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
-import { Separator } from '@colanode/ui/components/ui/separator';
 import { WorkspaceUploadFile } from '@colanode/ui/components/workspaces/uploads/workspace-upload-file';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
@@ -20,8 +20,7 @@ export const WorkspaceUploadsScreen = () => {
     length: lastPage,
   }).map((_, i) => ({
     type: 'upload.list',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     count: UPLOADS_PER_PAGE,
     page: i + 1,
   }));

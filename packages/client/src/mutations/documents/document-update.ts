@@ -1,7 +1,6 @@
 export type DocumentUpdateMutationInput = {
   type: 'document.update';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   documentId: string;
   update: string;
 };

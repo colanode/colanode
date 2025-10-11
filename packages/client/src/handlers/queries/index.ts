@@ -3,9 +3,8 @@ import { QueryMap } from '@colanode/client/queries';
 import { AppService } from '@colanode/client/services/app-service';
 
 import { AccountGetQueryHandler } from './accounts/account-get';
-import { AccountMetadataListQueryHandler } from './accounts/account-metadata-list';
 import { AccountListQueryHandler } from './accounts/accounts-list';
-import { AppMetadataListQueryHandler } from './apps/app-metadata-list';
+import { MetadataListQueryHandler } from './apps/metadata-list';
 import { TabsListQueryHandler } from './apps/tabs-list';
 import { AvatarGetQueryHandler } from './avatars/avatar-get';
 import { ChatListQueryHandler } from './chats/chat-list';
@@ -47,9 +46,7 @@ import { UserGetQueryHandler } from './users/user-get';
 import { UserListQueryHandler } from './users/user-list';
 import { UserSearchQueryHandler } from './users/user-search';
 import { UserStorageGetQueryHandler } from './users/user-storage-get';
-import { WorkspaceGetQueryHandler } from './workspaces/workspace-get';
 import { WorkspaceListQueryHandler } from './workspaces/workspace-list';
-import { WorkspaceMetadataListQueryHandler } from './workspaces/workspace-metadata-list';
 import { WorkspaceStorageGetQueryHandler } from './workspaces/workspace-storage-get';
 
 export type QueryHandlerMap = {
@@ -58,7 +55,7 @@ export type QueryHandlerMap = {
 
 export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
   return {
-    'app.metadata.list': new AppMetadataListQueryHandler(app),
+    'metadata.list': new MetadataListQueryHandler(app),
     'avatar.get': new AvatarGetQueryHandler(app),
     'account.list': new AccountListQueryHandler(app),
     'message.list': new MessageListQueryHandler(app),
@@ -83,7 +80,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'node.children.get': new NodeChildrenGetQueryHandler(app),
     'radar.data.get': new RadarDataGetQueryHandler(app),
     'account.get': new AccountGetQueryHandler(app),
-    'workspace.get': new WorkspaceGetQueryHandler(app),
     'database.list': new DatabaseListQueryHandler(app),
     'database.view.list': new DatabaseViewListQueryHandler(app),
     'record.search': new RecordSearchQueryHandler(app),
@@ -93,11 +89,9 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'file.download.request.get': new FileDownloadRequestGetQueryHandler(app),
     'chat.list': new ChatListQueryHandler(app),
     'space.list': new SpaceListQueryHandler(app),
-    'workspace.metadata.list': new WorkspaceMetadataListQueryHandler(app),
     'document.get': new DocumentGetQueryHandler(app),
     'document.state.get': new DocumentStateGetQueryHandler(app),
     'document.updates.list': new DocumentUpdatesListQueryHandler(app),
-    'account.metadata.list': new AccountMetadataListQueryHandler(app),
     'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
     'upload.list': new UploadListQueryHandler(app),
     'upload.list.pending': new UploadListPendingQueryHandler(app),

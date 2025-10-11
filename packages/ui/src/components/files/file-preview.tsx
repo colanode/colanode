@@ -18,8 +18,7 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
   const localFileQuery = useLiveQuery({
     type: 'local.file.get',
     fileId: file.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     autoDownload: true,
   });
 

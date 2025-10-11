@@ -24,12 +24,11 @@ export class MutationService {
     await this.workspace.account.app.jobs.addJob(
       {
         type: 'mutations.sync',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        userId: this.workspace.userId,
       },
       {
         deduplication: {
-          key: `mutations.sync.${this.workspace.accountId}.${this.workspace.id}`,
+          key: `mutations.sync.${this.workspace.accountId}.${this.workspace.workspaceId}`,
           replace: true,
         },
         delay: 500,
@@ -79,7 +78,7 @@ export class MutationService {
     }
 
     debug(
-      `Sending ${pendingMutations.length} local pending mutations for user ${this.workspace.id}`
+      `Sending ${pendingMutations.length} local pending mutations for user ${this.workspace.workspaceId}`
     );
 
     const totalBatches = Math.ceil(validMutations.length / BATCH_SIZE);
@@ -90,7 +89,7 @@ export class MutationService {
         const batch = validMutations.splice(0, BATCH_SIZE);
 
         debug(
-          `Sending batch ${currentBatch++} of ${totalBatches} mutations for user ${this.workspace.id}`
+          `Sending batch ${currentBatch++} of ${totalBatches} mutations for user ${this.workspace.workspaceId}`
         );
 
         const body: SyncMutationsInput = {
@@ -98,7 +97,7 @@ export class MutationService {
         };
 
         const response = await this.workspace.account.client
-          .post(`v1/workspaces/${this.workspace.id}/mutations`, {
+          .post(`v1/workspaces/${this.workspace.workspaceId}/mutations`, {
             json: body,
           })
           .json<SyncMutationsOutput>();
@@ -127,7 +126,7 @@ export class MutationService {
       }
     } catch (error) {
       debug(
-        `Failed to send local pending mutations for user ${this.workspace.id}: ${error}`
+        `Failed to send local pending mutations for user ${this.workspace.workspaceId}: ${error}`
       );
 
       return false;
@@ -148,7 +147,7 @@ export class MutationService {
     }
 
     debug(
-      `Reverting ${invalidMutations.length} invalid mutations for workspace ${this.workspace.id}`
+      `Reverting ${invalidMutations.length} invalid mutations for workspace ${this.workspace.workspaceId}`
     );
 
     for (const mutationRow of invalidMutations) {
@@ -182,7 +181,7 @@ export class MutationService {
     reason: string
   ): Promise<void> {
     debug(
-      `Deleting ${mutationIds.length} local mutations for user ${this.workspace.id}. Reason: ${reason}`
+      `Deleting ${mutationIds.length} local mutations for user ${this.workspace.workspaceId}. Reason: ${reason}`
     );
 
     await this.workspace.database
@@ -193,7 +192,7 @@ export class MutationService {
 
   private async markMutationsAsFailed(mutationIds: string[]): Promise<void> {
     debug(
-      `Marking ${mutationIds.length} local pending mutations as failed for user ${this.workspace.id}`
+      `Marking ${mutationIds.length} local pending mutations as failed for user ${this.workspace.workspaceId}`
     );
 
     await this.workspace.database

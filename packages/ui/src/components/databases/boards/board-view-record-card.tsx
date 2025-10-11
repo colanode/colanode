@@ -36,7 +36,7 @@ export const BoardViewRecordCard = () => {
       className="animate-fade-in flex cursor-pointer flex-col gap-1 rounded-md border p-2 text-left hover:bg-accent"
     >
       <Link
-        from="/acc/$accountId/$workspaceId"
+        from="/workspace/$userId"
         to="$nodeId"
         params={{ nodeId: record.id }}
       >

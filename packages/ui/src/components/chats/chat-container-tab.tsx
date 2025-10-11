@@ -20,8 +20,7 @@ export const ChatContainerTab = ({
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: chatId,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   const chat = nodeGetQuery.data as LocalChatNode;
@@ -33,9 +32,8 @@ export const ChatContainerTab = ({
 
   const userGetQuery = useLiveQuery({
     type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId,
+    userId: workspace.userId,
+    id: userId,
   });
 
   const user = userGetQuery.data;
@@ -48,11 +46,7 @@ export const ChatContainerTab = ({
     return <p className="text-sm text-muted-foreground">Not found</p>;
   }
 
-  const unreadState = radar.getNodeState(
-    workspace.accountId,
-    workspace.id,
-    chat.id
-  );
+  const unreadState = radar.getNodeState(workspace.userId, chat.id);
 
   return (
     <div className="flex items-center space-x-2">

@@ -10,17 +10,15 @@ import { SpaceTab } from '@colanode/ui/components/spaces/space-tab';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface NodeTabProps {
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   nodeId: string;
 }
 
-export const NodeTab = ({ accountId, workspaceId, nodeId }: NodeTabProps) => {
+export const NodeTab = ({ userId, nodeId }: NodeTabProps) => {
   const query = useLiveQuery({
     type: 'node.get',
-    accountId,
-    workspaceId,
-    nodeId,
+    userId: userId,
+    nodeId: nodeId,
   });
 
   if (query.isPending) {

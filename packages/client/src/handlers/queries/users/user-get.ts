@@ -22,8 +22,7 @@ export class UserGetQueryHandler
   ): Promise<ChangeCheckResult<UserGetQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -33,9 +32,8 @@ export class UserGetQueryHandler
 
     if (
       event.type === 'user.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
-      event.user.id === input.userId
+      event.workspace.userId === input.userId &&
+      event.user.id === input.id
     ) {
       return {
         hasChanges: true,
@@ -45,9 +43,8 @@ export class UserGetQueryHandler
 
     if (
       event.type === 'user.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
-      event.user.id === input.userId
+      event.workspace.userId === input.userId &&
+      event.user.id === input.id
     ) {
       return {
         hasChanges: true,
@@ -57,9 +54,8 @@ export class UserGetQueryHandler
 
     if (
       event.type === 'user.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
-      event.user.id === input.userId
+      event.workspace.userId === input.userId &&
+      event.user.id === input.id
     ) {
       return {
         hasChanges: true,
@@ -75,12 +71,12 @@ export class UserGetQueryHandler
   private async fetchUser(
     input: UserGetQueryInput
   ): Promise<SelectUser | undefined> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const row = await workspace.database
       .selectFrom('users')
       .selectAll()
-      .where('id', '=', input.userId)
+      .where('id', '=', input.id)
       .executeTakeFirst();
 
     return row;

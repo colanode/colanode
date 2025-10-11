@@ -35,8 +35,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
             databaseId: database.id,
             name,
             fieldType: type,
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
           });
 
           if (!result.success) {
@@ -51,8 +50,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
             databaseId: database.id,
             fieldId: id,
             name,
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
           });
 
           if (!result.success) {
@@ -66,8 +64,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
             type: 'database.name.field.update',
             databaseId: database.id,
             name,
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
           });
 
           if (!result.success) {
@@ -81,8 +78,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
             type: 'field.delete',
             databaseId: database.id,
             fieldId: id,
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
           });
 
           if (!result.success) {
@@ -98,8 +94,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
             fieldId,
             name,
             color,
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
           });
 
           if (!result.success) {
@@ -116,8 +111,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
             optionId: attributes.id,
             name: attributes.name,
             color: attributes.color,
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
           });
 
           if (!result.success) {
@@ -132,8 +126,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
             databaseId: database.id,
             fieldId,
             optionId,
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
           });
 
           if (!result.success) {

@@ -1,11 +1,7 @@
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { mapAppMetadata } from '@colanode/client/lib/mappers';
+import { mapMetadata } from '@colanode/client/lib/mappers';
 import { AppService } from '@colanode/client/services/app-service';
-import {
-  AppMetadata,
-  AppMetadataKey,
-  AppMetadataMap,
-} from '@colanode/client/types/apps';
+import { Metadata } from '@colanode/client/types/apps';
 import { createDebugger } from '@colanode/core';
 
 const debug = createDebugger('desktop:service:metadata');
@@ -17,21 +13,20 @@ export class MetadataService {
     this.app = app;
   }
 
-  public async getAll(): Promise<AppMetadata[]> {
+  public async getAll(): Promise<Metadata[]> {
     const metadata = await this.app.database
       .selectFrom('metadata')
       .selectAll()
       .execute();
 
-    return metadata.map(mapAppMetadata);
+    return metadata.map(mapMetadata);
   }
 
-  public async get<K extends AppMetadataKey>(
-    key: K
-  ): Promise<AppMetadataMap[K] | null> {
+  public async get(namespace: string, key: string): Promise<Metadata | null> {
     const metadata = await this.app.database
       .selectFrom('metadata')
       .selectAll()
+      .where('namespace', '=', namespace)
       .where('key', '=', key)
       .executeTakeFirst();
 
@@ -39,26 +34,25 @@ export class MetadataService {
       return null;
     }
 
-    return mapAppMetadata(metadata) as AppMetadataMap[K];
+    return mapMetadata(metadata);
   }
 
-  public async set<K extends AppMetadataKey>(
-    key: K,
-    value: AppMetadataMap[K]['value']
-  ) {
+  public async set(namespace: string, key: string, value: string) {
     debug(`Setting metadata key ${key} to value ${value}`);
 
+    const json = JSON.stringify(value);
     const createdMetadata = await this.app.database
       .insertInto('metadata')
       .returningAll()
       .values({
+        namespace,
         key,
-        value: JSON.stringify(value),
+        value: json,
         created_at: new Date().toISOString(),
       })
       .onConflict((b) =>
-        b.column('key').doUpdateSet({
-          value: JSON.stringify(value),
+        b.columns(['namespace', 'key']).doUpdateSet({
+          value: json,
           updated_at: new Date().toISOString(),
         })
       )
@@ -69,16 +63,17 @@ export class MetadataService {
     }
 
     eventBus.publish({
-      type: 'app.metadata.updated',
-      metadata: mapAppMetadata(createdMetadata),
+      type: 'metadata.updated',
+      metadata: mapMetadata(createdMetadata),
     });
   }
 
-  public async delete(key: string) {
+  public async delete(namespace: string, key: string) {
     debug(`Deleting metadata key ${key}`);
 
     const deletedMetadata = await this.app.database
       .deleteFrom('metadata')
+      .where('namespace', '=', namespace)
       .where('key', '=', key)
       .returningAll()
       .executeTakeFirst();
@@ -88,8 +83,8 @@ export class MetadataService {
     }
 
     eventBus.publish({
-      type: 'app.metadata.deleted',
-      metadata: mapAppMetadata(deletedMetadata),
+      type: 'metadata.deleted',
+      metadata: mapMetadata(deletedMetadata),
     });
   }
 }

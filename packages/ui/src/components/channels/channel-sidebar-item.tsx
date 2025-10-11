@@ -19,18 +19,14 @@ export const ChannelSidebarItem = ({
   const workspace = useWorkspace();
   const radar = useRadar();
 
-  const unreadState = radar.getNodeState(
-    workspace.accountId,
-    workspace.id,
-    channel.id
-  );
+  const unreadState = radar.getNodeState(workspace.userId, channel.id);
 
   return (
     <InView
       rootMargin="20px"
       onChange={(inView) => {
         if (inView) {
-          radar.markNodeAsSeen(workspace.accountId, workspace.id, channel.id);
+          radar.markNodeAsSeen(workspace.userId, channel.id);
         }
       }}
       className={cn(

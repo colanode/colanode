@@ -15,8 +15,7 @@ export const DatabaseContainerTab = ({
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: databaseId,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (nodeGetQuery.isPending) {

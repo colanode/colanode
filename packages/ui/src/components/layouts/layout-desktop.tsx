@@ -12,10 +12,13 @@ import { TabsContent } from '@colanode/ui/components/layouts/tabs/tabs-content';
 import { TabsHeader } from '@colanode/ui/components/layouts/tabs/tabs-header';
 import { TabManagerContext } from '@colanode/ui/contexts/tab-manager';
 import { database } from '@colanode/ui/data';
+import { buildMetadataKey } from '@colanode/ui/data/metadata';
+import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import { router, routeTree } from '@colanode/ui/routes';
 
 export const LayoutDesktop = () => {
   const routersRef = useRef<Map<string, typeof router>>(new Map());
+  const [activeTabId, setActiveTabId] = useMetadata('app', 'tab');
 
   const handleTabAdd = useCallback((location: string) => {
     const tabs = database.tabs.map((tab) => tab);
@@ -37,7 +40,8 @@ export const LayoutDesktop = () => {
 
   const handleTabDelete = useCallback((id: string) => {
     const tabs = database.tabs.map((tab) => tab);
-    const tabMetadata = database.metadata.get('tab');
+    const tabMetadataKey = buildMetadataKey('app', 'tab');
+    const tabMetadata = database.metadata.get(tabMetadataKey);
 
     if (tabs.length === 1) {
       return;
@@ -64,6 +68,7 @@ export const LayoutDesktop = () => {
         });
       } else {
         database.metadata.insert({
+          namespace: 'app',
           key: 'tab',
           value: nextTab,
           createdAt: new Date().toISOString(),
@@ -75,21 +80,12 @@ export const LayoutDesktop = () => {
     database.tabs.delete(id);
   }, []);
 
-  const handleTabSwitch = useCallback((id: string) => {
-    const tabMetadata = database.metadata.get('tab');
-    if (!tabMetadata) {
-      database.metadata.insert({
-        key: 'tab',
-        value: id,
-        createdAt: new Date().toISOString(),
-        updatedAt: null,
-      });
-    } else {
-      database.metadata.update('tab', (metadata) => {
-        metadata.value = id;
-      });
-    }
-  }, []);
+  const handleTabSwitch = useCallback(
+    (id: string) => {
+      setActiveTabId(id);
+    },
+    [setActiveTabId]
+  );
 
   const handleTabGetRouter = useCallback((id: string) => {
     if (routersRef.current.has(id)) {
@@ -139,8 +135,8 @@ export const LayoutDesktop = () => {
       }}
     >
       <div className="flex flex-col h-full">
-        <TabsHeader />
-        <TabsContent />
+        <TabsHeader activeTabId={activeTabId} />
+        <TabsContent activeTabId={activeTabId} />
       </div>
     </TabManagerContext.Provider>
   );

@@ -9,19 +9,8 @@ export abstract class WorkspaceQueryHandlerBase {
     this.app = app;
   }
 
-  protected getWorkspace(
-    accountId: string,
-    workspaceId: string
-  ): WorkspaceService {
-    const account = this.app.getAccount(accountId);
-    if (!account) {
-      throw new QueryError(
-        QueryErrorCode.AccountNotFound,
-        'Account not found or has been logged out already. Try closing the app and opening it again.'
-      );
-    }
-
-    const workspace = account.getWorkspace(workspaceId);
+  protected getWorkspace(userId: string): WorkspaceService {
+    const workspace = this.app.getWorkspace(userId);
     if (!workspace) {
       throw new QueryError(
         QueryErrorCode.WorkspaceNotFound,

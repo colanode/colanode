@@ -27,7 +27,7 @@ export const FileDeleteDialog = ({
   onOpenChange,
 }: FileDeleteDialogProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   return (
@@ -52,8 +52,7 @@ export const FileDeleteDialog = ({
                 input: {
                   type: 'file.delete',
                   fileId: fileId,
-                  accountId: workspace.accountId,
-                  workspaceId: workspace.id,
+                  userId: workspace.userId,
                 },
                 onSuccess() {
                   onOpenChange(false);

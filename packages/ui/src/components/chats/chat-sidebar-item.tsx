@@ -24,9 +24,8 @@ export const ChatSidebarItem = ({ chat, isActive }: ChatSidebarItemProps) => {
 
   const userGetQuery = useLiveQuery({
     type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId,
+    userId: workspace.userId,
+    id: userId,
   });
 
   if (userGetQuery.isPending || !userGetQuery.data) {
@@ -34,18 +33,14 @@ export const ChatSidebarItem = ({ chat, isActive }: ChatSidebarItemProps) => {
   }
 
   const user = userGetQuery.data;
-  const unreadState = radar.getNodeState(
-    workspace.accountId,
-    workspace.id,
-    chat.id
-  );
+  const unreadState = radar.getNodeState(workspace.userId, chat.id);
 
   return (
     <InView
       rootMargin="20px"
       onChange={(inView) => {
         if (inView) {
-          radar.markNodeAsSeen(workspace.accountId, workspace.id, chat.id);
+          radar.markNodeAsSeen(workspace.userId, chat.id);
         }
       }}
       className={cn(

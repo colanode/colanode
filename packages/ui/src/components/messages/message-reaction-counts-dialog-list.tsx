@@ -27,8 +27,7 @@ export const MessageReactionCountsDialogList = ({
     type: 'node.reaction.list',
     nodeId: message.id,
     reaction: reactionCount.reaction,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     page: i + 1,
     count: REACTIONS_PER_PAGE,
   }));
@@ -44,9 +43,8 @@ export const MessageReactionCountsDialogList = ({
   const results = useLiveQueries(
     userIds.map((userId) => ({
       type: 'user.get',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
-      userId,
+      userId: workspace.userId,
+      id: userId,
     }))
   );
 

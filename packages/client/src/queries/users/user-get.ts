@@ -2,9 +2,8 @@ import { User } from '@colanode/client/types/users';
 
 export type UserGetQueryInput = {
   type: 'user.get';
+  id: string;
   userId: string;
-  accountId: string;
-  workspaceId: string;
 };
 
 declare module '@colanode/client/queries' {

@@ -14,12 +14,12 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
-import { AccountContext, useAccount } from '@colanode/ui/contexts/account';
 import { useRadar } from '@colanode/ui/contexts/radar';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { database } from '@colanode/ui/data';
 
 export function SidebarMenuFooter() {
-  const account = useAccount();
+  const workspace = useWorkspace();
   const radar = useRadar();
   const navigate = useNavigate();
 
@@ -29,8 +29,8 @@ export function SidebarMenuFooter() {
     q.from({ accounts: database.accounts })
   );
   const accounts = accountsQuery.data ?? [];
-  const currentAccount = accounts.find((a) => a.id === account.id);
-  const otherAccounts = accounts.filter((a) => a.id !== account.id);
+  const currentAccount = accounts.find((a) => a.id === workspace.accountId);
+  const otherAccounts = accounts.filter((a) => a.id !== workspace.accountId);
   const accountUnreadStates: Record<string, UnreadState> = {};
   for (const accountItem of otherAccounts) {
     accountUnreadStates[accountItem.id] = radar.getAccountState(accountItem.id);
@@ -85,37 +85,33 @@ export function SidebarMenuFooter() {
               className="p-0"
               onClick={() => {
                 navigate({
-                  to: '/acc/$accountId',
-                  params: { accountId: accountItem.id },
+                  to: '/workspace/$userId',
+                  params: { userId: accountItem.id },
                 });
               }}
             >
-              <AccountContext.Provider value={accountItem}>
-                <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar
-                    className="h-8 w-8 rounded-lg"
-                    id={accountItem.id}
-                    name={accountItem.name}
-                    avatar={accountItem.avatar}
-                  />
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {accountItem.name}
-                    </span>
-                    <span className="truncate text-xs">
-                      {accountItem.email}
-                    </span>
-                  </div>
-                  {accountItem.id === account.id ? (
-                    <Check className="size-4" />
-                  ) : (
-                    <UnreadBadge
-                      count={state.unreadCount}
-                      unread={state.hasUnread}
-                    />
-                  )}
+              <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                <Avatar
+                  className="h-8 w-8 rounded-lg"
+                  id={accountItem.id}
+                  name={accountItem.name}
+                  avatar={accountItem.avatar}
+                />
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">
+                    {accountItem.name}
+                  </span>
+                  <span className="truncate text-xs">{accountItem.email}</span>
                 </div>
-              </AccountContext.Provider>
+                {accountItem.id === workspace.accountId ? (
+                  <Check className="size-4" />
+                ) : (
+                  <UnreadBadge
+                    count={state.unreadCount}
+                    unread={state.hasUnread}
+                  />
+                )}
+              </div>
             </DropdownMenuItem>
           );
         })}

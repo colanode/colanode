@@ -34,7 +34,7 @@ interface ViewProps {
 export const View = ({ view }: ViewProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
-  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
+  const navigate = useNavigate({ from: '/workspace/$userId' });
 
   const fields: ViewField[] = database.fields
     .map((field) => {
@@ -78,8 +78,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -96,8 +95,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -125,8 +123,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -158,8 +155,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -182,8 +178,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -202,8 +197,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -240,8 +234,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -294,8 +287,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -324,8 +316,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -351,8 +342,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -401,8 +391,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -429,8 +418,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -457,8 +445,7 @@ export const View = ({ view }: ViewProps) => {
 
           const result = await window.colanode.executeMutation({
             type: 'view.update',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             viewId: view.id,
             view: viewAttributes,
           });
@@ -503,8 +490,7 @@ export const View = ({ view }: ViewProps) => {
           const result = await window.colanode.executeMutation({
             type: 'record.create',
             databaseId: database.id,
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             fields,
           });
 

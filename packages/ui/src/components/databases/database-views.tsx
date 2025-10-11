@@ -17,8 +17,7 @@ export const DatabaseViews = ({ inline = false }: DatabaseViewsProps) => {
 
   const databaseViewListQuery = useLiveQuery({
     type: 'database.view.list',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     databaseId: database.id,
   });
 

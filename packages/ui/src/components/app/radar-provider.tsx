@@ -16,20 +16,23 @@ export const RadarProvider = ({ children }: RadarProviderProps) => {
     <RadarContext.Provider
       value={{
         getAccountState: (accountId) => {
-          const accountState = radarData[accountId];
-          if (!accountState) {
+          const accountWorkspaces = Object.values(radarData).filter(
+            (workspace) => workspace.accountId === accountId
+          );
+
+          if (!accountWorkspaces.length) {
             return {
               hasUnread: false,
               unreadCount: 0,
             };
           }
 
-          const hasUnread = Object.values(accountState).some(
-            (state) => state.state.hasUnread
+          const hasUnread = accountWorkspaces.some(
+            (workspace) => workspace.state.hasUnread
           );
 
-          const unreadCount = Object.values(accountState).reduce(
-            (acc, state) => acc + state.state.unreadCount,
+          const unreadCount = accountWorkspaces.reduce(
+            (acc, workspace) => acc + workspace.state.unreadCount,
             0
           );
 
@@ -38,16 +41,16 @@ export const RadarProvider = ({ children }: RadarProviderProps) => {
             unreadCount,
           };
         },
-        getWorkspaceState: (accountId, workspaceId) => {
-          const workspaceState = radarData[accountId]?.[workspaceId];
+        getWorkspaceState: (userId) => {
+          const workspaceState = radarData[userId];
           if (workspaceState) {
             return workspaceState;
           }
 
           return {
-            userId: '',
-            workspaceId: workspaceId,
-            accountId: accountId,
+            userId: userId,
+            workspaceId: '',
+            accountId: '',
             state: {
               hasUnread: false,
               unreadCount: 0,
@@ -55,8 +58,8 @@ export const RadarProvider = ({ children }: RadarProviderProps) => {
             nodeStates: {},
           };
         },
-        getNodeState: (accountId, workspaceId, nodeId) => {
-          const workspaceState = radarData[accountId]?.[workspaceId];
+        getNodeState: (userId, nodeId) => {
+          const workspaceState = radarData[userId];
           if (workspaceState) {
             const nodeState = workspaceState.nodeStates[nodeId];
             if (nodeState) {
@@ -69,8 +72,8 @@ export const RadarProvider = ({ children }: RadarProviderProps) => {
             unreadCount: 0,
           };
         },
-        getChatsState: (accountId, workspaceId) => {
-          const workspaceState = radarData[accountId]?.[workspaceId];
+        getChatsState: (userId) => {
+          const workspaceState = radarData[userId];
           if (!workspaceState) {
             return {
               hasUnread: false,
@@ -92,8 +95,8 @@ export const RadarProvider = ({ children }: RadarProviderProps) => {
             unreadCount,
           };
         },
-        getChannelsState: (accountId, workspaceId) => {
-          const workspaceState = radarData[accountId]?.[workspaceId];
+        getChannelsState: (userId) => {
+          const workspaceState = radarData[userId];
           if (!workspaceState) {
             return {
               hasUnread: false,
@@ -115,20 +118,18 @@ export const RadarProvider = ({ children }: RadarProviderProps) => {
             unreadCount,
           };
         },
-        markNodeAsSeen: (accountId, workspaceId, nodeId) => {
+        markNodeAsSeen: (userId, nodeId) => {
           window.colanode.executeMutation({
             type: 'node.interaction.seen',
             nodeId,
-            accountId,
-            workspaceId,
+            userId,
           });
         },
-        markNodeAsOpened: (accountId, workspaceId, nodeId) => {
+        markNodeAsOpened: (userId, nodeId) => {
           window.colanode.executeMutation({
             type: 'node.interaction.opened',
             nodeId,
-            accountId,
-            workspaceId,
+            userId,
           });
         },
       }}

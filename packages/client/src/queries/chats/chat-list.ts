@@ -4,8 +4,7 @@ export type ChatListQueryInput = {
   type: 'chat.list';
   page: number;
   count: number;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 declare module '@colanode/client/queries' {

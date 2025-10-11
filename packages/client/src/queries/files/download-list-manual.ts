@@ -2,8 +2,7 @@ import { Download } from '@colanode/client/types/files';
 
 export type DownloadListManualQueryInput = {
   type: 'download.list.manual';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   page: number;
   count: number;
 };

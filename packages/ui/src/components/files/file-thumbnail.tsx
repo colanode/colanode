@@ -14,8 +14,7 @@ export const FileImageThumbnail = ({ file, className }: FileThumbnailProps) => {
   const localFileQuery = useLiveQuery({
     type: 'local.file.get',
     fileId: file.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (localFileQuery.isPending) {

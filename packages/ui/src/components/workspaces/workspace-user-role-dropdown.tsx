@@ -104,7 +104,7 @@ export const WorkspaceUserRoleDropdown = ({
                   input: {
                     type: 'user.role.update',
                     accountId: workspace.accountId,
-                    workspaceId: workspace.id,
+                    workspaceId: workspace.workspaceId,
                     userId: userId,
                     role: role.value,
                   },

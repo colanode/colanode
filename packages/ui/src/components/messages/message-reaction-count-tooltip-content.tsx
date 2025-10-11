@@ -24,8 +24,7 @@ export const MessageReactionCountTooltipContent = ({
     type: 'node.reaction.list',
     nodeId: message.id,
     reaction: reactionCount.reaction,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     page: 0,
     count: 3,
   });
@@ -37,9 +36,8 @@ export const MessageReactionCountTooltipContent = ({
   const results = useLiveQueries(
     userIds.map((userId) => ({
       type: 'user.get',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
-      userId,
+      userId: workspace.userId,
+      id: userId,
     }))
   );
 

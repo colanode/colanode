@@ -8,21 +8,23 @@ export const createAccountsCollection = () => {
       return item.id;
     },
     sync: {
-      async sync({ begin, write, commit, markReady }) {
-        const accounts = await window.colanode.executeQuery({
-          type: 'account.list',
-        });
+      sync({ begin, write, commit, markReady }) {
+        window.colanode
+          .executeQuery({
+            type: 'account.list',
+          })
+          .then((accounts) => {
+            begin();
 
-        begin();
+            for (const account of accounts) {
+              write({ type: 'insert', value: account });
+            }
 
-        for (const account of accounts) {
-          write({ type: 'insert', value: account });
-        }
+            commit();
+            markReady();
+          });
 
-        commit();
-        markReady();
-
-        window.eventBus.subscribe((event) => {
+        const subscriptionId = window.eventBus.subscribe((event) => {
           if (event.type === 'account.created') {
             begin();
             write({ type: 'insert', value: event.account });
@@ -37,6 +39,12 @@ export const createAccountsCollection = () => {
             commit();
           }
         });
+
+        return {
+          cleanup: () => {
+            window.eventBus.unsubscribe(subscriptionId);
+          },
+        };
       },
     },
   });

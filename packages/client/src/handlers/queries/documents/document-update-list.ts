@@ -12,7 +12,7 @@ export class DocumentUpdatesListQueryHandler
   public async handleQuery(
     input: DocumentUpdatesListQueryInput
   ): Promise<DocumentUpdate[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     const documentUpdates = await workspace.database
       .selectFrom('document_updates')
       .selectAll()
@@ -33,8 +33,7 @@ export class DocumentUpdatesListQueryHandler
   ): Promise<ChangeCheckResult<DocumentUpdatesListQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -44,8 +43,7 @@ export class DocumentUpdatesListQueryHandler
 
     if (
       event.type === 'document.update.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.documentUpdate.documentId === input.documentId
     ) {
       const newOutput = [...output, event.documentUpdate];
@@ -57,8 +55,7 @@ export class DocumentUpdatesListQueryHandler
 
     if (
       event.type === 'document.update.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.documentId === input.documentId
     ) {
       const newOutput = output.filter((update) => update.id !== event.updateId);
@@ -71,8 +68,7 @@ export class DocumentUpdatesListQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.id === input.documentId
     ) {
       return {
@@ -83,8 +79,7 @@ export class DocumentUpdatesListQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.id === input.documentId
     ) {
       const newOutput = await this.handleQuery(input);

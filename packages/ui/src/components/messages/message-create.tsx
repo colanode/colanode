@@ -75,8 +75,7 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
         type: 'message.create',
         parentId: conversation.id,
         content: content,
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        userId: workspace.userId,
         referenceId: replyTo?.id,
         rootId: conversation.rootId,
       },
@@ -157,7 +156,7 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
               ref={messageEditorRef}
               userId={workspace.userId}
               accountId={workspace.accountId}
-              workspaceId={workspace.id}
+              workspaceId={workspace.workspaceId}
               conversationId={conversation.id}
               rootId={conversation.rootId}
               onChange={setContent}

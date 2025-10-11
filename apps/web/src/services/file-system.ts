@@ -77,7 +77,7 @@ export class WebFileSystem implements FileSystem {
         : new ArrayBuffer(data.byteLength);
 
     if (!(data.buffer instanceof ArrayBuffer)) {
-      const view = new Uint8Array<ArrayBuffer>(arrayBuffer);
+      const view = new Uint8Array(arrayBuffer);
       view.set(data);
     }
 

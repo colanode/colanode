@@ -22,8 +22,7 @@ export class UploadListPendingQueryHandler
   ): Promise<ChangeCheckResult<UploadListPendingQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -33,8 +32,7 @@ export class UploadListPendingQueryHandler
 
     if (
       event.type === 'upload.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.upload.status === UploadStatus.Pending
     ) {
       const newResult = await this.fetchPendingUploads(input);
@@ -46,8 +44,7 @@ export class UploadListPendingQueryHandler
 
     if (
       event.type === 'upload.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       const upload = output.find(
         (upload) => upload.fileId === event.upload.fileId
@@ -61,7 +58,7 @@ export class UploadListPendingQueryHandler
 
       if (
         upload.status === UploadStatus.Pending &&
-        event.upload.status === UploadStatus.Uploading
+        event.upload.status === UploadStatus.Pending
       ) {
         const newResult = output.map((upload) => {
           if (upload.fileId === event.upload.fileId) {
@@ -102,8 +99,7 @@ export class UploadListPendingQueryHandler
 
     if (
       event.type === 'upload.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       const upload = output.find(
         (upload) => upload.fileId === event.upload.fileId
@@ -140,7 +136,7 @@ export class UploadListPendingQueryHandler
   private async fetchPendingUploads(
     input: UploadListPendingQueryInput
   ): Promise<Upload[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const offset = (input.page - 1) * input.count;
     const uploads = await workspace.database

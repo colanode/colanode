@@ -28,9 +28,8 @@ export const NodeCollaborator = ({
 
   const userGetQuery = useLiveQuery({
     type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: collaboratorId,
+    userId: workspace.userId,
+    id: collaboratorId,
   });
 
   if (userGetQuery.isPending || !userGetQuery.data) {
@@ -58,8 +57,7 @@ export const NodeCollaborator = ({
                 nodeId: nodeId,
                 collaboratorId: collaboratorId,
                 role: newRole,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               },
               onError(error) {
                 toast.error(error.message);
@@ -76,8 +74,7 @@ export const NodeCollaborator = ({
                   type: 'node.collaborator.delete',
                   nodeId: nodeId,
                   collaboratorId: collaboratorId,
-                  accountId: workspace.accountId,
-                  workspaceId: workspace.id,
+                  userId: workspace.userId,
                 },
               });
             }}

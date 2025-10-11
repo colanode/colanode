@@ -8,8 +8,7 @@ export const UserStorageStats = () => {
 
   const userStorageGetQuery = useLiveQuery({
     type: 'user.storage.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   const data = userStorageGetQuery.data ?? {

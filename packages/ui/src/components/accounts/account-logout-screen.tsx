@@ -2,16 +2,16 @@ import { useNavigate } from '@tanstack/react-router';
 import { LogOut } from 'lucide-react';
 import { toast } from 'sonner';
 
-import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
-import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { useAccount } from '@colanode/ui/contexts/account';
+import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
+import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export const AccountLogoutScreen = () => {
-  const account = useAccount();
+  const workspace = useWorkspace();
   const navigate = useNavigate();
   const { mutate, isPending } = useMutation();
 
@@ -47,7 +47,7 @@ export const AccountLogoutScreen = () => {
                   mutate({
                     input: {
                       type: 'account.logout',
-                      accountId: account.id,
+                      accountId: workspace.accountId,
                     },
                     onSuccess() {
                       navigate({

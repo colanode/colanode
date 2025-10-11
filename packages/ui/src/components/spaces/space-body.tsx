@@ -17,7 +17,7 @@ interface SpaceBodyProps {
 
 export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   const canEdit = hasNodeRole(role, 'admin');
@@ -41,8 +41,7 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
             mutate({
               input: {
                 type: 'space.update',
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
                 spaceId: space.id,
                 name: values.name,
                 description: values.description,

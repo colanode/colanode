@@ -5,7 +5,6 @@ import {
 } from '@colanode/client/queries/interactions/radar-data-get';
 import { AppService } from '@colanode/client/services/app-service';
 import { Event } from '@colanode/client/types/events';
-import { WorkspaceRadarData } from '@colanode/client/types/radars';
 
 export class RadarDataGetQueryHandler
   implements QueryHandler<RadarDataGetQueryInput>
@@ -50,21 +49,12 @@ export class RadarDataGetQueryHandler
 
   private getRadarData(): RadarDataGetQueryOutput {
     const result: RadarDataGetQueryOutput = {};
-    const accounts = this.app.getAccounts();
-    if (accounts.length === 0) {
-      return result;
-    }
 
-    for (const account of accounts) {
-      const accountResult: Record<string, WorkspaceRadarData> = {};
-      const workspaces = account.getWorkspaces();
+    const workspaces = this.app.getWorkspaces();
 
-      for (const workspace of workspaces) {
-        const radarData = workspace.radar.getData();
-        accountResult[workspace.id] = radarData;
-      }
-
-      result[account.id] = accountResult;
+    for (const workspace of workspaces) {
+      const radarData = workspace.radar.getData();
+      result[workspace.userId] = radarData;
     }
 
     return result;

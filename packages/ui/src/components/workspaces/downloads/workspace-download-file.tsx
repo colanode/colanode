@@ -22,12 +22,11 @@ export const WorkspaceDownloadFile = ({
   download,
 }: WorkspaceDownloadFileProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate({ from: '/acc/$accountId/$workspaceId' });
+  const navigate = useNavigate({ from: '/workspace/$userId' });
 
   const fileQuery = useLiveQuery({
     type: 'node.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     nodeId: download.fileId,
   });
 

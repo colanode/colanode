@@ -31,8 +31,7 @@ export const BoardViewColumnsCollaborator = ({
     databaseId: database.id,
     filters: view.filters,
     fieldId: field.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (collaboratorCountQuery.isPending) {
@@ -86,8 +85,7 @@ export const BoardViewColumnsCollaborator = ({
                     type: 'record.field.value.delete',
                     recordId: record.id,
                     fieldId: field.id,
-                    accountId: workspace.accountId,
-                    workspaceId: workspace.id,
+                    userId: workspace.userId,
                   });
 
                   if (!result.success) {
@@ -120,8 +118,7 @@ export const BoardViewColumnsCollaborator = ({
                     recordId: record.id,
                     fieldId: field.id,
                     value: newValue,
-                    accountId: workspace.accountId,
-                    workspaceId: workspace.id,
+                    userId: workspace.userId,
                   });
 
                   if (!result.success) {
@@ -157,8 +154,7 @@ export const BoardViewColumnsCollaborator = ({
                 type: 'record.field.value.delete',
                 recordId: record.id,
                 fieldId: field.id,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               });
 
               if (!result.success) {
@@ -170,8 +166,7 @@ export const BoardViewColumnsCollaborator = ({
                 recordId: record.id,
                 fieldId: field.id,
                 value,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               });
 
               if (!result.success) {
@@ -203,9 +198,8 @@ const BoardViewColumnCollaboratorHeader = ({
   const userQuery = useLiveQuery(
     {
       type: 'user.get',
-      userId: collaborator ?? '',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
+      id: collaborator ?? '',
+      userId: workspace.userId,
     },
     {
       enabled: !!collaborator,

@@ -22,8 +22,7 @@ export class DownloadListManualQueryHandler
   ): Promise<ChangeCheckResult<DownloadListManualQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -33,8 +32,7 @@ export class DownloadListManualQueryHandler
 
     if (
       event.type === 'download.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.download.type === DownloadType.Manual
     ) {
       const newResult = await this.fetchManualDownloads(input);
@@ -46,8 +44,7 @@ export class DownloadListManualQueryHandler
 
     if (
       event.type === 'download.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.download.type === DownloadType.Manual
     ) {
       const download = output.find(
@@ -72,8 +69,7 @@ export class DownloadListManualQueryHandler
 
     if (
       event.type === 'download.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.download.type === DownloadType.Manual
     ) {
       const download = output.find(
@@ -111,7 +107,7 @@ export class DownloadListManualQueryHandler
   private async fetchManualDownloads(
     input: DownloadListManualQueryInput
   ): Promise<Download[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const offset = (input.page - 1) * input.count;
     const downloads = await workspace.database

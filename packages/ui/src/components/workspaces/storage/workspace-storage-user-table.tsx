@@ -61,9 +61,8 @@ const WorkspaceStorageUserRow = ({
 
   const userQuery = useQuery({
     type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: user.id,
+    userId: workspace.userId,
+    id: user.id,
   });
 
   const name = userQuery.data?.name ?? 'Unknown';

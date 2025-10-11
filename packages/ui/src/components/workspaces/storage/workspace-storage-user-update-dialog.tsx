@@ -108,9 +108,8 @@ export const WorkspaceStorageUserUpdateDialog = ({
 
   const userQuery = useQuery({
     type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: user.id,
+    userId: workspace.userId,
+    id: user.id,
   });
 
   const name = userQuery.data?.name ?? 'Unknown';
@@ -151,7 +150,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
       input: {
         type: 'user.storage.update',
         accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        workspaceId: workspace.workspaceId,
         userId: user.id,
         storageLimit: apiValues.storageLimit,
         maxFileSize: apiValues.maxFileSize,

@@ -83,8 +83,7 @@ export const WorkspaceUserInvite = () => {
                   email,
                   role: 'collaborator',
                 })),
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               },
               onSuccess() {
                 setEmails([]);

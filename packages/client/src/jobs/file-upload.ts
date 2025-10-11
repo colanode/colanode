@@ -26,8 +26,7 @@ import {
 
 export type FileUploadInput = {
   type: 'file.upload';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   fileId: string;
 };
 
@@ -55,15 +54,15 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
   };
 
   public async handleJob(input: FileUploadInput): Promise<JobOutput> {
-    const account = this.app.getAccount(input.accountId);
-    if (!account) {
+    const workspace = this.app.getWorkspace(input.userId);
+    if (!workspace) {
       return {
         type: 'cancel',
       };
     }
 
-    const workspace = account.getWorkspace(input.workspaceId);
-    if (!workspace) {
+    const account = this.app.getAccount(workspace.accountId);
+    if (!account) {
       return {
         type: 'cancel',
       };
@@ -164,7 +163,7 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
       const fileStream = await this.app.fs.readStream(localFile.path);
       await new Promise<void>((resolve, reject) => {
         const tusUpload = new Upload(fileStream, {
-          endpoint: `${account.server.httpBaseUrl}/v1/workspaces/${workspace.id}/files/${file.id}/tus`,
+          endpoint: `${account.server.httpBaseUrl}/v1/workspaces/${workspace.workspaceId}/files/${file.id}/tus`,
           chunkSize: FILE_UPLOAD_PART_SIZE,
           retryDelays: [
             0,
@@ -286,7 +285,7 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
 
       const fileStream = await this.app.fs.readStream(localFile.path);
       await account.client.put(
-        `v1/workspaces/${workspace.id}/files/${file.id}`,
+        `v1/workspaces/${workspace.workspaceId}/files/${file.id}`,
         {
           body: fileStream,
           headers: {
@@ -403,8 +402,11 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
 
     eventBus.publish({
       type: 'upload.updated',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
+      workspace: {
+        workspaceId: workspace.workspaceId,
+        userId: workspace.userId,
+        accountId: workspace.accountId,
+      },
       upload: mapUpload(updatedUpload),
     });
   }
@@ -422,8 +424,11 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
     if (deletedUpload) {
       eventBus.publish({
         type: 'upload.deleted',
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        workspace: {
+          workspaceId: workspace.workspaceId,
+          userId: workspace.userId,
+          accountId: workspace.accountId,
+        },
         upload: mapUpload(deletedUpload),
       });
     }

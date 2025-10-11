@@ -105,8 +105,7 @@ export const ViewCreateDialog = ({
         viewType: type.type,
         databaseId: database.id,
         name: name,
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        userId: workspace.userId,
       },
       onSuccess() {
         form.reset();

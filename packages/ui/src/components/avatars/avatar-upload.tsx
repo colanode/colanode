@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { useAccount } from '@colanode/ui/contexts/account';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { openFileDialog } from '@colanode/ui/lib/files';
 
@@ -13,7 +13,7 @@ interface AvatarUploadProps {
 }
 
 export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
-  const account = useAccount();
+  const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
   const [url, setUrl] = useState<string | undefined>(undefined);
@@ -73,7 +73,7 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
             mutate({
               input: {
                 type: 'avatar.upload',
-                accountId: account.id,
+                accountId: workspace.accountId,
                 file,
               },
               onSuccess(output) {

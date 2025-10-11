@@ -73,8 +73,7 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
         type: 'record.name.update',
         name: newName,
         recordId: record.id,
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        userId: workspace.userId,
       },
       onSuccess() {
         setIsEditing(false);
@@ -106,7 +105,7 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
             )}
           </div>
           <Link
-            from="/acc/$accountId/$workspaceId"
+            from="/workspace/$userId"
             to="$nodeId"
             params={{ nodeId: record.id }}
             className="absolute right-2 flex h-6 cursor-pointer flex-row items-center gap-1 rounded-md border p-1 text-sm text-muted-foreground opacity-0 hover:bg-accent group-hover:opacity-100"

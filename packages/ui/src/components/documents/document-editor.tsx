@@ -154,8 +154,7 @@ export const DocumentEditor = ({
 
         const result = await window.colanode.executeMutation({
           type: 'document.update',
-          accountId: workspace.accountId,
-          workspaceId: workspace.id,
+          userId: workspace.userId,
           documentId: node.id,
           update: encodeState(update),
         });
@@ -178,7 +177,7 @@ export const DocumentEditor = ({
           context: {
             userId: workspace.userId,
             accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            workspaceId: workspace.workspaceId,
             documentId: node.id,
             rootId: node.rootId,
           },
@@ -235,7 +234,7 @@ export const DocumentEditor = ({
             userId: workspace.userId,
             documentId: node.id,
             accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            workspaceId: workspace.workspaceId,
             rootId: node.rootId,
           },
         }),
@@ -352,8 +351,7 @@ export const DocumentEditor = ({
 
     const result = await window.colanode.executeMutation({
       type: 'document.update',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
+      userId: workspace.userId,
       documentId: node.id,
       update: encodeState(update),
     });
@@ -386,8 +384,7 @@ export const DocumentEditor = ({
 
     const result = await window.colanode.executeMutation({
       type: 'document.update',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
+      userId: workspace.userId,
       documentId: node.id,
       update: encodeState(update),
     });

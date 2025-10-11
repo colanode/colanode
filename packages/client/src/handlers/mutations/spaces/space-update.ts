@@ -14,7 +14,7 @@ export class SpaceUpdateMutationHandler
   async handleMutation(
     input: SpaceUpdateMutationInput
   ): Promise<SpaceUpdateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const result = await workspace.nodes.updateNode<SpaceAttributes>(
       input.spaceId,

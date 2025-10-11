@@ -13,9 +13,8 @@ export const RecordCreatedByValue = ({ field }: RecordCreatedByValueProps) => {
   const record = useRecord();
   const userGetQuery = useLiveQuery({
     type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: record.createdBy,
+    userId: workspace.userId,
+    id: record.createdBy,
   });
 
   const createdBy = userGetQuery.data

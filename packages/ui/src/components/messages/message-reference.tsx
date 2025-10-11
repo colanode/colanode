@@ -14,8 +14,7 @@ export const MessageReference = ({ messageId }: MessageReferenceProps) => {
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: messageId,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (nodeGetQuery.isPending) {

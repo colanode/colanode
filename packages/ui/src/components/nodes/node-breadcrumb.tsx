@@ -48,7 +48,7 @@ export const NodeBreadcrumb = ({ breadcrumb }: NodeBreadcrumbProps) => {
               {!isFirst && <BreadcrumbSeparator />}
               <BreadcrumbItem className="cursor-pointer hover:text-foreground">
                 <Link
-                  from="/acc/$accountId/$workspaceId"
+                  from="/workspace/$userId"
                   to="$nodeId"
                   params={{ nodeId: item.id }}
                 >
@@ -68,7 +68,7 @@ export const NodeBreadcrumb = ({ breadcrumb }: NodeBreadcrumbProps) => {
                           return (
                             <DropdownMenuItem key={ellipsisItem.id}>
                               <Link
-                                from="/acc/$accountId/$workspaceId"
+                                from="/workspace/$userId"
                                 to="$nodeId"
                                 params={{ nodeId: ellipsisItem.id }}
                               >

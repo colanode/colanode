@@ -19,9 +19,8 @@ export const ChatTab = ({ chat }: ChatTabProps) => {
 
   const userGetQuery = useLiveQuery({
     type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId,
+    userId: workspace.userId,
+    id: userId,
   });
 
   if (userGetQuery.isPending || !userGetQuery.data) {
