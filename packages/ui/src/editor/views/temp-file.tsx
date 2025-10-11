@@ -1,49 +1,65 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewWrapper } from '@tiptap/react';
 import { X } from 'lucide-react';
 
-import { TempFile } from '@colanode/client/types';
+import { FileSubtype } from '@colanode/core';
 import { FileNoPreview } from '@colanode/ui/components/files/file-no-preview';
 import { FilePreviewAudio } from '@colanode/ui/components/files/previews/file-preview-audio';
 import { FilePreviewImage } from '@colanode/ui/components/files/previews/file-preview-image';
 import { FilePreviewVideo } from '@colanode/ui/components/files/previews/file-preview-video';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { database } from '@colanode/ui/data';
 import { canPreviewFile } from '@colanode/ui/lib/files';
 
-const TempFilePreview = ({ file }: { file: TempFile }) => {
-  if (file.subtype === 'image') {
-    return <FilePreviewImage url={file.url} name={file.name} />;
+interface TempFilePreviewProps {
+  name: string;
+  mimeType: string;
+  subtype: FileSubtype;
+  url: string;
+}
+
+const TempFilePreview = ({
+  name,
+  mimeType,
+  subtype,
+  url,
+}: TempFilePreviewProps) => {
+  if (subtype === 'image') {
+    return <FilePreviewImage url={url} name={name} />;
   }
 
-  if (file.subtype === 'video') {
-    return <FilePreviewVideo url={file.url} />;
+  if (subtype === 'video') {
+    return <FilePreviewVideo url={url} />;
   }
 
-  if (file.subtype === 'audio') {
-    return <FilePreviewAudio url={file.url} />;
+  if (subtype === 'audio') {
+    return <FilePreviewAudio url={url} />;
   }
 
-  return <FileNoPreview mimeType={file.mimeType} />;
+  return <FileNoPreview mimeType={mimeType} />;
 };
 
 export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
   const fileId = node.attrs.id;
 
-  const tempFileQuery = useLiveQuery(
-    {
-      type: 'temp.file.get',
-      id: fileId,
-    },
-    {
-      enabled: !!fileId,
-    }
+  const tempFileQuery = useLiveQuery((q) =>
+    q
+      .from({ tempFiles: database.tempFiles })
+      .where(({ tempFiles }) => eq(tempFiles.id, fileId))
+      .select(({ tempFiles }) => ({
+        name: tempFiles.name,
+        mimeType: tempFiles.mimeType,
+        subtype: tempFiles.subtype,
+        url: tempFiles.url,
+      }))
+      .findOne()
   );
 
-  if (!fileId || tempFileQuery.isPending || !tempFileQuery.data) {
+  const tempFile = tempFileQuery.data;
+  if (!fileId || !tempFile) {
     return null;
   }
 
-  const tempFile = tempFileQuery.data;
   const mimeType = tempFile.mimeType;
   const subtype = tempFile.subtype;
   const canPreview = canPreviewFile(subtype);
@@ -61,7 +77,12 @@ export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
           <X className="size-4" />
         </button>
         {canPreview ? (
-          <TempFilePreview file={tempFile} />
+          <TempFilePreview
+            name={tempFile.name}
+            mimeType={tempFile.mimeType}
+            subtype={tempFile.subtype}
+            url={tempFile.url}
+          />
         ) : (
           <FileNoPreview mimeType={mimeType} />
         )}

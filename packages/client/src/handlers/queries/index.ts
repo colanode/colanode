@@ -2,7 +2,6 @@ import { QueryHandler } from '@colanode/client/lib/types';
 import { QueryMap } from '@colanode/client/queries';
 import { AppService } from '@colanode/client/services/app-service';
 
-import { AccountGetQueryHandler } from './accounts/account-get';
 import { AccountListQueryHandler } from './accounts/accounts-list';
 import { MetadataListQueryHandler } from './apps/metadata-list';
 import { TabsListQueryHandler } from './apps/tabs-list';
@@ -23,7 +22,7 @@ import { DownloadListQueryHandler } from './files/download-list';
 import { FileDownloadRequestGetQueryHandler } from './files/file-download-request-get';
 import { FileListQueryHandler } from './files/file-list';
 import { LocalFileGetQueryHandler } from './files/local-file-get';
-import { TempFileGetQueryHandler } from './files/temp-file-get';
+import { TempFileListQueryHandler } from './files/temp-file-list';
 import { UploadListQueryHandler } from './files/upload-list';
 import { IconCategoryListQueryHandler } from './icons/icon-category-list';
 import { IconListQueryHandler } from './icons/icon-list';
@@ -77,7 +76,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'icon.category.list': new IconCategoryListQueryHandler(app),
     'node.children.get': new NodeChildrenGetQueryHandler(app),
     'radar.data.get': new RadarDataGetQueryHandler(app),
-    'account.get': new AccountGetQueryHandler(app),
     'database.list': new DatabaseListQueryHandler(app),
     'database.view.list': new DatabaseViewListQueryHandler(app),
     'record.search': new RecordSearchQueryHandler(app),
@@ -92,7 +90,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
     'upload.list': new UploadListQueryHandler(app),
     'download.list': new DownloadListQueryHandler(app),
-    'temp.file.get': new TempFileGetQueryHandler(app),
+    'temp.file.list': new TempFileListQueryHandler(app),
     'icon.svg.get': new IconSvgGetQueryHandler(app),
     'emoji.svg.get': new EmojiSvgGetQueryHandler(app),
     'tabs.list': new TabsListQueryHandler(app),

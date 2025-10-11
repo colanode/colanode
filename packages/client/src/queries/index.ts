@@ -1,6 +1,5 @@
 import { sha256 } from 'js-sha256';
 
-export * from './accounts/account-get';
 export * from './accounts/account-list';
 export * from './apps/metadata-list';
 export * from './chats/chat-list';
@@ -39,7 +38,7 @@ export * from './records/record-field-value-count';
 export * from './workspaces/workspace-storage-get';
 export * from './files/upload-list';
 export * from './files/download-list';
-export * from './files/temp-file-get';
+export * from './files/temp-file-list';
 export * from './icons/icon-svg-get';
 export * from './emojis/emoji-svg-get';
 export * from './apps/tabs-list';

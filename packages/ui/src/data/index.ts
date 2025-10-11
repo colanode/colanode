@@ -6,6 +6,7 @@ import { createDownloadsCollection } from '@colanode/ui/data/downloads';
 import { createMetadataCollection } from '@colanode/ui/data/metadata';
 import { createServersCollection } from '@colanode/ui/data/servers';
 import { createTabsCollection } from '@colanode/ui/data/tabs';
+import { createTempFilesCollection } from '@colanode/ui/data/temp-files';
 import { createUploadsCollection } from '@colanode/ui/data/uploads';
 import { createUsersCollection } from '@colanode/ui/data/users';
 import { createWorkspacesCollection } from '@colanode/ui/data/workspaces';
@@ -31,6 +32,7 @@ class AppDatabase {
   public readonly tabs = createTabsCollection();
   public readonly metadata = createMetadataCollection();
   public readonly workspaces = createWorkspacesCollection();
+  public readonly tempFiles = createTempFilesCollection();
 
   private readonly workspaceDatabases: Map<string, WorkspaceDatabase> =
     new Map();
@@ -54,6 +56,7 @@ class AppDatabase {
       this.metadata.preload(),
       this.tabs.preload(),
       this.workspaces.preload(),
+      this.tempFiles.preload(),
     ]);
   }
 
