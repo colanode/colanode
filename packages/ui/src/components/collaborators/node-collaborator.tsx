@@ -1,3 +1,4 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -5,7 +6,7 @@ import { NodeRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { NodeCollaboratorRoleDropdown } from '@colanode/ui/components/collaborators/node-collaborator-role-dropdown';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { database } from '@colanode/ui/data';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface NodeCollaboratorProps {
@@ -26,17 +27,24 @@ export const NodeCollaborator = ({
   const workspace = useWorkspace();
   const { mutate } = useMutation();
 
-  const userGetQuery = useLiveQuery({
-    type: 'user.get',
-    userId: workspace.userId,
-    id: collaboratorId,
-  });
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: database.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, collaboratorId))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+        email: users.email,
+      }))
+      .findOne()
+  );
 
-  if (userGetQuery.isPending || !userGetQuery.data) {
+  const user = userQuery.data;
+  if (!user) {
     return null;
   }
 
-  const user = userGetQuery.data;
   return (
     <div className="flex items-center justify-between space-x-3">
       <div className="flex items-center space-x-3">

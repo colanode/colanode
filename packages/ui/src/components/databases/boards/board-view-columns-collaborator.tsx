@@ -1,3 +1,4 @@
+import { eq, useLiveQuery as useLiveQueryTanstack } from '@tanstack/react-db';
 import { CircleAlert, CircleDashed } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -8,11 +9,11 @@ import {
 } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { BoardViewContext } from '@colanode/ui/contexts/board-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { database } from '@colanode/ui/data';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface BoardViewColumnsCollaboratorProps {
@@ -195,15 +196,16 @@ const BoardViewColumnCollaboratorHeader = ({
 }: BoardViewColumnCollaboratorHeaderProps) => {
   const workspace = useWorkspace();
 
-  const userQuery = useLiveQuery(
-    {
-      type: 'user.get',
-      id: collaborator ?? '',
-      userId: workspace.userId,
-    },
-    {
-      enabled: !!collaborator,
-    }
+  const userQuery = useLiveQueryTanstack((q) =>
+    q
+      .from({ users: database.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, collaborator))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
   );
 
   if (!collaborator) {
@@ -211,18 +213,6 @@ const BoardViewColumnCollaboratorHeader = ({
       <div className="flex flex-row gap-2 items-center">
         <CircleDashed className="size-5" />
         <p className="text-muted-foreground">No {field.name}</p>
-        <p className="text-muted-foreground text-sm ml-1">
-          {count.toLocaleString()}
-        </p>
-      </div>
-    );
-  }
-
-  if (userQuery.isPending) {
-    return (
-      <div className="flex flex-row gap-2 items-center">
-        <Spinner className="size-5" />
-        <p className="text-muted-foreground">Loading...</p>
         <p className="text-muted-foreground text-sm ml-1">
           {count.toLocaleString()}
         </p>

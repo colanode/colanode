@@ -1,8 +1,10 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
 import { LocalChatNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { database } from '@colanode/ui/data';
 
 interface ChatBreadcrumbItemProps {
   chat: LocalChatNode;
@@ -18,13 +20,20 @@ export const ChatBreadcrumbItem = ({ chat }: ChatBreadcrumbItemProps) => {
         ) ?? '')
       : '';
 
-  const userGetQuery = useLiveQuery({
-    type: 'user.get',
-    userId: workspace.userId,
-    id: userId,
-  });
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: database.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, userId))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
+  );
 
-  if (userGetQuery.isPending || !userGetQuery.data) {
+  const user = userQuery.data;
+  if (!user) {
     return null;
   }
 
@@ -32,13 +41,13 @@ export const ChatBreadcrumbItem = ({ chat }: ChatBreadcrumbItemProps) => {
     <BreadcrumbItem
       icon={(className) => (
         <Avatar
-          id={userGetQuery.data!.id}
-          name={userGetQuery.data!.name}
-          avatar={userGetQuery.data!.avatar}
+          id={user.id}
+          name={user.name}
+          avatar={user.avatar}
           className={className}
         />
       )}
-      name={userGetQuery.data!.name}
+      name={user.name}
     />
   );
 };

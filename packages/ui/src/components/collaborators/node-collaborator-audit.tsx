@@ -1,7 +1,9 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
 import { timeAgo } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { database } from '@colanode/ui/data';
 
 interface NodeCollaboratorAuditProps {
   collaboratorId: string;
@@ -14,17 +16,22 @@ export const NodeCollaboratorAudit = ({
 }: NodeCollaboratorAuditProps) => {
   const workspace = useWorkspace();
 
-  const userGetQuery = useLiveQuery({
-    type: 'user.get',
-    userId: workspace.userId,
-    id: collaboratorId,
-  });
-
-  if (userGetQuery.isPending || !userGetQuery.data) {
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: database.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, collaboratorId))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
+  );
+  const user = userQuery.data;
+  if (!user) {
     return null;
   }
 
-  const user = userGetQuery.data;
   return (
     <div className="flex items-center gap-2 w-full">
       <Avatar

@@ -1,6 +1,6 @@
+import { inArray, useLiveQuery } from '@tanstack/react-db';
 import { ChevronDown, Trash2, X } from 'lucide-react';
 
-import { User } from '@colanode/client/types';
 import {
   DatabaseViewFieldFilterAttributes,
   CreatedByFieldAttributes,
@@ -24,24 +24,20 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { UserSearch } from '@colanode/ui/components/users/user-search';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
+import { database } from '@colanode/ui/data';
 import { createdByFieldFilterOperators } from '@colanode/ui/lib/databases';
 
-interface ViewCreatedByFieldFilterProps {
-  field: CreatedByFieldAttributes;
-  filter: DatabaseViewFieldFilterAttributes;
+interface CollaboratorBadgeProps {
+  id: string;
+  name: string;
+  avatar: string | null;
 }
 
-const CollaboratorBadge = ({ collaborator }: { collaborator: User }) => {
+const CollaboratorBadge = ({ id, name, avatar }: CollaboratorBadgeProps) => {
   return (
     <div className="flex flex-row items-center gap-1 text-sm">
-      <Avatar
-        id={collaborator.id}
-        name={collaborator.name}
-        avatar={collaborator.avatar}
-        size="small"
-      />
-      <p>{collaborator.name}</p>
+      <Avatar id={id} name={name} avatar={avatar} size="small" />
+      <p>{name}</p>
     </div>
   );
 };
@@ -49,6 +45,11 @@ const CollaboratorBadge = ({ collaborator }: { collaborator: User }) => {
 const isOperatorWithoutValue = (operator: string) => {
   return operator === 'is_me' || operator === 'is_not_me';
 };
+
+interface ViewCreatedByFieldFilterProps {
+  field: CreatedByFieldAttributes;
+  filter: DatabaseViewFieldFilterAttributes;
+}
 
 export const ViewCreatedByFieldFilter = ({
   field,
@@ -63,20 +64,19 @@ export const ViewCreatedByFieldFilter = ({
     ) ?? createdByFieldFilterOperators[0]!;
 
   const collaboratorIds = (filter.value as string[]) ?? [];
-  const results = useLiveQueries(
-    collaboratorIds.map((id) => ({
-      type: 'user.get',
-      userId: workspace.userId,
-      id: id,
-    }))
+  const collaboratorsQuery = useLiveQuery((q) =>
+    q
+      .from({ users: database.workspace(workspace.userId).users })
+      .where(({ users }) => inArray(users.id, collaboratorIds))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+        email: users.email,
+      }))
   );
 
-  const collaborators: User[] = [];
-  for (const result of results) {
-    if (result.data) {
-      collaborators.push(result.data);
-    }
-  }
+  const collaborators = collaboratorsQuery.data;
   const hideInput = isOperatorWithoutValue(operator.value);
 
   return (
@@ -151,7 +151,9 @@ export const ViewCreatedByFieldFilter = ({
                 {collaborators.slice(0, 1).map((collaborator) => (
                   <CollaboratorBadge
                     key={collaborator.id}
-                    collaborator={collaborator}
+                    id={collaborator.id}
+                    name={collaborator.name}
+                    avatar={collaborator.avatar}
                   />
                 ))}
                 {collaborators.length === 0 && (

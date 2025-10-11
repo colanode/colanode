@@ -1,14 +1,21 @@
+import { Collection } from '@tanstack/react-db';
+
+import { User } from '@colanode/client/types';
 import { createAccountsCollection } from '@colanode/ui/data/accounts';
 import { createMetadataCollection } from '@colanode/ui/data/metadata';
 import { createServersCollection } from '@colanode/ui/data/servers';
 import { createTabsCollection } from '@colanode/ui/data/tabs';
+import { createUsersCollection } from '@colanode/ui/data/users';
 import { createWorkspacesCollection } from '@colanode/ui/data/workspaces';
 
 class WorkspaceDatabase {
   private readonly userId: string;
 
+  public readonly users: Collection<User, string>;
+
   constructor(userId: string) {
     this.userId = userId;
+    this.users = createUsersCollection(userId);
   }
 }
 
@@ -42,6 +49,10 @@ class AppDatabase {
       this.tabs.preload(),
       this.workspaces.preload(),
     ]);
+  }
+
+  public workspace(userId: string) {
+    return this.getWorkspaceDatabase(userId);
   }
 }
 

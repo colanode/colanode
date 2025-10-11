@@ -30,7 +30,6 @@ export * from './nodes/node-tree-get';
 export * from './records/record-list';
 export * from './records/record-search';
 export * from './spaces/space-list';
-export * from './users/user-get';
 export * from './users/user-list';
 export * from './users/user-search';
 export * from './users/user-storage-get';

@@ -1,3 +1,7 @@
+import {
+  inArray,
+  useLiveQuery as useLiveQueryTanstack,
+} from '@tanstack/react-db';
 import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
@@ -5,6 +9,7 @@ import { NodeReactionListQueryInput } from '@colanode/client/queries';
 import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { database } from '@colanode/ui/data';
 import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 const REACTIONS_PER_PAGE = 20;
@@ -40,18 +45,18 @@ export const MessageReactionCountsDialogList = ({
 
   const userIds = reactions?.map((reaction) => reaction.collaboratorId) ?? [];
 
-  const results = useLiveQueries(
-    userIds.map((userId) => ({
-      type: 'user.get',
-      userId: workspace.userId,
-      id: userId,
-    }))
+  const usersQuery = useLiveQueryTanstack((q) =>
+    q
+      .from({ users: database.workspace(workspace.userId).users })
+      .where(({ users }) => inArray(users.id, userIds))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
   );
 
-  const users = results
-    .filter((result) => result.data !== null)
-    .map((result) => result.data!);
-
+  const users = usersQuery.data;
   return (
     <div className="flex flex-col gap-2 p-2">
       {users.map((user) => (

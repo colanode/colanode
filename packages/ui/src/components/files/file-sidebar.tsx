@@ -1,3 +1,4 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Fragment } from 'react';
 
 import { LocalFileNode } from '@colanode/client/types';
@@ -5,7 +6,7 @@ import { formatBytes, formatDate } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { database } from '@colanode/ui/data';
 
 interface FileSidebarProps {
   file: LocalFileNode;
@@ -22,14 +23,18 @@ const FileMeta = ({ title, value }: { title: string; value: string }) => {
 
 export const FileSidebar = ({ file }: FileSidebarProps) => {
   const workspace = useWorkspace();
-
-  const userQuery = useLiveQuery({
-    type: 'user.get',
-    userId: workspace.userId,
-    id: file.createdBy,
-  });
-
-  const user = userQuery.data ?? null;
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: database.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, file.createdBy))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
+  );
+  const user = userQuery.data;
 
   return (
     <Fragment>

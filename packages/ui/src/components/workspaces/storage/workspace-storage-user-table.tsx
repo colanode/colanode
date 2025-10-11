@@ -1,3 +1,4 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Settings } from 'lucide-react';
 import { useState } from 'react';
 
@@ -14,7 +15,7 @@ import {
 } from '@colanode/ui/components/ui/table';
 import { WorkspaceStorageUserUpdateDialog } from '@colanode/ui/components/workspaces/storage/workspace-storage-user-update-dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
+import { database } from '@colanode/ui/data';
 import { bigintToPercent, cn } from '@colanode/ui/lib/utils';
 
 const UserStorageProgressBar = ({
@@ -59,11 +60,18 @@ const WorkspaceStorageUserRow = ({
   const workspace = useWorkspace();
   const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
 
-  const userQuery = useQuery({
-    type: 'user.get',
-    userId: workspace.userId,
-    id: user.id,
-  });
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: database.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, user.id))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+        email: users.email,
+      }))
+      .findOne()
+  );
 
   const name = userQuery.data?.name ?? 'Unknown';
   const email = userQuery.data?.email ?? '';

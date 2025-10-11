@@ -42,7 +42,6 @@ import { RecordListQueryHandler } from './records/record-list';
 import { RecordSearchQueryHandler } from './records/record-search';
 import { ServerListQueryHandler } from './servers/server-list';
 import { SpaceListQueryHandler } from './spaces/space-list';
-import { UserGetQueryHandler } from './users/user-get';
 import { UserListQueryHandler } from './users/user-list';
 import { UserSearchQueryHandler } from './users/user-search';
 import { UserStorageGetQueryHandler } from './users/user-storage-get';
@@ -83,7 +82,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'database.list': new DatabaseListQueryHandler(app),
     'database.view.list': new DatabaseViewListQueryHandler(app),
     'record.search': new RecordSearchQueryHandler(app),
-    'user.get': new UserGetQueryHandler(app),
     'user.storage.get': new UserStorageGetQueryHandler(app),
     'local.file.get': new LocalFileGetQueryHandler(app),
     'file.download.request.get': new FileDownloadRequestGetQueryHandler(app),

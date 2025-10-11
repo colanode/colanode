@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Check, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -33,8 +34,8 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { database } from '@colanode/ui/data';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 
 const UNITS = [
   { label: 'TB', value: 'TB', bytes: 1024 ** 4 },
@@ -106,11 +107,18 @@ export const WorkspaceStorageUserUpdateDialog = ({
     initialMaxFileSize.unit
   );
 
-  const userQuery = useQuery({
-    type: 'user.get',
-    userId: workspace.userId,
-    id: user.id,
-  });
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: database.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, user.id))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+        email: users.email,
+      }))
+      .findOne()
+  );
 
   const name = userQuery.data?.name ?? 'Unknown';
   const email = userQuery.data?.email ?? '';

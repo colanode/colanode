@@ -12,7 +12,7 @@ export class UserListQueryHandler
 {
   public async handleQuery(input: UserListQueryInput): Promise<User[]> {
     const rows = await this.fetchUsers(input);
-    return this.buildWorkspaceUserNodes(rows);
+    return rows.map(mapUser);
   }
 
   public async checkForChanges(
@@ -34,7 +34,7 @@ export class UserListQueryHandler
       event.type === 'user.created' &&
       event.workspace.userId === input.userId
     ) {
-      const newResult = await this.handleQuery(input);
+      const newResult = [...output, event.user];
       return {
         hasChanges: true,
         result: newResult,
@@ -47,7 +47,7 @@ export class UserListQueryHandler
     ) {
       const user = output.find((user) => user.id === event.user.id);
       if (user) {
-        const newUsers = output.map((user) => {
+        const newResult = output.map((user) => {
           if (user.id === event.user.id) {
             return event.user;
           }
@@ -56,7 +56,7 @@ export class UserListQueryHandler
 
         return {
           hasChanges: true,
-          result: newUsers,
+          result: newResult,
         };
       }
     }
@@ -65,7 +65,7 @@ export class UserListQueryHandler
       event.type === 'user.deleted' &&
       event.workspace.userId === input.userId
     ) {
-      const newResult = await this.handleQuery(input);
+      const newResult = output.filter((user) => user.id !== event.user.id);
       return {
         hasChanges: true,
         result: newResult,
@@ -80,20 +80,12 @@ export class UserListQueryHandler
   private async fetchUsers(input: UserListQueryInput): Promise<SelectUser[]> {
     const workspace = this.getWorkspace(input.userId);
 
-    const offset = (input.page - 1) * input.count;
     const rows = await workspace.database
       .selectFrom('users')
       .selectAll()
       .orderBy('created_at', 'asc')
-      .offset(offset)
-      .limit(input.count)
       .execute();
 
     return rows;
   }
-
-  private buildWorkspaceUserNodes = (rows: SelectUser[]): User[] => {
-    const users = rows.map(mapUser);
-    return users;
-  };
 }

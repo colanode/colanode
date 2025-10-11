@@ -22,14 +22,14 @@ export const useLocationTracker = (userId: string) => {
       const currentLocation = database.metadata.get(metadataKey);
       if (currentLocation) {
         database.metadata.update(metadataKey, (metadata) => {
-          metadata.value = location;
+          metadata.value = JSON.stringify(location);
           metadata.updatedAt = new Date().toISOString();
         });
       } else {
         database.metadata.insert({
           namespace: userId,
           key: 'location',
-          value: location,
+          value: JSON.stringify(location),
           createdAt: new Date().toISOString(),
           updatedAt: null,
         });

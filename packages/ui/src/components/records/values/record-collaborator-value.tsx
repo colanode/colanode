@@ -1,7 +1,7 @@
+import { inArray, useLiveQuery } from '@tanstack/react-db';
 import { X } from 'lucide-react';
 import { useState } from 'react';
 
-import { User } from '@colanode/client/types';
 import { CollaboratorFieldAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Badge } from '@colanode/ui/components/ui/badge';
@@ -14,26 +14,27 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { UserSearch } from '@colanode/ui/components/users/user-search';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
+import { database } from '@colanode/ui/data';
+
+interface CollaboratorBadgeProps {
+  id: string;
+  name: string;
+  avatar: string | null;
+}
+
+const CollaboratorBadge = ({ id, name, avatar }: CollaboratorBadgeProps) => {
+  return (
+    <div className="flex flex-row items-center gap-1 text-sm">
+      <Avatar id={id} name={name} avatar={avatar} size="small" />
+      <p>{name}</p>
+    </div>
+  );
+};
 
 interface RecordCollaboratorValueProps {
   field: CollaboratorFieldAttributes;
   readOnly?: boolean;
 }
-
-const CollaboratorBadge = ({ collaborator }: { collaborator: User }) => {
-  return (
-    <div className="flex flex-row items-center gap-1 text-sm">
-      <Avatar
-        id={collaborator.id}
-        name={collaborator.name}
-        avatar={collaborator.avatar}
-        size="small"
-      />
-      <p>{collaborator.name}</p>
-    </div>
-  );
-};
 
 export const RecordCollaboratorValue = ({
   field,
@@ -45,20 +46,19 @@ export const RecordCollaboratorValue = ({
   const [open, setOpen] = useState(false);
 
   const collaboratorIds = record.getCollaboratorValue(field) ?? [];
-  const results = useLiveQueries(
-    collaboratorIds.map((id) => ({
-      type: 'user.get',
-      id: id,
-      userId: workspace.userId,
-    }))
+  const collaboratorsQuery = useLiveQuery((q) =>
+    q
+      .from({ users: database.workspace(workspace.userId).users })
+      .where(({ users }) => inArray(users.id, collaboratorIds))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+        email: users.email,
+      }))
   );
 
-  const collaborators: User[] = [];
-  for (const result of results) {
-    if (result.data) {
-      collaborators.push(result.data);
-    }
-  }
+  const collaborators = collaboratorsQuery.data;
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
@@ -67,7 +67,9 @@ export const RecordCollaboratorValue = ({
           {collaborators.slice(0, 1).map((collaborator) => (
             <CollaboratorBadge
               key={collaborator.id}
-              collaborator={collaborator}
+              id={collaborator.id}
+              name={collaborator.name}
+              avatar={collaborator.avatar}
             />
           ))}
           {collaborators.length === 0 && ' '}

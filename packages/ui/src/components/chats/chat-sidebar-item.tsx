@@ -1,3 +1,4 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { InView } from 'react-intersection-observer';
 
 import { LocalChatNode } from '@colanode/client/types';
@@ -5,7 +6,7 @@ import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { database } from '@colanode/ui/data';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface ChatSidebarItemProps {
@@ -22,17 +23,23 @@ export const ChatSidebarItem = ({ chat, isActive }: ChatSidebarItemProps) => {
       (id) => id !== workspace.userId
     ) ?? '';
 
-  const userGetQuery = useLiveQuery({
-    type: 'user.get',
-    userId: workspace.userId,
-    id: userId,
-  });
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: database.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, userId))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
+  );
 
-  if (userGetQuery.isPending || !userGetQuery.data) {
+  const user = userQuery.data;
+  if (!user) {
     return null;
   }
 
-  const user = userGetQuery.data;
   const unreadState = radar.getNodeState(workspace.userId, chat.id);
 
   return (

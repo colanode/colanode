@@ -1,10 +1,10 @@
-import { Fragment } from 'react';
+import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { UpdatedByFieldAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { database } from '@colanode/ui/data';
 
 interface RecordUpdatedByValueProps {
   field: UpdatedByFieldAttributes;
@@ -14,39 +14,34 @@ export const RecordUpdatedByValue = ({ field }: RecordUpdatedByValueProps) => {
   const workspace = useWorkspace();
   const record = useRecord();
 
-  const { data } = useLiveQuery(
-    {
-      type: 'user.get',
-      userId: workspace.userId,
-      id: record.updatedBy!,
-    },
-    {
-      enabled: !!record.updatedBy,
-    }
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: database.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, record.updatedBy))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
   );
 
-  const updatedBy = data
-    ? {
-        name: data.name,
-        avatar: data.avatar,
-      }
-    : null;
-
+  const user = userQuery.data;
   return (
     <div
       className="flex h-full w-full flex-row items-center gap-1 text-sm p-0"
       data-field={field.id}
     >
-      {updatedBy && (
-        <Fragment>
+      {user && (
+        <>
           <Avatar
             id={record.updatedBy!}
-            name={updatedBy.name}
-            avatar={updatedBy.avatar}
+            name={user.name}
+            avatar={user.avatar}
             size="small"
           />
-          <p>{updatedBy.name}</p>
-        </Fragment>
+          <p>{user.name}</p>
+        </>
       )}
     </div>
   );

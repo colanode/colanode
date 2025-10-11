@@ -1,9 +1,7 @@
 import { database } from '@colanode/ui/data';
 
 export const getDefaultWorkspaceUserId = () => {
-  const workspaceIds = database.workspaces.map(
-    (workspace) => workspace.workspaceId
-  );
+  const workspaceIds = database.workspaces.map((workspace) => workspace.userId);
 
   const lastUsedWorkspaceId = database.metadata.get('workspace')?.value as
     | string
