@@ -6,7 +6,6 @@ import { AccountListQueryHandler } from './accounts/accounts-list';
 import { MetadataListQueryHandler } from './apps/metadata-list';
 import { TabsListQueryHandler } from './apps/tabs-list';
 import { AvatarGetQueryHandler } from './avatars/avatar-get';
-import { ChatListQueryHandler } from './chats/chat-list';
 import { DatabaseListQueryHandler } from './databases/database-list';
 import { DatabaseViewListQueryHandler } from './databases/database-view-list';
 import { DocumentGetQueryHandler } from './documents/document-get';
@@ -32,6 +31,7 @@ import { RadarDataGetQueryHandler } from './interactions/radar-data-get';
 import { MessageListQueryHandler } from './messages/message-list';
 import { NodeChildrenGetQueryHandler } from './nodes/node-children-get';
 import { NodeGetQueryHandler } from './nodes/node-get';
+import { NodeListQueryHandler } from './nodes/node-list';
 import { NodeReactionsListQueryHandler } from './nodes/node-reaction-list';
 import { NodeReactionsAggregateQueryHandler } from './nodes/node-reactions-aggregate';
 import { NodeTreeGetQueryHandler } from './nodes/node-tree-get';
@@ -39,7 +39,6 @@ import { RecordFieldValueCountQueryHandler } from './records/record-field-value-
 import { RecordListQueryHandler } from './records/record-list';
 import { RecordSearchQueryHandler } from './records/record-search';
 import { ServerListQueryHandler } from './servers/server-list';
-import { SpaceListQueryHandler } from './spaces/space-list';
 import { UserListQueryHandler } from './users/user-list';
 import { UserSearchQueryHandler } from './users/user-search';
 import { UserStorageGetQueryHandler } from './users/user-storage-get';
@@ -59,6 +58,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'node.reaction.list': new NodeReactionsListQueryHandler(app),
     'node.reactions.aggregate': new NodeReactionsAggregateQueryHandler(app),
     'node.get': new NodeGetQueryHandler(app),
+    'node.list': new NodeListQueryHandler(app),
     'node.tree.get': new NodeTreeGetQueryHandler(app),
     'record.list': new RecordListQueryHandler(app),
     'record.field.value.count': new RecordFieldValueCountQueryHandler(app),
@@ -82,8 +82,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'user.storage.get': new UserStorageGetQueryHandler(app),
     'local.file.get': new LocalFileGetQueryHandler(app),
     'file.download.request.get': new FileDownloadRequestGetQueryHandler(app),
-    'chat.list': new ChatListQueryHandler(app),
-    'space.list': new SpaceListQueryHandler(app),
     'document.get': new DocumentGetQueryHandler(app),
     'document.state.get': new DocumentStateGetQueryHandler(app),
     'document.updates.list': new DocumentUpdatesListQueryHandler(app),

@@ -1,9 +1,10 @@
 import { Collection } from '@tanstack/react-db';
 
-import { Download, Upload, User } from '@colanode/client/types';
+import { Download, LocalNode, Upload, User } from '@colanode/client/types';
 import { createAccountsCollection } from '@colanode/ui/data/accounts';
 import { createDownloadsCollection } from '@colanode/ui/data/downloads';
 import { createMetadataCollection } from '@colanode/ui/data/metadata';
+import { createNodesCollection } from '@colanode/ui/data/nodes';
 import { createServersCollection } from '@colanode/ui/data/servers';
 import { createTabsCollection } from '@colanode/ui/data/tabs';
 import { createTempFilesCollection } from '@colanode/ui/data/temp-files';
@@ -17,12 +18,14 @@ class WorkspaceDatabase {
   public readonly users: Collection<User, string>;
   public readonly downloads: Collection<Download, string>;
   public readonly uploads: Collection<Upload, string>;
+  public readonly nodes: Collection<LocalNode, string>;
 
   constructor(userId: string) {
     this.userId = userId;
     this.users = createUsersCollection(userId);
     this.downloads = createDownloadsCollection(userId);
     this.uploads = createUploadsCollection(userId);
+    this.nodes = createNodesCollection(userId);
   }
 }
 

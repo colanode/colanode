@@ -2,7 +2,6 @@ import { sha256 } from 'js-sha256';
 
 export * from './accounts/account-list';
 export * from './apps/metadata-list';
-export * from './chats/chat-list';
 export * from './databases/database-list';
 export * from './databases/database-view-list';
 export * from './documents/document-get';
@@ -28,7 +27,6 @@ export * from './nodes/node-reactions-aggregate';
 export * from './nodes/node-tree-get';
 export * from './records/record-list';
 export * from './records/record-search';
-export * from './spaces/space-list';
 export * from './users/user-list';
 export * from './users/user-search';
 export * from './users/user-storage-get';
@@ -43,6 +41,7 @@ export * from './icons/icon-svg-get';
 export * from './emojis/emoji-svg-get';
 export * from './apps/tabs-list';
 export * from './servers/server-list';
+export * from './nodes/node-list';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface QueryMap {}
