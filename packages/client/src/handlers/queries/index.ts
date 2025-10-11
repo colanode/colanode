@@ -19,13 +19,12 @@ import { EmojiGetBySkinIdQueryHandler } from './emojis/emoji-get-by-skin-id';
 import { EmojiListQueryHandler } from './emojis/emoji-list';
 import { EmojiSearchQueryHandler } from './emojis/emoji-search';
 import { EmojiSvgGetQueryHandler } from './emojis/emoji-svg-get';
-import { DownloadListManualQueryHandler } from './files/download-list-manual';
+import { DownloadListQueryHandler } from './files/download-list';
 import { FileDownloadRequestGetQueryHandler } from './files/file-download-request-get';
 import { FileListQueryHandler } from './files/file-list';
 import { LocalFileGetQueryHandler } from './files/local-file-get';
 import { TempFileGetQueryHandler } from './files/temp-file-get';
 import { UploadListQueryHandler } from './files/upload-list';
-import { UploadListPendingQueryHandler } from './files/upload-list-pending';
 import { IconCategoryListQueryHandler } from './icons/icon-category-list';
 import { IconListQueryHandler } from './icons/icon-list';
 import { IconSearchQueryHandler } from './icons/icon-search';
@@ -92,8 +91,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'document.updates.list': new DocumentUpdatesListQueryHandler(app),
     'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
     'upload.list': new UploadListQueryHandler(app),
-    'upload.list.pending': new UploadListPendingQueryHandler(app),
-    'download.list.manual': new DownloadListManualQueryHandler(app),
+    'download.list': new DownloadListQueryHandler(app),
     'temp.file.get': new TempFileGetQueryHandler(app),
     'icon.svg.get': new IconSvgGetQueryHandler(app),
     'emoji.svg.get': new EmojiSvgGetQueryHandler(app),

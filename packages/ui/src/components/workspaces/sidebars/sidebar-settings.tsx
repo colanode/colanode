@@ -1,3 +1,4 @@
+import { count, inArray, useLiveQuery } from '@tanstack/react-db';
 import {
   Cylinder,
   Download,
@@ -8,27 +9,32 @@ import {
   Users,
 } from 'lucide-react';
 
+import { UploadStatus } from '@colanode/client/types';
 import { Link } from '@colanode/ui/components/ui/link';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { SidebarHeader } from '@colanode/ui/components/workspaces/sidebars/sidebar-header';
 import { SidebarSettingsItem } from '@colanode/ui/components/workspaces/sidebars/sidebar-settings-item';
 import { useApp } from '@colanode/ui/contexts/app';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { database } from '@colanode/ui/data';
 
 export const SidebarSettings = () => {
   const app = useApp();
   const workspace = useWorkspace();
 
-  const pendingUploadsQuery = useLiveQuery({
-    type: 'upload.list.pending',
-    userId: workspace.userId,
-    page: 1,
-    count: 21,
-  });
+  const pendingUploadsQuery = useLiveQuery((q) =>
+    q
+      .from({ uploads: database.workspace(workspace.userId).uploads })
+      .where(({ uploads }) =>
+        inArray(uploads.status, [UploadStatus.Pending, UploadStatus.Uploading])
+      )
+      .select(({ uploads }) => ({
+        count: count(uploads.fileId),
+      }))
+      .findOne()
+  );
 
-  const pendingUploads = pendingUploadsQuery.data ?? [];
-  const pendingUploadsCount = pendingUploads.length;
+  const pendingUploads = pendingUploadsQuery.data?.count ?? 0;
 
   return (
     <div className="flex flex-col gap-4 h-full px-2 group/sidebar">
@@ -69,8 +75,8 @@ export const SidebarSettings = () => {
               icon={Upload}
               isActive={isActive}
               unreadBadge={{
-                count: pendingUploadsCount,
-                unread: pendingUploadsCount > 0,
+                count: pendingUploads,
+                unread: pendingUploads > 0,
                 maxCount: 20,
                 className: 'bg-blue-500',
               }}

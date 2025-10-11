@@ -1,12 +1,17 @@
+import { count, inArray, useLiveQuery } from '@tanstack/react-db';
 import { LayoutGrid, MessageCircle, Settings } from 'lucide-react';
 
-import { SidebarMenuType, WindowSize } from '@colanode/client/types';
+import {
+  SidebarMenuType,
+  UploadStatus,
+  WindowSize,
+} from '@colanode/client/types';
 import { SidebarMenuFooter } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu-footer';
 import { SidebarMenuHeader } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu-header';
 import { SidebarMenuIcon } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu-icon';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { database } from '@colanode/ui/data';
 import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import { cn } from '@colanode/ui/lib/utils';
 
@@ -26,15 +31,19 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
   const chatsState = radar.getChatsState(workspace.userId);
   const channelsState = radar.getChannelsState(workspace.userId);
 
-  const pendingUploadsQuery = useLiveQuery({
-    type: 'upload.list.pending',
-    userId: workspace.userId,
-    page: 1,
-    count: 21,
-  });
+  const pendingUploadsQuery = useLiveQuery((q) =>
+    q
+      .from({ uploads: database.workspace(workspace.userId).uploads })
+      .where(({ uploads }) =>
+        inArray(uploads.status, [UploadStatus.Pending, UploadStatus.Uploading])
+      )
+      .select(({ uploads }) => ({
+        count: count(uploads.fileId),
+      }))
+      .findOne()
+  );
 
-  const pendingUploads = pendingUploadsQuery.data ?? [];
-  const pendingUploadsCount = pendingUploads.length;
+  const pendingUploads = pendingUploadsQuery.data?.count ?? 0;
 
   return (
     <div className="flex flex-col h-full w-[65px] min-w-[65px] items-center">
@@ -74,8 +83,8 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
           className="mt-auto"
           isActive={value === 'settings'}
           unreadBadge={{
-            count: pendingUploadsCount,
-            unread: pendingUploadsCount > 0,
+            count: pendingUploads,
+            unread: pendingUploads > 0,
             maxCount: 20,
             className: 'bg-blue-500',
           }}

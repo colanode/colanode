@@ -3,8 +3,6 @@ import { Upload } from '@colanode/client/types/files';
 export type UploadListQueryInput = {
   type: 'upload.list';
   userId: string;
-  page: number;
-  count: number;
 };
 
 declare module '@colanode/client/queries' {

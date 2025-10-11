@@ -1,16 +1,14 @@
 import { Download } from '@colanode/client/types/files';
 
-export type DownloadListManualQueryInput = {
-  type: 'download.list.manual';
+export type DownloadListQueryInput = {
+  type: 'download.list';
   userId: string;
-  page: number;
-  count: number;
 };
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
-    'download.list.manual': {
-      input: DownloadListManualQueryInput;
+    'download.list': {
+      input: DownloadListQueryInput;
       output: Download[];
     };
   }

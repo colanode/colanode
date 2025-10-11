@@ -1,36 +1,24 @@
+import { useLiveQuery } from '@tanstack/react-db';
 import { Download } from 'lucide-react';
-import { useState } from 'react';
-import { InView } from 'react-intersection-observer';
 
-import { DownloadListManualQueryInput } from '@colanode/client/queries';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
 import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { WorkspaceDownloadFile } from '@colanode/ui/components/workspaces/downloads/workspace-download-file';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
-
-const DOWNLOADS_PER_PAGE = 100;
+import { database } from '@colanode/ui/data';
 
 export const WorkspaceDownloadsScreen = () => {
   const workspace = useWorkspace();
 
-  const [lastPage, setLastPage] = useState<number>(1);
-  const inputs: DownloadListManualQueryInput[] = Array.from({
-    length: lastPage,
-  }).map((_, i) => ({
-    type: 'download.list.manual',
-    userId: workspace.userId,
-    count: DOWNLOADS_PER_PAGE,
-    page: i + 1,
-  }));
+  const downloadsQuery = useLiveQuery((q) =>
+    q
+      .from({ downloads: database.workspace(workspace.userId).downloads })
+      .select(({ downloads }) => downloads)
+      .orderBy(({ downloads }) => downloads.id, 'desc')
+  );
 
-  const result = useLiveQueries(inputs);
-  const downloads = result.flatMap((data) => data.data ?? []);
-
-  const isPending = result.some((data) => data.isPending);
-  const hasMore =
-    !isPending && downloads.length === lastPage * DOWNLOADS_PER_PAGE;
+  const downloads = downloadsQuery.data ?? [];
 
   return (
     <>
@@ -51,14 +39,6 @@ export const WorkspaceDownloadsScreen = () => {
               <WorkspaceDownloadFile key={download.id} download={download} />
             ))}
           </div>
-          <InView
-            rootMargin="200px"
-            onChange={(inView) => {
-              if (inView && hasMore && !isPending) {
-                setLastPage(lastPage + 1);
-              }
-            }}
-          />
         </div>
       </div>
     </>

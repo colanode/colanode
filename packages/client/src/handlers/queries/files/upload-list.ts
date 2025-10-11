@@ -32,7 +32,7 @@ export class UploadListQueryHandler
       event.type === 'upload.created' &&
       event.workspace.userId === input.userId
     ) {
-      const newResult = await this.fetchUploads(input);
+      const newResult = [...output, event.upload];
       return {
         hasChanges: true,
         result: newResult,
@@ -71,27 +71,16 @@ export class UploadListQueryHandler
         (upload) => upload.fileId === event.upload.fileId
       );
 
-      if (!upload) {
-        return {
-          hasChanges: false,
-        };
-      }
+      if (upload) {
+        const newResult = output.filter(
+          (upload) => upload.fileId !== event.upload.fileId
+        );
 
-      if (output.length === input.count) {
-        const newResult = await this.fetchUploads(input);
         return {
           hasChanges: true,
           result: newResult,
         };
       }
-
-      const newOutput = output.filter(
-        (upload) => upload.fileId !== event.upload.fileId
-      );
-      return {
-        hasChanges: true,
-        result: newOutput,
-      };
     }
 
     return {
@@ -102,13 +91,9 @@ export class UploadListQueryHandler
   private async fetchUploads(input: UploadListQueryInput): Promise<Upload[]> {
     const workspace = this.getWorkspace(input.userId);
 
-    const offset = (input.page - 1) * input.count;
     const uploads = await workspace.database
       .selectFrom('uploads')
       .selectAll()
-      .orderBy('file_id', 'desc')
-      .limit(input.count)
-      .offset(offset)
       .execute();
 
     return uploads.map(mapUpload);
