@@ -1,7 +1,7 @@
 import { Editor, isNodeSelection, useEditorState } from '@tiptap/react';
 import { BubbleMenu, type BubbleMenuProps } from '@tiptap/react/menus';
 import { Bold, Code, Italic, Strikethrough, Underline } from 'lucide-react';
-import { useState } from 'react';
+import { memo, useState } from 'react';
 
 import { ColorButton } from '@colanode/ui/editor/menus/color-button';
 import { HighlightButton } from '@colanode/ui/editor/menus/highlight-button';
@@ -12,7 +12,7 @@ interface ToolbarMenuProps extends Omit<BubbleMenuProps, 'children'> {
   editor: Editor;
 }
 
-export const ToolbarMenu = (props: ToolbarMenuProps) => {
+const ToolbarMenuComponent = (props: ToolbarMenuProps) => {
   const [isColorButtonOpen, setIsColorButtonOpen] = useState(false);
   const [isLinkButtonOpen, setIsLinkButtonOpen] = useState(false);
   const [isHighlightButtonOpen, setIsHighlightButtonOpen] = useState(false);
@@ -137,3 +137,5 @@ export const ToolbarMenu = (props: ToolbarMenuProps) => {
     </BubbleMenu>
   );
 };
+
+export const ToolbarMenu = memo(ToolbarMenuComponent);
