@@ -72,11 +72,12 @@ export class WebFileSystem implements FileSystem {
   //Ensure the data type is compatible with the File Write API
   private ensureArrayBuffer(data: Uint8Array): ArrayBuffer {
     const arrayBuffer: ArrayBuffer =
-      data.buffer instanceof ArrayBuffer ?
-        data.buffer : new ArrayBuffer(data.byteLength);
+      data.buffer instanceof ArrayBuffer
+        ? data.buffer
+        : new ArrayBuffer(data.byteLength);
 
     if (!(data.buffer instanceof ArrayBuffer)) {
-      const view = new Uint8Array<ArrayBuffer>(arrayBuffer);
+      const view = new Uint8Array(arrayBuffer);
       view.set(data);
     }
 
