@@ -46,7 +46,7 @@
     "ws": "^8.18.3"
   },
   "optionalDependencies": {
-    "lightningcss-darwin-arm64": "^1.30.2",
+    "lightningcss-darwin-arm64": "^1.30.1",
     "lightningcss-darwin-x64": "^1.30.1",
     "lightningcss-linux-x64-gnu": "^1.30.1",
     "lightningcss-linux-x64-musl": "^1.30.1",
