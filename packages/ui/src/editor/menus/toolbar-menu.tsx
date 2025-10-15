@@ -1,7 +1,8 @@
+import { EditorState } from '@tiptap/pm/state';
 import { Editor, isNodeSelection, useEditorState } from '@tiptap/react';
 import { BubbleMenu, type BubbleMenuProps } from '@tiptap/react/menus';
 import { Bold, Code, Italic, Strikethrough, Underline } from 'lucide-react';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 
 import { ColorButton } from '@colanode/ui/editor/menus/color-button';
 import { HighlightButton } from '@colanode/ui/editor/menus/highlight-button';
@@ -35,9 +36,8 @@ export const ToolbarMenu = (props: ToolbarMenuProps) => {
     },
   });
 
-  const bubbleMenuProps: ToolbarMenuProps = {
-    ...props,
-    shouldShow: ({ state, editor }) => {
+  const shouldShow = useCallback(
+    ({ state, editor }: { state: EditorState; editor: Editor }) => {
       const { selection } = state;
       const { empty } = selection;
 
@@ -61,17 +61,22 @@ export const ToolbarMenu = (props: ToolbarMenuProps) => {
 
       return true;
     },
-    options: {
-      strategy: 'absolute',
-      placement: 'top',
+    []
+  );
+
+  const options = useMemo(
+    () => ({
+      strategy: 'absolute' as const,
+      placement: 'top' as const,
       offset: 8,
       onHide: () => {
         setIsColorButtonOpen(false);
         setIsLinkButtonOpen(false);
         setIsHighlightButtonOpen(false);
       },
-    },
-  };
+    }),
+    []
+  );
 
   if (props.editor == null) {
     return null;
@@ -79,7 +84,9 @@ export const ToolbarMenu = (props: ToolbarMenuProps) => {
 
   return (
     <BubbleMenu
-      {...bubbleMenuProps}
+      editor={props.editor}
+      shouldShow={shouldShow}
+      options={options}
       className="flex flex-row items-center gap-1 rounded border border-border bg-muted p-0.5 shadow-xl transition-transform duration-150 ease-out"
     >
       <LinkButton

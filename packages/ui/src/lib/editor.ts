@@ -12,7 +12,7 @@ export const editorColors: EditorColorOption[] = [
     color: 'default',
     textClass: 'text-foreground',
     bgClass: '',
-    bgHoverClass: 'hover:bg-gray-100 dark:hover:bg-gray-800',
+    bgHoverClass: 'hover:bg-input',
   },
   {
     name: 'Gray',
