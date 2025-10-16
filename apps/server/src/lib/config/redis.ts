@@ -16,7 +16,7 @@ export const redisConfigSchema = z.object({
 
 export type RedisConfig = z.infer<typeof redisConfigSchema>;
 
-export const readRedisConfigVariables = () => {
+export const readRedisConfigFromEnv = () => {
   return {
     url: process.env.REDIS_URL,
     db: process.env.REDIS_DB,

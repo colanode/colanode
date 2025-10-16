@@ -1,19 +1,29 @@
 import { z } from 'zod/v4';
 
-import { accountConfigSchema, readAccountConfigVariables } from './account';
-import { aiConfigSchema, readAiConfigVariables } from './ai';
-import { jobsConfigSchema, readJobsConfigVariables } from './jobs';
-import { loggingConfigSchema, readLoggingConfigVariables } from './logging';
-import { postgresConfigSchema, readPostgresConfigVariables } from './postgres';
-import { readRedisConfigVariables, redisConfigSchema } from './redis';
-import { readServerConfigVariables, serverConfigSchema } from './server';
-import { readSmtpConfigVariables, smtpConfigSchema } from './smtp';
-import { readStorageConfigVariables, storageConfigSchema } from './storage';
-import { readUserConfigVariables, userConfigSchema } from './user';
-import {
-  readWorkspaceConfigVariables,
-  workspaceConfigSchema,
-} from './workspace';
+import { readAccountConfigFromEnv } from './account';
+import { readAiConfigFromEnv } from './ai';
+import { readJobsConfigFromEnv } from './jobs';
+import { loadRawConfig } from './loader';
+import { readLoggingConfigFromEnv } from './logging';
+import { readPostgresConfigFromEnv } from './postgres';
+import { readRedisConfigFromEnv } from './redis';
+import { readServerConfigFromEnv } from './server';
+import { readSmtpConfigFromEnv } from './smtp';
+import { readStorageConfigFromEnv } from './storage';
+import { readUserConfigFromEnv } from './user';
+import { readWorkspaceConfigFromEnv } from './workspace';
+
+import { accountConfigSchema } from './account';
+import { aiConfigSchema } from './ai';
+import { jobsConfigSchema } from './jobs';
+import { loggingConfigSchema } from './logging';
+import { postgresConfigSchema } from './postgres';
+import { redisConfigSchema } from './redis';
+import { serverConfigSchema } from './server';
+import { smtpConfigSchema } from './smtp';
+import { storageConfigSchema } from './storage';
+import { userConfigSchema } from './user';
+import { workspaceConfigSchema } from './workspace';
 
 const configSchema = z.object({
   server: serverConfigSchema,
@@ -33,20 +43,25 @@ export type Configuration = z.infer<typeof configSchema>;
 
 const readConfigVariables = (): Configuration => {
   try {
-    const input = {
-      server: readServerConfigVariables(),
-      account: readAccountConfigVariables(),
-      user: readUserConfigVariables(),
-      postgres: readPostgresConfigVariables(),
-      redis: readRedisConfigVariables(),
-      storage: readStorageConfigVariables(),
-      smtp: readSmtpConfigVariables(),
-      ai: readAiConfigVariables(),
-      jobs: readJobsConfigVariables(),
-      logging: readLoggingConfigVariables(),
-      workspace: readWorkspaceConfigVariables(),
+    // Legacy env-based config (used as override for JSON config)
+    const legacyEnvConfig = {
+      server: readServerConfigFromEnv(),
+      account: readAccountConfigFromEnv(),
+      user: readUserConfigFromEnv(),
+      postgres: readPostgresConfigFromEnv(),
+      redis: readRedisConfigFromEnv(),
+      storage: readStorageConfigFromEnv(),
+      smtp: readSmtpConfigFromEnv(),
+      ai: readAiConfigFromEnv(),
+      jobs: readJobsConfigFromEnv(),
+      logging: readLoggingConfigFromEnv(),
+      workspace: readWorkspaceConfigFromEnv(),
     };
 
+    // Merge JSON config with env config (env takes precedence)
+    const input = loadRawConfig(legacyEnvConfig);
+
+    console.log('Loaded configuration:', input);
     return configSchema.parse(input);
   } catch (error) {
     if (error instanceof z.ZodError) {

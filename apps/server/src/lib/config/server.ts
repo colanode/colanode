@@ -20,7 +20,7 @@ export const serverConfigSchema = z.object({
 
 export type ServerConfig = z.infer<typeof serverConfigSchema>;
 
-export const readServerConfigVariables = () => {
+export const readServerConfigFromEnv = () => {
   return {
     version: build.version,
     sha: build.sha,

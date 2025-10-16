@@ -53,24 +53,39 @@ export const jobsConfigSchema = z.object({
 
 export type JobsConfig = z.infer<typeof jobsConfigSchema>;
 
-export const readJobsConfigVariables = () => {
+export const readJobsConfigFromEnv = () => {
   return {
     nodeUpdatesMerge: {
-      enabled: process.env.JOBS_NODE_UPDATES_MERGE_ENABLED === 'true',
+      enabled:
+        process.env.JOBS_NODE_UPDATES_MERGE_ENABLED === 'true'
+          ? true
+          : process.env.JOBS_NODE_UPDATES_MERGE_ENABLED === 'false'
+            ? false
+            : undefined,
       cron: process.env.JOBS_NODE_UPDATES_MERGE_CRON,
       batchSize: process.env.JOBS_NODE_UPDATES_MERGE_BATCH_SIZE,
       mergeWindow: process.env.JOBS_NODE_UPDATES_MERGE_MERGE_WINDOW,
       cutoffWindow: process.env.JOBS_NODE_UPDATES_MERGE_CUTOFF_WINDOW,
     },
     documentUpdatesMerge: {
-      enabled: process.env.JOBS_DOCUMENT_UPDATES_MERGE_ENABLED === 'true',
+      enabled:
+        process.env.JOBS_DOCUMENT_UPDATES_MERGE_ENABLED === 'true'
+          ? true
+          : process.env.JOBS_DOCUMENT_UPDATES_MERGE_ENABLED === 'false'
+            ? false
+            : undefined,
       cron: process.env.JOBS_DOCUMENT_UPDATES_MERGE_CRON,
       batchSize: process.env.JOBS_DOCUMENT_UPDATES_MERGE_BATCH_SIZE,
       mergeWindow: process.env.JOBS_DOCUMENT_UPDATES_MERGE_MERGE_WINDOW,
       cutoffWindow: process.env.JOBS_DOCUMENT_UPDATES_MERGE_CUTOFF_WINDOW,
     },
     uploadsClean: {
-      enabled: process.env.JOBS_UPLOADS_CLEAN_ENABLED === 'true',
+      enabled:
+        process.env.JOBS_UPLOADS_CLEAN_ENABLED === 'true'
+          ? true
+          : process.env.JOBS_UPLOADS_CLEAN_ENABLED === 'false'
+            ? false
+            : undefined,
       cron: process.env.JOBS_UPLOADS_CLEAN_CRON,
     },
   };
