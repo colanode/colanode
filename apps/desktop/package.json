@@ -44,12 +44,5 @@
     "update-electron-app": "^3.1.1",
     "utf-8-validate": "^6.0.5",
     "ws": "^8.18.3"
-  },
-  "optionalDependencies": {
-    "lightningcss-darwin-arm64": "^1.30.1",
-    "lightningcss-darwin-x64": "^1.30.1",
-    "lightningcss-linux-x64-gnu": "^1.30.1",
-    "lightningcss-linux-x64-musl": "^1.30.1",
-    "lightningcss-win32-x64-msvc": "^1.30.1"
   }
 }
