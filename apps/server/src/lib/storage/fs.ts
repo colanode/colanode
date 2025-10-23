@@ -1,8 +1,9 @@
 import { createReadStream, createWriteStream, promises as fs } from 'fs';
 import { Readable } from 'stream';
 
-import { DataStore } from '@tus/server';
 import { FileStore } from '@tus/file-store';
+import { DataStore } from '@tus/server';
+
 import type { FileStorageConfig } from '@colanode/server/lib/config/storage';
 
 import type { Storage } from './core';

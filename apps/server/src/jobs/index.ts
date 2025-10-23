@@ -1,4 +1,5 @@
 import { assistantRespondHandler } from '@colanode/server/jobs/assistant-response';
+import { cleanupHandler } from '@colanode/server/jobs/cleanup';
 import { documentEmbedHandler } from '@colanode/server/jobs/document-embed';
 import { documentEmbedScanHandler } from '@colanode/server/jobs/document-embed-scan';
 import { documentUpdatesMergeHandler } from '@colanode/server/jobs/document-updates-merge';
@@ -8,7 +9,6 @@ import { nodeCleanHandler } from '@colanode/server/jobs/node-clean';
 import { nodeEmbedHandler } from '@colanode/server/jobs/node-embed';
 import { nodeEmbedScanHandler } from '@colanode/server/jobs/node-embed-scan';
 import { nodeUpdatesMergeHandler } from '@colanode/server/jobs/node-updates-merge';
-import { uploadsCleanHandler } from '@colanode/server/jobs/uploads-clean';
 import { workspaceCleanHandler } from '@colanode/server/jobs/workspace-clean';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -34,5 +34,5 @@ export const jobHandlerMap: JobHandlerMap = {
   'document.embed.scan': documentEmbedScanHandler,
   'node.updates.merge': nodeUpdatesMergeHandler,
   'document.updates.merge': documentUpdatesMergeHandler,
-  'uploads.clean': uploadsCleanHandler,
+  cleanup: cleanupHandler,
 };
