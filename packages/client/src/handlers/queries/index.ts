@@ -6,8 +6,6 @@ import { AccountListQueryHandler } from './accounts/accounts-list';
 import { MetadataListQueryHandler } from './apps/metadata-list';
 import { TabsListQueryHandler } from './apps/tabs-list';
 import { AvatarGetQueryHandler } from './avatars/avatar-get';
-import { DatabaseListQueryHandler } from './databases/database-list';
-import { DatabaseViewListQueryHandler } from './databases/database-view-list';
 import { DocumentGetQueryHandler } from './documents/document-get';
 import { DocumentStateGetQueryHandler } from './documents/document-state-get';
 import { DocumentUpdatesListQueryHandler } from './documents/document-update-list';
@@ -76,8 +74,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'icon.category.list': new IconCategoryListQueryHandler(app),
     'node.children.get': new NodeChildrenGetQueryHandler(app),
     'radar.data.get': new RadarDataGetQueryHandler(app),
-    'database.list': new DatabaseListQueryHandler(app),
-    'database.view.list': new DatabaseViewListQueryHandler(app),
     'record.search': new RecordSearchQueryHandler(app),
     'user.storage.get': new UserStorageGetQueryHandler(app),
     'local.file.get': new LocalFileGetQueryHandler(app),

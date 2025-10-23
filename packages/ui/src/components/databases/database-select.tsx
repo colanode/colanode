@@ -1,6 +1,8 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
+import { DatabaseAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -17,7 +19,7 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { database } from '@colanode/ui/data';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface DatabaseSelectProps {
@@ -29,12 +31,26 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
   const workspace = useWorkspace();
   const [open, setOpen] = useState(false);
 
-  const databaseListQuery = useLiveQuery({
-    type: 'database.list',
-    userId: workspace.userId,
-  });
+  const databaseListQuery = useLiveQuery((q) =>
+    q
+      .from({ nodes: database.workspace(workspace.userId).nodes })
+      .where(({ nodes }) => eq(nodes.type, 'database'))
+      .select(({ nodes }) => ({
+        id: nodes.id,
+        attributes: nodes.attributes,
+      }))
+  );
 
-  const databases = databaseListQuery.data ?? [];
+  const databases =
+    databaseListQuery.data.map((node) => {
+      const attributes = node.attributes as DatabaseAttributes;
+      return {
+        id: node.id,
+        name: attributes.name,
+        avatar: attributes.avatar,
+      };
+    }) ?? [];
+
   const selectedDatabase = id
     ? databases.find((database) => database.id === id)
     : undefined;
@@ -54,11 +70,11 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
               <span className="flex flex-row items-center gap-1">
                 <Avatar
                   id={selectedDatabase.id}
-                  name={selectedDatabase.attributes.name}
-                  avatar={selectedDatabase.attributes.avatar}
+                  name={selectedDatabase.name}
+                  avatar={selectedDatabase.avatar}
                   className="size-4"
                 />
-                {selectedDatabase.attributes.name}
+                {selectedDatabase.name}
               </span>
             </Fragment>
           ) : (
@@ -76,7 +92,7 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
               {databases.map((database) => (
                 <CommandItem
                   key={database.id}
-                  value={`${database.id} - ${database.attributes.name}`}
+                  value={`${database.id} - ${database.name}`}
                   onSelect={() => {
                     onChange(database.id);
                     setOpen(false);
@@ -85,11 +101,11 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
                   <div className="flex w-full flex-row items-center gap-2">
                     <Avatar
                       id={database.id}
-                      name={database.attributes.name}
-                      avatar={database.attributes.avatar}
+                      name={database.name}
+                      avatar={database.avatar}
                       className="size-4"
                     />
-                    <p>{database.attributes.name}</p>
+                    <p>{database.name}</p>
                     <Check
                       className={cn(
                         'ml-auto size-4',

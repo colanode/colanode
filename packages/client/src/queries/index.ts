@@ -2,8 +2,6 @@ import { sha256 } from 'js-sha256';
 
 export * from './accounts/account-list';
 export * from './apps/metadata-list';
-export * from './databases/database-list';
-export * from './databases/database-view-list';
 export * from './documents/document-get';
 export * from './documents/document-state-get';
 export * from './documents/document-updates-list';
