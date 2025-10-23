@@ -1,12 +1,12 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { eq, useLiveInfiniteQuery } from '@tanstack/react-db';
+import { Fragment, useEffect, useRef } from 'react';
 import { InView } from 'react-intersection-observer';
 
-import { MessageListQueryInput } from '@colanode/client/queries';
-import { compareString } from '@colanode/core';
+import { LocalMessageNode } from '@colanode/client/types';
 import { Message } from '@colanode/ui/components/messages/message';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
+import { database } from '@colanode/ui/data';
 
 const MESSAGES_PER_PAGE = 50;
 
@@ -15,27 +15,22 @@ export const MessageList = () => {
   const conversation = useConversation();
 
   const lastMessageId = useRef<string | null>(null);
-  const [lastPage, setLastPage] = useState<number>(1);
+  const messageListQuery = useLiveInfiniteQuery(
+    (q) =>
+      q
+        .from({ nodes: database.workspace(workspace.userId).nodes })
+        .where(({ nodes }) => eq(nodes.type, 'message'))
+        .where(({ nodes }) => eq(nodes.parentId, conversation.id))
+        .orderBy(({ nodes }) => nodes.id, 'desc'),
+    {
+      pageSize: MESSAGES_PER_PAGE,
+      getNextPageParam: (lastPage) =>
+        lastPage.length === MESSAGES_PER_PAGE ? lastPage.length : undefined,
+    }
+  );
 
-  const inputs: MessageListQueryInput[] = Array.from({
-    length: lastPage,
-  }).map((_, i) => ({
-    type: 'message.list',
-    conversationId: conversation.id,
-    userId: workspace.userId,
-    page: i + 1,
-    count: MESSAGES_PER_PAGE,
-  }));
-
-  const result = useLiveQueries(inputs);
-  const messages = result
-    .flatMap((data) => data.data ?? [])
-    .sort((a, b) => compareString(a.id, b.id));
-
-  const isPending = result.some((data) => data.isPending);
-
-  const hasMore =
-    !isPending && messages.length === lastPage * MESSAGES_PER_PAGE;
+  const messages =
+    messageListQuery.data.map((node) => node as LocalMessageNode) ?? [];
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -56,37 +51,49 @@ export const MessageList = () => {
       <InView
         rootMargin="200px"
         onChange={(inView) => {
-          if (inView && hasMore && !isPending) {
-            setLastPage(lastPage + 1);
+          if (
+            inView &&
+            messageListQuery.hasNextPage &&
+            !messageListQuery.isFetchingNextPage
+          ) {
+            messageListQuery.fetchNextPage();
           }
         }}
       />
-      {messages.map((message, index) => {
-        const previousMessage = index > 0 ? messages[index - 1] : null;
+      {(() => {
+        const elements = [];
+        for (let i = messages.length - 1; i >= 0; i--) {
+          const message = messages[i];
+          if (!message) continue;
 
-        const currentMessageDate = new Date(message.createdAt);
-        const previousMessageDate = previousMessage
-          ? new Date(previousMessage.createdAt)
-          : null;
-        const showDate =
-          !previousMessageDate ||
-          currentMessageDate.getDate() !== previousMessageDate.getDate();
+          const previousMessage =
+            i < messages.length - 1 ? messages[i + 1] : null;
 
-        return (
-          <Fragment key={message.id}>
-            {showDate && (
-              <div className="relative flex items-center py-1">
-                <div className="flex-grow border-t border-muted" />
-                <span className="mx-4 flex-shrink text-xs text-muted-foreground">
-                  {currentMessageDate.toDateString()}
-                </span>
-                <div className="flex-grow border-t border-muted" />
-              </div>
-            )}
-            <Message message={message} previousMessage={previousMessage} />
-          </Fragment>
-        );
-      })}
+          const currentMessageDate = new Date(message.createdAt);
+          const previousMessageDate = previousMessage
+            ? new Date(previousMessage.createdAt)
+            : null;
+          const showDate =
+            !previousMessageDate ||
+            currentMessageDate.getDate() !== previousMessageDate.getDate();
+
+          elements.push(
+            <Fragment key={message.id}>
+              {showDate && (
+                <div className="relative flex items-center py-1">
+                  <div className="flex-grow border-t border-muted" />
+                  <span className="mx-4 flex-shrink text-xs text-muted-foreground">
+                    {currentMessageDate.toDateString()}
+                  </span>
+                  <div className="flex-grow border-t border-muted" />
+                </div>
+              )}
+              <Message message={message} previousMessage={previousMessage} />
+            </Fragment>
+          );
+        }
+        return elements;
+      })()}
     </Fragment>
   );
 };
