@@ -1,7 +1,7 @@
 import { database } from '@colanode/server/data/database';
 import { JobHandler } from '@colanode/server/jobs';
-import { storage } from '@colanode/server/lib/storage';
 import { createLogger } from '@colanode/server/lib/logger';
+import { storage } from '@colanode/server/lib/storage';
 
 const BATCH_SIZE = 500;
 const logger = createLogger('server:job:clean-workspace-data');
