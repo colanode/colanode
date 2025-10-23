@@ -1,17 +1,14 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { useNavigate } from '@tanstack/react-router';
-import { useState } from 'react';
 import { match } from 'ts-pattern';
 
-import { FileListQueryInput } from '@colanode/client/queries';
-import { FolderLayoutType } from '@colanode/client/types';
+import { FolderLayoutType, LocalFileNode } from '@colanode/client/types';
 import { GalleryLayout } from '@colanode/ui/components/folders/galleries/gallery-layout';
 import { GridLayout } from '@colanode/ui/components/folders/grids/grid-layout';
 import { ListLayout } from '@colanode/ui/components/folders/lists/list-layout';
 import { FolderContext } from '@colanode/ui/contexts/folder';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
-
-const FILES_PER_PAGE = 100;
+import { database } from '@colanode/ui/data';
 
 interface FolderFilesProps {
   id: string;
@@ -27,19 +24,15 @@ export const FolderFiles = ({
   const workspace = useWorkspace();
   const navigate = useNavigate({ from: '/workspace/$userId' });
 
-  const [lastPage] = useState<number>(1);
-  const inputs: FileListQueryInput[] = Array.from({
-    length: lastPage,
-  }).map((_, i) => ({
-    type: 'file.list',
-    userId: workspace.userId,
-    parentId: id,
-    count: FILES_PER_PAGE,
-    page: i + 1,
-  }));
+  const viewListQuery = useLiveQuery((q) =>
+    q
+      .from({ nodes: database.workspace(workspace.userId).nodes })
+      .where(({ nodes }) => eq(nodes.type, 'file'))
+      .where(({ nodes }) => eq(nodes.parentId, id))
+      .orderBy(({ nodes }) => nodes.id, 'asc')
+  );
 
-  const result = useLiveQueries(inputs);
-  const files = result.flatMap((data) => data.data ?? []);
+  const files = viewListQuery.data.map((node) => node as LocalFileNode) ?? [];
 
   return (
     <FolderContext.Provider
