@@ -19,7 +19,7 @@ COPY ../../packages/ui/package.json packages/ui/package.json
 COPY ../../apps/web/package.json apps/web/package.json
 
 # Install dependencies
-RUN npm ci
+RUN npm i -g npm@latest && npm ci
 
 # Copy source files
 COPY ../../packages/core packages/core
