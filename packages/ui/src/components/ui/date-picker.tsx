@@ -1,6 +1,5 @@
 import { useState } from 'react';
 
-import { toUTCDate } from '@colanode/core';
 import { Calendar } from '@colanode/ui/components/ui/calendar';
 import {
   Popover,
@@ -17,6 +16,26 @@ interface DatePickerProps {
   readonly?: boolean;
 }
 
+const toUTCDate = (dateParam: Date | string): Date => {
+  const date = typeof dateParam === 'string' ? new Date(dateParam) : dateParam;
+
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
+
+  return new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
+};
+
+const fromUTCDate = (dateParam: Date | string): Date => {
+  const date = typeof dateParam === 'string' ? new Date(dateParam) : dateParam;
+
+  const year = date.getUTCFullYear();
+  const month = date.getUTCMonth();
+  const day = date.getUTCDate();
+
+  return new Date(year, month, day, 0, 0, 0, 0);
+};
+
 export const DatePicker = ({
   value,
   className,
@@ -25,7 +44,7 @@ export const DatePicker = ({
   readonly,
 }: DatePickerProps) => {
   const [open, setOpen] = useState(false);
-  const dateObj = value ? new Date(value) : undefined;
+  const dateObj = value ? fromUTCDate(value) : undefined;
   const placeHolderText = placeholder ?? '';
 
   if (readonly) {
@@ -58,7 +77,7 @@ export const DatePicker = ({
               onChange(toUTCDate(date));
             }
           }}
-          initialFocus
+          autoFocus={true}
         />
       </PopoverContent>
     </Popover>
