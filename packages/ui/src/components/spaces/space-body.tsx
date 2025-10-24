@@ -55,7 +55,7 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
               },
             });
           }}
-          isSaving={isPending}
+          isPending={isPending}
           saveText="Update"
         />
       </div>

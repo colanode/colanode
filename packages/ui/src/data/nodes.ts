@@ -48,5 +48,16 @@ export const createNodesCollection = (userId: string) => {
         };
       },
     },
+    onInsert: async ({ transaction }) => {
+      await Promise.all(
+        transaction.mutations.map(async (mutation) => {
+          return await window.colanode.executeMutation({
+            type: 'node.create',
+            userId,
+            node: mutation.modified,
+          });
+        })
+      );
+    },
   });
 };

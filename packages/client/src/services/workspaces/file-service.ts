@@ -137,10 +137,18 @@ export class FileService {
       version: generateId(IdType.Version),
     };
 
-    const createdNode = await this.workspace.nodes.createNode({
+    const createdNode = await this.workspace.nodes.insertNode({
       id: fileId,
       attributes: attributes,
       parentId: parentId,
+      createdAt: new Date().toISOString(),
+      createdBy: this.workspace.userId,
+      updatedAt: new Date().toISOString(),
+      updatedBy: this.workspace.userId,
+      rootId: node.rootId,
+      localRevision: '0',
+      serverRevision: '0',
+      type: 'file',
     });
 
     const createdLocalFile = await this.workspace.database
@@ -174,7 +182,7 @@ export class FileService {
         file_id: fileId,
         status: UploadStatus.Pending,
         retries: 0,
-        created_at: createdNode.created_at,
+        created_at: createdNode.createdAt,
         progress: 0,
       })
       .executeTakeFirst();

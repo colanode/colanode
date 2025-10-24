@@ -1,8 +1,13 @@
+import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
+import { LocalChannelNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
-import { ChannelForm } from '@colanode/ui/components/channels/channel-form';
+import {
+  ChannelForm,
+  ChannelFormValues,
+} from '@colanode/ui/components/channels/channel-form';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +16,7 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { database } from '@colanode/ui/data';
 
 interface ChannelCreateDialogProps {
   spaceId: string;
@@ -26,7 +31,46 @@ export const ChannelCreateDialog = ({
 }: ChannelCreateDialogProps) => {
   const workspace = useWorkspace();
   const navigate = useNavigate({ from: '/workspace/$userId' });
-  const { mutate, isPending } = useMutation();
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: ChannelFormValues) => {
+      const channelId = generateId(IdType.Channel);
+      const nodes = database.workspace(workspace.userId).nodes;
+
+      const channel: LocalChannelNode = {
+        id: channelId,
+        type: 'channel',
+        attributes: {
+          type: 'channel',
+          name: values.name,
+          parentId: spaceId,
+        },
+        parentId: spaceId,
+        rootId: spaceId,
+        createdAt: new Date().toISOString(),
+        createdBy: workspace.userId,
+        updatedAt: null,
+        updatedBy: null,
+        localRevision: '0',
+        serverRevision: '0',
+      };
+
+      nodes.insert(channel);
+      return channel;
+    },
+    onSuccess: (channel) => {
+      navigate({
+        to: '$nodeId',
+        params: {
+          nodeId: channel.id,
+        },
+      });
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -44,36 +88,10 @@ export const ChannelCreateDialog = ({
           }}
           isPending={isPending}
           submitText="Create"
-          handleCancel={() => {
+          onCancel={() => {
             onOpenChange(false);
           }}
-          handleSubmit={(values) => {
-            if (isPending) {
-              return;
-            }
-
-            mutate({
-              input: {
-                type: 'channel.create',
-                spaceId: spaceId,
-                name: values.name,
-                avatar: values.avatar,
-                userId: workspace.userId,
-              },
-              onSuccess(output) {
-                onOpenChange(false);
-                navigate({
-                  to: '$nodeId',
-                  params: {
-                    nodeId: output.id,
-                  },
-                });
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
-            });
-          }}
+          onSubmit={(values) => mutate(values)}
         />
       </DialogContent>
     </Dialog>

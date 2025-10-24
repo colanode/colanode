@@ -3,7 +3,11 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { match } from 'ts-pattern';
 
-import { LocalDatabaseViewNode, ViewField } from '@colanode/client/types';
+import {
+  LocalDatabaseViewNode,
+  LocalRecordNode,
+  ViewField,
+} from '@colanode/client/types';
 import {
   compareString,
   SortDirection,
@@ -11,6 +15,8 @@ import {
   DatabaseViewFilterAttributes,
   DatabaseViewSortAttributes,
   SpecialId,
+  generateId,
+  IdType,
 } from '@colanode/core';
 import { BoardView } from '@colanode/ui/components/databases/boards/board-view';
 import { CalendarView } from '@colanode/ui/components/databases/calendars/calendar-view';
@@ -18,6 +24,7 @@ import { TableView } from '@colanode/ui/components/databases/tables/table-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { DatabaseViewContext } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { database as appDatabase } from '@colanode/ui/data';
 import {
   generateFieldValuesFromFilters,
   generateViewFieldIndex,
@@ -487,21 +494,32 @@ export const View = ({ view }: ViewProps) => {
             workspace.userId
           );
 
-          const result = await window.colanode.executeMutation({
-            type: 'record.create',
-            databaseId: database.id,
-            userId: workspace.userId,
-            fields,
-          });
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const record: LocalRecordNode = {
+            id: generateId(IdType.Record),
+            type: 'record',
+            attributes: {
+              type: 'record',
+              parentId: database.id,
+              databaseId: database.id,
+              name: '',
+              fields: fields,
+            },
+            parentId: database.id,
+            rootId: database.id,
+            createdAt: new Date().toISOString(),
+            createdBy: workspace.userId,
+            updatedAt: null,
+            updatedBy: null,
+            localRevision: '0',
+            serverRevision: '0',
+          };
+          nodes.insert(record);
 
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            navigate({
-              to: '$nodeId',
-              params: { nodeId: result.output.id },
-            });
-          }
+          navigate({
+            to: '$nodeId',
+            params: { nodeId: record.id },
+          });
         },
       }}
     >

@@ -14,20 +14,21 @@ import {
   FormMessage,
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),
   avatar: z.string().optional().nullable(),
 });
 
+export type PageFormValues = z.infer<typeof formSchema>;
+
 interface PageFormProps {
   id: string;
-  values: z.infer<typeof formSchema>;
+  values: PageFormValues;
   isPending: boolean;
   submitText: string;
-  handleCancel: () => void;
-  handleSubmit: (values: z.infer<typeof formSchema>) => void;
+  onCancel: () => void;
+  onSubmit: (values: PageFormValues) => void;
   readOnly?: boolean;
 }
 
@@ -36,11 +37,11 @@ export const PageForm = ({
   values,
   isPending,
   submitText,
-  handleCancel,
-  handleSubmit,
+  onCancel,
+  onSubmit,
   readOnly = false,
 }: PageFormProps) => {
-  const form = useForm<z.infer<typeof formSchema>>({
+  const form = useForm<PageFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: values,
   });
@@ -60,10 +61,7 @@ export const PageForm = ({
 
   return (
     <Form {...form}>
-      <form
-        className="flex flex-col"
-        onSubmit={form.handleSubmit(handleSubmit)}
-      >
+      <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex-grow flex flex-row items-end gap-2 py-2 pb-4">
           {readOnly ? (
             <Button type="button" variant="outline" size="icon">
@@ -106,12 +104,11 @@ export const PageForm = ({
             type="button"
             variant="outline"
             disabled={isPending}
-            onClick={handleCancel}
+            onClick={onCancel}
           >
             Cancel
           </Button>
           <Button type="submit" disabled={isPending || readOnly}>
-            {isPending && <Spinner className="mr-1" />}
             {submitText}
           </Button>
         </div>

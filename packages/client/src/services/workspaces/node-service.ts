@@ -16,7 +16,7 @@ import {
 } from '@colanode/client/lib/mentions';
 import { deleteNodeRelations, fetchNodeTree } from '@colanode/client/lib/utils';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
-import { DownloadStatus } from '@colanode/client/types';
+import { DownloadStatus, LocalNode } from '@colanode/client/types';
 import {
   generateId,
   IdType,
@@ -58,8 +58,8 @@ export class NodeService {
     this.workspace = workspaceService;
   }
 
-  public async createNode(input: CreateNodeInput): Promise<SelectNode> {
-    debug(`Creating ${Array.isArray(input) ? 'nodes' : 'node'}`);
+  public async insertNode(input: LocalNode): Promise<LocalNode> {
+    debug(`Inserting node ${input.id} with type ${input.attributes.type}`);
 
     const tree = input.parentId
       ? await fetchNodeTree(this.workspace.database, input.parentId)
@@ -222,7 +222,7 @@ export class NodeService {
     }
 
     this.workspace.mutations.scheduleSync();
-    return createdNode;
+    return mapNode(createdNode);
   }
 
   public async updateNode<T extends NodeAttributes>(

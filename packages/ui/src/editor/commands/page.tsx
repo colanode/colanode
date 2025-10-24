@@ -1,6 +1,8 @@
 import { FileText } from 'lucide-react';
 
-import { EditorCommand } from '@colanode/client/types';
+import { EditorCommand, LocalPageNode } from '@colanode/client/types';
+import { generateId, IdType } from '@colanode/core';
+import { database } from '@colanode/ui/data';
 
 export const PageCommand: EditorCommand = {
   key: 'page',
@@ -14,18 +16,30 @@ export const PageCommand: EditorCommand = {
       return;
     }
 
-    const { userId, documentId } = context;
-    const output = await window.colanode.executeMutation({
-      type: 'page.create',
-      name: 'Untitled',
-      userId,
-      parentId: documentId,
-      generateIndex: false,
-    });
+    const { userId, documentId, rootId } = context;
+    const pageId = generateId(IdType.Page);
+    const nodes = database.workspace(userId).nodes;
 
-    if (!output.success) {
-      return;
-    }
+    const page: LocalPageNode = {
+      id: pageId,
+      type: 'page',
+      attributes: {
+        type: 'page',
+        name: 'Untitled',
+        avatar: null,
+        parentId: documentId,
+      },
+      parentId: documentId,
+      rootId: rootId,
+      createdAt: new Date().toISOString(),
+      createdBy: userId,
+      updatedAt: null,
+      updatedBy: null,
+      localRevision: '0',
+      serverRevision: '0',
+    };
+
+    nodes.insert(page);
 
     editor
       .chain()
@@ -34,7 +48,7 @@ export const PageCommand: EditorCommand = {
       .insertContent({
         type: 'page',
         attrs: {
-          id: output.output.id,
+          id: page.id,
         },
       })
       .run();

@@ -46,10 +46,8 @@ export const PageUpdateDialog = ({
           isPending={isPending}
           submitText="Update"
           readOnly={!canEdit}
-          handleCancel={() => {
-            onOpenChange(false);
-          }}
-          handleSubmit={(values) => {
+          onCancel={() => onOpenChange(false)}
+          onSubmit={(values) => {
             if (isPending) {
               return;
             }

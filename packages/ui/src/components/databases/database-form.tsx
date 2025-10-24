@@ -21,13 +21,15 @@ const formSchema = z.object({
   avatar: z.string().optional().nullable(),
 });
 
+export type DatabaseFormValues = z.infer<typeof formSchema>;
+
 interface DatabaseFormProps {
   id: string;
   values: z.infer<typeof formSchema>;
   isPending: boolean;
   submitText: string;
-  handleCancel: () => void;
-  handleSubmit: (values: z.infer<typeof formSchema>) => void;
+  onCancel: () => void;
+  onSubmit: (values: z.infer<typeof formSchema>) => void;
   readOnly?: boolean;
 }
 
@@ -36,8 +38,8 @@ export const DatabaseForm = ({
   values,
   isPending,
   submitText,
-  handleCancel,
-  handleSubmit,
+  onCancel,
+  onSubmit,
   readOnly = false,
 }: DatabaseFormProps) => {
   const form = useForm<z.infer<typeof formSchema>>({
@@ -60,10 +62,7 @@ export const DatabaseForm = ({
 
   return (
     <Form {...form}>
-      <form
-        className="flex flex-col"
-        onSubmit={form.handleSubmit(handleSubmit)}
-      >
+      <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
         <div className="flex-grow flex flex-row items-end gap-2 py-2 pb-4">
           {readOnly ? (
             <Button type="button" variant="outline" size="icon">
@@ -106,7 +105,7 @@ export const DatabaseForm = ({
             type="button"
             variant="outline"
             disabled={isPending}
-            onClick={handleCancel}
+            onClick={onCancel}
           >
             Cancel
           </Button>
