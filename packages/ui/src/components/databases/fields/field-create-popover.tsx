@@ -1,10 +1,19 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
-import { FieldType } from '@colanode/core';
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
+import {
+  compareString,
+  FieldAttributes,
+  FieldType,
+  generateFractionalIndex,
+  generateId,
+  IdType,
+} from '@colanode/core';
 import { DatabaseSelect } from '@colanode/ui/components/databases/database-select';
 import { FieldTypeSelect } from '@colanode/ui/components/databases/fields/field-type-select';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -22,10 +31,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { database as appDatabase } from '@colanode/ui/data';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
@@ -50,6 +58,8 @@ const formSchema = z.object({
   relationDatabaseId: z.string().optional().nullable(),
 });
 
+type FieldCreateFormValues = z.infer<typeof formSchema>;
+
 interface FieldCreatePopoverProps {
   button: React.ReactNode;
   onSuccess?: (fieldId: string) => void;
@@ -65,8 +75,6 @@ export const FieldCreatePopover = ({
   const workspace = useWorkspace();
   const database = useDatabase();
 
-  const { mutate, isPending } = useMutation();
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -75,32 +83,77 @@ export const FieldCreatePopover = ({
     },
   });
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: FieldCreateFormValues) => {
+      const nodes = appDatabase.workspace(workspace.userId).nodes;
+
+      if (values.type === 'relation') {
+        if (!values.relationDatabaseId) {
+          throw new MutationError(
+            MutationErrorCode.RelationDatabaseNotFound,
+            'Relation database not found.'
+          );
+        }
+
+        const relationDatabase = nodes.get(values.relationDatabaseId);
+        if (!relationDatabase || relationDatabase.type !== 'database') {
+          throw new MutationError(
+            MutationErrorCode.RelationDatabaseNotFound,
+            'Relation database not found.'
+          );
+        }
+      }
+
+      if (!nodes.has(database.id)) {
+        return null;
+      }
+
+      const fieldId = generateId(IdType.Field);
+      nodes.update(database.id, (draft) => {
+        if (draft.attributes.type !== 'database') {
+          return;
+        }
+
+        const maxIndex = Object.values(draft.attributes.fields)
+          .map((field) => field.index)
+          .sort((a, b) => -compareString(a, b))[0];
+
+        const index = generateFractionalIndex(maxIndex, null);
+
+        const newField: FieldAttributes = {
+          id: fieldId,
+          type: values.type as FieldType,
+          name: values.name,
+          index,
+        };
+
+        if (newField.type === 'relation') {
+          newField.databaseId = values.relationDatabaseId;
+        }
+
+        draft.attributes.fields[fieldId] = newField;
+      });
+
+      return fieldId;
+    },
+    onSuccess: (fieldId) => {
+      form.reset();
+      setOpen(false);
+
+      if (fieldId) {
+        onSuccess?.(fieldId);
+      }
+    },
+    onError: (error) => {
+      toast.error(error.message as string);
+    },
+  });
+
   const type = form.watch('type');
 
   const handleCancelClick = () => {
     setOpen(false);
     form.reset();
-  };
-
-  const handleSubmit = (values: z.infer<typeof formSchema>) => {
-    mutate({
-      input: {
-        type: 'field.create',
-        databaseId: database.id,
-        name: values.name,
-        fieldType: values.type,
-        userId: workspace.userId,
-        relationDatabaseId: values.relationDatabaseId,
-      },
-      onSuccess: (output) => {
-        setOpen(false);
-        form.reset();
-        onSuccess?.(output.id);
-      },
-      onError(error) {
-        toast.error(error.message);
-      },
-    });
   };
 
   if (!database.canEdit) {
@@ -114,7 +167,7 @@ export const FieldCreatePopover = ({
         <Form {...form}>
           <form
             className="flex flex-col gap-2"
-            onSubmit={form.handleSubmit(handleSubmit)}
+            onSubmit={form.handleSubmit((values) => mutate(values))}
           >
             <div className="flex-grow space-y-4 py-2 pb-4">
               <FormField
@@ -170,11 +223,11 @@ export const FieldCreatePopover = ({
                 variant="outline"
                 size="sm"
                 onClick={handleCancelClick}
+                disabled={isPending}
               >
                 Cancel
               </Button>
               <Button type="submit" size="sm" disabled={isPending}>
-                {isPending && <Spinner className="mr-1" />}
                 Create
               </Button>
             </div>

@@ -1,9 +1,8 @@
-import { toast } from 'sonner';
-
 import { LocalRecordNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { RecordContext } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { database as appDatabase } from '@colanode/ui/data';
 
 export const RecordProvider = ({
   record,
@@ -34,29 +33,32 @@ export const RecordProvider = ({
         localRevision: record.localRevision,
         canEdit,
         updateFieldValue: async (field, value) => {
-          const result = await window.colanode.executeMutation({
-            type: 'record.field.value.set',
-            recordId: record.id,
-            fieldId: field.id,
-            value,
-            userId: workspace.userId,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(record.id)) {
+            return;
           }
+
+          nodes.update(record.id, (draft) => {
+            if (draft.attributes.type !== 'record') {
+              return;
+            }
+
+            draft.attributes.fields[field.id] = value;
+          });
         },
         removeFieldValue: async (field) => {
-          const result = await window.colanode.executeMutation({
-            type: 'record.field.value.delete',
-            recordId: record.id,
-            fieldId: field.id,
-            userId: workspace.userId,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(record.id)) {
+            return;
           }
+
+          nodes.update(record.id, (draft) => {
+            if (draft.attributes.type !== 'record') {
+              return;
+            }
+
+            delete draft.attributes.fields[field.id];
+          });
         },
         getBooleanValue: (field) => {
           const fieldValue = record.attributes.fields[field.id];

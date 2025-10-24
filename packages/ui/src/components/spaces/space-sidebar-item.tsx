@@ -1,9 +1,9 @@
+import { eq, inArray, useLiveQuery } from '@tanstack/react-db';
 import { ChevronRight } from 'lucide-react';
 import { RefAttributes, useRef } from 'react';
 import { useDrop } from 'react-dnd';
-import { toast } from 'sonner';
 
-import { LocalSpaceNode } from '@colanode/client/types';
+import { LocalNode, LocalSpaceNode } from '@colanode/client/types';
 import { extractNodeRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { SpaceSidebarDropdown } from '@colanode/ui/components/spaces/space-sidebar-dropdown';
@@ -15,9 +15,11 @@ import {
 import { Link } from '@colanode/ui/components/ui/link';
 import { WorkspaceSidebarItem } from '@colanode/ui/components/workspaces/sidebars/sidebar-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { sortSpaceChildren } from '@colanode/ui/lib/spaces';
+import { database } from '@colanode/ui/data';
+import {
+  generateSpaceChildIndex,
+  sortSpaceChildren,
+} from '@colanode/ui/lib/spaces';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface SpaceSidebarItemProps {
@@ -26,17 +28,18 @@ interface SpaceSidebarItemProps {
 
 export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const workspace = useWorkspace();
-  const mutation = useMutation();
 
   const role = extractNodeRole(space, workspace.userId);
   const canEdit = role === 'admin';
 
-  const nodeChildrenGetQuery = useLiveQuery({
-    type: 'node.children.get',
-    nodeId: space.id,
-    userId: workspace.userId,
-    types: ['page', 'channel', 'database', 'folder'],
-  });
+  const nodeChildrenGetQuery = useLiveQuery((q) =>
+    q
+      .from({ nodes: database.workspace(workspace.userId).nodes })
+      .where(({ nodes }) => eq(nodes.parentId, space.id))
+      .where(({ nodes }) =>
+        inArray(nodes.type, ['page', 'channel', 'database', 'folder'])
+      )
+  );
 
   const [dropMonitor, dropRef] = useDrop({
     accept: 'sidebar-item',
@@ -55,17 +58,33 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const children = sortSpaceChildren(space, nodeChildrenGetQuery.data ?? []);
 
   const handleDragEnd = (childId: string, after: string | null) => {
-    mutation.mutate({
-      input: {
-        type: 'space.child.reorder',
-        userId: workspace.userId,
-        spaceId: space.id,
-        childId,
-        after,
-      },
-      onError(error) {
-        toast.error(error.message);
-      },
+    const nodes = database.workspace(workspace.userId).nodes;
+    if (!nodes.has(space.id)) {
+      return;
+    }
+
+    const children: LocalNode[] = [];
+    for (const [, node] of nodes.entries()) {
+      if (node.parentId === space.id) {
+        children.push(node);
+      }
+    }
+
+    const newIndex = generateSpaceChildIndex(space, children, childId, after);
+
+    nodes.update(space.id, (draft) => {
+      if (draft.attributes.type !== 'space') {
+        return;
+      }
+
+      const childrenSettings = draft.attributes.children ?? {};
+      childrenSettings[childId] = {
+        ...(childrenSettings[childId] ?? {}),
+        id: childId,
+        index: newIndex,
+      };
+
+      draft.attributes.children = childrenSettings;
     });
   };
 

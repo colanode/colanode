@@ -1,5 +1,3 @@
-import { toast } from 'sonner';
-
 import { LocalChannelNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { ChannelForm } from '@colanode/ui/components/channels/channel-form';
@@ -11,7 +9,7 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { database } from '@colanode/ui/data';
 
 interface ChannelUpdateDialogProps {
   channel: LocalChannelNode;
@@ -27,7 +25,6 @@ export const ChannelUpdateDialog = ({
   onOpenChange,
 }: ChannelUpdateDialogProps) => {
   const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
   const canEdit = hasNodeRole(role, 'editor');
 
   return (
@@ -45,33 +42,28 @@ export const ChannelUpdateDialog = ({
             name: channel.attributes.name,
             avatar: channel.attributes.avatar,
           }}
-          isPending={isPending}
+          isPending={false}
           submitText="Update"
           readOnly={!canEdit}
           onCancel={() => {
             onOpenChange(false);
           }}
           onSubmit={(values) => {
-            if (isPending) {
+            const nodes = database.workspace(workspace.userId).nodes;
+            if (!nodes.has(channel.id)) {
               return;
             }
 
-            mutate({
-              input: {
-                type: 'channel.update',
-                channelId: channel.id,
-                name: values.name,
-                avatar: values.avatar,
-                userId: workspace.userId,
-              },
-              onSuccess() {
-                onOpenChange(false);
-                toast.success('Channel updated');
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
+            nodes.update(channel.id, (draft) => {
+              if (draft.attributes.type !== 'channel') {
+                return;
+              }
+
+              draft.attributes.name = values.name;
+              draft.attributes.avatar = values.avatar;
             });
+
+            onOpenChange(false);
           }}
         />
       </DialogContent>

@@ -1,5 +1,3 @@
-import { toast } from 'sonner';
-
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { DatabaseForm } from '@colanode/ui/components/databases/database-form';
@@ -11,7 +9,7 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { database as appDatabase } from '@colanode/ui/data';
 
 interface DatabaseUpdateDialogProps {
   database: LocalDatabaseNode;
@@ -27,7 +25,7 @@ export const DatabaseUpdateDialog = ({
   onOpenChange,
 }: DatabaseUpdateDialogProps) => {
   const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
+
   const canEdit = hasNodeRole(role, 'editor');
 
   return (
@@ -45,33 +43,28 @@ export const DatabaseUpdateDialog = ({
             name: database.attributes.name,
             avatar: database.attributes.avatar,
           }}
-          isPending={isPending}
+          isPending={false}
           submitText="Update"
           readOnly={!canEdit}
           onCancel={() => {
             onOpenChange(false);
           }}
           onSubmit={(values) => {
-            if (isPending) {
+            const nodes = appDatabase.workspace(workspace.userId).nodes;
+            if (!nodes.has(database.id)) {
               return;
             }
 
-            mutate({
-              input: {
-                type: 'database.update',
-                databaseId: database.id,
-                name: values.name,
-                avatar: values.avatar,
-                userId: workspace.userId,
-              },
-              onSuccess() {
-                onOpenChange(false);
-                toast.success('Database updated');
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
+            nodes.update(database.id, (draft) => {
+              if (draft.attributes.type !== 'database') {
+                return;
+              }
+
+              draft.attributes.name = values.name;
+              draft.attributes.avatar = values.avatar;
             });
+
+            onOpenChange(false);
           }}
         />
       </DialogContent>

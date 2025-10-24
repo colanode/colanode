@@ -16,23 +16,11 @@ import { TabCreateMutationHandler } from './apps/tab-create';
 import { TabDeleteMutationHandler } from './apps/tab-delete';
 import { TabUpdateMutationHandler } from './apps/tab-update';
 import { AvatarUploadMutationHandler } from './avatars/avatar-upload';
-import { ChannelUpdateMutationHandler } from './channels/channel-update';
-import { DatabaseNameFieldUpdateMutationHandler } from './databases/database-name-field-update';
-import { DatabaseUpdateMutationHandler } from './databases/database-update';
-import { FieldCreateMutationHandler } from './databases/field-create';
-import { FieldDeleteMutationHandler } from './databases/field-delete';
-import { FieldNameUpdateMutationHandler } from './databases/field-name-update';
-import { SelectOptionCreateMutationHandler } from './databases/select-option-create';
-import { SelectOptionDeleteMutationHandler } from './databases/select-option-delete';
-import { SelectOptionUpdateMutationHandler } from './databases/select-option-update';
-import { ViewNameUpdateMutationHandler } from './databases/view-name-update';
-import { ViewUpdateMutationHandler } from './databases/view-update';
 import { DocumentUpdateMutationHandler } from './documents/document-update';
 import { FileCreateMutationHandler } from './files/file-create';
 import { FileDeleteMutationHandler } from './files/file-delete';
 import { FileDownloadMutationHandler } from './files/file-download';
 import { TempFileCreateMutationHandler } from './files/temp-file-create';
-import { FolderUpdateMutationHandler } from './folders/folder-update';
 import { NodeCollaboratorCreateMutationHandler } from './nodes/node-collaborator-create';
 import { NodeCollaboratorDeleteMutationHandler } from './nodes/node-collaborator-delete';
 import { NodeCollaboratorUpdateMutationHandler } from './nodes/node-collaborator-update';
@@ -42,15 +30,9 @@ import { NodeInteractionOpenedMutationHandler } from './nodes/node-interaction-o
 import { NodeInteractionSeenMutationHandler } from './nodes/node-interaction-seen';
 import { NodeReactionCreateMutationHandler } from './nodes/node-reaction-create';
 import { NodeReactionDeleteMutationHandler } from './nodes/node-reaction-delete';
-import { PageUpdateMutationHandler } from './pages/page-update';
-import { RecordAvatarUpdateMutationHandler } from './records/record-avatar-update';
-import { RecordFieldValueDeleteMutationHandler } from './records/record-field-value-delete';
-import { RecordFieldValueSetMutationHandler } from './records/record-field-value-set';
-import { RecordNameUpdateMutationHandler } from './records/record-name-update';
+import { NodeUpdateMutationHandler } from './nodes/node-update';
 import { ServerCreateMutationHandler } from './servers/server-create';
 import { ServerDeleteMutationHandler } from './servers/server-delete';
-import { SpaceChildReorderMutationHandler } from './spaces/space-child-reorder';
-import { SpaceUpdateMutationHandler } from './spaces/space-update';
 import { UserRoleUpdateMutationHandler } from './users/user-role-update';
 import { UserStorageUpdateMutationHandler } from './users/user-storage-update';
 import { UsersCreateMutationHandler } from './users/users-create';
@@ -71,12 +53,6 @@ export const buildMutationHandlerMap = (
     'email.register': new EmailRegisterMutationHandler(app),
     'email.verify': new EmailVerifyMutationHandler(app),
     'google.login': new GoogleLoginMutationHandler(app),
-    'database.name.field.update': new DatabaseNameFieldUpdateMutationHandler(
-      app
-    ),
-    'field.create': new FieldCreateMutationHandler(app),
-    'field.delete': new FieldDeleteMutationHandler(app),
-    'field.name.update': new FieldNameUpdateMutationHandler(app),
     'file.delete': new FileDeleteMutationHandler(app),
     'node.collaborator.create': new NodeCollaboratorCreateMutationHandler(app),
     'node.collaborator.delete': new NodeCollaboratorDeleteMutationHandler(app),
@@ -85,13 +61,6 @@ export const buildMutationHandlerMap = (
     'node.interaction.seen': new NodeInteractionSeenMutationHandler(app),
     'node.reaction.create': new NodeReactionCreateMutationHandler(app),
     'node.reaction.delete': new NodeReactionDeleteMutationHandler(app),
-    'record.avatar.update': new RecordAvatarUpdateMutationHandler(app),
-    'record.name.update': new RecordNameUpdateMutationHandler(app),
-    'record.field.value.delete': new RecordFieldValueDeleteMutationHandler(app),
-    'record.field.value.set': new RecordFieldValueSetMutationHandler(app),
-    'select.option.create': new SelectOptionCreateMutationHandler(app),
-    'select.option.delete': new SelectOptionDeleteMutationHandler(app),
-    'select.option.update': new SelectOptionUpdateMutationHandler(app),
     'server.create': new ServerCreateMutationHandler(app),
     'server.delete': new ServerDeleteMutationHandler(app),
     'user.role.update': new UserRoleUpdateMutationHandler(app),
@@ -102,15 +71,7 @@ export const buildMutationHandlerMap = (
     'account.logout': new AccountLogoutMutationHandler(app),
     'file.create': new FileCreateMutationHandler(app),
     'file.download': new FileDownloadMutationHandler(app),
-    'space.update': new SpaceUpdateMutationHandler(app),
-    'space.child.reorder': new SpaceChildReorderMutationHandler(app),
     'account.update': new AccountUpdateMutationHandler(app),
-    'view.update': new ViewUpdateMutationHandler(app),
-    'view.name.update': new ViewNameUpdateMutationHandler(app),
-    'channel.update': new ChannelUpdateMutationHandler(app),
-    'page.update': new PageUpdateMutationHandler(app),
-    'folder.update': new FolderUpdateMutationHandler(app),
-    'database.update': new DatabaseUpdateMutationHandler(app),
     'document.update': new DocumentUpdateMutationHandler(app),
     'metadata.update': new MetadataUpdateMutationHandler(app),
     'metadata.delete': new MetadataDeleteMutationHandler(app),
@@ -124,5 +85,6 @@ export const buildMutationHandlerMap = (
     'tab.update': new TabUpdateMutationHandler(app),
     'tab.delete': new TabDeleteMutationHandler(app),
     'node.delete': new NodeDeleteMutationHandler(app),
+    'node.update': new NodeUpdateMutationHandler(app),
   };
 };

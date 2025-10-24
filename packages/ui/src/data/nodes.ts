@@ -49,26 +49,38 @@ export const createNodesCollection = (userId: string) => {
       },
     },
     onInsert: async ({ transaction }) => {
-      await Promise.all(
-        transaction.mutations.map(async (mutation) => {
-          return await window.colanode.executeMutation({
-            type: 'node.create',
-            userId,
-            node: mutation.modified,
-          });
-        })
-      );
+      transaction.mutations.forEach(async (mutation) => {
+        await window.colanode.executeMutation({
+          type: 'node.create',
+          userId,
+          node: mutation.modified,
+        });
+      });
+    },
+    onUpdate: async ({ transaction }) => {
+      transaction.mutations.forEach(async (mutation) => {
+        console.log('onUpdate', mutation);
+        const attributes = mutation.changes.attributes;
+        if (!attributes) {
+          return;
+        }
+
+        await window.colanode.executeMutation({
+          type: 'node.update',
+          userId,
+          nodeId: mutation.key,
+          attributes,
+        });
+      });
     },
     onDelete: async ({ transaction }) => {
-      await Promise.all(
-        transaction.mutations.map(async (mutation) => {
-          return await window.colanode.executeMutation({
-            type: 'node.delete',
-            userId,
-            nodeId: mutation.key,
-          });
-        })
-      );
+      transaction.mutations.forEach(async (mutation) => {
+        await window.colanode.executeMutation({
+          type: 'node.delete',
+          userId,
+          nodeId: mutation.key,
+        });
+      });
     },
   });
 };

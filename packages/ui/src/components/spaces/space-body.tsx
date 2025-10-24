@@ -1,5 +1,3 @@
-import { toast } from 'sonner';
-
 import { LocalSpaceNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { NodeCollaborators } from '@colanode/ui/components/collaborators/node-collaborators';
@@ -7,7 +5,7 @@ import { SpaceDelete } from '@colanode/ui/components/spaces/space-delete';
 import { SpaceForm } from '@colanode/ui/components/spaces/space-form';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { database } from '@colanode/ui/data';
 
 interface SpaceBodyProps {
   space: LocalSpaceNode;
@@ -16,7 +14,6 @@ interface SpaceBodyProps {
 
 export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
   const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
 
   const canEdit = hasNodeRole(role, 'admin');
   const canDelete = hasNodeRole(role, 'admin');
@@ -36,24 +33,22 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
           }}
           readOnly={!canEdit}
           onSubmit={(values) => {
-            mutate({
-              input: {
-                type: 'space.update',
-                userId: workspace.userId,
-                spaceId: space.id,
-                name: values.name,
-                description: values.description,
-                avatar: values.avatar,
-              },
-              onSuccess() {
-                toast.success('Space updated');
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
+            const nodes = database.workspace(workspace.userId).nodes;
+            if (!nodes.has(space.id)) {
+              return;
+            }
+
+            nodes.update(space.id, (draft) => {
+              if (draft.attributes.type !== 'space') {
+                return;
+              }
+
+              draft.attributes.name = values.name;
+              draft.attributes.description = values.description;
+              draft.attributes.avatar = values.avatar;
             });
           }}
-          isPending={isPending}
+          isPending={false}
           saveText="Update"
         />
       </div>

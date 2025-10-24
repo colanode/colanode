@@ -1,5 +1,3 @@
-import { toast } from 'sonner';
-
 import { LocalFolderNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { FolderForm } from '@colanode/ui/components/folders/folder-form';
@@ -11,7 +9,7 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { database } from '@colanode/ui/data';
 
 interface FolderUpdateDialogProps {
   folder: LocalFolderNode;
@@ -27,7 +25,6 @@ export const FolderUpdateDialog = ({
   onOpenChange,
 }: FolderUpdateDialogProps) => {
   const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
   const canEdit = hasNodeRole(role, 'editor');
 
   return (
@@ -43,33 +40,28 @@ export const FolderUpdateDialog = ({
             name: folder.attributes.name,
             avatar: folder.attributes.avatar,
           }}
-          isPending={isPending}
+          isPending={false}
           submitText="Update"
           readOnly={!canEdit}
           onCancel={() => {
             onOpenChange(false);
           }}
           onSubmit={(values) => {
-            if (isPending) {
+            const nodes = database.workspace(workspace.userId).nodes;
+            if (!nodes.has(folder.id)) {
               return;
             }
 
-            mutate({
-              input: {
-                type: 'folder.update',
-                folderId: folder.id,
-                name: values.name,
-                avatar: values.avatar,
-                userId: workspace.userId,
-              },
-              onSuccess() {
-                onOpenChange(false);
-                toast.success('Folder was updated successfully');
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
+            nodes.update(folder.id, (draft) => {
+              if (draft.attributes.type !== 'folder') {
+                return;
+              }
+
+              draft.attributes.name = values.name;
+              draft.attributes.avatar = values.avatar;
             });
+
+            onOpenChange(false);
           }}
         />
       </DialogContent>

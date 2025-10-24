@@ -1,15 +1,13 @@
 import { useEffect, useRef } from 'react';
-import { toast } from 'sonner';
 
 import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { database as appDatabase } from '@colanode/ui/data';
 
 export const RecordName = () => {
   const workspace = useWorkspace();
   const record = useRecord();
-  const { mutate, isPending } = useMutation();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -29,24 +27,21 @@ export const RecordName = () => {
       readOnly={!record.canEdit}
       ref={inputRef}
       onChange={(value) => {
-        if (isPending) {
-          return;
-        }
-
         if (value === record.name) {
           return;
         }
 
-        mutate({
-          input: {
-            type: 'record.name.update',
-            recordId: record.id,
-            name: value,
-            userId: workspace.userId,
-          },
-          onError(error) {
-            toast.error(error.message);
-          },
+        const nodes = appDatabase.workspace(workspace.userId).nodes;
+        if (!nodes.has(record.id)) {
+          return;
+        }
+
+        nodes.update(record.id, (draft) => {
+          if (draft.attributes.type !== 'record') {
+            return;
+          }
+
+          draft.attributes.name = value;
         });
       }}
       className="font-heading border-b border-none pl-1 text-4xl font-bold shadow-none focus-visible:ring-0"

@@ -1,5 +1,4 @@
 import { CircleDashed } from 'lucide-react';
-import { toast } from 'sonner';
 
 import {
   DatabaseViewFilterAttributes,
@@ -12,6 +11,7 @@ import { BoardViewContext } from '@colanode/ui/contexts/board-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { database as appDatabase } from '@colanode/ui/data';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { getSelectOptionLightColorClass } from '@colanode/ui/lib/databases';
 
@@ -89,29 +89,27 @@ export const BoardViewColumnsSelect = ({
               ),
               canDrag: (record) => record.canEdit,
               onDragEnd: async (record, value) => {
+                const nodes = appDatabase.workspace(workspace.userId).nodes;
+                if (!nodes.has(record.id)) {
+                  return;
+                }
+
                 if (!value) {
-                  const result = await window.colanode.executeMutation({
-                    type: 'record.field.value.delete',
-                    recordId: record.id,
-                    fieldId: field.id,
-                    userId: workspace.userId,
-                  });
+                  nodes.update(record.id, (draft) => {
+                    if (draft.attributes.type !== 'record') {
+                      return;
+                    }
 
-                  if (!result.success) {
-                    toast.error(result.error.message);
-                  }
+                    delete draft.attributes.fields[field.id];
+                  });
                 } else {
-                  const result = await window.colanode.executeMutation({
-                    type: 'record.field.value.set',
-                    recordId: record.id,
-                    fieldId: field.id,
-                    value,
-                    userId: workspace.userId,
-                  });
+                  nodes.update(record.id, (draft) => {
+                    if (draft.attributes.type !== 'record') {
+                      return;
+                    }
 
-                  if (!result.success) {
-                    toast.error(result.error.message);
-                  }
+                    draft.attributes.fields[field.id] = value;
+                  });
                 }
               },
             }}
@@ -138,29 +136,27 @@ export const BoardViewColumnsSelect = ({
           dragOverClass: noValueDraggingClass,
           canDrag: () => true,
           onDragEnd: async (record, value) => {
+            const nodes = appDatabase.workspace(workspace.userId).nodes;
+            if (!nodes.has(record.id)) {
+              return;
+            }
+
             if (!value) {
-              const result = await window.colanode.executeMutation({
-                type: 'record.field.value.delete',
-                recordId: record.id,
-                fieldId: field.id,
-                userId: workspace.userId,
-              });
+              nodes.update(record.id, (draft) => {
+                if (draft.attributes.type !== 'record') {
+                  return;
+                }
 
-              if (!result.success) {
-                toast.error(result.error.message);
-              }
+                delete draft.attributes.fields[field.id];
+              });
             } else {
-              const result = await window.colanode.executeMutation({
-                type: 'record.field.value.set',
-                recordId: record.id,
-                fieldId: field.id,
-                value,
-                userId: workspace.userId,
-              });
+              nodes.update(record.id, (draft) => {
+                if (draft.attributes.type !== 'record') {
+                  return;
+                }
 
-              if (!result.success) {
-                toast.error(result.error.message);
-              }
+                draft.attributes.fields[field.id] = value;
+              });
             }
           },
         }}

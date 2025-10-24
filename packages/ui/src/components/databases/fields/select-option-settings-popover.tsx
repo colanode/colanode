@@ -12,6 +12,8 @@ import {
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabase } from '@colanode/ui/contexts/database';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { database as appDatabase } from '@colanode/ui/data';
 import { selectOptionColors } from '@colanode/ui/lib/databases';
 import { cn } from '@colanode/ui/lib/utils';
 
@@ -25,6 +27,7 @@ export const SelectOptionSettingsPopover = ({
   option,
 }: SelectOptionSettingsPopoverProps) => {
   const database = useDatabase();
+  const workspace = useWorkspace();
 
   const [openSetttingsPopover, setOpenSetttingsPopover] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
@@ -46,9 +49,38 @@ export const SelectOptionSettingsPopover = ({
               onChange={(newName) => {
                 if (newName === option.name) return;
 
-                database.updateSelectOption(fieldId, {
-                  ...option,
-                  name: newName,
+                const nodes = appDatabase.workspace(workspace.userId).nodes;
+                if (!nodes.has(database.id)) {
+                  return;
+                }
+
+                nodes.update(database.id, (draft) => {
+                  if (draft.attributes.type !== 'database') {
+                    return;
+                  }
+
+                  const fieldDraft = draft.attributes.fields[fieldId];
+                  if (!fieldDraft) {
+                    return;
+                  }
+
+                  if (
+                    fieldDraft.type !== 'select' &&
+                    fieldDraft.type !== 'multi_select'
+                  ) {
+                    return;
+                  }
+
+                  if (!fieldDraft.options) {
+                    return;
+                  }
+
+                  const optionDraft = fieldDraft.options[option.id];
+                  if (!optionDraft) {
+                    return;
+                  }
+
+                  optionDraft.name = newName;
                 });
               }}
             />
@@ -61,9 +93,38 @@ export const SelectOptionSettingsPopover = ({
                 key={color.value}
                 className="flex cursor-pointer flex-row items-center gap-2 rounded-md p-1 hover:bg-accent"
                 onClick={() => {
-                  database.updateSelectOption(fieldId, {
-                    ...option,
-                    color: color.value,
+                  const nodes = appDatabase.workspace(workspace.userId).nodes;
+                  if (!nodes.has(database.id)) {
+                    return;
+                  }
+
+                  nodes.update(database.id, (draft) => {
+                    if (draft.attributes.type !== 'database') {
+                      return;
+                    }
+
+                    const fieldDraft = draft.attributes.fields[fieldId];
+                    if (!fieldDraft) {
+                      return;
+                    }
+
+                    if (
+                      fieldDraft.type !== 'select' &&
+                      fieldDraft.type !== 'multi_select'
+                    ) {
+                      return;
+                    }
+
+                    if (!fieldDraft.options) {
+                      return;
+                    }
+
+                    const optionDraft = fieldDraft.options[option.id];
+                    if (!optionDraft) {
+                      return;
+                    }
+
+                    optionDraft.color = color.value;
                   });
                 }}
               >

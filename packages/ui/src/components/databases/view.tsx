@@ -1,6 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { toast } from 'sonner';
 import { match } from 'ts-pattern';
 
 import {
@@ -80,36 +79,34 @@ export const View = ({ view }: ViewProps) => {
         rename: async (name: string) => {
           if (!database.canEdit) return;
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.name = name;
-
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
           }
+
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
+              return;
+            }
+
+            draft.attributes.name = name;
+          });
         },
         updateAvatar: async (avatar: string) => {
           if (!database.canEdit) return;
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.avatar = avatar;
-
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
           }
+
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
+              return;
+            }
+
+            draft.attributes.avatar = avatar;
+          });
         },
         setFieldDisplay: async (id: string, display: boolean) => {
           if (!database.canEdit) return;
@@ -117,27 +114,26 @@ export const View = ({ view }: ViewProps) => {
           const viewField = view.attributes.fields?.[id];
           if (viewField && viewField.display === display) return;
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.fields = viewAttributes.fields ?? {};
-          if (!viewAttributes.fields[id]) {
-            viewAttributes.fields[id] = {
-              id: id,
-              display: display,
-            };
-          } else {
-            viewAttributes.fields[id].display = display;
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
           }
 
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
+              return;
+            }
+
+            draft.attributes.fields = draft.attributes.fields ?? {};
+            if (!draft.attributes.fields[id]) {
+              draft.attributes.fields[id] = {
+                id: id,
+                display: display,
+              };
+            } else {
+              draft.attributes.fields[id].display = display;
+            }
           });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          }
         },
         resizeField: async (id: string, width: number) => {
           if (!database.canEdit) {
@@ -149,27 +145,26 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.fields = viewAttributes.fields ?? {};
-          if (!viewAttributes.fields[id]) {
-            viewAttributes.fields[id] = {
-              id: id,
-              width: width,
-            };
-          } else {
-            viewAttributes.fields[id].width = width;
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
           }
 
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
+              return;
+            }
+
+            draft.attributes.fields = draft.attributes.fields ?? {};
+            if (!draft.attributes.fields[id]) {
+              draft.attributes.fields[id] = {
+                id: id,
+                width: width,
+              };
+            } else {
+              draft.attributes.fields[id].width = width;
+            }
           });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          }
         },
         resizeName: async (width: number) => {
           if (!database.canEdit) {
@@ -180,38 +175,36 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.nameWidth = width;
-
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
           }
+
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
+              return;
+            }
+
+            draft.attributes.nameWidth = width;
+          });
         },
         setGroupBy: async (fieldId: string | null) => {
           if (!database.canEdit) {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.groupBy = fieldId;
-
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
           }
+
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
+              return;
+            }
+
+            draft.attributes.groupBy = fieldId;
+          });
         },
         moveField: async (id: string, after: string) => {
           if (!database.canEdit) {
@@ -224,31 +217,31 @@ export const View = ({ view }: ViewProps) => {
             id,
             after
           );
+
           if (newIndex === null) {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.fields = viewAttributes.fields ?? {};
-          if (!viewAttributes.fields[id]) {
-            viewAttributes.fields[id] = {
-              id: id,
-              index: newIndex,
-            };
-          } else {
-            viewAttributes.fields[id].index = newIndex;
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
           }
 
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
+              return;
+            }
+
+            draft.attributes.fields = draft.attributes.fields ?? {};
+            if (!draft.attributes.fields[id]) {
+              draft.attributes.fields[id] = {
+                id: id,
+                index: newIndex,
+              };
+            } else {
+              draft.attributes.fields[id].index = newIndex;
+            }
           });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          }
         },
         isFieldFilterOpened: (fieldId: string) =>
           openedFieldFilters.includes(fieldId),
@@ -262,48 +255,47 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.filters = viewAttributes.filters ?? {};
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
+          }
 
-          if (fieldId === SpecialId.Name) {
-            const operators = getFieldFilterOperators('text');
-            const filter: DatabaseViewFieldFilterAttributes = {
-              type: 'field',
-              id: fieldId,
-              fieldId,
-              operator: operators[0]?.value ?? 'contains',
-            };
-
-            viewAttributes.filters[fieldId] = filter;
-          } else {
-            const field = database.fields.find((f) => f.id === fieldId);
-            if (!field) {
+          const filterId = generateId(IdType.ViewFilter);
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
               return;
             }
 
-            const operators = getFieldFilterOperators(field.type);
-            const filter: DatabaseViewFieldFilterAttributes = {
-              type: 'field',
-              id: fieldId,
-              fieldId,
-              operator: operators[0]?.value ?? '',
-            };
+            draft.attributes.filters = draft.attributes.filters ?? {};
+            if (fieldId === SpecialId.Name) {
+              const operators = getFieldFilterOperators('text');
+              const filter: DatabaseViewFieldFilterAttributes = {
+                type: 'field',
+                id: filterId,
+                fieldId,
+                operator: operators[0]?.value ?? 'contains',
+              };
 
-            viewAttributes.filters[fieldId] = filter;
-          }
+              draft.attributes.filters[filterId] = filter;
+            } else {
+              const field = database.fields.find((f) => f.id === fieldId);
+              if (!field) {
+                return;
+              }
 
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
+              const operators = getFieldFilterOperators(field.type);
+              const filter: DatabaseViewFieldFilterAttributes = {
+                type: 'field',
+                id: filterId,
+                fieldId,
+                operator: operators[0]?.value ?? '',
+              };
+
+              draft.attributes.filters[filterId] = filter;
+            }
           });
 
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            setOpenedFieldFilters((prev) => [...prev, fieldId]);
-          }
+          setOpenedFieldFilters((prev) => [...prev, filterId]);
         },
         updateFilter: async (
           id: string,
@@ -317,22 +309,22 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.filters = viewAttributes.filters ?? {};
-          viewAttributes.filters[id] = filter;
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
+          }
 
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
+              return;
+            }
+
+            const filters = draft.attributes.filters ?? {};
+            filters[id] = filter;
+            draft.attributes.filters = filters;
           });
 
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            setIsSearchBarOpened(true);
-          }
+          setIsSearchBarOpened(true);
         },
         removeFilter: async (id: string) => {
           if (!database.canEdit) {
@@ -343,22 +335,28 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.filters = viewAttributes.filters ?? {};
-          delete viewAttributes.filters[id];
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
+          }
 
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
+              return;
+            }
+
+            if (!draft.attributes) {
+              return;
+            }
+
+            if (!draft.attributes.filters?.[id]) {
+              return;
+            }
+
+            delete draft.attributes.filters[id];
           });
 
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            setIsSearchBarOpened(true);
-          }
+          setIsSearchBarOpened(true);
         },
         initFieldSort: async (fieldId: string, direction: SortDirection) => {
           if (!database.canEdit) {
@@ -370,45 +368,41 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.sorts = viewAttributes.sorts ?? {};
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
+          }
 
-          if (fieldId === SpecialId.Name) {
-            const sort: DatabaseViewSortAttributes = {
-              id: fieldId,
-              fieldId,
-              direction,
-            };
-
-            viewAttributes.sorts[fieldId] = sort;
-          } else {
-            const field = database.fields.find((f) => f.id === fieldId);
-            if (!field) {
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
               return;
             }
 
-            const sort: DatabaseViewSortAttributes = {
-              id: fieldId,
-              fieldId,
-              direction,
-            };
+            draft.attributes.sorts = draft.attributes.sorts ?? {};
 
-            viewAttributes.sorts[fieldId] = sort;
-          }
-
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
+            if (fieldId === SpecialId.Name) {
+              const sort: DatabaseViewSortAttributes = {
+                id: fieldId,
+                fieldId,
+                direction,
+              };
+              draft.attributes.sorts[fieldId] = sort;
+            } else {
+              const field = database.fields.find((f) => f.id === fieldId);
+              if (!field) {
+                return;
+              }
+              const sort: DatabaseViewSortAttributes = {
+                id: fieldId,
+                fieldId,
+                direction,
+              };
+              draft.attributes.sorts[fieldId] = sort;
+            }
           });
 
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            setIsSearchBarOpened(true);
-            setIsSortsOpened(true);
-          }
+          setIsSearchBarOpened(true);
+          setIsSortsOpened(true);
         },
         updateSort: async (id: string, sort: DatabaseViewSortAttributes) => {
           if (!database.canEdit) {
@@ -419,23 +413,21 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.sorts = viewAttributes.sorts ?? {};
-          viewAttributes.sorts[id] = sort;
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
+          }
 
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
+              return;
+            }
+            draft.attributes.sorts = draft.attributes.sorts ?? {};
+            draft.attributes.sorts[id] = sort;
           });
 
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            setIsSearchBarOpened(true);
-            setIsSortsOpened(true);
-          }
+          setIsSearchBarOpened(true);
+          setIsSortsOpened(true);
         },
         removeSort: async (id: string) => {
           if (!database.canEdit) {
@@ -446,23 +438,21 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
-          viewAttributes.sorts = viewAttributes.sorts ?? {};
-          delete viewAttributes.sorts[id];
+          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          if (!nodes.has(view.id)) {
+            return;
+          }
 
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
+          nodes.update(view.id, (draft) => {
+            if (draft.attributes.type !== 'database_view') {
+              return;
+            }
+            draft.attributes.sorts = draft.attributes.sorts ?? {};
+            delete draft.attributes.sorts[id];
           });
 
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            setIsSearchBarOpened(true);
-            setIsSortsOpened(true);
-          }
+          setIsSearchBarOpened(true);
+          setIsSortsOpened(true);
         },
         openSearchBar: () => {
           setIsSearchBarOpened(true);

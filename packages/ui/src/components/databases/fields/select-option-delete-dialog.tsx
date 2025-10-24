@@ -9,6 +9,8 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useDatabase } from '@colanode/ui/contexts/database';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { database as appDatabase } from '@colanode/ui/data';
 
 interface SelectOptionDeleteDialogProps {
   fieldId: string;
@@ -23,6 +25,7 @@ export const SelectOptionDeleteDialog = ({
   open,
   onOpenChange,
 }: SelectOptionDeleteDialogProps) => {
+  const workspace = useWorkspace();
   const database = useDatabase();
 
   return (
@@ -42,7 +45,36 @@ export const SelectOptionDeleteDialog = ({
           <Button
             variant="destructive"
             onClick={() => {
-              database.deleteSelectOption(fieldId, optionId);
+              const nodes = appDatabase.workspace(workspace.userId).nodes;
+              if (!nodes.has(database.id)) {
+                return;
+              }
+
+              nodes.update(database.id, (draft) => {
+                if (draft.attributes.type !== 'database') {
+                  return;
+                }
+
+                const fieldDraft = draft.attributes.fields[fieldId];
+                if (!fieldDraft) {
+                  return;
+                }
+
+                if (
+                  fieldDraft.type !== 'select' &&
+                  fieldDraft.type !== 'multi_select'
+                ) {
+                  return;
+                }
+
+                if (!fieldDraft.options) {
+                  return;
+                }
+
+                delete fieldDraft.options[optionId];
+              });
+
+              onOpenChange(false);
             }}
           >
             Delete

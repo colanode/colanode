@@ -9,6 +9,8 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useDatabase } from '@colanode/ui/contexts/database';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { database as appDatabase } from '@colanode/ui/data';
 
 interface FieldDeleteDialogProps {
   id: string;
@@ -21,6 +23,7 @@ export const FieldDeleteDialog = ({
   open,
   onOpenChange,
 }: FieldDeleteDialogProps) => {
+  const workspace = useWorkspace();
   const database = useDatabase();
 
   return (
@@ -39,8 +42,22 @@ export const FieldDeleteDialog = ({
           <AlertDialogCancel>Cancel</AlertDialogCancel>
           <Button
             variant="destructive"
-            onClick={async () => {
-              database.deleteField(id);
+            onClick={() => {
+              const nodes = appDatabase.workspace(workspace.userId).nodes;
+              if (!nodes.has(database.id)) {
+                console.error('Database not found');
+                return;
+              }
+
+              nodes.update(database.id, (draft) => {
+                if (draft.attributes.type !== 'database') {
+                  console.error('Database not found');
+                  return;
+                }
+
+                delete draft.attributes.fields[id];
+              });
+
               onOpenChange(false);
             }}
           >

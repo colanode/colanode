@@ -1,8 +1,14 @@
+import { useMutation } from '@tanstack/react-query';
 import { Check, Plus, X } from 'lucide-react';
 import { Fragment, useState } from 'react';
 import { toast } from 'sonner';
 
+import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import {
+  compareString,
+  generateFractionalIndex,
+  generateId,
+  IdType,
   MultiSelectFieldAttributes,
   SelectFieldAttributes,
 } from '@colanode/core';
@@ -18,7 +24,7 @@ import {
 } from '@colanode/ui/components/ui/command';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { database as appDatabase } from '@colanode/ui/data';
 import { getRandomSelectOptionColor } from '@colanode/ui/lib/databases';
 
 interface SelectFieldOptionsProps {
@@ -36,7 +42,6 @@ export const SelectFieldOptions = ({
 }: SelectFieldOptionsProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
-  const { mutate, isPending } = useMutation();
 
   const selectOptions = Object.values(field.options ?? {});
 
@@ -46,6 +51,71 @@ export const SelectFieldOptions = ({
     database.canEdit &&
     allowAdd &&
     !selectOptions.some((option) => option.name === inputValue.trim());
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async ({ name, color }: { name: string; color: string }) => {
+      const nodes = appDatabase.workspace(workspace.userId).nodes;
+      if (!nodes.has(database.id)) {
+        return null;
+      }
+
+      const selectOptionId = generateId(IdType.SelectOption);
+      nodes.update(database.id, (draft) => {
+        if (draft.attributes.type !== 'database') {
+          return;
+        }
+
+        const fieldDraft = draft.attributes.fields[field.id];
+        if (!fieldDraft) {
+          throw new MutationError(
+            MutationErrorCode.FieldNotFound,
+            'The field you are trying to create a select option in does not exist.'
+          );
+        }
+
+        if (
+          fieldDraft.type !== 'multi_select' &&
+          fieldDraft.type !== 'select'
+        ) {
+          throw new MutationError(
+            MutationErrorCode.FieldTypeInvalid,
+            'The field you are trying to create a select option in is not a "Select" or "Multi-Select" field.'
+          );
+        }
+
+        if (!fieldDraft.options) {
+          fieldDraft.options = {};
+        }
+
+        const maxIndex = Object.values(fieldDraft.options)
+          .map((selectOption) => selectOption.index)
+          .sort((a, b) => -compareString(a, b))[0];
+
+        const index = generateFractionalIndex(maxIndex, null);
+
+        fieldDraft.options[selectOptionId] = {
+          name: name,
+          id: selectOptionId,
+          color: color,
+          index: index,
+        };
+      });
+
+      return selectOptionId;
+    },
+    onSuccess: (selectOptionId) => {
+      if (!selectOptionId) {
+        return;
+      }
+
+      setInputValue('');
+      setColor(getRandomSelectOptionColor());
+      onSelect(selectOptionId);
+    },
+    onError: (error) => {
+      toast.error(error.message as string);
+    },
+  });
 
   return (
     <Command className="min-h-min">
@@ -104,33 +174,9 @@ export const SelectFieldOptions = ({
               key={inputValue.trim()}
               value={inputValue.trim()}
               onSelect={() => {
-                if (isPending) {
-                  return;
-                }
-
-                if (inputValue.trim().length === 0) {
-                  return;
-                }
-
-                mutate({
-                  input: {
-                    type: 'select.option.create',
-                    databaseId: database.id,
-                    fieldId: field.id,
-                    name: inputValue.trim(),
-                    color,
-                    userId: workspace.userId,
-                  },
-                  onSuccess(output) {
-                    setInputValue('');
-                    setColor(getRandomSelectOptionColor());
-                    onSelect(output.id);
-                  },
-                  onError(error) {
-                    toast.error(error.message);
-                  },
-                });
+                mutate({ name: inputValue.trim(), color });
               }}
+              disabled={isPending}
               className="flex flex-row items-center gap-2"
             >
               <span className="text-xs text-muted-foreground">Create</span>
