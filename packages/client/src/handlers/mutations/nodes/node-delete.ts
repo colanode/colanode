@@ -1,19 +1,19 @@
 import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
 import { MutationHandler } from '@colanode/client/lib/types';
 import {
-  RecordDeleteMutationInput,
-  RecordDeleteMutationOutput,
-} from '@colanode/client/mutations/records/record-delete';
+  NodeDeleteMutationInput,
+  NodeDeleteMutationOutput,
+} from '@colanode/client/mutations/nodes/node-delete';
 
-export class RecordDeleteMutationHandler
+export class NodeDeleteMutationHandler
   extends WorkspaceMutationHandlerBase
-  implements MutationHandler<RecordDeleteMutationInput>
+  implements MutationHandler<NodeDeleteMutationInput>
 {
   async handleMutation(
-    input: RecordDeleteMutationInput
-  ): Promise<RecordDeleteMutationOutput> {
+    input: NodeDeleteMutationInput
+  ): Promise<NodeDeleteMutationOutput> {
     const workspace = this.getWorkspace(input.userId);
-    await workspace.nodes.deleteNode(input.recordId);
+    await workspace.nodes.deleteNode(input.nodeId);
 
     return {
       success: true,

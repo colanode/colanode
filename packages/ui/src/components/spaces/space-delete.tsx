@@ -1,3 +1,5 @@
+import { useMutation } from '@tanstack/react-query';
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
@@ -11,18 +13,30 @@ import {
   AlertDialogTitle,
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { database } from '@colanode/ui/data';
 
 interface SpaceDeleteProps {
   id: string;
-  onDeleted: () => void;
 }
 
-export const SpaceDelete = ({ id, onDeleted }: SpaceDeleteProps) => {
+export const SpaceDelete = ({ id }: SpaceDeleteProps) => {
   const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
+  const navigate = useNavigate({ from: '/workspace/$userId' });
+
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      const nodes = database.workspace(workspace.userId).nodes;
+      nodes.delete(id);
+    },
+    onSuccess: () => {
+      navigate({ to: 'home', replace: true });
+      setShowDeleteModal(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
@@ -59,29 +73,12 @@ export const SpaceDelete = ({ id, onDeleted }: SpaceDeleteProps) => {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
             <Button
               variant="destructive"
               disabled={isPending}
-              onClick={() => {
-                mutate({
-                  input: {
-                    type: 'space.delete',
-                    userId: workspace.userId,
-                    spaceId: id,
-                  },
-                  onSuccess() {
-                    setShowDeleteModal(false);
-                    onDeleted();
-                    toast.success('Space deleted');
-                  },
-                  onError(error) {
-                    toast.error(error.message);
-                  },
-                });
-              }}
+              onClick={() => mutate()}
             >
-              {isPending && <Spinner className="mr-1" />}
               Delete
             </Button>
           </AlertDialogFooter>

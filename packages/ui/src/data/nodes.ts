@@ -59,5 +59,16 @@ export const createNodesCollection = (userId: string) => {
         })
       );
     },
+    onDelete: async ({ transaction }) => {
+      await Promise.all(
+        transaction.mutations.map(async (mutation) => {
+          return await window.colanode.executeMutation({
+            type: 'node.delete',
+            userId,
+            nodeId: mutation.key,
+          });
+        })
+      );
+    },
   });
 };

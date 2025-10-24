@@ -1,4 +1,3 @@
-import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import { LocalSpaceNode } from '@colanode/client/types';
@@ -17,7 +16,6 @@ interface SpaceBodyProps {
 
 export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
   const workspace = useWorkspace();
-  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   const canEdit = hasNodeRole(role, 'admin');
@@ -78,14 +76,7 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
             </h2>
             <Separator className="mt-3" />
           </div>
-          <SpaceDelete
-            id={space.id}
-            onDeleted={() => {
-              navigate({
-                to: '/',
-              });
-            }}
-          />
+          <SpaceDelete id={space.id} />
         </div>
       )}
     </div>

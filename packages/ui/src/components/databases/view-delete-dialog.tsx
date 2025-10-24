@@ -1,3 +1,4 @@
+import { useMutation } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 import {
@@ -10,10 +11,8 @@ import {
   AlertDialogTitle,
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { database } from '@colanode/ui/data';
 
 interface ViewDeleteDialogProps {
   id: string;
@@ -27,12 +26,18 @@ export const ViewDeleteDialog = ({
   onOpenChange,
 }: ViewDeleteDialogProps) => {
   const workspace = useWorkspace();
-  const database = useDatabase();
-  const { mutate, isPending } = useMutation();
-
-  if (!database.canEdit) {
-    return null;
-  }
+  const { mutate, isPending } = useMutation({
+    mutationFn: async () => {
+      const nodes = database.workspace(workspace.userId).nodes;
+      nodes.delete(id);
+    },
+    onSuccess: () => {
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -47,28 +52,12 @@ export const ViewDeleteDialog = ({
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
           <Button
             variant="destructive"
             disabled={isPending}
-            onClick={() => {
-              mutate({
-                input: {
-                  type: 'view.delete',
-                  viewId: id,
-                  databaseId: database.id,
-                  userId: workspace.userId,
-                },
-                onSuccess() {
-                  onOpenChange(false);
-                },
-                onError(error) {
-                  toast.error(error.message);
-                },
-              });
-            }}
+            onClick={() => mutate()}
           >
-            {isPending && <Spinner className="mr-1" />}
             Delete
           </Button>
         </AlertDialogFooter>
