@@ -83,22 +83,24 @@ export const SelectFieldOptions = ({
           );
         }
 
-        if (!fieldDraft.options) {
-          fieldDraft.options = {};
-        }
-
-        const maxIndex = Object.values(fieldDraft.options)
+        const existingOptions = fieldDraft.options ?? {};
+        const maxIndex = Object.values(existingOptions)
           .map((selectOption) => selectOption.index)
           .sort((a, b) => -compareString(a, b))[0];
 
         const index = generateFractionalIndex(maxIndex, null);
 
-        fieldDraft.options[selectOptionId] = {
-          name: name,
-          id: selectOptionId,
-          color: color,
-          index: index,
+        const updatedOptions = {
+          ...existingOptions,
+          [selectOptionId]: {
+            name: name,
+            id: selectOptionId,
+            color: color,
+            index: index,
+          },
         };
+
+        fieldDraft.options = updatedOptions;
       });
 
       return selectOptionId;
@@ -113,6 +115,7 @@ export const SelectFieldOptions = ({
       onSelect(selectOptionId);
     },
     onError: (error) => {
+      console.log('error', error);
       toast.error(error.message as string);
     },
   });

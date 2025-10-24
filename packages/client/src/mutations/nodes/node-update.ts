@@ -4,7 +4,7 @@ export type NodeUpdateMutationInput = {
   type: 'node.update';
   userId: string;
   nodeId: string;
-  attributes: Partial<NodeAttributes>;
+  attributes: NodeAttributes;
 };
 
 export type NodeUpdateMutationOutput = {

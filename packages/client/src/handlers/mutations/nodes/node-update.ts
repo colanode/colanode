@@ -1,5 +1,3 @@
-import { merge } from 'lodash-es';
-
 import { WorkspaceMutationHandlerBase } from '@colanode/client/handlers/mutations/workspace-mutation-handler-base';
 import { MutationHandler } from '@colanode/client/lib/types';
 import {
@@ -15,8 +13,8 @@ export class NodeUpdateMutationHandler
     input: NodeUpdateMutationInput
   ): Promise<NodeUpdateMutationOutput> {
     const workspace = this.getWorkspace(input.userId);
-    await workspace.nodes.updateNode(input.nodeId, (attributes) => {
-      return merge(attributes, input.attributes);
+    await workspace.nodes.updateNode(input.nodeId, () => {
+      return input.attributes;
     });
 
     return {

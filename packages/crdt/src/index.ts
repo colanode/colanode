@@ -52,11 +52,16 @@ export class YDoc {
     schema: z.ZodSchema,
     object: z.infer<typeof schema>
   ): Uint8Array | null {
-    if (!schema.safeParse(object).success) {
-      throw new Error('Invalid object', schema.safeParse(object).error);
+    const normalizedObject = this.normalizeForUpdate(object);
+
+    const parseResult = schema.safeParse(normalizedObject);
+    if (!parseResult.success) {
+      throw new Error(`Invalid object: ${parseResult.error.message}`, {
+        cause: parseResult.error,
+      });
     }
 
-    const objectSchema = this.extractType(schema, object);
+    const objectSchema = this.extractType(schema, normalizedObject);
     if (!(objectSchema instanceof z.ZodObject)) {
       throw new Error('Schema must be a ZodObject');
     }
@@ -70,7 +75,7 @@ export class YDoc {
 
     const objectMap = this.doc.getMap('object');
     this.doc.transact(() => {
-      this.applyObjectChanges(objectSchema, object, objectMap);
+      this.applyObjectChanges(objectSchema, normalizedObject, objectMap);
 
       const parseResult = schema.safeParse(objectMap.toJSON());
       if (!parseResult.success) {
@@ -468,5 +473,27 @@ export class YDoc {
     }
 
     return schema;
+  }
+
+  private normalizeForUpdate(object: any): any {
+    if (object === null || object === undefined) {
+      return object;
+    }
+
+    if (Array.isArray(object)) {
+      return object.map((item) => this.normalizeForUpdate(item));
+    }
+
+    if (typeof object === 'object') {
+      const normalized: any = {};
+      for (const [key, value] of Object.entries(object)) {
+        if (value !== undefined) {
+          normalized[key] = this.normalizeForUpdate(value);
+        }
+      }
+      return normalized;
+    }
+
+    return object;
   }
 }
