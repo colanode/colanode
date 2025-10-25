@@ -1,8 +1,8 @@
 import { FieldAttributes } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 
 interface FieldRenameInputProps {
   field: FieldAttributes;
@@ -19,7 +19,7 @@ export const FieldRenameInput = ({ field }: FieldRenameInputProps) => {
         readOnly={!database.canEdit}
         onChange={(newName) => {
           if (newName === field.name) return;
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(database.id)) {
             return;
           }

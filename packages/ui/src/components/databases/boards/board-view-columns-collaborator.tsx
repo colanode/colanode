@@ -6,13 +6,13 @@ import {
   DatabaseViewFilterAttributes,
   FieldValue,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
 import { BoardViewContext } from '@colanode/ui/contexts/board-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface BoardViewColumnsCollaboratorProps {
@@ -80,7 +80,7 @@ export const BoardViewColumnsCollaborator = ({
               ),
               canDrag: (record) => record.canEdit,
               onDragEnd: async (record, value) => {
-                const nodes = appDatabase.workspace(workspace.userId).nodes;
+                const nodes = collections.workspace(workspace.userId).nodes;
                 if (!nodes.has(record.id)) {
                   return;
                 }
@@ -147,7 +147,7 @@ export const BoardViewColumnsCollaborator = ({
           ),
           canDrag: () => true,
           onDragEnd: async (record, value) => {
-            const nodes = appDatabase.workspace(workspace.userId).nodes;
+            const nodes = collections.workspace(workspace.userId).nodes;
             if (!nodes.has(record.id)) {
               return;
             }
@@ -193,7 +193,7 @@ const BoardViewColumnCollaboratorHeader = ({
 
   const userQuery = useLiveQueryTanstack((q) =>
     q
-      .from({ users: appDatabase.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => eq(users.id, collaborator))
       .select(({ users }) => ({
         id: users.id,

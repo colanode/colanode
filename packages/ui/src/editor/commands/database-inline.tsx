@@ -6,7 +6,7 @@ import {
   LocalDatabaseViewNode,
 } from '@colanode/client/types';
 import { IdType, generateId, generateFractionalIndex } from '@colanode/core';
-import { database as appDatabase } from '@colanode/ui/data';
+import { collections } from '@colanode/ui/collections';
 
 export const DatabaseInlineCommand: EditorCommand = {
   key: 'database-inline',
@@ -21,7 +21,7 @@ export const DatabaseInlineCommand: EditorCommand = {
     }
 
     const { userId, documentId, rootId } = context;
-    const nodes = appDatabase.workspace(userId).nodes;
+    const nodes = collections.workspace(userId).nodes;
     const databaseId = generateId(IdType.Database);
     const fieldId = generateId(IdType.Field);
     const viewId = generateId(IdType.DatabaseView);

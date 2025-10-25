@@ -4,6 +4,7 @@ import { Fragment, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { SpecialId } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import {
   Popover,
   PopoverContent,
@@ -14,7 +15,6 @@ import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 import { cn } from '@colanode/ui/lib/utils';
 
 export const TableViewNameHeader = () => {
@@ -94,7 +94,7 @@ export const TableViewNameHeader = () => {
               onChange={(newName) => {
                 if (newName === database.nameField?.name) return;
 
-                const nodes = appDatabase.workspace(workspace.userId).nodes;
+                const nodes = collections.workspace(workspace.userId).nodes;
                 nodes.update(database.id, (draft) => {
                   if (draft.attributes.type !== 'database') {
                     return;

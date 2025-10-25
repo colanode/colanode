@@ -2,7 +2,7 @@ import { FileText } from 'lucide-react';
 
 import { EditorCommand, LocalPageNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
-import { database } from '@colanode/ui/data';
+import { collections } from '@colanode/ui/collections';
 
 export const PageCommand: EditorCommand = {
   key: 'page',
@@ -18,7 +18,7 @@ export const PageCommand: EditorCommand = {
 
     const { userId, documentId, rootId } = context;
     const pageId = generateId(IdType.Page);
-    const nodes = database.workspace(userId).nodes;
+    const nodes = collections.workspace(userId).nodes;
 
     const page: LocalPageNode = {
       id: pageId,

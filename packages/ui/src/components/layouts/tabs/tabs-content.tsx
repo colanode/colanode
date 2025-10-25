@@ -1,7 +1,7 @@
 import { useLiveQuery } from '@tanstack/react-db';
 
+import { collections } from '@colanode/ui/collections';
 import { TabsContentItem } from '@colanode/ui/components/layouts/tabs/tabs-content-item';
-import { database } from '@colanode/ui/data';
 
 interface TabsContentProps {
   activeTabId?: string;
@@ -10,7 +10,7 @@ interface TabsContentProps {
 export const TabsContent = ({ activeTabId }: TabsContentProps) => {
   const tabsQuery = useLiveQuery((q) =>
     q
-      .from({ tabs: database.tabs })
+      .from({ tabs: collections.tabs })
       .orderBy(({ tabs }) => tabs.index, `asc`)
       .select(({ tabs }) => ({
         id: tabs.id,

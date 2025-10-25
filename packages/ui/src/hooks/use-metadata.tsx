@@ -1,7 +1,7 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
-import { database } from '@colanode/ui/data';
-import { buildMetadataKey } from '@colanode/ui/data/metadata';
+import { collections } from '@colanode/ui/collections';
+import { buildMetadataKey } from '@colanode/ui/collections/metadata';
 
 export const useMetadata = <T = string,>(
   namespace: string,
@@ -9,7 +9,7 @@ export const useMetadata = <T = string,>(
 ): [T | undefined, (value: T | undefined) => void] => {
   const metadataQuery = useLiveQuery((q) =>
     q
-      .from({ metadata: database.metadata })
+      .from({ metadata: collections.metadata })
       .where(
         ({ metadata }) =>
           eq(metadata.namespace, namespace) && eq(metadata.key, key)
@@ -22,17 +22,17 @@ export const useMetadata = <T = string,>(
 
   const setValue = (value: T | undefined) => {
     const metadataKey = buildMetadataKey(namespace, key);
-    const currentMetadata = database.metadata.get(metadataKey);
+    const currentMetadata = collections.metadata.get(metadataKey);
 
     if (value === undefined) {
       if (currentMetadata) {
-        database.metadata.delete(metadataKey);
+        collections.metadata.delete(metadataKey);
       }
     } else {
       const json = JSON.stringify(value);
 
       if (currentMetadata) {
-        database.metadata.update(metadataKey, (metadata) => {
+        collections.metadata.update(metadataKey, (metadata) => {
           metadata.value = json;
           metadata.updatedAt = new Date().toISOString();
         });
@@ -45,7 +45,7 @@ export const useMetadata = <T = string,>(
           updatedAt: null,
         };
 
-        database.metadata.insert(newMetadata);
+        collections.metadata.insert(newMetadata);
       }
     }
   };

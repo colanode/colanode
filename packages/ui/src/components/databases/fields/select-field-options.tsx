@@ -12,6 +12,7 @@ import {
   MultiSelectFieldAttributes,
   SelectFieldAttributes,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { SelectOptionBadge } from '@colanode/ui/components/databases/fields/select-option-badge';
 import { SelectOptionSettingsPopover } from '@colanode/ui/components/databases/fields/select-option-settings-popover';
 import {
@@ -24,7 +25,6 @@ import {
 } from '@colanode/ui/components/ui/command';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 import { getRandomSelectOptionColor } from '@colanode/ui/lib/databases';
 
 interface SelectFieldOptionsProps {
@@ -54,7 +54,7 @@ export const SelectFieldOptions = ({
 
   const { mutate, isPending } = useMutation({
     mutationFn: async ({ name, color }: { name: string; color: string }) => {
-      const nodes = appDatabase.workspace(workspace.userId).nodes;
+      const nodes = collections.workspace(workspace.userId).nodes;
       if (!nodes.has(database.id)) {
         return null;
       }

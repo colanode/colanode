@@ -5,6 +5,7 @@ import { useDrop } from 'react-dnd';
 
 import { LocalNode, LocalSpaceNode } from '@colanode/client/types';
 import { extractNodeRole } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { SpaceSidebarDropdown } from '@colanode/ui/components/spaces/space-sidebar-dropdown';
 import {
@@ -15,7 +16,6 @@ import {
 import { Link } from '@colanode/ui/components/ui/link';
 import { WorkspaceSidebarItem } from '@colanode/ui/components/workspaces/sidebars/sidebar-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import {
   generateSpaceChildIndex,
   sortSpaceChildren,
@@ -34,7 +34,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
 
   const nodeChildrenGetQuery = useLiveQuery((q) =>
     q
-      .from({ nodes: database.workspace(workspace.userId).nodes })
+      .from({ nodes: collections.workspace(workspace.userId).nodes })
       .where(({ nodes }) => eq(nodes.parentId, space.id))
       .where(({ nodes }) =>
         inArray(nodes.type, ['page', 'channel', 'database', 'folder'])
@@ -58,7 +58,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const children = sortSpaceChildren(space, nodeChildrenGetQuery.data ?? []);
 
   const handleDragEnd = (childId: string, after: string | null) => {
-    const nodes = database.workspace(workspace.userId).nodes;
+    const nodes = collections.workspace(workspace.userId).nodes;
     if (!nodes.has(space.id)) {
       return;
     }

@@ -3,10 +3,10 @@ import { Fragment } from 'react';
 
 import { LocalFileNode } from '@colanode/client/types';
 import { formatBytes, formatDate } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 interface FileSidebarProps {
   file: LocalFileNode;
@@ -25,7 +25,7 @@ export const FileSidebar = ({ file }: FileSidebarProps) => {
   const workspace = useWorkspace();
   const userQuery = useLiveQuery((q) =>
     q
-      .from({ users: database.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => eq(users.id, file.createdBy))
       .select(({ users }) => ({
         id: users.id,

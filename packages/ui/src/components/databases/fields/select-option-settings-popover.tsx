@@ -2,6 +2,7 @@ import { Ellipsis, Trash2 } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
 import { SelectOptionAttributes } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { SelectOptionDeleteDialog } from '@colanode/ui/components/databases/fields/select-option-delete-dialog';
 import { Label } from '@colanode/ui/components/ui/label';
 import {
@@ -13,7 +14,6 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 import { selectOptionColors } from '@colanode/ui/lib/databases';
 import { cn } from '@colanode/ui/lib/utils';
 
@@ -49,7 +49,7 @@ export const SelectOptionSettingsPopover = ({
               onChange={(newName) => {
                 if (newName === option.name) return;
 
-                const nodes = appDatabase.workspace(workspace.userId).nodes;
+                const nodes = collections.workspace(workspace.userId).nodes;
                 if (!nodes.has(database.id)) {
                   return;
                 }
@@ -93,7 +93,7 @@ export const SelectOptionSettingsPopover = ({
                 key={color.value}
                 className="flex cursor-pointer flex-row items-center gap-2 rounded-md p-1 hover:bg-accent"
                 onClick={() => {
-                  const nodes = appDatabase.workspace(workspace.userId).nodes;
+                  const nodes = collections.workspace(workspace.userId).nodes;
                   if (!nodes.has(database.id)) {
                     return;
                   }

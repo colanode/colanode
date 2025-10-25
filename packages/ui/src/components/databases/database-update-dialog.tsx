@@ -1,5 +1,6 @@
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { DatabaseForm } from '@colanode/ui/components/databases/database-form';
 import {
   Dialog,
@@ -9,7 +10,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 
 interface DatabaseUpdateDialogProps {
   database: LocalDatabaseNode;
@@ -50,7 +50,7 @@ export const DatabaseUpdateDialog = ({
             onOpenChange(false);
           }}
           onSubmit={(values) => {
-            const nodes = appDatabase.workspace(workspace.userId).nodes;
+            const nodes = collections.workspace(workspace.userId).nodes;
             if (!nodes.has(database.id)) {
               return;
             }

@@ -14,6 +14,7 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { DatabaseSelect } from '@colanode/ui/components/databases/database-select';
 import { FieldTypeSelect } from '@colanode/ui/components/databases/fields/field-type-select';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -33,7 +34,6 @@ import {
 } from '@colanode/ui/components/ui/popover';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 
 const formSchema = z.object({
   name: z.string().min(1, { message: 'Name is required' }),
@@ -85,7 +85,7 @@ export const FieldCreatePopover = ({
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (values: FieldCreateFormValues) => {
-      const nodes = appDatabase.workspace(workspace.userId).nodes;
+      const nodes = collections.workspace(workspace.userId).nodes;
 
       if (values.type === 'relation') {
         if (!values.relationDatabaseId) {

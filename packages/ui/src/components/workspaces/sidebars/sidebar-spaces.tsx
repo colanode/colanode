@@ -1,11 +1,11 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { LocalSpaceNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { SpaceCreateButton } from '@colanode/ui/components/spaces/space-create-button';
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
 import { SidebarHeader } from '@colanode/ui/components/workspaces/sidebars/sidebar-header';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 export const SidebarSpaces = () => {
   const workspace = useWorkspace();
@@ -14,7 +14,7 @@ export const SidebarSpaces = () => {
 
   const spacesQuery = useLiveQuery((q) =>
     q
-      .from({ nodes: database.workspace(workspace.userId).nodes })
+      .from({ nodes: collections.workspace(workspace.userId).nodes })
       .where(({ nodes }) => eq(nodes.type, 'space'))
   );
 

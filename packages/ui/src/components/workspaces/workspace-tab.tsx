@@ -1,7 +1,7 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
+import { collections } from '@colanode/ui/collections';
 import { Tab } from '@colanode/ui/components/layouts/tabs/tab';
-import { database } from '@colanode/ui/data';
 
 interface WorkspaceTabProps {
   userId: string;
@@ -10,7 +10,7 @@ interface WorkspaceTabProps {
 export const WorkspaceTab = ({ userId }: WorkspaceTabProps) => {
   const workspaceQuery = useLiveQuery((q) =>
     q
-      .from({ workspaces: database.workspaces })
+      .from({ workspaces: collections.workspaces })
       .where(({ workspaces }) => eq(workspaces.userId, userId))
       .select(({ workspaces }) => ({
         workspaceId: workspaces.workspaceId,

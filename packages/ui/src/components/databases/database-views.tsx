@@ -2,11 +2,11 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 import { useEffect, useState } from 'react';
 
 import { LocalDatabaseViewNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { View } from '@colanode/ui/components/databases/view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { DatabaseViewsContext } from '@colanode/ui/contexts/database-views';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 
 interface DatabaseViewsProps {
   inline?: boolean;
@@ -19,7 +19,7 @@ export const DatabaseViews = ({ inline = false }: DatabaseViewsProps) => {
 
   const viewListQuery = useLiveQuery((q) =>
     q
-      .from({ nodes: appDatabase.workspace(workspace.userId).nodes })
+      .from({ nodes: collections.workspace(workspace.userId).nodes })
       .where(({ nodes }) => eq(nodes.type, 'database_view'))
       .where(({ nodes }) => eq(nodes.parentId, database.id))
   );

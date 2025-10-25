@@ -1,19 +1,19 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { LocalChatNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { ChatCreatePopover } from '@colanode/ui/components/chats/chat-create-popover';
 import { ChatSidebarItem } from '@colanode/ui/components/chats/chat-sidebar-item';
 import { Link } from '@colanode/ui/components/ui/link';
 import { SidebarHeader } from '@colanode/ui/components/workspaces/sidebars/sidebar-header';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 export const SidebarChats = () => {
   const workspace = useWorkspace();
 
   const chatsQuery = useLiveQuery((q) =>
     q
-      .from({ nodes: database.workspace(workspace.userId).nodes })
+      .from({ nodes: collections.workspace(workspace.userId).nodes })
       .where(({ nodes }) => eq(nodes.type, 'chat'))
   );
 

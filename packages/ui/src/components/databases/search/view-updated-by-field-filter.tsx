@@ -5,6 +5,7 @@ import {
   DatabaseViewFieldFilterAttributes,
   UpdatedByFieldAttributes,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { Badge } from '@colanode/ui/components/ui/badge';
@@ -24,7 +25,6 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { UserSearch } from '@colanode/ui/components/users/user-search';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { updatedByFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface CollaboratorBadgeProps {
@@ -71,7 +71,7 @@ export const ViewUpdatedByFieldFilter = ({
   const collaboratorIds = (filter.value as string[]) ?? [];
   const collaboratorsQuery = useLiveQuery((q) =>
     q
-      .from({ users: database.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => inArray(users.id, collaboratorIds))
       .select(({ users }) => ({
         id: users.id,

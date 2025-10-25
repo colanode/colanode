@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
 import { WorkspaceStorageUser } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -34,7 +35,6 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 const UNITS = [
@@ -109,7 +109,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
 
   const userQuery = useLiveQuery((q) =>
     q
-      .from({ users: database.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => eq(users.id, user.id))
       .select(({ users }) => ({
         id: users.id,

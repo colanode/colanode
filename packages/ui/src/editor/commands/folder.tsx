@@ -2,7 +2,7 @@ import { Folder } from 'lucide-react';
 
 import { EditorCommand, LocalFolderNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
-import { database } from '@colanode/ui/data';
+import { collections } from '@colanode/ui/collections';
 
 export const FolderCommand: EditorCommand = {
   key: 'folder',
@@ -19,7 +19,7 @@ export const FolderCommand: EditorCommand = {
     const { userId, documentId, rootId } = context;
 
     const folderId = generateId(IdType.Folder);
-    const nodes = database.workspace(userId).nodes;
+    const nodes = collections.workspace(userId).nodes;
 
     const folder: LocalFolderNode = {
       id: folderId,

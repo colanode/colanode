@@ -1,5 +1,6 @@
 import { LocalChannelNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { ChannelForm } from '@colanode/ui/components/channels/channel-form';
 import {
   Dialog,
@@ -9,7 +10,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 interface ChannelUpdateDialogProps {
   channel: LocalChannelNode;
@@ -49,7 +49,7 @@ export const ChannelUpdateDialog = ({
             onOpenChange(false);
           }}
           onSubmit={(values) => {
-            const nodes = database.workspace(workspace.userId).nodes;
+            const nodes = collections.workspace(workspace.userId).nodes;
             if (!nodes.has(channel.id)) {
               return;
             }

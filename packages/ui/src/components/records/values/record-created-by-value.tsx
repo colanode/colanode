@@ -1,10 +1,10 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { CreatedByFieldAttributes } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 interface RecordCreatedByValueProps {
   field: CreatedByFieldAttributes;
@@ -15,7 +15,7 @@ export const RecordCreatedByValue = ({ field }: RecordCreatedByValueProps) => {
   const record = useRecord();
   const userQuery = useLiveQuery((q) =>
     q
-      .from({ users: database.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => eq(users.id, record.createdBy))
       .select(({ users }) => ({
         id: users.id,

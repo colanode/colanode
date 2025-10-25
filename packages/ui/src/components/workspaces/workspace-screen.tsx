@@ -2,10 +2,10 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 import { useParams } from '@tanstack/react-router';
 // import { useEffect } from 'react';
 
+import { collections } from '@colanode/ui/collections';
 import { WorkspaceLayout } from '@colanode/ui/components/workspaces/workspace-layout';
 import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { useLocationTracker } from '@colanode/ui/hooks/use-location-tracker';
 
 export const WorkspaceScreen = () => {
@@ -15,7 +15,7 @@ export const WorkspaceScreen = () => {
 
   const workspaceQuery = useLiveQuery((q) =>
     q
-      .from({ workspaces: database.workspaces })
+      .from({ workspaces: collections.workspaces })
       .where(({ workspaces }) => eq(workspaces.userId, userId))
       .select(({ workspaces }) => ({
         userId: workspaces.userId,

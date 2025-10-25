@@ -4,9 +4,9 @@ import {
 } from '@tanstack/react-db';
 
 import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface MessageReactionCountTooltipContentProps {
@@ -40,7 +40,7 @@ export const MessageReactionCountTooltipContent = ({
 
   const usersQuery = useLiveQueryTanstack((q) =>
     q
-      .from({ users: database.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => inArray(users.id, userIds))
       .select(({ users }) => ({
         name: users.name,

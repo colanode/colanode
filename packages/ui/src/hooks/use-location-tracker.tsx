@@ -1,8 +1,8 @@
 import { useRouter } from '@tanstack/react-router';
 import { useEffect } from 'react';
 
-import { database } from '@colanode/ui/data';
-import { buildMetadataKey } from '@colanode/ui/data/metadata';
+import { collections } from '@colanode/ui/collections';
+import { buildMetadataKey } from '@colanode/ui/collections/metadata';
 
 export const useLocationTracker = (userId: string) => {
   const router = useRouter();
@@ -19,14 +19,14 @@ export const useLocationTracker = (userId: string) => {
       }
 
       const metadataKey = buildMetadataKey(userId, 'location');
-      const currentLocation = database.metadata.get(metadataKey);
+      const currentLocation = collections.metadata.get(metadataKey);
       if (currentLocation) {
-        database.metadata.update(metadataKey, (metadata) => {
+        collections.metadata.update(metadataKey, (metadata) => {
           metadata.value = JSON.stringify(location);
           metadata.updatedAt = new Date().toISOString();
         });
       } else {
-        database.metadata.insert({
+        collections.metadata.insert({
           namespace: userId,
           key: 'location',
           value: JSON.stringify(location),

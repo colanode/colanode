@@ -3,6 +3,7 @@ import { Check, ChevronsUpDown } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
 import { DatabaseAttributes } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -19,7 +20,6 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface DatabaseSelectProps {
@@ -33,7 +33,7 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
 
   const databaseListQuery = useLiveQuery((q) =>
     q
-      .from({ nodes: database.workspace(workspace.userId).nodes })
+      .from({ nodes: collections.workspace(workspace.userId).nodes })
       .where(({ nodes }) => eq(nodes.type, 'database'))
       .select(({ nodes }) => ({
         id: nodes.id,

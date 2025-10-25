@@ -1,8 +1,8 @@
 import { LocalRecordNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { RecordContext } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 
 export const RecordProvider = ({
   record,
@@ -33,7 +33,7 @@ export const RecordProvider = ({
         localRevision: record.localRevision,
         canEdit,
         updateFieldValue: async (field, value) => {
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(record.id)) {
             return;
           }
@@ -47,7 +47,7 @@ export const RecordProvider = ({
           });
         },
         removeFieldValue: async (field) => {
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(record.id)) {
             return;
           }

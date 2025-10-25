@@ -7,9 +7,9 @@ import { InView } from 'react-intersection-observer';
 
 import { NodeReactionListQueryInput } from '@colanode/client/queries';
 import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 const REACTIONS_PER_PAGE = 20;
@@ -47,7 +47,7 @@ export const MessageReactionCountsDialogList = ({
 
   const usersQuery = useLiveQueryTanstack((q) =>
     q
-      .from({ users: database.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => inArray(users.id, userIds))
       .select(({ users }) => ({
         id: users.id,

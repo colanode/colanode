@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 
 import { LocalChatNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import {
   Popover,
   PopoverContent,
@@ -13,7 +14,6 @@ import {
 } from '@colanode/ui/components/ui/popover';
 import { UserSearch } from '@colanode/ui/components/users/user-search';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 export const ChatCreatePopover = () => {
   const workspace = useWorkspace();
@@ -23,7 +23,7 @@ export const ChatCreatePopover = () => {
 
   const { mutate } = useMutation({
     mutationFn: async (otherUserId: string) => {
-      const nodes = database.workspace(workspace.userId).nodes;
+      const nodes = collections.workspace(workspace.userId).nodes;
       for (const [, node] of nodes.entries()) {
         if (node.type !== 'chat') {
           continue;

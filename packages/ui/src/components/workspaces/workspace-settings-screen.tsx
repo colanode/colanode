@@ -2,6 +2,7 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
+import { collections } from '@colanode/ui/collections';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
 import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
@@ -9,7 +10,6 @@ import { WorkspaceDelete } from '@colanode/ui/components/workspaces/workspace-de
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
 import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export const WorkspaceSettingsScreen = () => {
@@ -18,7 +18,7 @@ export const WorkspaceSettingsScreen = () => {
 
   const currentWorkspaceQuery = useLiveQuery((q) =>
     q
-      .from({ workspaces: database.workspaces })
+      .from({ workspaces: collections.workspaces })
       .where(({ workspaces }) => eq(workspaces.accountId, workspace.accountId))
       .select(({ workspaces }) => ({
         name: workspaces.name,

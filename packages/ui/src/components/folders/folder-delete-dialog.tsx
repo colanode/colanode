@@ -2,6 +2,7 @@ import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
+import { collections } from '@colanode/ui/collections';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -13,7 +14,6 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 interface FolderDeleteDialogProps {
   open: boolean;
@@ -30,7 +30,7 @@ export const FolderDeleteDialog = ({
   const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation({
     mutationFn: async () => {
-      const nodes = database.workspace(workspace.userId).nodes;
+      const nodes = collections.workspace(workspace.userId).nodes;
       nodes.delete(folderId);
     },
     onSuccess: () => {

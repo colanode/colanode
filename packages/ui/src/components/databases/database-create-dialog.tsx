@@ -7,6 +7,7 @@ import {
   LocalDatabaseViewNode,
 } from '@colanode/client/types';
 import { generateFractionalIndex, generateId, IdType } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import {
   DatabaseForm,
   DatabaseFormValues,
@@ -19,7 +20,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 
 interface DatabaseCreateDialogProps {
   spaceId: string;
@@ -36,7 +36,7 @@ export const DatabaseCreateDialog = ({
   const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation({
     mutationFn: async (values: DatabaseFormValues) => {
-      const nodes = appDatabase.workspace(workspace.userId).nodes;
+      const nodes = collections.workspace(workspace.userId).nodes;
 
       const databaseId = generateId(IdType.Database);
       const fieldId = generateId(IdType.Field);

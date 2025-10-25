@@ -1,9 +1,11 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
 import { LocalChannelNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface ChannelContainerTabProps {
   channelId: string;
@@ -17,17 +19,14 @@ export const ChannelContainerTab = ({
   const workspace = useWorkspace();
   const radar = useRadar();
 
-  const nodeGetQuery = useLiveQuery({
-    type: 'node.get',
-    nodeId: channelId,
-    userId: workspace.userId,
-  });
+  const nodeQuery = useLiveQuery((q) =>
+    q
+      .from({ nodes: collections.workspace(workspace.userId).nodes })
+      .where(({ nodes }) => eq(nodes.id, channelId))
+      .findOne()
+  );
 
-  if (nodeGetQuery.isPending) {
-    return <p className="text-sm text-muted-foreground">Loading...</p>;
-  }
-
-  const channel = nodeGetQuery.data as LocalChannelNode;
+  const channel = nodeQuery.data as LocalChannelNode;
   if (!channel) {
     return <p className="text-sm text-muted-foreground">Not found</p>;
   }

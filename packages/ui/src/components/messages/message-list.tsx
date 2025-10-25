@@ -3,10 +3,10 @@ import { Fragment, useEffect, useRef } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { LocalMessageNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Message } from '@colanode/ui/components/messages/message';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 const MESSAGES_PER_PAGE = 50;
 
@@ -18,7 +18,7 @@ export const MessageList = () => {
   const messageListQuery = useLiveInfiniteQuery(
     (q) =>
       q
-        .from({ nodes: database.workspace(workspace.userId).nodes })
+        .from({ nodes: collections.workspace(workspace.userId).nodes })
         .where(({ nodes }) => eq(nodes.type, 'message'))
         .where(({ nodes }) => eq(nodes.parentId, conversation.id))
         .orderBy(({ nodes }) => nodes.id, 'desc'),

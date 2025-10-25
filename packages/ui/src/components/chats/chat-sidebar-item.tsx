@@ -2,11 +2,11 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 import { InView } from 'react-intersection-observer';
 
 import { LocalChatNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface ChatSidebarItemProps {
@@ -25,7 +25,7 @@ export const ChatSidebarItem = ({ chat, isActive }: ChatSidebarItemProps) => {
 
   const userQuery = useLiveQuery((q) =>
     q
-      .from({ users: database.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => eq(users.id, userId))
       .select(({ users }) => ({
         id: users.id,

@@ -13,6 +13,7 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   Dialog,
@@ -33,7 +34,6 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 import { cn } from '@colanode/ui/lib/utils';
 
 const formSchema = z.object({
@@ -91,7 +91,7 @@ export const ViewCreateDialog = ({
         name = type.name;
       }
 
-      const nodes = appDatabase.workspace(workspace.userId).nodes;
+      const nodes = collections.workspace(workspace.userId).nodes;
       let maxIndex: string | null = null;
       nodes.forEach((node) => {
         if (node.type === 'database_view' && node.parentId === database.id) {

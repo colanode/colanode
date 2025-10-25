@@ -6,6 +6,7 @@ import { match } from 'ts-pattern';
 
 import { isFeatureSupported } from '@colanode/client/lib';
 import { LoginSuccessOutput } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { EmailLogin } from '@colanode/ui/components/accounts/email-login';
 import { EmailPasswordResetComplete } from '@colanode/ui/components/accounts/email-password-reset-complete';
 import { EmailPasswordResetInit } from '@colanode/ui/components/accounts/email-password-reset-init';
@@ -15,7 +16,6 @@ import { ServerDropdown } from '@colanode/ui/components/servers/server-dropdown'
 import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { ServerContext } from '@colanode/ui/contexts/server';
-import { database } from '@colanode/ui/data';
 
 type LoginPanelState = {
   type: 'login';
@@ -51,12 +51,12 @@ type PanelState =
 export const LoginForm = () => {
   const router = useRouter();
   const serversQuery = useLiveQuery((q) =>
-    q.from({ servers: database.servers })
+    q.from({ servers: collections.servers })
   );
   const servers = serversQuery.data;
 
   const workspacesQuery = useLiveQuery((q) =>
-    q.from({ workspaces: database.workspaces }).select(({ workspaces }) => ({
+    q.from({ workspaces: collections.workspaces }).select(({ workspaces }) => ({
       userId: workspaces.userId,
     }))
   );

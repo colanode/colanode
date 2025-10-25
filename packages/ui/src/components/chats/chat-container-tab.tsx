@@ -1,12 +1,11 @@
-import { eq, useLiveQuery as useLiveQueryTanstack } from '@tanstack/react-db';
+import { eq, useLiveQuery } from '@tanstack/react-db';
 
-import { LocalChatNode } from '@colanode/client/types';
+import { ChatAttributes } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface ChatContainerTabProps {
   chatId: string;
@@ -20,22 +19,26 @@ export const ChatContainerTab = ({
   const workspace = useWorkspace();
   const radar = useRadar();
 
-  const nodeGetQuery = useLiveQuery({
-    type: 'node.get',
-    nodeId: chatId,
-    userId: workspace.userId,
-  });
+  const nodeQuery = useLiveQuery((q) =>
+    q
+      .from({ nodes: collections.workspace(workspace.userId).nodes })
+      .where(({ nodes }) => eq(nodes.id, chatId))
+      .select(({ nodes }) => ({
+        id: nodes.id,
+        attributes: nodes.attributes,
+      }))
+      .findOne()
+  );
 
-  const chat = nodeGetQuery.data as LocalChatNode;
+  const chat = nodeQuery.data?.attributes as ChatAttributes;
   const userId = chat
-    ? (Object.keys(chat.attributes.collaborators).find(
-        (id) => id !== workspace.userId
-      ) ?? '')
+    ? (Object.keys(chat.collaborators).find((id) => id !== workspace.userId) ??
+      '')
     : '';
 
-  const userQuery = useLiveQueryTanstack((q) =>
+  const userQuery = useLiveQuery((q) =>
     q
-      .from({ users: database.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => eq(users.id, userId))
       .select(({ users }) => ({
         id: users.id,
@@ -46,15 +49,11 @@ export const ChatContainerTab = ({
   );
   const user = userQuery.data;
 
-  if (nodeGetQuery.isPending || userQuery.isLoading) {
-    return <p className="text-sm text-muted-foreground">Loading...</p>;
-  }
-
   if (!chat || !user) {
     return <p className="text-sm text-muted-foreground">Not found</p>;
   }
 
-  const unreadState = radar.getNodeState(workspace.userId, chat.id);
+  const unreadState = radar.getNodeState(workspace.userId, chatId);
 
   return (
     <div className="flex items-center space-x-2">

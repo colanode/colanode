@@ -1,5 +1,6 @@
 import { LocalFolderNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { FolderForm } from '@colanode/ui/components/folders/folder-form';
 import {
   Dialog,
@@ -9,7 +10,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 interface FolderUpdateDialogProps {
   folder: LocalFolderNode;
@@ -47,7 +47,7 @@ export const FolderUpdateDialog = ({
             onOpenChange(false);
           }}
           onSubmit={(values) => {
-            const nodes = database.workspace(workspace.userId).nodes;
+            const nodes = collections.workspace(workspace.userId).nodes;
             if (!nodes.has(folder.id)) {
               return;
             }

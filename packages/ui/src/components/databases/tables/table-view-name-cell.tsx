@@ -3,9 +3,9 @@ import { SquareArrowOutUpRight } from 'lucide-react';
 import React, { Fragment } from 'react';
 
 import { RecordNode } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 
 interface NameEditorProps {
   initialValue: string;
@@ -65,7 +65,7 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
   const handleSave = (newName: string) => {
     if (newName === record.attributes.name) return;
 
-    const nodes = appDatabase.workspace(workspace.userId).nodes;
+    const nodes = collections.workspace(workspace.userId).nodes;
     if (!nodes.has(record.id)) {
       return;
     }

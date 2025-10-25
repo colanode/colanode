@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 
 import { LocalPageNode, LocalSpaceNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import {
   SpaceForm,
   SpaceFormValues,
@@ -15,7 +16,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 interface SpaceCreateDialogProps {
   open: boolean;
@@ -30,7 +30,7 @@ export const SpaceCreateDialog = ({
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (values: SpaceFormValues) => {
-      const nodes = database.workspace(workspace.userId).nodes;
+      const nodes = collections.workspace(workspace.userId).nodes;
 
       const spaceId = generateId(IdType.Space);
       const space: LocalSpaceNode = {

@@ -5,13 +5,13 @@ import {
   SelectFieldAttributes,
   SelectOptionAttributes,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
 import { SelectOptionBadge } from '@colanode/ui/components/databases/fields/select-option-badge';
 import { BoardViewContext } from '@colanode/ui/contexts/board-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { getSelectOptionLightColorClass } from '@colanode/ui/lib/databases';
 
@@ -89,7 +89,7 @@ export const BoardViewColumnsSelect = ({
               ),
               canDrag: (record) => record.canEdit,
               onDragEnd: async (record, value) => {
-                const nodes = appDatabase.workspace(workspace.userId).nodes;
+                const nodes = collections.workspace(workspace.userId).nodes;
                 if (!nodes.has(record.id)) {
                   return;
                 }
@@ -136,7 +136,7 @@ export const BoardViewColumnsSelect = ({
           dragOverClass: noValueDraggingClass,
           canDrag: () => true,
           onDragEnd: async (record, value) => {
-            const nodes = appDatabase.workspace(workspace.userId).nodes;
+            const nodes = collections.workspace(workspace.userId).nodes;
             if (!nodes.has(record.id)) {
               return;
             }

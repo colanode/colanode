@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import { LocalChannelNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import {
   ChannelForm,
   ChannelFormValues,
@@ -16,7 +17,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 interface ChannelCreateDialogProps {
   spaceId: string;
@@ -35,7 +35,7 @@ export const ChannelCreateDialog = ({
   const { mutate, isPending } = useMutation({
     mutationFn: async (values: ChannelFormValues) => {
       const channelId = generateId(IdType.Channel);
-      const nodes = database.workspace(workspace.userId).nodes;
+      const nodes = collections.workspace(workspace.userId).nodes;
 
       const channel: LocalChannelNode = {
         id: channelId,

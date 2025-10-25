@@ -1,9 +1,9 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 import { JSONContent } from '@tiptap/core';
 
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { defaultClasses } from '@colanode/ui/editor/classes';
 
 interface MentionRendererProps {
@@ -17,7 +17,7 @@ export const MentionRenderer = ({ node }: MentionRendererProps) => {
   const target = node.attrs?.target;
   const userQuery = useLiveQuery((q) =>
     q
-      .from({ users: database.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => eq(users.id, target))
       .select(({ users }) => ({
         id: users.id,

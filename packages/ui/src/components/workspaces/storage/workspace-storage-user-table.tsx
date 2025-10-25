@@ -3,6 +3,7 @@ import { Settings } from 'lucide-react';
 import { useState } from 'react';
 
 import { formatBytes, WorkspaceStorageUser } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -15,7 +16,6 @@ import {
 } from '@colanode/ui/components/ui/table';
 import { WorkspaceStorageUserUpdateDialog } from '@colanode/ui/components/workspaces/storage/workspace-storage-user-update-dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { bigintToPercent, cn } from '@colanode/ui/lib/utils';
 
 const UserStorageProgressBar = ({
@@ -62,7 +62,7 @@ const WorkspaceStorageUserRow = ({
 
   const userQuery = useLiveQuery((q) =>
     q
-      .from({ users: database.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => eq(users.id, user.id))
       .select(({ users }) => ({
         id: users.id,

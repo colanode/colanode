@@ -1,8 +1,8 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { LocalChatNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Tab } from '@colanode/ui/components/layouts/tabs/tab';
-import { database } from '@colanode/ui/data';
 
 interface ChatTabProps {
   chat: LocalChatNode;
@@ -19,7 +19,7 @@ export const ChatTab = ({ chat, userId }: ChatTabProps) => {
 
   const userQuery = useLiveQuery((q) =>
     q
-      .from({ users: database.workspace(userId).users })
+      .from({ users: collections.workspace(userId).users })
       .where(({ users }) => eq(users.id, otherUserId))
       .select(({ users }) => ({
         id: users.id,

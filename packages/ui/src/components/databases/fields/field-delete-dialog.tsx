@@ -1,3 +1,4 @@
+import { collections } from '@colanode/ui/collections';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -10,7 +11,6 @@ import {
 import { Button } from '@colanode/ui/components/ui/button';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 
 interface FieldDeleteDialogProps {
   id: string;
@@ -43,7 +43,7 @@ export const FieldDeleteDialog = ({
           <Button
             variant="destructive"
             onClick={() => {
-              const nodes = appDatabase.workspace(workspace.userId).nodes;
+              const nodes = collections.workspace(workspace.userId).nodes;
               if (!nodes.has(database.id)) {
                 console.error('Database not found');
                 return;

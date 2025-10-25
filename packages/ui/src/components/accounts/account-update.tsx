@@ -5,6 +5,7 @@ import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -18,7 +19,6 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { openFileDialog } from '@colanode/ui/lib/files';
@@ -34,7 +34,7 @@ export const AccountUpdate = () => {
   const workspace = useWorkspace();
   const accountQuery = useLiveQuery((q) =>
     q
-      .from({ accounts: database.accounts })
+      .from({ accounts: collections.accounts })
       .where(({ accounts }) => eq(accounts.id, workspace.accountId))
       .select(({ accounts }) => ({
         name: accounts.name,

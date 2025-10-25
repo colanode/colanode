@@ -17,13 +17,13 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { BoardView } from '@colanode/ui/components/databases/boards/board-view';
 import { CalendarView } from '@colanode/ui/components/databases/calendars/calendar-view';
 import { TableView } from '@colanode/ui/components/databases/tables/table-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { DatabaseViewContext } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database as appDatabase } from '@colanode/ui/data';
 import {
   generateFieldValuesFromFilters,
   generateViewFieldIndex,
@@ -79,7 +79,7 @@ export const View = ({ view }: ViewProps) => {
         rename: async (name: string) => {
           if (!database.canEdit) return;
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -95,7 +95,7 @@ export const View = ({ view }: ViewProps) => {
         updateAvatar: async (avatar: string) => {
           if (!database.canEdit) return;
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -114,7 +114,7 @@ export const View = ({ view }: ViewProps) => {
           const viewField = view.attributes.fields?.[id];
           if (viewField && viewField.display === display) return;
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -145,7 +145,7 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -175,7 +175,7 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -193,7 +193,7 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -222,7 +222,7 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -255,7 +255,7 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -309,7 +309,7 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -335,7 +335,7 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -368,7 +368,7 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -413,7 +413,7 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -438,7 +438,7 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           if (!nodes.has(view.id)) {
             return;
           }
@@ -484,7 +484,7 @@ export const View = ({ view }: ViewProps) => {
             workspace.userId
           );
 
-          const nodes = appDatabase.workspace(workspace.userId).nodes;
+          const nodes = collections.workspace(workspace.userId).nodes;
           const record: LocalRecordNode = {
             id: generateId(IdType.Record),
             type: 'record',

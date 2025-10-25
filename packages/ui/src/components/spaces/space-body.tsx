@@ -1,11 +1,11 @@
 import { LocalSpaceNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { NodeCollaborators } from '@colanode/ui/components/collaborators/node-collaborators';
 import { SpaceDelete } from '@colanode/ui/components/spaces/space-delete';
 import { SpaceForm } from '@colanode/ui/components/spaces/space-form';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 interface SpaceBodyProps {
   space: LocalSpaceNode;
@@ -33,7 +33,7 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
           }}
           readOnly={!canEdit}
           onSubmit={(values) => {
-            const nodes = database.workspace(workspace.userId).nodes;
+            const nodes = collections.workspace(workspace.userId).nodes;
             if (!nodes.has(space.id)) {
               return;
             }

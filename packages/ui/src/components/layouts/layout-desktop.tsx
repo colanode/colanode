@@ -8,11 +8,11 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
+import { buildMetadataKey } from '@colanode/ui/collections/metadata';
 import { TabsContent } from '@colanode/ui/components/layouts/tabs/tabs-content';
 import { TabsHeader } from '@colanode/ui/components/layouts/tabs/tabs-header';
 import { TabManagerContext } from '@colanode/ui/contexts/tab-manager';
-import { database } from '@colanode/ui/data';
-import { buildMetadataKey } from '@colanode/ui/data/metadata';
 import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import { router, routeTree } from '@colanode/ui/routes';
 
@@ -21,7 +21,7 @@ export const LayoutDesktop = () => {
   const [activeTabId, setActiveTabId] = useMetadata('app', 'tab');
 
   const handleTabAdd = useCallback((location: string) => {
-    const tabs = database.tabs.map((tab) => tab);
+    const tabs = collections.tabs.map((tab) => tab);
     const orderedTabs = tabs.toSorted((a, b) =>
       compareString(a.index, b.index)
     );
@@ -35,13 +35,13 @@ export const LayoutDesktop = () => {
       updatedAt: null,
     };
 
-    database.tabs.insert(tab);
+    collections.tabs.insert(tab);
   }, []);
 
   const handleTabDelete = useCallback((id: string) => {
-    const tabs = database.tabs.map((tab) => tab);
+    const tabs = collections.tabs.map((tab) => tab);
     const tabMetadataKey = buildMetadataKey('app', 'tab');
-    const tabMetadata = database.metadata.get(tabMetadataKey);
+    const tabMetadata = collections.metadata.get(tabMetadataKey);
 
     if (tabs.length === 1) {
       return;
@@ -60,14 +60,14 @@ export const LayoutDesktop = () => {
         return;
       }
 
-      const tabMetadata = database.metadata.get('tab');
+      const tabMetadata = collections.metadata.get('tab');
       if (tabMetadata) {
-        database.metadata.update('tab', (tab) => {
+        collections.metadata.update('tab', (tab) => {
           tab.value = nextTab;
           tab.updatedAt = new Date().toISOString();
         });
       } else {
-        database.metadata.insert({
+        collections.metadata.insert({
           namespace: 'app',
           key: 'tab',
           value: nextTab,
@@ -77,7 +77,7 @@ export const LayoutDesktop = () => {
       }
     }
 
-    database.tabs.delete(id);
+    collections.tabs.delete(id);
   }, []);
 
   const handleTabSwitch = useCallback(
@@ -92,7 +92,7 @@ export const LayoutDesktop = () => {
       return routersRef.current.get(id)!;
     }
 
-    const tab = database.tabs.get(id);
+    const tab = collections.tabs.get(id);
     if (!tab) {
       throw new Error(`Tab ${id} not found`);
     }

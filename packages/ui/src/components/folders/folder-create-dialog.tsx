@@ -4,6 +4,7 @@ import { toast } from 'sonner';
 
 import { LocalFolderNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import {
   FolderForm,
   FolderFormValues,
@@ -16,7 +17,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 interface FolderCreateDialogProps {
   spaceId: string;
@@ -35,7 +35,7 @@ export const FolderCreateDialog = ({
   const { mutate, isPending } = useMutation({
     mutationFn: async (values: FolderFormValues) => {
       const folderId = generateId(IdType.Folder);
-      const nodes = database.workspace(workspace.userId).nodes;
+      const nodes = collections.workspace(workspace.userId).nodes;
 
       const folder: LocalFolderNode = {
         id: folderId,
