@@ -137,6 +137,8 @@ const cleanNodeRelations = async (nodeIds: string[]) => {
     .where('node_id', 'in', nodeIds)
     .execute();
 
+  await database.deleteFrom('documents').where('id', 'in', nodeIds).execute();
+
   await database
     .deleteFrom('document_embeddings')
     .where('document_id', 'in', nodeIds)
@@ -144,11 +146,6 @@ const cleanNodeRelations = async (nodeIds: string[]) => {
 
   await database
     .deleteFrom('document_updates')
-    .where('document_id', 'in', nodeIds)
-    .execute();
-
-  await database
-    .deleteFrom('document_embeddings')
     .where('document_id', 'in', nodeIds)
     .execute();
 };

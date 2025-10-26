@@ -1,31 +1,36 @@
 import { Readable } from 'stream';
 
-import { Storage, Bucket, File } from '@google-cloud/storage';
-import { DataStore } from '@tus/server';
+import { Storage as GoogleStorage, Bucket, File } from '@google-cloud/storage';
 import { GCSStore } from '@tus/gcs-store';
+import { DataStore } from '@tus/server';
+
 import type { GCSStorageConfig } from '@colanode/server/lib/config/storage';
 
-import type { Storage as StorageInterface } from './core';
+import type { Storage } from './core';
 
-export class GCSStorage implements StorageInterface {
+export class GCSStorage implements Storage {
   private readonly bucket: Bucket;
-  public readonly tusStore: DataStore;
+  private readonly gcsStore: GCSStore;
 
   constructor(config: GCSStorageConfig) {
-    const storage = new Storage({
+    const storage = new GoogleStorage({
       projectId: config.projectId,
       keyFilename: config.credentials,
     });
 
     this.bucket = storage.bucket(config.bucket);
-    this.tusStore = new GCSStore({ bucket: this.bucket });
+    this.gcsStore = new GCSStore({ bucket: this.bucket });
+  }
+
+  public get tusStore(): DataStore {
+    return this.gcsStore;
   }
 
   private getFile(path: string): File {
     return this.bucket.file(path);
   }
 
-  async download(
+  public async download(
     path: string
   ): Promise<{ stream: Readable; contentType?: string }> {
     const file = this.getFile(path);
@@ -38,12 +43,12 @@ export class GCSStorage implements StorageInterface {
     };
   }
 
-  async delete(path: string): Promise<void> {
+  public async delete(path: string): Promise<void> {
     const file = this.getFile(path);
     await file.delete();
   }
 
-  async upload(
+  public async upload(
     path: string,
     data: Buffer | Readable,
     contentType: string,

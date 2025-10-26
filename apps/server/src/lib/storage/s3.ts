@@ -6,22 +6,23 @@ import {
   PutObjectCommand,
   S3Client,
 } from '@aws-sdk/client-s3';
-import { RedisClientType } from '@redis/client';
-import { FILE_UPLOAD_PART_SIZE } from '@colanode/core';
+import { MetadataValue, S3Store } from '@tus/s3-store';
 import { DataStore } from '@tus/server';
-import { S3Store } from '@tus/s3-store';
 
-import { config } from '@colanode/server/lib/config';
-import { RedisKvStore } from '@colanode/server/lib/storage/tus/redis-kv';
-import type { S3StorageConfig } from '@colanode/server/lib/config/storage';
+import { FILE_UPLOAD_PART_SIZE } from '@colanode/core';
 import { redis } from '@colanode/server/data/redis';
+import { config } from '@colanode/server/lib/config';
+import type { S3StorageConfig } from '@colanode/server/lib/config/storage';
+import { RedisKvStore } from '@colanode/server/lib/storage/tus/redis-kv';
+
 import type { Storage } from './core';
 
 export class S3Storage implements Storage {
   private readonly client: S3Client;
   private readonly bucket: string;
   private readonly s3Config: S3StorageConfig;
-  public readonly tusStore: DataStore;
+  private readonly s3Store: S3Store;
+  private readonly redisKv: RedisKvStore<MetadataValue>;
 
   constructor(s3Config: S3StorageConfig) {
     this.s3Config = { ...s3Config };
@@ -37,9 +38,10 @@ export class S3Storage implements Storage {
 
     this.bucket = this.s3Config.bucket;
 
-    this.tusStore = new S3Store({
+    this.redisKv = new RedisKvStore(redis, config.redis.tus.kvPrefix);
+    this.s3Store = new S3Store({
       partSize: FILE_UPLOAD_PART_SIZE,
-      cache: new RedisKvStore(redis, config.redis.tus.kvPrefix),
+      cache: this.redisKv,
       s3ClientConfig: {
         bucket: this.bucket,
         endpoint: this.s3Config.endpoint,
@@ -53,7 +55,11 @@ export class S3Storage implements Storage {
     });
   }
 
-  async download(
+  public get tusStore(): DataStore {
+    return this.s3Store;
+  }
+
+  public async download(
     path: string
   ): Promise<{ stream: Readable; contentType?: string }> {
     const command = new GetObjectCommand({ Bucket: this.bucket, Key: path });
@@ -69,12 +75,16 @@ export class S3Storage implements Storage {
     };
   }
 
-  async delete(path: string): Promise<void> {
+  public async delete(path: string): Promise<void> {
     const command = new DeleteObjectCommand({ Bucket: this.bucket, Key: path });
     await this.client.send(command);
+    await this.redisKv.delete(path);
+
+    const infoPath = `${path}.info`;
+    await this.redisKv.delete(infoPath);
   }
 
-  async upload(
+  public async upload(
     path: string,
     data: Buffer | Readable,
     contentType: string,

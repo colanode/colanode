@@ -1,12 +1,13 @@
 import { Readable } from 'stream';
 
-import { DataStore } from '@tus/server';
-import { AzureStore } from '@tus/azure-store';
 import {
   BlobServiceClient,
   StorageSharedKeyCredential,
   BlockBlobClient,
 } from '@azure/storage-blob';
+import { AzureStore } from '@tus/azure-store';
+import { DataStore } from '@tus/server';
+
 import type { AzureStorageConfig } from '@colanode/server/lib/config/storage';
 
 import type { Storage } from './core';
@@ -15,7 +16,7 @@ export class AzureBlobStorage implements Storage {
   private readonly containerName: string;
   private readonly blobServiceClient: BlobServiceClient;
   private readonly config: AzureStorageConfig;
-  public readonly tusStore: DataStore;
+  private readonly azureStore: AzureStore;
 
   constructor(config: AzureStorageConfig) {
     this.config = { ...config };
@@ -30,11 +31,15 @@ export class AzureBlobStorage implements Storage {
     );
     this.containerName = this.config.containerName;
 
-    this.tusStore = new AzureStore({
+    this.azureStore = new AzureStore({
       account: this.config.account,
       accountKey: this.config.accountKey,
       containerName: this.containerName,
     });
+  }
+
+  public get tusStore(): DataStore {
+    return this.azureStore;
   }
 
   private getBlockBlobClient(path: string): BlockBlobClient {
