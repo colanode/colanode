@@ -28,12 +28,22 @@ export const smtpConfigSchema = z.discriminatedUnion('enabled', [
 
 export type SmtpConfig = z.infer<typeof smtpConfigSchema>;
 
-export const readSmtpConfigVariables = () => {
+export const readSmtpConfigFromEnv = () => {
   return {
-    enabled: process.env.SMTP_ENABLED === 'true',
+    enabled:
+      process.env.SMTP_ENABLED === 'true'
+        ? true
+        : process.env.SMTP_ENABLED === 'false'
+          ? false
+          : undefined,
     host: process.env.SMTP_HOST,
     port: process.env.SMTP_PORT,
-    secure: process.env.SMTP_SECURE === 'true',
+    secure:
+      process.env.SMTP_SECURE === 'true'
+        ? true
+        : process.env.SMTP_SECURE === 'false'
+          ? false
+          : undefined,
     user: process.env.SMTP_USER,
     password: process.env.SMTP_PASSWORD,
     from: {

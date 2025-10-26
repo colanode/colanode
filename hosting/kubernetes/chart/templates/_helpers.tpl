@@ -90,6 +90,19 @@ Return the default PVC name used for file storage
 {{- end }}
 
 {{/*
+Return the config.json ConfigMap name
+*/}}
+{{- define "colanode.configJsonConfigMapName" -}}
+{{- if .Values.colanode.configFile.existingConfigMap -}}
+{{ .Values.colanode.configFile.existingConfigMap }}
+{{- else if .Values.colanode.configFile.name }}
+{{ .Values.colanode.configFile.name }}
+{{- else }}
+{{ printf "%s-config-json" (include "colanode.fullname" .) }}
+{{- end }}
+{{- end }}
+
+{{/*
 Helper to get value from secret key reference or direct value
 Usage: {{ include "colanode.getValueOrSecret" (dict "key" "theKey" "value" .Values.path.to.value) }}
 */}}

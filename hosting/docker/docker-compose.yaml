@@ -84,129 +84,32 @@ services:
       - valkey
       # - smtp # Optional
     environment:
-      # ───────────────────────────────────────────────────────────────
-      # General Node/Server Config
-      # ───────────────────────────────────────────────────────────────
+      # ------------------------------------------------------------------
+      # Configuration Strategy
+      # ------------------------------------------------------------------
+      # • Most defaults live in config.json mounted at /app/config.json
+      # • config.json references secrets via env://VAR or env://VAR? pointers
+      # • The variables below are those secrets; keep only what JSON needs
+      # • Env values always override JSON if both are present
+      # ------------------------------------------------------------------
       NODE_ENV: production
 
-      # The server requires a name and avatar URL which will be displayed in the desktop app login screen.
-      SERVER_NAME: 'Colanode Local'
-      SERVER_AVATAR: ''
-      # Possible values for SERVER_MODE: 'standalone', 'cluster'
-      SERVER_MODE: 'standalone'
+      # Required env:// secrets (config.json marks these as env://VAR)
+      POSTGRES_URL: postgres://colanode_user:postgrespass123@postgres:5432/colanode_db
+      REDIS_URL: redis://:your_valkey_password@valkey:6379/0
 
-      # Optional custom path prefix for the server.
-      # Add a plain text without any slashes. For example if you set 'colanode'
-      # the URL 'https://localhost:3000/config' will be: 'https://localhost:3000/colanode/config'
-      # SERVER_PATH_PREFIX: 'colanode'
-
-      # Optional CORS Configuration. By default the server is accessible from 'http://localhost:4000'.
-      # You can change this to allow custom origins (use comma to separate multiple origins) or '*' to allow all origins.
-      # SERVER_CORS_ORIGIN: 'http://localhost:4000'
-      # SERVER_CORS_MAX_AGE: '7200'
-
-      # ───────────────────────────────────────────────────────────────
-      # Logging Configuration
-      # ───────────────────────────────────────────────────────────────
-      # Possible values for LOGGING_LEVEL: 'trace', 'debug', 'info', 'warn', 'error', 'fatal', 'silent'
-      # Default: 'info'
-      # LOGGING_LEVEL: 'debug'
-
-      # ───────────────────────────────────────────────────────────────
-      # Account Configuration
-      # ───────────────────────────────────────────────────────────────
-      # Possible values for ACCOUNT_VERIFICATION_TYPE: 'automatic', 'manual', 'email'
-      ACCOUNT_VERIFICATION_TYPE: 'automatic'
-      ACCOUNT_OTP_TIMEOUT: '600' # in seconds
-
-      # If you want to enable Google login, you need to set the following variables:
-      # ACCOUNT_GOOGLE_ENABLED: 'true'
-      # ACCOUNT_GOOGLE_CLIENT_ID: 'your_google_client_id'
-      # ACCOUNT_GOOGLE_CLIENT_SECRET: 'your_google_client_secret'
-
-      # ───────────────────────────────────────────────────────────────
-      # Workspace Configuration
-      # ───────────────────────────────────────────────────────────────
-      # Optional, leave empty for no limits
-      # WORKSPACE_STORAGE_LIMIT: '10737418240' # 10 GB
-      # WORKSPACE_MAX_FILE_SIZE: '104857600' # 100 MB
-
-      # ───────────────────────────────────────────────────────────────
-      # User Configuration
-      # ───────────────────────────────────────────────────────────────
-      USER_STORAGE_LIMIT: '10737418240' # 10 GB
-      USER_MAX_FILE_SIZE: '104857600' # 100 MB
-
-      # ───────────────────────────────────────────────────────────────
-      # PostgreSQL Configuration
-      # ───────────────────────────────────────────────────────────────
-      # The server expects a PostgreSQL database with the pgvector extension installed.
-      POSTGRES_URL: 'postgres://colanode_user:postgrespass123@postgres:5432/colanode_db'
-
-      # Optional variables for SSL connection to the database
-      # POSTGRES_SSL_REJECT_UNAUTHORIZED: 'false'
-      # POSTGRES_SSL_CA: ''
-      # POSTGRES_SSL_KEY: ''
-      # POSTGRES_SSL_CERT: ''
-
-      # ───────────────────────────────────────────────────────────────
-      # Redis Configuration
-      # ───────────────────────────────────────────────────────────────
-      REDIS_URL: 'redis://:your_valkey_password@valkey:6379/0'
-      REDIS_DB: '0'
-      # Optional variables:
-      # REDIS_JOBS_QUEUE_NAME: 'jobs'
-      # REDIS_JOBS_QUEUE_PREFIX: 'colanode'
-      # REDIS_TUS_LOCK_PREFIX: 'colanode:tus:lock'
-      # REDIS_TUS_KV_PREFIX: 'colanode:tus:kv'
-      # REDIS_EVENTS_CHANNEL: 'events'
-
-      # ───────────────────────────────────────────────────────────────
-      # Storage configuration
-      # Supported storage types: 'file', 's3', 'gcs', 'azure'
-      # By default we store files on the local filesystem.
-      # ───────────────────────────────────────────────────────────────
-      STORAGE_TYPE: 'file'
-      STORAGE_FILE_DIRECTORY: '/var/lib/colanode/storage'
-      # To use the optional MinIO service (or any S3-compatible storage):
-      # STORAGE_TYPE: 's3'
-      # STORAGE_S3_ENDPOINT: 'http://minio:9000'
-      # STORAGE_S3_ACCESS_KEY: 'minioadmin'
-      # STORAGE_S3_SECRET_KEY: 'your_minio_password'
-      # STORAGE_S3_BUCKET: 'colanode'
-      # STORAGE_S3_REGION: 'us-east-1'
-      # STORAGE_S3_FORCE_PATH_STYLE: 'true'
-
-      # ───────────────────────────────────────────────────────────────
-      # SMTP configuration
-      # ---------------------------------------------------------------
-      # We leave the SMTP configuration disabled by default.
-      # ---------------------------------------------------------------
-      SMTP_ENABLED: 'false'
-      # ---------------------------------------------------------------
-      # If using the local Mailpit service (defined above), use:
-      # SMTP_ENABLED: 'true'
-      # SMTP_HOST: 'smtp'
-      # SMTP_PORT: '1025'
-      # SMTP_USER: ''
-      # SMTP_PASSWORD: ''
-      # SMTP_EMAIL_FROM: 'your_email@example.com'
-      # SMTP_EMAIL_FROM_NAME: 'Colanode'
-      # ---------------------------------------------------------------
-      # If using a real SMTP provider, update these:
-      # SMTP_ENABLED: 'true'
-      # SMTP_HOST: 'your_smtp_provider_host'
-      # SMTP_PORT: '587' # Or 465, etc.
-      # SMTP_USER: 'your_smtp_username'
-      # SMTP_PASSWORD: 'your_smtp_password'
-      # SMTP_EMAIL_FROM: 'your_email@example.com'
-      # SMTP_EMAIL_FROM_NAME: 'Colanode'
-      # ---------------------------------------------------------------
+      # Optional env://? secrets – include only the entries referenced in JSON
+      # ACCOUNT_GOOGLE_CLIENT_ID: ''
+      # ACCOUNT_GOOGLE_CLIENT_SECRET: ''
+      # ...
 
     ports:
       - '3000:3000'
     volumes:
       - server_storage:/var/lib/colanode/storage
+      # Mount a config.json sitting next to this compose file to override defaults.
+      # If omitted, the already included config.json inside the server image is used.
+      - ./config.json:/app/apps/server/config.json:ro
     networks:
       - colanode_network
 

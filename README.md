@@ -61,7 +61,17 @@ If you prefer to host your own Colanode server, check out the [`hosting/`](hosti
 - **Storage backend** for user files. Colanode defaults to local filesystem storage, but you can switch to **S3-compatible**, **Google Cloud Storage**, or **Azure Blob Storage** backends by setting `STORAGE_TYPE`.
 - **Colanode server API**, provided as a Docker image.
 
-All required environment variables for the Colanode server can be found in the [`hosting/docker/docker-compose.yaml`](hosting/docker/docker-compose.yaml) file or [`hosting/kubernetes/README.md`](hosting/kubernetes/README.md) for Kubernetes deployments.
+#### Configuration model
+
+- The server image now ships with a full `config.json`, so most defaults are ready to go without touching env vars.
+- Sensitive values can be referenced from JSON using the `env://VAR_NAME` pattern (only `POSTGRES_URL` and `REDIS_URL` are required out of the box).
+- Environment variables still override JSON for backward compatibility, but future releases will rely primarily on the config file.
+- To customize settings:
+  1. Copy `apps/server/config.json`, edit it, and mount/bind it when using Docker Compose (see `hosting/docker/docker-compose.yaml`).
+  2. For Helm, enable `colanode.configFile.enabled` and pass your file via `--set-file colanode.configFile.data=./config.json` (details in [`hosting/kubernetes/README.md`](hosting/kubernetes/README.md)).
+  3. Keep secrets as env vars so you don't have to bake them into JSON; the loader resolves `env://` pointers at runtime.
+
+All environment variables that remain relevant, along with mounting instructions, live in [`hosting/docker/docker-compose.yaml`](hosting/docker/docker-compose.yaml) and [`hosting/kubernetes/README.md`](hosting/kubernetes/README.md).
 
 ### Running locally
 

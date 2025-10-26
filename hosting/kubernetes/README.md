@@ -69,6 +69,20 @@ helm install my-colanode ./hosting/kubernetes/chart \
 | `redis.enabled`      | Enable Redis deployment                                           | `true`  |
 | `minio.enabled`      | Enable bundled MinIO (only required for the in-cluster S3 option) | `false` |
 
+### Using config.json with Helm
+
+- The server image already ships with a default `config.json`. Only two env vars are strictly required: `POSTGRES_URL` and `REDIS_URL` (because the JSON references them via `env://`).
+- To supply your own JSON file, copy `apps/server/config.json`, edit it, and enable the new override:
+
+  ```bash
+  helm install my-colanode ./hosting/kubernetes/chart \
+    --set colanode.configFile.enabled=true \
+    --set-file colanode.configFile.data=./config.json
+  ```
+
+- Alternatively, create a ConfigMap yourself (`kubectl create configmap colanode-config --from-file=config.json`) and set `colanode.configFile.existingConfigMap=colanode-config`.
+- Environment variables still win over JSON for now, but plan to migrate to JSON-first; start moving non-secret settings into your config file while keeping secrets/credentials as env vars referenced via `env://`.
+
 ### Storage Configuration
 
 Set `colanode.storage.type` to choose where user files and avatars are stored:

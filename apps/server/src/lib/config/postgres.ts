@@ -18,7 +18,7 @@ export const postgresConfigSchema = z.object({
 
 export type PostgresConfig = z.infer<typeof postgresConfigSchema>;
 
-export const readPostgresConfigVariables = () => {
+export const readPostgresConfigFromEnv = () => {
   return {
     url: process.env.POSTGRES_URL,
     ssl: {

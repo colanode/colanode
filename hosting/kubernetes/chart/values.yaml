@@ -72,6 +72,10 @@ colanode:
     enabled: false
 
   # -- Colanode server configuration
+  # Notes:
+  #   • POSTGRES_URL and REDIS_URL must remain environment variables because config.json references them via env://
+  #   • All other fields are optional overrides; defaults live in the baked-in config.json
+  #   • Environment variables still override config.json for backward compatibility (will change in a future release)
   config:
     # Core settings
     NODE_ENV: production
@@ -122,6 +126,19 @@ colanode:
     # SMTP_PASSWORD: ""
     # SMTP_EMAIL_FROM: ""
     # SMTP_EMAIL_FROM_NAME: "Colanode"
+
+  # -- Optional config.json override
+  configFile:
+    enabled: false
+    # -- Reference an existing ConfigMap instead of inlining data
+    existingConfigMap: ''
+    # -- Name to give the generated ConfigMap (defaults to "<release>-config-json")
+    name: ''
+    # -- Key to use inside the ConfigMap
+    key: config.json
+    # -- Raw config.json content (use --set-file to load your version)
+    data: |
+      {}
 
   storage:
     # -- Storage backend type. Supported values: file, s3, gcs, azure
