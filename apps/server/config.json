@@ -1,9 +1,8 @@
 {
   "_comment": "Colanode Server Configuration - Copy this file to config.json and customize as needed",
   "_migration_guide": {
-    "precedence": "Environment variables > config.local.json > config.json > schema defaults",
+    "precedence": "Environment variables > config.json > schema defaults",
     "env_syntax": "Use 'env://VAR_NAME' to reference environment variables. Add '?' suffix for optional variables (e.g., 'env://VAR_NAME?')",
-    "local_overrides": "Create config.local.json (gitignored) for developer-specific settings",
     "backward_compatibility": "Environment variables still work without this file - this is optional"
   },
 
@@ -64,14 +63,9 @@
   },
 
   "storage": {
-    "_comment": "S3-compatible storage (e.g., MinIO)",
-    "type": "s3",
-    "endpoint": "env://STORAGE_S3_ENDPOINT",
-    "accessKey": "env://STORAGE_S3_ACCESS_KEY",
-    "secretKey": "env://STORAGE_S3_SECRET_KEY",
-    "bucket": "env://STORAGE_S3_BUCKET",
-    "region": "us-east-1",
-    "forcePathStyle": true
+    "_comment": "...",
+    "type": "file",
+    "directory": "./colanode"
   },
 
   "smtp": {

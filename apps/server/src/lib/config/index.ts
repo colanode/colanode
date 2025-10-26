@@ -61,7 +61,6 @@ const readConfigVariables = (): Configuration => {
     // Merge JSON config with env config (env takes precedence)
     const input = loadRawConfig(legacyEnvConfig);
 
-    console.log('Loaded configuration:', input);
     return configSchema.parse(input);
   } catch (error) {
     if (error instanceof z.ZodError) {
