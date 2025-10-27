@@ -1,0 +1,21 @@
+{{- $storageType := default "file" .Values.colanode.storage.type -}}
+{{- $persistence := .Values.colanode.storage.file.persistence -}}
+{{- if and (eq $storageType "file") $persistence.enabled (not $persistence.existingClaim) -}}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "colanode.storagePvcName" . }}
+  labels:
+    {{- include "colanode.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    {{- range $persistence.accessModes }}
+    - {{ . }}
+    {{- end }}
+  resources:
+    requests:
+      storage: {{ required "colanode.storage.file.persistence.size must be set when creating a storage PVC" $persistence.size }}
+{{- if $persistence.storageClass }}
+  storageClassName: {{ $persistence.storageClass }}
+{{- end }}
+{{- end }}

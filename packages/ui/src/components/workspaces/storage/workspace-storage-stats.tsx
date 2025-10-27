@@ -4,6 +4,7 @@ import { match } from 'ts-pattern';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { StorageStats } from '@colanode/ui/components/workspaces/storage/storage-stats';
+import { WorkspaceStorageCloud } from '@colanode/ui/components/workspaces/storage/workspace-storage-cloud';
 import { WorkspaceStorageUserTable } from '@colanode/ui/components/workspaces/storage/workspace-storage-user-table';
 import { useServer } from '@colanode/ui/contexts/server';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -62,6 +63,8 @@ export const WorkspaceStorageStats = () => {
                 storageLimit={data.storageLimit ?? null}
                 subtypes={data.subtypes}
               />
+              <WorkspaceStorageCloud />
+              <Separator className="my-4" />
               <WorkspaceStorageUserTable
                 users={data.users}
                 onUpdate={() => {

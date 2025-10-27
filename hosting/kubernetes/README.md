@@ -9,7 +9,8 @@ This chart deploys a complete Colanode instance with all required dependencies:
 - **Colanode Server**: The main application server
 - **PostgreSQL**: Database with pgvector extension for vector operations
 - **Redis/Valkey**: Message queue and caching
-- **MinIO**: S3-compatible object storage for files and avatars
+- **File Storage (default)**: Persistent volume for user files and avatars
+- **Optional Object Storage**: MinIO (S3-compatible), external S3, Google Cloud Storage, or Azure Blob Storage
 
 ## Prerequisites
 
@@ -62,11 +63,40 @@ helm install my-colanode ./hosting/kubernetes/chart \
 
 ### Dependencies
 
-| Parameter            | Description                  | Default |
-| -------------------- | ---------------------------- | ------- |
-| `postgresql.enabled` | Enable PostgreSQL deployment | `true`  |
-| `redis.enabled`      | Enable Redis deployment      | `true`  |
-| `minio.enabled`      | Enable MinIO deployment      | `true`  |
+| Parameter            | Description                                                       | Default |
+| -------------------- | ----------------------------------------------------------------- | ------- |
+| `postgresql.enabled` | Enable PostgreSQL deployment                                      | `true`  |
+| `redis.enabled`      | Enable Redis deployment                                           | `true`  |
+| `minio.enabled`      | Enable bundled MinIO (only required for the in-cluster S3 option) | `false` |
+
+### Storage Configuration
+
+Set `colanode.storage.type` to choose where user files and avatars are stored:
+
+- **File storage (default)** mounts a persistent volume at `/var/lib/colanode/storage`. Adjust `colanode.storage.file.persistence` to control the PVC size, storage class, or reference an existing claim.
+- **S3-compatible storage** (Amazon S3, MinIO, Cloudflare R2, etc.) requires `colanode.storage.type=s3`. Enable the bundled MinIO instance with `--set minio.enabled=true` or supply your provider endpoint, bucket, region, and credentials via `colanode.storage.s3.*`.
+- **Google Cloud Storage** needs a service-account JSON key. Create a secret:
+
+  ```bash
+  kubectl create secret generic gcs-credentials \
+    --from-file=service-account.json=/path/to/key.json
+  ```
+
+  Then configure:
+
+  ```yaml
+  colanode:
+    storage:
+      type: gcs
+      gcs:
+        bucket: your-bucket
+        projectId: your-project
+        credentialsSecret:
+          name: gcs-credentials
+          key: service-account.json
+  ```
+
+- **Azure Blob Storage** is available with `colanode.storage.type=azure`. Provide the storage `account`, `containerName`, and the account key via `colanode.storage.azure.accountKey` (inline value or an existing secret).
 
 ## Important Notes
 
@@ -78,9 +108,10 @@ The chart includes `global.security.allowInsecureImages: true` because we use a 
 
 By default, the chart configures persistent storage for:
 
+- Colanode file storage (PVC): 20Gi
 - PostgreSQL: 8Gi
 - Redis: 8Gi
-- MinIO: 10Gi
+- MinIO: 10Gi (only when `minio.enabled=true`)
 
 Adjust these values based on your requirements.
 

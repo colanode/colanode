@@ -47,7 +47,7 @@ class JobService {
       return;
     }
 
-    this.jobWorker = new Worker(this.queueName, this.handleJobJob, {
+    this.jobWorker = new Worker(this.queueName, this.handleJob, {
       prefix: this.prefix,
       connection: {
         url: config.redis.url,
@@ -64,7 +64,7 @@ class JobService {
     await this.jobQueue.add(job.type, job, options);
   }
 
-  private handleJobJob = async (job: Job) => {
+  private handleJob = async (job: Job) => {
     const input = job.data as JobInput;
     const handler = jobHandlerMap[input.type] as JobHandler<typeof input>;
     if (!handler) {
@@ -89,7 +89,7 @@ class JobService {
     await this.initDocumentEmbedScanRecurringJob();
     await this.initNodeUpdatesMergeRecurringJob();
     await this.initDocumentUpdatesMergeRecurringJob();
-    await this.initUploadsCleanRecurringJob();
+    await this.initCleanupRecurringJob();
   }
 
   private async initNodeEmbedScanRecurringJob(): Promise<void> {
@@ -183,19 +183,19 @@ class JobService {
     }
   }
 
-  private async initUploadsCleanRecurringJob(): Promise<void> {
+  private async initCleanupRecurringJob(): Promise<void> {
     if (!this.jobQueue) {
       return;
     }
 
-    const id = 'uploads.clean';
-    if (config.jobs.uploadsClean.enabled) {
+    const id = 'cleanup';
+    if (config.jobs.cleanup.enabled) {
       this.jobQueue.upsertJobScheduler(
         id,
-        { pattern: config.jobs.uploadsClean.cron },
+        { pattern: config.jobs.cleanup.cron },
         {
           name: id,
-          data: { type: 'uploads.clean' } as JobInput,
+          data: { type: 'cleanup' } as JobInput,
         }
       );
     } else {

@@ -1,4 +1,3 @@
-import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import sharp from 'sharp';
 
@@ -9,8 +8,7 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
-import { s3Client } from '@colanode/server/data/storage';
-import { config } from '@colanode/server/lib/config';
+import { storage } from '@colanode/server/lib/storage';
 
 const ALLOWED_MIME_TYPES = [
   'image/jpeg',
@@ -70,14 +68,7 @@ export const avatarUploadRoute: FastifyPluginCallbackZod = (
           .toBuffer();
 
         const avatarId = generateId(IdType.Avatar);
-        const command = new PutObjectCommand({
-          Bucket: config.storage.bucket,
-          Key: `avatars/${avatarId}.jpeg`,
-          Body: jpegBuffer,
-          ContentType: 'image/jpeg',
-        });
-
-        await s3Client.send(command);
+        await storage.upload(`avatars/${avatarId}.jpeg`, jpegBuffer, 'image/jpeg');
 
         return { success: true, id: avatarId };
       } catch {

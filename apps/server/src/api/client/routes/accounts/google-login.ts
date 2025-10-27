@@ -1,4 +1,3 @@
-import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import ky from 'ky';
 import sharp from 'sharp';
@@ -14,12 +13,12 @@ import {
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { UpdateAccount } from '@colanode/server/data/schema';
-import { s3Client } from '@colanode/server/data/storage';
 import {
   buildLoginSuccessOutput,
   buildLoginVerifyOutput,
 } from '@colanode/server/lib/accounts';
 import { config } from '@colanode/server/lib/config';
+import { storage } from '@colanode/server/lib/storage';
 import { AccountAttributes } from '@colanode/server/types/accounts';
 
 const GoogleUserInfoUrl = 'https://www.googleapis.com/oauth2/v1/userinfo';
@@ -113,14 +112,7 @@ const uploadGooglePictureAsAvatar = async (
       .toBuffer();
 
     const avatarId = generateId(IdType.Avatar);
-    const command = new PutObjectCommand({
-      Bucket: config.storage.bucket,
-      Key: `avatars/${avatarId}.jpeg`,
-      Body: jpegBuffer,
-      ContentType: 'image/jpeg',
-    });
-
-    await s3Client.send(command);
+    await storage.upload(`avatars/${avatarId}.jpeg`, jpegBuffer, 'image/jpeg');
 
     return avatarId;
   } catch {

@@ -1,5 +1,4 @@
 import type { RedisClientType } from '@redis/client';
-import type { Upload } from '@tus/server';
 import type { KvStore } from '@tus/utils';
 import { sha256 } from 'js-sha256';
 
@@ -11,7 +10,7 @@ import { sha256 } from 'js-sha256';
  * Original author: Mitja Puzigaća <mitjap@gmail.com>
  */
 
-export class RedisKvStore<T = Upload> implements KvStore<T> {
+export class RedisKvStore<T> implements KvStore<T> {
   private readonly redis: RedisClientType;
   private readonly prefix: string;
 

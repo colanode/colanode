@@ -5,7 +5,6 @@ import { DayPicker, DayProps, getDefaultClassNames } from 'react-day-picker';
 import {
   FieldAttributes,
   isSameDay,
-  toUTCDate,
   DatabaseViewFilterAttributes,
 } from '@colanode/core';
 import { CalendarViewDay } from '@colanode/ui/components/databases/calendars/calendar-view-day';
@@ -184,7 +183,7 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
 
           return (
             <CalendarViewDay
-              date={toUTCDate(props.day.date)}
+              date={props.day.date}
               records={dayRecords}
               onCreate={onCreate}
               isOutside={props.day.outside}

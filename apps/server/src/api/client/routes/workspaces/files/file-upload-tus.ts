@@ -1,34 +1,19 @@
-import { S3Store } from '@tus/s3-store';
 import { Server } from '@tus/server';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
-import {
-  ApiErrorCode,
-  FILE_UPLOAD_PART_SIZE,
-  FileStatus,
-  generateId,
-  IdType,
-} from '@colanode/core';
+import { ApiErrorCode, FileStatus, generateId, IdType } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { redis } from '@colanode/server/data/redis';
-import { s3Config } from '@colanode/server/data/storage';
 import { config } from '@colanode/server/lib/config';
 import { fetchCounter } from '@colanode/server/lib/counters';
 import { generateUrl } from '@colanode/server/lib/fastify';
-import { buildFilePath, deleteFile } from '@colanode/server/lib/files';
+import { buildFilePath } from '@colanode/server/lib/files';
 import { mapNode, updateNode } from '@colanode/server/lib/nodes';
-import { RedisKvStore } from '@colanode/server/lib/tus/redis-kv';
-import { RedisLocker } from '@colanode/server/lib/tus/redis-locker';
+import { storage } from '@colanode/server/lib/storage';
+import { RedisLocker } from '@colanode/server/lib/storage/tus/redis-locker';
 
-const s3Store = new S3Store({
-  partSize: FILE_UPLOAD_PART_SIZE,
-  cache: new RedisKvStore(redis, config.redis.tus.kvPrefix),
-  s3ClientConfig: {
-    ...s3Config,
-    bucket: config.storage.bucket,
-  },
-});
+const tusStore = storage.tusStore;
 
 export const fileUploadTusRoute: FastifyPluginCallbackZod = (
   instance,
@@ -102,7 +87,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
 
       const tusServer = new Server({
         path: '/tus',
-        datastore: s3Store,
+        datastore: tusStore,
         locker: new RedisLocker(redis, config.redis.tus.lockPrefix),
         async onUploadCreate() {
           const upload = await database
@@ -277,7 +262,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
           }
 
           const tusInfoPath = `${path}.info`;
-          await deleteFile(tusInfoPath);
+          await storage.delete(tusInfoPath);
 
           return {
             status_code: 200,

@@ -30,8 +30,8 @@ import {
   checkCollaboratorChanges,
 } from '@colanode/server/lib/collaborations';
 import { eventBus } from '@colanode/server/lib/event-bus';
-import { deleteFile } from '@colanode/server/lib/files';
 import { createLogger } from '@colanode/server/lib/logger';
+import { storage } from '@colanode/server/lib/storage';
 import { jobService } from '@colanode/server/services/job-service';
 import {
   ConcurrentUpdateResult,
@@ -711,7 +711,7 @@ export const deleteNodeFromMutation = async (
       .executeTakeFirst();
 
     if (upload) {
-      await deleteFile(upload.path);
+      await storage.delete(upload.path);
 
       await database
         .deleteFrom('uploads')

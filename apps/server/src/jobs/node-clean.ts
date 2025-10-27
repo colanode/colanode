@@ -4,8 +4,8 @@ import { CreateNodeTombstone } from '@colanode/server/data/schema';
 import { JobHandler } from '@colanode/server/jobs';
 import { updateDocument } from '@colanode/server/lib/documents';
 import { eventBus } from '@colanode/server/lib/event-bus';
-import { deleteFile } from '@colanode/server/lib/files';
 import { createLogger } from '@colanode/server/lib/logger';
+import { storage } from '@colanode/server/lib/storage';
 
 const BATCH_SIZE = 100;
 const logger = createLogger('server:job:clean-node-data');
@@ -137,6 +137,8 @@ const cleanNodeRelations = async (nodeIds: string[]) => {
     .where('node_id', 'in', nodeIds)
     .execute();
 
+  await database.deleteFrom('documents').where('id', 'in', nodeIds).execute();
+
   await database
     .deleteFrom('document_embeddings')
     .where('document_id', 'in', nodeIds)
@@ -144,11 +146,6 @@ const cleanNodeRelations = async (nodeIds: string[]) => {
 
   await database
     .deleteFrom('document_updates')
-    .where('document_id', 'in', nodeIds)
-    .execute();
-
-  await database
-    .deleteFrom('document_embeddings')
     .where('document_id', 'in', nodeIds)
     .execute();
 };
@@ -162,7 +159,7 @@ const cleanNodeFiles = async (nodeIds: string[]) => {
 
   if (uploads.length > 0) {
     for (const upload of uploads) {
-      await deleteFile(upload.path);
+      await storage.delete(upload.path);
     }
 
     await database

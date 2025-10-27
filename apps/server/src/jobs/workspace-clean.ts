@@ -1,7 +1,7 @@
 import { database } from '@colanode/server/data/database';
 import { JobHandler } from '@colanode/server/jobs';
-import { deleteFile } from '@colanode/server/lib/files';
 import { createLogger } from '@colanode/server/lib/logger';
+import { storage } from '@colanode/server/lib/storage';
 
 const BATCH_SIZE = 500;
 const logger = createLogger('server:job:clean-workspace-data');
@@ -143,7 +143,7 @@ const deleteWorkspaceUploads = async (workspaceId: string) => {
     }
 
     for (const upload of uploads) {
-      await deleteFile(upload.path);
+      await storage.delete(upload.path);
     }
 
     const fileIds = uploads.map((upload) => upload.file_id);

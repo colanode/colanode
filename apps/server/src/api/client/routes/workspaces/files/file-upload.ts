@@ -1,4 +1,3 @@
-import { PutObjectCommand } from '@aws-sdk/client-s3';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
@@ -10,11 +9,10 @@ import {
   IdType,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
-import { s3Client } from '@colanode/server/data/storage';
-import { config } from '@colanode/server/lib/config';
 import { fetchCounter } from '@colanode/server/lib/counters';
 import { buildFilePath } from '@colanode/server/lib/files';
 import { mapNode, updateNode } from '@colanode/server/lib/nodes';
+import { storage } from '@colanode/server/lib/storage';
 
 export const fileUploadRoute: FastifyPluginCallbackZod = (
   instance,
@@ -150,16 +148,13 @@ export const fileUploadRoute: FastifyPluginCallbackZod = (
       const path = buildFilePath(workspaceId, fileId, file.attributes);
 
       const stream = request.raw;
-      const uploadCommand = new PutObjectCommand({
-        Bucket: config.storage.bucket,
-        Key: path,
-        Body: stream,
-        ContentType: file.attributes.mimeType,
-        ContentLength: file.attributes.size,
-      });
-
       try {
-        await s3Client.send(uploadCommand);
+        await storage.upload(
+          path,
+          stream,
+          file.attributes.mimeType,
+          BigInt(file.attributes.size)
+        );
       } catch (error) {
         console.error(error);
         return reply.code(500).send({

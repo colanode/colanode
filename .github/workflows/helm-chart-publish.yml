@@ -2,10 +2,8 @@ name: Hosting - Publish Helm chart to static.colanode.com
 
 on:
   push:
-    branches: [main]
-    paths:
-      - 'hosting/kubernetes/chart/**'
-      - '.github/workflows/helm-chart-publish.yml'
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -22,10 +20,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Extract version from tag
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
+
       - uses: azure/setup-helm@v3
         with: { version: v3.14.3 }
 
       - run: helm dependency update "$CHART_DIR"
+
+      - name: Update Chart.yaml appVersion
+        run: |
+          sed -i "s/^appVersion:.*/appVersion: '${{ env.VERSION }}'/" "$CHART_DIR/Chart.yaml"
 
       - name: Configure AWS CLI
         run: aws configure set default.s3.addressing_style path

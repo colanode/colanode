@@ -1,6 +1,3 @@
-import { Readable } from 'stream';
-
-import { GetObjectCommand } from '@aws-sdk/client-s3';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
@@ -11,9 +8,8 @@ import {
   FileStatus,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
-import { s3Client } from '@colanode/server/data/storage';
-import { config } from '@colanode/server/lib/config';
 import { fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
+import { storage } from '@colanode/server/lib/storage';
 
 export const fileDownloadRoute: FastifyPluginCallbackZod = (
   instance,
@@ -84,28 +80,20 @@ export const fileDownloadRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const command = new GetObjectCommand({
-        Bucket: config.storage.bucket,
-        Key: upload.path,
-      });
+      try {
+        const { stream, contentType } = await storage.download(upload.path);
 
-      const fileResponse = await s3Client.send(command);
-      if (!fileResponse.Body) {
+        if (contentType) {
+          reply.header('Content-Type', contentType);
+        }
+
+        return reply.send(stream);
+      } catch (error) {
         return reply.code(404).send({
           code: ApiErrorCode.FileNotFound,
           message: 'File not found.',
         });
       }
-
-      if (fileResponse.Body instanceof Readable) {
-        reply.header('Content-Type', fileResponse.ContentType);
-        return reply.send(fileResponse.Body);
-      }
-
-      return reply.code(404).send({
-        code: ApiErrorCode.FileNotFound,
-        message: 'File not found.',
-      });
     },
   });
 
