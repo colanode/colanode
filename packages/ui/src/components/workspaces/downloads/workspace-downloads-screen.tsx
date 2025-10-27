@@ -1,19 +1,19 @@
 import { useLiveQuery } from '@tanstack/react-db';
 import { Download } from 'lucide-react';
 
+import { collections } from '@colanode/ui/collections';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
 import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { WorkspaceDownloadFile } from '@colanode/ui/components/workspaces/downloads/workspace-download-file';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 export const WorkspaceDownloadsScreen = () => {
   const workspace = useWorkspace();
 
   const downloadsQuery = useLiveQuery((q) =>
     q
-      .from({ downloads: database.workspace(workspace.userId).downloads })
+      .from({ downloads: collections.workspace(workspace.userId).downloads })
       .select(({ downloads }) => downloads)
       .orderBy(({ downloads }) => downloads.id, 'desc')
   );

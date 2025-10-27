@@ -2,8 +2,8 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 import { X } from 'lucide-react';
 import { useMemo } from 'react';
 
+import { collections } from '@colanode/ui/collections';
 import { useTabManager } from '@colanode/ui/contexts/tab-manager';
-import { database } from '@colanode/ui/data';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface TabsHeaderItemProps {
@@ -24,7 +24,7 @@ export const TabsHeaderItem = ({
   const tabQuery = useLiveQuery(
     (q) =>
       q
-        .from({ tabs: database.tabs })
+        .from({ tabs: collections.tabs })
         .where(({ tabs }) => eq(tabs.id, id))
         .select(({ tabs }) => ({
           location: tabs.location,

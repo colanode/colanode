@@ -6,12 +6,12 @@ import {
   UploadStatus,
   WindowSize,
 } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { SidebarMenuFooter } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu-footer';
 import { SidebarMenuHeader } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu-header';
 import { SidebarMenuIcon } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu-icon';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import { cn } from '@colanode/ui/lib/utils';
 
@@ -33,7 +33,7 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
 
   const pendingUploadsQuery = useLiveQuery((q) =>
     q
-      .from({ uploads: database.workspace(workspace.userId).uploads })
+      .from({ uploads: collections.workspace(workspace.userId).uploads })
       .where(({ uploads }) =>
         inArray(uploads.status, [UploadStatus.Pending, UploadStatus.Uploading])
       )

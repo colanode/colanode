@@ -4,6 +4,7 @@ import { Check, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 import { UnreadState } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import {
   DropdownMenu,
@@ -16,7 +17,6 @@ import {
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 export function SidebarMenuFooter() {
   const workspace = useWorkspace();
@@ -26,7 +26,7 @@ export function SidebarMenuFooter() {
   const [open, setOpen] = useState(false);
 
   const accountsQuery = useLiveQuery((q) =>
-    q.from({ accounts: database.accounts })
+    q.from({ accounts: collections.accounts })
   );
   const accounts = accountsQuery.data ?? [];
   const currentAccount = accounts.find((a) => a.id === workspace.accountId);

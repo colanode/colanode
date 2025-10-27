@@ -3,6 +3,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { Check, Plus } from 'lucide-react';
 import { useState } from 'react';
 
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import {
   DropdownMenu,
@@ -15,7 +16,6 @@ import {
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 export const SidebarMenuHeader = () => {
   const workspace = useWorkspace();
@@ -26,7 +26,7 @@ export const SidebarMenuHeader = () => {
 
   const workspacesQuery = useLiveQuery((q) =>
     q
-      .from({ workspaces: database.workspaces })
+      .from({ workspaces: collections.workspaces })
       .where(({ workspaces }) => eq(workspaces.accountId, workspace.accountId))
   );
 

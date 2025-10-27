@@ -1,9 +1,11 @@
-import { database } from '@colanode/ui/data';
+import { collections } from '@colanode/ui/collections';
 
 export const getDefaultWorkspaceUserId = () => {
-  const workspaceIds = database.workspaces.map((workspace) => workspace.userId);
+  const workspaceIds = collections.workspaces.map(
+    (workspace) => workspace.userId
+  );
 
-  const lastUsedWorkspaceId = database.metadata.get('workspace')?.value as
+  const lastUsedWorkspaceId = collections.metadata.get('workspace')?.value as
     | string
     | undefined;
 
@@ -11,7 +13,7 @@ export const getDefaultWorkspaceUserId = () => {
 };
 
 export const getWorkspaceUserId = (workspaceId: string) => {
-  for (const [userId, workspace] of database.workspaces.entries()) {
+  for (const [userId, workspace] of collections.workspaces.entries()) {
     if (workspace.workspaceId === workspaceId) {
       return userId;
     }

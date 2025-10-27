@@ -10,13 +10,13 @@ import {
 } from 'lucide-react';
 
 import { UploadStatus } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Link } from '@colanode/ui/components/ui/link';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { SidebarHeader } from '@colanode/ui/components/workspaces/sidebars/sidebar-header';
 import { SidebarSettingsItem } from '@colanode/ui/components/workspaces/sidebars/sidebar-settings-item';
 import { useApp } from '@colanode/ui/contexts/app';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 export const SidebarSettings = () => {
   const app = useApp();
@@ -24,7 +24,7 @@ export const SidebarSettings = () => {
 
   const pendingUploadsQuery = useLiveQuery((q) =>
     q
-      .from({ uploads: database.workspace(workspace.userId).uploads })
+      .from({ uploads: collections.workspace(workspace.userId).uploads })
       .where(({ uploads }) =>
         inArray(uploads.status, [UploadStatus.Pending, UploadStatus.Uploading])
       )

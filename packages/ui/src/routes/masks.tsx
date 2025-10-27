@@ -1,6 +1,6 @@
 import { createRouteMask, notFound } from '@tanstack/react-router';
 
-import { database } from '@colanode/ui/data';
+import { collections } from '@colanode/ui/collections';
 import { routeTree } from '@colanode/ui/routes';
 
 export const workspaceRouteMask = createRouteMask({
@@ -8,7 +8,7 @@ export const workspaceRouteMask = createRouteMask({
   from: '/workspace/$userId',
   to: '/$workspaceId',
   params: (ctx) => {
-    const workspace = database.workspaces.get(ctx.userId);
+    const workspace = collections.workspaces.get(ctx.userId);
     if (!workspace) {
       throw notFound();
     }
@@ -24,7 +24,7 @@ export const workspaceHomeRouteMask = createRouteMask({
   from: '/workspace/$userId/home',
   to: '/$workspaceId/home',
   params: (ctx) => {
-    const workspace = database.workspaces.get(ctx.userId);
+    const workspace = collections.workspaces.get(ctx.userId);
     if (!workspace) {
       throw notFound();
     }
@@ -40,7 +40,7 @@ export const nodeRouteMask = createRouteMask({
   from: '/workspace/$userId/$nodeId',
   to: '/$workspaceId/$nodeId',
   params: (ctx) => {
-    const workspace = database.workspaces.get(ctx.userId);
+    const workspace = collections.workspaces.get(ctx.userId);
     if (!workspace) {
       throw notFound();
     }
@@ -56,7 +56,7 @@ export const workspaceSettingsRouteMask = createRouteMask({
   from: '/workspace/$userId/settings',
   to: '/$workspaceId/settings',
   params: (ctx) => {
-    const workspace = database.workspaces.get(ctx.userId);
+    const workspace = collections.workspaces.get(ctx.userId);
     if (!workspace) {
       throw notFound();
     }
@@ -72,7 +72,7 @@ export const workspaceUsersRouteMask = createRouteMask({
   from: '/workspace/$userId/users',
   to: '/$workspaceId/users',
   params: (ctx) => {
-    const workspace = database.workspaces.get(ctx.userId);
+    const workspace = collections.workspaces.get(ctx.userId);
     if (!workspace) {
       throw notFound();
     }
@@ -88,7 +88,7 @@ export const workspaceStorageRouteMask = createRouteMask({
   from: '/workspace/$userId/storage',
   to: '/$workspaceId/storage',
   params: (ctx) => {
-    const workspace = database.workspaces.get(ctx.userId);
+    const workspace = collections.workspaces.get(ctx.userId);
     if (!workspace) {
       throw notFound();
     }
@@ -104,7 +104,7 @@ export const workspaceUploadsRouteMask = createRouteMask({
   from: '/workspace/$userId/uploads',
   to: '/$workspaceId/uploads',
   params: (ctx) => {
-    const workspace = database.workspaces.get(ctx.userId);
+    const workspace = collections.workspaces.get(ctx.userId);
     if (!workspace) {
       throw notFound();
     }
@@ -120,7 +120,7 @@ export const workspaceDownloadsRouteMask = createRouteMask({
   from: '/workspace/$userId/downloads',
   to: '/$workspaceId/downloads',
   params: (ctx) => {
-    const workspace = database.workspaces.get(ctx.userId);
+    const workspace = collections.workspaces.get(ctx.userId);
     if (!workspace) {
       throw notFound();
     }
@@ -136,7 +136,7 @@ export const accountSettingsRouteMask = createRouteMask({
   from: '/workspace/$userId/account/settings',
   to: '/$workspaceId/account/settings',
   params: (ctx) => {
-    const workspace = database.workspaces.get(ctx.userId);
+    const workspace = collections.workspaces.get(ctx.userId);
     if (!workspace) {
       throw notFound();
     }
@@ -152,7 +152,7 @@ export const accountLogoutRouteMask = createRouteMask({
   from: '/workspace/$userId/account/logout',
   to: '/$workspaceId/account/logout',
   params: (ctx) => {
-    const workspace = database.workspaces.get(ctx.userId);
+    const workspace = collections.workspaces.get(ctx.userId);
     if (!workspace) {
       throw notFound();
     }
@@ -168,7 +168,7 @@ export const appAppearanceRouteMask = createRouteMask({
   from: '/workspace/$userId/app/appearance',
   to: '/$workspaceId/app/appearance',
   params: (ctx) => {
-    const workspace = database.workspaces.get(ctx.userId);
+    const workspace = collections.workspaces.get(ctx.userId);
     if (!workspace) {
       throw notFound();
     }

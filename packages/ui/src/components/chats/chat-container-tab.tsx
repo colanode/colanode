@@ -1,11 +1,11 @@
 import { eq, useLiveQuery as useLiveQueryTanstack } from '@tanstack/react-db';
 
 import { LocalChatNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface ChatContainerTabProps {
@@ -35,7 +35,7 @@ export const ChatContainerTab = ({
 
   const userQuery = useLiveQueryTanstack((q) =>
     q
-      .from({ users: database.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => eq(users.id, userId))
       .select(({ users }) => ({
         id: users.id,

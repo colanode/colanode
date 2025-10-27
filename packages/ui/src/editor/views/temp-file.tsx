@@ -4,11 +4,11 @@ import { NodeViewWrapper } from '@tiptap/react';
 import { X } from 'lucide-react';
 
 import { FileSubtype } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { FileNoPreview } from '@colanode/ui/components/files/file-no-preview';
 import { FilePreviewAudio } from '@colanode/ui/components/files/previews/file-preview-audio';
 import { FilePreviewImage } from '@colanode/ui/components/files/previews/file-preview-image';
 import { FilePreviewVideo } from '@colanode/ui/components/files/previews/file-preview-video';
-import { database } from '@colanode/ui/data';
 import { canPreviewFile } from '@colanode/ui/lib/files';
 
 interface TempFilePreviewProps {
@@ -44,7 +44,7 @@ export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
 
   const tempFileQuery = useLiveQuery((q) =>
     q
-      .from({ tempFiles: database.tempFiles })
+      .from({ tempFiles: collections.tempFiles })
       .where(({ tempFiles }) => eq(tempFiles.id, fileId))
       .select(({ tempFiles }) => ({
         name: tempFiles.name,

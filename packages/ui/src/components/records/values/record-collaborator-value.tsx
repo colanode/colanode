@@ -3,6 +3,7 @@ import { X } from 'lucide-react';
 import { useState } from 'react';
 
 import { CollaboratorFieldAttributes } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Badge } from '@colanode/ui/components/ui/badge';
 import {
@@ -14,7 +15,6 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { UserSearch } from '@colanode/ui/components/users/user-search';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { database } from '@colanode/ui/data';
 
 interface CollaboratorBadgeProps {
   id: string;
@@ -48,7 +48,7 @@ export const RecordCollaboratorValue = ({
   const collaboratorIds = record.getCollaboratorValue(field) ?? [];
   const collaboratorsQuery = useLiveQuery((q) =>
     q
-      .from({ users: database.workspace(workspace.userId).users })
+      .from({ users: collections.workspace(workspace.userId).users })
       .where(({ users }) => inArray(users.id, collaboratorIds))
       .select(({ users }) => ({
         id: users.id,

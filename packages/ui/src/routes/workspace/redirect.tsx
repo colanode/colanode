@@ -1,7 +1,7 @@
 import { createRoute, notFound, redirect } from '@tanstack/react-router';
 
-import { database } from '@colanode/ui/data';
-import { buildMetadataKey } from '@colanode/ui/data/metadata';
+import { collections } from '@colanode/ui/collections';
+import { buildMetadataKey } from '@colanode/ui/collections/metadata';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
   workspaceMaskRoute,
@@ -13,14 +13,14 @@ export const workspaceRedirectRoute = createRoute({
   path: '/',
   component: () => null,
   beforeLoad: (ctx) => {
-    const workspace = database.workspaces.get(ctx.params.userId);
+    const workspace = collections.workspaces.get(ctx.params.userId);
 
     if (!workspace) {
       throw notFound();
     }
 
     const metadataKey = buildMetadataKey(workspace.userId, 'location');
-    const metadataValue = database.metadata.get(metadataKey)?.value;
+    const metadataValue = collections.metadata.get(metadataKey)?.value;
     const lastLocation = metadataValue ? JSON.parse(metadataValue) : undefined;
 
     if (lastLocation) {
