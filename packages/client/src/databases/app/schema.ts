@@ -102,6 +102,7 @@ interface TabTable {
   id: ColumnType<string, string, never>;
   location: ColumnType<string, string, string>;
   index: ColumnType<string, string, string>;
+  last_active_at: ColumnType<string, string, string>;
   created_at: ColumnType<string, string, string>;
   updated_at: ColumnType<string | null, string | null, string | null>;
 }

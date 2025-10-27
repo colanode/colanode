@@ -25,6 +25,7 @@ export class TabUpdateMutationHandler
       .set({
         location: input.location,
         index: input.index,
+        last_active_at: input.lastActiveAt,
         updated_at: new Date().toISOString(),
       })
       .where('id', '=', input.id)

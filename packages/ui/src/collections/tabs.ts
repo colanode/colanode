@@ -69,6 +69,7 @@ export const createTabsCollection = () => {
             id: original.id,
             location: changes.location,
             index: changes.index,
+            lastActiveAt: changes.lastActiveAt,
           });
         })
       );

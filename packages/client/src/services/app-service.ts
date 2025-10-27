@@ -156,6 +156,7 @@ export class AppService {
             id: generateId(IdType.Tab),
             location: '/',
             index: generateFractionalIndex(),
+            last_active_at: new Date().toISOString(),
             created_at: new Date().toISOString(),
           })
           .execute();

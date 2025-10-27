@@ -3,6 +3,7 @@ export type TabUpdateMutationInput = {
   id: string;
   location?: string;
   index?: string;
+  lastActiveAt?: string;
 };
 
 export type TabUpdateMutationOutput = {

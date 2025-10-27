@@ -7,6 +7,7 @@ export const createTabsTable: Migration = {
       .addColumn('id', 'text', (col) => col.primaryKey().notNull())
       .addColumn('location', 'text', (col) => col.notNull())
       .addColumn('index', 'text', (col) => col.notNull())
+      .addColumn('last_active_at', 'text', (col) => col.notNull())
       .addColumn('created_at', 'text', (col) => col.notNull())
       .addColumn('updated_at', 'text')
       .execute();

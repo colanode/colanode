@@ -271,6 +271,7 @@ export const mapTab = (row: SelectTab): Tab => {
     id: row.id,
     location: row.location,
     index: row.index,
+    lastActiveAt: row.last_active_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

@@ -11,6 +11,7 @@ interface TabsHeaderItemProps {
   index: number;
   isLast: boolean;
   isActive: boolean;
+  canDelete: boolean;
 }
 
 export const TabsHeaderItem = ({
@@ -18,6 +19,7 @@ export const TabsHeaderItem = ({
   index,
   isLast,
   isActive,
+  canDelete,
 }: TabsHeaderItemProps) => {
   const tabManager = useTabManager();
 
@@ -68,20 +70,22 @@ export const TabsHeaderItem = ({
         <div className="truncate text-sm font-medium">
           {tabComponent || 'New tab'}
         </div>
-        <button
-          className={cn(
-            'opacity-0 group-hover/tab:opacity-100 transition-all duration-200 flex-shrink-0 rounded-full p-1 hover:bg-destructive/20 hover:text-destructive',
-            isActive && 'opacity-70 hover:opacity-100',
-            'ml-auto'
-          )}
-          onClick={(e) => {
-            e.stopPropagation();
-            tabManager.deleteTab(id);
-          }}
-          title="Close tab"
-        >
-          <X className="size-3" />
-        </button>
+        {canDelete && (
+          <button
+            className={cn(
+              'opacity-0 group-hover/tab:opacity-100 transition-all duration-200 flex-shrink-0 rounded-full p-1 hover:bg-destructive/20 hover:text-destructive',
+              isActive && 'opacity-70 hover:opacity-100',
+              'ml-auto'
+            )}
+            onClick={(e) => {
+              e.stopPropagation();
+              tabManager.deleteTab(id);
+            }}
+            title="Close tab"
+          >
+            <X className="size-3" />
+          </button>
+        )}
       </div>
 
       {!isActive && !isLast && (

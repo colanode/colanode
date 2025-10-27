@@ -26,6 +26,7 @@ export class TabCreateMutationHandler
         id: input.id,
         location: input.location,
         index: input.index,
+        last_active_at: new Date().toISOString(),
         created_at: new Date().toISOString(),
       })
       .onConflict((cb) =>

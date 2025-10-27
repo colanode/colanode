@@ -18,6 +18,7 @@ export type Tab = {
   id: string;
   location: string;
   index: string;
+  lastActiveAt: string;
   createdAt: string;
   updatedAt: string | null;
 };
