@@ -1,7 +1,7 @@
 import { UpdateMergeMetadata } from '@colanode/core';
 
-export type SyncNodesUpdatesInput = {
-  type: 'nodes.updates';
+export type SyncNodeUpdatesInput = {
+  type: 'node.updates';
   rootId: string;
 };
 
@@ -19,8 +19,8 @@ export type SyncNodeUpdateData = {
 
 declare module '@colanode/core' {
   interface SynchronizerMap {
-    'nodes.updates': {
-      input: SyncNodesUpdatesInput;
+    'node.updates': {
+      input: SyncNodeUpdatesInput;
       data: SyncNodeUpdateData;
     };
   }

@@ -155,7 +155,7 @@ export class SocketConnection {
         message.input,
         cursor
       );
-    } else if (message.input.type === 'nodes.updates') {
+    } else if (message.input.type === 'node.updates') {
       if (!user.rootIds.has(message.input.rootId)) {
         return null;
       }
