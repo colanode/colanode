@@ -15,13 +15,6 @@ export class FileDownloadMutationHandler
     const workspace = this.getWorkspace(input.userId);
     const path = input.path;
 
-    if (!path) {
-      const autoDownload = await workspace.files.initAutoDownload(input.fileId);
-      return {
-        success: !!autoDownload,
-      };
-    }
-
     const manualDownload = await workspace.files.initManualDownload(
       input.fileId,
       path

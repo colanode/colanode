@@ -1,46 +1,49 @@
 import ms from 'ms';
 
-import { SelectDownload, UpdateDownload } from '@colanode/client/databases';
+import { SelectLocalFile, UpdateLocalFile } from '@colanode/client/databases';
 import {
   JobHandler,
   JobOutput,
   JobConcurrencyConfig,
 } from '@colanode/client/jobs';
-import { eventBus, mapDownload, mapNode } from '@colanode/client/lib';
+import { eventBus, mapLocalFile, mapNode } from '@colanode/client/lib';
 import { AppService } from '@colanode/client/services/app-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import { DownloadStatus, LocalFileNode } from '@colanode/client/types';
 import { FileStatus } from '@colanode/core';
 
-export type FileDownloadInput = {
-  type: 'file.download';
+export type LocalFileDownloadInput = {
+  type: 'local.file.download';
   userId: string;
-  downloadId: string;
+  fileId: string;
 };
 
 declare module '@colanode/client/jobs' {
   interface JobMap {
-    'file.download': {
-      input: FileDownloadInput;
+    'local.file.download': {
+      input: LocalFileDownloadInput;
     };
   }
 }
 
 const DOWNLOAD_RETRIES_LIMIT = 10;
 
-export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
+export class LocalFileDownloadJobHandler
+  implements JobHandler<LocalFileDownloadInput>
+{
   private readonly app: AppService;
 
   constructor(app: AppService) {
     this.app = app;
   }
 
-  public readonly concurrency: JobConcurrencyConfig<FileDownloadInput> = {
+  public readonly concurrency: JobConcurrencyConfig<LocalFileDownloadInput> = {
     limit: 1,
-    key: (input: FileDownloadInput) => `file.download.${input.downloadId}`,
+    key: (input: LocalFileDownloadInput) =>
+      `local.file.download.${input.fileId}`,
   };
 
-  public async handleJob(input: FileDownloadInput): Promise<JobOutput> {
+  public async handleJob(input: LocalFileDownloadInput): Promise<JobOutput> {
     const workspace = this.app.getWorkspace(input.userId);
     if (!workspace) {
       return {
@@ -55,20 +58,24 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
       };
     }
 
-    const download = await this.fetchDownload(workspace, input.downloadId);
-    if (!download) {
+    const localFile = await workspace.database
+      .selectFrom('local_files')
+      .selectAll()
+      .where('id', '=', input.fileId)
+      .executeTakeFirst();
+
+    if (!localFile) {
       return {
         type: 'cancel',
       };
     }
 
-    const file = await this.fetchNode(workspace, download.file_id);
+    const file = await this.fetchNode(workspace, input.fileId);
     if (!file) {
-      await this.updateDownload(workspace, download.id, {
-        status: DownloadStatus.Failed,
-        error_code: 'file_deleted',
-        error_message: 'File has been deleted',
-      });
+      await workspace.database
+        .deleteFrom('local_files')
+        .where('id', '=', input.fileId)
+        .execute();
 
       return {
         type: 'cancel',
@@ -89,18 +96,21 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
       };
     }
 
-    return this.performDownload(workspace, download, file);
+    return this.performDownload(workspace, localFile, file);
   }
 
   private async performDownload(
     workspace: WorkspaceService,
-    download: SelectDownload,
+    localFile: SelectLocalFile,
     file: LocalFileNode
   ): Promise<JobOutput> {
     try {
-      await this.updateDownload(workspace, download.id, {
-        status: DownloadStatus.Downloading,
-        started_at: new Date().toISOString(),
+      await this.updateLocalFile(workspace, localFile.id, {
+        download_status: DownloadStatus.Downloading,
+        download_progress: 0,
+        download_completed_at: null,
+        download_error_code: null,
+        download_error_message: null,
       });
 
       const response = await workspace.account.client.get(
@@ -108,37 +118,37 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
         {
           onDownloadProgress: async (progress, _chunk) => {
             const percentage = Math.round((progress.percent || 0) * 100);
-            await this.updateDownload(workspace, download.id, {
-              progress: percentage,
+            await this.updateLocalFile(workspace, localFile.id, {
+              download_progress: percentage,
             });
           },
         }
       );
 
-      const writeStream = await this.app.fs.writeStream(download.path);
+      const writeStream = await this.app.fs.writeStream(localFile.path);
       await response.body?.pipeTo(writeStream);
 
-      await this.updateDownload(workspace, download.id, {
-        status: DownloadStatus.Completed,
-        completed_at: new Date().toISOString(),
-        progress: 100,
-        error_code: null,
-        error_message: null,
+      await this.updateLocalFile(workspace, localFile.id, {
+        download_status: DownloadStatus.Completed,
+        download_completed_at: new Date().toISOString(),
+        download_progress: 100,
+        download_error_code: null,
+        download_error_message: null,
       });
 
       return {
         type: 'success',
       };
     } catch {
-      const newRetries = download.retries + 1;
+      const newRetries = localFile.download_retries + 1;
 
       if (newRetries >= DOWNLOAD_RETRIES_LIMIT) {
-        await this.updateDownload(workspace, download.id, {
-          status: DownloadStatus.Failed,
-          completed_at: new Date().toISOString(),
-          progress: 0,
-          error_code: 'file_download_failed',
-          error_message:
+        await this.updateLocalFile(workspace, localFile.id, {
+          download_status: DownloadStatus.Failed,
+          download_completed_at: new Date().toISOString(),
+          download_progress: 0,
+          download_error_code: 'file_download_failed',
+          download_error_message:
             'Failed to download file after ' + newRetries + ' retries',
         });
 
@@ -147,30 +157,14 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
         };
       }
 
-      await this.updateDownload(workspace, download.id, {
-        status: DownloadStatus.Pending,
-        retries: newRetries,
-        started_at: new Date().toISOString(),
-        error_code: null,
-        error_message: null,
+      await this.updateLocalFile(workspace, localFile.id, {
+        download_status: DownloadStatus.Pending,
+        download_retries: newRetries,
+        download_completed_at: null,
       });
 
-      return {
-        type: 'retry',
-        delay: ms('1 minute'),
-      };
+      return { type: 'retry', delay: ms('1 minute') };
     }
-  }
-
-  private async fetchDownload(
-    workspace: WorkspaceService,
-    downloadId: string
-  ): Promise<SelectDownload | undefined> {
-    return workspace.database
-      .selectFrom('downloads')
-      .selectAll()
-      .where('id', '=', downloadId)
-      .executeTakeFirst();
   }
 
   private async fetchNode(
@@ -190,30 +184,31 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
     return mapNode(node) as LocalFileNode;
   }
 
-  private async updateDownload(
+  private async updateLocalFile(
     workspace: WorkspaceService,
-    downloadId: string,
-    values: UpdateDownload
+    fileId: string,
+    values: UpdateLocalFile
   ): Promise<void> {
-    const updatedDownload = await workspace.database
-      .updateTable('downloads')
+    const updatedLocalFile = await workspace.database
+      .updateTable('local_files')
       .returningAll()
       .set(values)
-      .where('id', '=', downloadId)
+      .where('id', '=', fileId)
       .executeTakeFirst();
 
-    if (!updatedDownload) {
+    if (!updatedLocalFile) {
       return;
     }
 
+    const url = await this.app.fs.url(updatedLocalFile.path);
     eventBus.publish({
-      type: 'download.updated',
+      type: 'local.file.updated',
       workspace: {
         workspaceId: workspace.workspaceId,
         userId: workspace.userId,
         accountId: workspace.accountId,
       },
-      download: mapDownload(updatedDownload),
+      localFile: mapLocalFile(updatedLocalFile, url),
     });
   }
 }

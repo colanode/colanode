@@ -3,7 +3,7 @@ import { mapDownload } from '@colanode/client/lib';
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
 import { DownloadListQueryInput } from '@colanode/client/queries/files/download-list';
 import { Event } from '@colanode/client/types/events';
-import { Download, DownloadType } from '@colanode/client/types/files';
+import { Download } from '@colanode/client/types/files';
 
 export class DownloadListQueryHandler
   extends WorkspaceQueryHandlerBase
@@ -30,8 +30,7 @@ export class DownloadListQueryHandler
 
     if (
       event.type === 'download.created' &&
-      event.workspace.userId === input.userId &&
-      event.download.type === DownloadType.Manual
+      event.workspace.userId === input.userId
     ) {
       const newResult = [...output, event.download];
       return {
@@ -42,8 +41,7 @@ export class DownloadListQueryHandler
 
     if (
       event.type === 'download.updated' &&
-      event.workspace.userId === input.userId &&
-      event.download.type === DownloadType.Manual
+      event.workspace.userId === input.userId
     ) {
       const download = output.find(
         (download) => download.id === event.download.id
@@ -67,8 +65,7 @@ export class DownloadListQueryHandler
 
     if (
       event.type === 'download.deleted' &&
-      event.workspace.userId === input.userId &&
-      event.download.type === DownloadType.Manual
+      event.workspace.userId === input.userId
     ) {
       const download = output.find(
         (download) => download.id === event.download.id

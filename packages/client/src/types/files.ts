@@ -19,14 +19,16 @@ export type TempFile = {
 export type LocalFile = {
   id: string;
   version: string;
-  name: string;
   path: string;
-  size: number;
-  subtype: FileSubtype;
-  mimeType: string;
   createdAt: string;
   openedAt: string;
-  url: string;
+  url: string | null;
+  downloadStatus: DownloadStatus;
+  downloadProgress: number;
+  downloadRetries: number;
+  downloadCompletedAt: string | null;
+  downloadErrorCode: string | null;
+  downloadErrorMessage: string | null;
 };
 
 export type Upload = {
@@ -44,7 +46,6 @@ export type Download = {
   id: string;
   fileId: string;
   version: string;
-  type: DownloadType;
   name: string;
   path: string;
   size: number;
@@ -70,9 +71,4 @@ export enum UploadStatus {
   Uploading = 1,
   Completed = 2,
   Failed = 3,
-}
-
-export enum DownloadType {
-  Auto = 0,
-  Manual = 1,
 }

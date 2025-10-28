@@ -1,9 +1,6 @@
 import semver from 'semver';
 
-export const FeatureVersions = {
-  'workspace.storage.management': '0.3.0',
-  'file.upload.tus': '0.3.0',
-} as const;
+export const FeatureVersions = {} as const;
 
 export type FeatureKey = keyof typeof FeatureVersions;
 

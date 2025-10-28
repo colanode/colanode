@@ -21,8 +21,8 @@ export const FileImageThumbnail = ({ file, className }: FileThumbnailProps) => {
     return null;
   }
 
-  const localFile = localFileQuery.data?.localFile;
-  if (localFile) {
+  const localFile = localFileQuery.data;
+  if (localFile && localFile.url) {
     return (
       <img
         src={localFile.url}

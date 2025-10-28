@@ -26,8 +26,8 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
     return null;
   }
 
-  const localFile = localFileQuery.data?.localFile;
-  if (localFile) {
+  const localFile = localFileQuery.data;
+  if (localFile && localFile.url) {
     if (file.attributes.subtype === 'image') {
       return (
         <FilePreviewImage url={localFile.url} name={file.attributes.name} />
@@ -45,9 +45,8 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
     }
   }
 
-  const download = localFileQuery.data?.download;
-  if (download && download.status !== DownloadStatus.Completed) {
-    return <FileDownloadProgress progress={download.progress} />;
+  if (localFile && localFile.downloadStatus !== DownloadStatus.Completed) {
+    return <FileDownloadProgress progress={localFile.downloadProgress} />;
   }
 
   const isReady = file.attributes.status === FileStatus.Ready;

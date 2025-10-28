@@ -2,7 +2,7 @@ export type FileDownloadMutationInput = {
   type: 'file.download';
   userId: string;
   fileId: string;
-  path: string | null;
+  path: string;
 };
 
 export type FileDownloadMutationOutput = {

@@ -173,16 +173,21 @@ export const mapNodeInteraction = (
   };
 };
 
-export const mapLocalFile = (row: SelectLocalFile, url: string): LocalFile => {
+export const mapLocalFile = (
+  row: SelectLocalFile,
+  url: string | null
+): LocalFile => {
   return {
     id: row.id,
     version: row.version,
-    name: row.name,
     path: row.path,
-    size: row.size,
-    subtype: row.subtype,
     openedAt: row.opened_at,
-    mimeType: row.mime_type,
+    downloadStatus: row.download_status,
+    downloadProgress: row.download_progress,
+    downloadRetries: row.download_retries,
+    downloadCompletedAt: row.download_completed_at,
+    downloadErrorCode: row.download_error_code,
+    downloadErrorMessage: row.download_error_message,
     createdAt: row.created_at,
     url,
   };
@@ -206,7 +211,6 @@ export const mapDownload = (row: SelectDownload): Download => {
     id: row.id,
     fileId: row.file_id,
     version: row.version,
-    type: row.type,
     name: row.name,
     path: row.path,
     size: row.size,

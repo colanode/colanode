@@ -1,4 +1,3 @@
-import AsyncLock from 'async-lock';
 import ms from 'ms';
 
 import {
@@ -18,7 +17,7 @@ import { AppService } from '@colanode/client/services/app-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import {
   DownloadStatus,
-  DownloadType,
+  LocalFile,
   UploadStatus,
 } from '@colanode/client/types/files';
 import { LocalFileNode } from '@colanode/client/types/nodes';
@@ -38,7 +37,6 @@ export class FileService {
   private readonly app: AppService;
   private readonly workspace: WorkspaceService;
   private readonly filesDir: string;
-  private readonly lock = new AsyncLock();
 
   constructor(workspace: WorkspaceService) {
     this.app = workspace.account.app;
@@ -149,14 +147,15 @@ export class FileService {
       .values({
         id: fileId,
         version: generateId(IdType.Version),
-        name: tempFile.name,
-        extension: tempFile.extension,
-        subtype: tempFile.subtype,
-        mime_type: tempFile.mime_type,
-        size: tempFile.size,
         created_at: new Date().toISOString(),
         path: this.buildFilePath(fileId, tempFile.extension),
         opened_at: new Date().toISOString(),
+        download_status: DownloadStatus.Completed,
+        download_progress: 100,
+        download_completed_at: new Date().toISOString(),
+        download_error_code: null,
+        download_error_message: null,
+        download_retries: 0,
       })
       .executeTakeFirst();
 
@@ -235,11 +234,10 @@ export class FileService {
     await this.app.fs.delete(filePath);
   }
 
-  public async initAutoDownload(
-    fileId: string
-  ): Promise<SelectDownload | null> {
-    const lockKey = `download.auto.${fileId}`;
-
+  public async getLocalFile(
+    fileId: string,
+    autoDownload: boolean
+  ): Promise<LocalFile | null> {
     const node = await this.workspace.database
       .selectFrom('nodes')
       .selectAll()
@@ -247,85 +245,70 @@ export class FileService {
       .executeTakeFirst();
 
     if (!node) {
-      throw new MutationError(
-        MutationErrorCode.FileNotFound,
-        'The file you are trying to download does not exist.'
-      );
-    }
-
-    const file = mapNode(node) as LocalFileNode;
-    if (file.attributes.status !== FileStatus.Ready) {
-      throw new MutationError(
-        MutationErrorCode.FileNotReady,
-        'The file you are trying to download is not uploaded by the author yet.'
-      );
-    }
-
-    const result = await this.lock.acquire(lockKey, async () => {
-      const existingDownload = await this.workspace.database
-        .selectFrom('downloads')
-        .selectAll()
-        .where('file_id', '=', fileId)
-        .where('type', '=', DownloadType.Auto)
-        .executeTakeFirst();
-
-      if (existingDownload) {
-        return { existingDownload };
-      }
-
-      const createdDownload = await this.workspace.database
-        .insertInto('downloads')
-        .returningAll()
-        .values({
-          id: generateId(IdType.Download),
-          file_id: fileId,
-          version: file.attributes.version,
-          type: DownloadType.Auto,
-          name: file.attributes.name,
-          path: this.buildFilePath(fileId, file.attributes.extension),
-          size: file.attributes.size,
-          mime_type: file.attributes.mimeType,
-          status: DownloadStatus.Pending,
-          progress: 0,
-          retries: 0,
-          created_at: new Date().toISOString(),
-        })
-        .executeTakeFirst();
-
-      if (!createdDownload) {
-        return null;
-      }
-
-      return { createdDownload };
-    });
-
-    if (!result) {
       return null;
     }
 
-    if (result.existingDownload) {
-      return result.existingDownload;
+    const updatedLocalFile = await this.workspace.database
+      .updateTable('local_files')
+      .returningAll()
+      .set({
+        opened_at: new Date().toISOString(),
+      })
+      .where('id', '=', fileId)
+      .executeTakeFirst();
+
+    if (updatedLocalFile) {
+      const url = await this.app.fs.url(updatedLocalFile.path);
+      return mapLocalFile(updatedLocalFile, url);
     }
 
-    if (result.createdDownload) {
-      await this.app.jobs.addJob({
-        type: 'file.download',
+    if (!autoDownload) {
+      return null;
+    }
+
+    const file = mapNode(node) as LocalFileNode;
+    const now = new Date().toISOString();
+    const createdLocalFile = await this.workspace.database
+      .insertInto('local_files')
+      .returningAll()
+      .values({
+        id: fileId,
+        version: file.attributes.version,
+        created_at: now,
+        path: this.buildFilePath(fileId, file.attributes.extension),
+        opened_at: now,
+        download_status: DownloadStatus.Pending,
+        download_progress: 0,
+        download_completed_at: null,
+        download_error_code: null,
+        download_error_message: null,
+        download_retries: 0,
+      })
+      .onConflict((oc) => oc.column('id').doNothing())
+      .executeTakeFirst();
+
+    if (!createdLocalFile) {
+      return null;
+    }
+
+    await this.app.jobs.addJob({
+      type: 'local.file.download',
+      userId: this.workspace.userId,
+      fileId: fileId,
+    });
+
+    const localFile = mapLocalFile(createdLocalFile, null);
+    eventBus.publish({
+      type: 'local.file.created',
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
         userId: this.workspace.userId,
-        downloadId: result.createdDownload.id,
-      });
+        accountId: this.workspace.accountId,
+      },
+      localFile: localFile,
+    });
 
-      eventBus.publish({
-        type: 'download.created',
-        workspace: {
-          workspaceId: this.workspace.workspaceId,
-          userId: this.workspace.userId,
-          accountId: this.workspace.accountId,
-        },
-        download: mapDownload(result.createdDownload),
-      });
-    }
-
-    return result.createdDownload;
+    return localFile;
   }
 
   public async initManualDownload(
@@ -361,7 +344,6 @@ export class FileService {
         id: generateId(IdType.Download),
         file_id: fileId,
         version: file.attributes.version,
-        type: DownloadType.Manual,
         name: name,
         path: path,
         size: file.attributes.size,

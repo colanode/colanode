@@ -90,6 +90,12 @@ export type LocalFileCreatedEvent = {
   localFile: LocalFile;
 };
 
+export type LocalFileUpdatedEvent = {
+  type: 'local.file.updated';
+  workspace: WorkspaceEventData;
+  localFile: LocalFile;
+};
+
 export type LocalFileDeletedEvent = {
   type: 'local.file.deleted';
   workspace: WorkspaceEventData;
@@ -342,6 +348,7 @@ export type Event =
   | ServerDeletedEvent
   | ServerAvailabilityChangedEvent
   | LocalFileCreatedEvent
+  | LocalFileUpdatedEvent
   | LocalFileDeletedEvent
   | UploadCreatedEvent
   | UploadUpdatedEvent

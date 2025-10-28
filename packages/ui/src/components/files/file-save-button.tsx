@@ -52,16 +52,16 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
     setIsSaving(true);
 
     try {
-      const localFileQuery = await window.colanode.executeQuery({
+      const localFile = await window.colanode.executeQuery({
         type: 'local.file.get',
         fileId: file.id,
         userId: workspace.userId,
       });
 
-      if (localFileQuery.localFile) {
+      if (localFile && localFile.url) {
         // the file is already downloaded locally, so we can just trigger a download
         const link = document.createElement('a');
-        link.href = localFileQuery.localFile.url;
+        link.href = localFile.url;
         link.download = file.attributes.name;
         link.style.display = 'none';
         document.body.appendChild(link);
