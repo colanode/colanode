@@ -1,10 +1,17 @@
 import { useLiveQuery } from '@tanstack/react-db';
 
+import { WindowState } from '@colanode/client/types';
 import { collections } from '@colanode/ui/collections';
 import { TabAddButton } from '@colanode/ui/components/layouts/tabs/tab-add-button';
 import { TabsHeaderItem } from '@colanode/ui/components/layouts/tabs/tabs-header-item';
+import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 
 export const TabsHeader = () => {
+  const [platform] = useMetadata<string>('app', 'platform');
+  const [windowState] = useMetadata<WindowState>('app', 'window');
+  const showMacOsPlaceholder =
+    platform === 'darwin' && windowState?.fullscreen !== true;
+
   const tabsQuery = useLiveQuery((q) =>
     q
       .from({ tabs: collections.tabs })
@@ -25,7 +32,8 @@ export const TabsHeader = () => {
     : null;
 
   return (
-    <div className="relative flex bg-sidebar border-b border-border h-10 overflow-hidden">
+    <div className="relative flex bg-sidebar border-b border-border h-10 overflow-hidden app-drag-region">
+      {showMacOsPlaceholder && <div className="w-20 h-full" />}
       {tabs.map((tab, index) => {
         const isLast = index === tabs.length - 1;
         const isActive = activeTabId ? tab.id === activeTabId : index === 0;

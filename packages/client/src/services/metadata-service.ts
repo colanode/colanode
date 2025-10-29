@@ -37,7 +37,7 @@ export class MetadataService {
     return mapMetadata(metadata);
   }
 
-  public async set(namespace: string, key: string, value: string) {
+  public async set(namespace: string, key: string, value: unknown) {
     debug(`Setting metadata key ${key} to value ${value}`);
 
     const json = JSON.stringify(value);

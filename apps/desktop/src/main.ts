@@ -16,7 +16,7 @@ import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
 import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationMap } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
-import { TempFile, ThemeMode, WindowSize } from '@colanode/client/types';
+import { TempFile, ThemeMode } from '@colanode/client/types';
 import {
   createDebugger,
   extractFileSubtype,
@@ -24,6 +24,7 @@ import {
   IdType,
 } from '@colanode/core';
 import { app, appBadge } from '@colanode/desktop/main/app-service';
+import { bootstrap } from '@colanode/desktop/main/bootstrap';
 import { handleLocalRequest } from '@colanode/desktop/main/protocols';
 
 const debug = createDebugger('desktop:main');
@@ -47,25 +48,15 @@ updateElectronApp({
 });
 
 const createWindow = async () => {
-  await app.migrate();
-
-  const themeMetadata = await app.metadata.get('app', 'theme.mode');
-  if (themeMetadata) {
-    const themeMode = JSON.parse(themeMetadata.value) as ThemeMode;
-    nativeTheme.themeSource = themeMode;
-  }
-
-  let windowSize: WindowSize | undefined;
-  const windowSizeMetadata = await app.metadata.get('app', 'window.size');
-  if (windowSizeMetadata) {
-    windowSize = JSON.parse(windowSizeMetadata.value) as WindowSize;
-  }
+  nativeTheme.themeSource = bootstrap.theme ?? 'system';
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: windowSize?.width ?? 1200,
-    height: windowSize?.height ?? 800,
-    fullscreen: windowSize?.fullscreen ?? false,
+    width: bootstrap.window.width,
+    height: bootstrap.window.height,
+    fullscreen: bootstrap.window.fullscreen,
+    x: bootstrap.window.x,
+    y: bootstrap.window.y,
     fullscreenable: true,
     minWidth: 800,
     minHeight: 600,
@@ -75,40 +66,26 @@ const createWindow = async () => {
     },
     autoHideMenuBar: true,
     titleBarStyle: 'hiddenInset',
-    trafficLightPosition: { x: 5, y: 5 },
   });
 
   mainWindow.setMenuBarVisibility(false);
 
-  mainWindow.on('resized', () => {
-    windowSize = {
+  const updateWindowState = () => {
+    bootstrap.updateWindow({
+      fullscreen: mainWindow.isFullScreen(),
       width: mainWindow.getBounds().width,
       height: mainWindow.getBounds().height,
-      fullscreen: false,
-    };
+      x: mainWindow.getBounds().x,
+      y: mainWindow.getBounds().y,
+    });
 
-    app.metadata.set('app', 'window.size', JSON.stringify(windowSize));
-  });
+    app.metadata.set('app', 'window', bootstrap.window);
+  };
 
-  mainWindow.on('enter-full-screen', () => {
-    windowSize = {
-      width: windowSize?.width ?? mainWindow.getBounds().width,
-      height: windowSize?.height ?? mainWindow.getBounds().height,
-      fullscreen: true,
-    };
-
-    app.metadata.set('app', 'window.size', JSON.stringify(windowSize));
-  });
-
-  mainWindow.on('leave-full-screen', () => {
-    windowSize = {
-      width: windowSize?.width ?? mainWindow.getBounds().width,
-      height: windowSize?.height ?? mainWindow.getBounds().height,
-      fullscreen: false,
-    };
-
-    app.metadata.set('app', 'window.size', JSON.stringify(windowSize));
-  });
+  mainWindow.on('resized', updateWindowState);
+  mainWindow.on('enter-full-screen', updateWindowState);
+  mainWindow.on('leave-full-screen', updateWindowState);
+  mainWindow.on('moved', updateWindowState);
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -129,11 +106,13 @@ const createWindow = async () => {
     ) {
       const themeMode = JSON.parse(event.metadata.value) as ThemeMode;
       nativeTheme.themeSource = themeMode;
+      bootstrap.updateTheme(themeMode);
     } else if (
       event.type === 'metadata.deleted' &&
       event.metadata.key === 'theme.mode'
     ) {
       nativeTheme.themeSource = 'system';
+      bootstrap.updateTheme(null);
     }
   });
 

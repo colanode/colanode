@@ -139,6 +139,7 @@ export class AppService {
   }
 
   public async init(): Promise<void> {
+    await this.migrate();
     await this.initServers();
     await this.initAccounts();
     await this.initWorkspaces();

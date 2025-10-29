@@ -1,9 +1,11 @@
 export type AppType = 'desktop' | 'web' | 'mobile';
 
-export type WindowSize = {
+export type WindowState = {
+  fullscreen: boolean;
   width: number;
   height: number;
-  fullscreen: boolean;
+  x: number;
+  y: number;
 };
 
 export type Metadata = {

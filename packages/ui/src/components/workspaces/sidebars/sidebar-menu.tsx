@@ -1,19 +1,13 @@
 import { count, inArray, useLiveQuery } from '@tanstack/react-db';
 import { LayoutGrid, MessageCircle, Settings } from 'lucide-react';
 
-import {
-  SidebarMenuType,
-  UploadStatus,
-  WindowSize,
-} from '@colanode/client/types';
+import { SidebarMenuType, UploadStatus } from '@colanode/client/types';
 import { collections } from '@colanode/ui/collections';
 import { SidebarMenuFooter } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu-footer';
 import { SidebarMenuHeader } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu-header';
 import { SidebarMenuIcon } from '@colanode/ui/components/workspaces/sidebars/sidebar-menu-icon';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMetadata } from '@colanode/ui/hooks/use-metadata';
-import { cn } from '@colanode/ui/lib/utils';
 
 interface SidebarMenuProps {
   value: SidebarMenuType;
@@ -23,10 +17,6 @@ interface SidebarMenuProps {
 export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
   const workspace = useWorkspace();
   const radar = useRadar();
-
-  const [platform] = useMetadata<string>('app', 'platform');
-  const [windowSize] = useMetadata<WindowSize>('app', 'window.size');
-  const showMacOsPlaceholder = platform === 'darwin' && !windowSize?.fullscreen;
 
   const chatsState = radar.getChatsState(workspace.userId);
   const channelsState = radar.getChannelsState(workspace.userId);
@@ -47,7 +37,6 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
 
   return (
     <div className="flex flex-col h-full w-[65px] min-w-[65px] items-center">
-      <div className={cn('w-full', showMacOsPlaceholder ? 'h-8' : 'h-4')} />
       <SidebarMenuHeader />
       <div className="flex flex-col gap-1 mt-2 w-full p-2 items-center flex-grow">
         <SidebarMenuIcon
