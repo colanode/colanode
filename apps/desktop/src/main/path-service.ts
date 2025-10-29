@@ -7,6 +7,10 @@ export class DesktopPathService implements PathService {
   private readonly nativePath = path;
 
   private readonly appPath = app.getPath('userData');
+  private readonly bootstrapPath = this.nativePath.join(
+    this.appPath,
+    'bootstrap.json'
+  );
   private readonly appDatabasePath = this.nativePath.join(
     this.appPath,
     'app.db'
@@ -37,6 +41,10 @@ export class DesktopPathService implements PathService {
 
   public get app(): string {
     return this.appPath;
+  }
+
+  public get bootstrap(): string {
+    return this.bootstrapPath;
   }
 
   public get appDatabase(): string {

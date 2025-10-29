@@ -8,6 +8,7 @@ import {
   dialog,
   nativeTheme,
 } from 'electron';
+import fs from 'fs';
 import path from 'path';
 
 import started from 'electron-squirrel-startup';
@@ -16,6 +17,7 @@ import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
 import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationMap } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
+import { AppMeta, AppService } from '@colanode/client/services';
 import { TempFile, ThemeMode } from '@colanode/client/types';
 import {
   createDebugger,
@@ -23,9 +25,25 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
-import { app, appBadge } from '@colanode/desktop/main/app-service';
-import { bootstrap } from '@colanode/desktop/main/bootstrap';
+import { AppBadge } from '@colanode/desktop/main/app-badge';
+import { BootstrapService } from '@colanode/desktop/main/bootstrap';
+import { DesktopFileSystem } from '@colanode/desktop/main/file-system';
+import { DesktopKyselyService } from '@colanode/desktop/main/kysely-service';
+import { DesktopPathService } from '@colanode/desktop/main/path-service';
 import { handleLocalRequest } from '@colanode/desktop/main/protocols';
+
+const appMeta: AppMeta = {
+  type: 'desktop',
+  platform: process.platform,
+};
+
+const fileSystem = new DesktopFileSystem();
+const pathService = new DesktopPathService();
+const kyselyService = new DesktopKyselyService();
+const bootstrap = new BootstrapService(pathService);
+
+let app: AppService | null = null;
+let appBadge: AppBadge | null = null;
 
 const debug = createDebugger('desktop:main');
 
@@ -60,7 +78,7 @@ const createWindow = async () => {
     fullscreenable: true,
     minWidth: 800,
     minHeight: 600,
-    icon: path.join(app.path.assets, 'colanode-logo.png'),
+    icon: path.join(pathService.assets, 'colanode-logo.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
@@ -79,7 +97,9 @@ const createWindow = async () => {
       y: mainWindow.getBounds().y,
     });
 
-    app.metadata.set('app', 'window', bootstrap.window);
+    if (app) {
+      app.metadata.set('app', 'window', bootstrap.window);
+    }
   };
 
   mainWindow.on('resized', updateWindowState);
@@ -118,7 +138,11 @@ const createWindow = async () => {
 
   if (!protocol.isProtocolHandled('local')) {
     protocol.handle('local', (request) => {
-      return handleLocalRequest(request);
+      if (!app) {
+        throw new Error('App is not initialized');
+      }
+
+      return handleLocalRequest(pathService, app?.assets, request);
     });
   }
 
@@ -139,14 +163,85 @@ const createWindow = async () => {
   debug('Window created');
 };
 
+const initApp = async () => {
+  app = new AppService(appMeta, fileSystem, kyselyService, pathService);
+  appBadge = new AppBadge(app);
+
+  await app.init();
+  appBadge.init();
+
+  await bootstrap.save();
+
+  await app.metadata.set('app', 'version', bootstrap.version);
+  await app.metadata.set('app', 'platform', appMeta.platform);
+  await app.metadata.set('app', 'window', bootstrap.window);
+  if (bootstrap.theme) {
+    await app.metadata.set('app', 'theme.mode', bootstrap.theme);
+  } else {
+    await app.metadata.delete('app', 'theme.mode');
+  }
+
+  return app;
+};
+
 protocol.registerSchemesAsPrivileged([
   { scheme: 'local', privileges: { standard: true, stream: true } },
 ]);
 
+const ensureFreshStart = async (): Promise<boolean> => {
+  if (!bootstrap.needsFreshStart) {
+    return false;
+  }
+
+  const { response } = await dialog.showMessageBox({
+    type: 'info',
+    title: 'Colanode Updated',
+    message:
+      'Colanode has been upgraded to a new version and needs to restart.',
+    detail:
+      'We need to reset local app data to ensure compatibility with the new version. Click "Restart now" to proceed.',
+    buttons: ['Restart now', 'Close'],
+    defaultId: 0,
+    cancelId: 1,
+    noLink: true,
+  });
+
+  console.log('Response:', response);
+
+  if (response !== 0) {
+    debug('User dismissed upgrade restart dialog. Exiting application.');
+    electronApp.exit(0);
+    return true;
+  }
+
+  try {
+    await fs.promises.rm(pathService.app, { recursive: true, force: true });
+  } catch (error) {
+    console.error('Failed to clear app data during fresh start.', error);
+    await dialog.showMessageBox({
+      type: 'error',
+      title: 'Restart Failed',
+      message: 'We could not clear the local app data. The app will restart.',
+    });
+  }
+
+  debug('Relaunching application.');
+  electronApp.relaunch();
+  electronApp.exit(0);
+
+  return true;
+};
+
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-electronApp.on('ready', createWindow);
+electronApp.on('ready', async () => {
+  if (await ensureFreshStart()) {
+    return;
+  }
+
+  await createWindow();
+});
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -156,7 +251,9 @@ electronApp.on('window-all-closed', () => {
     electronApp.quit();
   }
 
-  app.mediator.clearSubscriptions();
+  if (app) {
+    app.mediator.clearSubscriptions();
+  }
 });
 
 electronApp.on('activate', () => {
@@ -170,8 +267,7 @@ electronApp.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 ipcMain.handle('init', async () => {
-  await app.init();
-  appBadge.init();
+  await initApp();
 });
 
 ipcMain.handle(
@@ -180,6 +276,10 @@ ipcMain.handle(
     _: unknown,
     input: T
   ): Promise<MutationMap[T['type']]['output']> => {
+    if (!app) {
+      throw new Error('App is not initialized');
+    }
+
     return app.mediator.executeMutation(input);
   }
 );
@@ -190,6 +290,10 @@ ipcMain.handle(
     _: unknown,
     input: T
   ): Promise<QueryMap[T['type']]['output']> => {
+    if (!app) {
+      throw new Error('App is not initialized');
+    }
+
     return app.mediator.executeQuery(input);
   }
 );
@@ -202,6 +306,10 @@ ipcMain.handle(
     windowId: string,
     input: T
   ): Promise<QueryMap[T['type']]['output']> => {
+    if (!app) {
+      throw new Error('App is not initialized');
+    }
+
     return app.mediator.executeQueryAndSubscribe(key, windowId, input);
   }
 );
@@ -209,6 +317,10 @@ ipcMain.handle(
 ipcMain.handle(
   'unsubscribe-query',
   (_: unknown, key: string, windowId: string): void => {
+    if (!app) {
+      throw new Error('App is not initialized');
+    }
+
     app.mediator.unsubscribeQuery(key, windowId);
   }
 );
@@ -220,6 +332,10 @@ ipcMain.handle(
     file: { name: string; size: number; type: string; buffer: Buffer }
   ): Promise<TempFile> => {
     const id = generateId(IdType.TempFile);
+    if (!app) {
+      throw new Error('App is not initialized');
+    }
+
     const extension = app.path.extension(file.name);
     const mimeType = file.type;
     const subtype = extractFileSubtype(mimeType);

@@ -1,9 +1,8 @@
-import { app } from 'electron';
 import fs from 'fs';
-import path from 'path';
 
 import { ThemeMode, WindowState } from '@colanode/client/types';
 import { build } from '@colanode/core';
+import { DesktopPathService } from '@colanode/desktop/main/path-service';
 
 interface BootstrapData {
   version: string;
@@ -13,36 +12,41 @@ interface BootstrapData {
 
 export class BootstrapService {
   private data: BootstrapData;
-  private readonly filePath: string;
+  private readonly paths: DesktopPathService;
+  private readonly requiresFreshStart: boolean;
 
-  constructor() {
-    this.filePath = path.join(app.getPath('userData'), 'bootstrap.json');
-    this.data = this.load();
+  constructor(paths: DesktopPathService) {
+    this.paths = paths;
+    const bootstrapExists = fs.existsSync(this.paths.bootstrap);
+    const appDatabaseExists = fs.existsSync(this.paths.appDatabase);
+
+    this.requiresFreshStart = !bootstrapExists && appDatabaseExists;
+    this.data = this.load(bootstrapExists);
   }
 
-  private load(): BootstrapData {
+  private load(bootstrapExists: boolean): BootstrapData {
     try {
-      if (fs.existsSync(this.filePath)) {
-        const content = fs.readFileSync(this.filePath, 'utf-8');
-        const parsed = JSON.parse(content);
-
-        return {
-          version: parsed.version || build.version,
-          theme: parsed.theme || 'system',
-          window: {
-            fullscreen: parsed.window?.fullscreen || false,
-            width: parsed.window?.width || 1280,
-            height: parsed.window?.height || 800,
-            x: parsed.window?.x || 100,
-            y: parsed.window?.y || 100,
-          },
-        };
+      if (!bootstrapExists) {
+        return this.getDefaultData();
       }
+
+      const content = fs.readFileSync(this.paths.bootstrap, 'utf-8');
+      const parsed = JSON.parse(content);
+
+      return {
+        version: parsed.version || build.version,
+        theme: parsed.theme || 'system',
+        window: {
+          fullscreen: parsed.window?.fullscreen || false,
+          width: parsed.window?.width || 1280,
+          height: parsed.window?.height || 800,
+          x: parsed.window?.x || 100,
+          y: parsed.window?.y || 100,
+        },
+      };
     } catch {
       return this.getDefaultData();
     }
-
-    return this.getDefaultData();
   }
 
   private getDefaultData(): BootstrapData {
@@ -59,10 +63,17 @@ export class BootstrapService {
     };
   }
 
-  private async save(): Promise<void> {
+  public async save(): Promise<void> {
+    if (!this.requiresFreshStart) {
+      return;
+    }
+
     try {
+      await fs.promises.mkdir(this.paths.dirname(this.paths.bootstrap), {
+        recursive: true,
+      });
       await fs.promises.writeFile(
-        this.filePath,
+        this.paths.bootstrap,
         JSON.stringify(this.data, null, 2)
       );
     } catch (error) {
@@ -113,6 +124,8 @@ export class BootstrapService {
     this.data.window = state;
     await this.save();
   }
-}
 
-export const bootstrap = new BootstrapService();
+  public get needsFreshStart(): boolean {
+    return this.requiresFreshStart;
+  }
+}

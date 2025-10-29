@@ -1,7 +1,6 @@
 import ky, { KyInstance } from 'ky';
 import { Kysely, Migration, Migrator } from 'kysely';
 import ms from 'ms';
-import semver from 'semver';
 
 import {
   AppDatabaseSchema,
@@ -103,15 +102,6 @@ export class AppService {
     });
 
     await migrator.migrateToLatest();
-
-    const versionMetadata = await this.metadata.get('app', 'version');
-    const version = semver.parse(versionMetadata?.value);
-    if (version && semver.lt(version, '0.2.0')) {
-      await this.deleteAllData();
-    }
-
-    await this.metadata.set('app', 'version', build.version);
-    await this.metadata.set('app', 'platform', this.meta.platform);
   }
 
   public getAccount(id: string): AccountService | null {
@@ -327,13 +317,6 @@ export class AppService {
         server: server.server,
       });
     }
-  }
-
-  private async deleteAllData(): Promise<void> {
-    await this.database.deleteFrom('accounts').execute();
-    await this.database.deleteFrom('metadata').execute();
-    await this.database.deleteFrom('job_schedules').execute();
-    await this.database.deleteFrom('jobs').execute();
   }
 
   private async initJobSchedules(): Promise<void> {
