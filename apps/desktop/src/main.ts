@@ -31,6 +31,10 @@ import { DesktopFileSystem } from '@colanode/desktop/main/file-system';
 import { DesktopKyselyService } from '@colanode/desktop/main/kysely-service';
 import { DesktopPathService } from '@colanode/desktop/main/path-service';
 import { handleLocalRequest } from '@colanode/desktop/main/protocols';
+import {
+  showErrorDialog,
+  showUpgradeRestartDialog,
+} from '@colanode/desktop/main/utils';
 
 const appMeta: AppMeta = {
   type: 'desktop',
@@ -193,22 +197,8 @@ const ensureFreshStart = async (): Promise<boolean> => {
     return false;
   }
 
-  const { response } = await dialog.showMessageBox({
-    type: 'info',
-    title: 'Colanode Updated',
-    message:
-      'Colanode has been upgraded to a new version and needs to restart.',
-    detail:
-      'We need to reset local app data to ensure compatibility with the new version. Click "Restart now" to proceed.',
-    buttons: ['Restart now', 'Close'],
-    defaultId: 0,
-    cancelId: 1,
-    noLink: true,
-  });
-
-  console.log('Response:', response);
-
-  if (response !== 0) {
+  const response = await showUpgradeRestartDialog();
+  if (!response) {
     debug('User dismissed upgrade restart dialog. Exiting application.');
     electronApp.exit(0);
     return true;
@@ -218,11 +208,9 @@ const ensureFreshStart = async (): Promise<boolean> => {
     await fs.promises.rm(pathService.app, { recursive: true, force: true });
   } catch (error) {
     console.error('Failed to clear app data during fresh start.', error);
-    await dialog.showMessageBox({
-      type: 'error',
-      title: 'Restart Failed',
-      message: 'We could not clear the local app data. The app will restart.',
-    });
+    await showErrorDialog(
+      'We could not clear the local app data. The app will restart.'
+    );
   }
 
   debug('Relaunching application.');
