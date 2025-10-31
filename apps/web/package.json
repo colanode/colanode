@@ -1,8 +1,8 @@
 {
   "name": "@colanode/web",
-  "version": "1.0.0",
   "private": true,
   "type": "module",
+  "version": "1.0.0",
   "scripts": {
     "dev": "vite --port 4000",
     "start": "vite --port 4000",
