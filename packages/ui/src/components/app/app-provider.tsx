@@ -1,11 +1,12 @@
 import { useEffect, useState } from 'react';
 
-import { AppType } from '@colanode/client/types';
+import { AppInitOutput, AppType } from '@colanode/client/types';
 import { build } from '@colanode/core';
 import { collections } from '@colanode/ui/collections';
 import { AppAssets } from '@colanode/ui/components/app/app-assets';
 import { AppLayout } from '@colanode/ui/components/app/app-layout';
 import { AppLoadingScreen } from '@colanode/ui/components/app/app-loading-screen';
+import { AppResetScreen } from '@colanode/ui/components/app/app-reset-screen';
 import { AppThemeProvider } from '@colanode/ui/components/app/app-theme-provider';
 import { RadarProvider } from '@colanode/ui/components/app/radar-provider';
 import { AppContext } from '@colanode/ui/contexts/app';
@@ -15,36 +16,40 @@ interface AppProviderProps {
 }
 
 export const AppProvider = ({ type }: AppProviderProps) => {
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [initOutput, setInitOutput] = useState<AppInitOutput | null>(null);
 
   useEffect(() => {
     console.log(`Colanode | Version: ${build.version} | SHA: ${build.sha}`);
 
-    window.colanode.init().then(() => {
+    window.colanode.init().then((output) => {
       console.log('Colanode | Initialized');
 
-      collections
-        .preload()
-        .then(() => {
-          setIsInitialized(true);
-        })
-        .catch((err) => {
-          console.error('Colanode | Error preloading', err);
-        });
+      if (output === 'success') {
+        collections
+          .preload()
+          .then(() => {
+            setInitOutput('success');
+          })
+          .catch((err) => {
+            console.error('Colanode | Error preloading', err);
+          });
+      } else {
+        setInitOutput(output);
+      }
     });
   }, []);
 
-  if (!isInitialized) {
-    return <AppLoadingScreen />;
-  }
-
   return (
     <AppContext.Provider value={{ type }}>
-      <AppAssets />
-      <AppThemeProvider>
-        <RadarProvider>
-          <AppLayout type={type} />
-        </RadarProvider>
+      <AppThemeProvider init={initOutput}>
+        <AppAssets />
+        {initOutput === null && <AppLoadingScreen />}
+        {initOutput === 'reset' && <AppResetScreen />}
+        {initOutput === 'success' && (
+          <RadarProvider>
+            <AppLayout type={type} />
+          </RadarProvider>
+        )}
       </AppThemeProvider>
     </AppContext.Provider>
   );

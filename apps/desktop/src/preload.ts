@@ -13,6 +13,7 @@ const windowId = generateId(IdType.Window);
 
 contextBridge.exposeInMainWorld('colanode', {
   init: () => ipcRenderer.invoke('init'),
+  reset: () => ipcRenderer.invoke('reset'),
 
   executeMutation: <T extends MutationInput>(
     input: T

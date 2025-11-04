@@ -4,11 +4,16 @@ export class WebPathService implements PathService {
   private readonly appPath = '';
   private readonly assetsSourcePath = 'assets';
   private readonly appDatabasePath = this.join(this.appPath, 'app.db');
+  private readonly bootstrapPath = this.join(this.appPath, 'bootstrap.json');
   private readonly avatarsPath = this.join(this.appPath, 'avatars');
   private readonly workspacesPath = this.join(this.appPath, 'workspaces');
 
   public get app() {
     return this.appPath;
+  }
+
+  public get bootstrap() {
+    return this.bootstrapPath;
   }
 
   public get appDatabase() {

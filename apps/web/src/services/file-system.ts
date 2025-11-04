@@ -1,3 +1,5 @@
+/// <reference lib="webworker" />
+
 import { FileReadStream, FileSystem } from '@colanode/client/services';
 
 export class WebFileSystem implements FileSystem {
@@ -82,6 +84,13 @@ export class WebFileSystem implements FileSystem {
     }
 
     return arrayBuffer;
+  }
+
+  public async reset(): Promise<void> {
+    const root = await this.ensureInitialized();
+    for await (const [name] of root.entries()) {
+      await root.removeEntry(name, { recursive: true });
+    }
   }
 
   public async makeDirectory(path: string): Promise<void> {

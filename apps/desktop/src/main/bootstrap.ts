@@ -64,7 +64,7 @@ export class BootstrapService {
   }
 
   public async save(): Promise<void> {
-    if (!this.requiresFreshStart) {
+    if (this.requiresFreshStart) {
       return;
     }
 
@@ -72,6 +72,7 @@ export class BootstrapService {
       await fs.promises.mkdir(this.paths.dirname(this.paths.bootstrap), {
         recursive: true,
       });
+
       await fs.promises.writeFile(
         this.paths.bootstrap,
         JSON.stringify(this.data, null, 2)

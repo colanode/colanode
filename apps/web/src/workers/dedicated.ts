@@ -8,8 +8,10 @@ import {
 } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
 import { AppMeta, AppService } from '@colanode/client/services';
-import { extractFileSubtype, generateId, IdType } from '@colanode/core';
+import { AppInitOutput } from '@colanode/client/types';
+import { build, extractFileSubtype, generateId, IdType } from '@colanode/core';
 import {
+  BroadcastInitMessage,
   BroadcastMessage,
   BroadcastMutationMessage,
   BroadcastQueryAndSubscribeMessage,
@@ -18,6 +20,7 @@ import {
   ColanodeWorkerApi,
   PendingPromise,
 } from '@colanode/web/lib/types';
+import { WebBootstrapService } from '@colanode/web/services/bootstrap';
 import { WebFileSystem } from '@colanode/web/services/file-system';
 import { WebKyselyService } from '@colanode/web/services/kysely-service';
 import { WebPathService } from '@colanode/web/services/path-service';
@@ -28,7 +31,7 @@ const pendingPromises = new Map<string, PendingPromise>();
 const fs = new WebFileSystem();
 const path = new WebPathService();
 let app: AppService | null = null;
-let appInitialized = false;
+let appInitOutput: AppInitOutput | null = null;
 
 const broadcast = new BroadcastChannel('colanode');
 broadcast.onmessage = (event) => {
@@ -41,11 +44,40 @@ navigator.locks.request('colanode', async () => {
     platform: navigator.userAgent,
   };
 
+  const bootstrap = await WebBootstrapService.create(path, fs);
+  if (bootstrap.needsFreshInstall) {
+    appInitOutput = 'reset';
+
+    if (pendingPromises.has('init')) {
+      const promise = pendingPromises.get('init');
+      if (promise && promise.type === 'init') {
+        promise.resolve(appInitOutput);
+      }
+    }
+
+    broadcastMessage({
+      type: 'init_result',
+      result: appInitOutput,
+    });
+
+    return;
+  }
+
   app = new AppService(appMeta, fs, new WebKyselyService(), path);
 
   await app.migrate();
   await app.init();
-  appInitialized = true;
+  await bootstrap.updateVersion(build.version);
+
+  await app.metadata.set('app', 'version', build.version);
+  await app.metadata.set('app', 'platform', appMeta.platform);
+
+  appInitOutput = 'success';
+
+  broadcastMessage({
+    type: 'init_result',
+    result: appInitOutput,
+  });
 
   const ids = Array.from(pendingPromises.keys());
   for (const id of ids) {
@@ -54,7 +86,9 @@ navigator.locks.request('colanode', async () => {
       continue;
     }
 
-    if (promise.type === 'query') {
+    if (promise.type === 'init') {
+      promise.resolve(appInitOutput);
+    } else if (promise.type === 'query') {
       const result = await app.mediator.executeQuery(promise.input);
       promise.resolve(result);
     } else if (promise.type === 'query_and_subscribe') {
@@ -88,7 +122,16 @@ const broadcastMessage = (message: BroadcastMessage) => {
 };
 
 const handleMessage = async (message: BroadcastMessage) => {
-  if (message.type === 'event') {
+  if (message.type === 'init') {
+    if (!appInitOutput) {
+      return;
+    }
+
+    broadcastMessage({
+      type: 'init_result',
+      result: appInitOutput,
+    });
+  } else if (message.type === 'event') {
     if (message.windowId === windowId) {
       return;
     }
@@ -141,6 +184,14 @@ const handleMessage = async (message: BroadcastMessage) => {
     }
 
     app.mediator.unsubscribeQuery(message.key, message.windowId);
+  } else if (message.type === 'init_result') {
+    const promise = pendingPromises.get('init');
+    if (!promise || promise.type !== 'init') {
+      return;
+    }
+
+    promise.resolve(message.result);
+    pendingPromises.delete('init');
   } else if (message.type === 'query_result') {
     const promise = pendingPromises.get(message.queryId);
     if (!promise || promise.type !== 'query') {
@@ -168,124 +219,163 @@ const handleMessage = async (message: BroadcastMessage) => {
   }
 };
 
+const waitForInit = async () => {
+  let count = 0;
+  while (!appInitOutput) {
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    count++;
+    if (count > 100) {
+      throw new Error('App initialization timed out');
+    }
+  }
+};
+
 const api: ColanodeWorkerApi = {
   async init() {
-    if (!app) {
-      return;
+    if (appInitOutput) {
+      return appInitOutput;
     }
 
-    if (appInitialized) {
-      return;
-    }
+    if (!appInitOutput) {
+      const message: BroadcastInitMessage = {
+        type: 'init',
+      };
 
-    let count = 0;
-    while (!appInitialized) {
-      await new Promise((resolve) => setTimeout(resolve, 50));
-      count++;
-      if (count > 100) {
-        throw new Error('App initialization timed out');
-      }
-    }
-  },
-  executeMutation(input) {
-    if (app && appInitialized) {
-      return app.mediator.executeMutation(input);
-    }
-
-    const mutationId = generateId(IdType.Mutation);
-    const message: BroadcastMutationMessage = {
-      type: 'mutation',
-      mutationId,
-      input,
-    };
-
-    const promise = new Promise<MutationResult<MutationInput>>(
-      (resolve, reject) => {
-        pendingPromises.set(mutationId, {
-          type: 'mutation',
-          mutationId,
-          input,
+      const promise = new Promise<AppInitOutput>((resolve, reject) => {
+        pendingPromises.set('init', {
+          type: 'init',
           resolve,
           reject,
         });
-      }
-    );
-
-    broadcastMessage(message);
-    return promise;
-  },
-  executeQuery(input) {
-    if (app && appInitialized) {
-      return app.mediator.executeQuery(input);
+      });
+      broadcastMessage(message);
+      return promise;
     }
 
-    const queryId = generateId(IdType.Query);
-    const message: BroadcastQueryMessage = {
-      type: 'query',
-      queryId,
-      input,
-    };
-
-    const promise = new Promise<QueryMap[QueryInput['type']]['output']>(
-      (resolve, reject) => {
-        pendingPromises.set(queryId, {
-          type: 'query',
-          queryId,
-          input,
-          resolve,
-          reject,
-        });
-      }
-    );
-
-    broadcastMessage(message);
-    return promise;
-  },
-  executeQueryAndSubscribe(key, input) {
-    if (app && appInitialized) {
-      return app.mediator.executeQueryAndSubscribe(key, windowId, input);
+    await waitForInit();
+    if (!appInitOutput) {
+      return Promise.reject(new Error('App not initialized'));
     }
 
-    const queryId = generateId(IdType.Query);
-    const message: BroadcastQueryAndSubscribeMessage = {
-      type: 'query_and_subscribe',
-      queryId,
-      key,
-      windowId,
-      input,
-    };
-
-    const promise = new Promise<QueryMap[QueryInput['type']]['output']>(
-      (resolve, reject) => {
-        pendingPromises.set(queryId, {
-          type: 'query_and_subscribe',
-          queryId,
-          key,
-          windowId,
-          input,
-          resolve,
-          reject,
-        });
-      }
-    );
-
-    broadcastMessage(message);
-    return promise;
+    return appInitOutput;
   },
-  unsubscribeQuery(key) {
-    if (app && appInitialized) {
-      app.mediator.unsubscribeQuery(key, windowId);
+  async reset() {
+    await fs.reset();
+  },
+  async executeMutation(input) {
+    if (!appInitOutput) {
+      const mutationId = generateId(IdType.Mutation);
+      const message: BroadcastMutationMessage = {
+        type: 'mutation',
+        mutationId,
+        input,
+      };
+
+      const promise = new Promise<MutationResult<MutationInput>>(
+        (resolve, reject) => {
+          pendingPromises.set(mutationId, {
+            type: 'mutation',
+            mutationId,
+            input,
+            resolve,
+            reject,
+          });
+        }
+      );
+
+      broadcastMessage(message);
+      return promise;
+    }
+
+    if (!app || appInitOutput !== 'success') {
+      return Promise.reject(new Error('App not initialized'));
+    }
+
+    return app.mediator.executeMutation(input);
+  },
+  async executeQuery(input) {
+    if (!appInitOutput) {
+      const queryId = generateId(IdType.Query);
+      const message: BroadcastQueryMessage = {
+        type: 'query',
+        queryId,
+        input,
+      };
+
+      const promise = new Promise<QueryMap[QueryInput['type']]['output']>(
+        (resolve, reject) => {
+          pendingPromises.set(queryId, {
+            type: 'query',
+            queryId,
+            input,
+            resolve,
+            reject,
+          });
+        }
+      );
+
+      broadcastMessage(message);
+      return promise;
+    }
+
+    if (!app || appInitOutput !== 'success') {
+      return Promise.reject(new Error('App not initialized'));
+    }
+
+    return app.mediator.executeQuery(input);
+  },
+  async executeQueryAndSubscribe(key, input) {
+    if (!appInitOutput) {
+      const queryId = generateId(IdType.Query);
+      const message: BroadcastQueryAndSubscribeMessage = {
+        type: 'query_and_subscribe',
+        queryId,
+        key,
+        windowId,
+        input,
+      };
+
+      const promise = new Promise<QueryMap[QueryInput['type']]['output']>(
+        (resolve, reject) => {
+          pendingPromises.set(queryId, {
+            type: 'query_and_subscribe',
+            queryId,
+            key,
+            windowId,
+            input,
+            resolve,
+            reject,
+          });
+        }
+      );
+
+      broadcastMessage(message);
+      return promise;
+    }
+
+    if (!app || appInitOutput !== 'success') {
+      return Promise.reject(new Error('App not initialized'));
+    }
+
+    return app.mediator.executeQuery(input);
+  },
+  async unsubscribeQuery(key) {
+    if (!appInitOutput) {
+      const message: BroadcastQueryUnsubscribeMessage = {
+        type: 'query_unsubscribe',
+        key,
+        windowId,
+      };
+
+      broadcastMessage(message);
       return Promise.resolve();
     }
 
-    const message: BroadcastQueryUnsubscribeMessage = {
-      type: 'query_unsubscribe',
-      key,
-      windowId,
-    };
+    if (!app || appInitOutput !== 'success') {
+      return;
+    }
 
-    broadcastMessage(message);
-    return Promise.resolve();
+    return app.mediator.unsubscribeQuery(key, windowId);
   },
   subscribe(callback) {
     const id = eventBus.subscribe(callback);
@@ -320,7 +410,7 @@ const api: ColanodeWorkerApi = {
       path: filePath,
     };
 
-    if (app && appInitialized) {
+    if (app && appInitOutput === 'success') {
       await app.mediator.executeMutation(input);
     } else {
       const mutationId = generateId(IdType.Mutation);

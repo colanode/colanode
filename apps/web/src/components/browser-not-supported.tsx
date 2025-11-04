@@ -3,7 +3,7 @@ import { MonitorOff } from 'lucide-react';
 export const BrowserNotSupported = () => {
   return (
     <div className="min-w-screen flex h-full min-h-screen w-full items-center justify-center">
-      <div className="flex flex-col items-center gap-8 text-center w-128">
+      <div className="flex flex-col items-center gap-8 text-center w-lg">
         <MonitorOff className="h-10 w-10 text-foreground" />
         <h2 className="text-4xl text-foreground">Browser not supported</h2>
         <p className="text-sm text-muted-foreground">

@@ -18,8 +18,9 @@ import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationMap } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
 import { AppMeta, AppService } from '@colanode/client/services';
-import { TempFile, ThemeMode } from '@colanode/client/types';
+import { AppInitOutput, TempFile, ThemeMode } from '@colanode/client/types';
 import {
+  build,
   createDebugger,
   extractFileSubtype,
   generateId,
@@ -31,10 +32,6 @@ import { DesktopFileSystem } from '@colanode/desktop/main/file-system';
 import { DesktopKyselyService } from '@colanode/desktop/main/kysely-service';
 import { DesktopPathService } from '@colanode/desktop/main/path-service';
 import { handleLocalRequest } from '@colanode/desktop/main/protocols';
-import {
-  showErrorDialog,
-  showUpgradeRestartDialog,
-} from '@colanode/desktop/main/utils';
 
 const appMeta: AppMeta = {
   type: 'desktop',
@@ -167,14 +164,18 @@ const createWindow = async () => {
   debug('Window created');
 };
 
-const initApp = async () => {
+const initApp = async (): Promise<AppInitOutput> => {
+  if (bootstrap.needsFreshStart) {
+    return 'reset';
+  }
+
   app = new AppService(appMeta, fileSystem, kyselyService, pathService);
   appBadge = new AppBadge(app);
 
   await app.init();
   appBadge.init();
 
-  await bootstrap.save();
+  await bootstrap.updateVersion(build.version);
 
   await app.metadata.set('app', 'version', bootstrap.version);
   await app.metadata.set('app', 'platform', appMeta.platform);
@@ -185,51 +186,17 @@ const initApp = async () => {
     await app.metadata.delete('app', 'theme.mode');
   }
 
-  return app;
+  return 'success';
 };
 
 protocol.registerSchemesAsPrivileged([
   { scheme: 'local', privileges: { standard: true, stream: true } },
 ]);
 
-const ensureFreshStart = async (): Promise<boolean> => {
-  if (!bootstrap.needsFreshStart) {
-    return false;
-  }
-
-  const response = await showUpgradeRestartDialog();
-  if (!response) {
-    debug('User dismissed upgrade restart dialog. Exiting application.');
-    electronApp.exit(0);
-    return true;
-  }
-
-  try {
-    await fs.promises.rm(pathService.app, { recursive: true, force: true });
-  } catch (error) {
-    console.error('Failed to clear app data during fresh start.', error);
-    await showErrorDialog(
-      'We could not clear the local app data. The app will restart.'
-    );
-  }
-
-  debug('Relaunching application.');
-  electronApp.relaunch();
-  electronApp.exit(0);
-
-  return true;
-};
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
-electronApp.on('ready', async () => {
-  if (await ensureFreshStart()) {
-    return;
-  }
-
-  await createWindow();
-});
+electronApp.on('ready', createWindow);
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
@@ -255,7 +222,13 @@ electronApp.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 ipcMain.handle('init', async () => {
-  await initApp();
+  return initApp();
+});
+
+ipcMain.handle('reset', async () => {
+  await fs.promises.rm(pathService.app, { recursive: true, force: true });
+  electronApp.relaunch();
+  electronApp.exit(0);
 });
 
 ipcMain.handle(
