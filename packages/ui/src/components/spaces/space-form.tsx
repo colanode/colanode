@@ -97,10 +97,7 @@ export const SpaceForm = ({
           </AvatarPopover>
 
           <div
-            className={cn(
-              'space-y-4 py-2 pb-4',
-              isMobile ? 'w-full' : 'flex-grow'
-            )}
+            className={cn('space-y-4 py-2 pb-4', isMobile ? 'w-full' : 'grow')}
           >
             <FormField
               control={form.control}

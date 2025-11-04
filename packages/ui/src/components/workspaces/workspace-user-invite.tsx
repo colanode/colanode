@@ -39,7 +39,7 @@ export const WorkspaceUserInvite = () => {
           ))}
           <input
             value={input}
-            className="flex-grow px-1 focus-visible:outline-none"
+            className="grow px-1 focus-visible:outline-none"
             onChange={(e) => setInput(e.target.value.trim())}
             placeholder="Enter email addresses"
             onKeyUp={(e) => {

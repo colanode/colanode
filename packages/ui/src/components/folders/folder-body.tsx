@@ -129,7 +129,7 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
                   >
                     <div className="flex w-full flex-row items-center gap-2">
                       <item.icon className="size-4" />
-                      <p className="flex-grow">{item.name}</p>
+                      <p className="grow">{item.name}</p>
                       {layout === item.value && <Check className="size-4" />}
                     </div>
                   </DropdownMenuItem>

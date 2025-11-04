@@ -108,7 +108,7 @@ export const ViewCreatedByFieldFilter = ({
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex flex-grow flex-row items-center gap-1 rounded-md p-1 font-semibold cursor-pointer hover:bg-accent">
+              <div className="flex grow flex-row items-center gap-1 rounded-md p-1 font-semibold cursor-pointer hover:bg-accent">
                 <p>{operator.label}</p>
                 <ChevronDown className="size-4 text-muted-foreground" />
               </div>
@@ -185,7 +185,7 @@ export const ViewCreatedByFieldFilter = ({
                         avatar={collaborator.avatar}
                         className="h-7 w-7"
                       />
-                      <div className="flex flex-grow flex-col">
+                      <div className="flex grow flex-col">
                         <p className="text-sm">{collaborator.name}</p>
                         <p className="text-xs text-muted-foreground">
                           {collaborator.email}

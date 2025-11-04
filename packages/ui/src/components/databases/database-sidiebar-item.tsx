@@ -25,7 +25,7 @@ export const DatabaseSidebarItem = ({
         name={database.attributes.name}
         className="h-4 w-4"
       />
-      <span className={cn('line-clamp-1 w-full flex-grow pl-2 text-left')}>
+      <span className={cn('line-clamp-1 w-full grow pl-2 text-left')}>
         {database.attributes.name ?? 'Unnamed'}
       </span>
     </button>

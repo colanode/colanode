@@ -41,7 +41,7 @@ export const NodeCollaboratorAudit = ({
         className="size-7"
       />
       <div className="flex flex-col">
-        <span className="font-normal flex-grow">{user.name}</span>
+        <span className="font-normal grow">{user.name}</span>
         <span className="text-xs text-muted-foreground">{timeAgo(date)}</span>
       </div>
     </div>

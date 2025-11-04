@@ -14,12 +14,12 @@ export const FileBody = ({ file }: FileBodyProps) => {
 
   return (
     <div className="flex h-full max-h-full w-full flex-row items-center gap-2">
-      <div className="flex flex-col w-full max-w-full h-full flex-grow overflow-hidden">
+      <div className="flex flex-col w-full max-w-full h-full grow overflow-hidden">
         <div className="flex flex-row w-full items-center justify-end p-4 gap-4">
           <FileSaveButton file={file} />
         </div>
 
-        <div className="flex flex-col flex-grow items-center justify-center overflow-hidden p-10">
+        <div className="flex flex-col grow items-center justify-center overflow-hidden p-10">
           {canPreview ? (
             <FilePreview file={file} />
           ) : (

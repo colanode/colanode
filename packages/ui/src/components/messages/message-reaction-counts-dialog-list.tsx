@@ -67,9 +67,7 @@ export const MessageReactionCountsDialogList = ({
             avatar={user.avatar}
             className="size-5"
           />
-          <p className="flex-grow text-sm font-medium leading-none">
-            {user.name}
-          </p>
+          <p className="grow text-sm font-medium leading-none">{user.name}</p>
         </div>
       ))}
       <InView

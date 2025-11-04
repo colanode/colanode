@@ -54,7 +54,7 @@ export const MessageReactionCountsDialog = ({
               </TabsTrigger>
             ))}
           </TabsList>
-          <div className="flex-grow">
+          <div className="grow">
             {reactionCounts.map((reactionCount) => (
               <TabsContent
                 key={`tab-content-${reactionCount.reaction}`}

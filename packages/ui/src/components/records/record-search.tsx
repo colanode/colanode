@@ -68,9 +68,7 @@ export const RecordSearch = ({
                       avatar={record.attributes.avatar}
                       className="size-4"
                     />
-                    <p className="text-sm flex-grow">
-                      {record.attributes.name}
-                    </p>
+                    <p className="text-sm grow">{record.attributes.name}</p>
                   </div>
                 </CommandItem>
               ))}

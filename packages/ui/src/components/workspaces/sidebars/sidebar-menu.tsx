@@ -38,7 +38,7 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
   return (
     <div className="flex flex-col h-full w-[65px] min-w-[65px] items-center">
       <SidebarMenuHeader />
-      <div className="flex flex-col gap-1 mt-2 w-full p-2 items-center flex-grow">
+      <div className="flex flex-col gap-1 mt-2 w-full p-2 items-center grow">
         <SidebarMenuIcon
           icon={MessageCircle}
           onClick={() => {

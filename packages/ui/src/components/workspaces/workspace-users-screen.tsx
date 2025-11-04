@@ -76,7 +76,7 @@ export const WorkspaceUsersScreen = () => {
               return (
                 <div key={user.id} className="flex items-center space-x-3">
                   <Avatar id={user.id} name={name} avatar={avatar} />
-                  <div className="flex-grow">
+                  <div className="grow">
                     <p className="text-sm font-medium leading-none">{name}</p>
                     <p className="text-sm text-muted-foreground">{email}</p>
                   </div>

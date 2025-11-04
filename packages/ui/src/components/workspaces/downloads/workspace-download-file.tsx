@@ -50,7 +50,7 @@ export const WorkspaceDownloadFile = ({
         <FileIcon mimeType={download.mimeType} className="size-10" />
       )}
 
-      <div className="flex-grow flex flex-col gap-2 justify-center items-start min-w-0">
+      <div className="grow flex flex-col gap-2 justify-center items-start min-w-0">
         <p className="font-medium text-sm truncate">{download.name}</p>
         <p className="flex items-center gap-4 text-xs text-muted-foreground">
           <span>{download.mimeType}</span>

@@ -11,7 +11,7 @@ export const SidebarHeader = ({ title, actions }: SidebarHeaderProps) => {
 
   return (
     <div className="flex items-center justify-between h-12 pl-2 pr-1 app-drag-region">
-      <p className="font-bold text-muted-foreground flex-grow app-no-drag-region">
+      <p className="font-bold text-muted-foreground grow app-no-drag-region">
         {title}
       </p>
       {actions && (

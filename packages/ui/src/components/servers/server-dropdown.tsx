@@ -56,7 +56,7 @@ export const ServerDropdown = ({
         }}
       >
         <DropdownMenuTrigger asChild>
-          <div className="flex w-full flex-grow flex-row items-center gap-3 rounded-md border border-input p-2 cursor-pointer hover:bg-accent">
+          <div className="flex w-full grow flex-row items-center gap-3 rounded-md border border-input p-2 cursor-pointer hover:bg-accent">
             {server ? (
               <ServerAvatar
                 url={server.avatar}
@@ -66,18 +66,16 @@ export const ServerDropdown = ({
             ) : (
               <ServerOffIcon className="size-8 text-muted-foreground rounded-md" />
             )}
-            <div className="flex-grow">
+            <div className="grow">
               {server ? (
                 <Fragment>
-                  <p className="flex-grow font-semibold">{server.name}</p>
+                  <p className="grow font-semibold">{server.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {server.domain}
                   </p>
                 </Fragment>
               ) : (
-                <p className="flex-grow text-muted-foreground">
-                  Select a server
-                </p>
+                <p className="grow text-muted-foreground">Select a server</p>
               )}
             </div>
             <ChevronDown className="size-4 text-muted-foreground" />
@@ -92,16 +90,16 @@ export const ServerDropdown = ({
                   onChange(server.domain);
                 }
               }}
-              className="group/server flex w-full flex-grow flex-row items-center gap-3 p-2 cursor-pointer hover:bg-accent"
+              className="group/server flex w-full grow flex-row items-center gap-3 p-2 cursor-pointer hover:bg-accent"
             >
-              <div className="flex flex-grow items-center gap-3">
+              <div className="flex grow items-center gap-3">
                 <ServerAvatar
                   url={server.avatar}
                   name={server.name}
                   className="size-8 rounded-md"
                 />
-                <div className="flex-grow">
-                  <p className="flex-grow font-semibold">{server.name}</p>
+                <div className="grow">
+                  <p className="grow font-semibold">{server.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {server.domain}
                   </p>

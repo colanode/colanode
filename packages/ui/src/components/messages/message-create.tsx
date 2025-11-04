@@ -149,7 +149,7 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="max-h-72 flex-grow overflow-y-auto">
+        <div className="max-h-72 grow overflow-y-auto">
           {conversation.canCreateMessage ? (
             <MessageEditor
               key={conversation.id}

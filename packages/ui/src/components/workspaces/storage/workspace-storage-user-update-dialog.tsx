@@ -190,7 +190,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
         </DialogHeader>
         <div className="flex items-center space-x-3 py-4 border-b">
           <Avatar id={user.id} name={name} avatar={avatar} />
-          <div className="flex-grow min-w-0">
+          <div className="grow min-w-0">
             <p className="text-sm font-medium leading-none truncate">{name}</p>
             <p className="text-sm text-muted-foreground truncate">{email}</p>
           </div>
@@ -200,7 +200,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
             className="flex flex-col"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
-            <div className="flex-grow space-y-6 py-2 pb-4">
+            <div className="grow space-y-6 py-2 pb-4">
               <FormField
                 control={form.control}
                 name="storageLimit"

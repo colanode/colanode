@@ -20,7 +20,7 @@ export const Sidebar = () => {
       )}
     >
       <SidebarMenu value={menu} onChange={setMenu} />
-      <div className="min-h-0 flex-grow overflow-auto border-l border-sidebar-border">
+      <div className="min-h-0 grow overflow-auto border-l border-sidebar-border">
         {menu === 'spaces' && <SidebarSpaces />}
         {menu === 'chats' && <SidebarChats />}
         {menu === 'settings' && <SidebarSettings />}

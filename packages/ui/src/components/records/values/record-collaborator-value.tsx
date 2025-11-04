@@ -97,7 +97,7 @@ export const RecordCollaboratorValue = ({
                   avatar={collaborator.avatar}
                   className="h-7 w-7"
                 />
-                <div className="flex flex-grow flex-col">
+                <div className="flex grow flex-col">
                   <p className="text-sm">{collaborator.name}</p>
                   <p className="text-xs text-muted-foreground">
                     {collaborator.email}

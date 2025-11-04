@@ -86,7 +86,7 @@ const WorkspaceStorageUserRow = ({
         <TableCell>
           <div className="flex items-center space-x-3">
             <Avatar id={user.id} name={name} avatar={avatar} />
-            <div className="flex-grow min-w-0">
+            <div className="grow min-w-0">
               <p className="text-sm font-medium leading-none truncate">
                 {name}
               </p>

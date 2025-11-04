@@ -63,7 +63,7 @@ export const ChatSidebarItem = ({ chat, isActive }: ChatSidebarItemProps) => {
       />
       <span
         className={cn(
-          'line-clamp-1 w-full flex-grow pl-2 text-left',
+          'line-clamp-1 w-full grow pl-2 text-left',
           !isActive && unreadState.hasUnread && 'font-semibold'
         )}
       >

@@ -26,7 +26,7 @@ export const SidebarSettingsItem = ({
       )}
     >
       <Icon className="size-4" />
-      <span className="line-clamp-1 w-full flex-grow text-left">{title}</span>
+      <span className="line-clamp-1 w-full grow text-left">{title}</span>
       {unreadBadge && (
         <UnreadBadge className="absolute top-0 right-0" {...unreadBadge} />
       )}

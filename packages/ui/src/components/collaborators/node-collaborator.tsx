@@ -49,7 +49,7 @@ export const NodeCollaborator = ({
     <div className="flex items-center justify-between space-x-3">
       <div className="flex items-center space-x-3">
         <Avatar id={user.id} name={user.name} avatar={user.avatar} />
-        <div className="flex-grow">
+        <div className="grow">
           <p className="text-sm font-medium leading-none">{user.name}</p>
           <p className="text-sm text-muted-foreground">{user.email}</p>
         </div>
