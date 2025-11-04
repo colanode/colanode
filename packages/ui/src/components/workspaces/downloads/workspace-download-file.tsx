@@ -78,7 +78,7 @@ export const WorkspaceDownloadFile = ({
           <p className="text-xs text-red-500">{download.errorMessage}</p>
         )}
       </div>
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-2 shrink-0">
         <div className="w-10 flex items-center justify-center">
           <WorkspaceDownloadStatus
             status={download.status}

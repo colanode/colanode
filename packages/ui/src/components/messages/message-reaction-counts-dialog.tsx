@@ -34,7 +34,7 @@ export const MessageReactionCountsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-hidden p-2 outline-none w-128 min-w-128 max-w-128 h-128 min-h-128 max-h-128">
+      <DialogContent className="overflow-hidden p-2 outline-none w-lg min-w-lg max-w-lg h-lg min-h-lg max-h-lg">
         <VisuallyHidden>
           <DialogTitle>Reactions</DialogTitle>
         </VisuallyHidden>

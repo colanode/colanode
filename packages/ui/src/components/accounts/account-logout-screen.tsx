@@ -38,7 +38,7 @@ export const AccountLogoutScreen = () => {
                 data will be re-synced.
               </p>
             </div>
-            <div className="w-full md:w-auto md:flex-shrink-0">
+            <div className="w-full md:w-auto md:shrink-0">
               <Button
                 variant="destructive"
                 disabled={isPending}

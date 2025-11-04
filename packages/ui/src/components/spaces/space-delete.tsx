@@ -35,7 +35,7 @@ export const SpaceDelete = ({ id, onDeleted }: SpaceDeleteProps) => {
             Once you delete a space, there is no going back. Please be certain.
           </p>
         </div>
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Button
             variant="destructive"
             onClick={() => {

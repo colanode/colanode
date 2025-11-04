@@ -1,8 +1,8 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 import { useParams } from '@tanstack/react-router';
-// import { useEffect } from 'react';
 
 import { collections } from '@colanode/ui/collections';
+import { ServerProvider } from '@colanode/ui/components/servers/server-provider';
 import { WorkspaceLayout } from '@colanode/ui/components/workspaces/workspace-layout';
 import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
@@ -26,49 +26,38 @@ export const WorkspaceScreen = () => {
       .findOne()
   );
 
+  const accountQuery = useLiveQuery((q) =>
+    q
+      .from({ accounts: collections.accounts })
+      .where(({ accounts }) => eq(accounts.id, workspaceQuery.data?.accountId))
+      .select(({ accounts }) => ({
+        server: accounts.server,
+      }))
+      .findOne()
+  );
+
   const role = workspaceQuery.data?.role;
   const workspaceId = workspaceQuery.data?.workspaceId;
   const accountId = workspaceQuery.data?.accountId;
+  const server = accountQuery.data?.server;
 
   useLocationTracker(userId!);
 
-  if (!workspaceId || !accountId) {
+  if (!workspaceId || !accountId || !server) {
     return <WorkspaceNotFound />;
   }
-
-  // useEffect(() => {
-  //   if (!accountId) {
-  //     return;
-  //   }
-
-  //   const accountMetadataCollection = database.accountMetadata;
-  //   const workspaceMetadata = accountMetadataCollection.get('workspace');
-  //   if (workspaceMetadata) {
-  //     if (workspaceMetadata.value !== userId) {
-  //       accountMetadataCollection.update('workspace', (metadata) => {
-  //         metadata.value = userId;
-  //       });
-  //     }
-  //   } else {
-  //     accountMetadataCollection.insert({
-  //       key: 'workspace',
-  //       accountId: accountId,
-  //       value: userId,
-  //       createdAt: new Date().toISOString(),
-  //       updatedAt: null,
-  //     });
-  //   }
-  // }, [userId]);
 
   if (!userId || !role) {
     return <WorkspaceNotFound />;
   }
 
   return (
-    <WorkspaceContext.Provider
-      value={{ accountId: accountId, workspaceId: workspaceId, userId, role }}
-    >
-      <WorkspaceLayout />
-    </WorkspaceContext.Provider>
+    <ServerProvider domain={server}>
+      <WorkspaceContext.Provider
+        value={{ accountId: accountId, workspaceId: workspaceId, userId, role }}
+      >
+        <WorkspaceLayout />
+      </WorkspaceContext.Provider>
+    </ServerProvider>
   );
 };

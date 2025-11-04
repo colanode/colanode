@@ -110,7 +110,7 @@ export const FieldCreatePopover = ({
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>{button}</PopoverTrigger>
-      <PopoverContent className="mr-5 w-128" side="bottom">
+      <PopoverContent className="mr-5 w-lg" side="bottom">
         <Form {...form}>
           <form
             className="flex flex-col gap-2"

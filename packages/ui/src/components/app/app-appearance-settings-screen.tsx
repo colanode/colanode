@@ -127,7 +127,7 @@ export const AppAppearanceSettingsScreen = () => {
                 title={option.label}
               >
                 <div
-                  className="size-5 rounded-full border border-border/50 flex-shrink-0"
+                  className="size-5 rounded-full border border-border/50 shrink-0"
                   style={{ backgroundColor: option.color }}
                 />
                 {option.label}

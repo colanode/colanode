@@ -73,7 +73,7 @@ export const TabsHeaderItem = ({
         {canDelete && (
           <button
             className={cn(
-              'opacity-0 group-hover/tab:opacity-100 transition-all duration-200 flex-shrink-0 rounded-full p-1 hover:bg-destructive/20 hover:text-destructive',
+              'opacity-0 group-hover/tab:opacity-100 transition-all duration-200 shrink-0 rounded-full p-1 hover:bg-destructive/20 hover:text-destructive',
               isActive && 'opacity-70 hover:opacity-100',
               'ml-auto'
             )}

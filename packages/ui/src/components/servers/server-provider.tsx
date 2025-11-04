@@ -15,10 +15,10 @@ export const ServerProvider = ({ domain, children }: ServerProviderProps) => {
     q
       .from({ servers: collections.servers })
       .where(({ servers }) => eq(servers.domain, domain))
-      .select(({ servers }) => servers)
+      .findOne()
   );
 
-  const server = serverQuery.data?.[0];
+  const server = serverQuery.data;
   if (!server) {
     return <ServerNotFound domain={domain} />;
   }

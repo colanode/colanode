@@ -35,7 +35,7 @@ export const Container = () => {
       <div className="flex h-full flex-col">
         <div
           className={cn(
-            'sticky top-0 z-20 flex flex-row w-full items-center gap-2 p-3 h-10 mb-2 flex-shrink-0 bg-background/80 backdrop-blur',
+            'sticky top-0 z-20 flex flex-row w-full items-center gap-2 p-3 h-10 mb-2 shrink-0 bg-background/80 backdrop-blur',
             app.type === 'mobile' && 'p-0 pr-2'
           )}
         >
