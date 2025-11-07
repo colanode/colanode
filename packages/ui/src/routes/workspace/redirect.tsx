@@ -27,7 +27,6 @@ export const workspaceRedirectRoute = createRoute({
       throw redirect({ to: lastLocation, replace: true });
     }
 
-    console.log('redirecting to workspace home');
     throw redirect({
       from: '/workspace/$userId',
       to: 'home',
