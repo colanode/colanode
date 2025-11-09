@@ -36,4 +36,23 @@ export const useLocationTracker = (userId: string) => {
       }
     });
   }, [userId, router]);
+
+  useEffect(() => {
+    const metadataKey = buildMetadataKey('app', 'workspace');
+    const currentWorkspace = collections.metadata.get(metadataKey);
+    if (currentWorkspace) {
+      collections.metadata.update(metadataKey, (metadata) => {
+        metadata.value = JSON.stringify(userId);
+        metadata.updatedAt = new Date().toISOString();
+      });
+    } else {
+      collections.metadata.insert({
+        namespace: 'app',
+        key: 'workspace',
+        value: JSON.stringify(userId),
+        createdAt: new Date().toISOString(),
+        updatedAt: null,
+      });
+    }
+  }, [userId]);
 };

@@ -1,11 +1,13 @@
 import { collections } from '@colanode/ui/collections';
+import { buildMetadataKey } from '@colanode/ui/collections/metadata';
 
 export const getDefaultWorkspaceUserId = () => {
   const workspaceIds = collections.workspaces.map(
     (workspace) => workspace.userId
   );
 
-  const lastUsedWorkspaceId = collections.metadata.get('workspace')?.value as
+  const metadataKey = buildMetadataKey('app', 'workspace');
+  const lastUsedWorkspaceId = collections.metadata.get(metadataKey)?.value as
     | string
     | undefined;
 
