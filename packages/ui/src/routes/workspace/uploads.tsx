@@ -1,6 +1,7 @@
 import { createRoute, notFound, redirect } from '@tanstack/react-router';
 
 import { WorkspaceUploadsScreen } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-screen';
+import { WorkspaceUploadsTab } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
   workspaceRoute,
@@ -11,6 +12,11 @@ export const workspaceUploadsRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/uploads',
   component: WorkspaceUploadsScreen,
+  context: () => {
+    return {
+      tab: <WorkspaceUploadsTab />,
+    };
+  },
 });
 
 export const workspaceUploadsMaskRoute = createRoute({

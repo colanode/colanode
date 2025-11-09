@@ -1,6 +1,7 @@
 import { createRoute, notFound, redirect } from '@tanstack/react-router';
 
 import { AccountLogoutScreen } from '@colanode/ui/components/accounts/account-logout-screen';
+import { AccountLogoutTab } from '@colanode/ui/components/accounts/account-logout-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
   workspaceRoute,
@@ -11,6 +12,11 @@ export const accountLogoutRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/account/logout',
   component: AccountLogoutScreen,
+  context: () => {
+    return {
+      tab: <AccountLogoutTab />,
+    };
+  },
 });
 
 export const accountLogoutMaskRoute = createRoute({

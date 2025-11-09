@@ -1,6 +1,7 @@
 import { createRoute, notFound, redirect } from '@tanstack/react-router';
 
 import { WorkspaceUsersScreen } from '@colanode/ui/components/workspaces/workspace-users-screen';
+import { WorkspaceUsersTab } from '@colanode/ui/components/workspaces/workspace-users-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
   workspaceRoute,
@@ -11,6 +12,11 @@ export const workspaceUsersRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/users',
   component: WorkspaceUsersScreen,
+  context: () => {
+    return {
+      tab: <WorkspaceUsersTab />,
+    };
+  },
 });
 
 export const workspaceUsersMaskRoute = createRoute({
