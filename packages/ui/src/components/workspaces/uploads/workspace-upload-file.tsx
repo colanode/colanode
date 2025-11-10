@@ -55,7 +55,11 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
       params={{ nodeId: file.id }}
       className="border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors flex items-center gap-6 cursor-pointer"
     >
-      <FileThumbnail file={file} className="size-10 text-muted-foreground" />
+      <FileThumbnail
+        userId={workspace.userId}
+        file={file}
+        className="size-10 text-muted-foreground"
+      />
       <div className="grow flex flex-col gap-2 justify-center items-start min-w-0">
         <p className="font-medium text-sm truncate w-full">
           {file.attributes.name}

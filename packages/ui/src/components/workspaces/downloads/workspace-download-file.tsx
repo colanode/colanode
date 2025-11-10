@@ -45,7 +45,11 @@ export const WorkspaceDownloadFile = ({
       }}
     >
       {file ? (
-        <FileThumbnail file={file} className="size-10 text-muted-foreground" />
+        <FileThumbnail
+          userId={workspace.userId}
+          file={file}
+          className="size-10 text-muted-foreground"
+        />
       ) : (
         <FileIcon mimeType={download.mimeType} className="size-10" />
       )}

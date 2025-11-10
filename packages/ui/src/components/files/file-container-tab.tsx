@@ -27,7 +27,11 @@ export const FileContainerTab = ({ fileId }: FileContainerTabProps) => {
 
   return (
     <div className="flex items-center space-x-2">
-      <FileThumbnail file={file} className="size-4 rounded object-contain" />
+      <FileThumbnail
+        userId={workspace.userId}
+        file={file}
+        className="size-4 rounded object-contain"
+      />
       <span>{file.attributes.name}</span>
     </div>
   );

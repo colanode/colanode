@@ -46,7 +46,7 @@ export const NodeTab = ({ userId, nodeId }: NodeTabProps) => {
     case 'folder':
       return <FolderTab folder={node} />;
     case 'file':
-      return <FileTab file={node} />;
+      return <FileTab userId={userId} file={node} />;
     case 'message':
       return <MessageTab message={node} />;
     default:

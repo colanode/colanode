@@ -40,11 +40,12 @@ export const FileSidebar = ({ file }: FileSidebarProps) => {
     <Fragment>
       <div className="flex items-center gap-x-4 p-2">
         <FileThumbnail
+          userId={workspace.userId}
           file={file}
           className="h-12 w-9 min-w-[36px] overflow-hidden rounded object-contain"
         />
         <div
-          className="line-clamp-3 break-words text-base font-medium"
+          className="line-clamp-3 wrap-break-word text-base font-medium"
           title={file.attributes.name}
         >
           {file.attributes.name}
