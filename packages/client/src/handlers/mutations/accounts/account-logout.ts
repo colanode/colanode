@@ -27,14 +27,6 @@ export class AccountLogoutMutationHandler
       );
     }
 
-    const workspaces = this.app
-      .getWorkspaces()
-      .filter((w) => w.accountId === account.id);
-
-    for (const workspace of workspaces) {
-      await workspace.delete();
-    }
-
     await account.logout();
     return {
       success: true,

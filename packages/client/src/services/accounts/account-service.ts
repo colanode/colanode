@@ -100,6 +100,14 @@ export class AccountService {
 
   public async logout(): Promise<void> {
     try {
+      const workspaces = this.app
+        .getWorkspaces()
+        .filter((w) => w.account.id === this.account.id);
+
+      for (const workspace of workspaces) {
+        await workspace.delete();
+      }
+
       const deletedAccount = await this.app.database
         .deleteFrom('accounts')
         .where('id', '=', this.account.id)
