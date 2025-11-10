@@ -1,4 +1,4 @@
-import { LocalFileNode } from '@colanode/client/types';
+import { DownloadStatus, LocalFileNode } from '@colanode/client/types';
 import { FileIcon } from '@colanode/ui/components/files/file-icon';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
@@ -22,7 +22,11 @@ export const FileImageThumbnail = ({ file, className }: FileThumbnailProps) => {
   }
 
   const localFile = localFileQuery.data;
-  if (localFile && localFile.url) {
+  if (
+    localFile &&
+    localFile.downloadStatus === DownloadStatus.Completed &&
+    localFile.url
+  ) {
     return (
       <img
         src={localFile.url}
