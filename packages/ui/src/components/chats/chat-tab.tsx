@@ -3,26 +3,24 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 import { LocalChatNode } from '@colanode/client/types';
 import { collections } from '@colanode/ui/collections';
 import { Tab } from '@colanode/ui/components/layouts/tabs/tab';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 interface ChatTabProps {
+  userId: string;
   chat: LocalChatNode;
 }
 
-export const ChatTab = ({ chat }: ChatTabProps) => {
-  const workspace = useWorkspace();
-
-  const userId =
+export const ChatTab = ({ userId, chat }: ChatTabProps) => {
+  const otherUserId =
     chat.type === 'chat'
       ? (Object.keys(chat.attributes.collaborators).find(
-          (id) => id !== workspace.userId
+          (id) => id !== userId
         ) ?? '')
       : '';
 
   const userQuery = useLiveQuery((q) =>
     q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, userId))
+      .from({ users: collections.workspace(userId).users })
+      .where(({ users }) => eq(users.id, otherUserId))
       .select(({ users }) => ({
         id: users.id,
         name: users.name,

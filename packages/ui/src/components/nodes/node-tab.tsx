@@ -36,7 +36,7 @@ export const NodeTab = ({ userId, nodeId }: NodeTabProps) => {
     case 'channel':
       return <ChannelTab channel={node} />;
     case 'chat':
-      return <ChatTab chat={node} />;
+      return <ChatTab userId={userId} chat={node} />;
     case 'page':
       return <PageTab page={node} />;
     case 'database':
