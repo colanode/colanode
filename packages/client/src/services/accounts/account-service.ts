@@ -117,6 +117,11 @@ export class AccountService {
         throw new Error('Failed to delete account');
       }
 
+      await this.app.database
+        .deleteFrom('metadata')
+        .where('namespace', '=', this.account.id)
+        .execute();
+
       await this.app.jobs.addJob(
         {
           type: 'token.delete',

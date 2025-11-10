@@ -11,7 +11,11 @@ export const getDefaultWorkspaceUserId = () => {
     | string
     | undefined;
 
-  return lastUsedWorkspaceId ?? workspaceIds[0];
+  if (lastUsedWorkspaceId && workspaceIds.includes(lastUsedWorkspaceId)) {
+    return lastUsedWorkspaceId;
+  }
+
+  return workspaceIds[0];
 };
 
 export const getWorkspaceUserId = (workspaceId: string) => {

@@ -161,6 +161,11 @@ export class WorkspaceService {
         .where('user_id', '=', this.workspace.userId)
         .execute();
 
+      await this.account.app.database
+        .deleteFrom('metadata')
+        .where('namespace', '=', this.workspace.userId)
+        .execute();
+
       await this.account.app.jobs.removeJobSchedule(
         this.workspaceFilesCleanJobScheduleId
       );
