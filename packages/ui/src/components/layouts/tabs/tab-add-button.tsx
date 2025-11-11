@@ -1,24 +1,21 @@
 import { Plus } from 'lucide-react';
-import { useMemo } from 'react';
+import { useCallback } from 'react';
 
 import { useTabManager } from '@colanode/ui/contexts/tab-manager';
-import { useMetadata } from '@colanode/ui/hooks/use-metadata';
+import { getDefaultWorkspaceUserId } from '@colanode/ui/routes/utils';
 
 export const TabAddButton = () => {
   const tabManager = useTabManager();
-  const [lastActiveAccount] = useMetadata('app', 'account');
+  const handleAddTab = useCallback(() => {
+    const userId = getDefaultWorkspaceUserId();
+    const location = userId ? `/workspace/${userId}/home` : '/login';
 
-  const location = useMemo(() => {
-    if (lastActiveAccount) {
-      return `/acc/${lastActiveAccount}`;
-    }
-
-    return '/';
-  }, [lastActiveAccount]);
+    tabManager.addTab(location);
+  }, []);
 
   return (
     <button
-      onClick={() => tabManager.addTab(location)}
+      onClick={handleAddTab}
       className="flex items-center justify-center w-10 h-10 bg-sidebar hover:bg-sidebar-accent transition-all duration-200 app-no-drag-region shrink-0 border-l border-border/30 hover:border-border/60 rounded-tl-md"
       title="Add new tab"
     >

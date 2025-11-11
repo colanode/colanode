@@ -51,7 +51,7 @@ export const TabsHeader = () => {
       })}
 
       <TabAddButton />
-      <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-background/5 to-border/10" />
+      <div className="absolute inset-0 pointer-events-none bg-linear-to-b from-background/5 to-border/10" />
     </div>
   );
 };
