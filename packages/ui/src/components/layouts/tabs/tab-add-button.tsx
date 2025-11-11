@@ -8,7 +8,7 @@ export const TabAddButton = () => {
   const tabManager = useTabManager();
   const handleAddTab = useCallback(() => {
     const userId = getDefaultWorkspaceUserId();
-    const location = userId ? `/workspace/${userId}/home` : '/login';
+    const location = userId ? `/workspace/${userId}/home` : '/';
 
     tabManager.addTab(location);
   }, []);
