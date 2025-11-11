@@ -1,7 +1,7 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
-import { WorkspaceUploadsBreadcrumb } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-breadcrumb';
-import { WorkspaceUploadsScreen } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-screen';
+import { WorkspaceUploadsContainer } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-container';
+import { WorkspaceUploadsHeader } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-header';
 import { WorkspaceUploadsTab } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
@@ -12,11 +12,11 @@ import {
 export const workspaceUploadsRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/uploads',
-  component: WorkspaceUploadsScreen,
+  component: WorkspaceUploadsContainer,
   context: () => {
     return {
       tab: <WorkspaceUploadsTab />,
-      breadcrumb: <WorkspaceUploadsBreadcrumb />,
+      header: <WorkspaceUploadsHeader />,
     };
   },
 });

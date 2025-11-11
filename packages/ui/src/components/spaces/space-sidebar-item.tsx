@@ -6,6 +6,7 @@ import { toast } from 'sonner';
 import { LocalSpaceNode } from '@colanode/client/types';
 import { extractNodeRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { WorkspaceSidebarItem } from '@colanode/ui/components/layouts/sidebars/sidebar-item';
 import { SpaceSidebarDropdown } from '@colanode/ui/components/spaces/space-sidebar-dropdown';
 import {
   Collapsible,
@@ -13,7 +14,6 @@ import {
   CollapsibleTrigger,
 } from '@colanode/ui/components/ui/collapsible';
 import { Link } from '@colanode/ui/components/ui/link';
-import { WorkspaceSidebarItem } from '@colanode/ui/components/workspaces/sidebars/sidebar-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';

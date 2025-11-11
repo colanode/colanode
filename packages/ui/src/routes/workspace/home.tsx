@@ -1,7 +1,7 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
-import { WorkspaceHomeBreadcrumb } from '@colanode/ui/components/workspaces/workspace-home-breadcrumb';
-import { WorkspaceHomeScreen } from '@colanode/ui/components/workspaces/workspace-home-screen';
+import { WorkspaceHomeContainer } from '@colanode/ui/components/workspaces/workspace-home-container';
+import { WorkspaceHomeHeader } from '@colanode/ui/components/workspaces/workspace-home-header';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
   workspaceMaskRoute,
@@ -11,10 +11,10 @@ import {
 export const workspaceHomeRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/home',
-  component: WorkspaceHomeScreen,
+  component: WorkspaceHomeContainer,
   context: () => {
     return {
-      breadcrumb: <WorkspaceHomeBreadcrumb />,
+      header: <WorkspaceHomeHeader />,
     };
   },
 });

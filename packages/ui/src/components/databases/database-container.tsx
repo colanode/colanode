@@ -1,9 +1,7 @@
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { Database } from '@colanode/ui/components/databases/database';
 import { DatabaseNotFound } from '@colanode/ui/components/databases/database-not-found';
-import { DatabaseSettings } from '@colanode/ui/components/databases/database-settings';
 import { DatabaseViews } from '@colanode/ui/components/databases/database-views';
-import { ContainerSettings } from '@colanode/ui/components/workspaces/containers/container-settings';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
 import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
 
@@ -27,13 +25,8 @@ export const DatabaseContainer = ({ databaseId }: DatabaseContainerProps) => {
   const { node: database, role } = data;
 
   return (
-    <>
-      <ContainerSettings>
-        <DatabaseSettings database={database} role={role} />
-      </ContainerSettings>
-      <Database database={database} role={role}>
-        <DatabaseViews />
-      </Database>
-    </>
+    <Database database={database} role={role}>
+      <DatabaseViews />
+    </Database>
   );
 };

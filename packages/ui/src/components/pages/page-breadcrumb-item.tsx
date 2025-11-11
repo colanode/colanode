@@ -1,5 +1,5 @@
 import { LocalPageNode } from '@colanode/client/types';
-import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/containers/breadcrumb-item';
 
 interface PageBreadcrumbItemProps {
   page: LocalPageNode;

@@ -1,5 +1,5 @@
-import { Container } from '@colanode/ui/components/workspaces/containers/container';
-import { SidebarDesktop } from '@colanode/ui/components/workspaces/sidebars/sidebar-desktop';
+import { Container } from '@colanode/ui/components/layouts/containers/container';
+import { SidebarDesktop } from '@colanode/ui/components/layouts/sidebars/sidebar-desktop';
 import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 
 export const WorkspaceLayout = () => {

@@ -2,7 +2,7 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { LocalChatNode } from '@colanode/client/types';
 import { collections } from '@colanode/ui/collections';
-import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/containers/breadcrumb-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 interface ChatBreadcrumbItemProps {
