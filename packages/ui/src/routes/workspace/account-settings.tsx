@@ -1,6 +1,7 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
-import { AccountSettingsScreen } from '@colanode/ui/components/accounts/account-settings-screen';
+import { AccountSettingsContainer } from '@colanode/ui/components/accounts/account-settings-container';
+import { AccountSettingsHeader } from '@colanode/ui/components/accounts/account-settings-header';
 import { AccountSettingsTab } from '@colanode/ui/components/accounts/account-settings-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
@@ -11,10 +12,11 @@ import {
 export const accountSettingsRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/account/settings',
-  component: AccountSettingsScreen,
+  component: AccountSettingsContainer,
   context: () => {
     return {
       tab: <AccountSettingsTab />,
+      header: <AccountSettingsHeader />,
     };
   },
 });

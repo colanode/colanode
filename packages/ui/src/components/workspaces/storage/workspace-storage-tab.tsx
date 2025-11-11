@@ -1,10 +1,6 @@
-import { Cylinder } from 'lucide-react';
+import { TabItem } from '@colanode/ui/components/layouts/tabs/tab-item';
+import { defaultIcons } from '@colanode/ui/lib/assets';
 
 export const WorkspaceStorageTab = () => {
-  return (
-    <div className="flex items-center space-x-2">
-      <Cylinder className="size-4" />
-      <span>Workspace Storage</span>
-    </div>
-  );
+  return <TabItem id="storage" avatar={defaultIcons.storage} name="Storage" />;
 };

@@ -1,6 +1,7 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
-import { AppAppearanceSettingsScreen } from '@colanode/ui/components/app/app-appearance-settings-screen';
+import { AppAppearanceSettingsContainer } from '@colanode/ui/components/app/app-appearance-settings-container';
+import { AppAppearanceSettingsHeader } from '@colanode/ui/components/app/app-appearance-settings-header';
 import { AppAppearanceSettingsTab } from '@colanode/ui/components/app/app-appearance-settings-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
@@ -11,10 +12,11 @@ import {
 export const appAppearanceRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/app/appearance',
-  component: AppAppearanceSettingsScreen,
+  component: AppAppearanceSettingsContainer,
   context: () => {
     return {
       tab: <AppAppearanceSettingsTab />,
+      header: <AppAppearanceSettingsHeader />,
     };
   },
 });

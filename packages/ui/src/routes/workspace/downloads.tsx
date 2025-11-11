@@ -1,6 +1,7 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
-import { WorkspaceDownloadsScreen } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-screen';
+import { WorkspaceDownloadsContainer } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-container';
+import { WorkspaceDownloadsHeader } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-header';
 import { WorkspaceDownloadsTab } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
@@ -11,10 +12,11 @@ import {
 export const workspaceDownloadsRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/downloads',
-  component: WorkspaceDownloadsScreen,
+  component: WorkspaceDownloadsContainer,
   context: () => {
     return {
       tab: <WorkspaceDownloadsTab />,
+      header: <WorkspaceDownloadsHeader />,
     };
   },
 });

@@ -1,6 +1,5 @@
 import { LocalRecordNode } from '@colanode/client/types';
-import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/containers/breadcrumb-item';
 
 interface RecordBreadcrumbItemProps {
   record: LocalRecordNode;
@@ -9,14 +8,8 @@ interface RecordBreadcrumbItemProps {
 export const RecordBreadcrumbItem = ({ record }: RecordBreadcrumbItemProps) => {
   return (
     <BreadcrumbItem
-      icon={(className) => (
-        <Avatar
-          id={record.id}
-          name={record.attributes.name}
-          avatar={record.attributes.avatar}
-          className={className}
-        />
-      )}
+      id={record.id}
+      avatar={record.attributes.avatar}
       name={record.attributes.name}
     />
   );

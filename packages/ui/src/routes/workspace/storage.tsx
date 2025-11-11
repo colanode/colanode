@@ -1,6 +1,7 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
-import { WorkspaceStorageScreen } from '@colanode/ui/components/workspaces/storage/workspace-storage-screen';
+import { WorkspaceStorageContainer } from '@colanode/ui/components/workspaces/storage/workspace-storage-container';
+import { WorkspaceStorageHeader } from '@colanode/ui/components/workspaces/storage/workspace-storage-header';
 import { WorkspaceStorageTab } from '@colanode/ui/components/workspaces/storage/workspace-storage-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
@@ -11,10 +12,11 @@ import {
 export const workspaceStorageRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/storage',
-  component: WorkspaceStorageScreen,
+  component: WorkspaceStorageContainer,
   context: () => {
     return {
       tab: <WorkspaceStorageTab />,
+      header: <WorkspaceStorageHeader />,
     };
   },
 });

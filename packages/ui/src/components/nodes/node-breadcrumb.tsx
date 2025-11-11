@@ -18,20 +18,17 @@ import {
 import { Link } from '@colanode/ui/components/ui/link';
 
 interface NodeBreadcrumbProps {
-  breadcrumb: LocalNode[];
+  nodes: LocalNode[];
 }
 
-export const NodeBreadcrumb = ({ breadcrumb }: NodeBreadcrumbProps) => {
-  // Show ellipsis if we have more than 3 nodes (first + last two)
-  const showEllipsis = breadcrumb.length > 3;
+export const NodeBreadcrumb = ({ nodes }: NodeBreadcrumbProps) => {
+  const showEllipsis = nodes.length > 3;
 
   // Get visible entries: first node + last two entries
-  const visibleItems = showEllipsis
-    ? [breadcrumb[0], ...breadcrumb.slice(-2)]
-    : breadcrumb;
+  const visibleItems = showEllipsis ? [nodes[0], ...nodes.slice(-2)] : nodes;
 
   // Get middle entries for ellipsis (everything except first and last two)
-  const ellipsisItems = showEllipsis ? breadcrumb.slice(1, -2) : [];
+  const ellipsisItems = showEllipsis ? nodes.slice(1, -2) : [];
 
   return (
     <Breadcrumb className="grow">

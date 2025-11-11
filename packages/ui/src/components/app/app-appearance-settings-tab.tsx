@@ -1,10 +1,12 @@
-import { Palette } from 'lucide-react';
+import { TabItem } from '@colanode/ui/components/layouts/tabs/tab-item';
+import { defaultIcons } from '@colanode/ui/lib/assets';
 
 export const AppAppearanceSettingsTab = () => {
   return (
-    <div className="flex items-center space-x-2">
-      <Palette className="size-4" />
-      <span>Appearance</span>
-    </div>
+    <TabItem
+      id="appearance"
+      avatar={defaultIcons.appearance}
+      name="Appearance"
+    />
   );
 };

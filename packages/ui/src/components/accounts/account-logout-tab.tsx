@@ -1,10 +1,6 @@
-import { LogOut } from 'lucide-react';
+import { TabItem } from '@colanode/ui/components/layouts/tabs/tab-item';
+import { defaultIcons } from '@colanode/ui/lib/assets';
 
 export const AccountLogoutTab = () => {
-  return (
-    <div className="flex items-center space-x-2">
-      <LogOut className="size-4" />
-      <span>Logout</span>
-    </div>
-  );
+  return <TabItem id="logout" avatar={defaultIcons.logout} name="Logout" />;
 };
