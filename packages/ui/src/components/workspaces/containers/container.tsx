@@ -6,6 +6,7 @@ import {
   ScrollBar,
   ScrollViewport,
 } from '@colanode/ui/components/ui/scroll-area';
+import { ContainerBreadcrumb } from '@colanode/ui/components/workspaces/containers/container-breadcrumb';
 import { SidebarMobile } from '@colanode/ui/components/workspaces/sidebars/sidebar-mobile';
 import { useApp } from '@colanode/ui/contexts/app';
 import { ContainerContext } from '@colanode/ui/contexts/container';
@@ -46,6 +47,7 @@ export const Container = () => {
         <ScrollArea ref={scrollAreaRef} className="overflow-hidden h-full">
           <ScrollViewport ref={scrollViewportRef} className="h-full">
             <div className="lg:px-10 px-4 min-h-0 flex-1 h-full">
+              <ContainerBreadcrumb />
               <Outlet />
             </div>
           </ScrollViewport>

@@ -1,9 +1,9 @@
-import { TabItem } from '@colanode/ui/components/layouts/tabs/tab-item';
+import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { defaultIcons } from '@colanode/ui/lib/assets';
 
-export const AccountSettingsTab = () => {
+export const AccountSettingsBreadcrumb = () => {
   return (
-    <TabItem
+    <BreadcrumbItem
       id="settings"
       avatar={defaultIcons.settings}
       name="Account Settings"

@@ -1,5 +1,6 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
+import { AppAppearanceSettingsBreadcrumb } from '@colanode/ui/components/app/app-appearance-settings-breadcrumb';
 import { AppAppearanceSettingsScreen } from '@colanode/ui/components/app/app-appearance-settings-screen';
 import { AppAppearanceSettingsTab } from '@colanode/ui/components/app/app-appearance-settings-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
@@ -15,6 +16,7 @@ export const appAppearanceRoute = createRoute({
   context: () => {
     return {
       tab: <AppAppearanceSettingsTab />,
+      breadcrumb: <AppAppearanceSettingsBreadcrumb />,
     };
   },
 });

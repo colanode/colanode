@@ -1,10 +1,8 @@
-import { Check, Laptop, Moon, Palette, Sun } from 'lucide-react';
+import { Check, Laptop, Moon, Sun } from 'lucide-react';
 
 import { ThemeColor, ThemeMode } from '@colanode/client/types';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
-import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import { cn } from '@colanode/ui/lib/utils';
 
@@ -56,89 +54,81 @@ export const AppAppearanceSettingsScreen = () => {
   const [themeColor, setThemeColor] = useMetadata('app', 'theme.color');
 
   return (
-    <>
-      <Breadcrumb>
-        <BreadcrumbItem
-          icon={(className) => <Palette className={className} />}
-          name="Appearance"
-        />
-      </Breadcrumb>
-      <div className="max-w-4xl space-y-8">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Appearance</h2>
-          <Separator className="mt-3" />
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {themeModeOptions.map((option) => {
-            const isActive =
-              option.value === null ? !themeMode : themeMode === option.value;
-            const Icon = option.icon;
-
-            return (
-              <Button
-                key={option.key}
-                variant="outline"
-                onClick={() => {
-                  setThemeMode(option.value ?? undefined);
-                }}
-                className={cn(
-                  'h-10 w-full justify-start gap-2 relative',
-                  isActive && 'ring-1 ring-ring border-primary'
-                )}
-                title={option.title}
-              >
-                <Icon className="size-5" />
-                {option.label}
-                {isActive && (
-                  <Check className="size-5 absolute -top-2 -right-2 text-background bg-primary rounded-full p-0.5" />
-                )}
-              </Button>
-            );
-          })}
-        </div>
-
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Color</h2>
-          <Separator className="mt-3" />
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3 max-w-2xl">
-          {themeColorOptions.map((option) => {
-            const isDefault = option.value === 'default';
-            const isActive = isDefault
-              ? !themeColor
-              : themeColor === option.value;
-
-            return (
-              <Button
-                key={option.value}
-                variant="outline"
-                onClick={() => {
-                  if (isDefault) {
-                    setThemeColor(undefined);
-                  } else {
-                    setThemeColor(option.value as ThemeColor);
-                  }
-                }}
-                className={cn(
-                  'h-10 justify-start gap-3 text-left relative',
-                  isActive && 'ring-1 ring-ring border-primary'
-                )}
-                title={option.label}
-              >
-                <div
-                  className="size-5 rounded-full border border-border/50 shrink-0"
-                  style={{ backgroundColor: option.color }}
-                />
-                {option.label}
-                {isActive && (
-                  <Check className="size-5 absolute -top-2 -right-2 text-background bg-primary rounded-full p-0.5" />
-                )}
-              </Button>
-            );
-          })}
-        </div>
+    <div className="max-w-4xl space-y-8">
+      <div>
+        <h2 className="text-2xl font-semibold tracking-tight">Appearance</h2>
+        <Separator className="mt-3" />
       </div>
-    </>
+
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        {themeModeOptions.map((option) => {
+          const isActive =
+            option.value === null ? !themeMode : themeMode === option.value;
+          const Icon = option.icon;
+
+          return (
+            <Button
+              key={option.key}
+              variant="outline"
+              onClick={() => {
+                setThemeMode(option.value ?? undefined);
+              }}
+              className={cn(
+                'h-10 w-full justify-start gap-2 relative',
+                isActive && 'ring-1 ring-ring border-primary'
+              )}
+              title={option.title}
+            >
+              <Icon className="size-5" />
+              {option.label}
+              {isActive && (
+                <Check className="size-5 absolute -top-2 -right-2 text-background bg-primary rounded-full p-0.5" />
+              )}
+            </Button>
+          );
+        })}
+      </div>
+
+      <div>
+        <h2 className="text-2xl font-semibold tracking-tight">Color</h2>
+        <Separator className="mt-3" />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-3 max-w-2xl">
+        {themeColorOptions.map((option) => {
+          const isDefault = option.value === 'default';
+          const isActive = isDefault
+            ? !themeColor
+            : themeColor === option.value;
+
+          return (
+            <Button
+              key={option.value}
+              variant="outline"
+              onClick={() => {
+                if (isDefault) {
+                  setThemeColor(undefined);
+                } else {
+                  setThemeColor(option.value as ThemeColor);
+                }
+              }}
+              className={cn(
+                'h-10 justify-start gap-3 text-left relative',
+                isActive && 'ring-1 ring-ring border-primary'
+              )}
+              title={option.label}
+            >
+              <div
+                className="size-5 rounded-full border border-border/50 shrink-0"
+                style={{ backgroundColor: option.color }}
+              />
+              {option.label}
+              {isActive && (
+                <Check className="size-5 absolute -top-2 -right-2 text-background bg-primary rounded-full p-0.5" />
+              )}
+            </Button>
+          );
+        })}
+      </div>
+    </div>
   );
 };

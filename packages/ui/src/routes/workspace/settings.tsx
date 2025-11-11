@@ -1,5 +1,6 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
+import { WorkspaceSettingsBreadcrumb } from '@colanode/ui/components/workspaces/workspace-settings-breadcrumb';
 import { WorkspaceSettingsScreen } from '@colanode/ui/components/workspaces/workspace-settings-screen';
 import { WorkspaceSettingsTab } from '@colanode/ui/components/workspaces/workspace-settings-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
@@ -15,6 +16,7 @@ export const workspaceSettingsRoute = createRoute({
   context: () => {
     return {
       tab: <WorkspaceSettingsTab />,
+      breadcrumb: <WorkspaceSettingsBreadcrumb />,
     };
   },
 });

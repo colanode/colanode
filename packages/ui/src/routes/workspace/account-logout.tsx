@@ -1,5 +1,6 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
+import { AccountLogoutBreadcrumb } from '@colanode/ui/components/accounts/account-logout-breadcrumb';
 import { AccountLogoutScreen } from '@colanode/ui/components/accounts/account-logout-screen';
 import { AccountLogoutTab } from '@colanode/ui/components/accounts/account-logout-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
@@ -15,6 +16,7 @@ export const accountLogoutRoute = createRoute({
   context: () => {
     return {
       tab: <AccountLogoutTab />,
+      breadcrumb: <AccountLogoutBreadcrumb />,
     };
   },
 });

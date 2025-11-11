@@ -1,11 +1,8 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
-import { Settings } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { collections } from '@colanode/ui/collections';
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
-import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { WorkspaceDelete } from '@colanode/ui/components/workspaces/workspace-delete';
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
 import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
@@ -35,59 +32,49 @@ export const WorkspaceSettingsScreen = () => {
   }
 
   return (
-    <>
-      <Breadcrumb>
-        <BreadcrumbItem
-          icon={(className) => <Settings className={className} />}
-          name="Settings"
+    <div className="max-w-4xl space-y-8">
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight">General</h2>
+          <Separator className="mt-3" />
+        </div>
+        <WorkspaceForm
+          readOnly={!canEdit}
+          values={{
+            name: currentWorkspace.name,
+            description: currentWorkspace.description ?? '',
+            avatar: currentWorkspace.avatar ?? null,
+          }}
+          onSubmit={(values) => {
+            mutate({
+              input: {
+                type: 'workspace.update',
+                id: workspace.workspaceId,
+                userId: workspace.userId,
+                name: values.name,
+                description: values.description,
+                avatar: values.avatar ?? null,
+              },
+              onSuccess() {
+                toast.success('Workspace updated');
+              },
+              onError(error) {
+                toast.error(error.message);
+              },
+            });
+          }}
+          isSaving={isPending}
+          saveText="Update"
         />
-      </Breadcrumb>
-      <div className="max-w-4xl space-y-8">
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight">General</h2>
-            <Separator className="mt-3" />
-          </div>
-          <WorkspaceForm
-            readOnly={!canEdit}
-            values={{
-              name: currentWorkspace.name,
-              description: currentWorkspace.description ?? '',
-              avatar: currentWorkspace.avatar ?? null,
-            }}
-            onSubmit={(values) => {
-              mutate({
-                input: {
-                  type: 'workspace.update',
-                  id: workspace.workspaceId,
-                  userId: workspace.userId,
-                  name: values.name,
-                  description: values.description,
-                  avatar: values.avatar ?? null,
-                },
-                onSuccess() {
-                  toast.success('Workspace updated');
-                },
-                onError(error) {
-                  toast.error(error.message);
-                },
-              });
-            }}
-            isSaving={isPending}
-            saveText="Update"
-          />
-        </div>
-
-        <div className="space-y-6">
-          <div>
-            <h2 className="text-2xl font-semibold tracking-tight">
-              Danger Zone
-            </h2>
-            <Separator className="mt-3" />
-          </div>
-          <WorkspaceDelete />
-        </div>
       </div>
-    </>
+
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight">Danger Zone</h2>
+          <Separator className="mt-3" />
+        </div>
+        <WorkspaceDelete />
+      </div>
+    </div>
   );
 };

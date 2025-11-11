@@ -1,5 +1,6 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
+import { WorkspaceUploadsBreadcrumb } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-breadcrumb';
 import { WorkspaceUploadsScreen } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-screen';
 import { WorkspaceUploadsTab } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
@@ -15,6 +16,7 @@ export const workspaceUploadsRoute = createRoute({
   context: () => {
     return {
       tab: <WorkspaceUploadsTab />,
+      breadcrumb: <WorkspaceUploadsBreadcrumb />,
     };
   },
 });

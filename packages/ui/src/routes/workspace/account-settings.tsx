@@ -1,5 +1,6 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
+import { AccountSettingsBreadcrumb } from '@colanode/ui/components/accounts/account-settings-breadcrumb';
 import { AccountSettingsScreen } from '@colanode/ui/components/accounts/account-settings-screen';
 import { AccountSettingsTab } from '@colanode/ui/components/accounts/account-settings-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
@@ -15,6 +16,7 @@ export const accountSettingsRoute = createRoute({
   context: () => {
     return {
       tab: <AccountSettingsTab />,
+      breadcrumb: <AccountSettingsBreadcrumb />,
     };
   },
 });

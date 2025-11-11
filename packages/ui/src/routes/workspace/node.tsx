@@ -1,5 +1,6 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
+import { NodeBreadcrumb } from '@colanode/ui/components/nodes/node-breadcrumb';
 import { NodeErrorScreen } from '@colanode/ui/components/nodes/node-error-screen';
 import { NodeScreen } from '@colanode/ui/components/nodes/node-screen';
 import { NodeTab } from '@colanode/ui/components/nodes/node-tab';
@@ -17,6 +18,7 @@ export const nodeRoute = createRoute({
   context: (ctx) => {
     return {
       tab: <NodeTab userId={ctx.params.userId} nodeId={ctx.params.nodeId} />,
+      breadcrumb: <NodeBreadcrumb nodeId={ctx.params.nodeId} />,
     };
   },
 });

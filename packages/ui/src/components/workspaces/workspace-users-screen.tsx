@@ -1,4 +1,3 @@
-import { Users } from 'lucide-react';
 import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
@@ -7,8 +6,6 @@ import { WorkspaceRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
-import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
 import { WorkspaceUserInvite } from '@colanode/ui/components/workspaces/workspace-user-invite';
 import { WorkspaceUserRoleDropdown } from '@colanode/ui/components/workspaces/workspace-user-role-dropdown';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -36,72 +33,64 @@ export const WorkspaceUsersScreen = () => {
   const hasMore = !isPending && users.length === lastPage * USERS_PER_PAGE;
 
   return (
-    <>
-      <Breadcrumb>
-        <BreadcrumbItem
-          icon={(className) => <Users className={className} />}
-          name="Users"
-        />
-      </Breadcrumb>
-      <div className="max-w-4xl space-y-8">
-        {canEditUsers && (
-          <div className="space-y-6">
-            <div>
-              <h2 className="text-2xl font-semibold tracking-tight">Invite</h2>
-              <Separator className="mt-3" />
-            </div>
-            <WorkspaceUserInvite />
-          </div>
-        )}
-
+    <div className="max-w-4xl space-y-8">
+      {canEditUsers && (
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight">Users</h2>
-            <p className="text-sm text-muted-foreground mt-1">
-              The list of all users on the workspace
-            </p>
+            <h2 className="text-2xl font-semibold tracking-tight">Invite</h2>
             <Separator className="mt-3" />
           </div>
-          <div className="flex flex-col gap-3">
-            {users.map((user) => {
-              const name: string = user.name ?? 'Unknown';
-              const email: string = user.email ?? ' ';
-              const avatar: string | null | undefined = user.avatar;
-              const role: WorkspaceRole = user.role;
+          <WorkspaceUserInvite />
+        </div>
+      )}
 
-              if (!role) {
-                return null;
-              }
+      <div className="space-y-6">
+        <div>
+          <h2 className="text-2xl font-semibold tracking-tight">Users</h2>
+          <p className="text-sm text-muted-foreground mt-1">
+            The list of all users on the workspace
+          </p>
+          <Separator className="mt-3" />
+        </div>
+        <div className="flex flex-col gap-3">
+          {users.map((user) => {
+            const name: string = user.name ?? 'Unknown';
+            const email: string = user.email ?? ' ';
+            const avatar: string | null | undefined = user.avatar;
+            const role: WorkspaceRole = user.role;
 
-              return (
-                <div key={user.id} className="flex items-center space-x-3">
-                  <Avatar id={user.id} name={name} avatar={avatar} />
-                  <div className="grow">
-                    <p className="text-sm font-medium leading-none">{name}</p>
-                    <p className="text-sm text-muted-foreground">{email}</p>
-                  </div>
-                  <WorkspaceUserRoleDropdown
-                    userId={user.id}
-                    value={role}
-                    canEdit={canEditUsers}
-                  />
+            if (!role) {
+              return null;
+            }
+
+            return (
+              <div key={user.id} className="flex items-center space-x-3">
+                <Avatar id={user.id} name={name} avatar={avatar} />
+                <div className="grow">
+                  <p className="text-sm font-medium leading-none">{name}</p>
+                  <p className="text-sm text-muted-foreground">{email}</p>
                 </div>
-              );
-            })}
-            <div className="flex items-center justify-center space-x-3">
-              {isPending && <Spinner />}
-            </div>
-            <InView
-              rootMargin="200px"
-              onChange={(inView) => {
-                if (inView && hasMore && !isPending) {
-                  setLastPage(lastPage + 1);
-                }
-              }}
-            />
+                <WorkspaceUserRoleDropdown
+                  userId={user.id}
+                  value={role}
+                  canEdit={canEditUsers}
+                />
+              </div>
+            );
+          })}
+          <div className="flex items-center justify-center space-x-3">
+            {isPending && <Spinner />}
           </div>
+          <InView
+            rootMargin="200px"
+            onChange={(inView) => {
+              if (inView && hasMore && !isPending) {
+                setLastPage(lastPage + 1);
+              }
+            }}
+          />
         </div>
       </div>
-    </>
+    </div>
   );
 };

@@ -2,6 +2,7 @@ import { createRoute, redirect } from '@tanstack/react-router';
 
 import { WorkspaceStorageScreen } from '@colanode/ui/components/workspaces/storage/workspace-storage-screen';
 import { WorkspaceStorageTab } from '@colanode/ui/components/workspaces/storage/workspace-storage-tab';
+import { WorkspaceStorageBreadcrumb } from '@colanode/ui/components/workspaces/storage/workspace-storage.breadcrumb';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
   workspaceRoute,
@@ -15,6 +16,7 @@ export const workspaceStorageRoute = createRoute({
   context: () => {
     return {
       tab: <WorkspaceStorageTab />,
+      breadcrumb: <WorkspaceStorageBreadcrumb />,
     };
   },
 });

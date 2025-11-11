@@ -16,12 +16,24 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { Link } from '@colanode/ui/components/ui/link';
+import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
 
 interface NodeBreadcrumbProps {
-  breadcrumb: LocalNode[];
+  nodeId: string;
 }
 
-export const NodeBreadcrumb = ({ breadcrumb }: NodeBreadcrumbProps) => {
+export const NodeBreadcrumb = ({ nodeId }: NodeBreadcrumbProps) => {
+  const data = useNodeContainer<LocalNode>(nodeId);
+
+  if (data.isPending) {
+    return null;
+  }
+
+  if (!data.node) {
+    return null;
+  }
+
+  const breadcrumb = data.breadcrumb ?? [];
   // Show ellipsis if we have more than 3 nodes (first + last two)
   const showEllipsis = breadcrumb.length > 3;
 

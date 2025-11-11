@@ -1,14 +1,14 @@
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 
-interface BreadcrumbItemProps {
+interface TabItemProps {
   id: string;
   name: string;
   avatar?: string | null;
 }
 
-export const BreadcrumbItem = ({ id, name, avatar }: BreadcrumbItemProps) => {
+export const TabItem = ({ id, name, avatar }: TabItemProps) => {
   return (
-    <div className="text-muted-foreground flex items-center space-x-2 hover:text-foreground cursor-pointer text-sm">
+    <div className="flex items-center space-x-2 cursor-pointer text-sm">
       <Avatar id={id} avatar={avatar} name={name} className="size-4" />
       <span>{name}</span>
     </div>
