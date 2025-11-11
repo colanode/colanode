@@ -4,7 +4,7 @@ import { toast } from 'sonner';
 
 import { Button } from '@colanode/ui/components/ui/button';
 
-export const AppResetScreen = () => {
+export const AppReset = () => {
   const mutation = useMutation({
     mutationFn: () => {
       return window.colanode.reset();

@@ -1,5 +1,4 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
-import { useParams } from '@tanstack/react-router';
 
 import { collections } from '@colanode/ui/collections';
 import { ServerProvider } from '@colanode/ui/components/servers/server-provider';
@@ -8,11 +7,11 @@ import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
 import { useLocationTracker } from '@colanode/ui/hooks/use-location-tracker';
 
-export const WorkspaceScreen = () => {
-  const { userId } = useParams({
-    from: '/workspace/$userId',
-  });
+interface WorkspaceProps {
+  userId: string;
+}
 
+export const Workspace = ({ userId }: WorkspaceProps) => {
   const workspaceQuery = useLiveQuery((q) =>
     q
       .from({ workspaces: collections.workspaces })

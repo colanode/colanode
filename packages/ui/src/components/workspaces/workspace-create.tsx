@@ -6,7 +6,7 @@ import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
-export const WorkspaceCreateScreen = () => {
+export const WorkspaceCreate = () => {
   const workspace = useWorkspace();
   const router = useRouter();
   const { mutate, isPending } = useMutation();

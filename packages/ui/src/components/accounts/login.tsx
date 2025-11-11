@@ -1,6 +1,6 @@
 import { LoginForm } from '@colanode/ui/components/accounts/login-form';
 
-export const LoginScreen = () => {
+export const Login = () => {
   return (
     <div className="grid h-screen min-h-screen w-full grid-cols-1 lg:grid-cols-5">
       <div className="items-center justify-center bg-foreground hidden lg:flex lg:col-span-2">
