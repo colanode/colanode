@@ -1,4 +1,4 @@
-import { createRoute, notFound, redirect } from '@tanstack/react-router';
+import { createRoute, redirect } from '@tanstack/react-router';
 
 import { AccountSettingsScreen } from '@colanode/ui/components/accounts/account-settings-screen';
 import { AccountSettingsTab } from '@colanode/ui/components/accounts/account-settings-tab';
@@ -32,7 +32,5 @@ export const accountSettingsMaskRoute = createRoute({
         replace: true,
       });
     }
-
-    throw notFound();
   },
 });

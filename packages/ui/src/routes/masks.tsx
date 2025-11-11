@@ -1,4 +1,4 @@
-import { createRouteMask, notFound } from '@tanstack/react-router';
+import { createRouteMask } from '@tanstack/react-router';
 
 import { collections } from '@colanode/ui/collections';
 import { routeTree } from '@colanode/ui/routes';
@@ -9,12 +9,8 @@ export const workspaceRouteMask = createRouteMask({
   to: '/$workspaceId',
   params: (ctx) => {
     const workspace = collections.workspaces.get(ctx.userId);
-    if (!workspace) {
-      throw notFound();
-    }
-
     return {
-      workspaceId: workspace.workspaceId,
+      workspaceId: workspace?.workspaceId ?? 'unknown',
     };
   },
 });
@@ -25,12 +21,8 @@ export const workspaceHomeRouteMask = createRouteMask({
   to: '/$workspaceId/home',
   params: (ctx) => {
     const workspace = collections.workspaces.get(ctx.userId);
-    if (!workspace) {
-      throw notFound();
-    }
-
     return {
-      workspaceId: workspace.workspaceId,
+      workspaceId: workspace?.workspaceId ?? 'unknown',
     };
   },
 });
@@ -41,12 +33,8 @@ export const nodeRouteMask = createRouteMask({
   to: '/$workspaceId/$nodeId',
   params: (ctx) => {
     const workspace = collections.workspaces.get(ctx.userId);
-    if (!workspace) {
-      throw notFound();
-    }
-
     return {
-      workspaceId: workspace.workspaceId,
+      workspaceId: workspace?.workspaceId ?? 'unknown',
     };
   },
 });
@@ -57,12 +45,8 @@ export const workspaceSettingsRouteMask = createRouteMask({
   to: '/$workspaceId/settings',
   params: (ctx) => {
     const workspace = collections.workspaces.get(ctx.userId);
-    if (!workspace) {
-      throw notFound();
-    }
-
     return {
-      workspaceId: workspace.workspaceId,
+      workspaceId: workspace?.workspaceId ?? 'unknown',
     };
   },
 });
@@ -73,12 +57,8 @@ export const workspaceUsersRouteMask = createRouteMask({
   to: '/$workspaceId/users',
   params: (ctx) => {
     const workspace = collections.workspaces.get(ctx.userId);
-    if (!workspace) {
-      throw notFound();
-    }
-
     return {
-      workspaceId: workspace.workspaceId,
+      workspaceId: workspace?.workspaceId ?? 'unknown',
     };
   },
 });
@@ -89,12 +69,8 @@ export const workspaceStorageRouteMask = createRouteMask({
   to: '/$workspaceId/storage',
   params: (ctx) => {
     const workspace = collections.workspaces.get(ctx.userId);
-    if (!workspace) {
-      throw notFound();
-    }
-
     return {
-      workspaceId: workspace.workspaceId,
+      workspaceId: workspace?.workspaceId ?? 'unknown',
     };
   },
 });
@@ -105,12 +81,8 @@ export const workspaceUploadsRouteMask = createRouteMask({
   to: '/$workspaceId/uploads',
   params: (ctx) => {
     const workspace = collections.workspaces.get(ctx.userId);
-    if (!workspace) {
-      throw notFound();
-    }
-
     return {
-      workspaceId: workspace.workspaceId,
+      workspaceId: workspace?.workspaceId ?? 'unknown',
     };
   },
 });
@@ -121,12 +93,8 @@ export const workspaceDownloadsRouteMask = createRouteMask({
   to: '/$workspaceId/downloads',
   params: (ctx) => {
     const workspace = collections.workspaces.get(ctx.userId);
-    if (!workspace) {
-      throw notFound();
-    }
-
     return {
-      workspaceId: workspace.workspaceId,
+      workspaceId: workspace?.workspaceId ?? 'unknown',
     };
   },
 });
@@ -137,12 +105,8 @@ export const accountSettingsRouteMask = createRouteMask({
   to: '/$workspaceId/account/settings',
   params: (ctx) => {
     const workspace = collections.workspaces.get(ctx.userId);
-    if (!workspace) {
-      throw notFound();
-    }
-
     return {
-      workspaceId: workspace.workspaceId,
+      workspaceId: workspace?.workspaceId ?? 'unknown',
     };
   },
 });
@@ -153,12 +117,8 @@ export const accountLogoutRouteMask = createRouteMask({
   to: '/$workspaceId/account/logout',
   params: (ctx) => {
     const workspace = collections.workspaces.get(ctx.userId);
-    if (!workspace) {
-      throw notFound();
-    }
-
     return {
-      workspaceId: workspace.workspaceId,
+      workspaceId: workspace?.workspaceId ?? 'unknown',
     };
   },
 });
@@ -169,12 +129,8 @@ export const appAppearanceRouteMask = createRouteMask({
   to: '/$workspaceId/app/appearance',
   params: (ctx) => {
     const workspace = collections.workspaces.get(ctx.userId);
-    if (!workspace) {
-      throw notFound();
-    }
-
     return {
-      workspaceId: workspace.workspaceId,
+      workspaceId: workspace?.workspaceId ?? 'unknown',
     };
   },
 });

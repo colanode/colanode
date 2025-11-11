@@ -1,4 +1,4 @@
-import { createRoute, notFound, redirect } from '@tanstack/react-router';
+import { createRoute, redirect } from '@tanstack/react-router';
 
 import { WorkspaceStorageScreen } from '@colanode/ui/components/workspaces/storage/workspace-storage-screen';
 import { WorkspaceStorageTab } from '@colanode/ui/components/workspaces/storage/workspace-storage-tab';
@@ -32,7 +32,5 @@ export const workspaceStorageMaskRoute = createRoute({
         replace: true,
       });
     }
-
-    throw notFound();
   },
 });

@@ -1,4 +1,4 @@
-import { createRoute, notFound, redirect } from '@tanstack/react-router';
+import { createRoute, redirect } from '@tanstack/react-router';
 
 import { AppAppearanceSettingsScreen } from '@colanode/ui/components/app/app-appearance-settings-screen';
 import { AppAppearanceSettingsTab } from '@colanode/ui/components/app/app-appearance-settings-tab';
@@ -32,7 +32,5 @@ export const appAppearanceMaskRoute = createRoute({
         replace: true,
       });
     }
-
-    throw notFound();
   },
 });

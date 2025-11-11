@@ -1,4 +1,4 @@
-import { createRoute, notFound, redirect } from '@tanstack/react-router';
+import { createRoute, redirect } from '@tanstack/react-router';
 
 import { NodeErrorScreen } from '@colanode/ui/components/nodes/node-error-screen';
 import { NodeScreen } from '@colanode/ui/components/nodes/node-screen';
@@ -24,7 +24,6 @@ export const nodeRoute = createRoute({
 export const nodeMaskRoute = createRoute({
   getParentRoute: () => workspaceMaskRoute,
   path: '/$nodeId',
-  component: () => null,
   beforeLoad: (ctx) => {
     const userId = getWorkspaceUserId(ctx.params.workspaceId);
     if (userId) {
@@ -37,7 +36,5 @@ export const nodeMaskRoute = createRoute({
         replace: true,
       });
     }
-
-    throw notFound();
   },
 });

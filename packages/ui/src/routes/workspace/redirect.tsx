@@ -16,7 +16,7 @@ export const workspaceRedirectRoute = createRoute({
     const workspace = collections.workspaces.get(ctx.params.userId);
 
     if (!workspace) {
-      throw notFound();
+      throw notFound({ throw: true });
     }
 
     const metadataKey = buildMetadataKey(workspace.userId, 'location');
@@ -48,7 +48,5 @@ export const workspaceRedirectMaskRoute = createRoute({
         replace: true,
       });
     }
-
-    throw notFound();
   },
 });

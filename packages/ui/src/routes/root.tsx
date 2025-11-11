@@ -1,3 +1,7 @@
 import { createRootRoute } from '@tanstack/react-router';
 
-export const rootRoute = createRootRoute();
+import { AppNotFound } from '@colanode/ui/components/app/app-not-found';
+
+export const rootRoute = createRootRoute({
+  notFoundComponent: AppNotFound,
+});

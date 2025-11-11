@@ -1,4 +1,4 @@
-import { createRoute, notFound, redirect } from '@tanstack/react-router';
+import { createRoute, redirect } from '@tanstack/react-router';
 
 import { WorkspaceUsersScreen } from '@colanode/ui/components/workspaces/workspace-users-screen';
 import { WorkspaceUsersTab } from '@colanode/ui/components/workspaces/workspace-users-tab';
@@ -32,7 +32,5 @@ export const workspaceUsersMaskRoute = createRoute({
         replace: true,
       });
     }
-
-    throw notFound();
   },
 });

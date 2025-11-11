@@ -1,4 +1,4 @@
-import { createRoute, notFound, redirect } from '@tanstack/react-router';
+import { createRoute, redirect } from '@tanstack/react-router';
 
 import { WorkspaceHomeScreen } from '@colanode/ui/components/workspaces/workspace-home-screen';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
@@ -26,7 +26,5 @@ export const workspaceHomeMaskRoute = createRoute({
         replace: true,
       });
     }
-
-    throw notFound();
   },
 });

@@ -1,4 +1,4 @@
-import { createRoute, notFound, redirect } from '@tanstack/react-router';
+import { createRoute, redirect } from '@tanstack/react-router';
 
 import { AccountLogoutScreen } from '@colanode/ui/components/accounts/account-logout-screen';
 import { AccountLogoutTab } from '@colanode/ui/components/accounts/account-logout-tab';
@@ -32,7 +32,5 @@ export const accountLogoutMaskRoute = createRoute({
         replace: true,
       });
     }
-
-    throw notFound();
   },
 });

@@ -46,7 +46,7 @@
     "@react-oauth/google": "^0.12.2",
     "@tanstack/react-db": "^0.1.39",
     "@tanstack/react-query": "^5.90.6",
-    "@tanstack/react-router": "^1.134.12",
+    "@tanstack/react-router": "^1.135.2",
     "@tanstack/react-virtual": "^3.13.12",
     "@tiptap/core": "^3.7.0",
     "@tiptap/extension-blockquote": "^3.7.0",
