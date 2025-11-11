@@ -28,7 +28,7 @@ export class MutationService {
       },
       {
         deduplication: {
-          key: `mutations.sync.${this.workspace.accountId}.${this.workspace.workspaceId}`,
+          key: `mutations.sync.${this.workspace.userId}`,
           replace: true,
         },
         delay: 500,
@@ -78,7 +78,7 @@ export class MutationService {
     }
 
     debug(
-      `Sending ${pendingMutations.length} local pending mutations for user ${this.workspace.workspaceId}`
+      `Sending ${pendingMutations.length} local pending mutations for user ${this.workspace.userId}`
     );
 
     const totalBatches = Math.ceil(validMutations.length / BATCH_SIZE);
@@ -89,7 +89,7 @@ export class MutationService {
         const batch = validMutations.splice(0, BATCH_SIZE);
 
         debug(
-          `Sending batch ${currentBatch++} of ${totalBatches} mutations for user ${this.workspace.workspaceId}`
+          `Sending batch ${currentBatch++} of ${totalBatches} mutations for user ${this.workspace.userId}`
         );
 
         const body: SyncMutationsInput = {
@@ -126,7 +126,7 @@ export class MutationService {
       }
     } catch (error) {
       debug(
-        `Failed to send local pending mutations for user ${this.workspace.workspaceId}: ${error}`
+        `Failed to send local pending mutations for user ${this.workspace.userId}: ${error}`
       );
 
       return false;
@@ -147,7 +147,7 @@ export class MutationService {
     }
 
     debug(
-      `Reverting ${invalidMutations.length} invalid mutations for workspace ${this.workspace.workspaceId}`
+      `Reverting ${invalidMutations.length} invalid mutations for user ${this.workspace.userId}`
     );
 
     for (const mutationRow of invalidMutations) {
@@ -181,7 +181,7 @@ export class MutationService {
     reason: string
   ): Promise<void> {
     debug(
-      `Deleting ${mutationIds.length} local mutations for user ${this.workspace.workspaceId}. Reason: ${reason}`
+      `Deleting ${mutationIds.length} local mutations for user ${this.workspace.userId}. Reason: ${reason}`
     );
 
     await this.workspace.database
@@ -192,7 +192,7 @@ export class MutationService {
 
   private async markMutationsAsFailed(mutationIds: string[]): Promise<void> {
     debug(
-      `Marking ${mutationIds.length} local pending mutations as failed for user ${this.workspace.workspaceId}`
+      `Marking ${mutationIds.length} local pending mutations as failed for user ${this.workspace.userId}`
     );
 
     await this.workspace.database
