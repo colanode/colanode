@@ -1,7 +1,6 @@
 export type DatabaseNameFieldUpdateMutationInput = {
   type: 'database.name.field.update';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   databaseId: string;
   name: string;
 };

@@ -13,7 +13,9 @@ export class UserService {
   }
 
   public async upsert(user: UserOutput) {
-    debug(`Upserting user ${user.id} in workspace ${this.workspace.id}`);
+    debug(
+      `Upserting user ${user.id} in workspace ${this.workspace.workspaceId}`
+    );
 
     const createdUser = await this.workspace.database
       .insertInto('users')
@@ -51,15 +53,20 @@ export class UserService {
     if (createdUser) {
       eventBus.publish({
         type: 'user.created',
-        accountId: this.workspace.account.id,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         user: mapUser(createdUser),
       });
     }
   }
 
   public async syncServerUser(user: SyncUserData) {
-    debug(`Syncing server user ${user.id} in workspace ${this.workspace.id}`);
+    debug(
+      `Syncing server user ${user.id} in workspace ${this.workspace.workspaceId}`
+    );
 
     const createdUser = await this.workspace.database
       .insertInto('users')
@@ -97,8 +104,11 @@ export class UserService {
     if (createdUser) {
       eventBus.publish({
         type: 'user.created',
-        accountId: this.workspace.account.id,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         user: mapUser(createdUser),
       });
     }

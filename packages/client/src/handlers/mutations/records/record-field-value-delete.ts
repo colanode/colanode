@@ -14,7 +14,7 @@ export class RecordFieldValueDeleteMutationHandler
   async handleMutation(
     input: RecordFieldValueDeleteMutationInput
   ): Promise<RecordFieldValueDeleteMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const result = await workspace.nodes.updateNode<RecordAttributes>(
       input.recordId,

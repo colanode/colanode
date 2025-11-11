@@ -26,8 +26,7 @@ export class DatabaseListQueryHandler
   ): Promise<ChangeCheckResult<DatabaseListQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -37,8 +36,7 @@ export class DatabaseListQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'database'
     ) {
       const newResult = await this.handleQuery(input);
@@ -51,8 +49,7 @@ export class DatabaseListQueryHandler
 
     if (
       event.type === 'node.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'database'
     ) {
       const database = output.find((database) => database.id === event.node.id);
@@ -73,8 +70,7 @@ export class DatabaseListQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'database'
     ) {
       const database = output.find((node) => node.id === event.node.id);
@@ -96,7 +92,7 @@ export class DatabaseListQueryHandler
   private async fetchDatabases(
     input: DatabaseListQueryInput
   ): Promise<SelectNode[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const databases = await workspace.database
       .selectFrom('nodes')

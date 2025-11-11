@@ -1,18 +1,24 @@
 import { LocalFileNode } from '@colanode/client/types';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
+import { BreadcrumbItem } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb-item';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 interface FileBreadcrumbItemProps {
   file: LocalFileNode;
 }
 
 export const FileBreadcrumbItem = ({ file }: FileBreadcrumbItemProps) => {
+  const workspace = useWorkspace();
   return (
-    <div className="flex items-center space-x-2">
-      <FileThumbnail
-        file={file}
-        className="size-4 overflow-hidden rounded object-contain"
-      />
-      <span>{file.attributes.name}</span>
-    </div>
+    <BreadcrumbItem
+      icon={(className) => (
+        <FileThumbnail
+          userId={workspace.userId}
+          file={file}
+          className={className}
+        />
+      )}
+      name={file.attributes.name}
+    />
   );
 };

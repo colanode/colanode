@@ -9,7 +9,7 @@ export const AccountDelete = () => {
           Account delete will be available soon.
         </p>
       </div>
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         <Button variant="destructive" className="w-20" disabled>
           Delete
         </Button>

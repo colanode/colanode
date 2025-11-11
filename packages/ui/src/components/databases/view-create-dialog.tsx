@@ -105,8 +105,7 @@ export const ViewCreateDialog = ({
         viewType: type.type,
         databaseId: database.id,
         name: name,
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        userId: workspace.userId,
       },
       onSuccess() {
         form.reset();
@@ -136,7 +135,7 @@ export const ViewCreateDialog = ({
             className="flex flex-col"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
-            <div className="flex-grow space-y-4 py-2 pb-4">
+            <div className="grow space-y-4 py-2 pb-4">
               <FormField
                 control={form.control}
                 name="name"

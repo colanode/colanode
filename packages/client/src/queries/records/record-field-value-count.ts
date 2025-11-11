@@ -5,8 +5,7 @@ export type RecordFieldValueCountQueryInput = {
   databaseId: string;
   filters: DatabaseViewFilterAttributes[];
   fieldId: string;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 export type RecordFieldValueCount = {

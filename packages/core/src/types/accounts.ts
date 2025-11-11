@@ -11,7 +11,7 @@ export enum AccountStatus {
 export const accountOutputSchema = z.object({
   id: z.string(),
   name: z.string(),
-  email: z.string().email(),
+  email: z.email(),
   avatar: z.string().optional().nullable(),
 });
 
@@ -92,7 +92,7 @@ export const emailVerifyInputSchema = z.object({
 export type EmailVerifyInput = z.infer<typeof emailVerifyInputSchema>;
 
 export const emailPasswordResetInitInputSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
 });
 
 export type EmailPasswordResetInitInput = z.infer<

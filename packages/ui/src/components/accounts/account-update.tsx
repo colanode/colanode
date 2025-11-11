@@ -1,10 +1,11 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Upload } from 'lucide-react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
-import { Account } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -17,6 +18,8 @@ import {
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { openFileDialog } from '@colanode/ui/lib/files';
 import { cn } from '@colanode/ui/lib/utils';
@@ -27,16 +30,30 @@ const formSchema = z.object({
   email: z.email('Invalid email address'),
 });
 
-export const AccountUpdate = ({ account }: { account: Account }) => {
+export const AccountUpdate = () => {
+  const workspace = useWorkspace();
+  const accountQuery = useLiveQuery((q) =>
+    q
+      .from({ accounts: collections.accounts })
+      .where(({ accounts }) => eq(accounts.id, workspace.accountId))
+      .select(({ accounts }) => ({
+        name: accounts.name,
+        avatar: accounts.avatar,
+        email: accounts.email,
+      }))
+  );
+
+  const isMobile = useIsMobile();
   const { mutate: uploadAvatar, isPending: isUploadingAvatar } = useMutation();
   const { mutate: updateAccount, isPending: isUpdatingAccount } = useMutation();
 
+  const accountData = accountQuery.data?.[0];
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: account.name,
-      avatar: account.avatar,
-      email: account.email,
+      name: accountData?.name,
+      avatar: accountData?.avatar,
+      email: accountData?.email,
     },
   });
 
@@ -51,7 +68,7 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
     updateAccount({
       input: {
         type: 'account.update',
-        id: account.id,
+        id: workspace.accountId,
         name: values.name,
         avatar: values.avatar,
       },
@@ -64,11 +81,20 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
     });
   };
 
+  if (!accountData) {
+    return <p>Account not found</p>;
+  }
+
   return (
     <Form {...form}>
       <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex flex-row gap-1">
-          <div className="h-40 w-40 pt-3">
+        <div className={cn('flex gap-1', isMobile ? 'flex-col' : 'flex-row')}>
+          <div
+            className={cn(
+              'pt-3',
+              isMobile ? 'flex justify-center pb-4' : 'size-40'
+            )}
+          >
             <div
               className="group relative cursor-pointer"
               onClick={async () => {
@@ -89,7 +115,7 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
                   uploadAvatar({
                     input: {
                       type: 'avatar.upload',
-                      accountId: account.id,
+                      accountId: workspace.accountId,
                       file,
                     },
                     onSuccess(output) {
@@ -107,14 +133,15 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
               }}
             >
               <Avatar
-                id={account.id}
+                id={workspace.accountId}
                 name={name}
                 avatar={avatar}
-                className="h-32 w-32"
+                className={isMobile ? 'size-24' : 'size-32'}
               />
               <div
                 className={cn(
-                  `absolute left-0 top-0 hidden h-32 w-32 items-center justify-center overflow-hidden bg-accent/50 group-hover:inline-flex`,
+                  `absolute left-0 top-0 hidden items-center justify-center overflow-hidden bg-accent/50 group-hover:inline-flex`,
+                  isMobile ? 'size-24' : 'size-32',
                   isUploadingAvatar ? 'inline-flex' : 'hidden'
                 )}
               >
@@ -126,7 +153,9 @@ export const AccountUpdate = ({ account }: { account: Account }) => {
               </div>
             </div>
           </div>
-          <div className="flex-grow space-y-4 py-2 pb-4">
+          <div
+            className={cn('space-y-4 py-2 pb-4', isMobile ? 'w-full' : 'grow')}
+          >
             <FormField
               control={form.control}
               name="name"

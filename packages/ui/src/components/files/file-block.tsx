@@ -1,7 +1,7 @@
 import { LocalFileNode } from '@colanode/client/types';
 import { FileIcon } from '@colanode/ui/components/files/file-icon';
 import { FilePreview } from '@colanode/ui/components/files/file-preview';
-import { useLayout } from '@colanode/ui/contexts/layout';
+import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { canPreviewFile } from '@colanode/ui/lib/files';
@@ -12,13 +12,11 @@ interface FileBlockProps {
 
 export const FileBlock = ({ id }: FileBlockProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
 
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (nodeGetQuery.isPending || !nodeGetQuery.data) {
@@ -30,23 +28,23 @@ export const FileBlock = ({ id }: FileBlockProps) => {
 
   if (canPreview) {
     return (
-      <div
+      <Link
+        from="/workspace/$userId"
+        to="$nodeId"
+        params={{ nodeId: id }}
         className="flex h-72 max-h-72 max-w-128 w-full cursor-pointer overflow-hidden rounded-md p-2 hover:bg-muted/50"
-        onClick={() => {
-          layout.previewLeft(id, true);
-        }}
       >
         <FilePreview file={file} />
-      </div>
+      </Link>
     );
   }
 
   return (
-    <div
+    <Link
+      from="/workspace/$userId"
+      to="$nodeId"
+      params={{ nodeId: id }}
       className="flex flex-row gap-4 items-center w-full cursor-pointer overflow-hidden rounded-md p-2 pl-0 hover:bg-accent"
-      onClick={() => {
-        layout.previewLeft(id, true);
-      }}
     >
       <FileIcon mimeType={file.attributes.mimeType} className="size-10" />
       <div className="flex flex-col gap-1">
@@ -55,6 +53,6 @@ export const FileBlock = ({ id }: FileBlockProps) => {
           {file.attributes.mimeType}
         </div>
       </div>
-    </div>
+    </Link>
   );
 };

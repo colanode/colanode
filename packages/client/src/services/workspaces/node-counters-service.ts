@@ -80,8 +80,11 @@ export class NodeCountersService {
       for (const counter of counters) {
         eventBus.publish({
           type: 'node.counter.updated',
-          accountId: this.workspace.accountId,
-          workspaceId: this.workspace.id,
+          workspace: {
+            workspaceId: this.workspace.workspaceId,
+            userId: this.workspace.userId,
+            accountId: this.workspace.accountId,
+          },
           counter: {
             nodeId: counter.node_id,
             type: counter.type,
@@ -112,8 +115,11 @@ export class NodeCountersService {
       for (const counter of counters) {
         eventBus.publish({
           type: 'node.counter.deleted',
-          accountId: this.workspace.accountId,
-          workspaceId: this.workspace.id,
+          workspace: {
+            workspaceId: this.workspace.workspaceId,
+            userId: this.workspace.userId,
+            accountId: this.workspace.accountId,
+          },
           counter: {
             nodeId: counter.node_id,
             type: counter.type,
@@ -195,8 +201,11 @@ export class NodeCountersService {
       for (const counter of counters) {
         eventBus.publish({
           type: 'node.counter.updated',
-          accountId: this.workspace.accountId,
-          workspaceId: this.workspace.id,
+          workspace: {
+            workspaceId: this.workspace.workspaceId,
+            userId: this.workspace.userId,
+            accountId: this.workspace.accountId,
+          },
           counter: {
             nodeId: counter.node_id,
             type: counter.type,

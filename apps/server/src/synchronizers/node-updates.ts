@@ -1,6 +1,6 @@
 import {
   SynchronizerOutputMessage,
-  SyncNodesUpdatesInput,
+  SyncNodeUpdatesInput,
   SyncNodeUpdateData,
 } from '@colanode/core';
 import { encodeState } from '@colanode/crdt';
@@ -12,8 +12,8 @@ import { Event } from '@colanode/server/types/events';
 
 const logger = createLogger('node-update-synchronizer');
 
-export class NodeUpdatesSynchronizer extends BaseSynchronizer<SyncNodesUpdatesInput> {
-  public async fetchData(): Promise<SynchronizerOutputMessage<SyncNodesUpdatesInput> | null> {
+export class NodeUpdatesSynchronizer extends BaseSynchronizer<SyncNodeUpdatesInput> {
+  public async fetchData(): Promise<SynchronizerOutputMessage<SyncNodeUpdatesInput> | null> {
     const nodeUpdates = await this.fetchNodeUpdates();
     if (nodeUpdates.length === 0) {
       return null;
@@ -24,7 +24,7 @@ export class NodeUpdatesSynchronizer extends BaseSynchronizer<SyncNodesUpdatesIn
 
   public async fetchDataFromEvent(
     event: Event
-  ): Promise<SynchronizerOutputMessage<SyncNodesUpdatesInput> | null> {
+  ): Promise<SynchronizerOutputMessage<SyncNodeUpdatesInput> | null> {
     if (!this.shouldFetch(event)) {
       return null;
     }
@@ -66,7 +66,7 @@ export class NodeUpdatesSynchronizer extends BaseSynchronizer<SyncNodesUpdatesIn
 
   private buildMessage(
     unsyncedNodeUpdates: SelectNodeUpdate[]
-  ): SynchronizerOutputMessage<SyncNodesUpdatesInput> {
+  ): SynchronizerOutputMessage<SyncNodeUpdatesInput> {
     const items: SyncNodeUpdateData[] = unsyncedNodeUpdates.map(
       (nodeUpdate) => {
         return {

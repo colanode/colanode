@@ -1,7 +1,9 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Settings } from 'lucide-react';
 import { useState } from 'react';
 
 import { formatBytes, WorkspaceStorageUser } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -14,7 +16,6 @@ import {
 } from '@colanode/ui/components/ui/table';
 import { WorkspaceStorageUserUpdateDialog } from '@colanode/ui/components/workspaces/storage/workspace-storage-user-update-dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 import { bigintToPercent, cn } from '@colanode/ui/lib/utils';
 
 const UserStorageProgressBar = ({
@@ -59,12 +60,18 @@ const WorkspaceStorageUserRow = ({
   const workspace = useWorkspace();
   const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
 
-  const userQuery = useQuery({
-    type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: user.id,
-  });
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, user.id))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+        email: users.email,
+      }))
+      .findOne()
+  );
 
   const name = userQuery.data?.name ?? 'Unknown';
   const email = userQuery.data?.email ?? '';
@@ -79,7 +86,7 @@ const WorkspaceStorageUserRow = ({
         <TableCell>
           <div className="flex items-center space-x-3">
             <Avatar id={user.id} name={name} avatar={avatar} />
-            <div className="flex-grow min-w-0">
+            <div className="grow min-w-0">
               <p className="text-sm font-medium leading-none truncate">
                 {name}
               </p>

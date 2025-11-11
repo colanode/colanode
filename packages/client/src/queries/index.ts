@@ -1,7 +1,7 @@
-export * from './accounts/account-get';
+import { sha256 } from 'js-sha256';
+
 export * from './accounts/account-list';
-export * from './accounts/account-metadata-list';
-export * from './apps/app-metadata-list';
+export * from './apps/metadata-list';
 export * from './chats/chat-list';
 export * from './databases/database-list';
 export * from './databases/database-view-list';
@@ -28,24 +28,21 @@ export * from './nodes/node-reactions-aggregate';
 export * from './nodes/node-tree-get';
 export * from './records/record-list';
 export * from './records/record-search';
-export * from './servers/server-list';
 export * from './spaces/space-list';
-export * from './users/user-get';
 export * from './users/user-list';
 export * from './users/user-search';
 export * from './users/user-storage-get';
-export * from './workspaces/workspace-get';
 export * from './workspaces/workspace-list';
-export * from './workspaces/workspace-metadata-list';
 export * from './avatars/avatar-get';
 export * from './records/record-field-value-count';
 export * from './workspaces/workspace-storage-get';
 export * from './files/upload-list';
-export * from './files/download-list-manual';
-export * from './files/temp-file-get';
-export * from './files/upload-list-pending';
+export * from './files/download-list';
+export * from './files/temp-file-list';
 export * from './icons/icon-svg-get';
 export * from './emojis/emoji-svg-get';
+export * from './apps/tabs-list';
+export * from './servers/server-list';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface QueryMap {}
@@ -67,3 +64,9 @@ export enum QueryErrorCode {
   WorkspaceNotFound = 'workspace_not_found',
   ApiError = 'api_error',
 }
+
+export const buildQueryKey = <T extends QueryInput>(input: T): string => {
+  const inputJson = JSON.stringify(input);
+  const hash = sha256(inputJson);
+  return hash;
+};

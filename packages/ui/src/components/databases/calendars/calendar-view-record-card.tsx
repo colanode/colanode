@@ -1,10 +1,9 @@
 import { RecordFieldValue } from '@colanode/ui/components/records/record-field-value';
+import { Link } from '@colanode/ui/components/ui/link';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useRecord } from '@colanode/ui/contexts/record';
 
 export const CalendarViewRecordCard = () => {
-  const layout = useLayout();
   const view = useDatabaseView();
   const record = useRecord();
 
@@ -12,13 +11,12 @@ export const CalendarViewRecordCard = () => {
   const hasName = name !== null && name !== '';
 
   return (
-    <div
-      role="presentation"
+    <Link
+      from="/workspace/$userId"
+      to="$nodeId"
+      params={{ nodeId: record.id }}
       key={record.id}
       className="animate-fade-in flex justify-start items-start cursor-pointer flex-col gap-1 rounded-md border p-1 pl-2 hover:bg-accent"
-      onClick={() => {
-        layout.previewLeft(record.id, true);
-      }}
     >
       <p className={hasName ? '' : 'text-muted-foreground'}>
         {hasName ? name : 'Unnamed'}
@@ -38,6 +36,6 @@ export const CalendarViewRecordCard = () => {
           })}
         </div>
       )}
-    </div>
+    </Link>
   );
 };

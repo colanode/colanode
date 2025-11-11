@@ -20,10 +20,15 @@ const IconElementWeb = ({ id, className }: IconElementProps) => {
 };
 
 const IconElementDesktop = ({ id, className }: IconElementProps) => {
-  const svgQuery = useLiveQuery({
-    type: 'icon.svg.get',
-    id,
-  });
+  const svgQuery = useLiveQuery(
+    {
+      type: 'icon.svg.get',
+      id,
+    },
+    {
+      staleTime: Infinity,
+    }
+  );
 
   if (svgQuery.isLoading) {
     return null;

@@ -15,8 +15,7 @@ export const RecordDatabase = ({ id, role, children }: RecordDatabaseProps) => {
 
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     nodeId: id,
   });
 

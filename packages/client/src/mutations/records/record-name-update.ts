@@ -1,7 +1,6 @@
 export type RecordNameUpdateMutationInput = {
   type: 'record.name.update';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   recordId: string;
   name: string;
 };

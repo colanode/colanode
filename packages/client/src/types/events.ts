@@ -1,5 +1,5 @@
-import { Account, AccountMetadata } from '@colanode/client/types/accounts';
-import { AppMetadata } from '@colanode/client/types/apps';
+import { Account } from '@colanode/client/types/accounts';
+import { Metadata, Tab } from '@colanode/client/types/apps';
 import { Avatar } from '@colanode/client/types/avatars';
 import {
   Document,
@@ -21,128 +21,120 @@ import {
 } from '@colanode/client/types/nodes';
 import { Server } from '@colanode/client/types/servers';
 import { User } from '@colanode/client/types/users';
-import {
-  Workspace,
-  WorkspaceMetadata,
-} from '@colanode/client/types/workspaces';
+import { Workspace } from '@colanode/client/types/workspaces';
 import { Message } from '@colanode/core';
+
+export type WorkspaceEventData = {
+  workspaceId: string;
+  userId: string;
+  accountId: string;
+};
 
 export type UserCreatedEvent = {
   type: 'user.created';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   user: User;
 };
 
 export type UserUpdatedEvent = {
   type: 'user.updated';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   user: User;
 };
 
 export type UserDeletedEvent = {
   type: 'user.deleted';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   user: User;
 };
 
 export type NodeCreatedEvent = {
   type: 'node.created';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   node: LocalNode;
 };
 
 export type NodeUpdatedEvent = {
   type: 'node.updated';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   node: LocalNode;
 };
 
 export type NodeDeletedEvent = {
   type: 'node.deleted';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   node: LocalNode;
 };
 
 export type NodeInteractionUpdatedEvent = {
   type: 'node.interaction.updated';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   nodeInteraction: NodeInteraction;
 };
 
 export type NodeReactionCreatedEvent = {
   type: 'node.reaction.created';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   nodeReaction: NodeReaction;
 };
 
 export type NodeReactionDeletedEvent = {
   type: 'node.reaction.deleted';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   nodeReaction: NodeReaction;
 };
 
 export type LocalFileCreatedEvent = {
   type: 'local.file.created';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
+  localFile: LocalFile;
+};
+
+export type LocalFileUpdatedEvent = {
+  type: 'local.file.updated';
+  workspace: WorkspaceEventData;
   localFile: LocalFile;
 };
 
 export type LocalFileDeletedEvent = {
   type: 'local.file.deleted';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   localFile: LocalFile;
 };
 
 export type UploadCreatedEvent = {
   type: 'upload.created';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   upload: Upload;
 };
 
 export type UploadUpdatedEvent = {
   type: 'upload.updated';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   upload: Upload;
 };
 
 export type UploadDeletedEvent = {
   type: 'upload.deleted';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   upload: Upload;
 };
 
 export type DownloadCreatedEvent = {
   type: 'download.created';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   download: Download;
 };
 
 export type DownloadUpdatedEvent = {
   type: 'download.updated';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   download: Download;
 };
 
 export type DownloadDeletedEvent = {
   type: 'download.deleted';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   download: Download;
 };
 
@@ -191,6 +183,12 @@ export type ServerDeletedEvent = {
   server: Server;
 };
 
+export type ServerAvailabilityChangedEvent = {
+  type: 'server.availability.changed';
+  domain: string;
+  isAvailable: boolean;
+};
+
 export type QueryResultUpdatedEvent = {
   type: 'query.result.updated';
   id: string;
@@ -203,22 +201,14 @@ export type RadarDataUpdatedEvent = {
 
 export type CollaborationCreatedEvent = {
   type: 'collaboration.created';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   nodeId: string;
 };
 
 export type CollaborationDeletedEvent = {
   type: 'collaboration.deleted';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   nodeId: string;
-};
-
-export type ServerAvailabilityChangedEvent = {
-  type: 'server.availability.changed';
-  server: Server;
-  isAvailable: boolean;
 };
 
 export type AccountConnectionOpenedEvent = {
@@ -237,115 +227,78 @@ export type AccountConnectionMessageReceivedEvent = {
   message: Message;
 };
 
-export type AppMetadataUpdatedEvent = {
-  type: 'app.metadata.updated';
-  metadata: AppMetadata;
+export type MetadataUpdatedEvent = {
+  type: 'metadata.updated';
+  metadata: Metadata;
 };
 
-export type AppMetadataDeletedEvent = {
-  type: 'app.metadata.deleted';
-  metadata: AppMetadata;
-};
-
-export type AccountMetadataUpdatedEvent = {
-  type: 'account.metadata.updated';
-  accountId: string;
-  metadata: AccountMetadata;
-};
-
-export type AccountMetadataDeletedEvent = {
-  type: 'account.metadata.deleted';
-  accountId: string;
-  metadata: AccountMetadata;
-};
-
-export type WorkspaceMetadataUpdatedEvent = {
-  type: 'workspace.metadata.updated';
-  accountId: string;
-  workspaceId: string;
-  metadata: WorkspaceMetadata;
-};
-
-export type WorkspaceMetadataDeletedEvent = {
-  type: 'workspace.metadata.deleted';
-  accountId: string;
-  workspaceId: string;
-  metadata: WorkspaceMetadata;
+export type MetadataDeletedEvent = {
+  type: 'metadata.deleted';
+  metadata: Metadata;
 };
 
 export type DocumentUpdatedEvent = {
   type: 'document.updated';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   document: Document;
 };
 
 export type DocumentDeletedEvent = {
   type: 'document.deleted';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   documentId: string;
 };
 
 export type DocumentStateUpdatedEvent = {
   type: 'document.state.updated';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   documentState: DocumentState;
 };
 
 export type DocumentUpdateCreatedEvent = {
   type: 'document.update.created';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   documentUpdate: DocumentUpdate;
 };
 
 export type DocumentUpdateDeletedEvent = {
   type: 'document.update.deleted';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   documentId: string;
   updateId: string;
 };
 
 export type NodeReferenceCreatedEvent = {
   type: 'node.reference.created';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   nodeReference: NodeReference;
 };
 
 export type NodeReferenceDeletedEvent = {
   type: 'node.reference.deleted';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   nodeReference: NodeReference;
 };
 
 export type NodeCounterUpdatedEvent = {
   type: 'node.counter.updated';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   counter: NodeCounter;
 };
 
 export type NodeCounterDeletedEvent = {
   type: 'node.counter.deleted';
-  accountId: string;
-  workspaceId: string;
+  workspace: WorkspaceEventData;
   counter: NodeCounter;
 };
 
 export type AvatarCreatedEvent = {
   type: 'avatar.created';
-  accountId: string;
   avatar: Avatar;
 };
 
 export type AvatarDeletedEvent = {
   type: 'avatar.deleted';
-  accountId: string;
   avatar: Avatar;
 };
 
@@ -357,6 +310,21 @@ export type TempFileCreatedEvent = {
 export type TempFileDeletedEvent = {
   type: 'temp.file.deleted';
   tempFile: TempFile;
+};
+
+export type TabCreatedEvent = {
+  type: 'tab.created';
+  tab: Tab;
+};
+
+export type TabUpdatedEvent = {
+  type: 'tab.updated';
+  tab: Tab;
+};
+
+export type TabDeletedEvent = {
+  type: 'tab.deleted';
+  tab: Tab;
 };
 
 export type Event =
@@ -380,6 +348,7 @@ export type Event =
   | ServerDeletedEvent
   | ServerAvailabilityChangedEvent
   | LocalFileCreatedEvent
+  | LocalFileUpdatedEvent
   | LocalFileDeletedEvent
   | UploadCreatedEvent
   | UploadUpdatedEvent
@@ -394,12 +363,8 @@ export type Event =
   | AccountConnectionOpenedEvent
   | AccountConnectionClosedEvent
   | AccountConnectionMessageReceivedEvent
-  | AppMetadataUpdatedEvent
-  | AppMetadataDeletedEvent
-  | AccountMetadataUpdatedEvent
-  | AccountMetadataDeletedEvent
-  | WorkspaceMetadataUpdatedEvent
-  | WorkspaceMetadataDeletedEvent
+  | MetadataUpdatedEvent
+  | MetadataDeletedEvent
   | DocumentUpdatedEvent
   | DocumentDeletedEvent
   | DocumentStateUpdatedEvent
@@ -412,4 +377,7 @@ export type Event =
   | AvatarCreatedEvent
   | AvatarDeletedEvent
   | TempFileCreatedEvent
-  | TempFileDeletedEvent;
+  | TempFileDeletedEvent
+  | TabCreatedEvent
+  | TabUpdatedEvent
+  | TabDeletedEvent;

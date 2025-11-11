@@ -24,8 +24,7 @@ export class NodeChildrenGetQueryHandler
   ): Promise<ChangeCheckResult<NodeChildrenGetQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -35,8 +34,7 @@ export class NodeChildrenGetQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.parentId === input.nodeId &&
       (input.types === undefined || input.types.includes(event.node.type))
     ) {
@@ -49,8 +47,7 @@ export class NodeChildrenGetQueryHandler
 
     if (
       event.type === 'node.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.parentId === input.nodeId &&
       (input.types === undefined || input.types.includes(event.node.type))
     ) {
@@ -69,8 +66,7 @@ export class NodeChildrenGetQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.parentId === input.nodeId &&
       (input.types === undefined || input.types.includes(event.node.type))
     ) {
@@ -92,7 +88,7 @@ export class NodeChildrenGetQueryHandler
   private async fetchChildren(
     input: NodeChildrenGetQueryInput
   ): Promise<SelectNode[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const rows = await workspace.database
       .selectFrom('nodes')

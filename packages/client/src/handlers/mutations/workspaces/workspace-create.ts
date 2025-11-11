@@ -44,11 +44,12 @@ export class WorkspaceCreateMutationHandler
         })
         .json<WorkspaceOutput>();
 
-      const createdWorkspace = await account.database
+      const createdWorkspace = await this.app.database
         .insertInto('workspaces')
         .returningAll()
         .values({
-          id: response.id,
+          user_id: response.user.id,
+          workspace_id: response.id,
           account_id: response.user.accountId,
           name: response.name,
           description: response.description,
@@ -56,7 +57,6 @@ export class WorkspaceCreateMutationHandler
           role: response.user.role,
           storage_limit: response.user.storageLimit,
           max_file_size: response.user.maxFileSize,
-          user_id: response.user.id,
           created_at: new Date().toISOString(),
         })
         .onConflict((cb) => cb.doNothing())
@@ -69,16 +69,16 @@ export class WorkspaceCreateMutationHandler
         );
       }
 
-      const workspace = mapWorkspace(createdWorkspace);
-      await account.initWorkspace(workspace);
+      await this.app.initWorkspace(createdWorkspace);
 
+      const workspace = mapWorkspace(createdWorkspace);
       eventBus.publish({
         type: 'workspace.created',
         workspace: workspace,
       });
 
       return {
-        id: createdWorkspace.id,
+        id: createdWorkspace.workspace_id,
         userId: createdWorkspace.user_id,
       };
     } catch (error) {

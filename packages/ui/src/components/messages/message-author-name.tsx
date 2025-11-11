@@ -1,6 +1,8 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
 import { LocalMessageNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface MessageAuthorNameProps {
@@ -14,18 +16,21 @@ export const MessageAuthorName = ({
 }: MessageAuthorNameProps) => {
   const workspace = useWorkspace();
 
-  const userGetQuery = useLiveQuery({
-    type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: message.createdBy,
-  });
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, message.createdBy))
+      .select(({ users }) => ({
+        name: users.name,
+      }))
+      .findOne()
+  );
 
-  if (userGetQuery.isPending || !userGetQuery.data) {
+  const user = userQuery.data;
+  if (!user) {
     return null;
   }
 
-  const user = userGetQuery.data;
   return (
     <span className={cn('font-medium text-foreground', className)}>
       {user.name}

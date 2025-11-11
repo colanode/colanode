@@ -57,7 +57,7 @@ export const workspaceUpdateInputSchema = z.object({
 export type WorkspaceUpdateInput = z.infer<typeof workspaceUpdateInputSchema>;
 
 export const userCreateInputSchema = z.object({
-  email: z.string().email(),
+  email: z.email(),
   role: workspaceRoleSchema,
 });
 
@@ -71,7 +71,7 @@ export type UsersCreateInput = z.infer<typeof usersCreateInputSchema>;
 
 export const userOutputSchema = z.object({
   id: z.string(),
-  email: z.string().email(),
+  email: z.email(),
   name: z.string(),
   avatar: z.string().nullable().optional(),
   role: workspaceRoleSchema,

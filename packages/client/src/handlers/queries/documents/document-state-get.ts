@@ -12,7 +12,7 @@ export class DocumentStateGetQueryHandler
   public async handleQuery(
     input: DocumentStateGetQueryInput
   ): Promise<DocumentState | null> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     const documentState = await workspace.database
       .selectFrom('document_states')
       .selectAll()
@@ -33,8 +33,7 @@ export class DocumentStateGetQueryHandler
   ): Promise<ChangeCheckResult<DocumentStateGetQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -44,8 +43,7 @@ export class DocumentStateGetQueryHandler
 
     if (
       event.type === 'document.state.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.documentState.id === input.documentId
     ) {
       return {
@@ -56,8 +54,7 @@ export class DocumentStateGetQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.id === input.documentId
     ) {
       return {
@@ -68,8 +65,7 @@ export class DocumentStateGetQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.id === input.documentId
     ) {
       const newOutput = await this.handleQuery(input);

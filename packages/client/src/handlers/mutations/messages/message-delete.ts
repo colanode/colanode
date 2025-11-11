@@ -12,7 +12,7 @@ export class MessageDeleteMutationHandler
   async handleMutation(
     input: MessageDeleteMutationInput
   ): Promise<MessageDeleteMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     await workspace.nodes.deleteNode(input.messageId);
 
     return {

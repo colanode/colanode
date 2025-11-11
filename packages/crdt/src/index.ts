@@ -5,7 +5,7 @@ import { isEqual } from 'lodash-es';
 import * as Y from 'yjs';
 import { z } from 'zod/v4';
 
-import { ZodText } from '@colanode/core';
+import { ZOD_TEXT_DESCRIPTION } from '@colanode/core';
 
 export const encodeState = (state: Uint8Array) => {
   return fromUint8Array(state);
@@ -220,7 +220,10 @@ export class YDoc {
         }
 
         this.applyArrayChanges(schemaField, value, yArray);
-      } else if (schemaField instanceof ZodText) {
+      } else if (
+        schemaField instanceof z.ZodString &&
+        schemaField.description === ZOD_TEXT_DESCRIPTION
+      ) {
         if (typeof value !== 'string') {
           throw new Error('Value must be a string');
         }
@@ -302,7 +305,10 @@ export class YDoc {
         }
 
         this.applyRecordChanges(itemSchema, item, nestedMap);
-      } else if (itemSchema instanceof ZodText) {
+      } else if (
+        itemSchema instanceof z.ZodString &&
+        itemSchema.description === ZOD_TEXT_DESCRIPTION
+      ) {
         if (yArray.length <= i) {
           const yText = new Y.Text();
           yArray.insert(i, [yText]);
@@ -385,7 +391,10 @@ export class YDoc {
         }
 
         this.applyArrayChanges(valueSchema, value, yArray);
-      } else if (valueSchema instanceof ZodText) {
+      } else if (
+        valueSchema instanceof z.ZodString &&
+        valueSchema.description === ZOD_TEXT_DESCRIPTION
+      ) {
         if (typeof value !== 'string') {
           throw new Error('Value must be a string');
         }

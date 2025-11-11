@@ -1,21 +1,21 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { InView } from 'react-intersection-observer';
 
 import { LocalChatNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface ChatSidebarItemProps {
   chat: LocalChatNode;
+  isActive: boolean;
 }
 
-export const ChatSidebarItem = ({ chat }: ChatSidebarItemProps) => {
+export const ChatSidebarItem = ({ chat, isActive }: ChatSidebarItemProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
   const radar = useRadar();
 
   const userId =
@@ -23,31 +23,31 @@ export const ChatSidebarItem = ({ chat }: ChatSidebarItemProps) => {
       (id) => id !== workspace.userId
     ) ?? '';
 
-  const userGetQuery = useLiveQuery({
-    type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId,
-  });
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, userId))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
+  );
 
-  if (userGetQuery.isPending || !userGetQuery.data) {
+  const user = userQuery.data;
+  if (!user) {
     return null;
   }
 
-  const user = userGetQuery.data;
-  const unreadState = radar.getNodeState(
-    workspace.accountId,
-    workspace.id,
-    chat.id
-  );
-  const isActive = layout.activeTab === chat.id;
+  const unreadState = radar.getNodeState(workspace.userId, chat.id);
 
   return (
     <InView
       rootMargin="20px"
       onChange={(inView) => {
         if (inView) {
-          radar.markNodeAsSeen(workspace.accountId, workspace.id, chat.id);
+          radar.markNodeAsSeen(workspace.userId, chat.id);
         }
       }}
       className={cn(
@@ -63,7 +63,7 @@ export const ChatSidebarItem = ({ chat }: ChatSidebarItemProps) => {
       />
       <span
         className={cn(
-          'line-clamp-1 w-full flex-grow pl-2 text-left',
+          'line-clamp-1 w-full grow pl-2 text-left',
           !isActive && unreadState.hasUnread && 'font-semibold'
         )}
       >

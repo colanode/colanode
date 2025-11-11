@@ -1,4 +1,4 @@
 export interface AppMeta {
-  type: 'desktop' | 'web';
+  type: 'desktop' | 'web' | 'mobile';
   platform: string;
 }

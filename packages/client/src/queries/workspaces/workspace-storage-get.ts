@@ -2,8 +2,7 @@ import { WorkspaceStorageGetOutput } from '@colanode/core';
 
 export type WorkspaceStorageGetQueryInput = {
   type: 'workspace.storage.get';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 declare module '@colanode/client/queries' {

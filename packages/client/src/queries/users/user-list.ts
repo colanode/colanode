@@ -2,10 +2,7 @@ import { User } from '@colanode/client/types/users';
 
 export type UserListQueryInput = {
   type: 'user.list';
-  accountId: string;
-  workspaceId: string;
-  page: number;
-  count: number;
+  userId: string;
 };
 
 declare module '@colanode/client/queries' {

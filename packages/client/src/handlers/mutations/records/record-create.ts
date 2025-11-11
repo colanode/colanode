@@ -13,7 +13,7 @@ export class RecordCreateMutationHandler
   async handleMutation(
     input: RecordCreateMutationInput
   ): Promise<RecordCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const id = generateId(IdType.Record);
     const attributes: RecordAttributes = {

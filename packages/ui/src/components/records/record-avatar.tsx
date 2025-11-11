@@ -37,8 +37,7 @@ export const RecordAvatar = () => {
             type: 'record.avatar.update',
             recordId: record.id,
             avatar,
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
           },
           onError(error) {
             toast.error(error.message);

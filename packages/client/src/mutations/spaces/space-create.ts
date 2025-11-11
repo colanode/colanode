@@ -1,7 +1,6 @@
 export type SpaceCreateMutationInput = {
   type: 'space.create';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   name: string;
   description: string;
   avatar?: string | null;

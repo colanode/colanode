@@ -43,6 +43,7 @@ export enum IdType {
   Save = 'sv',
   Job = 'jb',
   Download = 'dl',
+  Tab = 'tb',
 }
 
 export const SpecialId = {

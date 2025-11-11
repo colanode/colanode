@@ -3,7 +3,7 @@ import '../../../packages/ui/src/styles/globals.css';
 
 import { useRegisterSW } from 'virtual:pwa-register/react';
 
-import { RootProvider } from '@colanode/ui';
+import { App } from '@colanode/ui';
 
 export const Root = () => {
   useRegisterSW({
@@ -12,5 +12,5 @@ export const Root = () => {
     },
   });
 
-  return <RootProvider type="web" />;
+  return <App type="web" />;
 };

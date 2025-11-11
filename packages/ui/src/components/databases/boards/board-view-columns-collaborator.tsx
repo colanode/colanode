@@ -1,3 +1,4 @@
+import { eq, useLiveQuery as useLiveQueryTanstack } from '@tanstack/react-db';
 import { CircleAlert, CircleDashed } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -6,9 +7,9 @@ import {
   DatabaseViewFilterAttributes,
   FieldValue,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { BoardViewContext } from '@colanode/ui/contexts/board-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
@@ -31,8 +32,7 @@ export const BoardViewColumnsCollaborator = ({
     databaseId: database.id,
     filters: view.filters,
     fieldId: field.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (collaboratorCountQuery.isPending) {
@@ -86,8 +86,7 @@ export const BoardViewColumnsCollaborator = ({
                     type: 'record.field.value.delete',
                     recordId: record.id,
                     fieldId: field.id,
-                    accountId: workspace.accountId,
-                    workspaceId: workspace.id,
+                    userId: workspace.userId,
                   });
 
                   if (!result.success) {
@@ -120,8 +119,7 @@ export const BoardViewColumnsCollaborator = ({
                     recordId: record.id,
                     fieldId: field.id,
                     value: newValue,
-                    accountId: workspace.accountId,
-                    workspaceId: workspace.id,
+                    userId: workspace.userId,
                   });
 
                   if (!result.success) {
@@ -157,8 +155,7 @@ export const BoardViewColumnsCollaborator = ({
                 type: 'record.field.value.delete',
                 recordId: record.id,
                 fieldId: field.id,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               });
 
               if (!result.success) {
@@ -170,8 +167,7 @@ export const BoardViewColumnsCollaborator = ({
                 recordId: record.id,
                 fieldId: field.id,
                 value,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               });
 
               if (!result.success) {
@@ -200,16 +196,16 @@ const BoardViewColumnCollaboratorHeader = ({
 }: BoardViewColumnCollaboratorHeaderProps) => {
   const workspace = useWorkspace();
 
-  const userQuery = useLiveQuery(
-    {
-      type: 'user.get',
-      userId: collaborator ?? '',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
-    },
-    {
-      enabled: !!collaborator,
-    }
+  const userQuery = useLiveQueryTanstack((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, collaborator))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
   );
 
   if (!collaborator) {
@@ -217,18 +213,6 @@ const BoardViewColumnCollaboratorHeader = ({
       <div className="flex flex-row gap-2 items-center">
         <CircleDashed className="size-5" />
         <p className="text-muted-foreground">No {field.name}</p>
-        <p className="text-muted-foreground text-sm ml-1">
-          {count.toLocaleString()}
-        </p>
-      </div>
-    );
-  }
-
-  if (userQuery.isPending) {
-    return (
-      <div className="flex flex-row gap-2 items-center">
-        <Spinner className="size-5" />
-        <p className="text-muted-foreground">Loading...</p>
         <p className="text-muted-foreground text-sm ml-1">
           {count.toLocaleString()}
         </p>

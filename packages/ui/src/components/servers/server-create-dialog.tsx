@@ -42,7 +42,7 @@ export const ServerCreateDialog = ({
           <DialogTitle>Add a server</DialogTitle>
           <DialogDescription>Add a custom server to login to</DialogDescription>
         </DialogHeader>
-        <div className="flex-grow space-y-2 py-2 pb-4">
+        <div className="grow space-y-2 py-2 pb-4">
           <Label>Server URL</Label>
           <Input
             placeholder="https://us.colanode.com/config"

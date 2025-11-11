@@ -1,14 +1,10 @@
 import { LocalChannelNode } from '@colanode/client/types';
 import { ChannelNotFound } from '@colanode/ui/components/channels/channel-not-found';
 import { ChannelSettings } from '@colanode/ui/components/channels/channel-settings';
-import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
+import { Breadcrumb } from '@colanode/ui/components/workspaces/breadcrumbs/breadcrumb';
+import { ContainerSettings } from '@colanode/ui/components/workspaces/containers/container-settings';
 import { Conversation } from '@colanode/ui/components/messages/conversation';
-import {
-  Container,
-  ContainerBody,
-  ContainerHeader,
-  ContainerSettings,
-} from '@colanode/ui/components/ui/container';
+import { NodeBreadcrumb } from '@colanode/ui/components/nodes/node-breadcrumb';
 import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
 import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
 
@@ -32,20 +28,18 @@ export const ChannelContainer = ({ channelId }: ChannelContainerProps) => {
   const { node: channel, role } = data;
 
   return (
-    <Container>
-      <ContainerHeader>
-        <ContainerBreadcrumb breadcrumb={data.breadcrumb} />
-        <ContainerSettings>
-          <ChannelSettings channel={channel} role={role} />
-        </ContainerSettings>
-      </ContainerHeader>
-      <ContainerBody>
-        <Conversation
-          conversationId={channel.id}
-          rootId={channel.rootId}
-          role={role}
-        />
-      </ContainerBody>
-    </Container>
+    <>
+      <Breadcrumb>
+        <NodeBreadcrumb breadcrumb={data.breadcrumb} />
+      </Breadcrumb>
+      <ContainerSettings>
+        <ChannelSettings channel={channel} role={role} />
+      </ContainerSettings>
+      <Conversation
+        conversationId={channel.id}
+        rootId={channel.rootId}
+        role={role}
+      />
+    </>
   );
 };

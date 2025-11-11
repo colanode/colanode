@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import {
@@ -11,7 +12,6 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -27,7 +27,7 @@ export const DatabaseDeleteDialog = ({
   onOpenChange,
 }: DatabaseDeleteDialogProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   return (
@@ -52,12 +52,14 @@ export const DatabaseDeleteDialog = ({
                 input: {
                   type: 'database.delete',
                   databaseId,
-                  accountId: workspace.accountId,
-                  workspaceId: workspace.id,
+                  userId: workspace.userId,
                 },
                 onSuccess() {
                   onOpenChange(false);
-                  layout.close(databaseId);
+                  navigate({
+                    to: '/',
+                    replace: true,
+                  });
                 },
                 onError(error) {
                   toast.error(error.message);

@@ -4,8 +4,7 @@ export type NodeReactionListQueryInput = {
   type: 'node.reaction.list';
   nodeId: string;
   reaction: string;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   page: number;
   count: number;
 };

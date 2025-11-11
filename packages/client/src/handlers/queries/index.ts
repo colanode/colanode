@@ -2,10 +2,9 @@ import { QueryHandler } from '@colanode/client/lib/types';
 import { QueryMap } from '@colanode/client/queries';
 import { AppService } from '@colanode/client/services/app-service';
 
-import { AccountGetQueryHandler } from './accounts/account-get';
-import { AccountMetadataListQueryHandler } from './accounts/account-metadata-list';
 import { AccountListQueryHandler } from './accounts/accounts-list';
-import { AppMetadataListQueryHandler } from './apps/app-metadata-list';
+import { MetadataListQueryHandler } from './apps/metadata-list';
+import { TabsListQueryHandler } from './apps/tabs-list';
 import { AvatarGetQueryHandler } from './avatars/avatar-get';
 import { ChatListQueryHandler } from './chats/chat-list';
 import { DatabaseListQueryHandler } from './databases/database-list';
@@ -19,13 +18,12 @@ import { EmojiGetBySkinIdQueryHandler } from './emojis/emoji-get-by-skin-id';
 import { EmojiListQueryHandler } from './emojis/emoji-list';
 import { EmojiSearchQueryHandler } from './emojis/emoji-search';
 import { EmojiSvgGetQueryHandler } from './emojis/emoji-svg-get';
-import { DownloadListManualQueryHandler } from './files/download-list-manual';
+import { DownloadListQueryHandler } from './files/download-list';
 import { FileDownloadRequestGetQueryHandler } from './files/file-download-request-get';
 import { FileListQueryHandler } from './files/file-list';
 import { LocalFileGetQueryHandler } from './files/local-file-get';
-import { TempFileGetQueryHandler } from './files/temp-file-get';
+import { TempFileListQueryHandler } from './files/temp-file-list';
 import { UploadListQueryHandler } from './files/upload-list';
-import { UploadListPendingQueryHandler } from './files/upload-list-pending';
 import { IconCategoryListQueryHandler } from './icons/icon-category-list';
 import { IconListQueryHandler } from './icons/icon-list';
 import { IconSearchQueryHandler } from './icons/icon-search';
@@ -42,13 +40,10 @@ import { RecordListQueryHandler } from './records/record-list';
 import { RecordSearchQueryHandler } from './records/record-search';
 import { ServerListQueryHandler } from './servers/server-list';
 import { SpaceListQueryHandler } from './spaces/space-list';
-import { UserGetQueryHandler } from './users/user-get';
 import { UserListQueryHandler } from './users/user-list';
 import { UserSearchQueryHandler } from './users/user-search';
 import { UserStorageGetQueryHandler } from './users/user-storage-get';
-import { WorkspaceGetQueryHandler } from './workspaces/workspace-get';
 import { WorkspaceListQueryHandler } from './workspaces/workspace-list';
-import { WorkspaceMetadataListQueryHandler } from './workspaces/workspace-metadata-list';
 import { WorkspaceStorageGetQueryHandler } from './workspaces/workspace-storage-get';
 
 export type QueryHandlerMap = {
@@ -57,7 +52,7 @@ export type QueryHandlerMap = {
 
 export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
   return {
-    'app.metadata.list': new AppMetadataListQueryHandler(app),
+    'metadata.list': new MetadataListQueryHandler(app),
     'avatar.get': new AvatarGetQueryHandler(app),
     'account.list': new AccountListQueryHandler(app),
     'message.list': new MessageListQueryHandler(app),
@@ -67,7 +62,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'node.tree.get': new NodeTreeGetQueryHandler(app),
     'record.list': new RecordListQueryHandler(app),
     'record.field.value.count': new RecordFieldValueCountQueryHandler(app),
-    'server.list': new ServerListQueryHandler(app),
     'user.search': new UserSearchQueryHandler(app),
     'workspace.list': new WorkspaceListQueryHandler(app),
     'user.list': new UserListQueryHandler(app),
@@ -82,28 +76,24 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'icon.category.list': new IconCategoryListQueryHandler(app),
     'node.children.get': new NodeChildrenGetQueryHandler(app),
     'radar.data.get': new RadarDataGetQueryHandler(app),
-    'account.get': new AccountGetQueryHandler(app),
-    'workspace.get': new WorkspaceGetQueryHandler(app),
     'database.list': new DatabaseListQueryHandler(app),
     'database.view.list': new DatabaseViewListQueryHandler(app),
     'record.search': new RecordSearchQueryHandler(app),
-    'user.get': new UserGetQueryHandler(app),
     'user.storage.get': new UserStorageGetQueryHandler(app),
     'local.file.get': new LocalFileGetQueryHandler(app),
     'file.download.request.get': new FileDownloadRequestGetQueryHandler(app),
     'chat.list': new ChatListQueryHandler(app),
     'space.list': new SpaceListQueryHandler(app),
-    'workspace.metadata.list': new WorkspaceMetadataListQueryHandler(app),
     'document.get': new DocumentGetQueryHandler(app),
     'document.state.get': new DocumentStateGetQueryHandler(app),
     'document.updates.list': new DocumentUpdatesListQueryHandler(app),
-    'account.metadata.list': new AccountMetadataListQueryHandler(app),
     'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
     'upload.list': new UploadListQueryHandler(app),
-    'upload.list.pending': new UploadListPendingQueryHandler(app),
-    'download.list.manual': new DownloadListManualQueryHandler(app),
-    'temp.file.get': new TempFileGetQueryHandler(app),
+    'download.list': new DownloadListQueryHandler(app),
+    'temp.file.list': new TempFileListQueryHandler(app),
     'icon.svg.get': new IconSvgGetQueryHandler(app),
     'emoji.svg.get': new EmojiSvgGetQueryHandler(app),
+    'tabs.list': new TabsListQueryHandler(app),
+    'server.list': new ServerListQueryHandler(app),
   };
 };

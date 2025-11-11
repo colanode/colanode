@@ -23,7 +23,7 @@ export class WorkspaceStorageGetQueryHandler
   public async handleQuery(
     input: WorkspaceStorageGetQueryInput
   ): Promise<WorkspaceStorageGetOutput> {
-    return this.fetchWorkspaceStorage(input.accountId, input.workspaceId);
+    return this.fetchWorkspaceStorage(input.userId);
   }
 
   public async checkForChanges(
@@ -33,13 +33,9 @@ export class WorkspaceStorageGetQueryHandler
   ): Promise<ChangeCheckResult<WorkspaceStorageGetQueryInput>> {
     if (
       event.type === 'workspace.created' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
-      const result = await this.fetchWorkspaceStorage(
-        input.accountId,
-        input.workspaceId
-      );
+      const result = await this.fetchWorkspaceStorage(input.userId);
 
       return {
         hasChanges: true,
@@ -49,8 +45,7 @@ export class WorkspaceStorageGetQueryHandler
 
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -64,17 +59,16 @@ export class WorkspaceStorageGetQueryHandler
   }
 
   private async fetchWorkspaceStorage(
-    accountId: string,
-    workspaceId: string
+    userId: string
   ): Promise<WorkspaceStorageGetOutput> {
-    const workspace = this.getWorkspace(accountId, workspaceId);
+    const workspace = this.getWorkspace(userId);
     if (!workspace) {
       return EMPTY_STORAGE_OUTPUT;
     }
 
     try {
       const response = await workspace.account.client
-        .get(`v1/workspaces/${workspace.id}/storage`)
+        .get(`v1/workspaces/${workspace.workspaceId}/storage`)
         .json<WorkspaceStorageGetOutput>();
 
       return response;

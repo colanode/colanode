@@ -4,6 +4,7 @@ import {
   DocumentUpdateMutationInput,
   DocumentUpdateMutationOutput,
 } from '@colanode/client/mutations';
+import { decodeState } from '@colanode/crdt';
 
 export class DocumentUpdateMutationHandler
   extends WorkspaceMutationHandlerBase
@@ -12,8 +13,11 @@ export class DocumentUpdateMutationHandler
   async handleMutation(
     input: DocumentUpdateMutationInput
   ): Promise<DocumentUpdateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
-    await workspace.documents.updateDocument(input.documentId, input.update);
+    const workspace = this.getWorkspace(input.userId);
+    await workspace.documents.updateDocument(
+      input.documentId,
+      decodeState(input.update)
+    );
 
     return {
       success: true,

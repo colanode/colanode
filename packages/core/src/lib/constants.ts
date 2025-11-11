@@ -22,3 +22,5 @@ export const EditorNodeTypes = {
 };
 
 export type SortDirection = 'asc' | 'desc';
+
+export const ZOD_TEXT_DESCRIPTION = 'text';

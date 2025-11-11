@@ -26,8 +26,7 @@ export class MessageListQueryHandler
   ): Promise<ChangeCheckResult<MessageListQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -38,8 +37,7 @@ export class MessageListQueryHandler
     if (
       event.type === 'node.created' &&
       event.node.type === 'message' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.parentId === input.conversationId
     ) {
       const newResult = await this.handleQuery(input);
@@ -53,8 +51,7 @@ export class MessageListQueryHandler
     if (
       event.type === 'node.updated' &&
       event.node.type === 'message' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.parentId === input.conversationId
     ) {
       const message = output.find((message) => message.id === event.node.id);
@@ -76,8 +73,7 @@ export class MessageListQueryHandler
     if (
       event.type === 'node.deleted' &&
       event.node.type === 'message' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.parentId === input.conversationId
     ) {
       const message = output.find((message) => message.id === event.node.id);
@@ -99,7 +95,7 @@ export class MessageListQueryHandler
   private async fetchMesssages(
     input: MessageListQueryInput
   ): Promise<SelectNode[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const offset = (input.page - 1) * input.count;
     const messages = await workspace.database

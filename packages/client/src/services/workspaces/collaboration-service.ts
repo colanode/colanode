@@ -36,7 +36,7 @@ export class CollaborationService {
 
   public async syncServerCollaboration(collaboration: SyncCollaborationData) {
     debug(
-      `Applying server collaboration: ${collaboration.nodeId} for workspace ${this.workspace.id}`
+      `Applying server collaboration: ${collaboration.nodeId} for workspace ${this.workspace.workspaceId}`
     );
 
     const upsertedCollaboration = await this.workspace.database
@@ -88,16 +88,22 @@ export class CollaborationService {
 
       eventBus.publish({
         type: 'collaboration.deleted',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         nodeId: collaboration.nodeId,
       });
     } else {
       eventBus.publish({
         type: 'collaboration.created',
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         nodeId: collaboration.nodeId,
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
       });
     }
   }

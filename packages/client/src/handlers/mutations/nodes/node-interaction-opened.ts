@@ -22,7 +22,7 @@ export class NodeInteractionOpenedMutationHandler
   async handleMutation(
     input: NodeInteractionOpenedMutationInput
   ): Promise<NodeInteractionOpenedMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const node = await fetchNode(workspace.database, input.nodeId);
     if (!node) {
@@ -123,8 +123,11 @@ export class NodeInteractionOpenedMutationHandler
 
     eventBus.publish({
       type: 'node.interaction.updated',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
+      workspace: {
+        workspaceId: workspace.workspaceId,
+        userId: workspace.userId,
+        accountId: workspace.accountId,
+      },
       nodeInteraction: mapNodeInteraction(createdInteraction),
     });
 

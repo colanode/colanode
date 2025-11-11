@@ -14,7 +14,7 @@ export class PageUpdateMutationHandler
   async handleMutation(
     input: PageUpdateMutationInput
   ): Promise<PageUpdateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const result = await workspace.nodes.updateNode<PageAttributes>(
       input.pageId,

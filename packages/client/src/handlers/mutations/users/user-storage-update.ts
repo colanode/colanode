@@ -15,7 +15,7 @@ export class UserStorageUpdateMutationHandler
   async handleMutation(
     input: UserStorageUpdateMutationInput
   ): Promise<UserStorageUpdateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     try {
       const body: UserStorageUpdateInput = {
@@ -24,9 +24,12 @@ export class UserStorageUpdateMutationHandler
       };
 
       const output = await workspace.account.client
-        .patch(`v1/workspaces/${workspace.id}/users/${input.userId}/storage`, {
-          json: body,
-        })
+        .patch(
+          `v1/workspaces/${workspace.workspaceId}/users/${input.userId}/storage`,
+          {
+            json: body,
+          }
+        )
         .json<UserOutput>();
 
       await workspace.users.upsert(output);

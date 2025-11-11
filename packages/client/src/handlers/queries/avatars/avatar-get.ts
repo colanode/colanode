@@ -19,29 +19,21 @@ export class AvatarGetQueryHandler
       return null;
     }
 
-    return account.avatars.getAvatar(input.avatarId, true);
+    return this.app.assets.getAvatar(account.id, input.avatarId, true);
   }
 
   public async checkForChanges(
     event: Event,
     input: AvatarGetQueryInput
   ): Promise<ChangeCheckResult<AvatarGetQueryInput>> {
-    if (
-      event.type === 'avatar.created' &&
-      event.accountId === input.accountId &&
-      event.avatar.id === input.avatarId
-    ) {
+    if (event.type === 'avatar.created' && event.avatar.id === input.avatarId) {
       return {
         hasChanges: true,
         result: event.avatar,
       };
     }
 
-    if (
-      event.type === 'avatar.deleted' &&
-      event.accountId === input.accountId &&
-      event.avatar.id === input.avatarId
-    ) {
+    if (event.type === 'avatar.deleted' && event.avatar.id === input.avatarId) {
       return {
         hasChanges: true,
         result: null,

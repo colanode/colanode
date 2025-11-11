@@ -1,7 +1,7 @@
 import { TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { ServerDetails } from '@colanode/client/types';
+import { Server } from '@colanode/client/types';
 import { formatDate, isColanodeServer, timeAgo } from '@colanode/core';
 import { ServerAvatar } from '@colanode/ui/components/servers/server-avatar';
 import { Badge } from '@colanode/ui/components/ui/badge';
@@ -23,7 +23,7 @@ import { cn } from '@colanode/ui/lib/utils';
 interface ServerSettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  server: ServerDetails;
+  server: Server;
   onDelete: () => void;
 }
 

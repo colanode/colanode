@@ -22,8 +22,7 @@ export const MessageList = () => {
   }).map((_, i) => ({
     type: 'message.list',
     conversationId: conversation.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     page: i + 1,
     count: MESSAGES_PER_PAGE,
   }));
@@ -77,11 +76,11 @@ export const MessageList = () => {
           <Fragment key={message.id}>
             {showDate && (
               <div className="relative flex items-center py-1">
-                <div className="flex-grow border-t border-muted" />
-                <span className="mx-4 flex-shrink text-xs text-muted-foreground">
+                <div className="grow border-t border-muted" />
+                <span className="mx-4 shrink text-xs text-muted-foreground">
                   {currentMessageDate.toDateString()}
                 </span>
-                <div className="flex-grow border-t border-muted" />
+                <div className="grow border-t border-muted" />
               </div>
             )}
             <Message message={message} previousMessage={previousMessage} />

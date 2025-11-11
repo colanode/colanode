@@ -3,13 +3,12 @@ import { useDrag } from 'react-dnd';
 
 import { FieldValue } from '@colanode/core';
 import { RecordFieldValue } from '@colanode/ui/components/records/record-field-value';
+import { Link } from '@colanode/ui/components/ui/link';
 import { useBoardView } from '@colanode/ui/contexts/board-view';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useRecord } from '@colanode/ui/contexts/record';
 
 export const BoardViewRecordCard = () => {
-  const layout = useLayout();
   const view = useDatabaseView();
   const boardView = useBoardView();
   const record = useRecord();
@@ -35,28 +34,31 @@ export const BoardViewRecordCard = () => {
       role="presentation"
       key={record.id}
       className="animate-fade-in flex cursor-pointer flex-col gap-1 rounded-md border p-2 text-left hover:bg-accent"
-      onClick={() => {
-        layout.previewLeft(record.id, true);
-      }}
     >
-      <p className={hasName ? '' : 'text-muted-foreground'}>
-        {hasName ? name : 'Unnamed'}
-      </p>
-      {view.fields.length > 0 && (
-        <div className="flex flex-col gap-1 mt-2">
-          {view.fields.map((viewField) => {
-            if (!viewField.display) {
-              return null;
-            }
+      <Link
+        from="/workspace/$userId"
+        to="$nodeId"
+        params={{ nodeId: record.id }}
+      >
+        <p className={hasName ? '' : 'text-muted-foreground'}>
+          {hasName ? name : 'Unnamed'}
+        </p>
+        {view.fields.length > 0 && (
+          <div className="flex flex-col gap-1 mt-2">
+            {view.fields.map((viewField) => {
+              if (!viewField.display) {
+                return null;
+              }
 
-            return (
-              <div key={viewField.field.id}>
-                <RecordFieldValue field={viewField.field} readOnly={true} />
-              </div>
-            );
-          })}
-        </div>
-      )}
+              return (
+                <div key={viewField.field.id}>
+                  <RecordFieldValue field={viewField.field} readOnly={true} />
+                </div>
+              );
+            })}
+          </div>
+        )}
+      </Link>
     </div>
   );
 };

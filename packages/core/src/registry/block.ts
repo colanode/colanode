@@ -1,10 +1,10 @@
 import { z } from 'zod/v4';
 
-import { ZodText } from '@colanode/core/registry/zod';
+import { ZOD_TEXT_DESCRIPTION } from '@colanode/core/lib/constants';
 
 export const blockLeafSchema = z.object({
   type: z.string(),
-  text: new ZodText().nullable().optional(),
+  text: z.string().nullable().optional().describe(ZOD_TEXT_DESCRIPTION),
   attrs: z.record(z.string(), z.any()).nullable().optional(),
   marks: z
     .array(
