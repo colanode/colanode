@@ -12,6 +12,7 @@ export const defaultIcons = {
   bookmark: '01jhzfk3g4q40x7927qcm0hrjdic',
   folder: '01jhzfk3jrgc276z2gdabm4cwmic',
   apps: '01jhzfk4m7djqd1pw0e1671cmric',
+  login: '01jhzfk4ppvzdambh6hyw0mv91ic',
   logout: '01jhzfk4pv13qxjprqgqfeqp73ic',
   settings: '01jhzfk4ra4fvcay6qgrydgsf5ic',
   appearance: '01jhzfk39qxa7xtr7z69fyrb2pic',

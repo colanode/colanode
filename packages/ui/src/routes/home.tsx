@@ -17,6 +17,6 @@ export const homeRoute = createRoute({
       });
     }
 
-    throw redirect({ to: '/login', replace: true });
+    throw redirect({ to: '/auth/login', replace: true });
   },
 });

@@ -121,7 +121,7 @@ export const SidebarSettings = () => {
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
         <Separator className="my-2" />
-        <Link from="/workspace/$userId" to="account/logout">
+        <Link from="/workspace/$userId" to="logout">
           {({ isActive }) => (
             <SidebarSettingsItem
               title="Logout"

@@ -120,7 +120,7 @@ export function SidebarMenuFooter() {
         <DropdownMenuItem
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
           onClick={() => {
-            navigate({ to: '/login' });
+            navigate({ to: '/auth/login' });
           }}
         >
           <Plus className="size-4" />

@@ -113,8 +113,8 @@ export const accountSettingsRouteMask = createRouteMask({
 
 export const accountLogoutRouteMask = createRouteMask({
   routeTree: routeTree,
-  from: '/workspace/$userId/account/logout',
-  to: '/$workspaceId/account/logout',
+  from: '/workspace/$userId/logout',
+  to: '/$workspaceId/logout',
   params: (ctx) => {
     const workspace = collections.workspaces.get(ctx.userId);
     return {
