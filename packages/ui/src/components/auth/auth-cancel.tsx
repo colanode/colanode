@@ -1,10 +1,9 @@
 import { useLiveQuery } from '@tanstack/react-db';
 import { useRouter } from '@tanstack/react-router';
-import { HouseIcon } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 import { collections } from '@colanode/ui/collections';
 import { Button } from '@colanode/ui/components/ui/button';
-import { Separator } from '@colanode/ui/components/ui/separator';
 
 export const AuthCancel = () => {
   const router = useRouter();
@@ -21,22 +20,19 @@ export const AuthCancel = () => {
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <Separator className="w-full" />
-      <Button
-        variant="link"
-        className="w-full text-muted-foreground"
-        type="button"
-        onClick={() => {
-          router.navigate({
-            to: '/workspace/$userId',
-            params: { userId: workspaces[0]!.userId },
-          });
-        }}
-      >
-        <HouseIcon className="mr-1 size-4" />
-        Back to workspace
-      </Button>
-    </div>
+    <Button
+      variant="ghost"
+      size="icon"
+      className="absolute left-5 top-5"
+      type="button"
+      onClick={() => {
+        router.navigate({
+          to: '/workspace/$userId',
+          params: { userId: workspaces[0]!.userId },
+        });
+      }}
+    >
+      <ArrowLeft className="size-4" />
+    </Button>
   );
 };

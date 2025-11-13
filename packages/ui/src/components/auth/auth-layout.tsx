@@ -39,13 +39,13 @@ export const AuthLayout = () => {
         },
       }}
     >
-      <div className="flex h-screen min-h-screen w-full flex-col items-center justify-center py-12">
+      <div className="relative flex h-screen min-h-screen w-full flex-col items-center justify-center py-12">
+        <AuthCancel />
         <div className="mx-auto grid w-96 gap-10">
           <div className="flex justify-center">
             <ColanodeLogo className="w-20 h-20" />
           </div>
           <Outlet />
-          <AuthCancel />
         </div>
       </div>
     </AuthContext.Provider>
