@@ -6,7 +6,6 @@ import { LoginOutput } from '@colanode/core';
 import { LoginForm } from '@colanode/ui/components/auth/email-login-form';
 import { EmailVerifyForm } from '@colanode/ui/components/auth/email-verify-form';
 import { GoogleLogin } from '@colanode/ui/components/auth/google-login';
-import { ServerDropdown } from '@colanode/ui/components/servers/server-dropdown';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useAuth } from '@colanode/ui/contexts/auth';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -137,26 +136,20 @@ export const Login = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-2 text-center">
+    <div className="flex flex-col gap-6 w-full">
+      <div className="flex flex-col gap-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
-          {state.type === 'login' ? 'Welcome back' : 'Verify your email'}
+          {state.type === 'login'
+            ? 'Login to your account'
+            : 'Verify your email'}
         </h1>
         <p className="text-sm text-muted-foreground">
           {state.type === 'login'
-            ? 'Login to your account'
+            ? 'Enter your email and password to login to your account'
             : 'Enter the code sent to your email'}
         </p>
       </div>
       <div className="flex flex-col gap-6">
-        <ServerDropdown
-          value={auth.server?.domain ?? null}
-          onChange={(domain) => {
-            auth.setServer(domain);
-          }}
-          servers={auth.servers}
-          readonly={state.type !== 'login'}
-        />
         {state.type === 'login' && (
           <>
             <LoginForm

@@ -1,53 +1,43 @@
-import { useLiveQuery } from '@tanstack/react-db';
 import { Outlet } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { collections } from '@colanode/ui/collections';
+import { Server } from '@colanode/client/types';
 import { AuthCancel } from '@colanode/ui/components/auth/auth-cancel';
+import { AuthServer } from '@colanode/ui/components/auth/auth-server';
 import { ColanodeLogo } from '@colanode/ui/components/ui/logo';
 import { AuthContext } from '@colanode/ui/contexts/auth';
 
 export const AuthLayout = () => {
-  const serversQuery = useLiveQuery((q) =>
-    q.from({ servers: collections.servers })
-  );
-  const servers = serversQuery.data;
-
-  const [domain, setDomain] = useState<string | null>(
-    servers[0]?.domain ?? null
-  );
-
-  useEffect(() => {
-    const serverExists =
-      domain !== null && servers.some((s) => s.domain === domain);
-    if (!serverExists && servers.length > 0) {
-      setDomain(servers[0]!.domain);
-    }
-  }, [domain, servers]);
-
-  const server = domain
-    ? (servers.find((s) => s.domain === domain) ?? null)
-    : null;
+  const [server, setServer] = useState<Server | null>(null);
 
   return (
-    <AuthContext.Provider
-      value={{
-        servers,
-        server: server!,
-        setServer(domain) {
-          setDomain(domain);
-        },
-      }}
-    >
-      <div className="relative flex h-screen min-h-screen w-full flex-col items-center justify-center py-12">
-        <AuthCancel />
-        <div className="mx-auto grid w-96 gap-10">
-          <div className="flex justify-center">
-            <ColanodeLogo className="w-20 h-20" />
+    <div className="relative flex min-h-screen w-full items-center justify-center">
+      <AuthCancel />
+      <div className="flex w-full flex-col items-center justify-center gap-12 px-4 py-12 lg:flex-row lg:gap-24">
+        <div className="flex flex-col items-center justify-center bg-background px-6 py-12">
+          <div className="flex flex-col items-center gap-8 text-center">
+            <ColanodeLogo className="h-48 w-48 lg:h-64 lg:w-64" />
+            <div className="space-y-4">
+              <p className="text-4xl font-medium text-foreground lg:text-5xl">
+                Colanode
+              </p>
+              <p className="max-w-md text-base text-muted-foreground lg:text-lg">
+                Your all-in-one workspace for collaboration and productivity.
+              </p>
+            </div>
           </div>
-          <Outlet />
+        </div>
+
+        <div className="w-96 max-w-xl flex flex-col items-center justify-center bg-background">
+          {server ? (
+            <AuthContext.Provider value={{ server }}>
+              <Outlet />
+            </AuthContext.Provider>
+          ) : (
+            <AuthServer onSelect={setServer} />
+          )}
         </div>
       </div>
-    </AuthContext.Provider>
+    </div>
   );
 };

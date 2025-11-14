@@ -6,7 +6,6 @@ import { LoginOutput } from '@colanode/core';
 import { RegisterForm } from '@colanode/ui/components/auth/email-register-form';
 import { EmailVerifyForm } from '@colanode/ui/components/auth/email-verify-form';
 import { GoogleLogin } from '@colanode/ui/components/auth/google-login';
-import { ServerDropdown } from '@colanode/ui/components/servers/server-dropdown';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useAuth } from '@colanode/ui/contexts/auth';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -140,8 +139,8 @@ export const Register = () => {
   };
 
   return (
-    <div className="space-y-4">
-      <div className="grid gap-2 text-center">
+    <div className="flex flex-col gap-6 w-full">
+      <div className="flex flex-col gap-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
           {state.type === 'register'
             ? 'Create an account'
@@ -154,39 +153,27 @@ export const Register = () => {
         </p>
       </div>
       <div className="flex flex-col gap-4">
-        <ServerDropdown
-          value={auth.server?.domain ?? null}
-          onChange={(domain) => {
-            auth.setServer(domain);
-          }}
-          servers={auth.servers}
-          readonly={state.type !== 'register'}
-        />
         {state.type === 'register' && (
           <>
-            {auth.server && (
-              <>
-                <RegisterForm
-                  onSubmit={handleRegisterSubmit}
-                  isPending={isEmailRegisterPending}
-                />
-                <GoogleLogin
-                  context="register"
-                  onLogin={handleGoogleRegister}
-                  isPending={isGoogleRegisterPending}
-                />
-                <Button
-                  variant="link"
-                  className="w-full text-muted-foreground"
-                  onClick={() => {
-                    navigate({ to: '/auth/login' });
-                  }}
-                  type="button"
-                >
-                  Already have an account? Login
-                </Button>
-              </>
-            )}
+            <RegisterForm
+              onSubmit={handleRegisterSubmit}
+              isPending={isEmailRegisterPending}
+            />
+            <GoogleLogin
+              context="register"
+              onLogin={handleGoogleRegister}
+              isPending={isGoogleRegisterPending}
+            />
+            <Button
+              variant="link"
+              className="w-full text-muted-foreground"
+              onClick={() => {
+                navigate({ to: '/auth/login' });
+              }}
+              type="button"
+            >
+              Already have an account? Login
+            </Button>
           </>
         )}
         {state.type === 'verify' && (

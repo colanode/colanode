@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 import { EmailPasswordResetInitOutput } from '@colanode/core';
 import { PasswordResetCompleteForm } from '@colanode/ui/components/auth/email-password-reset-complete-form';
 import { PasswordResetInitForm } from '@colanode/ui/components/auth/email-password-reset-init-form';
-import { ServerDropdown } from '@colanode/ui/components/servers/server-dropdown';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useAuth } from '@colanode/ui/contexts/auth';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -90,7 +89,7 @@ export const Reset = () => {
   };
 
   return (
-    <div className="space-y-4">
+    <div className="flex flex-col gap-6 w-full">
       <div className="grid gap-2 text-center">
         <h1 className="text-2xl font-semibold tracking-tight">
           {state.type === 'init'
@@ -108,34 +107,22 @@ export const Reset = () => {
         </p>
       </div>
       <div className="flex flex-col gap-4">
-        <ServerDropdown
-          value={auth.server?.domain ?? null}
-          onChange={(domain) => {
-            auth.setServer(domain);
-          }}
-          servers={auth.servers}
-          readonly={state.type !== 'init'}
-        />
         {state.type === 'init' && (
           <>
-            {auth.server && (
-              <>
-                <PasswordResetInitForm
-                  onSubmit={handleInitSubmit}
-                  isPending={isPasswordResetInitPending}
-                />
-                <Button
-                  variant="link"
-                  className="w-full text-muted-foreground"
-                  onClick={() => {
-                    navigate({ to: '/auth/login' });
-                  }}
-                  type="button"
-                >
-                  Back to login
-                </Button>
-              </>
-            )}
+            <PasswordResetInitForm
+              onSubmit={handleInitSubmit}
+              isPending={isPasswordResetInitPending}
+            />
+            <Button
+              variant="link"
+              className="w-full text-muted-foreground"
+              onClick={() => {
+                navigate({ to: '/auth/login' });
+              }}
+              type="button"
+            >
+              Back to login
+            </Button>
           </>
         )}
         {state.type === 'complete' && (

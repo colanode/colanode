@@ -3,9 +3,7 @@ import { createContext, useContext } from 'react';
 import { Server } from '@colanode/client/types';
 
 export interface AuthContextValue {
-  servers: Server[];
   server: Server;
-  setServer: (domain: string) => void;
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);

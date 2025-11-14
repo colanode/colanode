@@ -1,9 +1,10 @@
 import { useLiveQuery } from '@tanstack/react-db';
 import { useRouter } from '@tanstack/react-router';
-import { ArrowLeft } from 'lucide-react';
+import { Home } from 'lucide-react';
 
 import { collections } from '@colanode/ui/collections';
 import { Button } from '@colanode/ui/components/ui/button';
+import { getDefaultWorkspaceUserId } from '@colanode/ui/routes/utils';
 
 export const AuthCancel = () => {
   const router = useRouter();
@@ -26,13 +27,18 @@ export const AuthCancel = () => {
       className="absolute left-5 top-5"
       type="button"
       onClick={() => {
+        const defaultWorkspaceUserId = getDefaultWorkspaceUserId();
+        if (!defaultWorkspaceUserId) {
+          return;
+        }
+
         router.navigate({
           to: '/workspace/$userId',
-          params: { userId: workspaces[0]!.userId },
+          params: { userId: defaultWorkspaceUserId },
         });
       }}
     >
-      <ArrowLeft className="size-4" />
+      <Home className="size-4" />
     </Button>
   );
 };
