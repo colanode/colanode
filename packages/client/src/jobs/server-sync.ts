@@ -45,7 +45,7 @@ export class ServerSyncJobHandler implements JobHandler<ServerSyncInput> {
       .filter((account) => account.server.domain === server.domain);
 
     if (accounts.length === 0) {
-      // don't sync if the server has been synced in the last day
+      // don't sync if the server has no active accounts and has been synced in the last day
       const lastSyncedAt = server.server.syncedAt;
       if (lastSyncedAt && lastSyncedAt.getTime() > Date.now() - ms('1 day')) {
         return {

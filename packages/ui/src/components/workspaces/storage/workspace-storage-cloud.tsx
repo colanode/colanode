@@ -1,6 +1,6 @@
 import { Cloud, ExternalLink } from 'lucide-react';
 
-import { isColanodeServer } from '@colanode/core';
+import { isColanodeDomain } from '@colanode/core';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useServer } from '@colanode/ui/contexts/server';
 
@@ -8,7 +8,7 @@ const CLOUD_URL = 'https://cloud.colanode.com';
 
 export const WorkspaceStorageCloud = () => {
   const server = useServer();
-  if (!isColanodeServer(server.domain)) {
+  if (!isColanodeDomain(server.domain)) {
     return null;
   }
 

@@ -14,7 +14,7 @@ import {
   extractFileSubtype,
   generateId,
   IdType,
-  isColanodeServer,
+  isColanodeDomain,
 } from '@colanode/core';
 import {
   BroadcastInitMessage,
@@ -78,9 +78,8 @@ navigator.locks.request('colanode', async () => {
   await app.metadata.set('app', 'version', build.version);
   await app.metadata.set('app', 'platform', appMeta.platform);
 
-  // if the window's domain is Colanode hosted, add the default servers
   const domain = self.location.hostname;
-  if (isColanodeServer(domain)) {
+  if (isColanodeDomain(domain)) {
     await app.createServer(new URL('https://eu.colanode.com/config'));
     await app.createServer(new URL('https://us.colanode.com/config'));
   }

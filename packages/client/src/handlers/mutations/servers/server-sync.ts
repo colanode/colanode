@@ -28,7 +28,7 @@ export class ServerSyncMutationHandler
       );
     }
 
-    // don't sync if the server has been synced in the last 1 minute
+    // no need to sync if the server has been synced in the last minute
     const lastSyncedAt = server.server.syncedAt;
     if (lastSyncedAt && lastSyncedAt.getTime() > Date.now() - ms('1 minute')) {
       return {

@@ -15,8 +15,8 @@ interface ServerCardProps {
 }
 
 export const ServerCard = ({ server, onSelect }: ServerCardProps) => {
-  const [settingsOpen, setSettingsOpen] = useState(false);
-  const [deleteOpen, setDeleteOpen] = useState(false);
+  const [openSettings, setOpenSettings] = useState(false);
+  const [openDelete, setOpenDelete] = useState(false);
   const { mutate: syncServer, isPending: isSyncing } = useMutation();
 
   const handleServerClick = () => {
@@ -58,7 +58,7 @@ export const ServerCard = ({ server, onSelect }: ServerCardProps) => {
           onClick={(e) => {
             e.stopPropagation();
             e.preventDefault();
-            setSettingsOpen(true);
+            setOpenSettings(true);
           }}
         >
           {isSyncing ? (
@@ -70,17 +70,17 @@ export const ServerCard = ({ server, onSelect }: ServerCardProps) => {
       </button>
       <ServerSettingsDialog
         server={server}
-        open={settingsOpen}
-        onOpenChange={setSettingsOpen}
+        open={openSettings}
+        onOpenChange={setOpenSettings}
         onDelete={() => {
-          setSettingsOpen(false);
-          setDeleteOpen(true);
+          setOpenSettings(false);
+          setOpenDelete(true);
         }}
       />
       <ServerDeleteDialog
         server={server}
-        open={deleteOpen}
-        onOpenChange={setDeleteOpen}
+        open={openDelete}
+        onOpenChange={setOpenDelete}
       />
     </>
   );

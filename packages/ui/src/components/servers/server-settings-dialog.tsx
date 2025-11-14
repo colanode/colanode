@@ -2,7 +2,7 @@ import { TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 import { Server } from '@colanode/client/types';
-import { formatDate, isColanodeServer, timeAgo } from '@colanode/core';
+import { formatDate, isColanodeDomain, timeAgo } from '@colanode/core';
 import { ServerAvatar } from '@colanode/ui/components/servers/server-avatar';
 import { Badge } from '@colanode/ui/components/ui/badge';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -45,7 +45,7 @@ export const ServerSettingsDialog = ({
     return () => clearInterval(interval);
   }, [open]);
 
-  const canDelete = !isColanodeServer(server.domain);
+  const canDelete = !isColanodeDomain(server.domain);
   const isAvailable = server.state?.isAvailable ?? false;
   const isOutdated = server.isOutdated;
 
