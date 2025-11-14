@@ -34,7 +34,7 @@ export const AuthServer = ({ onSelect }: AuthServerProps) => {
           <button
             key={server.domain}
             onClick={() => onSelect(server)}
-            className="group/server relative flex w-full flex-row items-center gap-3 rounded-lg border border-border/60 bg-background p-3 text-left transition-all hover:cursor-pointer hover:border-border hover:bg-accent hover:shadow-md"
+            className="group/server relative flex w-full flex-row items-center gap-3 rounded-lg border border-border/60 bg-background p-2 text-left transition-all hover:cursor-pointer hover:border-border hover:bg-accent hover:shadow-md"
           >
             <ServerAvatar
               url={server.avatar}
