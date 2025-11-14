@@ -16,8 +16,10 @@ export const AuthLayout = () => {
       <div className="w-full flex lg:flex-row flex-col items-center justify-center lg:gap-40 gap-20">
         <div className="flex flex-col items-center justify-center bg-background px-6 py-12">
           <div className="flex flex-row items-center">
-            <ColanodeLogo className="size-16 lg:size-50" />
-            <p className="font-antonio text-3xl">
+            <div className="logo-draw-animation">
+              <ColanodeLogo className="size-16 lg:size-50" />
+            </div>
+            <p className="font-satoshi text-3xl tracking-tight">
               Your all-in-one <br /> collaboration platform
             </p>
           </div>
