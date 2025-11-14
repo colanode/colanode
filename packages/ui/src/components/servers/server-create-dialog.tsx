@@ -59,7 +59,7 @@ export const ServerCreateDialog = ({ onCancel }: ServerCreateDialogProps) => {
                   url,
                 },
                 onSuccess() {
-                  toast.success('Server added successfully');
+                  setOpen(false);
                 },
                 onError(error) {
                   toast.error(error.message);
