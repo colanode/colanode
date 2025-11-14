@@ -1,17 +1,16 @@
 import { createRouter } from '@tanstack/react-router';
 
+import { authRoute } from '@colanode/ui/routes/auth';
+import { loginRoute } from '@colanode/ui/routes/auth/login';
+import { registerRoute } from '@colanode/ui/routes/auth/register';
+import { resetRoute } from '@colanode/ui/routes/auth/reset';
 import { workspaceCreateRoute } from '@colanode/ui/routes/create';
 import { homeRoute } from '@colanode/ui/routes/home';
-import { loginRoute } from '@colanode/ui/routes/login';
 import { rootRoute } from '@colanode/ui/routes/root';
 import {
   workspaceRoute,
   workspaceMaskRoute,
 } from '@colanode/ui/routes/workspace';
-import {
-  accountLogoutMaskRoute,
-  accountLogoutRoute,
-} from '@colanode/ui/routes/workspace/account-logout';
 import {
   accountSettingsMaskRoute,
   accountSettingsRoute,
@@ -28,6 +27,10 @@ import {
   workspaceHomeMaskRoute,
   workspaceHomeRoute,
 } from '@colanode/ui/routes/workspace/home';
+import {
+  logoutMaskRoute,
+  logoutRoute,
+} from '@colanode/ui/routes/workspace/logout';
 import { nodeMaskRoute, nodeRoute } from '@colanode/ui/routes/workspace/node';
 import {
   workspaceRedirectMaskRoute,
@@ -52,7 +55,7 @@ import {
 
 export const routeTree = rootRoute.addChildren([
   homeRoute,
-  loginRoute,
+  authRoute.addChildren([loginRoute, registerRoute, resetRoute]),
   workspaceCreateRoute,
   workspaceRoute.addChildren([
     workspaceRedirectRoute,
@@ -64,7 +67,7 @@ export const routeTree = rootRoute.addChildren([
     workspaceUsersRoute,
     workspaceSettingsRoute,
     accountSettingsRoute,
-    accountLogoutRoute,
+    logoutRoute,
     appAppearanceRoute,
   ]),
   workspaceMaskRoute.addChildren([
@@ -77,7 +80,7 @@ export const routeTree = rootRoute.addChildren([
     workspaceUploadsMaskRoute,
     workspaceDownloadsMaskRoute,
     accountSettingsMaskRoute,
-    accountLogoutMaskRoute,
+    logoutMaskRoute,
     appAppearanceMaskRoute,
   ]),
 ]);

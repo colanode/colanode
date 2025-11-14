@@ -52,7 +52,7 @@ export class TokenDeleteJobHandler implements JobHandler<TokenDeleteInput> {
     }
 
     try {
-      await this.app.client.delete(`${server.httpBaseUrl}/v1/accounts/logout`, {
+      await this.app.client.delete(`${server.httpBaseUrl}/v1/auth/logout`, {
         headers: {
           Authorization: `Bearer ${input.token}`,
         },
