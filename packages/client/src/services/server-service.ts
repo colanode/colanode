@@ -97,7 +97,7 @@ export class ServerService {
     await this.app.jobs.triggerJobSchedule(scheduleId);
   }
 
-  public async sync() {
+  public async sync(): Promise<boolean> {
     const config = await ServerService.fetchServerConfig(this.configUrl);
     if (config) {
       const attributes: ServerAttributes = {
@@ -158,6 +158,8 @@ export class ServerService {
       type: 'server.updated',
       server: this.server,
     });
+
+    return isAvailable;
   }
 
   public static async fetchServerConfig(configUrl: URL | string) {

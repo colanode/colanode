@@ -67,6 +67,7 @@ export * from './users/users-create';
 export * from './files/temp-file-create';
 export * from './apps/tab-create';
 export * from './apps/tab-update';
+export * from './servers/server-sync';
 export * from './apps/tab-delete';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type

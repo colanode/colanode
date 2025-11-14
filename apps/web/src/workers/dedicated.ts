@@ -9,7 +9,13 @@ import {
 import { QueryInput, QueryMap } from '@colanode/client/queries';
 import { AppMeta, AppService } from '@colanode/client/services';
 import { AppInitOutput } from '@colanode/client/types';
-import { build, extractFileSubtype, generateId, IdType } from '@colanode/core';
+import {
+  build,
+  extractFileSubtype,
+  generateId,
+  IdType,
+  isColanodeDomain,
+} from '@colanode/core';
 import {
   BroadcastInitMessage,
   BroadcastMessage,
@@ -71,6 +77,12 @@ navigator.locks.request('colanode', async () => {
 
   await app.metadata.set('app', 'version', build.version);
   await app.metadata.set('app', 'platform', appMeta.platform);
+
+  const domain = self.location.hostname;
+  if (isColanodeDomain(domain)) {
+    await app.createServer(new URL('https://eu.colanode.com/config'));
+    await app.createServer(new URL('https://us.colanode.com/config'));
+  }
 
   appInitOutput = 'success';
 
