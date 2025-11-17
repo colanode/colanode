@@ -49,7 +49,7 @@ export class CollaborationSynchronizer extends BaseSynchronizer<SyncCollaboratio
         .where('collaborator_id', '=', this.user.userId)
         .where('revision', '>', this.cursor)
         .orderBy('revision', 'asc')
-        .limit(50)
+        .limit(100)
         .execute();
 
       return collaborations;

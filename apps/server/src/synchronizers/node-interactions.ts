@@ -50,7 +50,7 @@ export class NodeInteractionSynchronizer extends BaseSynchronizer<SyncNodeIntera
         .where('root_id', '=', this.input.rootId)
         .where('revision', '>', this.cursor)
         .orderBy('revision', 'asc')
-        .limit(20)
+        .limit(100)
         .execute();
 
       return nodeInteractions;
