@@ -29,10 +29,10 @@ export const FileBlock = ({ id }: FileBlockProps) => {
   if (canPreview) {
     return (
       <Link
-        from="/workspace/$userId"
-        to="$nodeId"
-        params={{ nodeId: id }}
-        className="flex h-72 max-h-72 max-w-128 w-full cursor-pointer overflow-hidden rounded-md p-2 hover:bg-muted/50"
+        from="/workspace/$userId/$nodeId"
+        to="modal/$modalNodeId"
+        params={{ modalNodeId: id }}
+        className="flex h-72 max-h-72 max-w-lg w-full cursor-pointer overflow-hidden rounded-md p-2 hover:bg-muted/50 items-center justify-center"
       >
         <FilePreview file={file} />
       </Link>
@@ -41,9 +41,9 @@ export const FileBlock = ({ id }: FileBlockProps) => {
 
   return (
     <Link
-      from="/workspace/$userId"
-      to="$nodeId"
-      params={{ nodeId: id }}
+      from="/workspace/$userId/$nodeId"
+      to="modal/$modalNodeId"
+      params={{ modalNodeId: id }}
       className="flex flex-row gap-4 items-center w-full cursor-pointer overflow-hidden rounded-md p-2 pl-0 hover:bg-accent"
     >
       <FileIcon mimeType={file.attributes.mimeType} className="size-10" />

@@ -24,16 +24,16 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
     autoDownload: isReady,
   });
 
-  if (!isReady) {
-    return <FileNotUploaded mimeType={file.attributes.mimeType} />;
-  }
-
   if (localFileQuery.isPending) {
     return null;
   }
 
   const localFile = localFileQuery.data;
   if (!localFile) {
+    if (!isReady) {
+      return <FileNotUploaded mimeType={file.attributes.mimeType} />;
+    }
+
     return <FileNoPreview mimeType={file.attributes.mimeType} />;
   }
 

@@ -44,13 +44,6 @@ export class TokenDeleteJobHandler implements JobHandler<TokenDeleteInput> {
       };
     }
 
-    if (!server.isAvailable) {
-      return {
-        type: 'retry',
-        delay: ms('1 minute'),
-      };
-    }
-
     try {
       await this.app.client.delete(`${server.httpBaseUrl}/v1/auth/logout`, {
         headers: {

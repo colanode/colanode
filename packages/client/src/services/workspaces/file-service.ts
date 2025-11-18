@@ -44,11 +44,11 @@ export class FileService {
     this.filesDir = this.workspace.account.app.path.workspaceFiles(
       this.workspace.userId
     );
-
-    this.app.fs.makeDirectory(this.filesDir);
   }
 
   public async init(): Promise<void> {
+    await this.app.fs.makeDirectory(this.filesDir);
+
     // if the download was interrupted, we need to reset the status on app start
     await this.workspace.database
       .updateTable('downloads')
@@ -258,7 +258,8 @@ export class FileService {
       .executeTakeFirst();
 
     if (updatedLocalFile) {
-      const url = await this.app.fs.url(updatedLocalFile.path);
+      const exists = await this.app.fs.exists(updatedLocalFile.path);
+      const url = exists ? await this.app.fs.url(updatedLocalFile.path) : null;
       return mapLocalFile(updatedLocalFile, url);
     }
 
