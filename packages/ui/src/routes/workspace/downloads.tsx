@@ -1,7 +1,6 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
 import { WorkspaceDownloadsContainer } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-container';
-import { WorkspaceDownloadsHeader } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-header';
 import { WorkspaceDownloadsTab } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
@@ -16,7 +15,6 @@ export const workspaceDownloadsRoute = createRoute({
   context: () => {
     return {
       tab: <WorkspaceDownloadsTab />,
-      header: <WorkspaceDownloadsHeader />,
     };
   },
 });

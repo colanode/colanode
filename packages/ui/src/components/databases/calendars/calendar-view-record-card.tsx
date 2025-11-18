@@ -12,9 +12,9 @@ export const CalendarViewRecordCard = () => {
 
   return (
     <Link
-      from="/workspace/$userId"
-      to="$nodeId"
-      params={{ nodeId: record.id }}
+      from="/workspace/$userId/$nodeId"
+      to="modal/$modalNodeId"
+      params={{ modalNodeId: record.id }}
       key={record.id}
       className="animate-fade-in flex justify-start items-start cursor-pointer flex-col gap-1 rounded-md border p-1 pl-2 hover:bg-accent"
     >

@@ -14,11 +14,11 @@ import {
 import {
   accountSettingsMaskRoute,
   accountSettingsRoute,
-} from '@colanode/ui/routes/workspace/account-settings';
+} from '@colanode/ui/routes/workspace/account';
 import {
   appAppearanceMaskRoute,
   appAppearanceRoute,
-} from '@colanode/ui/routes/workspace/app-appearance';
+} from '@colanode/ui/routes/workspace/appearance';
 import {
   workspaceDownloadsMaskRoute,
   workspaceDownloadsRoute,
@@ -31,6 +31,7 @@ import {
   logoutMaskRoute,
   logoutRoute,
 } from '@colanode/ui/routes/workspace/logout';
+import { modalNodeRoute } from '@colanode/ui/routes/workspace/modal';
 import { nodeMaskRoute, nodeRoute } from '@colanode/ui/routes/workspace/node';
 import {
   workspaceRedirectMaskRoute,
@@ -60,7 +61,7 @@ export const routeTree = rootRoute.addChildren([
   workspaceRoute.addChildren([
     workspaceRedirectRoute,
     workspaceHomeRoute,
-    nodeRoute,
+    nodeRoute.addChildren([modalNodeRoute]),
     workspaceDownloadsRoute,
     workspaceUploadsRoute,
     workspaceStorageRoute,

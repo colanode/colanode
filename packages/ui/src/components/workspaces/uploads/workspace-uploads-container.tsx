@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { UploadListQueryInput } from '@colanode/client/queries';
+import { Container } from '@colanode/ui/components/layouts/containers/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { WorkspaceUploadFile } from '@colanode/ui/components/workspaces/uploads/workspace-upload-file';
+import { WorkspaceUploadsBreadcrumb } from '@colanode/ui/components/workspaces/uploads/workspace-uploads-breadcrumb';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
@@ -29,26 +31,28 @@ export const WorkspaceUploadsContainer = () => {
   const hasMore = !isPending && uploads.length === lastPage * UPLOADS_PER_PAGE;
 
   return (
-    <div className="overflow-y-auto">
-      <div className="max-w-4xl space-y-10">
-        <div>
-          <h2 className="text-2xl font-semibold tracking-tight">Uploads</h2>
-          <Separator className="mt-3" />
+    <Container type="full" breadcrumb={<WorkspaceUploadsBreadcrumb />}>
+      <div className="overflow-y-auto">
+        <div className="max-w-4xl space-y-10">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">Uploads</h2>
+            <Separator className="mt-3" />
+          </div>
+          <div className="space-y-4 w-full">
+            {uploads.map((upload) => (
+              <WorkspaceUploadFile key={upload.fileId} upload={upload} />
+            ))}
+          </div>
+          <InView
+            rootMargin="200px"
+            onChange={(inView) => {
+              if (inView && hasMore && !isPending) {
+                setLastPage(lastPage + 1);
+              }
+            }}
+          />
         </div>
-        <div className="space-y-4 w-full">
-          {uploads.map((upload) => (
-            <WorkspaceUploadFile key={upload.fileId} upload={upload} />
-          ))}
-        </div>
-        <InView
-          rootMargin="200px"
-          onChange={(inView) => {
-            if (inView && hasMore && !isPending) {
-              setLastPage(lastPage + 1);
-            }
-          }}
-        />
       </div>
-    </div>
+    </Container>
   );
 };

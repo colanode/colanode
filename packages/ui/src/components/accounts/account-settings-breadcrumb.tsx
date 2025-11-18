@@ -1,8 +1,12 @@
 import { BreadcrumbItem } from '@colanode/ui/components/layouts/containers/breadcrumb-item';
 import { defaultIcons } from '@colanode/ui/lib/assets';
 
-export const LogoutHeader = () => {
+export const AccountSettingsBreadcrumb = () => {
   return (
-    <BreadcrumbItem id="logout" avatar={defaultIcons.logout} name="Logout" />
+    <BreadcrumbItem
+      id="settings"
+      avatar={defaultIcons.settings}
+      name="Account Settings"
+    />
   );
 };

@@ -1,7 +1,6 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
 import { WorkspaceHomeContainer } from '@colanode/ui/components/workspaces/workspace-home-container';
-import { WorkspaceHomeHeader } from '@colanode/ui/components/workspaces/workspace-home-header';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
   workspaceMaskRoute,
@@ -12,11 +11,6 @@ export const workspaceHomeRoute = createRoute({
   getParentRoute: () => workspaceRoute,
   path: '/home',
   component: WorkspaceHomeContainer,
-  context: () => {
-    return {
-      header: <WorkspaceHomeHeader />,
-    };
-  },
 });
 
 export const workspaceHomeMaskRoute = createRoute({

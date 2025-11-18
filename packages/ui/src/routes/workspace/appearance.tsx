@@ -1,8 +1,7 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
-import { AppAppearanceSettingsContainer } from '@colanode/ui/components/app/app-appearance-settings-container';
-import { AppAppearanceSettingsHeader } from '@colanode/ui/components/app/app-appearance-settings-header';
-import { AppAppearanceSettingsTab } from '@colanode/ui/components/app/app-appearance-settings-tab';
+import { AppAppearanceContainer } from '@colanode/ui/components/app/app-appearance-container';
+import { AppAppearanceTab } from '@colanode/ui/components/app/app-appearance-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
   workspaceRoute,
@@ -11,25 +10,24 @@ import {
 
 export const appAppearanceRoute = createRoute({
   getParentRoute: () => workspaceRoute,
-  path: '/app/appearance',
-  component: AppAppearanceSettingsContainer,
+  path: '/appearance',
+  component: AppAppearanceContainer,
   context: () => {
     return {
-      tab: <AppAppearanceSettingsTab />,
-      header: <AppAppearanceSettingsHeader />,
+      tab: <AppAppearanceTab />,
     };
   },
 });
 
 export const appAppearanceMaskRoute = createRoute({
   getParentRoute: () => workspaceMaskRoute,
-  path: '/app/appearance',
+  path: '/appearance',
   component: () => null,
   beforeLoad: (ctx) => {
     const userId = getWorkspaceUserId(ctx.params.workspaceId);
     if (userId) {
       throw redirect({
-        to: '/workspace/$userId/app/appearance',
+        to: '/workspace/$userId/appearance',
         params: { userId },
         replace: true,
       });

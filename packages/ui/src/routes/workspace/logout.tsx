@@ -1,7 +1,6 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
 import { LogoutContainer } from '@colanode/ui/components/auth/logout-container';
-import { LogoutHeader } from '@colanode/ui/components/auth/logout-header';
 import { LogoutTab } from '@colanode/ui/components/auth/logout-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
@@ -16,7 +15,6 @@ export const logoutRoute = createRoute({
   context: () => {
     return {
       tab: <LogoutTab />,
-      header: <LogoutHeader />,
     };
   },
 });

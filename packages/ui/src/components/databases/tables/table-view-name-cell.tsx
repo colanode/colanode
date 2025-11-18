@@ -105,9 +105,9 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
             )}
           </div>
           <Link
-            from="/workspace/$userId"
-            to="$nodeId"
-            params={{ nodeId: record.id }}
+            from="/workspace/$userId/$nodeId"
+            to="modal/$modalNodeId"
+            params={{ modalNodeId: record.id }}
             className="absolute right-2 flex h-6 cursor-pointer flex-row items-center gap-1 rounded-md border p-1 text-sm text-muted-foreground opacity-0 hover:bg-accent group-hover:opacity-100"
           >
             <SquareArrowOutUpRight className="mr-1 size-4" /> <p>Open</p>

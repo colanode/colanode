@@ -97,7 +97,7 @@ export const SidebarSettings = () => {
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
         <SidebarHeader title="Account settings" />
-        <Link from="/workspace/$userId" to="account/settings">
+        <Link from="/workspace/$userId" to="account">
           {({ isActive }) => (
             <SidebarSettingsItem
               title="General"
@@ -109,7 +109,7 @@ export const SidebarSettings = () => {
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
         <SidebarHeader title="App settings" />
-        <Link from="/workspace/$userId" to="app/appearance">
+        <Link from="/workspace/$userId" to="appearance">
           {({ isActive }) => (
             <SidebarSettingsItem
               title="Appearance"
