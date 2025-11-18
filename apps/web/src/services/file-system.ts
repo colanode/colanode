@@ -216,10 +216,18 @@ export class WebFileSystem implements FileSystem {
     await writable.close();
   }
 
-  public async url(path: string): Promise<string> {
-    const { parent, name } = await this.getFileLocation(path, false);
-    const fileHandle = await parent.getFileHandle(name);
-    const file = await fileHandle.getFile();
-    return URL.createObjectURL(file);
+  public async url(path: string): Promise<string | null> {
+    try {
+      const { parent, name } = await this.getFileLocation(path, false);
+      const fileHandle = await parent.getFileHandle(name);
+      if (!fileHandle) {
+        return null;
+      }
+
+      const file = await fileHandle.getFile();
+      return URL.createObjectURL(file);
+    } catch {
+      return null;
+    }
   }
 }

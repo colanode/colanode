@@ -449,6 +449,11 @@ const api: ColanodeWorkerApi = {
     }
 
     const url = await fs.url(filePath);
+    if (!url) {
+      await fs.delete(filePath);
+      return Promise.reject(new Error('Failed to save temp file'));
+    }
+
     return {
       id,
       name: file.name,

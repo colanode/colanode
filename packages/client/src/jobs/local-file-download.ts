@@ -200,8 +200,7 @@ export class LocalFileDownloadJobHandler
       return;
     }
 
-    const exists = await this.app.fs.exists(updatedLocalFile.path);
-    const url = exists ? await this.app.fs.url(updatedLocalFile.path) : null;
+    const url = await this.app.fs.url(updatedLocalFile.path);
     eventBus.publish({
       type: 'local.file.updated',
       workspace: {

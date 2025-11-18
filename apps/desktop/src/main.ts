@@ -323,6 +323,15 @@ ipcMain.handle(
       .execute();
 
     const url = await app.fs.url(filePath);
+    if (!url) {
+      await app.fs.delete(filePath);
+      await app.database
+        .deleteFrom('temp_files')
+        .where('id', '=', id)
+        .execute();
+
+      throw new Error('Failed to save temp file');
+    }
 
     return {
       id,

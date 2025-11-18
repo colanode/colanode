@@ -57,6 +57,16 @@ export class TempFileListQueryHandler
     const result: TempFile[] = [];
     for (const tempFile of tempFiles) {
       const url = await this.app.fs.url(tempFile.path);
+      if (!url) {
+        await this.app.fs.delete(tempFile.path);
+        await this.app.database
+          .deleteFrom('temp_files')
+          .where('id', '=', tempFile.id)
+          .execute();
+
+        continue;
+      }
+
       result.push(mapTempFile(tempFile, url));
     }
 

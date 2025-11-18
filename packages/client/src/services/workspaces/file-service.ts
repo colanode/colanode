@@ -258,8 +258,7 @@ export class FileService {
       .executeTakeFirst();
 
     if (updatedLocalFile) {
-      const exists = await this.app.fs.exists(updatedLocalFile.path);
-      const url = exists ? await this.app.fs.url(updatedLocalFile.path) : null;
+      const url = await this.app.fs.url(updatedLocalFile.path);
       return mapLocalFile(updatedLocalFile, url);
     }
 
