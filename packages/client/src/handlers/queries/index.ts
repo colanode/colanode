@@ -45,6 +45,7 @@ import { UserSearchQueryHandler } from './users/user-search';
 import { UserStorageGetQueryHandler } from './users/user-storage-get';
 import { WorkspaceListQueryHandler } from './workspaces/workspace-list';
 import { WorkspaceStorageGetQueryHandler } from './workspaces/workspace-storage-get';
+import { WorkspaceStorageUsersGetQueryHandler } from './workspaces/workspace-storage-users-get';
 
 export type QueryHandlerMap = {
   [K in keyof QueryMap]: QueryHandler<QueryMap[K]['input']>;
@@ -64,6 +65,8 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'record.field.value.count': new RecordFieldValueCountQueryHandler(app),
     'user.search': new UserSearchQueryHandler(app),
     'workspace.list': new WorkspaceListQueryHandler(app),
+    'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
+    'workspace.storage.users.get': new WorkspaceStorageUsersGetQueryHandler(app),
     'user.list': new UserListQueryHandler(app),
     'file.list': new FileListQueryHandler(app),
     'emoji.list': new EmojiListQueryHandler(app),
@@ -87,7 +90,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'document.get': new DocumentGetQueryHandler(app),
     'document.state.get': new DocumentStateGetQueryHandler(app),
     'document.updates.list': new DocumentUpdatesListQueryHandler(app),
-    'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
     'upload.list': new UploadListQueryHandler(app),
     'download.list': new DownloadListQueryHandler(app),
     'temp.file.list': new TempFileListQueryHandler(app),
