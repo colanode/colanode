@@ -1,30 +1,48 @@
 import { z } from 'zod/v4';
 
-import { fileSubtypeSchema } from '@colanode/core/types/files';
-
-export const workspaceStorageFileSubtypeSchema = z.object({
-  subtype: fileSubtypeSchema,
-  storageUsed: z.string(),
+export const workspaceStorageCounterSchema = z.object({
+  count: z.string(),
+  size: z.string(),
 });
 
-export type WorkspaceStorageFileSubtype = z.infer<
-  typeof workspaceStorageFileSubtypeSchema
+export type WorkspaceStorageCounter = z.infer<
+  typeof workspaceStorageCounterSchema
 >;
+
+export const workspaceStorageUsageSchema = z.object({
+  uploads: workspaceStorageCounterSchema,
+  nodes: workspaceStorageCounterSchema,
+  documents: workspaceStorageCounterSchema,
+});
+
+export type WorkspaceStorageUsage = z.infer<typeof workspaceStorageUsageSchema>;
 
 export const workspaceStorageUserSchema = z.object({
   id: z.string(),
-  storageUsed: z.string(),
   storageLimit: z.string(),
   maxFileSize: z.string(),
+  usage: workspaceStorageUsageSchema,
 });
 
 export type WorkspaceStorageUser = z.infer<typeof workspaceStorageUserSchema>;
 
-export const workspaceStorageGetOutputSchema = z.object({
-  storageLimit: z.string().nullable().optional(),
-  storageUsed: z.string(),
-  subtypes: z.array(workspaceStorageFileSubtypeSchema),
+export const workspaceStorageUsersGetOutputSchema = z.object({
   users: z.array(workspaceStorageUserSchema),
+});
+
+export type WorkspaceStorageUsersGetOutput = z.infer<
+  typeof workspaceStorageUsersGetOutputSchema
+>;
+
+const workspaceUsageSchema = z.object({
+  storageLimit: z.string().nullable().optional(),
+  maxFileSize: z.string().nullable().optional(),
+  usage: workspaceStorageUsageSchema,
+});
+
+export const workspaceStorageGetOutputSchema = z.object({
+  user: workspaceStorageUserSchema,
+  workspace: workspaceUsageSchema.optional(),
 });
 
 export type WorkspaceStorageGetOutput = z.infer<

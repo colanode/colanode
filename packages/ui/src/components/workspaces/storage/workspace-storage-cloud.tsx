@@ -13,7 +13,7 @@ export const WorkspaceStorageCloud = () => {
   }
 
   return (
-    <div className="w-full flex flex-row items-center border border-muted rounded-lg p-4 gap-4">
+    <div className="w-full flex flex-row items-center rounded-xl border p-6 shadow-sm gap-4">
       <Cloud className="size-6" />
       <div className="flex-1">
         <h3 className="text-lg font-semibold tracking-tight">

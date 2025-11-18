@@ -31,6 +31,11 @@ import { removeDocumentUpdateRevisionTrigger } from './00028-remove-document-upd
 import { addWorkspaceStorageLimitColumns } from './00029-add-workspace-storage-limit-columns';
 import { addWorkspaceIndexToUploads } from './00030-add-workspace-index-to-uploads';
 import { addCreatedAtIndexToUploads } from './00031-add-created-at-index-to-uploads';
+import { createUploadUsageCounterTriggers } from './00032-create-upload-usage-counter-triggers';
+import { createNodeCounterTriggers } from './00033-create-node-counter-triggers';
+import { createDocumentCounterTriggers } from './00034-create-document-counter-triggers';
+import { createNodeUpdateSizeCounterTriggers } from './00035-create-node-update-size-counter-triggers';
+import { createDocumentUpdateSizeCounterTriggers } from './00036-create-document-update-size-counter-triggers';
 
 export const databaseMigrations: Record<string, Migration> = {
   '00001_create_accounts_table': createAccountsTable,
@@ -68,4 +73,11 @@ export const databaseMigrations: Record<string, Migration> = {
   '00029_add_workspace_storage_limit_columns': addWorkspaceStorageLimitColumns,
   '00030_add_workspace_index_to_uploads': addWorkspaceIndexToUploads,
   '00031_add_created_at_index_to_uploads': addCreatedAtIndexToUploads,
+  '00032_create_upload_usage_counter_triggers': createUploadUsageCounterTriggers,
+  '00033_create_node_counter_triggers': createNodeCounterTriggers,
+  '00034_create_document_counter_triggers': createDocumentCounterTriggers,
+  '00035_create_node_update_size_counter_triggers':
+    createNodeUpdateSizeCounterTriggers,
+  '00036_create_document_update_size_counter_triggers':
+    createDocumentUpdateSizeCounterTriggers,
 };
