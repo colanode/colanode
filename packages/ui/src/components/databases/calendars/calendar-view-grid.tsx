@@ -16,6 +16,16 @@ import { useRecordsQuery } from '@colanode/ui/hooks/use-records-query';
 import { filterRecords } from '@colanode/ui/lib/databases';
 import { cn, getDisplayedDates } from '@colanode/ui/lib/utils';
 
+const toUTCDate = (dateParam: Date | string): Date => {
+  const date = typeof dateParam === 'string' ? new Date(dateParam) : dateParam;
+
+  const year = date.getFullYear();
+  const month = date.getMonth();
+  const day = date.getDate();
+
+  return new Date(Date.UTC(year, month, day, 0, 0, 0, 0));
+};
+
 interface CalendarViewGridProps {
   field: FieldAttributes;
 }
@@ -156,12 +166,13 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
           return <ChevronDown className={cn('size-4', className)} {...props} />;
         },
         Day: (props: DayProps) => {
+          const day = toUTCDate(props.day.date);
           const filter: DatabaseViewFilterAttributes = {
             id: 'calendar_filter',
             type: 'field',
             fieldId: field.id,
             operator: 'is_equal_to',
-            value: props.day.date.toISOString(),
+            value: day.toISOString(),
           };
 
           const dayRecords = filterRecords(
