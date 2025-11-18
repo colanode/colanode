@@ -369,7 +369,7 @@ const api: ColanodeWorkerApi = {
       return Promise.reject(new Error('App not initialized'));
     }
 
-    return app.mediator.executeQuery(input);
+    return app.mediator.executeQueryAndSubscribe(key, windowId, input);
   },
   async unsubscribeQuery(key) {
     if (!appInitOutput) {
