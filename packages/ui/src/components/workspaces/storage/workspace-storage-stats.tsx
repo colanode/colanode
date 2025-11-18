@@ -1,7 +1,6 @@
 import { BadgeAlert } from 'lucide-react';
 
 import { Button } from '@colanode/ui/components/ui/button';
-import { Separator } from '@colanode/ui/components/ui/separator';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { StorageStats } from '@colanode/ui/components/workspaces/storage/storage-stats';
 import { WorkspaceStorageCloud } from '@colanode/ui/components/workspaces/storage/workspace-storage-cloud';
@@ -24,10 +23,12 @@ export const WorkspaceStorageStats = () => {
 
   return (
     <div className="max-w-4xl space-y-10">
-      <div className="space-y-6">
+      <div className="space-y-4">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight">My storage</h2>
-          <Separator className="mt-3" />
+          <p className="mt-2 text-sm text-muted-foreground">
+            Your personal storage usage.
+          </p>
         </div>
         {storageQuery.isPending ? (
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
@@ -53,12 +54,14 @@ export const WorkspaceStorageStats = () => {
         ) : null}
       </div>
       {canManageStorage && (
-        <div className="space-y-10">
+        <div className="space-y-4">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">
               Workspace storage
             </h2>
-            <Separator className="mt-3" />
+            <p className="mt-2 text-sm text-muted-foreground">
+              Total storage usage for the workspace.
+            </p>
           </div>
           {storageQuery.isPending ? (
             <div className="flex items-center gap-4 text-sm text-muted-foreground">

@@ -49,6 +49,9 @@ export const WorkspaceStorageUsers = () => {
     <div className="space-y-6">
       <div>
         <h2 className="text-2xl font-semibold tracking-tight">Users</h2>
+        <p className="mt-2 text-sm text-muted-foreground">
+          View and manage storage usage for each workspace user.
+        </p>
         <Separator className="mt-3" />
       </div>
       {usersQuery.isPending && users.length === 0 ? (
