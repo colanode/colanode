@@ -1,9 +1,10 @@
 {
   "_comment": "Colanode Server Configuration - Copy this file to config.json and customize as needed",
   "_migration_guide": {
-    "precedence": "Environment variables > config.json > schema defaults",
+    "precedence": "config.json (plus env:// / file:// pointers) > schema defaults",
     "env_syntax": "Use 'env://VAR_NAME' to reference environment variables. Add '?' suffix for optional variables (e.g., 'env://VAR_NAME?')",
-    "backward_compatibility": "Environment variables still work without this file - this is optional"
+    "file_syntax": "Use 'file://relative/or/absolute/path' to inline file contents (e.g., PEM certificates). Add '?' to make it optional",
+    "backward_compatibility": "Environment variables are only read when referenced via env://"
   },
 
   "server": {
@@ -63,23 +64,27 @@
   },
 
   "storage": {
-    "_comment": "...",
+    "_comment": "File storage backend configuration. Supports: 'file' (local filesystem), 's3' (S3-compatible like AWS S3, MinIO, Cloudflare R2), 'gcs' (Google Cloud Storage), 'azure' (Azure Blob Storage). For file storage: set 'directory' to the path where user files will be stored. For other backends, set STORAGE_TYPE env var and provide backend-specific credentials via env:// references",
     "type": "file",
     "directory": "./colanode"
   },
 
-  "smtp": {
-    "_comment": "Email sending configuration",
+  "email": {
+    "_comment": "Email sending configuration. Supported providers: smtp",
     "enabled": false,
-    "_comment_when_enabled": "When enabled=true, you must provide host, user, password, and from.email",
-    "host": "env://SMTP_HOST?",
-    "port": 587,
-    "secure": false,
-    "user": "env://SMTP_USER?",
-    "password": "env://SMTP_PASSWORD?",
     "from": {
-      "email": "env://SMTP_EMAIL_FROM?",
+      "email": "env://EMAIL_FROM?",
       "name": "Colanode"
+    },
+    "provider": {
+      "type": "smtp",
+      "host": "env://EMAIL_SMTP_HOST?",
+      "port": 587,
+      "secure": false,
+      "auth": {
+        "user": "env://EMAIL_SMTP_USER?",
+        "password": "env://EMAIL_SMTP_PASSWORD?"
+      }
     }
   },
 
@@ -186,7 +191,7 @@
       "mergeWindow": 3600,
       "cutoffWindow": 7200
     },
-    "uploadsClean": {
+    "cleanup": {
       "enabled": false,
       "_comment_when_enabled": "Cleans up expired upload chunks",
       "cron": "0 5 */2 * * *"
@@ -199,8 +204,12 @@
   },
 
   "workspace": {
-    "_comment": "Per-workspace storage limits (optional, null = unlimited)",
-    "storageLimit": null,
-    "maxFileSize": null
+    "_comment": "Per-workspace storage limits (optional)",
+    "storageLimit": "21474836480",
+    "maxFileSize": "524288000"
+  },
+
+  "debug": {
+    "filePointerExample": "file://debug-file-example.txt"
   }
 }

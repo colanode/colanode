@@ -6,6 +6,7 @@ import { Configuration } from './index';
 type ConfigSource = Partial<Configuration>;
 
 const ENV_POINTER_PATTERN = /^env:\/\/([A-Z0-9_]+)(\?)?$/;
+const FILE_POINTER_PATTERN = /^file:\/\/(.+?)(\?)?$/;
 
 export class MissingEnvVarError extends Error {
   constructor(varName: string) {
@@ -14,63 +15,32 @@ export class MissingEnvVarError extends Error {
   }
 }
 
+export class MissingFileError extends Error {
+  constructor(filePath: string) {
+    super(`Missing required configuration file: ${filePath}`);
+    this.name = 'MissingFileError';
+  }
+}
+
 const isRecord = (value: unknown): value is Record<string, unknown> => {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
 };
 
-const deepMerge = (
-  base: Record<string, unknown>,
-  overrides: Record<string, unknown>
-): Record<string, unknown> => {
-  const result: Record<string, unknown> = { ...base };
-
-  for (const [key, overrideValue] of Object.entries(overrides)) {
-    if (overrideValue === undefined) {
-      continue;
-    }
-
-    const baseValue = result[key];
-
-    if (isRecord(baseValue) && isRecord(overrideValue)) {
-      result[key] = deepMerge(baseValue, overrideValue);
-      continue;
-    }
-
-    result[key] = overrideValue;
-  }
-
-  return result;
+type NormalizeContext = {
+  configDir: string;
 };
 
-const normalizeValue = (value: unknown): unknown => {
+const normalizeValue = (value: unknown, ctx: NormalizeContext): unknown => {
   if (value === null) {
     return undefined;
   }
 
   if (typeof value === 'string') {
-    const match = value.match(ENV_POINTER_PATTERN);
-
-    if (!match) {
-      return value;
-    }
-
-    const [, envName, optionalFlag] = match;
-    const envValue = process.env[envName!];
-    const optional = optionalFlag === '?';
-
-    if (envValue === undefined) {
-      if (optional) {
-        return undefined;
-      }
-
-      throw new MissingEnvVarError(envName!);
-    }
-
-    return envValue;
+    return resolvePointerValue(value, ctx);
   }
 
   if (Array.isArray(value)) {
-    return value.map((item) => normalizeValue(item));
+    return value.map((item) => normalizeValue(item, ctx));
   }
 
   if (isRecord(value)) {
@@ -82,7 +52,7 @@ const normalizeValue = (value: unknown): unknown => {
         continue;
       }
 
-      const processed = normalizeValue(nested);
+      const processed = normalizeValue(nested, ctx);
 
       if (processed !== undefined) {
         normalized[key] = processed;
@@ -99,7 +69,7 @@ const candidateConfigDirectories = (): string[] => {
   const cwd = process.cwd();
   const moduleDir = path.dirname(fileURLToPath(import.meta.url));
   const serverRoot = path.resolve(moduleDir, '../../..');
-  const candidates = [serverRoot, cwd, path.join(cwd, 'apps/server')];
+  const candidates = [cwd, path.join(cwd, 'apps/server'), serverRoot];
 
   return Array.from(new Set(candidates.map((dir) => path.resolve(dir))));
 };
@@ -116,13 +86,7 @@ const findConfigFile = (filename: string): string | undefined => {
   return undefined;
 };
 
-const readJsonFile = (
-  filePath: string | undefined
-): Record<string, unknown> => {
-  if (!filePath) {
-    return {};
-  }
-
+const readJsonFile = (filePath: string): Record<string, unknown> => {
   try {
     const raw = fs.readFileSync(filePath, 'utf-8');
     const parsed = JSON.parse(raw);
@@ -138,18 +102,75 @@ const readJsonFile = (
   }
 };
 
-export const resolveEnvPointers = (value: unknown): unknown => {
-  return normalizeValue(value);
+const resolvePointerValue = (value: string, ctx: NormalizeContext): unknown => {
+  const envMatch = value.match(ENV_POINTER_PATTERN);
+
+  if (envMatch) {
+    const [, envName, optionalFlag] = envMatch;
+    const envValue = process.env[envName!];
+    const optional = optionalFlag === '?';
+
+    if (envValue === undefined) {
+      if (optional) {
+        return undefined;
+      }
+
+      throw new MissingEnvVarError(envName!);
+    }
+
+    return envValue;
+  }
+
+  const fileMatch = value.match(FILE_POINTER_PATTERN);
+
+  if (fileMatch) {
+    const [, rawPath, optionalFlag] = fileMatch;
+    const optional = optionalFlag === '?';
+    const resolvedPath = path.isAbsolute(rawPath!)
+      ? rawPath!
+      : path.resolve(ctx.configDir, rawPath!);
+
+    if (!fs.existsSync(resolvedPath)) {
+      if (optional) {
+        return undefined;
+      }
+
+      throw new MissingFileError(resolvedPath);
+    }
+
+    try {
+      return fs.readFileSync(resolvedPath, 'utf-8');
+    } catch (error) {
+      const reason = error instanceof Error ? error.message : String(error);
+      throw new Error(`Failed to read ${resolvedPath}: ${reason}`);
+    }
+  }
+
+  return value;
 };
 
-export const loadRawConfig = (
-  envOverrides: Record<string, unknown>
-): ConfigSource => {
-  const jsonConfig = readJsonFile(
-    findConfigFile('config.json')
-  ) as ConfigSource;
+export const resolveEnvPointers = (
+  value: unknown,
+  ctx: NormalizeContext
+): unknown => {
+  return normalizeValue(value, ctx);
+};
 
-  const merged = deepMerge(jsonConfig as Record<string, unknown>, envOverrides);
+export const loadRawConfig = (): ConfigSource => {
+  const configPath = findConfigFile('config.json');
 
-  return normalizeValue(merged) as ConfigSource;
+  if (!configPath) {
+    throw new Error(
+      [
+        'Unable to find config.json.',
+        'Copy apps/server/config.json (or mount your own) so the server has a configuration file.',
+      ].join(' ')
+    );
+  }
+
+  const jsonConfig = readJsonFile(configPath) as ConfigSource;
+
+  return normalizeValue(jsonConfig, {
+    configDir: path.dirname(configPath),
+  }) as ConfigSource;
 };

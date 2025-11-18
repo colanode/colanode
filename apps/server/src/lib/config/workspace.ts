@@ -6,10 +6,3 @@ export const workspaceConfigSchema = z.object({
 });
 
 export type WorkspaceConfig = z.infer<typeof workspaceConfigSchema>;
-
-export const readWorkspaceConfigFromEnv = () => {
-  return {
-    storageLimit: process.env.WORKSPACE_STORAGE_LIMIT,
-    maxFileSize: process.env.WORKSPACE_MAX_FILE_SIZE,
-  };
-};

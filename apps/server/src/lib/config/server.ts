@@ -19,18 +19,3 @@ export const serverConfigSchema = z.object({
 });
 
 export type ServerConfig = z.infer<typeof serverConfigSchema>;
-
-export const readServerConfigFromEnv = () => {
-  return {
-    version: build.version,
-    sha: build.sha,
-    name: process.env.SERVER_NAME,
-    avatar: process.env.SERVER_AVATAR,
-    mode: process.env.SERVER_MODE,
-    pathPrefix: process.env.SERVER_PATH_PREFIX,
-    cors: {
-      origin: process.env.SERVER_CORS_ORIGIN,
-      maxAge: process.env.SERVER_CORS_MAX_AGE,
-    },
-  };
-};

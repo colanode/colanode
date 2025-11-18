@@ -43,30 +43,3 @@ export type S3StorageConfig = z.infer<typeof s3StorageConfigSchema>;
 export type FileStorageConfig = z.infer<typeof fileStorageConfigSchema>;
 export type GCSStorageConfig = z.infer<typeof gcsStorageConfigSchema>;
 export type AzureStorageConfig = z.infer<typeof azureStorageConfigSchema>;
-
-export const readStorageConfigFromEnv = () => {
-  return {
-    type: process.env.STORAGE_TYPE as StorageConfig['type'] | undefined,
-    // S3 fields
-    endpoint: process.env.STORAGE_S3_ENDPOINT,
-    accessKey: process.env.STORAGE_S3_ACCESS_KEY,
-    secretKey: process.env.STORAGE_S3_SECRET_KEY,
-    bucket: process.env.STORAGE_S3_BUCKET,
-    region: process.env.STORAGE_S3_REGION,
-    forcePathStyle:
-      process.env.STORAGE_S3_FORCE_PATH_STYLE === 'true'
-        ? true
-        : process.env.STORAGE_S3_FORCE_PATH_STYLE === 'false'
-          ? false
-          : undefined,
-    // File storage fields
-    directory: process.env.STORAGE_FILE_DIRECTORY,
-    // GCS fields
-    projectId: process.env.STORAGE_GCS_PROJECT_ID,
-    credentials: process.env.STORAGE_GCS_CREDENTIALS,
-    // Azure fields
-    account: process.env.STORAGE_AZURE_ACCOUNT,
-    accountKey: process.env.STORAGE_AZURE_ACCOUNT_KEY,
-    containerName: process.env.STORAGE_AZURE_CONTAINER_NAME,
-  };
-};

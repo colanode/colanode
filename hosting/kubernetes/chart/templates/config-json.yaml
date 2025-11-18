@@ -9,7 +9,11 @@ metadata:
 data:
   {{ default "config.json" $configFile.key | quote }}: |
 {{ if $configFile.data }}
-{{ $configFile.data | toString | nindent 4 }}
+{{- if kindIs "string" $configFile.data }}
+{{ $configFile.data | nindent 4 }}
+{{- else }}
+{{ $configFile.data | toPrettyJson | nindent 4 }}
+{{- end }}
 {{ else }}
     {}
 {{ end }}

@@ -59,9 +59,10 @@ services:
   # ---------------------------------------------------------------
   # This service runs Mailpit, a local SMTP testing tool.
   # If you want to test how emails are sent in the 'server' service,
-  # you can uncomment the 'smtp' service block and configure the
-  # SMTP_ENABLED variable to 'true' in the 'server' service environment
-  # variables.
+  # uncomment the 'smtp' service block, set email.enabled=true in config.json,
+  # point the email provider to "smtp", and define EMAIL_HOST /
+  # EMAIL_SMTP_USER / EMAIL_SMTP_PASSWORD env vars (and any others) so the
+  # SMTP provider block in config.json resolves via env:// pointers.
   #
   # Access the Mailpit UI at http://localhost:8025
   # ---------------------------------------------------------------
@@ -87,10 +88,10 @@ services:
       # ------------------------------------------------------------------
       # Configuration Strategy
       # ------------------------------------------------------------------
-      # • Most defaults live in config.json mounted at /app/config.json
-      # • config.json references secrets via env://VAR or env://VAR? pointers
-      # • The variables below are those secrets; keep only what JSON needs
-      # • Env values always override JSON if both are present
+      # - All defaults live in config.json mounted at /app/apps/server/config.json
+      # - config.json references secrets via env://VAR or read values from files via file://path
+      # - The variables below are only those secrets; every other setting
+      #   must be changed inside the JSON file
       # ------------------------------------------------------------------
       NODE_ENV: production
 
@@ -99,6 +100,7 @@ services:
       REDIS_URL: redis://:your_valkey_password@valkey:6379/0
 
       # Optional env://? secrets – include only the entries referenced in JSON
+      # Use file://path entries in config.json when you want to read the value from mounted files instead.
       # ACCOUNT_GOOGLE_CLIENT_ID: ''
       # ACCOUNT_GOOGLE_CLIENT_SECRET: ''
       # ...

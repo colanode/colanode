@@ -39,19 +39,23 @@ helm install my-colanode ./hosting/kubernetes/chart
 # Install with custom values
 helm install my-colanode ./hosting/kubernetes/chart \
   --set colanode.ingress.hosts[0].host=colanode.example.com \
-  --set colanode.config.SERVER_NAME="My Colanode Instance"
+  --set colanode.configFile.enabled=true \
+  --set-file colanode.configFile.data=./config.json
 ```
 
 ## Configuration
 
 ### Core Settings
 
-| Parameter                     | Description                 | Default                   |
-| ----------------------------- | --------------------------- | ------------------------- |
-| `colanode.replicaCount`       | Number of Colanode replicas | `1`                       |
-| `colanode.image.repository`   | Colanode image repository   | `ghcr.io/colanode/server` |
-| `colanode.image.tag`          | Colanode image tag          | `latest`                  |
-| `colanode.config.SERVER_NAME` | Server display name         | `Colanode K8s`            |
+| Parameter                    | Description                                                | Default                   |
+| ---------------------------- | ---------------------------------------------------------- | ------------------------- |
+| `colanode.replicaCount`      | Number of Colanode replicas                                | `1`                       |
+| `colanode.image.repository`  | Colanode image repository                                  | `ghcr.io/colanode/server` |
+| `colanode.image.tag`         | Colanode image tag                                         | `latest`                  |
+| `colanode.nodeEnv`           | Value exported as `NODE_ENV` inside the server pod         | `production`              |
+| `colanode.additionalEnv`     | Extra env vars consumed via `env://` pointers              | `[]`                      |
+| `colanode.extraVolumeMounts` | Additional pod volume mounts (pairs with `extraVolumes`)   | `[]`                      |
+| `colanode.extraVolumes`      | Extra `volumes` entries (Secrets/ConfigMaps for `file://`) | `[]`                      |
 
 ### Ingress Configuration
 
@@ -72,6 +76,7 @@ helm install my-colanode ./hosting/kubernetes/chart \
 ### Using config.json with Helm
 
 - The server image already ships with a default `config.json`. Only two env vars are strictly required: `POSTGRES_URL` and `REDIS_URL` (because the JSON references them via `env://`).
+- If you do not override `config.json`, the bundled file still expects those pointers. The chart wires them up automatically via `POSTGRES_URL=env://POSTGRES_URL` and `REDIS_URL=env://REDIS_URL`, so a vanilla install works without extra values.
 - To supply your own JSON file, copy `apps/server/config.json`, edit it, and enable the new override:
 
   ```bash
@@ -81,7 +86,30 @@ helm install my-colanode ./hosting/kubernetes/chart \
   ```
 
 - Alternatively, create a ConfigMap yourself (`kubectl create configmap colanode-config --from-file=config.json`) and set `colanode.configFile.existingConfigMap=colanode-config`.
-- Environment variables still win over JSON for now, but plan to migrate to JSON-first; start moving non-secret settings into your config file while keeping secrets/credentials as env vars referenced via `env://`.
+- Environment variables no longer override config values. Only secrets referenced via `env://` (and values from files via `file://`) are read at runtime. Keep non-secret settings in your JSON, mount it with `colanode.configFile`, and surface additional env vars through `colanode.additionalEnv` when a pointer needs a value from Kubernetes secrets.
+- To use `file://` pointers, mount the target files next to `config.json` (the chart stores it at `/app/apps/server/config.json`). For example, to load a PostgreSQL CA cert via `"file://secrets/postgres-ca.crt"`:
+  1. Create a secret with the cert contents:
+
+     ```bash
+     kubectl create secret generic postgres-ca \
+       --from-file=postgres-ca.crt=./certs/rootCA.crt
+     ```
+
+  2. Mount the secret and expose it inside the pod:
+
+     ```yaml
+     colanode:
+       extraVolumes:
+         - name: postgres-ca
+           secret:
+             secretName: postgres-ca
+       extraVolumeMounts:
+         - name: postgres-ca
+           mountPath: /app/apps/server/secrets
+           readOnly: true
+     ```
+
+  3. Point your `config.json` field to `"file://secrets/postgres-ca.crt"`. The loader resolves the path relative to the directory containing `config.json`.
 
 ### Storage Configuration
 

@@ -64,14 +64,13 @@ If you prefer to host your own Colanode server, check out the [`hosting/`](hosti
 #### Configuration model
 
 - The server image now ships with a full `config.json`, so most defaults are ready to go without touching env vars.
-- Sensitive values can be referenced from JSON using the `env://VAR_NAME` pattern (only `POSTGRES_URL` and `REDIS_URL` are required out of the box).
-- Environment variables still override JSON for backward compatibility, but future releases will rely primarily on the config file.
+- The config file is the single source of truth. Use `env://VAR_NAME` to pull sensitive values from env vars, or `file://path/to/secret.pem` to inline the contents of a mounted file (append `?` to make either optional). Only `POSTGRES_URL` and `REDIS_URL` are required out of the box.
 - To customize settings:
   1. Copy `apps/server/config.json`, edit it, and mount/bind it when using Docker Compose (see `hosting/docker/docker-compose.yaml`).
   2. For Helm, enable `colanode.configFile.enabled` and pass your file via `--set-file colanode.configFile.data=./config.json` (details in [`hosting/kubernetes/README.md`](hosting/kubernetes/README.md)).
   3. Keep secrets as env vars so you don't have to bake them into JSON; the loader resolves `env://` pointers at runtime.
 
-All environment variables that remain relevant, along with mounting instructions, live in [`hosting/docker/docker-compose.yaml`](hosting/docker/docker-compose.yaml) and [`hosting/kubernetes/README.md`](hosting/kubernetes/README.md).
+Environment variables no longer override regular config fields—only values explicitly tagged with `env://` are read from the environment. Refer to [`hosting/docker/docker-compose.yaml`](hosting/docker/docker-compose.yaml) and [`hosting/kubernetes/README.md`](hosting/kubernetes/README.md) for mounting instructions and the handful of required secrets.
 
 ### Running locally
 

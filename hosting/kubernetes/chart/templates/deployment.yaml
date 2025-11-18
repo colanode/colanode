@@ -44,7 +44,11 @@ spec:
 {{- $mountGcsCredentials := and (eq $storageType "gcs") $gcsSecret.name }}
 {{- $configFile := .Values.colanode.configFile }}
 {{- $mountConfigFile := or $configFile.enabled $configFile.existingConfigMap }}
-{{- if or $mountFileStorage $mountGcsCredentials $mountConfigFile }}
+{{- $extraVolumeMounts := .Values.colanode.extraVolumeMounts | default (list) }}
+{{- $extraVolumes := .Values.colanode.extraVolumes | default (list) }}
+{{- $hasExtraVolumeMounts := gt (len $extraVolumeMounts) 0 }}
+{{- $hasExtraVolumes := gt (len $extraVolumes) 0 }}
+{{- if or $mountFileStorage $mountGcsCredentials $mountConfigFile $hasExtraVolumeMounts }}
           volumeMounts:
 {{- if $mountFileStorage }}
             - name: storage-data
@@ -61,10 +65,13 @@ spec:
               subPath: {{ default "config.json" $configFile.key }}
               readOnly: true
 {{- end }}
+{{- if $hasExtraVolumeMounts }}
+            {{ include "colanode.renderExtraVolumeMounts" $extraVolumeMounts | nindent 12 }}
+{{- end }}
 {{- end }}
           resources:
             {{- toYaml .Values.colanode.resources | nindent 12 }}
-{{- if or $mountFileStorage $mountGcsCredentials $mountConfigFile }}
+{{- if or $mountFileStorage $mountGcsCredentials $mountConfigFile $hasExtraVolumes }}
       volumes:
 {{- if $mountFileStorage }}
         - name: storage-data
@@ -93,5 +100,8 @@ spec:
         - name: config-json
           configMap:
             name: {{ include "colanode.configJsonConfigMapName" . | trim | quote }}
+{{- end }}
+{{- if $hasExtraVolumes }}
+  {{ include "colanode.renderExtraVolumes" $extraVolumes | nindent 8 }}
 {{- end }}
 {{- end }}
