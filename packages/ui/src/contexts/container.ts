@@ -1,6 +1,9 @@
 import { createContext, useContext } from 'react';
 
+export type ContainerType = 'full' | 'modal';
+
 interface ContainerContext {
+  type: ContainerType;
   scrollAreaRef: React.RefObject<HTMLDivElement>;
   scrollViewportRef: React.RefObject<HTMLDivElement>;
 }

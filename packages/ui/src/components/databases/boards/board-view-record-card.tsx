@@ -36,9 +36,9 @@ export const BoardViewRecordCard = () => {
       className="animate-fade-in flex cursor-pointer flex-col gap-1 rounded-md border p-2 text-left hover:bg-accent"
     >
       <Link
-        from="/workspace/$userId"
-        to="$nodeId"
-        params={{ nodeId: record.id }}
+        from="/workspace/$userId/$nodeId"
+        to="modal/$modalNodeId"
+        params={{ modalNodeId: record.id }}
       >
         <p className={hasName ? '' : 'text-muted-foreground'}>
           {hasName ? name : 'Unnamed'}

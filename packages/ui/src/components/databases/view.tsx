@@ -34,7 +34,7 @@ interface ViewProps {
 export const View = ({ view }: ViewProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
-  const navigate = useNavigate({ from: '/workspace/$userId' });
+  const navigate = useNavigate();
 
   const fields: ViewField[] = database.fields
     .map((field) => {
@@ -498,8 +498,9 @@ export const View = ({ view }: ViewProps) => {
             toast.error(result.error.message);
           } else {
             navigate({
-              to: '$nodeId',
-              params: { nodeId: result.output.id },
+              from: '/workspace/$userId/$nodeId',
+              to: 'modal/$modalNodeId',
+              params: { modalNodeId: result.output.id },
             });
           }
         },

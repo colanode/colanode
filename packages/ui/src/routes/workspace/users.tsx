@@ -1,7 +1,6 @@
 import { createRoute, redirect } from '@tanstack/react-router';
 
 import { WorkspaceUsersContainer } from '@colanode/ui/components/workspaces/workspace-users-container';
-import { WorkspaceUsersHeader } from '@colanode/ui/components/workspaces/workspace-users-header';
 import { WorkspaceUsersTab } from '@colanode/ui/components/workspaces/workspace-users-tab';
 import { getWorkspaceUserId } from '@colanode/ui/routes/utils';
 import {
@@ -16,7 +15,6 @@ export const workspaceUsersRoute = createRoute({
   context: () => {
     return {
       tab: <WorkspaceUsersTab />,
-      header: <WorkspaceUsersHeader />,
     };
   },
 });

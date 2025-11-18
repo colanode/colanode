@@ -1,12 +1,8 @@
 import { BreadcrumbItem } from '@colanode/ui/components/layouts/containers/breadcrumb-item';
 import { defaultIcons } from '@colanode/ui/lib/assets';
 
-export const AccountSettingsHeader = () => {
+export const WorkspaceUploadsBreadcrumb = () => {
   return (
-    <BreadcrumbItem
-      id="settings"
-      avatar={defaultIcons.settings}
-      name="Account Settings"
-    />
+    <BreadcrumbItem id="uploads" avatar={defaultIcons.uploads} name="Uploads" />
   );
 };

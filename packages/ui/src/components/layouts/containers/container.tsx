@@ -1,7 +1,6 @@
-import { Outlet } from '@tanstack/react-router';
+import { Fullscreen } from 'lucide-react';
 import { useRef } from 'react';
 
-import { ContainerHeader } from '@colanode/ui/components/layouts/containers/container-header';
 import { SidebarMobile } from '@colanode/ui/components/layouts/sidebars/sidebar-mobile';
 import {
   ScrollArea,
@@ -9,11 +8,28 @@ import {
   ScrollViewport,
 } from '@colanode/ui/components/ui/scroll-area';
 import { useApp } from '@colanode/ui/contexts/app';
-import { ContainerContext } from '@colanode/ui/contexts/container';
+import {
+  ContainerContext,
+  ContainerType,
+} from '@colanode/ui/contexts/container';
 import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { cn } from '@colanode/ui/lib/utils';
 
-export const Container = () => {
+interface ContainerProps {
+  type: ContainerType;
+  children: React.ReactNode;
+  breadcrumb?: React.ReactNode;
+  actions?: React.ReactNode;
+  onFullscreen?: () => void;
+}
+
+export const Container = ({
+  type,
+  children,
+  breadcrumb,
+  actions,
+  onFullscreen,
+}: ContainerProps) => {
   const app = useApp();
   const isMobile = useIsMobile();
 
@@ -23,6 +39,7 @@ export const Container = () => {
   return (
     <ContainerContext.Provider
       value={{
+        type,
         scrollAreaRef,
         scrollViewportRef,
       }}
@@ -34,15 +51,22 @@ export const Container = () => {
             app.type === 'mobile' && 'p-0 pr-2'
           )}
         >
-          {isMobile && <SidebarMobile />}
-          <div className="flex-1">
-            <ContainerHeader />
+          {isMobile && type === 'full' && <SidebarMobile />}
+          {type === 'modal' && onFullscreen && (
+            <Fullscreen
+              className="size-4 cursor-pointer text-muted-foreground hover:text-foreground"
+              onClick={onFullscreen}
+            />
+          )}
+          <div className="flex-1 flex justify-between items-center">
+            <div>{type === 'full' ? breadcrumb : null}</div>
+            <div>{actions}</div>
           </div>
         </div>
         <ScrollArea ref={scrollAreaRef} className="overflow-hidden h-full">
           <ScrollViewport ref={scrollViewportRef} className="h-full">
             <div className="lg:px-10 px-4 min-h-0 flex-1 h-full">
-              <Outlet />
+              {children}
             </div>
           </ScrollViewport>
           <ScrollBar orientation="horizontal" />

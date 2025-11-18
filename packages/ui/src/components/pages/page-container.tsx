@@ -1,26 +1,13 @@
 import { LocalPageNode } from '@colanode/client/types';
-import { PageBody } from '@colanode/ui/components/pages/page-body';
-import { PageNotFound } from '@colanode/ui/components/pages/page-not-found';
-import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
-import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
+import { NodeRole, hasNodeRole } from '@colanode/core';
+import { Document } from '@colanode/ui/components/documents/document';
 
 interface PageContainerProps {
-  pageId: string;
+  page: LocalPageNode;
+  role: NodeRole;
 }
 
-export const PageContainer = ({ pageId }: PageContainerProps) => {
-  const data = useNodeContainer<LocalPageNode>(pageId);
-  useNodeRadar(data.node);
-
-  if (data.isPending) {
-    return null;
-  }
-
-  if (!data.node) {
-    return <PageNotFound />;
-  }
-
-  const { node: page, role } = data;
-
-  return <PageBody page={page} role={role} />;
+export const PageContainer = ({ page, role }: PageContainerProps) => {
+  const canEdit = hasNodeRole(role, 'editor');
+  return <Document node={page} canEdit={canEdit} autoFocus="start" />;
 };

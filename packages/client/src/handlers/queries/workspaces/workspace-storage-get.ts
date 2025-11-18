@@ -2,11 +2,9 @@ import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/wor
 import { parseApiError } from '@colanode/client/lib/ky';
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
 import { QueryError, QueryErrorCode } from '@colanode/client/queries';
-import {
-  WorkspaceStorageGetQueryInput,
-  WorkspaceStorageGetQueryOutput,
-} from '@colanode/client/queries/workspaces/workspace-storage-get';
+import { WorkspaceStorageGetQueryInput } from '@colanode/client/queries/workspaces/workspace-storage-get';
 import { Event } from '@colanode/client/types/events';
+import { WorkspaceStorageGetOutput } from '@colanode/core';
 
 export class WorkspaceStorageGetQueryHandler
   extends WorkspaceQueryHandlerBase
@@ -14,13 +12,13 @@ export class WorkspaceStorageGetQueryHandler
 {
   async handleQuery(
     input: WorkspaceStorageGetQueryInput
-  ): Promise<WorkspaceStorageGetQueryOutput> {
+  ): Promise<WorkspaceStorageGetOutput> {
     const workspace = this.getWorkspace(input.userId);
 
     try {
       const output = await workspace.account.client
         .get(`v1/workspaces/${workspace.workspaceId}/storage`)
-        .json<WorkspaceStorageGetQueryOutput>();
+        .json<WorkspaceStorageGetOutput>();
 
       return output;
     } catch (error) {
@@ -32,7 +30,7 @@ export class WorkspaceStorageGetQueryHandler
   async checkForChanges(
     _event: Event,
     _input: WorkspaceStorageGetQueryInput,
-    _output: WorkspaceStorageGetQueryOutput
+    _output: WorkspaceStorageGetOutput
   ): Promise<ChangeCheckResult<WorkspaceStorageGetQueryInput>> {
     return {
       hasChanges: false,
