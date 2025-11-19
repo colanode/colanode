@@ -45,6 +45,16 @@ export class AssetService {
 
     if (updatedAvatar) {
       const url = await this.app.fs.url(updatedAvatar.path);
+      if (!url) {
+        await this.app.fs.delete(updatedAvatar.path);
+        await this.app.database
+          .deleteFrom('avatars')
+          .where('id', '=', avatar)
+          .execute();
+
+        return null;
+      }
+
       return mapAvatar(updatedAvatar, url);
     }
 
@@ -115,6 +125,16 @@ export class AssetService {
     }
 
     const url = await this.app.fs.url(avatarPath);
+    if (!url) {
+      await this.app.fs.delete(avatarPath);
+      await this.app.database
+        .deleteFrom('avatars')
+        .where('id', '=', avatar)
+        .execute();
+
+      return false;
+    }
+
     eventBus.publish({
       type: 'avatar.created',
       avatar: mapAvatar(createdAvatar, url),

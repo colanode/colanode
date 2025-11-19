@@ -26,6 +26,7 @@ export const NodeModal = ({ nodeId }: NodeModalProps) => {
           });
         }
       }}
+      modal={true}
     >
       <DialogContent
         className="w-[90vw] h-[90vh] max-w-[90vw] max-h-[90vh] min-w-[90vw] min-h-[90vh] p-2"

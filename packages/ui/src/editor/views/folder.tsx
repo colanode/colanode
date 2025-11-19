@@ -35,15 +35,12 @@ export const FolderNodeView = ({ node }: NodeViewProps) => {
 
   return (
     <NodeViewWrapper data-id={node.attrs.id}>
-      <Link
-        from="/workspace/$userId"
-        to="$nodeId"
-        params={{ nodeId: id }}
-        className="my-0.5 flex h-10 w-full cursor-pointer flex-row items-center gap-1 rounded-md p-1 hover:bg-accent"
-      >
-        <Avatar size="small" id={id} name={name} avatar={avatar} />
-        <div role="presentation" className="grow">
-          {name}
+      <Link from="/workspace/$userId" to="$nodeId" params={{ nodeId: id }}>
+        <div className="my-0.5 flex h-10 w-full cursor-pointer flex-row items-center gap-1 rounded-md p-1 hover:bg-accent">
+          <Avatar size="small" id={id} name={name} avatar={avatar} />
+          <div role="presentation" className="grow">
+            {name}
+          </div>
         </div>
       </Link>
     </NodeViewWrapper>

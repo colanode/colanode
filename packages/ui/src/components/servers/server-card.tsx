@@ -38,9 +38,8 @@ export const ServerCard = ({ server, onSelect }: ServerCardProps) => {
 
   return (
     <>
-      <button
+      <div
         onClick={handleServerClick}
-        disabled={isSyncing}
         className="group/server relative flex w-full flex-row items-center gap-3 rounded-lg border border-border/60 bg-background p-2 text-left transition-all hover:cursor-pointer hover:border-border hover:bg-accent hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <ServerAvatar
@@ -67,7 +66,7 @@ export const ServerCard = ({ server, onSelect }: ServerCardProps) => {
             <SettingsIcon className="size-4" />
           )}
         </button>
-      </button>
+      </div>
       <ServerSettingsDialog
         server={server}
         open={openSettings}

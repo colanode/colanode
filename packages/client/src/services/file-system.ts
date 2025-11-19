@@ -10,5 +10,5 @@ export interface FileSystem {
   listFiles(path: string): Promise<string[]>;
   readFile(path: string): Promise<Uint8Array>;
   writeFile(path: string, data: Uint8Array): Promise<void>;
-  url(path: string): Promise<string>;
+  url(path: string): Promise<string | null>;
 }

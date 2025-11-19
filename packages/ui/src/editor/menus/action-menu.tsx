@@ -150,7 +150,7 @@ export const ActionMenu = ({ editor }: ActionMenuProps) => {
     <FloatingPortal>
       <div
         ref={refs.setFloating}
-        style={floatingStyles}
+        style={{ ...floatingStyles, zIndex: 60 }}
         className="flex items-center text-muted-foreground p-1 mr-2"
       >
         <Plus
