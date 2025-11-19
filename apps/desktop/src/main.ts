@@ -304,7 +304,7 @@ ipcMain.handle(
     const extension = app.path.extension(file.name);
     const mimeType = file.type;
     const subtype = extractFileSubtype(mimeType);
-    const filePath = app.path.tempFile(file.name);
+    const filePath = app.path.tempFile(id + extension);
 
     await app.fs.writeFile(filePath, file.buffer);
     await app.database

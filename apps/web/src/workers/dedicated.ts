@@ -405,7 +405,7 @@ const api: ColanodeWorkerApi = {
     const extension = path.extension(file.name);
     const mimeType = file.type;
     const subtype = extractFileSubtype(mimeType);
-    const filePath = path.tempFile(file.name);
+    const filePath = path.tempFile(id + extension);
 
     const arrayBuffer = await file.arrayBuffer();
     const fileData = new Uint8Array(arrayBuffer);

@@ -1,3 +1,4 @@
+import { eventBus, mapTempFile } from '@colanode/client/lib';
 import { MutationHandler } from '@colanode/client/lib/types';
 import {
   TempFileCreateMutationInput,
@@ -17,8 +18,9 @@ export class TempFileCreateMutationHandler
   async handleMutation(
     input: TempFileCreateMutationInput
   ): Promise<TempFileCreateMutationOutput> {
-    await this.app.database
+    const createdTempFile = await this.app.database
       .insertInto('temp_files')
+      .returningAll()
       .values({
         id: input.id,
         name: input.name,
@@ -31,7 +33,25 @@ export class TempFileCreateMutationHandler
         opened_at: new Date().toISOString(),
       })
       .onConflict((oc) => oc.doNothing())
-      .execute();
+      .executeTakeFirst();
+
+    if (!createdTempFile) {
+      return {
+        success: false,
+      };
+    }
+
+    const url = await this.app.fs.url(createdTempFile.path);
+    if (!url) {
+      return {
+        success: false,
+      };
+    }
+
+    eventBus.publish({
+      type: 'temp.file.created',
+      tempFile: mapTempFile(createdTempFile, url),
+    });
 
     return {
       success: true,
