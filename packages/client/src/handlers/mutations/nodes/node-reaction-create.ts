@@ -12,7 +12,7 @@ export class NodeReactionCreateMutationHandler
   async handleMutation(
     input: NodeReactionCreateMutationInput
   ): Promise<NodeReactionCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     await workspace.nodeReactions.createNodeReaction(
       input.nodeId,
       input.reaction

@@ -1,20 +1,12 @@
 import { createContext, useContext } from 'react';
 
-import {
-  Workspace,
-  WorkspaceMetadataKey,
-  WorkspaceMetadataMap,
-} from '@colanode/client/types';
+import { WorkspaceRole } from '@colanode/core';
 
-interface WorkspaceContext extends Workspace {
-  getMetadata: <K extends WorkspaceMetadataKey>(
-    key: K
-  ) => WorkspaceMetadataMap[K] | undefined;
-  setMetadata: <K extends WorkspaceMetadataKey>(
-    key: K,
-    value: WorkspaceMetadataMap[K]['value']
-  ) => void;
-  deleteMetadata: <K extends WorkspaceMetadataKey>(key: K) => void;
+interface WorkspaceContext {
+  workspaceId: string;
+  accountId: string;
+  userId: string;
+  role: WorkspaceRole;
 }
 
 export const WorkspaceContext = createContext<WorkspaceContext>(

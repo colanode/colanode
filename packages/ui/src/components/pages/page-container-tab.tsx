@@ -13,8 +13,7 @@ export const PageContainerTab = ({ pageId }: PageContainerTabProps) => {
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: pageId,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (nodeGetQuery.isPending) {

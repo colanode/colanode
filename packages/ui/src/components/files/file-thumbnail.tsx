@@ -1,29 +1,35 @@
-import { LocalFileNode } from '@colanode/client/types';
+import { DownloadStatus, LocalFileNode } from '@colanode/client/types';
 import { FileIcon } from '@colanode/ui/components/files/file-icon';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface FileThumbnailProps {
+  userId: string;
   file: LocalFileNode;
   className?: string;
 }
 
-export const FileImageThumbnail = ({ file, className }: FileThumbnailProps) => {
-  const workspace = useWorkspace();
+export const FileImageThumbnail = ({
+  userId,
+  file,
+  className,
+}: FileThumbnailProps) => {
   const localFileQuery = useLiveQuery({
     type: 'local.file.get',
     fileId: file.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: userId,
   });
 
   if (localFileQuery.isPending) {
     return null;
   }
 
-  const localFile = localFileQuery.data?.localFile;
-  if (localFile) {
+  const localFile = localFileQuery.data;
+  if (
+    localFile &&
+    localFile.downloadStatus === DownloadStatus.Completed &&
+    localFile.url
+  ) {
     return (
       <img
         src={localFile.url}
@@ -41,9 +47,15 @@ export const FileImageThumbnail = ({ file, className }: FileThumbnailProps) => {
   );
 };
 
-export const FileThumbnail = ({ file, className }: FileThumbnailProps) => {
+export const FileThumbnail = ({
+  userId,
+  file,
+  className,
+}: FileThumbnailProps) => {
   if (file.attributes.subtype === 'image') {
-    return <FileImageThumbnail file={file} className={className} />;
+    return (
+      <FileImageThumbnail userId={userId} file={file} className={className} />
+    );
   }
 
   return (

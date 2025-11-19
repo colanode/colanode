@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import { Server } from '@colanode/client/types';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   Dialog,
@@ -18,13 +17,9 @@ import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface ServerCreateDialogProps {
   onCancel: () => void;
-  onCreate: (server: Server) => void;
 }
 
-export const ServerCreateDialog = ({
-  onCancel,
-  onCreate,
-}: ServerCreateDialogProps) => {
+export const ServerCreateDialog = ({ onCancel }: ServerCreateDialogProps) => {
   const [open, setOpen] = useState(true);
   const { mutate, isPending } = useMutation();
   const [url, setUrl] = useState('');
@@ -42,7 +37,7 @@ export const ServerCreateDialog = ({
           <DialogTitle>Add a server</DialogTitle>
           <DialogDescription>Add a custom server to login to</DialogDescription>
         </DialogHeader>
-        <div className="flex-grow space-y-2 py-2 pb-4">
+        <div className="grow space-y-2 py-2 pb-4">
           <Label>Server URL</Label>
           <Input
             placeholder="https://us.colanode.com/config"
@@ -63,9 +58,8 @@ export const ServerCreateDialog = ({
                   type: 'server.create',
                   url,
                 },
-                onSuccess(output) {
-                  onCreate(output.server);
-                  toast.success('Server added successfully');
+                onSuccess() {
+                  setOpen(false);
                 },
                 onError(error) {
                   toast.error(error.message);

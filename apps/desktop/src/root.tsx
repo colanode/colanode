@@ -3,10 +3,10 @@ import '../../../packages/ui/src/styles/globals.css';
 
 import { createRoot } from 'react-dom/client';
 
-import { RootProvider } from '@colanode/ui';
+import { App } from '@colanode/ui';
 
 const Root = () => {
-  return <RootProvider type="desktop" />;
+  return <App type="desktop" />;
 };
 
 const root = createRoot(document.getElementById('root') as HTMLElement);

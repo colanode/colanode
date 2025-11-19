@@ -3,33 +3,30 @@ import { InView } from 'react-intersection-observer';
 import { LocalChannelNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface ChannelSidebarItemProps {
   channel: LocalChannelNode;
+  isActive: boolean;
 }
 
-export const ChannelSidebarItem = ({ channel }: ChannelSidebarItemProps) => {
+export const ChannelSidebarItem = ({
+  channel,
+  isActive,
+}: ChannelSidebarItemProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
   const radar = useRadar();
 
-  const isActive = layout.activeTab === channel.id;
-  const unreadState = radar.getNodeState(
-    workspace.accountId,
-    workspace.id,
-    channel.id
-  );
+  const unreadState = radar.getNodeState(workspace.userId, channel.id);
 
   return (
     <InView
       rootMargin="20px"
       onChange={(inView) => {
         if (inView) {
-          radar.markNodeAsSeen(workspace.accountId, workspace.id, channel.id);
+          radar.markNodeAsSeen(workspace.userId, channel.id);
         }
       }}
       className={cn(
@@ -45,7 +42,7 @@ export const ChannelSidebarItem = ({ channel }: ChannelSidebarItemProps) => {
       />
       <span
         className={cn(
-          'line-clamp-1 w-full flex-grow pl-2 text-left',
+          'line-clamp-1 w-full grow pl-2 text-left',
           !isActive && unreadState.hasUnread && 'font-semibold'
         )}
       >

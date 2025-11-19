@@ -1,18 +1,15 @@
-import { MessageCircle } from 'lucide-react';
-
 import { LocalMessageNode } from '@colanode/client/types';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/containers/breadcrumb-item';
+import { defaultIcons } from '@colanode/ui/lib/assets';
 
 interface MessageBreadcrumbItemProps {
   message: LocalMessageNode;
 }
 
 export const MessageBreadcrumbItem = ({
-  message,
+  message: _,
 }: MessageBreadcrumbItemProps) => {
   return (
-    <div className="flex items-center space-x-2" id={message.id}>
-      <MessageCircle className="size-4" />
-      <span>Message</span>
-    </div>
+    <BreadcrumbItem id="message" avatar={defaultIcons.message} name="Message" />
   );
 };

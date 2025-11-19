@@ -1,11 +1,12 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { NodeRole } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { NodeCollaboratorRoleDropdown } from '@colanode/ui/components/collaborators/node-collaborator-role-dropdown';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface NodeCollaboratorProps {
@@ -26,23 +27,29 @@ export const NodeCollaborator = ({
   const workspace = useWorkspace();
   const { mutate } = useMutation();
 
-  const userGetQuery = useLiveQuery({
-    type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: collaboratorId,
-  });
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, collaboratorId))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+        email: users.email,
+      }))
+      .findOne()
+  );
 
-  if (userGetQuery.isPending || !userGetQuery.data) {
+  const user = userQuery.data;
+  if (!user) {
     return null;
   }
 
-  const user = userGetQuery.data;
   return (
     <div className="flex items-center justify-between space-x-3">
       <div className="flex items-center space-x-3">
         <Avatar id={user.id} name={user.name} avatar={user.avatar} />
-        <div className="flex-grow">
+        <div className="grow">
           <p className="text-sm font-medium leading-none">{user.name}</p>
           <p className="text-sm text-muted-foreground">{user.email}</p>
         </div>
@@ -58,8 +65,7 @@ export const NodeCollaborator = ({
                 nodeId: nodeId,
                 collaboratorId: collaboratorId,
                 role: newRole,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               },
               onError(error) {
                 toast.error(error.message);
@@ -76,8 +82,7 @@ export const NodeCollaborator = ({
                   type: 'node.collaborator.delete',
                   nodeId: nodeId,
                   collaboratorId: collaboratorId,
-                  accountId: workspace.accountId,
-                  workspaceId: workspace.id,
+                  userId: workspace.userId,
                 },
               });
             }}

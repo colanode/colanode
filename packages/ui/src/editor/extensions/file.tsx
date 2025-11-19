@@ -51,8 +51,7 @@ export const FileNode = Node.create<FileNodeOptions>({
             const fileCreateResult = await window.colanode.executeMutation({
               type: 'file.create',
               tempFileId: tempFile.id,
-              accountId: options.context.accountId,
-              workspaceId: options.context.workspaceId,
+              userId: options.context.userId,
               parentId: options.context.documentId,
             });
 

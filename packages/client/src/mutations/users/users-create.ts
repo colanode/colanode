@@ -6,8 +6,7 @@ import {
 
 export type UsersCreateMutationInput = {
   type: 'users.create';
-  workspaceId: string;
-  accountId: string;
+  userId: string;
   users: UserCreateInput[];
 };
 

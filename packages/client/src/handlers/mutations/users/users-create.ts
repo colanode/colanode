@@ -15,7 +15,7 @@ export class UsersCreateMutationHandler
   async handleMutation(
     input: UsersCreateMutationInput
   ): Promise<UsersCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     try {
       const body: UsersCreateInput = {
@@ -23,7 +23,7 @@ export class UsersCreateMutationHandler
       };
 
       const output = await workspace.account.client
-        .post(`v1/workspaces/${workspace.id}/users`, {
+        .post(`v1/workspaces/${workspace.workspaceId}/users`, {
           json: body,
         })
         .json<UsersCreateOutput>();

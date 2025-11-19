@@ -1,10 +1,8 @@
-import { Download } from 'lucide-react';
+import { TabItem } from '@colanode/ui/components/layouts/tabs/tab-item';
+import { defaultIcons } from '@colanode/ui/lib/assets';
 
 export const WorkspaceDownloadsTab = () => {
   return (
-    <div className="flex items-center space-x-2">
-      <Download className="size-4" />
-      <span>Downloads</span>
-    </div>
+    <TabItem id="downloads" avatar={defaultIcons.downloads} name="Downloads" />
   );
 };

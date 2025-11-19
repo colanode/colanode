@@ -46,8 +46,7 @@ export const CalendarViewNoValueCount = ({
     databaseId: database.id,
     filters: filters,
     fieldId: field.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   const noValueCount = noValueCountQuery.data?.noValueCount ?? 0;

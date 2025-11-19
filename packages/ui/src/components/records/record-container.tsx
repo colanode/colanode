@@ -1,47 +1,29 @@
 import { LocalRecordNode } from '@colanode/client/types';
-import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
-import { RecordBody } from '@colanode/ui/components/records/record-body';
-import { RecordNotFound } from '@colanode/ui/components/records/record-not-found';
-import { RecordSettings } from '@colanode/ui/components/records/record-settings';
-import {
-  Container,
-  ContainerBody,
-  ContainerHeader,
-  ContainerSettings,
-} from '@colanode/ui/components/ui/container';
-import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
-import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
+import { NodeRole, hasNodeRole } from '@colanode/core';
+import { Document } from '@colanode/ui/components/documents/document';
+import { RecordAttributes } from '@colanode/ui/components/records/record-attributes';
+import { RecordDatabase } from '@colanode/ui/components/records/record-database';
+import { RecordProvider } from '@colanode/ui/components/records/record-provider';
+import { Separator } from '@colanode/ui/components/ui/separator';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 interface RecordContainerProps {
-  recordId: string;
+  record: LocalRecordNode;
+  role: NodeRole;
 }
 
-export const RecordContainer = ({ recordId }: RecordContainerProps) => {
-  const data = useNodeContainer<LocalRecordNode>(recordId);
+export const RecordContainer = ({ record, role }: RecordContainerProps) => {
+  const workspace = useWorkspace();
 
-  useNodeRadar(data.node);
-
-  if (data.isPending) {
-    return null;
-  }
-
-  if (!data.node) {
-    return <RecordNotFound />;
-  }
-
-  const { node: record, role } = data;
-
+  const canEdit =
+    record.createdBy === workspace.userId || hasNodeRole(role, 'editor');
   return (
-    <Container>
-      <ContainerHeader>
-        <ContainerBreadcrumb breadcrumb={data.breadcrumb} />
-        <ContainerSettings>
-          <RecordSettings record={record} role={role} />
-        </ContainerSettings>
-      </ContainerHeader>
-      <ContainerBody>
-        <RecordBody record={record} role={role} />
-      </ContainerBody>
-    </Container>
+    <RecordDatabase id={record.attributes.databaseId} role={role}>
+      <RecordProvider record={record} role={role}>
+        <RecordAttributes />
+      </RecordProvider>
+      <Separator className="my-4 w-full" />
+      <Document node={record} canEdit={canEdit} autoFocus={false} />
+    </RecordDatabase>
   );
 };

@@ -5,45 +5,30 @@ import { PathService } from '@colanode/client/services';
 
 export class DesktopPathService implements PathService {
   private readonly nativePath = path;
+
   private readonly appPath = app.getPath('userData');
+  private readonly bootstrapPath = this.nativePath.join(
+    this.appPath,
+    'bootstrap.json'
+  );
   private readonly appDatabasePath = this.nativePath.join(
     this.appPath,
     'app.db'
   );
-  private readonly accountsDirectoryPath = this.nativePath.join(
+  private readonly avatarsPath = this.nativePath.join(this.appPath, 'avatars');
+  private readonly workspacesPath = this.nativePath.join(
     this.appPath,
-    'accounts'
+    'workspaces'
   );
 
-  private getAccountDirectoryPath(accountId: string): string {
-    return this.nativePath.join(this.accountsDirectoryPath, accountId);
+  private getWorkspaceDirectoryPath(userId: string): string {
+    return this.nativePath.join(this.workspacesPath, userId);
   }
 
-  private getWorkspaceDirectoryPath(
-    accountId: string,
-    workspaceId: string
-  ): string {
+  private getWorkspaceFilesDirectoryPath(userId: string): string {
     return this.nativePath.join(
-      this.getAccountDirectoryPath(accountId),
-      'workspaces',
-      workspaceId
-    );
-  }
-
-  private getWorkspaceFilesDirectoryPath(
-    accountId: string,
-    workspaceId: string
-  ): string {
-    return this.nativePath.join(
-      this.getWorkspaceDirectoryPath(accountId, workspaceId),
+      this.getWorkspaceDirectoryPath(userId),
       'files'
-    );
-  }
-
-  private getAccountAvatarsDirectoryPath(accountId: string): string {
-    return this.nativePath.join(
-      this.getAccountDirectoryPath(accountId),
-      'avatars'
     );
   }
 
@@ -58,68 +43,53 @@ export class DesktopPathService implements PathService {
     return this.appPath;
   }
 
-  public get appDatabase(): string {
-    return this.appDatabasePath;
+  public get bootstrap(): string {
+    return this.bootstrapPath;
   }
 
-  public get accounts(): string {
-    return this.accountsDirectoryPath;
+  public get appDatabase(): string {
+    return this.appDatabasePath;
   }
 
   public get temp(): string {
     return this.nativePath.join(this.appPath, 'temp');
   }
 
+  public get avatars(): string {
+    return this.avatarsPath;
+  }
+
   public tempFile(name: string): string {
     return this.nativePath.join(this.appPath, 'temp', name);
   }
 
-  public account(accountId: string): string {
-    return this.getAccountDirectoryPath(accountId);
+  public avatar(avatarId: string): string {
+    return this.nativePath.join(this.avatarsPath, avatarId + '.jpeg');
   }
 
-  public accountDatabase(accountId: string): string {
+  public workspace(userId: string): string {
+    return this.getWorkspaceDirectoryPath(userId);
+  }
+
+  public workspaceDatabase(userId: string): string {
     return this.nativePath.join(
-      this.getAccountDirectoryPath(accountId),
-      'account.db'
-    );
-  }
-
-  public workspace(accountId: string, workspaceId: string): string {
-    return this.getWorkspaceDirectoryPath(accountId, workspaceId);
-  }
-
-  public workspaceDatabase(accountId: string, workspaceId: string): string {
-    return this.nativePath.join(
-      this.getWorkspaceDirectoryPath(accountId, workspaceId),
+      this.getWorkspaceDirectoryPath(userId),
       'workspace.db'
     );
   }
 
-  public workspaceFiles(accountId: string, workspaceId: string): string {
-    return this.getWorkspaceFilesDirectoryPath(accountId, workspaceId);
+  public workspaceFiles(userId: string): string {
+    return this.getWorkspaceFilesDirectoryPath(userId);
   }
 
   public workspaceFile(
-    accountId: string,
-    workspaceId: string,
+    userId: string,
     fileId: string,
     extension: string
   ): string {
     return this.nativePath.join(
-      this.getWorkspaceFilesDirectoryPath(accountId, workspaceId),
+      this.getWorkspaceFilesDirectoryPath(userId),
       fileId + extension
-    );
-  }
-
-  public accountAvatars(accountId: string): string {
-    return this.getAccountAvatarsDirectoryPath(accountId);
-  }
-
-  public accountAvatar(accountId: string, avatarId: string): string {
-    return this.nativePath.join(
-      this.getAccountAvatarsDirectoryPath(accountId),
-      avatarId + '.jpeg'
     );
   }
 
@@ -153,5 +123,9 @@ export class DesktopPathService implements PathService {
 
   public get iconsDatabase(): string {
     return this.nativePath.join(this.getAssetsSourcePath(), 'icons.db');
+  }
+
+  public font(name: string): string {
+    return this.nativePath.join(this.getAssetsSourcePath(), 'fonts', name);
   }
 }

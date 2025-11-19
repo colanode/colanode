@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-native",
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "paths": {
+      "@assets": ["./assets"],
+      "@colanode/mobile/*": ["./src/*"],
+      "@colanode/core/*": ["../../packages/core/src/*"],
+      "@colanode/crdt/*": ["../../packages/crdt/src/*"],
+      "@colanode/client/*": ["../../packages/client/src/*"],
+      "@colanode/ui/*": ["../../packages/ui/src/*"]
+    }
+  },
+  "exclude": ["node_modules"],
+  "extends": "expo/tsconfig.base",
+  "include": ["**/*", "assets/ui/index.html"],
+  "references": [
+    { "path": "../../packages/core/tsconfig.json" },
+    { "path": "../../packages/crdt/tsconfig.json" },
+    { "path": "../../packages/client/tsconfig.json" },
+    { "path": "../../packages/ui/tsconfig.json" }
+  ],
+}

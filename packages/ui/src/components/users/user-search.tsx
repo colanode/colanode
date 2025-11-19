@@ -30,8 +30,7 @@ export const UserSearch = ({ exclude, onSelect }: UserSearchProps) => {
   const userSearchQuery = useLiveQuery({
     type: 'user.search',
     searchQuery: query,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     exclude,
   });
 
@@ -63,7 +62,7 @@ export const UserSearch = ({ exclude, onSelect }: UserSearchProps) => {
                       avatar={user.avatar}
                       className="h-7 w-7"
                     />
-                    <div className="flex flex-grow flex-col">
+                    <div className="flex grow flex-col">
                       <p className="text-sm">{user.name}</p>
                       <p className="text-xs text-muted-foreground">
                         {user.email}

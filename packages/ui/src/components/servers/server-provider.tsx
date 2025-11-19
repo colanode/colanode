@@ -1,7 +1,9 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
 import { isFeatureSupported } from '@colanode/client/lib';
+import { collections } from '@colanode/ui/collections';
 import { ServerNotFound } from '@colanode/ui/components/servers/server-not-found';
 import { ServerContext } from '@colanode/ui/contexts/server';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface ServerProviderProps {
   domain: string;
@@ -9,18 +11,14 @@ interface ServerProviderProps {
 }
 
 export const ServerProvider = ({ domain, children }: ServerProviderProps) => {
-  const serverListQuery = useLiveQuery({
-    type: 'server.list',
-  });
-
-  const server = serverListQuery.data?.find(
-    (server) => server.domain === domain
+  const serverQuery = useLiveQuery((q) =>
+    q
+      .from({ servers: collections.servers })
+      .where(({ servers }) => eq(servers.domain, domain))
+      .findOne()
   );
 
-  if (serverListQuery.isPending) {
-    return null;
-  }
-
+  const server = serverQuery.data;
   if (!server) {
     return <ServerNotFound domain={domain} />;
   }

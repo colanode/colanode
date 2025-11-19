@@ -28,8 +28,7 @@ export class DatabaseViewListQueryHandler
   ): Promise<ChangeCheckResult<DatabaseViewListQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -39,8 +38,7 @@ export class DatabaseViewListQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'database_view' &&
       event.node.parentId === input.databaseId
     ) {
@@ -54,8 +52,7 @@ export class DatabaseViewListQueryHandler
 
     if (
       event.type === 'node.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'database_view' &&
       event.node.parentId === input.databaseId
     ) {
@@ -78,8 +75,7 @@ export class DatabaseViewListQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'database_view' &&
       event.node.parentId === input.databaseId
     ) {
@@ -102,7 +98,7 @@ export class DatabaseViewListQueryHandler
   private async fetchDatabaseViews(
     input: DatabaseViewListQueryInput
   ): Promise<SelectNode[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const databaseViews = await workspace.database
       .selectFrom('nodes')

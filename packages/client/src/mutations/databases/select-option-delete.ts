@@ -1,7 +1,6 @@
 export type SelectOptionDeleteMutationInput = {
   type: 'select.option.delete';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   databaseId: string;
   fieldId: string;
   optionId: string;

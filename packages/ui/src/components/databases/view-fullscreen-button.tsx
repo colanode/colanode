@@ -1,24 +1,25 @@
 import { Fullscreen } from 'lucide-react';
 
+import { Link } from '@colanode/ui/components/ui/link';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseViews } from '@colanode/ui/contexts/database-views';
-import { useLayout } from '@colanode/ui/contexts/layout';
 
 export const ViewFullscreenButton = () => {
   const database = useDatabase();
   const views = useDatabaseViews();
-  const layout = useLayout();
 
   if (!views.inline) {
     return null;
   }
 
   return (
-    <button
+    <Link
+      from="/workspace/$userId"
+      to="$nodeId"
+      params={{ nodeId: database.id }}
       className="flex cursor-pointer items-center rounded-md p-1.5 hover:bg-accent"
-      onClick={() => layout.previewLeft(database.id, true)}
     >
       <Fullscreen className="size-4" />
-    </button>
+    </Link>
   );
 };

@@ -1,7 +1,5 @@
 export type UserStorageUpdateMutationInput = {
   type: 'user.storage.update';
-  accountId: string;
-  workspaceId: string;
   userId: string;
   storageLimit: string;
   maxFileSize: string;

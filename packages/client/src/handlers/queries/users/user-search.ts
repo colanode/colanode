@@ -26,8 +26,7 @@ export class UserSearchQueryHandler
   ): Promise<ChangeCheckResult<UserSearchQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -37,8 +36,7 @@ export class UserSearchQueryHandler
 
     if (
       event.type === 'user.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       const newResult = await this.handleQuery(input);
       return {
@@ -49,8 +47,7 @@ export class UserSearchQueryHandler
 
     if (
       event.type === 'user.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       const newResult = await this.handleQuery(input);
       return {
@@ -61,8 +58,7 @@ export class UserSearchQueryHandler
 
     if (
       event.type === 'user.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       const newResult = await this.handleQuery(input);
       return {
@@ -79,7 +75,7 @@ export class UserSearchQueryHandler
   private async searchUsers(
     input: UserSearchQueryInput
   ): Promise<SelectUser[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     const exclude = input.exclude ?? [];
 
     let queryBuilder = workspace.database
@@ -96,7 +92,7 @@ export class UserSearchQueryHandler
   }
 
   private async fetchUsers(input: UserSearchQueryInput): Promise<SelectUser[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const exclude = input.exclude ?? [];
     return workspace.database

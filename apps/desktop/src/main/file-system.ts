@@ -44,7 +44,12 @@ export class DesktopFileSystem implements FileSystem {
     await fs.promises.rm(path, { recursive: true, force: true });
   }
 
-  public async url(path: string): Promise<string> {
+  public async url(path: string): Promise<string | null> {
+    const exists = await this.exists(path);
+    if (!exists) {
+      return null;
+    }
+
     const base64Path = Buffer.from(path).toString('base64');
     return `local://files/${base64Path}`;
   }

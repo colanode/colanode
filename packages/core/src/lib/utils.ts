@@ -223,3 +223,21 @@ export const calculatePercentage = (
   const factor = 10 ** digits;
   return Math.round(raw * factor) / factor;
 };
+
+export const bytesToString = (bytes: number[] | Uint8Array): string => {
+  const u8 = bytes instanceof Uint8Array ? bytes : Uint8Array.from(bytes);
+
+  if (typeof globalThis.TextDecoder !== 'undefined') {
+    return new TextDecoder('utf-8').decode(u8);
+  }
+
+  let result = '';
+  const CHUNK = 0x8000;
+  for (let i = 0; i < u8.length; i += CHUNK) {
+    result += String.fromCharCode.apply(
+      null,
+      Array.from(u8.subarray(i, i + CHUNK)) as unknown as number[]
+    );
+  }
+  return result;
+};

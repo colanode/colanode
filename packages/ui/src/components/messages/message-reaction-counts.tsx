@@ -25,8 +25,7 @@ export const MessageReactionCounts = ({
   const nodeReactionsAggregateQuery = useLiveQuery({
     type: 'node.reactions.aggregate',
     nodeId: message.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   const reactionCounts = nodeReactionsAggregateQuery.data ?? [];
@@ -67,8 +66,7 @@ export const MessageReactionCounts = ({
                     input: {
                       type: 'node.reaction.delete',
                       nodeId: message.id,
-                      accountId: workspace.accountId,
-                      workspaceId: workspace.id,
+                      userId: workspace.userId,
                       rootId: message.rootId,
                       reaction: reaction.reaction,
                     },
@@ -81,8 +79,7 @@ export const MessageReactionCounts = ({
                     input: {
                       type: 'node.reaction.create',
                       nodeId: message.id,
-                      accountId: workspace.accountId,
-                      workspaceId: workspace.id,
+                      userId: workspace.userId,
                       rootId: message.rootId,
                       reaction: reaction.reaction,
                     },

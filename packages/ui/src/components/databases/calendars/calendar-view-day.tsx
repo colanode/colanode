@@ -35,7 +35,7 @@ export const CalendarViewDay = ({
         )}
       >
         {onCreate && (
-          <div className="flex-grow">
+          <div className="grow">
             <Plus
               className="size-4 cursor-pointer opacity-0 group-hover/calendar-day:opacity-100"
               onClick={onCreate}

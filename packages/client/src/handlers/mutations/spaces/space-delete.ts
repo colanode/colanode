@@ -12,7 +12,7 @@ export class SpaceDeleteMutationHandler
   async handleMutation(
     input: SpaceDeleteMutationInput
   ): Promise<SpaceDeleteMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     await workspace.nodes.deleteNode(input.spaceId);
 
     return {

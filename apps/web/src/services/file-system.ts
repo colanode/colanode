@@ -1,3 +1,5 @@
+/// <reference lib="webworker" />
+
 import { FileReadStream, FileSystem } from '@colanode/client/services';
 
 export class WebFileSystem implements FileSystem {
@@ -82,6 +84,13 @@ export class WebFileSystem implements FileSystem {
     }
 
     return arrayBuffer;
+  }
+
+  public async reset(): Promise<void> {
+    const root = await this.ensureInitialized();
+    for await (const [name] of root.entries()) {
+      await root.removeEntry(name, { recursive: true });
+    }
   }
 
   public async makeDirectory(path: string): Promise<void> {
@@ -207,10 +216,18 @@ export class WebFileSystem implements FileSystem {
     await writable.close();
   }
 
-  public async url(path: string): Promise<string> {
-    const { parent, name } = await this.getFileLocation(path, false);
-    const fileHandle = await parent.getFileHandle(name);
-    const file = await fileHandle.getFile();
-    return URL.createObjectURL(file);
+  public async url(path: string): Promise<string | null> {
+    try {
+      const { parent, name } = await this.getFileLocation(path, false);
+      const fileHandle = await parent.getFileHandle(name);
+      if (!fileHandle) {
+        return null;
+      }
+
+      const file = await fileHandle.getFile();
+      return URL.createObjectURL(file);
+    } catch {
+      return null;
+    }
   }
 }

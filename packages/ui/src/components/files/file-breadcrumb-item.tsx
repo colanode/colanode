@@ -1,5 +1,6 @@
 import { LocalFileNode } from '@colanode/client/types';
-import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/containers/breadcrumb-item';
+import { defaultIcons } from '@colanode/ui/lib/assets';
 
 interface FileBreadcrumbItemProps {
   file: LocalFileNode;
@@ -7,12 +8,10 @@ interface FileBreadcrumbItemProps {
 
 export const FileBreadcrumbItem = ({ file }: FileBreadcrumbItemProps) => {
   return (
-    <div className="flex items-center space-x-2">
-      <FileThumbnail
-        file={file}
-        className="size-4 overflow-hidden rounded object-contain"
-      />
-      <span>{file.attributes.name}</span>
-    </div>
+    <BreadcrumbItem
+      id={file.id}
+      avatar={defaultIcons.file}
+      name={file.attributes.name}
+    />
   );
 };

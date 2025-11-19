@@ -19,14 +19,14 @@ export class ChatCreateMutationHandler
   public async handleMutation(
     input: ChatCreateMutationInput
   ): Promise<ChatCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const query = sql<ChatRow>`
       SELECT id
       FROM nodes
       WHERE type = 'chat'
+      AND json_extract(attributes, '$.collaborators.${sql.raw(input.collaboratorId)}') is not null
       AND json_extract(attributes, '$.collaborators.${sql.raw(input.userId)}') is not null
-      AND json_extract(attributes, '$.collaborators.${sql.raw(workspace.userId)}') is not null
     `.compile(workspace.database);
 
     const existingChats = await workspace.database.executeQuery(query);
@@ -42,7 +42,7 @@ export class ChatCreateMutationHandler
       type: 'chat',
       collaborators: {
         [input.userId]: 'admin',
-        [workspace.userId]: 'admin',
+        [input.collaboratorId]: 'admin',
       },
     };
 

@@ -1,7 +1,6 @@
 export type FileDeleteMutationInput = {
   type: 'file.delete';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   fileId: string;
 };
 

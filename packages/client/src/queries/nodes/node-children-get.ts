@@ -4,8 +4,7 @@ import { NodeType } from '@colanode/core';
 export type NodeChildrenGetQueryInput = {
   type: 'node.children.get';
   nodeId: string;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   types?: NodeType[];
 };
 

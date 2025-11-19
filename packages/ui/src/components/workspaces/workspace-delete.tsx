@@ -31,7 +31,7 @@ export const WorkspaceDelete = () => {
             certain.
           </p>
         </div>
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Button
             variant="destructive"
             onClick={() => {
@@ -63,8 +63,7 @@ export const WorkspaceDelete = () => {
                 mutate({
                   input: {
                     type: 'workspace.delete',
-                    accountId: workspace.accountId,
-                    workspaceId: workspace.id,
+                    userId: workspace.userId,
                   },
                   onSuccess() {
                     setShowDeleteModal(false);

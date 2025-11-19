@@ -27,9 +27,6 @@ export type Server = {
   version: string;
   createdAt: Date;
   syncedAt: Date | null;
-};
-
-export type ServerDetails = Server & {
   state: ServerState | null;
   isOutdated: boolean;
   configUrl: string;

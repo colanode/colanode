@@ -1,6 +1,9 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+import { useNavigate } from '@tanstack/react-router';
 import { Check, Plus } from 'lucide-react';
 import { useState } from 'react';
 
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import {
   DropdownMenu,
@@ -11,26 +14,31 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
-import { useAccount } from '@colanode/ui/contexts/account';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const SidebarMenuHeader = () => {
   const workspace = useWorkspace();
-  const account = useAccount();
   const radar = useRadar();
+  const navigate = useNavigate();
 
   const [open, setOpen] = useState(false);
-  const workspaceListQuery = useLiveQuery({
-    type: 'workspace.list',
-    accountId: account.id,
-  });
 
-  const workspaces = workspaceListQuery.data ?? [];
-  const otherWorkspaces = workspaces.filter((w) => w.id !== workspace.id);
+  const workspacesQuery = useLiveQuery((q) =>
+    q
+      .from({ workspaces: collections.workspaces })
+      .where(({ workspaces }) => eq(workspaces.accountId, workspace.accountId))
+  );
+
+  const workspaces = workspacesQuery.data;
+  const currentWorkspace = workspaces.find(
+    (w) => w.userId === workspace.userId
+  );
+  const otherWorkspaces = workspaces.filter(
+    (w) => w.userId !== workspace.userId
+  );
   const otherWorkspaceStates = otherWorkspaces.map((w) =>
-    radar.getWorkspaceState(w.accountId, w.id)
+    radar.getWorkspaceState(w.userId)
   );
   const unreadCount = otherWorkspaceStates.reduce(
     (acc, curr) => acc + curr.state.unreadCount,
@@ -38,14 +46,18 @@ export const SidebarMenuHeader = () => {
   );
   const hasUnread = otherWorkspaceStates.some((w) => w.state.hasUnread);
 
+  if (!currentWorkspace) {
+    return null;
+  }
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
-        <button className="flex w-full items-center justify-center relative cursor-pointer outline-none">
+        <button className="flex w-full items-center justify-center relative cursor-pointer outline-none mt-2">
           <Avatar
-            id={workspace.id}
-            avatar={workspace.avatar}
-            name={workspace.name}
+            id={currentWorkspace.workspaceId}
+            avatar={currentWorkspace.avatar}
+            name={currentWorkspace.name}
             className="size-10 rounded-lg shadow-md"
           />
           <UnreadBadge
@@ -64,28 +76,32 @@ export const SidebarMenuHeader = () => {
         <DropdownMenuLabel className="mb-1">Workspaces</DropdownMenuLabel>
         {workspaces.map((workspaceItem) => {
           const workspaceUnreadState = radar.getWorkspaceState(
-            workspaceItem.accountId,
-            workspaceItem.id
+            workspaceItem.userId
           );
           return (
             <DropdownMenuItem
-              key={workspaceItem.id}
+              key={workspaceItem.userId}
               className="p-0 cursor-pointer"
               onClick={() => {
-                account.openWorkspace(workspaceItem.id);
+                navigate({
+                  to: '/workspace/$userId',
+                  params: {
+                    userId: workspaceItem.userId,
+                  },
+                });
               }}
             >
               <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar
                   className="h-8 w-8 rounded-lg"
-                  id={workspaceItem.id}
+                  id={workspaceItem.workspaceId}
                   name={workspaceItem.name}
                   avatar={workspaceItem.avatar}
                 />
                 <p className="flex-1 text-left text-sm leading-tight truncate font-normal">
                   {workspaceItem.name}
                 </p>
-                {workspaceItem.id === workspace.id ? (
+                {workspaceItem.userId === workspace.userId ? (
                   <Check className="size-4" />
                 ) : (
                   <UnreadBadge
@@ -101,7 +117,9 @@ export const SidebarMenuHeader = () => {
         <DropdownMenuItem
           className="gap-2 p-2 text-muted-foreground hover:text-foreground cursor-pointer"
           onClick={() => {
-            account.openWorkspaceCreate();
+            navigate({
+              to: '/create',
+            });
           }}
         >
           <Plus className="size-4" />

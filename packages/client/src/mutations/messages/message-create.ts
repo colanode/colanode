@@ -2,8 +2,7 @@ import { JSONContent } from '@tiptap/core';
 
 export type MessageCreateMutationInput = {
   type: 'message.create';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   parentId: string;
   content: JSONContent;
   referenceId?: string;

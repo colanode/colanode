@@ -1,12 +1,9 @@
 import {
-  SelectAccountMetadata,
   SelectAvatar,
   SelectWorkspace,
-} from '@colanode/client/databases/account';
-import {
   SelectAccount,
-  SelectAppMetadata,
-  SelectServer,
+  SelectMetadata,
+  SelectTab,
   SelectTempFile,
 } from '@colanode/client/databases/app';
 import { SelectEmoji } from '@colanode/client/databases/emojis';
@@ -17,7 +14,6 @@ import {
   SelectUser,
   SelectNodeInteraction,
   SelectNodeReaction,
-  SelectWorkspaceMetadata,
   SelectDocument,
   SelectDocumentState,
   SelectDocumentUpdate,
@@ -26,12 +22,8 @@ import {
   SelectDownload,
   SelectUpload,
 } from '@colanode/client/databases/workspace';
-import {
-  Account,
-  AccountMetadata,
-  AccountMetadataKey,
-} from '@colanode/client/types/accounts';
-import { AppMetadata, AppMetadataKey } from '@colanode/client/types/apps';
+import { Account } from '@colanode/client/types/accounts';
+import { Metadata, Tab } from '@colanode/client/types/apps';
 import { Avatar } from '@colanode/client/types/avatars';
 import {
   Document,
@@ -52,14 +44,10 @@ import {
   NodeReaction,
   NodeReference,
 } from '@colanode/client/types/nodes';
-import { Server } from '@colanode/client/types/servers';
 import { User } from '@colanode/client/types/users';
-import {
-  Workspace,
-  WorkspaceMetadata,
-  WorkspaceMetadataKey,
-} from '@colanode/client/types/workspaces';
+import { Workspace } from '@colanode/client/types/workspaces';
 import { Mutation } from '@colanode/core';
+import { encodeState } from '@colanode/crdt';
 
 export const mapUser = (row: SelectUser): User => {
   return {
@@ -108,7 +96,7 @@ export const mapDocumentState = (row: SelectDocumentState): DocumentState => {
   return {
     id: row.id,
     revision: row.revision,
-    state: row.state,
+    state: encodeState(row.state),
   };
 };
 
@@ -118,7 +106,7 @@ export const mapDocumentUpdate = (
   return {
     id: row.id,
     documentId: row.document_id,
-    data: row.data,
+    data: encodeState(row.data),
   };
 };
 
@@ -139,15 +127,15 @@ export const mapAccount = (row: SelectAccount): Account => {
 
 export const mapWorkspace = (row: SelectWorkspace): Workspace => {
   return {
-    id: row.id,
+    workspaceId: row.workspace_id,
+    userId: row.user_id,
     name: row.name,
     accountId: row.account_id,
     role: row.role,
-    userId: row.user_id,
     avatar: row.avatar,
     description: row.description,
-    maxFileSize: row.max_file_size,
-    storageLimit: row.storage_limit,
+    maxFileSize: row.max_file_size.toString(),
+    storageLimit: row.storage_limit.toString(),
   };
 };
 
@@ -157,18 +145,6 @@ export const mapMutation = (row: SelectMutation): Mutation => {
     type: row.type,
     data: JSON.parse(row.data),
     createdAt: row.created_at,
-  };
-};
-
-export const mapServer = (row: SelectServer): Server => {
-  return {
-    domain: row.domain,
-    name: row.name,
-    avatar: row.avatar,
-    attributes: JSON.parse(row.attributes),
-    version: row.version,
-    createdAt: new Date(row.created_at),
-    syncedAt: row.synced_at ? new Date(row.synced_at) : null,
   };
 };
 
@@ -197,16 +173,21 @@ export const mapNodeInteraction = (
   };
 };
 
-export const mapLocalFile = (row: SelectLocalFile, url: string): LocalFile => {
+export const mapLocalFile = (
+  row: SelectLocalFile,
+  url: string | null
+): LocalFile => {
   return {
     id: row.id,
     version: row.version,
-    name: row.name,
     path: row.path,
-    size: row.size,
-    subtype: row.subtype,
     openedAt: row.opened_at,
-    mimeType: row.mime_type,
+    downloadStatus: row.download_status,
+    downloadProgress: row.download_progress,
+    downloadRetries: row.download_retries,
+    downloadCompletedAt: row.download_completed_at,
+    downloadErrorCode: row.download_error_code,
+    downloadErrorMessage: row.download_error_message,
     createdAt: row.created_at,
     url,
   };
@@ -230,7 +211,6 @@ export const mapDownload = (row: SelectDownload): Download => {
     id: row.id,
     fileId: row.file_id,
     version: row.version,
-    type: row.type,
     name: row.name,
     path: row.path,
     size: row.size,
@@ -280,32 +260,22 @@ export const mapIcon = (row: SelectIcon): Icon => {
   };
 };
 
-export const mapAppMetadata = (row: SelectAppMetadata): AppMetadata => {
+export const mapMetadata = (row: SelectMetadata): Metadata => {
   return {
-    key: row.key as AppMetadataKey,
-    value: JSON.parse(row.value),
+    namespace: row.namespace,
+    key: row.key,
+    value: row.value,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };
 };
 
-export const mapAccountMetadata = (
-  row: SelectAccountMetadata
-): AccountMetadata => {
+export const mapTab = (row: SelectTab): Tab => {
   return {
-    key: row.key as AccountMetadataKey,
-    value: JSON.parse(row.value),
-    createdAt: row.created_at,
-    updatedAt: row.updated_at,
-  };
-};
-
-export const mapWorkspaceMetadata = (
-  row: SelectWorkspaceMetadata
-): WorkspaceMetadata => {
-  return {
-    key: row.key as WorkspaceMetadataKey,
-    value: JSON.parse(row.value),
+    id: row.id,
+    location: row.location,
+    index: row.index,
+    lastActiveAt: row.last_active_at,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
   };

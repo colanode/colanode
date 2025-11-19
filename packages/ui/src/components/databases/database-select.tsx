@@ -31,8 +31,7 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
 
   const databaseListQuery = useLiveQuery({
     type: 'database.list',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   const databases = databaseListQuery.data ?? [];

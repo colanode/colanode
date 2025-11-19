@@ -1,44 +1,35 @@
 import { LocalFileNode } from '@colanode/client/types';
-import { FileBody } from '@colanode/ui/components/files/file-body';
-import { FileNotFound } from '@colanode/ui/components/files/file-not-found';
-import { FileSettings } from '@colanode/ui/components/files/file-settings';
-import { ContainerBreadcrumb } from '@colanode/ui/components/layouts/containers/container-breadrumb';
-import {
-  Container,
-  ContainerBody,
-  ContainerHeader,
-  ContainerSettings,
-} from '@colanode/ui/components/ui/container';
-import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
-import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
+import { FileNoPreview } from '@colanode/ui/components/files/file-no-preview';
+import { FilePreview } from '@colanode/ui/components/files/file-preview';
+import { FileSaveButton } from '@colanode/ui/components/files/file-save-button';
+import { FileSidebar } from '@colanode/ui/components/files/file-sidebar';
+import { canPreviewFile } from '@colanode/ui/lib/files';
 
 interface FileContainerProps {
-  fileId: string;
+  file: LocalFileNode;
 }
 
-export const FileContainer = ({ fileId }: FileContainerProps) => {
-  const data = useNodeContainer<LocalFileNode>(fileId);
-  useNodeRadar(data.node);
-
-  if (data.isPending) {
-    return null;
-  }
-
-  if (!data.node) {
-    return <FileNotFound />;
-  }
+export const FileContainer = ({ file }: FileContainerProps) => {
+  const canPreview = canPreviewFile(file.attributes.subtype);
 
   return (
-    <Container>
-      <ContainerHeader>
-        <ContainerBreadcrumb breadcrumb={data.breadcrumb} />
-        <ContainerSettings>
-          <FileSettings file={data.node} role={data.role} />
-        </ContainerSettings>
-      </ContainerHeader>
-      <ContainerBody>
-        <FileBody file={data.node} />
-      </ContainerBody>
-    </Container>
+    <div className="flex h-full max-h-full w-full flex-row items-center gap-2">
+      <div className="flex flex-col w-full max-w-full h-full grow overflow-hidden">
+        <div className="flex flex-row w-full items-center justify-end p-4 gap-4">
+          <FileSaveButton file={file} />
+        </div>
+
+        <div className="flex flex-col grow items-center justify-center overflow-hidden p-10">
+          {canPreview ? (
+            <FilePreview file={file} />
+          ) : (
+            <FileNoPreview mimeType={file.attributes.mimeType} />
+          )}
+        </div>
+      </div>
+      <div className="h-full w-72 min-w-72 overflow-hidden border-l border-border p-2 pl-3">
+        <FileSidebar file={file} />
+      </div>
+    </div>
   );
 };

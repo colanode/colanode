@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import { generateId, IdType } from '@colanode/core';
@@ -9,7 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -25,7 +25,7 @@ export const FolderCreateDialog = ({
   onOpenChange,
 }: FolderCreateDialogProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   return (
@@ -58,13 +58,15 @@ export const FolderCreateDialog = ({
                 parentId: spaceId,
                 name: values.name,
                 avatar: values.avatar,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
                 generateIndex: true,
               },
               onSuccess(output) {
                 onOpenChange(false);
-                layout.previewLeft(output.id);
+                navigate({
+                  to: '$nodeId',
+                  params: { nodeId: output.id },
+                });
               },
               onError(error) {
                 toast.error(error.message);

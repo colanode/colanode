@@ -25,7 +25,7 @@ export const SpaceCreateDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-xl max-w-xl min-w-xl">
+      <DialogContent className="w-xl max-w-full">
         <DialogHeader>
           <DialogTitle>Create space</DialogTitle>
           <DialogDescription>
@@ -48,8 +48,7 @@ export const SpaceCreateDialog = ({
                 name: values.name,
                 description: values.description,
                 avatar: values.avatar,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               },
               onSuccess() {
                 onOpenChange(false);

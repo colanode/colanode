@@ -3,8 +3,12 @@ import { Kysely, Transaction } from 'kysely';
 import { DatabaseSchema } from '@colanode/server/data/schema';
 
 export type CounterKey =
-  | `${string}.storage.used`
+  | `${string}.uploads.size`
+  | `${string}.uploads.count`
   | `${string}.nodes.count`
+  | `${string}.nodes.size`
+  | `${string}.documents.count`
+  | `${string}.documents.size`
   | `node.updates.merge.cursor`
   | `document.updates.merge.cursor`;
 

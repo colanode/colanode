@@ -28,7 +28,7 @@ export const FileSettings = ({ file, role }: FileSettingsProps) => {
     <Fragment>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Settings className="size-5 cursor-pointer text-muted-foreground hover:text-foreground" />
+          <Settings className="size-4 cursor-pointer text-muted-foreground hover:text-foreground" />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" className="mr-2 w-56">
           <DropdownMenuItem className="flex items-center gap-2" disabled>

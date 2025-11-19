@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import {
@@ -11,7 +12,6 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -27,7 +27,7 @@ export const FolderDeleteDialog = ({
   onOpenChange,
 }: FolderDeleteDialogProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   return (
@@ -52,12 +52,13 @@ export const FolderDeleteDialog = ({
                 input: {
                   type: 'folder.delete',
                   folderId: folderId,
-                  accountId: workspace.accountId,
-                  workspaceId: workspace.id,
+                  userId: workspace.userId,
                 },
                 onSuccess() {
                   onOpenChange(false);
-                  layout.close(folderId);
+                  navigate({
+                    to: '/',
+                  });
                 },
                 onError(error) {
                   toast.error(error.message);

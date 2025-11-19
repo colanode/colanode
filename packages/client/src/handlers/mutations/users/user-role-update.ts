@@ -15,7 +15,7 @@ export class UserRoleUpdateMutationHandler
   async handleMutation(
     input: UserRoleUpdateMutationInput
   ): Promise<UserRoleUpdateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     try {
       const body: UserRoleUpdateInput = {
@@ -23,9 +23,12 @@ export class UserRoleUpdateMutationHandler
       };
 
       const output = await workspace.account.client
-        .patch(`v1/workspaces/${workspace.id}/users/${input.userId}/role`, {
-          json: body,
-        })
+        .patch(
+          `v1/workspaces/${workspace.workspaceId}/users/${input.userId}/role`,
+          {
+            json: body,
+          }
+        )
         .json<UserOutput>();
 
       await workspace.users.upsert(output);

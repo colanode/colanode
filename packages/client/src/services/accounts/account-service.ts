@@ -1,21 +1,14 @@
 import { KyInstance } from 'ky';
-import { Kysely, Migration, Migrator } from 'kysely';
 import ms from 'ms';
 
-import {
-  AccountDatabaseSchema,
-  accountDatabaseMigrations,
-} from '@colanode/client/databases/account';
+import { SelectWorkspace } from '@colanode/client/databases';
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { parseApiError } from '@colanode/client/lib/ky';
 import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
 import { AccountSocket } from '@colanode/client/services/accounts/account-socket';
-import { AvatarService } from '@colanode/client/services/accounts/avatar-service';
 import { AppService } from '@colanode/client/services/app-service';
 import { ServerService } from '@colanode/client/services/server-service';
-import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import { Account } from '@colanode/client/types/accounts';
-import { Workspace } from '@colanode/client/types/workspaces';
 import {
   AccountSyncOutput,
   ApiErrorCode,
@@ -27,16 +20,12 @@ import {
 const debug = createDebugger('desktop:service:account');
 
 export class AccountService {
-  private readonly workspaces: Map<string, WorkspaceService> = new Map();
-  private readonly account: Account;
-
-  public readonly app: AppService;
-  public readonly server: ServerService;
-  public readonly database: Kysely<AccountDatabaseSchema>;
-  public readonly avatars: AvatarService;
-
+  public readonly account: Account;
   public readonly socket: AccountSocket;
   public readonly client: KyInstance;
+  public readonly app: AppService;
+  public readonly server: ServerService;
+
   private readonly accountSyncJobScheduleId: string;
   private readonly eventSubscriptionId: string;
 
@@ -47,12 +36,6 @@ export class AccountService {
     this.server = server;
     this.app = app;
 
-    this.database = app.kysely.build<AccountDatabaseSchema>({
-      path: app.path.accountDatabase(this.account.id),
-      readonly: false,
-    });
-
-    this.avatars = new AvatarService(this);
     this.socket = new AccountSocket(this);
     this.client = this.app.client.extend({
       prefixUrl: this.server.httpBaseUrl,
@@ -70,7 +53,8 @@ export class AccountService {
         this.handleMessage(event.message);
       } else if (
         event.type === 'server.availability.changed' &&
-        event.server.domain === this.server.domain
+        event.isAvailable &&
+        event.domain === this.server.domain
       ) {
         this.app.jobs.triggerJobSchedule(this.accountSyncJobScheduleId);
       }
@@ -90,12 +74,6 @@ export class AccountService {
   }
 
   public async init(): Promise<void> {
-    await this.migrate();
-    await this.app.fs.makeDirectory(this.app.path.account(this.account.id));
-    await this.app.fs.makeDirectory(
-      this.app.path.accountAvatars(this.account.id)
-    );
-
     await this.app.jobs.upsertJobSchedule(
       this.accountSyncJobScheduleId,
       {
@@ -112,7 +90,6 @@ export class AccountService {
     );
 
     this.socket.init();
-    await this.initWorkspaces();
   }
 
   public updateAccount(account: Account): void {
@@ -121,16 +98,16 @@ export class AccountService {
     this.account.deviceId = account.deviceId;
   }
 
-  public getWorkspace(id: string): WorkspaceService | null {
-    return this.workspaces.get(id) ?? null;
-  }
-
-  public getWorkspaces(): WorkspaceService[] {
-    return Array.from(this.workspaces.values());
-  }
-
   public async logout(): Promise<void> {
     try {
+      const workspaces = this.app
+        .getWorkspaces()
+        .filter((w) => w.account.id === this.account.id);
+
+      for (const workspace of workspaces) {
+        await workspace.delete();
+      }
+
       const deletedAccount = await this.app.database
         .deleteFrom('accounts')
         .where('id', '=', this.account.id)
@@ -139,6 +116,11 @@ export class AccountService {
       if (!deletedAccount) {
         throw new Error('Failed to delete account');
       }
+
+      await this.app.database
+        .deleteFrom('metadata')
+        .where('namespace', '=', this.account.id)
+        .execute();
 
       await this.app.jobs.addJob(
         {
@@ -154,21 +136,8 @@ export class AccountService {
 
       await this.app.jobs.removeJobSchedule(this.accountSyncJobScheduleId);
 
-      const workspaces = this.workspaces.values();
-      for (const workspace of workspaces) {
-        await workspace.delete();
-        this.workspaces.delete(workspace.id);
-      }
-
-      this.database.destroy();
       this.socket.close();
       eventBus.unsubscribe(this.eventSubscriptionId);
-
-      const databasePath = this.app.path.accountDatabase(this.account.id);
-      await this.app.kysely.delete(databasePath);
-
-      const accountPath = this.app.path.account(this.account.id);
-      await this.app.fs.delete(accountPath);
 
       eventBus.publish({
         type: 'account.deleted',
@@ -176,52 +145,6 @@ export class AccountService {
       });
     } catch (error) {
       debug(`Error logging out of account ${this.account.id}: ${error}`);
-    }
-  }
-
-  private async migrate(): Promise<void> {
-    debug(`Migrating account database for account ${this.account.id}`);
-    const migrator = new Migrator({
-      db: this.database,
-      provider: {
-        getMigrations(): Promise<Record<string, Migration>> {
-          return Promise.resolve(accountDatabaseMigrations);
-        },
-      },
-    });
-
-    await migrator.migrateToLatest();
-  }
-
-  private async initWorkspaces(): Promise<void> {
-    const workspaces = await this.database
-      .selectFrom('workspaces')
-      .selectAll()
-      .where('account_id', '=', this.account.id)
-      .execute();
-
-    for (const workspace of workspaces) {
-      const mappedWorkspace = mapWorkspace(workspace);
-      await this.initWorkspace(mappedWorkspace);
-    }
-  }
-
-  public async initWorkspace(workspace: Workspace): Promise<void> {
-    if (this.workspaces.has(workspace.id)) {
-      return;
-    }
-
-    const workspaceService = new WorkspaceService(workspace, this);
-    await workspaceService.init();
-
-    this.workspaces.set(workspace.id, workspaceService);
-  }
-
-  public async deleteWorkspace(id: string): Promise<void> {
-    const workspaceService = this.workspaces.get(id);
-    if (workspaceService) {
-      await workspaceService.delete();
-      this.workspaces.delete(id);
     }
   }
 
@@ -256,27 +179,124 @@ export class AccountService {
         response.account.name !== this.account.name ||
         response.account.avatar !== this.account.avatar;
 
-      const updatedAccount = await this.app.database
-        .updateTable('accounts')
-        .returningAll()
-        .set({
-          name: response.account.name,
-          avatar: response.account.avatar,
-          updated_at: hasChanges
-            ? new Date().toISOString()
-            : this.account.updatedAt,
-          synced_at: new Date().toISOString(),
-        })
-        .where('id', '=', this.account.id)
-        .executeTakeFirst();
+      // Execute all database operations in a single transaction
+      const result = await this.app.database
+        .transaction()
+        .execute(async (trx) => {
+          // Update account
+          const updatedAccount = await trx
+            .updateTable('accounts')
+            .returningAll()
+            .set({
+              name: response.account.name,
+              avatar: response.account.avatar,
+              updated_at: hasChanges
+                ? new Date().toISOString()
+                : this.account.updatedAt,
+              synced_at: new Date().toISOString(),
+            })
+            .where('id', '=', this.account.id)
+            .executeTakeFirst();
 
-      if (!updatedAccount) {
-        debug(`Failed to update account ${this.account.email} after sync`);
-        return;
-      }
+          if (!updatedAccount) {
+            throw new Error(
+              `Failed to update account ${this.account.email} after sync`
+            );
+          }
+
+          const createdWorkspaces: SelectWorkspace[] = [];
+          const updatedWorkspaces: SelectWorkspace[] = [];
+          const deletedWorkspaces: SelectWorkspace[] = [];
+
+          const currentWorkspaces = await trx
+            .selectFrom('workspaces')
+            .select('workspace_id')
+            .where('account_id', '=', this.account.id)
+            .execute();
+
+          const currentWorkspaceIds = new Set(
+            currentWorkspaces.map((w) => w.workspace_id)
+          );
+
+          for (const workspace of response.workspaces) {
+            if (currentWorkspaceIds.has(workspace.id)) {
+              // Update existing workspace
+              const updatedWorkspace = await trx
+                .updateTable('workspaces')
+                .returningAll()
+                .set({
+                  name: workspace.name,
+                  description: workspace.description,
+                  avatar: workspace.avatar,
+                  role: workspace.user.role,
+                  storage_limit: workspace.user.storageLimit,
+                  max_file_size: workspace.user.maxFileSize,
+                })
+                .where('workspace_id', '=', workspace.id)
+                .executeTakeFirst();
+
+              if (updatedWorkspace) {
+                updatedWorkspaces.push(updatedWorkspace);
+              }
+            } else {
+              // Create new workspace
+              const createdWorkspace = await trx
+                .insertInto('workspaces')
+                .returningAll()
+                .values({
+                  workspace_id: workspace.id,
+                  account_id: this.account.id,
+                  user_id: workspace.user.id,
+                  name: workspace.name,
+                  description: workspace.description,
+                  avatar: workspace.avatar,
+                  role: workspace.user.role,
+                  storage_limit: workspace.user.storageLimit,
+                  max_file_size: workspace.user.maxFileSize,
+                  created_at: new Date().toISOString(),
+                })
+                .executeTakeFirst();
+
+              if (createdWorkspace) {
+                createdWorkspaces.push(createdWorkspace);
+              }
+            }
+          }
+
+          const serverWorkspaceIds = new Set(
+            response.workspaces.map((w) => w.id)
+          );
+
+          const workspacesToDelete = [];
+          for (const workspaceId of currentWorkspaceIds) {
+            if (!serverWorkspaceIds.has(workspaceId)) {
+              workspacesToDelete.push(workspaceId);
+            }
+          }
+
+          if (workspacesToDelete.length > 0) {
+            const deleted = await trx
+              .deleteFrom('workspaces')
+              .returningAll()
+              .where('workspace_id', 'in', workspacesToDelete)
+              .where('account_id', '=', this.account.id)
+              .execute();
+
+            for (const deletedWorkspace of deleted) {
+              deletedWorkspaces.push(deletedWorkspace);
+            }
+          }
+
+          return {
+            updatedAccount,
+            createdWorkspaces,
+            updatedWorkspaces,
+            deletedWorkspaces,
+          };
+        });
 
       debug(`Updated account ${this.account.email} after sync`);
-      const account = mapAccount(updatedAccount);
+      const account = mapAccount(result.updatedAccount);
       this.updateAccount(account);
       this.socket.checkConnection();
 
@@ -285,74 +305,25 @@ export class AccountService {
         account,
       });
 
-      for (const workspace of response.workspaces) {
-        const workspaceService = this.getWorkspace(workspace.id);
-        if (!workspaceService) {
-          const createdWorkspace = await this.database
-            .insertInto('workspaces')
-            .returningAll()
-            .values({
-              id: workspace.id,
-              account_id: this.account.id,
-              user_id: workspace.user.id,
-              name: workspace.name,
-              description: workspace.description,
-              avatar: workspace.avatar,
-              role: workspace.user.role,
-              storage_limit: workspace.user.storageLimit,
-              max_file_size: workspace.user.maxFileSize,
-              created_at: new Date().toISOString(),
-            })
-            .executeTakeFirst();
-
-          if (!createdWorkspace) {
-            debug(`Failed to create workspace ${workspace.id}`);
-            continue;
-          }
-
-          const mappedWorkspace = mapWorkspace(createdWorkspace);
-          await this.initWorkspace(mappedWorkspace);
-
-          eventBus.publish({
-            type: 'workspace.created',
-            workspace: mappedWorkspace,
-          });
-        } else {
-          const updatedWorkspace = await this.database
-            .updateTable('workspaces')
-            .returningAll()
-            .set({
-              name: workspace.name,
-              description: workspace.description,
-              avatar: workspace.avatar,
-              role: workspace.user.role,
-              storage_limit: workspace.user.storageLimit,
-              max_file_size: workspace.user.maxFileSize,
-            })
-            .where('id', '=', workspace.id)
-            .executeTakeFirst();
-
-          if (updatedWorkspace) {
-            const mappedWorkspace = mapWorkspace(updatedWorkspace);
-            workspaceService.updateWorkspace(mappedWorkspace);
-
-            eventBus.publish({
-              type: 'workspace.updated',
-              workspace: mappedWorkspace,
-            });
-          }
-        }
+      for (const createdWorkspace of result.createdWorkspaces) {
+        eventBus.publish({
+          type: 'workspace.created',
+          workspace: mapWorkspace(createdWorkspace),
+        });
       }
 
-      const workspaceIds = this.workspaces.keys();
-      for (const workspaceId of workspaceIds) {
-        const updatedWorkspace = response.workspaces.find(
-          (w) => w.id === workspaceId
-        );
+      for (const updatedWorkspace of result.updatedWorkspaces) {
+        eventBus.publish({
+          type: 'workspace.updated',
+          workspace: mapWorkspace(updatedWorkspace),
+        });
+      }
 
-        if (!updatedWorkspace) {
-          await this.deleteWorkspace(workspaceId);
-        }
+      for (const deletedWorkspace of result.deletedWorkspaces) {
+        eventBus.publish({
+          type: 'workspace.deleted',
+          workspace: mapWorkspace(deletedWorkspace),
+        });
       }
     } catch (error) {
       const parsedError = await parseApiError(error);

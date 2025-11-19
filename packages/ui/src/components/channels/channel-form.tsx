@@ -64,7 +64,7 @@ export const ChannelForm = ({
         className="flex flex-col"
         onSubmit={form.handleSubmit(handleSubmit)}
       >
-        <div className="flex-grow flex flex-row items-end gap-2 py-2 pb-4">
+        <div className="grow flex flex-row items-end gap-2 py-2 pb-4">
           {readOnly ? (
             <Button type="button" variant="outline" size="icon">
               <Avatar id={id} name={name} avatar={avatar} className="h-6 w-6" />

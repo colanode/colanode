@@ -24,7 +24,7 @@ export class WorkspaceUpdateMutationHandler
   async handleMutation(
     input: WorkspaceUpdateMutationInput
   ): Promise<WorkspaceUpdateMutationOutput> {
-    const accountService = this.app.getAccount(input.accountId);
+    const accountService = this.app.getAccount(input.userId);
 
     if (!accountService) {
       throw new MutationError(
@@ -33,7 +33,7 @@ export class WorkspaceUpdateMutationHandler
       );
     }
 
-    const workspaceService = accountService.getWorkspace(input.id);
+    const workspaceService = this.app.getWorkspace(input.userId);
     if (!workspaceService) {
       throw new MutationError(
         MutationErrorCode.WorkspaceNotFound,
@@ -54,7 +54,7 @@ export class WorkspaceUpdateMutationHandler
         })
         .json<Workspace>();
 
-      const updatedWorkspace = await accountService.database
+      const updatedWorkspace = await this.app.database
         .updateTable('workspaces')
         .returningAll()
         .set({
@@ -63,7 +63,7 @@ export class WorkspaceUpdateMutationHandler
           avatar: response.avatar,
           role: response.role,
         })
-        .where((eb) => eb.and([eb('id', '=', input.id)]))
+        .where((eb) => eb.and([eb('user_id', '=', input.userId)]))
         .executeTakeFirst();
 
       if (!updatedWorkspace) {

@@ -1,8 +1,8 @@
 import { TrashIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
-import { ServerDetails } from '@colanode/client/types';
-import { formatDate, isColanodeServer, timeAgo } from '@colanode/core';
+import { Server } from '@colanode/client/types';
+import { formatDate, isColanodeDomain, timeAgo } from '@colanode/core';
 import { ServerAvatar } from '@colanode/ui/components/servers/server-avatar';
 import { Badge } from '@colanode/ui/components/ui/badge';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -23,7 +23,7 @@ import { cn } from '@colanode/ui/lib/utils';
 interface ServerSettingsDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  server: ServerDetails;
+  server: Server;
   onDelete: () => void;
 }
 
@@ -45,7 +45,7 @@ export const ServerSettingsDialog = ({
     return () => clearInterval(interval);
   }, [open]);
 
-  const canDelete = !isColanodeServer(server.domain);
+  const canDelete = !isColanodeDomain(server.domain);
   const isAvailable = server.state?.isAvailable ?? false;
   const isOutdated = server.isOutdated;
 
@@ -175,16 +175,23 @@ export const ServerSettingsDialog = ({
 
         {canDelete && (
           <div className="border rounded-lg p-4">
-            <h3 className="text-sm mb-3">Delete server from this device</h3>
-            <Button
-              variant="destructive"
-              onClick={() => {
-                onDelete();
-              }}
-            >
-              <TrashIcon className="size-4 mr-1" />
-              Delete
-            </Button>
+            <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+              <h3 className="text-sm font-semibold">
+                Delete server from this device
+              </h3>
+              <div className="w-full md:w-auto md:shrink-0">
+                <Button
+                  variant="destructive"
+                  className="w-full md:w-auto cursor-pointer"
+                  onClick={() => {
+                    onDelete();
+                  }}
+                >
+                  <TrashIcon className="size-4 mr-1" />
+                  Delete
+                </Button>
+              </div>
+            </div>
           </div>
         )}
       </DialogContent>

@@ -1,6 +1,7 @@
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
 import { IconSvgGetQueryInput } from '@colanode/client/queries/icons/icon-svg-get';
 import { AppService } from '@colanode/client/services/app-service';
+import { bytesToString } from '@colanode/core';
 
 export class IconSvgGetQueryHandler
   implements QueryHandler<IconSvgGetQueryInput>
@@ -14,10 +15,6 @@ export class IconSvgGetQueryHandler
   public async handleQuery(
     input: IconSvgGetQueryInput
   ): Promise<string | null> {
-    if (!this.app.assets.icons) {
-      return null;
-    }
-
     const row = await this.app.assets.icons
       .selectFrom('icon_svgs')
       .select('svg')
@@ -28,7 +25,7 @@ export class IconSvgGetQueryHandler
       return null;
     }
 
-    const svg = row.svg.toString('utf-8');
+    const svg = bytesToString(row.svg);
     return svg;
   }
 

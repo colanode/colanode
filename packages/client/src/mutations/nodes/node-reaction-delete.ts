@@ -1,7 +1,6 @@
 export type NodeReactionDeleteMutationInput = {
   type: 'node.reaction.delete';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   nodeId: string;
   reaction: string;
 };

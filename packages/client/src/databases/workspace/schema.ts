@@ -1,10 +1,6 @@
 import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
 
-import {
-  DownloadStatus,
-  DownloadType,
-  UploadStatus,
-} from '@colanode/client/types/files';
+import { DownloadStatus, UploadStatus } from '@colanode/client/types/files';
 import { NodeCounterType } from '@colanode/client/types/nodes';
 import {
   MutationType,
@@ -12,7 +8,6 @@ import {
   WorkspaceRole,
   UserStatus,
   DocumentType,
-  FileSubtype,
 } from '@colanode/core';
 
 interface UserTable {
@@ -227,28 +222,26 @@ export type SelectCursor = Selectable<CursorTable>;
 export type CreateCursor = Insertable<CursorTable>;
 export type UpdateCursor = Updateable<CursorTable>;
 
-interface MetadataTable {
-  key: ColumnType<string, string, never>;
-  value: ColumnType<string, string, string>;
-  created_at: ColumnType<string, string, never>;
-  updated_at: ColumnType<string | null, string | null, string | null>;
-}
-
-export type SelectWorkspaceMetadata = Selectable<MetadataTable>;
-export type CreateWorkspaceMetadata = Insertable<MetadataTable>;
-export type UpdateWorkspaceMetadata = Updateable<MetadataTable>;
-
 interface LocalFileTable {
   id: ColumnType<string, string, never>;
   version: ColumnType<string, string, string>;
-  name: ColumnType<string, string, string>;
   path: ColumnType<string, string, string>;
-  extension: ColumnType<string, string, string>;
-  size: ColumnType<number, number, number>;
-  subtype: ColumnType<FileSubtype, FileSubtype, FileSubtype>;
-  mime_type: ColumnType<string, string, string>;
   created_at: ColumnType<string, string, never>;
   opened_at: ColumnType<string, string, string>;
+  download_status: ColumnType<DownloadStatus, DownloadStatus, DownloadStatus>;
+  download_progress: ColumnType<number, number, number>;
+  download_retries: ColumnType<number, number, number>;
+  download_completed_at: ColumnType<
+    string | null,
+    string | null,
+    string | null
+  >;
+  download_error_code: ColumnType<string | null, string | null, string | null>;
+  download_error_message: ColumnType<
+    string | null,
+    string | null,
+    string | null
+  >;
 }
 
 export type SelectLocalFile = Selectable<LocalFileTable>;
@@ -275,7 +268,6 @@ interface DownloadTable {
   id: ColumnType<string, string, never>;
   file_id: ColumnType<string, string, never>;
   version: ColumnType<string, string, string>;
-  type: ColumnType<DownloadType, DownloadType, never>;
   name: ColumnType<string, string, string>;
   path: ColumnType<string, string, string>;
   size: ColumnType<number, number, number>;
@@ -293,6 +285,7 @@ interface DownloadTable {
 export type SelectDownload = Selectable<DownloadTable>;
 export type CreateDownload = Insertable<DownloadTable>;
 export type UpdateDownload = Updateable<DownloadTable>;
+
 export interface WorkspaceDatabaseSchema {
   users: UserTable;
   nodes: NodeTable;
@@ -314,5 +307,4 @@ export interface WorkspaceDatabaseSchema {
   mutations: MutationTable;
   tombstones: TombstoneTable;
   cursors: CursorTable;
-  metadata: MetadataTable;
 }
