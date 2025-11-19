@@ -7,9 +7,3 @@ export const loggingConfigSchema = z.object({
 });
 
 export type LoggingConfig = z.infer<typeof loggingConfigSchema>;
-
-export const readLoggingConfigVariables = () => {
-  return {
-    level: process.env.LOGGING_LEVEL,
-  };
-};

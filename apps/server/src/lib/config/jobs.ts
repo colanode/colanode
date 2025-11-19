@@ -52,26 +52,3 @@ export const jobsConfigSchema = z.object({
 });
 
 export type JobsConfig = z.infer<typeof jobsConfigSchema>;
-
-export const readJobsConfigVariables = () => {
-  return {
-    nodeUpdatesMerge: {
-      enabled: process.env.JOBS_NODE_UPDATES_MERGE_ENABLED === 'true',
-      cron: process.env.JOBS_NODE_UPDATES_MERGE_CRON,
-      batchSize: process.env.JOBS_NODE_UPDATES_MERGE_BATCH_SIZE,
-      mergeWindow: process.env.JOBS_NODE_UPDATES_MERGE_MERGE_WINDOW,
-      cutoffWindow: process.env.JOBS_NODE_UPDATES_MERGE_CUTOFF_WINDOW,
-    },
-    documentUpdatesMerge: {
-      enabled: process.env.JOBS_DOCUMENT_UPDATES_MERGE_ENABLED === 'true',
-      cron: process.env.JOBS_DOCUMENT_UPDATES_MERGE_CRON,
-      batchSize: process.env.JOBS_DOCUMENT_UPDATES_MERGE_BATCH_SIZE,
-      mergeWindow: process.env.JOBS_DOCUMENT_UPDATES_MERGE_MERGE_WINDOW,
-      cutoffWindow: process.env.JOBS_DOCUMENT_UPDATES_MERGE_CUTOFF_WINDOW,
-    },
-    cleanup: {
-      enabled: process.env.JOBS_CLEANUP_ENABLED === 'true',
-      cron: process.env.JOBS_CLEANUP_CRON,
-    },
-  };
-};
