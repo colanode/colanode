@@ -26,33 +26,27 @@ export const FileBlock = ({ id }: FileBlockProps) => {
   const file = nodeGetQuery.data as LocalFileNode;
   const canPreview = canPreviewFile(file.attributes.subtype);
 
-  if (canPreview) {
-    return (
-      <Link
-        from="/workspace/$userId/$nodeId"
-        to="modal/$modalNodeId"
-        params={{ modalNodeId: id }}
-        className="flex h-72 max-h-72 max-w-lg w-full cursor-pointer overflow-hidden rounded-md p-2 hover:bg-muted/50 items-center justify-center"
-      >
-        <FilePreview file={file} />
-      </Link>
-    );
-  }
-
   return (
     <Link
       from="/workspace/$userId/$nodeId"
       to="modal/$modalNodeId"
       params={{ modalNodeId: id }}
-      className="flex flex-row gap-4 items-center w-full cursor-pointer overflow-hidden rounded-md p-2 pl-0 hover:bg-accent"
     >
-      <FileIcon mimeType={file.attributes.mimeType} className="size-10" />
-      <div className="flex flex-col gap-1">
-        <div className="text-sm font-medium">{file.attributes.name}</div>
-        <div className="text-xs text-muted-foreground">
-          {file.attributes.mimeType}
+      {canPreview ? (
+        <div className="flex h-72 max-h-72 max-w-lg w-full cursor-pointer overflow-hidden rounded-md p-2 hover:bg-muted/50 items-center justify-center">
+          <FilePreview file={file} />
         </div>
-      </div>
+      ) : (
+        <div className="flex flex-row gap-4 items-center w-full cursor-pointer overflow-hidden rounded-md p-2 pl-0 hover:bg-accent">
+          <FileIcon mimeType={file.attributes.mimeType} className="size-10" />
+          <div className="flex flex-col gap-1">
+            <div className="text-sm font-medium">{file.attributes.name}</div>
+            <div className="text-xs text-muted-foreground">
+              {file.attributes.mimeType}
+            </div>
+          </div>
+        </div>
+      )}
     </Link>
   );
 };
