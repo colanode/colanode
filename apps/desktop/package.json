@@ -16,7 +16,7 @@
     "rebuild": "electron-rebuild -f -w better-sqlite3"
   },
   "devDependencies": {
-    "@electron-forge/cli": "^7.10.2",
+    "@electron-forge/cli": "^7.8.3",
     "@electron-forge/maker-deb": "^7.10.2",
     "@electron-forge/maker-dmg": "^7.10.2",
     "@electron-forge/maker-rpm": "^7.10.2",
@@ -27,12 +27,12 @@
     "@electron-forge/plugin-vite": "^7.10.2",
     "@electron-forge/publisher-github": "^7.10.2",
     "@electron/rebuild": "^4.0.1",
-    "@tailwindcss/postcss": "^4.1.14",
+    "@tailwindcss/postcss": "^4.1.17",
     "@types/better-sqlite3": "^7.6.13",
     "@types/electron-squirrel-startup": "^1.0.2",
-    "@vitejs/plugin-react": "^5.0.4",
-    "electron": "^38.2.2",
-    "vite": "^7.1.10"
+    "@vitejs/plugin-react": "^5.1.1",
+    "electron": "^39.2.2",
+    "vite": "^7.2.2"
   },
   "dependencies": {
     "@colanode/client": "*",

@@ -13,10 +13,7 @@ export const errorHandlerCallback: FastifyPluginCallback = (
   done
 ) => {
   fastify.setErrorHandler(async (error, _, reply) => {
-    logger.error(
-      error,
-      `Error processing request ${error.statusCode} - ${error.code} - ${error.message}`
-    );
+    logger.error(error, `Error processing request`);
 
     // TODO: return detailed validation errors
     if (hasZodFastifySchemaValidationErrors(error)) {
