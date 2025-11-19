@@ -28,7 +28,7 @@
   "devDependencies": {
     "@types/debug": "^4.1.12",
     "@types/lodash-es": "^4.17.12",
-    "@typescript-eslint/eslint-plugin": "^8.46.1",
+    "@typescript-eslint/eslint-plugin": "^8.47.0",
     "@typescript-eslint/parser": "^8.46.1",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.8",
@@ -36,7 +36,7 @@
     "eslint-plugin-react": "^7.37.5",
     "prettier": "^3.6.2",
     "tsx": "^4.20.6",
-    "turbo": "^2.5.8",
+    "turbo": "^2.6.1",
     "typescript": "^5.9.3",
     "vitest": "^3.2.4"
   },
