@@ -17,7 +17,6 @@ import { EmailVerifyMutationHandler } from './auth/email-verify';
 import { GoogleLoginMutationHandler } from './auth/google-login';
 import { AvatarUploadMutationHandler } from './avatars/avatar-upload';
 import { ChannelCreateMutationHandler } from './channels/channel-create';
-import { ChannelDeleteMutationHandler } from './channels/channel-delete';
 import { ChannelUpdateMutationHandler } from './channels/channel-update';
 import { ChatCreateMutationHandler } from './chats/chat-create';
 import { DatabaseCreateMutationHandler } from './databases/database-create';
@@ -47,6 +46,7 @@ import { MessageDeleteMutationHandler } from './messages/message-delete';
 import { NodeCollaboratorCreateMutationHandler } from './nodes/node-collaborator-create';
 import { NodeCollaboratorDeleteMutationHandler } from './nodes/node-collaborator-delete';
 import { NodeCollaboratorUpdateMutationHandler } from './nodes/node-collaborator-update';
+import { NodeDeleteMutationHandler } from './nodes/node-delete';
 import { NodeInteractionOpenedMutationHandler } from './nodes/node-interaction-opened';
 import { NodeInteractionSeenMutationHandler } from './nodes/node-interaction-seen';
 import { NodeReactionCreateMutationHandler } from './nodes/node-reaction-create';
@@ -88,7 +88,7 @@ export const buildMutationHandlerMap = (
     'google.login': new GoogleLoginMutationHandler(app),
     'view.create': new ViewCreateMutationHandler(app),
     'channel.create': new ChannelCreateMutationHandler(app),
-    'channel.delete': new ChannelDeleteMutationHandler(app),
+    'node.delete': new NodeDeleteMutationHandler(app),
     'chat.create': new ChatCreateMutationHandler(app),
     'database.create': new DatabaseCreateMutationHandler(app),
     'database.delete': new DatabaseDeleteMutationHandler(app),

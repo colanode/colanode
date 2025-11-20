@@ -71,14 +71,14 @@ export const createNodesCollection = (userId: string) => {
     //     });
     //   }
     // },
-    // onDelete: async ({ transaction }) => {
-    //   for (const mutation of transaction.mutations) {
-    //     await window.colanode.executeMutation({
-    //       type: 'node.delete',
-    //       userId,
-    //       nodeId: mutation.key,
-    //     });
-    //   }
-    // },
+    onDelete: async ({ transaction }) => {
+      for (const mutation of transaction.mutations) {
+        await window.colanode.executeMutation({
+          type: 'node.delete',
+          userId,
+          nodeId: mutation.key,
+        });
+      }
+    },
   });
 };

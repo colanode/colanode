@@ -1,6 +1,6 @@
 import { useNavigate } from '@tanstack/react-router';
-import { toast } from 'sonner';
 
+import { collections } from '@colanode/ui/collections';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -11,9 +11,7 @@ import {
   AlertDialogTitle,
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface ChannelDeleteDialogProps {
   open: boolean;
@@ -28,7 +26,14 @@ export const ChannelDeleteDialog = ({
 }: ChannelDeleteDialogProps) => {
   const workspace = useWorkspace();
   const navigate = useNavigate({ from: '/workspace/$userId' });
-  const { mutate, isPending } = useMutation();
+
+  const handleDelete = () => {
+    collections.workspace(workspace.userId).nodes.delete(channelId);
+    navigate({
+      to: 'home',
+      replace: true,
+    });
+  };
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
@@ -44,30 +49,7 @@ export const ChannelDeleteDialog = ({
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <Button
-            variant="destructive"
-            disabled={isPending}
-            onClick={() => {
-              mutate({
-                input: {
-                  type: 'channel.delete',
-                  channelId,
-                  userId: workspace.userId,
-                },
-                onSuccess() {
-                  onOpenChange(false);
-                  navigate({
-                    to: '/',
-                    replace: true,
-                  });
-                },
-                onError(error) {
-                  toast.error(error.message);
-                },
-              });
-            }}
-          >
-            {isPending && <Spinner className="mr-1" />}
+          <Button variant="destructive" onClick={handleDelete}>
             Delete
           </Button>
         </AlertDialogFooter>
