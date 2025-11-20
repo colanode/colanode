@@ -2,6 +2,7 @@ import { Collection, createLiveQueryCollection, eq } from '@tanstack/react-db';
 
 import {
   Download,
+  LocalChatNode,
   LocalNode,
   LocalRecordNode,
   Upload,
@@ -26,6 +27,7 @@ class WorkspaceCollections {
   public readonly uploads: Collection<Upload, string>;
   public readonly nodes: Collection<LocalNode, string>;
   public readonly records: Collection<LocalRecordNode>;
+  public readonly chats: Collection<LocalChatNode>;
 
   constructor(userId: string) {
     this.userId = userId;
@@ -34,8 +36,14 @@ class WorkspaceCollections {
     this.uploads = createUploadsCollection(userId);
     this.nodes = createNodesCollection(userId);
 
+    this.chats = createLiveQueryCollection((q) =>
+      q.from({ nodes: this.nodes }).where(({ nodes }) => eq(nodes.type, 'chat'))
+    );
+
     this.records = createLiveQueryCollection((q) =>
-      q.from({ node: this.nodes }).where(({ node }) => eq(node.type, 'record'))
+      q
+        .from({ nodes: this.nodes })
+        .where(({ nodes }) => eq(nodes.type, 'record'))
     );
   }
 }

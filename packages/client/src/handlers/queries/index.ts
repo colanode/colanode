@@ -6,7 +6,6 @@ import { AccountListQueryHandler } from './accounts/accounts-list';
 import { MetadataListQueryHandler } from './apps/metadata-list';
 import { TabsListQueryHandler } from './apps/tabs-list';
 import { AvatarGetQueryHandler } from './avatars/avatar-get';
-import { ChatListQueryHandler } from './chats/chat-list';
 import { DatabaseListQueryHandler } from './databases/database-list';
 import { DatabaseViewListQueryHandler } from './databases/database-view-list';
 import { DocumentGetQueryHandler } from './documents/document-get';
@@ -89,7 +88,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'user.storage.get': new UserStorageGetQueryHandler(app),
     'local.file.get': new LocalFileGetQueryHandler(app),
     'file.download.request.get': new FileDownloadRequestGetQueryHandler(app),
-    'chat.list': new ChatListQueryHandler(app),
     'space.list': new SpaceListQueryHandler(app),
     'document.get': new DocumentGetQueryHandler(app),
     'document.state.get': new DocumentStateGetQueryHandler(app),
