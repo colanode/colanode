@@ -32,6 +32,7 @@ import { RadarDataGetQueryHandler } from './interactions/radar-data-get';
 import { MessageListQueryHandler } from './messages/message-list';
 import { NodeChildrenGetQueryHandler } from './nodes/node-children-get';
 import { NodeGetQueryHandler } from './nodes/node-get';
+import { NodeListQueryHandler } from './nodes/node-list';
 import { NodeReactionsListQueryHandler } from './nodes/node-reaction-list';
 import { NodeReactionsAggregateQueryHandler } from './nodes/node-reactions-aggregate';
 import { NodeTreeGetQueryHandler } from './nodes/node-tree-get';
@@ -60,13 +61,16 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'node.reaction.list': new NodeReactionsListQueryHandler(app),
     'node.reactions.aggregate': new NodeReactionsAggregateQueryHandler(app),
     'node.get': new NodeGetQueryHandler(app),
+    'node.list': new NodeListQueryHandler(app),
     'node.tree.get': new NodeTreeGetQueryHandler(app),
     'record.list': new RecordListQueryHandler(app),
     'record.field.value.count': new RecordFieldValueCountQueryHandler(app),
     'user.search': new UserSearchQueryHandler(app),
     'workspace.list': new WorkspaceListQueryHandler(app),
     'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
-    'workspace.storage.users.get': new WorkspaceStorageUsersGetQueryHandler(app),
+    'workspace.storage.users.get': new WorkspaceStorageUsersGetQueryHandler(
+      app
+    ),
     'user.list': new UserListQueryHandler(app),
     'file.list': new FileListQueryHandler(app),
     'emoji.list': new EmojiListQueryHandler(app),

@@ -506,11 +506,13 @@ export const View = ({ view }: ViewProps) => {
         },
       }}
     >
-      {match(view.attributes.layout)
-        .with('table', () => <TableView />)
-        .with('board', () => <BoardView />)
-        .with('calendar', () => <CalendarView />)
-        .exhaustive()}
+      <div className="w-full h-full group/database">
+        {match(view.attributes.layout)
+          .with('table', () => <TableView />)
+          .with('board', () => <BoardView />)
+          .with('calendar', () => <CalendarView />)
+          .exhaustive()}
+      </div>
     </DatabaseViewContext.Provider>
   );
 };

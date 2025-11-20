@@ -1,9 +1,16 @@
-import { Collection } from '@tanstack/react-db';
+import { Collection, createLiveQueryCollection, eq } from '@tanstack/react-db';
 
-import { Download, Upload, User } from '@colanode/client/types';
+import {
+  Download,
+  LocalNode,
+  LocalRecordNode,
+  Upload,
+  User,
+} from '@colanode/client/types';
 import { createAccountsCollection } from '@colanode/ui/collections/accounts';
 import { createDownloadsCollection } from '@colanode/ui/collections/downloads';
 import { createMetadataCollection } from '@colanode/ui/collections/metadata';
+import { createNodesCollection } from '@colanode/ui/collections/nodes';
 import { createServersCollection } from '@colanode/ui/collections/servers';
 import { createTabsCollection } from '@colanode/ui/collections/tabs';
 import { createTempFilesCollection } from '@colanode/ui/collections/temp-files';
@@ -17,12 +24,19 @@ class WorkspaceCollections {
   public readonly users: Collection<User, string>;
   public readonly downloads: Collection<Download, string>;
   public readonly uploads: Collection<Upload, string>;
+  public readonly nodes: Collection<LocalNode, string>;
+  public readonly records: Collection<LocalRecordNode>;
 
   constructor(userId: string) {
     this.userId = userId;
     this.users = createUsersCollection(userId);
     this.downloads = createDownloadsCollection(userId);
     this.uploads = createUploadsCollection(userId);
+    this.nodes = createNodesCollection(userId);
+
+    this.records = createLiveQueryCollection((q) =>
+      q.from({ node: this.nodes }).where(({ node }) => eq(node.type, 'record'))
+    );
   }
 }
 

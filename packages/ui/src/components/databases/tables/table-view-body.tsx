@@ -3,14 +3,14 @@ import { InView } from 'react-intersection-observer';
 import { TableViewEmptyPlaceholder } from '@colanode/ui/components/databases/tables/table-view-empty-placeholder';
 import { TableViewRow } from '@colanode/ui/components/databases/tables/table-view-row';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
-import { useRecordsQuery } from '@colanode/ui/hooks/use-records-query';
+import { useRecordsInfiniteQuery } from '@colanode/ui/hooks/use-records-infinite-query';
 
 export const TableViewBody = () => {
   const view = useDatabaseView();
-  const { records, hasMore, loadMore, isPending } = useRecordsQuery(
-    view.filters,
-    view.sorts
-  );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useRecordsInfiniteQuery(view.filters, view.sorts);
+
+  const records = data;
 
   return (
     <div className="border-t">
@@ -21,8 +21,8 @@ export const TableViewBody = () => {
       <InView
         rootMargin="200px"
         onChange={(inView) => {
-          if (inView && hasMore && !isPending) {
-            loadMore();
+          if (inView && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
           }
         }}
       ></InView>
