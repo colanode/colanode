@@ -1,9 +1,11 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
 import { LocalFileNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { FileIcon } from '@colanode/ui/components/files/file-icon';
 import { FilePreview } from '@colanode/ui/components/files/file-preview';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { canPreviewFile } from '@colanode/ui/lib/files';
 
 interface FileBlockProps {
@@ -13,17 +15,20 @@ interface FileBlockProps {
 export const FileBlock = ({ id }: FileBlockProps) => {
   const workspace = useWorkspace();
 
-  const nodeGetQuery = useLiveQuery({
-    type: 'node.get',
-    nodeId: id,
-    userId: workspace.userId,
-  });
+  const fileGetQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ files: collections.workspace(workspace.userId).files })
+        .where(({ files }) => eq(files.id, id))
+        .findOne(),
+    [workspace.userId, id]
+  );
 
-  if (nodeGetQuery.isPending || !nodeGetQuery.data) {
+  if (fileGetQuery.isLoading || !fileGetQuery.data) {
     return null;
   }
 
-  const file = nodeGetQuery.data as LocalFileNode;
+  const file = fileGetQuery.data as LocalFileNode;
   const canPreview = canPreviewFile(file.attributes.subtype);
 
   return (

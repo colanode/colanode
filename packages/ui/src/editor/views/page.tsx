@@ -1,37 +1,46 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewWrapper } from '@tiptap/react';
 
-import { LocalPageNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const PageNodeView = ({ node }: NodeViewProps) => {
   const workspace = useWorkspace();
 
   const id = node.attrs.id;
-  const nodeGetQuery = useLiveQuery({
-    type: 'node.get',
-    nodeId: id,
-    userId: workspace.userId,
-  });
 
   if (!id) {
     return null;
   }
 
-  if (nodeGetQuery.isPending) {
+  const pageGetQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ pages: collections.workspace(workspace.userId).pages })
+        .where(({ pages }) => eq(pages.id, id))
+        .select(({ pages }) => ({
+          id: pages.id,
+          name: pages.attributes.name,
+          avatar: pages.attributes.avatar,
+        }))
+        .findOne(),
+    [workspace.userId, id]
+  );
+
+  if (pageGetQuery.isLoading) {
     return null;
   }
 
-  const page = nodeGetQuery.data as LocalPageNode;
+  const page = pageGetQuery.data;
   if (!page) {
     return null;
   }
 
-  const name = page.attributes.name ?? 'Unnamed';
-  const avatar = page.attributes.avatar;
+  const name = page.name ?? 'Unnamed';
+  const avatar = page.avatar;
 
   return (
     <NodeViewWrapper data-id={node.attrs.id}>

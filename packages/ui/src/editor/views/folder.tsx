@@ -1,37 +1,46 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewWrapper } from '@tiptap/react';
 
-import { LocalFolderNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const FolderNodeView = ({ node }: NodeViewProps) => {
   const workspace = useWorkspace();
 
   const id = node.attrs.id;
-  const nodeGetQuery = useLiveQuery({
-    type: 'node.get',
-    nodeId: id,
-    userId: workspace.userId,
-  });
 
   if (!id) {
     return null;
   }
 
-  if (nodeGetQuery.isPending) {
+  const folderGetQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ folders: collections.workspace(workspace.userId).folders })
+        .where(({ folders }) => eq(folders.id, id))
+        .select(({ folders }) => ({
+          id: folders.id,
+          name: folders.attributes.name,
+          avatar: folders.attributes.avatar,
+        }))
+        .findOne(),
+    [workspace.userId, id]
+  );
+
+  if (folderGetQuery.isLoading) {
     return null;
   }
 
-  const folder = nodeGetQuery.data as LocalFolderNode;
+  const folder = folderGetQuery.data;
   if (!folder) {
     return null;
   }
 
-  const name = folder.attributes.name ?? 'Unnamed';
-  const avatar = folder.attributes.avatar;
+  const name = folder.name ?? 'Unnamed';
+  const avatar = folder.avatar;
 
   return (
     <NodeViewWrapper data-id={node.attrs.id}>

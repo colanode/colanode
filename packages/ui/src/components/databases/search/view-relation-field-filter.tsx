@@ -1,3 +1,4 @@
+import { eq, inArray, useLiveQuery } from '@tanstack/react-db';
 import { ChevronDown, Trash2, X } from 'lucide-react';
 
 import { LocalRecordNode } from '@colanode/client/types';
@@ -5,6 +6,7 @@ import {
   DatabaseViewFieldFilterAttributes,
   RelationFieldAttributes,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { RecordSearch } from '@colanode/ui/components/records/record-search';
@@ -24,7 +26,6 @@ import {
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 import { relationFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewRelationFieldFilterProps {
@@ -64,21 +65,22 @@ export const ViewRelationFieldFilter = ({
     ) ?? relationFieldFilterOperators[0]!;
 
   const relationIds = (filter.value as string[]) ?? [];
-  const results = useLiveQueries(
-    relationIds.map((id) => ({
-      type: 'node.get',
-      nodeId: id,
-      userId: workspace.userId,
-    }))
+  const relationsQuery = useLiveQuery(
+    (q) => {
+      if (relationIds.length === 0 || !field.databaseId) {
+        return q
+          .from({ records: collections.workspace(workspace.userId).records })
+          .where(({ records }) => eq(records.id, '')); // Return empty result
+      }
+
+      return q
+        .from({ records: collections.workspace(workspace.userId).records })
+        .where(({ records }) => inArray(records.id, relationIds));
+    },
+    [workspace.userId, field.databaseId, relationIds]
   );
 
-  const relations: LocalRecordNode[] = [];
-  for (const result of results) {
-    if (result.data && result.data.type === 'record') {
-      relations.push(result.data);
-    }
-  }
-
+  const relations = relationsQuery.data;
   const hideInput = isOperatorWithoutValue(operator.value);
 
   if (!field.databaseId) {

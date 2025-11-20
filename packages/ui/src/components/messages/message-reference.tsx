@@ -1,9 +1,11 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
 import { LocalMessageNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { MessageAuthorAvatar } from '@colanode/ui/components/messages/message-author-avatar';
 import { MessageAuthorName } from '@colanode/ui/components/messages/message-author-name';
 import { MessageContent } from '@colanode/ui/components/messages/message-content';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface MessageReferenceProps {
   messageId: string;
@@ -11,17 +13,20 @@ interface MessageReferenceProps {
 
 export const MessageReference = ({ messageId }: MessageReferenceProps) => {
   const workspace = useWorkspace();
-  const nodeGetQuery = useLiveQuery({
-    type: 'node.get',
-    nodeId: messageId,
-    userId: workspace.userId,
-  });
+  const messageGetQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ messages: collections.workspace(workspace.userId).messages })
+        .where(({ messages }) => eq(messages.id, messageId))
+        .findOne(),
+    [workspace.userId, messageId]
+  );
 
-  if (nodeGetQuery.isPending) {
+  if (messageGetQuery.isLoading) {
     return null;
   }
 
-  const message = nodeGetQuery.data as LocalMessageNode;
+  const message = messageGetQuery.data as LocalMessageNode;
 
   if (!message) {
     return (
@@ -36,7 +41,7 @@ export const MessageReference = ({ messageId }: MessageReferenceProps) => {
   return (
     <div className="flex flex-row gap-2 border-l-4 p-2">
       <MessageAuthorAvatar message={message} className="size-5 mt-1" />
-      <div className='"grow flex-col gap-1'>
+      <div className="grow flex-col gap-1">
         <MessageAuthorName message={message} />
         <MessageContent message={message} />
       </div>

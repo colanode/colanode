@@ -2,12 +2,15 @@ import { Collection, createLiveQueryCollection, eq } from '@tanstack/react-db';
 
 import {
   Download,
+  LocalChannelNode,
   LocalChatNode,
   LocalDatabaseNode,
   LocalDatabaseViewNode,
   LocalFileNode,
+  LocalFolderNode,
   LocalMessageNode,
   LocalNode,
+  LocalPageNode,
   LocalRecordNode,
   LocalSpaceNode,
   Upload,
@@ -35,9 +38,12 @@ class WorkspaceCollections {
   public readonly views: Collection<LocalDatabaseViewNode>;
   public readonly records: Collection<LocalRecordNode>;
   public readonly chats: Collection<LocalChatNode>;
+  public readonly channels: Collection<LocalChannelNode>;
   public readonly spaces: Collection<LocalSpaceNode>;
   public readonly files: Collection<LocalFileNode>;
   public readonly messages: Collection<LocalMessageNode>;
+  public readonly folders: Collection<LocalFolderNode>;
+  public readonly pages: Collection<LocalPageNode>;
 
   constructor(userId: string) {
     this.userId = userId;
@@ -59,6 +65,11 @@ class WorkspaceCollections {
     this.chats = createLiveQueryCollection((q) =>
       q.from({ nodes: this.nodes }).where(({ nodes }) => eq(nodes.type, 'chat'))
     );
+    this.channels = createLiveQueryCollection((q) =>
+      q
+        .from({ nodes: this.nodes })
+        .where(({ nodes }) => eq(nodes.type, 'channel'))
+    );
     this.spaces = createLiveQueryCollection((q) =>
       q
         .from({ nodes: this.nodes })
@@ -76,6 +87,14 @@ class WorkspaceCollections {
       q
         .from({ nodes: this.nodes })
         .where(({ nodes }) => eq(nodes.type, 'message'))
+    );
+    this.folders = createLiveQueryCollection((q) =>
+      q
+        .from({ nodes: this.nodes })
+        .where(({ nodes }) => eq(nodes.type, 'folder'))
+    );
+    this.pages = createLiveQueryCollection((q) =>
+      q.from({ nodes: this.nodes }).where(({ nodes }) => eq(nodes.type, 'page'))
     );
   }
 }

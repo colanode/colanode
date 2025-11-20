@@ -1,3 +1,6 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
+import { collections } from '@colanode/ui/collections';
 import { ChannelTab } from '@colanode/ui/components/channels/channel-tab';
 import { ChatTab } from '@colanode/ui/components/chats/chat-tab';
 import { DatabaseTab } from '@colanode/ui/components/databases/database-tab';
@@ -7,7 +10,6 @@ import { MessageTab } from '@colanode/ui/components/messages/message-tab';
 import { PageTab } from '@colanode/ui/components/pages/page-tab';
 import { RecordTab } from '@colanode/ui/components/records/record-tab';
 import { SpaceTab } from '@colanode/ui/components/spaces/space-tab';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface NodeTabProps {
   userId: string;
@@ -15,13 +17,16 @@ interface NodeTabProps {
 }
 
 export const NodeTab = ({ userId, nodeId }: NodeTabProps) => {
-  const query = useLiveQuery({
-    type: 'node.get',
-    userId: userId,
-    nodeId: nodeId,
-  });
+  const query = useLiveQuery(
+    (q) =>
+      q
+        .from({ nodes: collections.workspace(userId).nodes })
+        .where(({ nodes }) => eq(nodes.id, nodeId))
+        .findOne(),
+    [userId, nodeId]
+  );
 
-  if (query.isPending) {
+  if (query.isLoading) {
     return null;
   }
 

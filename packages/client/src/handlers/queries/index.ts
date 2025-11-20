@@ -25,8 +25,6 @@ import { IconListQueryHandler } from './icons/icon-list';
 import { IconSearchQueryHandler } from './icons/icon-search';
 import { IconSvgGetQueryHandler } from './icons/icon-svg-get';
 import { RadarDataGetQueryHandler } from './interactions/radar-data-get';
-import { NodeChildrenGetQueryHandler } from './nodes/node-children-get';
-import { NodeGetQueryHandler } from './nodes/node-get';
 import { NodeListQueryHandler } from './nodes/node-list';
 import { NodeReactionsListQueryHandler } from './nodes/node-reaction-list';
 import { NodeReactionsAggregateQueryHandler } from './nodes/node-reactions-aggregate';
@@ -52,7 +50,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'account.list': new AccountListQueryHandler(app),
     'node.reaction.list': new NodeReactionsListQueryHandler(app),
     'node.reactions.aggregate': new NodeReactionsAggregateQueryHandler(app),
-    'node.get': new NodeGetQueryHandler(app),
     'node.list': new NodeListQueryHandler(app),
     'node.tree.get': new NodeTreeGetQueryHandler(app),
     'record.list': new RecordListQueryHandler(app),
@@ -72,7 +69,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'icon.list': new IconListQueryHandler(app),
     'icon.search': new IconSearchQueryHandler(app),
     'icon.category.list': new IconCategoryListQueryHandler(app),
-    'node.children.get': new NodeChildrenGetQueryHandler(app),
     'radar.data.get': new RadarDataGetQueryHandler(app),
     'record.search': new RecordSearchQueryHandler(app),
     'local.file.get': new LocalFileGetQueryHandler(app),

@@ -1,3 +1,4 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { ChevronRight } from 'lucide-react';
 import { RefAttributes, useRef } from 'react';
 import { useDrop } from 'react-dnd';
@@ -5,6 +6,7 @@ import { toast } from 'sonner';
 
 import { LocalSpaceNode } from '@colanode/client/types';
 import { extractNodeRole } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { WorkspaceSidebarItem } from '@colanode/ui/components/layouts/sidebars/sidebar-item';
 import { SpaceSidebarDropdown } from '@colanode/ui/components/spaces/space-sidebar-dropdown';
@@ -15,7 +17,6 @@ import {
 } from '@colanode/ui/components/ui/collapsible';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { sortSpaceChildren } from '@colanode/ui/lib/spaces';
 import { cn } from '@colanode/ui/lib/utils';
@@ -31,12 +32,13 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const role = extractNodeRole(space, workspace.userId);
   const canEdit = role === 'admin';
 
-  const nodeChildrenGetQuery = useLiveQuery({
-    type: 'node.children.get',
-    nodeId: space.id,
-    userId: workspace.userId,
-    types: ['page', 'channel', 'database', 'folder'],
-  });
+  const nodeChildrenGetQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ nodes: collections.workspace(workspace.userId).nodes })
+        .where(({ nodes }) => eq(nodes.parentId, space.id)),
+    [workspace.userId, space.id]
+  );
 
   const [dropMonitor, dropRef] = useDrop({
     accept: 'sidebar-item',
@@ -52,7 +54,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const divRef = useRef<HTMLDivElement>(null);
   const dropDivRef = dropRef(divRef);
 
-  const children = sortSpaceChildren(space, nodeChildrenGetQuery.data ?? []);
+  const children = sortSpaceChildren(space, nodeChildrenGetQuery.data);
 
   const handleDragEnd = (childId: string, after: string | null) => {
     mutation.mutate({

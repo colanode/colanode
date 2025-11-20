@@ -1,8 +1,10 @@
+import { eq, inArray, useLiveQuery } from '@tanstack/react-db';
 import { X } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
 import { LocalRecordNode } from '@colanode/client/types';
 import { RelationFieldAttributes } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { RecordSearch } from '@colanode/ui/components/records/record-search';
 import { Badge } from '@colanode/ui/components/ui/badge';
@@ -14,7 +16,6 @@ import {
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 interface RecordRelationValueProps {
   field: RelationFieldAttributes;
@@ -46,21 +47,22 @@ export const RecordRelationValue = ({
   const [open, setOpen] = useState(false);
 
   const relationIds = record.getRelationValue(field) ?? [];
-  const results = useLiveQueries(
-    relationIds.map((id) => ({
-      type: 'node.get',
-      nodeId: id,
-      userId: workspace.userId,
-    }))
+  const relationsQuery = useLiveQuery(
+    (q) => {
+      if (relationIds.length === 0 || !field.databaseId) {
+        return q
+          .from({ records: collections.workspace(workspace.userId).records })
+          .where(({ records }) => eq(records.id, '')); // Return empty result
+      }
+
+      return q
+        .from({ records: collections.workspace(workspace.userId).records })
+        .where(({ records }) => inArray(records.id, relationIds));
+    },
+    [workspace.userId, field.databaseId, relationIds]
   );
 
-  const relations: LocalRecordNode[] = [];
-  for (const result of results) {
-    if (result.data && result.data.type === 'record') {
-      relations.push(result.data);
-    }
-  }
-
+  const relations = relationsQuery.data;
   if (!field.databaseId) {
     return null;
   }
