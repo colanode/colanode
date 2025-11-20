@@ -1,23 +1,23 @@
+import { useLiveQuery } from '@tanstack/react-db';
+
+import { collections } from '@colanode/ui/collections';
 import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
 import { SpaceCreateButton } from '@colanode/ui/components/spaces/space-create-button';
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const SidebarSpaces = () => {
   const workspace = useWorkspace();
   const canCreateSpace =
     workspace.role !== 'guest' && workspace.role !== 'none';
 
-  const spaceListQuery = useLiveQuery({
-    type: 'space.list',
-    userId: workspace.userId,
-    parentId: workspace.workspaceId,
-    page: 0,
-    count: 100,
-  });
+  const spaceListQuery = useLiveQuery((q) =>
+    q
+      .from({ spaces: collections.workspace(workspace.userId).spaces })
+      .orderBy(({ spaces }) => spaces.id, 'asc')
+  );
 
-  const spaces = spaceListQuery.data ?? [];
+  const spaces = spaceListQuery.data;
 
   return (
     <div className="flex flex-col group/sidebar h-full px-2">

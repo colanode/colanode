@@ -7,6 +7,7 @@ import {
   LocalDatabaseViewNode,
   LocalNode,
   LocalRecordNode,
+  LocalSpaceNode,
   Upload,
   User,
 } from '@colanode/client/types';
@@ -32,6 +33,7 @@ class WorkspaceCollections {
   public readonly views: Collection<LocalDatabaseViewNode>;
   public readonly records: Collection<LocalRecordNode>;
   public readonly chats: Collection<LocalChatNode>;
+  public readonly spaces: Collection<LocalSpaceNode>;
 
   constructor(userId: string) {
     this.userId = userId;
@@ -45,17 +47,19 @@ class WorkspaceCollections {
         .from({ nodes: this.nodes })
         .where(({ nodes }) => eq(nodes.type, 'database'))
     );
-
     this.views = createLiveQueryCollection((q) =>
       q
         .from({ nodes: this.nodes })
         .where(({ nodes }) => eq(nodes.type, 'database_view'))
     );
-
     this.chats = createLiveQueryCollection((q) =>
       q.from({ nodes: this.nodes }).where(({ nodes }) => eq(nodes.type, 'chat'))
     );
-
+    this.spaces = createLiveQueryCollection((q) =>
+      q
+        .from({ nodes: this.nodes })
+        .where(({ nodes }) => eq(nodes.type, 'space'))
+    );
     this.records = createLiveQueryCollection((q) =>
       q
         .from({ nodes: this.nodes })
