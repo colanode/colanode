@@ -31,7 +31,7 @@ export const MessageList = () => {
     [workspace.userId, conversation.id]
   );
 
-  const messages = messageListQuery.data.sort((a, b) =>
+  const messages = messageListQuery.data.toSorted((a, b) =>
     compareString(a.id, b.id)
   );
 

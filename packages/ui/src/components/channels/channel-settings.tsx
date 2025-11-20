@@ -3,9 +3,9 @@ import { Fragment, useState } from 'react';
 
 import { LocalChannelNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
-import { ChannelDeleteDialog } from '@colanode/ui/components/channels/channel-delete-dialog';
 import { ChannelUpdateDialog } from '@colanode/ui/components/channels/channel-update-dialog';
 import { NodeCollaboratorAudit } from '@colanode/ui/components/collaborators/node-collaborator-audit';
+import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -107,8 +107,10 @@ export const ChannelSettings = ({ channel, role }: ChannelSettingsProps) => {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-      <ChannelDeleteDialog
-        channelId={channel.id}
+      <NodeDeleteDialog
+        id={channel.id}
+        title="Are you sure you want delete this channel?"
+        description="This action cannot be undone. This channel will no longer be accessible by you or others you've shared it with."
         open={showDeleteDialog}
         onOpenChange={setShowDeleteModal}
       />

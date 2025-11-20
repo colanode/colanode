@@ -28,15 +28,24 @@ export const createNodesCollection = (userId: string) => {
           });
 
         const subscriptionId = window.eventBus.subscribe((event) => {
-          if (event.type === 'node.created') {
+          if (
+            event.type === 'node.created' &&
+            event.workspace.userId === userId
+          ) {
             begin();
             write({ type: 'insert', value: event.node });
             commit();
-          } else if (event.type === 'node.updated') {
+          } else if (
+            event.type === 'node.updated' &&
+            event.workspace.userId === userId
+          ) {
             begin();
             write({ type: 'update', value: event.node });
             commit();
-          } else if (event.type === 'node.deleted') {
+          } else if (
+            event.type === 'node.deleted' &&
+            event.workspace.userId === userId
+          ) {
             begin();
             write({ type: 'delete', value: event.node });
             commit();

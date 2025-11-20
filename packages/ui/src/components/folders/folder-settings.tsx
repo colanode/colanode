@@ -4,8 +4,8 @@ import { Fragment, useState } from 'react';
 import { LocalFolderNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { NodeCollaboratorAudit } from '@colanode/ui/components/collaborators/node-collaborator-audit';
-import { FolderDeleteDialog } from '@colanode/ui/components/folders/folder-delete-dialog';
 import { FolderUpdateDialog } from '@colanode/ui/components/folders/folder-update-dialog';
+import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -104,8 +104,10 @@ export const FolderSettings = ({ folder, role }: FolderSettingsProps) => {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-      <FolderDeleteDialog
-        folderId={folder.id}
+      <NodeDeleteDialog
+        id={folder.id}
+        title="Are you sure you want delete this folder?"
+        description="This action cannot be undone. This folder will no longer be accessible by you or others you've shared it with."
         open={showDeleteDialog}
         onOpenChange={setShowDeleteModal}
       />
