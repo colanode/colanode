@@ -27,7 +27,6 @@ export * from './records/record-list';
 export * from './records/record-search';
 export * from './users/user-list';
 export * from './users/user-search';
-export * from './users/user-storage-get';
 export * from './workspaces/workspace-list';
 export * from './workspaces/workspace-storage-get';
 export * from './workspaces/workspace-storage-users-get';

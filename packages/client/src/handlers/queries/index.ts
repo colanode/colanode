@@ -39,7 +39,6 @@ import { RecordSearchQueryHandler } from './records/record-search';
 import { ServerListQueryHandler } from './servers/server-list';
 import { UserListQueryHandler } from './users/user-list';
 import { UserSearchQueryHandler } from './users/user-search';
-import { UserStorageGetQueryHandler } from './users/user-storage-get';
 import { WorkspaceListQueryHandler } from './workspaces/workspace-list';
 import { WorkspaceStorageGetQueryHandler } from './workspaces/workspace-storage-get';
 import { WorkspaceStorageUsersGetQueryHandler } from './workspaces/workspace-storage-users-get';
@@ -80,7 +79,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'node.children.get': new NodeChildrenGetQueryHandler(app),
     'radar.data.get': new RadarDataGetQueryHandler(app),
     'record.search': new RecordSearchQueryHandler(app),
-    'user.storage.get': new UserStorageGetQueryHandler(app),
     'local.file.get': new LocalFileGetQueryHandler(app),
     'file.download.request.get': new FileDownloadRequestGetQueryHandler(app),
     'document.get': new DocumentGetQueryHandler(app),
