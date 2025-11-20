@@ -22,16 +22,21 @@ export const SidebarSettings = () => {
   const app = useApp();
   const workspace = useWorkspace();
 
-  const pendingUploadsQuery = useLiveQuery((q) =>
-    q
-      .from({ uploads: collections.workspace(workspace.userId).uploads })
-      .where(({ uploads }) =>
-        inArray(uploads.status, [UploadStatus.Pending, UploadStatus.Uploading])
-      )
-      .select(({ uploads }) => ({
-        count: count(uploads.fileId),
-      }))
-      .findOne()
+  const pendingUploadsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ uploads: collections.workspace(workspace.userId).uploads })
+        .where(({ uploads }) =>
+          inArray(uploads.status, [
+            UploadStatus.Pending,
+            UploadStatus.Uploading,
+          ])
+        )
+        .select(({ uploads }) => ({
+          count: count(uploads.fileId),
+        }))
+        .findOne(),
+    [workspace.userId]
   );
 
   const pendingUploads = pendingUploadsQuery.data?.count ?? 0;

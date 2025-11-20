@@ -10,11 +10,13 @@ import { useWorkspace } from '@colanode/ui/contexts/workspace';
 export const WorkspaceDownloadsContainer = () => {
   const workspace = useWorkspace();
 
-  const downloadsQuery = useLiveQuery((q) =>
-    q
-      .from({ downloads: collections.workspace(workspace.userId).downloads })
-      .select(({ downloads }) => downloads)
-      .orderBy(({ downloads }) => downloads.id, 'desc')
+  const downloadsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ downloads: collections.workspace(workspace.userId).downloads })
+        .select(({ downloads }) => downloads)
+        .orderBy(({ downloads }) => downloads.id, 'desc'),
+    [workspace.userId]
   );
 
   const downloads = downloadsQuery.data ?? [];

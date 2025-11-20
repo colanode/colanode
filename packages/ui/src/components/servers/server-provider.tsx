@@ -11,11 +11,13 @@ interface ServerProviderProps {
 }
 
 export const ServerProvider = ({ domain, children }: ServerProviderProps) => {
-  const serverQuery = useLiveQuery((q) =>
-    q
-      .from({ servers: collections.servers })
-      .where(({ servers }) => eq(servers.domain, domain))
-      .findOne()
+  const serverQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ servers: collections.servers })
+        .where(({ servers }) => eq(servers.domain, domain))
+        .findOne(),
+    [domain]
   );
 
   const server = serverQuery.data;

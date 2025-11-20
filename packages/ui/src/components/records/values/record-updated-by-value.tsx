@@ -14,16 +14,18 @@ export const RecordUpdatedByValue = ({ field }: RecordUpdatedByValueProps) => {
   const workspace = useWorkspace();
   const record = useRecord();
 
-  const userQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, record.updatedBy))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-      }))
-      .findOne()
+  const userQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: collections.workspace(workspace.userId).users })
+        .where(({ users }) => eq(users.id, record.updatedBy))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+        }))
+        .findOne(),
+    [workspace.userId, record.updatedBy]
   );
 
   const user = userQuery.data;

@@ -58,17 +58,19 @@ export const WorkspaceStorageUserRow = ({
   const workspace = useWorkspace();
   const [openUpdateDialog, setOpenUpdateDialog] = useState(false);
 
-  const userQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, user.id))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-        email: users.email,
-      }))
-      .findOne()
+  const userQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: collections.workspace(workspace.userId).users })
+        .where(({ users }) => eq(users.id, user.id))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+          email: users.email,
+        }))
+        .findOne(),
+    [workspace.userId, user.id]
   );
 
   const name = userQuery.data?.name ?? 'Unknown';

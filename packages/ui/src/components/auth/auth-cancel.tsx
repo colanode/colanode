@@ -9,10 +9,14 @@ import { getDefaultWorkspaceUserId } from '@colanode/ui/routes/utils';
 export const AuthCancel = () => {
   const router = useRouter();
 
-  const workspacesQuery = useLiveQuery((q) =>
-    q.from({ workspaces: collections.workspaces }).select(({ workspaces }) => ({
-      userId: workspaces.userId,
-    }))
+  const workspacesQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ workspaces: collections.workspaces })
+        .select(({ workspaces }) => ({
+          userId: workspaces.userId,
+        })),
+    []
   );
   const workspaces = workspacesQuery.data;
 

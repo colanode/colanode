@@ -23,16 +23,18 @@ const FileMeta = ({ title, value }: { title: string; value: string }) => {
 
 export const FileSidebar = ({ file }: FileSidebarProps) => {
   const workspace = useWorkspace();
-  const userQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, file.createdBy))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-      }))
-      .findOne()
+  const userQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: collections.workspace(workspace.userId).users })
+        .where(({ users }) => eq(users.id, file.createdBy))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+        }))
+        .findOne(),
+    [workspace.userId, file.createdBy]
   );
   const user = userQuery.data;
 

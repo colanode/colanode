@@ -23,16 +23,18 @@ export const ChatSidebarItem = ({ chat, isActive }: ChatSidebarItemProps) => {
       (id) => id !== workspace.userId
     ) ?? '';
 
-  const userQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, userId))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-      }))
-      .findOne()
+  const userQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: collections.workspace(workspace.userId).users })
+        .where(({ users }) => eq(users.id, userId))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+        }))
+        .findOne(),
+    [userId]
   );
 
   const user = userQuery.data;

@@ -11,10 +11,12 @@ export const SidebarSpaces = () => {
   const canCreateSpace =
     workspace.role !== 'guest' && workspace.role !== 'none';
 
-  const spaceListQuery = useLiveQuery((q) =>
-    q
-      .from({ spaces: collections.workspace(workspace.userId).spaces })
-      .orderBy(({ spaces }) => spaces.id, 'asc')
+  const spaceListQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ spaces: collections.workspace(workspace.userId).spaces })
+        .orderBy(({ spaces }) => spaces.id, 'asc'),
+    [workspace.userId]
   );
 
   const spaces = spaceListQuery.data;

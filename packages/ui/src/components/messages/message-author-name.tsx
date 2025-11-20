@@ -16,14 +16,16 @@ export const MessageAuthorName = ({
 }: MessageAuthorNameProps) => {
   const workspace = useWorkspace();
 
-  const userQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, message.createdBy))
-      .select(({ users }) => ({
-        name: users.name,
-      }))
-      .findOne()
+  const userQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: collections.workspace(workspace.userId).users })
+        .where(({ users }) => eq(users.id, message.createdBy))
+        .select(({ users }) => ({
+          name: users.name,
+        }))
+        .findOne(),
+    [workspace.userId, message.createdBy]
   );
 
   const user = userQuery.data;

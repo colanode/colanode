@@ -10,7 +10,6 @@ export * from './emojis/emoji-get-by-skin-id';
 export * from './emojis/emoji-get';
 export * from './emojis/emoji-list';
 export * from './emojis/emoji-search';
-export * from './files/file-list';
 export * from './files/local-file-get';
 export * from './files/file-download-request-get';
 export * from './icons/icon-category-list';

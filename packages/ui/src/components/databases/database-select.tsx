@@ -30,10 +30,12 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
   const workspace = useWorkspace();
   const [open, setOpen] = useState(false);
 
-  const databaseListQuery = useLiveQuery((q) =>
-    q
-      .from({ databases: collections.workspace(workspace.userId).databases })
-      .orderBy(({ databases }) => databases.id, 'asc')
+  const databaseListQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ databases: collections.workspace(workspace.userId).databases })
+        .orderBy(({ databases }) => databases.id, 'asc'),
+    []
   );
 
   const databases = databaseListQuery.data;

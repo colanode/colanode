@@ -10,10 +10,12 @@ import { useWorkspace } from '@colanode/ui/contexts/workspace';
 export const SidebarChats = () => {
   const workspace = useWorkspace();
 
-  const chatListQuery = useLiveQuery((q) =>
-    q
-      .from({ chats: collections.workspace(workspace.userId).chats })
-      .orderBy(({ chats }) => chats.id, 'asc')
+  const chatListQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ chats: collections.workspace(workspace.userId).chats })
+        .orderBy(({ chats }) => chats.id, 'asc'),
+    [workspace.userId]
   );
 
   const chats = chatListQuery.data;

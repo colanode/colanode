@@ -14,10 +14,11 @@ interface AuthServerProps {
 export const AuthServer = ({ onSelect }: AuthServerProps) => {
   const [openCreate, setOpenCreate] = useState(false);
 
-  const serversQuery = useLiveQuery((q) =>
-    q.from({ servers: collections.servers })
+  const serversQuery = useLiveQuery(
+    (q) => q.from({ servers: collections.servers }),
+    []
   );
-  const servers = serversQuery.data ?? [];
+  const servers = serversQuery.data;
 
   return (
     <div className="flex flex-col gap-6 w-full">

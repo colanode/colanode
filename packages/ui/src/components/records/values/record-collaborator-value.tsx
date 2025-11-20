@@ -46,16 +46,18 @@ export const RecordCollaboratorValue = ({
   const [open, setOpen] = useState(false);
 
   const collaboratorIds = record.getCollaboratorValue(field) ?? [];
-  const collaboratorsQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => inArray(users.id, collaboratorIds))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-        email: users.email,
-      }))
+  const collaboratorsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: collections.workspace(workspace.userId).users })
+        .where(({ users }) => inArray(users.id, collaboratorIds))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+          email: users.email,
+        })),
+    [workspace.userId, collaboratorIds]
   );
 
   const collaborators = collaboratorsQuery.data;

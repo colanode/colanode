@@ -42,17 +42,19 @@ const TempFilePreview = ({
 export const TempFileNodeView = ({ node, deleteNode }: NodeViewProps) => {
   const fileId = node.attrs.id;
 
-  const tempFileQuery = useLiveQuery((q) =>
-    q
-      .from({ tempFiles: collections.tempFiles })
-      .where(({ tempFiles }) => eq(tempFiles.id, fileId))
-      .select(({ tempFiles }) => ({
-        name: tempFiles.name,
-        mimeType: tempFiles.mimeType,
-        subtype: tempFiles.subtype,
-        url: tempFiles.url,
-      }))
-      .findOne()
+  const tempFileQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ tempFiles: collections.tempFiles })
+        .where(({ tempFiles }) => eq(tempFiles.id, fileId))
+        .select(({ tempFiles }) => ({
+          name: tempFiles.name,
+          mimeType: tempFiles.mimeType,
+          subtype: tempFiles.subtype,
+          url: tempFiles.url,
+        }))
+        .findOne(),
+    [fileId]
   );
 
   const tempFile = tempFileQuery.data;

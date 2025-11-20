@@ -13,16 +13,18 @@ interface RecordCreatedByValueProps {
 export const RecordCreatedByValue = ({ field }: RecordCreatedByValueProps) => {
   const workspace = useWorkspace();
   const record = useRecord();
-  const userQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, record.createdBy))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-      }))
-      .findOne()
+  const userQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: collections.workspace(workspace.userId).users })
+        .where(({ users }) => eq(users.id, record.createdBy))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+        }))
+        .findOne(),
+    [workspace.userId, record.createdBy]
   );
 
   const user = userQuery.data;

@@ -72,16 +72,18 @@ export const ViewCollaboratorFieldFilter = ({
     ) ?? collaboratorFieldFilterOperators[0]!;
 
   const collaboratorIds = (filter.value as string[]) ?? [];
-  const collaboratorsQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => inArray(users.id, collaboratorIds))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-        email: users.email,
-      }))
+  const collaboratorsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: collections.workspace(workspace.userId).users })
+        .where(({ users }) => inArray(users.id, collaboratorIds))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+          email: users.email,
+        })),
+    [workspace.userId, collaboratorIds]
   );
 
   const collaborators = collaboratorsQuery.data;

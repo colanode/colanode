@@ -21,16 +21,21 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
   const chatsState = radar.getChatsState(workspace.userId);
   const channelsState = radar.getChannelsState(workspace.userId);
 
-  const pendingUploadsQuery = useLiveQuery((q) =>
-    q
-      .from({ uploads: collections.workspace(workspace.userId).uploads })
-      .where(({ uploads }) =>
-        inArray(uploads.status, [UploadStatus.Pending, UploadStatus.Uploading])
-      )
-      .select(({ uploads }) => ({
-        count: count(uploads.fileId),
-      }))
-      .findOne()
+  const pendingUploadsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ uploads: collections.workspace(workspace.userId).uploads })
+        .where(({ uploads }) =>
+          inArray(uploads.status, [
+            UploadStatus.Pending,
+            UploadStatus.Uploading,
+          ])
+        )
+        .select(({ uploads }) => ({
+          count: count(uploads.fileId),
+        }))
+        .findOne(),
+    [workspace.userId]
   );
 
   const pendingUploads = pendingUploadsQuery.data?.count ?? 0;

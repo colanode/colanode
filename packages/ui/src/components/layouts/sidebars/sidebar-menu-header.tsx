@@ -24,10 +24,14 @@ export const SidebarMenuHeader = () => {
 
   const [open, setOpen] = useState(false);
 
-  const workspacesQuery = useLiveQuery((q) =>
-    q
-      .from({ workspaces: collections.workspaces })
-      .where(({ workspaces }) => eq(workspaces.accountId, workspace.accountId))
+  const workspacesQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ workspaces: collections.workspaces })
+        .where(({ workspaces }) =>
+          eq(workspaces.accountId, workspace.accountId)
+        ),
+    [workspace.accountId]
   );
 
   const workspaces = workspacesQuery.data;

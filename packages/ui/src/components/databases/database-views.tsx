@@ -16,11 +16,13 @@ export const DatabaseViews = ({ inline = false }: DatabaseViewsProps) => {
   const database = useDatabase();
   const [activeViewId, setActiveViewId] = useState<string | null>(null);
 
-  const databaseViewListQuery = useLiveQuery((q) =>
-    q
-      .from({ views: collections.workspace(workspace.userId).views })
-      .where(({ views }) => eq(views.attributes.parentId, database.id))
-      .orderBy(({ views }) => views.attributes.index, 'asc')
+  const databaseViewListQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ views: collections.workspace(workspace.userId).views })
+        .where(({ views }) => eq(views.attributes.parentId, database.id))
+        .orderBy(({ views }) => views.attributes.index, 'asc'),
+    [workspace.userId, database.id]
   );
 
   const views = databaseViewListQuery.data;

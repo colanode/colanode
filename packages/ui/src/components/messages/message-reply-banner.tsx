@@ -15,15 +15,17 @@ export const MessageReplyBanner = ({
   onCancel,
 }: MessageReplyBannerProps) => {
   const workspace = useWorkspace();
-  const userQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, message.createdBy))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-      }))
-      .findOne()
+  const userQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: collections.workspace(workspace.userId).users })
+        .where(({ users }) => eq(users.id, message.createdBy))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+        }))
+        .findOne(),
+    [workspace.userId, message.createdBy]
   );
 
   const user = userQuery.data;
