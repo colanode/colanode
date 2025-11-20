@@ -1,6 +1,8 @@
+import { useLiveQuery } from '@tanstack/react-db';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -17,7 +19,6 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface DatabaseSelectProps {
@@ -29,12 +30,13 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
   const workspace = useWorkspace();
   const [open, setOpen] = useState(false);
 
-  const databaseListQuery = useLiveQuery({
-    type: 'database.list',
-    userId: workspace.userId,
-  });
+  const databaseListQuery = useLiveQuery((q) =>
+    q
+      .from({ databases: collections.workspace(workspace.userId).databases })
+      .orderBy(({ databases }) => databases.id, 'asc')
+  );
 
-  const databases = databaseListQuery.data ?? [];
+  const databases = databaseListQuery.data;
   const selectedDatabase = id
     ? databases.find((database) => database.id === id)
     : undefined;
