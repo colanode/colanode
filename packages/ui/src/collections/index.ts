@@ -6,6 +6,7 @@ import {
   LocalDatabaseNode,
   LocalDatabaseViewNode,
   LocalFileNode,
+  LocalMessageNode,
   LocalNode,
   LocalRecordNode,
   LocalSpaceNode,
@@ -36,6 +37,7 @@ class WorkspaceCollections {
   public readonly chats: Collection<LocalChatNode>;
   public readonly spaces: Collection<LocalSpaceNode>;
   public readonly files: Collection<LocalFileNode>;
+  public readonly messages: Collection<LocalMessageNode>;
 
   constructor(userId: string) {
     this.userId = userId;
@@ -69,6 +71,11 @@ class WorkspaceCollections {
     );
     this.files = createLiveQueryCollection((q) =>
       q.from({ nodes: this.nodes }).where(({ nodes }) => eq(nodes.type, 'file'))
+    );
+    this.messages = createLiveQueryCollection((q) =>
+      q
+        .from({ nodes: this.nodes })
+        .where(({ nodes }) => eq(nodes.type, 'message'))
     );
   }
 }

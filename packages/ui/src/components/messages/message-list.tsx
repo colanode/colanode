@@ -1,12 +1,12 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { eq, useLiveInfiniteQuery } from '@tanstack/react-db';
+import { Fragment, useEffect, useRef } from 'react';
 import { InView } from 'react-intersection-observer';
 
-import { MessageListQueryInput } from '@colanode/client/queries';
 import { compareString } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Message } from '@colanode/ui/components/messages/message';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 const MESSAGES_PER_PAGE = 50;
 
@@ -15,27 +15,25 @@ export const MessageList = () => {
   const conversation = useConversation();
 
   const lastMessageId = useRef<string | null>(null);
-  const [lastPage, setLastPage] = useState<number>(1);
+  const messageListQuery = useLiveInfiniteQuery(
+    (q) =>
+      q
+        .from({ messages: collections.workspace(workspace.userId).messages })
+        .where(({ messages }) =>
+          eq(messages.attributes.parentId, conversation.id)
+        )
+        .orderBy(({ messages }) => messages.id, 'desc'),
+    {
+      pageSize: MESSAGES_PER_PAGE,
+      getNextPageParam: (lastPage, allPages) =>
+        lastPage.length === MESSAGES_PER_PAGE ? allPages.length : undefined,
+    },
+    [workspace.userId, conversation.id]
+  );
 
-  const inputs: MessageListQueryInput[] = Array.from({
-    length: lastPage,
-  }).map((_, i) => ({
-    type: 'message.list',
-    conversationId: conversation.id,
-    userId: workspace.userId,
-    page: i + 1,
-    count: MESSAGES_PER_PAGE,
-  }));
-
-  const result = useLiveQueries(inputs);
-  const messages = result
-    .flatMap((data) => data.data ?? [])
-    .sort((a, b) => compareString(a.id, b.id));
-
-  const isPending = result.some((data) => data.isPending);
-
-  const hasMore =
-    !isPending && messages.length === lastPage * MESSAGES_PER_PAGE;
+  const messages = messageListQuery.data.sort((a, b) =>
+    compareString(a.id, b.id)
+  );
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -56,8 +54,12 @@ export const MessageList = () => {
       <InView
         rootMargin="200px"
         onChange={(inView) => {
-          if (inView && hasMore && !isPending) {
-            setLastPage(lastPage + 1);
+          if (
+            inView &&
+            messageListQuery.hasNextPage &&
+            !messageListQuery.isFetchingNextPage
+          ) {
+            messageListQuery.fetchNextPage();
           }
         }}
       />
