@@ -12,11 +12,13 @@ import {
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useAccount } from '@colanode/ui/contexts/account';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const SidebarMenuHeader = () => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const account = useAccount();
   const radar = useRadar();
@@ -61,7 +63,9 @@ export const SidebarMenuHeader = () => {
         side="right"
         sideOffset={4}
       >
-        <DropdownMenuLabel className="mb-1">Workspaces</DropdownMenuLabel>
+        <DropdownMenuLabel className="mb-1">
+          {t('workspace.workspaces')}
+        </DropdownMenuLabel>
         {workspaces.map((workspaceItem) => {
           const workspaceUnreadState = radar.getWorkspaceState(
             workspaceItem.accountId,
@@ -105,7 +109,7 @@ export const SidebarMenuHeader = () => {
           }}
         >
           <Plus className="size-4" />
-          <p className="font-medium">Create workspace</p>
+          <p className="font-medium">{t('workspace.createWorkspace')}</p>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

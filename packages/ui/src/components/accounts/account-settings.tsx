@@ -3,8 +3,10 @@ import { AccountUpdate } from '@colanode/ui/components/accounts/account-update';
 import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useAccount } from '@colanode/ui/contexts/account';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 export const AccountSettings = () => {
+  const { t } = useI18n();
   const account = useAccount();
 
   return (
@@ -12,7 +14,9 @@ export const AccountSettings = () => {
       <ContainerBody className="max-w-4xl space-y-8">
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight">General</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              {t('common.general')}
+            </h2>
             <Separator className="mt-3" />
           </div>
           <AccountUpdate account={account} />
@@ -21,7 +25,7 @@ export const AccountSettings = () => {
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">
-              Danger Zone
+              {t('account.dangerZone')}
             </h2>
             <Separator className="mt-3" />
           </div>

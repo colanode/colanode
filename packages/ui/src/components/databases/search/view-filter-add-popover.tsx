@@ -18,6 +18,7 @@ import {
 } from '@colanode/ui/components/ui/popover';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 interface ViewFilterAddPopoverProps {
   children: React.ReactNode;
@@ -26,6 +27,7 @@ interface ViewFilterAddPopoverProps {
 export const ViewFilterAddPopover = ({
   children,
 }: ViewFilterAddPopoverProps) => {
+  const { t } = useI18n();
   const database = useDatabase();
   const view = useDatabaseView();
 
@@ -50,8 +52,13 @@ export const ViewFilterAddPopover = ({
       <PopoverTrigger asChild>{children}</PopoverTrigger>
       <PopoverContent className="w-96 p-1">
         <Command className="min-h-min">
-          <CommandInput placeholder="Search fields..." className="h-9" />
-          <CommandEmpty>No field found.</CommandEmpty>
+          <CommandInput
+            placeholder={t('database.searchFields')}
+            className="h-9"
+          />
+          <CommandEmpty>
+            {t('field.fields')} {t('status.notFound').toLowerCase()}.
+          </CommandEmpty>
           <CommandList>
             <CommandGroup className="h-min">
               {!isFilteredByName && (
@@ -64,7 +71,7 @@ export const ViewFilterAddPopover = ({
                 >
                   <div className="flex w-full flex-row items-center gap-2">
                     <Type className="size-4" />
-                    <p>{database.nameField?.name ?? 'Name'}</p>
+                    <p>{database.nameField?.name ?? t('common.name')}</p>
                   </div>
                 </CommandItem>
               )}

@@ -8,6 +8,7 @@ import { App } from '@colanode/ui/components/app';
 import { FontLoader } from '@colanode/ui/components/font-loader';
 import { Toaster } from '@colanode/ui/components/ui/sonner';
 import { TooltipProvider } from '@colanode/ui/components/ui/tooltip';
+import { I18nProvider } from '@colanode/ui/contexts/i18n';
 import { HTML5Backend } from '@colanode/ui/lib/dnd-backend';
 
 export const queryClient = new QueryClient({
@@ -60,13 +61,15 @@ export const RootProvider = ({ type }: RootProviderProps) => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <DndProvider backend={HTML5Backend}>
-        <TooltipProvider>
-          <FontLoader type={type} />
-          <App type={type} />
-        </TooltipProvider>
-        <Toaster />
-      </DndProvider>
+      <I18nProvider>
+        <DndProvider backend={HTML5Backend}>
+          <TooltipProvider>
+            <FontLoader type={type} />
+            <App type={type} />
+          </TooltipProvider>
+          <Toaster />
+        </DndProvider>
+      </I18nProvider>
     </QueryClientProvider>
   );
 };

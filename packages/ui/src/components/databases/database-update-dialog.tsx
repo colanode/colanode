@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -26,6 +27,7 @@ export const DatabaseUpdateDialog = ({
   open,
   onOpenChange,
 }: DatabaseUpdateDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
   const canEdit = hasNodeRole(role, 'editor');
@@ -34,7 +36,7 @@ export const DatabaseUpdateDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Update database</DialogTitle>
+          <DialogTitle>{t('database.updateDatabase')}</DialogTitle>
           <DialogDescription>
             Update the database name and icon
           </DialogDescription>
@@ -46,7 +48,7 @@ export const DatabaseUpdateDialog = ({
             avatar: database.attributes.avatar,
           }}
           isPending={isPending}
-          submitText="Update"
+          submitText={t('common.update')}
           readOnly={!canEdit}
           handleCancel={() => {
             onOpenChange(false);
@@ -67,7 +69,6 @@ export const DatabaseUpdateDialog = ({
               },
               onSuccess() {
                 onOpenChange(false);
-                toast.success('Database updated');
               },
               onError(error) {
                 toast.error(error.message);

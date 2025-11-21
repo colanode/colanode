@@ -13,9 +13,11 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { cn } from '@colanode/ui/lib/utils';
 
 export const TableViewNameHeader = () => {
+  const { t } = useI18n();
   const database = useDatabase();
   const view = useDatabaseView();
 
@@ -105,7 +107,7 @@ export const TableViewNameHeader = () => {
                 }}
               >
                 <ArrowDownAz className="size-4" />
-                <span>Sort ascending</span>
+                <span>{t('view.sortAscending')}</span>
               </div>
 
               <div
@@ -116,7 +118,7 @@ export const TableViewNameHeader = () => {
                 }}
               >
                 <ArrowDownZa className="size-4" />
-                <span>Sort descending</span>
+                <span>{t('view.sortDescending')}</span>
               </div>
             </Fragment>
           )}

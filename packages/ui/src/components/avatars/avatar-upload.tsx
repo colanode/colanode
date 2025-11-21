@@ -5,6 +5,7 @@ import { Button } from '@colanode/ui/components/ui/button';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useAccount } from '@colanode/ui/contexts/account';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { openFileDialog } from '@colanode/ui/lib/files';
 
@@ -13,6 +14,7 @@ interface AvatarUploadProps {
 }
 
 export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
+  const { t } = useI18n();
   const account = useAccount();
   const { mutate, isPending } = useMutation();
 
@@ -38,7 +40,7 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
         <Input
           type="text"
           name="url"
-          placeholder="Paste link to an image..."
+          placeholder={t('ui.pasteImageLink')}
           onChange={(e) => setUrl(e.target.value)}
           autoComplete="off"
         />
@@ -47,7 +49,7 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
           className="h-auto px-3 py-0 text-sm"
           disabled={!url}
         >
-          Submit
+          {t('common.submit')}
         </Button>
       </form>
       <Button
@@ -89,11 +91,11 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
         }}
       >
         {isPending && <Spinner className="mr-1" />}
-        Upload file
+        {t('common.upload')} {t('file.file')}
       </Button>
       <div className="mt-4 flex flex-col gap-2 text-center text-xs text-muted-foreground">
-        <div>Recommended size is 280px x 280px</div>
-        <div>The maximum size per file is 5MB.</div>
+        <div>{t('misc.recommendedSize', { width: '280', height: '280' })}</div>
+        <div>{t('misc.maxFileSize', { size: '5' })}</div>
       </div>
     </div>
   );

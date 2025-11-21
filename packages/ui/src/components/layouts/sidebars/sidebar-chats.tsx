@@ -1,12 +1,14 @@
 import { ChatCreatePopover } from '@colanode/ui/components/chats/chat-create-popover';
 import { ChatSidebarItem } from '@colanode/ui/components/chats/chat-sidebar-item';
 import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 export const SidebarChats = () => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const layout = useLayout();
 
@@ -22,7 +24,7 @@ export const SidebarChats = () => {
 
   return (
     <div className="flex flex-col group/sidebar h-full px-2">
-      <SidebarHeader title="Chats" actions={<ChatCreatePopover />} />
+      <SidebarHeader title={t('chat.chats')} actions={<ChatCreatePopover />} />
       <div className="flex w-full min-w-0 flex-col gap-1">
         {chats.map((item) => (
           <button

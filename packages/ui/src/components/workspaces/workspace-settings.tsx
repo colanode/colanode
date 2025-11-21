@@ -4,10 +4,12 @@ import { Container, ContainerBody } from '@colanode/ui/components/ui/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { WorkspaceDelete } from '@colanode/ui/components/workspaces/workspace-delete';
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export const WorkspaceSettings = () => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
   const canEdit = workspace.role === 'owner';
@@ -38,7 +40,7 @@ export const WorkspaceSettings = () => {
                   avatar: values.avatar ?? null,
                 },
                 onSuccess() {
-                  toast.success('Workspace updated');
+                  toast.success(t('workspace.workspaceSettings'));
                 },
                 onError(error) {
                   toast.error(error.message);
@@ -46,7 +48,7 @@ export const WorkspaceSettings = () => {
               });
             }}
             isSaving={isPending}
-            saveText="Update"
+            saveText={t('common.update')}
           />
         </div>
 

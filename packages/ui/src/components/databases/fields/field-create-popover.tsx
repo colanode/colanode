@@ -24,6 +24,7 @@ import {
 } from '@colanode/ui/components/ui/popover';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useDatabase } from '@colanode/ui/contexts/database';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -61,6 +62,7 @@ export const FieldCreatePopover = ({
   onSuccess,
   types,
 }: FieldCreatePopoverProps) => {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const workspace = useWorkspace();
   const database = useDatabase();
@@ -123,9 +125,13 @@ export const FieldCreatePopover = ({
                 name="name"
                 render={({ field, formState }) => (
                   <FormItem>
-                    <FormLabel>Name</FormLabel>
+                    <FormLabel>{t('common.name')}</FormLabel>
                     <FormControl>
-                      <Input id="name" placeholder="Field name" {...field} />
+                      <Input
+                        id="name"
+                        placeholder={t('database.fieldName')}
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage>{formState.errors.name?.message}</FormMessage>
                   </FormItem>
@@ -136,7 +142,7 @@ export const FieldCreatePopover = ({
                 name="type"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Field type</FormLabel>
+                    <FormLabel>{t('field.fieldType')}</FormLabel>
                     <FormControl>
                       <FieldTypeSelect
                         value={field.value}
@@ -153,7 +159,7 @@ export const FieldCreatePopover = ({
                   name="relationDatabaseId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Database</FormLabel>
+                      <FormLabel>{t('database.database')}</FormLabel>
                       <FormControl>
                         <DatabaseSelect
                           id={field.value}
@@ -172,11 +178,11 @@ export const FieldCreatePopover = ({
                 size="sm"
                 onClick={handleCancelClick}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="submit" size="sm" disabled={isPending}>
                 {isPending && <Spinner className="mr-1" />}
-                Create
+                {t('common.create')}
               </Button>
             </div>
           </form>

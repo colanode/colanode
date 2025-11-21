@@ -16,6 +16,7 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useServer } from '@colanode/ui/contexts/server';
 import { useCountdown } from '@colanode/ui/hooks/use-countdown';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -37,6 +38,7 @@ export const EmailVerify = ({
   onSuccess,
   onBack,
 }: EmailVerifyProps) => {
+  const { t } = useI18n();
   const server = useServer();
   const { mutate, isPending } = useMutation();
 
@@ -51,7 +53,7 @@ export const EmailVerify = ({
 
   const handleSubmit = async (values: z.infer<typeof formSchema>) => {
     if (remainingSeconds <= 0) {
-      toast.error('Code has expired');
+      toast.error(t('ui.codeExpired'));
       return;
     }
 
@@ -79,14 +81,14 @@ export const EmailVerify = ({
           name="otp"
           render={({ field }) => (
             <FormItem>
-              <Label htmlFor="otp">Code</Label>
+              <Label htmlFor="otp">{t('auth.code')}</Label>
               <FormControl>
-                <Input placeholder="123456" {...field} />
+                <Input placeholder={t('auth.codePlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
               <div className="flex flex-col items-center gap-1">
                 <p className="text-sm text-muted-foreground w-full text-center">
-                  We sent a verification code to your email.
+                  {t('auth.verificationCodeSent')}
                 </p>
                 <p className="text-xs text-muted-foreground w-full text-center">
                   {formattedTime}
@@ -106,7 +108,7 @@ export const EmailVerify = ({
           ) : (
             <Mail className="mr-1 size-4" />
           )}
-          Confirm
+          {t('common.confirm')}
         </Button>
         <Button
           variant="link"
@@ -114,7 +116,7 @@ export const EmailVerify = ({
           onClick={onBack}
           type="button"
         >
-          Back to login
+          {t('common.back')}
         </Button>
       </form>
     </Form>

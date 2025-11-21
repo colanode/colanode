@@ -9,21 +9,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface PageCreateDialogProps {
-  spaceId: string;
+  parentId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export const PageCreateDialog = ({
-  spaceId,
+  parentId,
   open,
   onOpenChange,
 }: PageCreateDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const layout = useLayout();
   const { mutate, isPending } = useMutation();
@@ -32,9 +34,9 @@ export const PageCreateDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create page</DialogTitle>
+          <DialogTitle>{t('page.createPage')}</DialogTitle>
           <DialogDescription>
-            Create a new page to collaborate with your peers
+            {t('page.createPageDescription')}
           </DialogDescription>
         </DialogHeader>
         <PageForm
@@ -43,7 +45,7 @@ export const PageCreateDialog = ({
             name: '',
           }}
           isPending={isPending}
-          submitText="Create"
+          submitText={t('common.create')}
           handleCancel={() => {
             onOpenChange(false);
           }}
@@ -55,7 +57,7 @@ export const PageCreateDialog = ({
             mutate({
               input: {
                 type: 'page.create',
-                parentId: spaceId,
+                parentId: parentId,
                 name: values.name,
                 avatar: values.avatar,
                 accountId: workspace.accountId,

@@ -214,7 +214,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="outline"
-                              className="w-20 justify-between"
+                              className="justify-between"
                             >
                               {storageLimitUnitLabel}
                               <ChevronDown className="h-4 w-4" />
@@ -269,7 +269,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
                           <DropdownMenuTrigger asChild>
                             <Button
                               variant="outline"
-                              className="w-20 justify-between"
+                              className="justify-between"
                             >
                               {maxFileSizeUnitLabel}
                               <ChevronDown className="h-4 w-4" />

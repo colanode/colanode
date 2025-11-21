@@ -9,6 +9,7 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useDatabase } from '@colanode/ui/contexts/database';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 interface FieldDeleteDialogProps {
   id: string;
@@ -21,22 +22,20 @@ export const FieldDeleteDialog = ({
   open,
   onOpenChange,
 }: FieldDeleteDialogProps) => {
+  const { t } = useI18n();
   const database = useDatabase();
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            Are you sure you want delete this field?
-          </AlertDialogTitle>
+          <AlertDialogTitle>{t('field.deleteFieldConfirm')}</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This field will no longer be
-            accessible and all data in the field will be lost.
+            {t('field.deleteFieldDescription')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
           <Button
             variant="destructive"
             onClick={async () => {
@@ -44,7 +43,7 @@ export const FieldDeleteDialog = ({
               onOpenChange(false);
             }}
           >
-            Delete
+            {t('common.delete')}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

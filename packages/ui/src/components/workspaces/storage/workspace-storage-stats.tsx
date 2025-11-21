@@ -6,11 +6,13 @@ import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { StorageStats } from '@colanode/ui/components/workspaces/storage/storage-stats';
 import { WorkspaceStorageCloud } from '@colanode/ui/components/workspaces/storage/workspace-storage-cloud';
 import { WorkspaceStorageUserTable } from '@colanode/ui/components/workspaces/storage/workspace-storage-user-table';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useServer } from '@colanode/ui/contexts/server';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 
 export const WorkspaceStorageStats = () => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const server = useServer();
   const isFeatureSupported = server.supports('workspace.storage.management');
@@ -54,7 +56,7 @@ export const WorkspaceStorageStats = () => {
           .with({ isPending: true }, () => (
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <Spinner className="size-5" />
-              <span>Loading storage data from the server...</span>
+              <span>{t('storage.loadingStorageData')}</span>
             </div>
           ))
           .with({ isPending: false, isError: false }, () => (

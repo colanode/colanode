@@ -27,6 +27,7 @@ import {
   ScrollBar,
   ScrollViewport,
 } from '@colanode/ui/components/ui/scroll-area';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { openFileDialog } from '@colanode/ui/lib/files';
 
@@ -68,6 +69,7 @@ interface FolderBodyProps {
 }
 
 export const FolderBody = ({ folder }: FolderBodyProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
 
   const [layout, setLayout] = useState<FolderLayoutType>('grid');
@@ -101,7 +103,7 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
 
   return (
     <Dropzone
-      text="Drop files here to upload them in the folder"
+      text={t('file.dropFilesHere')}
       onDrop={(files) => {
         files.forEach((file) => console.log(file));
       }}
@@ -110,7 +112,7 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-2">
             <Button type="button" variant="outline" onClick={handleUploadClick}>
-              <Upload className="mr-2 size-4" /> Upload
+              <Upload className="mr-2 size-4" /> {t('common.upload')}
             </Button>
           </div>
           <div className="flex flex-row gap-2">
@@ -125,7 +127,7 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
                 </Button>
               </DropdownMenuTrigger>
               <DropdownMenuContent className="mr-5 w-56">
-                <DropdownMenuLabel>Layout</DropdownMenuLabel>
+                <DropdownMenuLabel>{t('layout.layout')}</DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 {folderLayouts.map((item) => (
                   <DropdownMenuItem
@@ -146,7 +148,11 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
         </div>
         <ScrollArea className="flex-grow">
           <ScrollViewport>
-            <FolderFiles id={folder.id} name="Folder" layout={layout} />
+            <FolderFiles
+              id={folder.id}
+              name={t('common.folder')}
+              layout={layout}
+            />
             <ScrollBar orientation="horizontal" />
             <ScrollBar orientation="vertical" />
           </ScrollViewport>

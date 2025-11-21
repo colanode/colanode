@@ -9,21 +9,23 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface FolderCreateDialogProps {
-  spaceId: string;
+  parentId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export const FolderCreateDialog = ({
-  spaceId,
+  parentId,
   open,
   onOpenChange,
 }: FolderCreateDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const layout = useLayout();
   const { mutate, isPending } = useMutation();
@@ -32,9 +34,9 @@ export const FolderCreateDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create folder</DialogTitle>
+          <DialogTitle>{t('folder.createFolder')}</DialogTitle>
           <DialogDescription>
-            Create a new folder to organize your pages
+            {t('folder.createFolderDescription')}
           </DialogDescription>
         </DialogHeader>
         <FolderForm
@@ -43,7 +45,7 @@ export const FolderCreateDialog = ({
             name: '',
           }}
           isPending={isPending}
-          submitText="Create"
+          submitText={t('common.create')}
           handleCancel={() => {
             onOpenChange(false);
           }}
@@ -55,7 +57,7 @@ export const FolderCreateDialog = ({
             mutate({
               input: {
                 type: 'folder.create',
-                parentId: spaceId,
+                parentId: parentId,
                 name: values.name,
                 avatar: values.avatar,
                 accountId: workspace.accountId,

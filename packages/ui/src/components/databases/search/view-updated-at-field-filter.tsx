@@ -1,8 +1,8 @@
 import { ChevronDown, Trash2 } from 'lucide-react';
 
 import {
-  DatabaseViewFieldFilterAttributes,
   UpdatedAtFieldAttributes,
+  DatabaseViewFieldFilterAttributes,
 } from '@colanode/core';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -19,6 +19,7 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { updatedAtFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewUpdatedAtFieldFilterProps {
@@ -34,6 +35,7 @@ export const ViewUpdatedAtFieldFilter = ({
   field,
   filter,
 }: ViewUpdatedAtFieldFilterProps) => {
+  const { t } = useI18n();
   const view = useDatabaseView();
 
   const operator =
@@ -128,7 +130,7 @@ export const ViewUpdatedAtFieldFilter = ({
               });
             }
           }}
-          placeholder="Select date"
+          placeholder={t('database.selectDate')}
           className="flex h-full w-full cursor-pointer flex-row items-center gap-1 rounded-md border border-input p-2 text-sm"
         />
       </PopoverContent>

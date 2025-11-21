@@ -24,6 +24,7 @@ import {
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useConversation } from '@colanode/ui/contexts/conversation';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { openFileDialog } from '@colanode/ui/lib/files';
@@ -33,6 +34,7 @@ export interface MessageCreateRefProps {
 }
 
 export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const conversation = useConversation();
 
@@ -139,13 +141,13 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
                 <DropdownMenuItem disabled={true}>
                   <div className="flex flex-row items-center gap-2 text-sm">
                     <Search className="size-4" />
-                    <span>Browse</span>
+                    <span>{t('misc.browse')}</span>
                   </div>
                 </DropdownMenuItem>
                 <DropdownMenuItem onClick={handleUploadClick}>
                   <div className="flex cursor-pointer flex-row items-center gap-2 text-sm">
                     <Upload className="size-4" />
-                    <span>Upload</span>
+                    <span>{t('common.upload')}</span>
                   </div>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -165,8 +167,7 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
               />
             ) : (
               <p className="m-0 px-0 py-1 text-muted-foreground">
-                You don&apos;t have permission to create messages in this
-                conversation
+                {t('chat.sendMessage')}
               </p>
             )}
           </div>

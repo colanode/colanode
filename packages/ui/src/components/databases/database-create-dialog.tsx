@@ -9,6 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -24,6 +25,7 @@ export const DatabaseCreateDialog = ({
   open,
   onOpenChange,
 }: DatabaseCreateDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const layout = useLayout();
   const { mutate, isPending } = useMutation();
@@ -32,7 +34,7 @@ export const DatabaseCreateDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create database</DialogTitle>
+          <DialogTitle>{t('database.createDatabase')}</DialogTitle>
           <DialogDescription>
             Create a new database to store your data
           </DialogDescription>
@@ -43,7 +45,7 @@ export const DatabaseCreateDialog = ({
             name: '',
           }}
           isPending={isPending}
-          submitText="Create"
+          submitText={t('common.create')}
           handleCancel={() => {
             onOpenChange(false);
           }}

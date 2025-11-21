@@ -19,6 +19,7 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { dateFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewDateFieldFilterProps {
@@ -34,6 +35,7 @@ export const ViewDateFieldFilter = ({
   field,
   filter,
 }: ViewDateFieldFilterProps) => {
+  const { t } = useI18n();
   const view = useDatabaseView();
 
   const operator =
@@ -131,7 +133,7 @@ export const ViewDateFieldFilter = ({
                 });
               }
             }}
-            placeholder="Select date"
+            placeholder={t('database.selectDate')}
             className="flex h-full w-full cursor-pointer flex-row items-center gap-1 rounded-md border border-input p-2 text-sm"
           />
         )}

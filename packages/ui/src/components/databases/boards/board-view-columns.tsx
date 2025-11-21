@@ -3,12 +3,14 @@ import { BoardViewColumnsCollaborator } from '@colanode/ui/components/databases/
 import { BoardViewColumnsCreatedBy } from '@colanode/ui/components/databases/boards/board-view-columns-created-by';
 import { BoardViewColumnsMultiSelect } from '@colanode/ui/components/databases/boards/board-view-columns-multi-select';
 import { BoardViewColumnsSelect } from '@colanode/ui/components/databases/boards/board-view-columns-select';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 interface BoardViewColumnsProps {
   field: FieldAttributes;
 }
 
 export const BoardViewColumns = ({ field }: BoardViewColumnsProps) => {
+  const { t } = useI18n();
   switch (field.type) {
     case 'select':
       return <BoardViewColumnsSelect field={field} />;
@@ -19,6 +21,6 @@ export const BoardViewColumns = ({ field }: BoardViewColumnsProps) => {
     case 'created_by':
       return <BoardViewColumnsCreatedBy field={field} />;
     default:
-      return <p>Unsupported field type</p>;
+      return <p>{t('field.unsupportedFieldType')}</p>;
   }
 };

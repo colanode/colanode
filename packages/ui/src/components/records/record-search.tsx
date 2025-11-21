@@ -15,6 +15,7 @@ import {
   ScrollViewport,
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -29,6 +30,7 @@ export const RecordSearch = ({
   onSelect,
   databaseId,
 }: RecordSearchProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
 
   const [query, setQuery] = useState('');
@@ -46,10 +48,10 @@ export const RecordSearch = ({
       <CommandInput
         value={query}
         onValueChange={setQuery}
-        placeholder="Search records..."
+        placeholder={t('database.searchRecords')}
         className="h-9"
       />
-      <CommandEmpty>No record found.</CommandEmpty>
+      <CommandEmpty>{t('view.noRecords')}</CommandEmpty>
       <ScrollArea className="h-80">
         <ScrollViewport>
           <CommandList className="max-h-none overflow-hidden">

@@ -14,6 +14,7 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface ServerCreateDialogProps {
@@ -25,6 +26,7 @@ export const ServerCreateDialog = ({
   onCancel,
   onCreate,
 }: ServerCreateDialogProps) => {
+  const { t } = useI18n();
   const [open, setOpen] = useState(true);
   const { mutate, isPending } = useMutation();
   const [url, setUrl] = useState('');
@@ -45,7 +47,7 @@ export const ServerCreateDialog = ({
         <div className="flex-grow space-y-2 py-2 pb-4">
           <Label>Server URL</Label>
           <Input
-            placeholder="https://us.colanode.com/config"
+            placeholder={t('server.serverUrlPlaceholder')}
             value={url}
             onChange={(e) => setUrl(e.target.value)}
           />

@@ -12,6 +12,7 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface ServerDeleteDialogProps {
@@ -25,6 +26,7 @@ export const ServerDeleteDialog = ({
   open,
   onOpenChange,
 }: ServerDeleteDialogProps) => {
+  const { t } = useI18n();
   const { mutate, isPending } = useMutation();
 
   return (
@@ -32,16 +34,15 @@ export const ServerDeleteDialog = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Are you sure you want delete the server{' '}
+            {t('server.deleteServer')}{' '}
             <span className="font-bold">&quot;{server.domain}&quot;</span>?
           </AlertDialogTitle>
           <AlertDialogDescription>
-            Deleting the server will remove all accounts connected to it. You
-            can re-add it later.
+            {t('server.deleteServerDescription')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
           <Button
             variant="destructive"
             disabled={isPending}
@@ -53,9 +54,7 @@ export const ServerDeleteDialog = ({
                 },
                 onSuccess() {
                   onOpenChange(false);
-                  toast.success(
-                    'Server and all associated accounts have been deleted'
-                  );
+                  toast.success(t('server.serverDeleted'));
                 },
                 onError(error) {
                   toast.error(error.message);
@@ -64,7 +63,7 @@ export const ServerDeleteDialog = ({
             }}
           >
             {isPending && <Spinner className="mr-1" />}
-            Delete
+            {t('common.delete')}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

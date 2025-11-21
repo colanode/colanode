@@ -16,6 +16,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { cn } from '@colanode/ui/lib/utils';
@@ -26,6 +27,7 @@ interface DatabaseSelectProps {
 }
 
 export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const [open, setOpen] = useState(false);
 
@@ -63,15 +65,20 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
               </span>
             </Fragment>
           ) : (
-            <span>Select database...</span>
+            <span>{t('database.database')}...</span>
           )}
           <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-96 p-1 overflow-hidden">
         <Command className="min-h-min">
-          <CommandInput placeholder="Search field types..." className="h-9" />
-          <CommandEmpty>No field type found.</CommandEmpty>
+          <CommandInput
+            placeholder={t('database.searchFieldTypes')}
+            className="h-9"
+          />
+          <CommandEmpty>
+            {t('database.database')} {t('status.notFound').toLowerCase()}.
+          </CommandEmpty>
           <CommandList>
             <CommandGroup className="h-min overflow-y-auto">
               {databases.map((database) => (

@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -26,6 +27,7 @@ export const PageUpdateDialog = ({
   open,
   onOpenChange,
 }: PageUpdateDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
   const canEdit = hasNodeRole(role, 'editor');
@@ -34,8 +36,10 @@ export const PageUpdateDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Update page</DialogTitle>
-          <DialogDescription>Update the page name and icon</DialogDescription>
+          <DialogTitle>{t('page.updatePage')}</DialogTitle>
+          <DialogDescription>
+            {t('page.updatePageDescription')}
+          </DialogDescription>
         </DialogHeader>
         <PageForm
           id={page.id}
@@ -44,7 +48,7 @@ export const PageUpdateDialog = ({
             avatar: page.attributes.avatar,
           }}
           isPending={isPending}
-          submitText="Update"
+          submitText={t('common.update')}
           readOnly={!canEdit}
           handleCancel={() => {
             onOpenChange(false);
@@ -65,7 +69,7 @@ export const PageUpdateDialog = ({
               },
               onSuccess() {
                 onOpenChange(false);
-                toast.success('Page was updated successfully');
+                toast.success(t('page.updatePage'));
               },
               onError(error) {
                 toast.error(error.message);

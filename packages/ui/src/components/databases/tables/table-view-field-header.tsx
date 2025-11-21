@@ -15,6 +15,7 @@ import {
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { isFilterableField, isSortableField } from '@colanode/ui/lib/databases';
 import { cn } from '@colanode/ui/lib/utils';
 
@@ -25,6 +26,7 @@ interface TableViewFieldHeaderProps {
 export const TableViewFieldHeader = ({
   viewField,
 }: TableViewFieldHeaderProps) => {
+  const { t } = useI18n();
   const database = useDatabase();
   const view = useDatabaseView();
 
@@ -128,7 +130,7 @@ export const TableViewFieldHeader = ({
                   }}
                 >
                   <ArrowDownAz className="size-4" />
-                  <span>Sort ascending</span>
+                  <span>{t('view.sortAscending')}</span>
                 </div>
 
                 <div
@@ -139,7 +141,7 @@ export const TableViewFieldHeader = ({
                   }}
                 >
                   <ArrowDownZa className="size-4" />
-                  <span>Sort descending</span>
+                  <span>{t('view.sortDescending')}</span>
                 </div>
               </Fragment>
             )}
@@ -164,7 +166,7 @@ export const TableViewFieldHeader = ({
                 }}
               >
                 <EyeOff className="size-4" />
-                <span>Hide in view</span>
+                <span>{t('view.hideInView')}</span>
               </div>
             )}
             {database.canEdit && (
@@ -175,7 +177,7 @@ export const TableViewFieldHeader = ({
                 }}
               >
                 <Trash2 className="size-4" />
-                <span>Delete field</span>
+                <span>{t('field.deleteField')}</span>
               </div>
             )}
           </PopoverContent>

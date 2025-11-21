@@ -16,28 +16,27 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useServer } from '@colanode/ui/contexts/server';
 import { useCountdown } from '@colanode/ui/hooks/use-countdown';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
-const formSchema = z
-  .object({
-    otp: z.string().min(6, 'OTP must be 6 characters long'),
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters long')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(
-        /[^A-Za-z0-9]/,
-        'Password must contain at least one special character'
-      ),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'], // path of error
-  });
+const createFormSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      otp: z.string().min(6, 'OTP must be 6 characters long'),
+      password: z
+        .string()
+        .min(8, t('auth.passwordRequirements.minLength'))
+        .regex(/[A-Z]/, t('auth.passwordRequirements.uppercase'))
+        .regex(/[a-z]/, t('auth.passwordRequirements.lowercase'))
+        .regex(/[^A-Za-z0-9]/, t('auth.passwordRequirements.special')),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t('auth.passwordRequirements.noMatch'),
+      path: ['confirmPassword'],
+    });
 
 interface EmailPasswordResetCompleteProps {
   id: string;
@@ -50,8 +49,11 @@ export const EmailPasswordResetComplete = ({
   expiresAt,
   onBack,
 }: EmailPasswordResetCompleteProps) => {
+  const { t } = useI18n();
   const server = useServer();
   const { mutate, isPending } = useMutation();
+
+  const formSchema = createFormSchema(t);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -67,7 +69,7 @@ export const EmailPasswordResetComplete = ({
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     if (remainingSeconds <= 0) {
-      toast.error('Code has expired');
+      toast.error(t('ui.codeExpired'));
       return;
     }
 
@@ -94,11 +96,10 @@ export const EmailPasswordResetComplete = ({
         <div className="flex flex-col items-center justify-center border border-border rounded-md p-4 gap-3 text-center">
           <CheckCircle className="size-7 text-green-600" />
           <p className="text-sm text-muted-foreground">
-            Your password has been reset. You can now login with your new
-            password.
+            {t('auth.passwordResetSuccess')}
           </p>
           <p className="text-sm font-semibold text-muted-foreground">
-            You have been logged out of all devices.
+            {t('auth.loggedOutAllDevices')}
           </p>
         </div>
         <Button
@@ -107,7 +108,7 @@ export const EmailPasswordResetComplete = ({
           onClick={onBack}
           type="button"
         >
-          Back to login
+          {t('common.back')}
         </Button>
       </div>
     );
@@ -121,13 +122,13 @@ export const EmailPasswordResetComplete = ({
           name="password"
           render={({ field }) => (
             <FormItem>
-              <Label htmlFor="password">New Password</Label>
+              <Label htmlFor="password">{t('auth.newPassword')}</Label>
               <FormControl>
                 <Input
                   type="password"
                   {...field}
                   autoComplete="new-password"
-                  placeholder="********"
+                  placeholder={t('auth.passwordPlaceholder')}
                 />
               </FormControl>
               <FormMessage />
@@ -139,13 +140,15 @@ export const EmailPasswordResetComplete = ({
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Label htmlFor="confirmPassword">
+                {t('auth.confirmNewPassword')}
+              </Label>
               <FormControl>
                 <Input
                   type="password"
                   {...field}
                   autoComplete="new-password"
-                  placeholder="********"
+                  placeholder={t('auth.passwordPlaceholder')}
                 />
               </FormControl>
               <FormMessage />
@@ -157,9 +160,9 @@ export const EmailPasswordResetComplete = ({
           name="otp"
           render={({ field }) => (
             <FormItem>
-              <Label htmlFor="otp">Code</Label>
+              <Label htmlFor="otp">{t('auth.code')}</Label>
               <FormControl>
-                <Input placeholder="123456" {...field} />
+                <Input placeholder={t('auth.codePlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
               <p className="text-xs text-muted-foreground w-full text-center">
@@ -179,7 +182,7 @@ export const EmailPasswordResetComplete = ({
           ) : (
             <Lock className="mr-1 size-4" />
           )}
-          Reset password
+          {t('auth.resetPassword')}
         </Button>
         <Button
           variant="link"
@@ -187,7 +190,7 @@ export const EmailPasswordResetComplete = ({
           onClick={onBack}
           type="button"
         >
-          Back to login
+          {t('common.back')}
         </Button>
       </form>
     </Form>

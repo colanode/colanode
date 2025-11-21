@@ -13,10 +13,12 @@ import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-
 import { SidebarSettingsItem } from '@colanode/ui/components/layouts/sidebars/sidebar-settings-item';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useApp } from '@colanode/ui/contexts/app';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const SidebarSettings = () => {
+  const { t } = useI18n();
   const app = useApp();
   const workspace = useWorkspace();
 
@@ -34,24 +36,24 @@ export const SidebarSettings = () => {
   return (
     <div className="flex flex-col gap-4 h-full px-2 group/sidebar">
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <SidebarHeader title="Workspace settings" />
+        <SidebarHeader title={t('workspace.workspaceSettings')} />
         <SidebarSettingsItem
-          title="General"
+          title={t('common.general')}
           icon={Settings}
           path={SpecialContainerTabPath.WorkspaceSettings}
         />
         <SidebarSettingsItem
-          title="Users"
+          title={t('workspace.users')}
           icon={Users}
           path={SpecialContainerTabPath.WorkspaceUsers}
         />
         <SidebarSettingsItem
-          title="Storage"
+          title={t('workspace.storage')}
           icon={Cylinder}
           path={SpecialContainerTabPath.WorkspaceStorage}
         />
         <SidebarSettingsItem
-          title="Uploads"
+          title={t('workspace.uploads')}
           icon={Upload}
           path={SpecialContainerTabPath.WorkspaceUploads}
           unreadBadge={{
@@ -63,24 +65,24 @@ export const SidebarSettings = () => {
         />
         {app.type === 'desktop' && (
           <SidebarSettingsItem
-            title="Downloads"
+            title={t('workspace.downloads')}
             icon={Download}
             path={SpecialContainerTabPath.WorkspaceDownloads}
           />
         )}
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <SidebarHeader title="Account settings" />
+        <SidebarHeader title={t('account.accountSettings')} />
         <SidebarSettingsItem
-          title="General"
+          title={t('common.general')}
           icon={Settings}
           path={SpecialContainerTabPath.AccountSettings}
         />
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <SidebarHeader title="App settings" />
+        <SidebarHeader title={t('app.appSettings')} />
         <SidebarSettingsItem
-          title="Appearance"
+          title={t('common.appearance')}
           icon={Palette}
           path={SpecialContainerTabPath.AppAppearance}
         />
@@ -88,7 +90,7 @@ export const SidebarSettings = () => {
       <div className="flex w-full min-w-0 flex-col gap-1">
         <Separator className="my-2" />
         <SidebarSettingsItem
-          title="Logout"
+          title={t('common.logout')}
           icon={LogOut}
           path={SpecialContainerTabPath.AccountLogout}
         />

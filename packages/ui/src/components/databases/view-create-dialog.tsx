@@ -25,6 +25,7 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useDatabase } from '@colanode/ui/contexts/database';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { cn } from '@colanode/ui/lib/utils';
@@ -40,19 +41,19 @@ interface ViewTypeOption {
   type: 'table' | 'board' | 'calendar';
 }
 
-const viewTypes: ViewTypeOption[] = [
+const getViewTypes = (t: (key: string) => string): ViewTypeOption[] => [
   {
-    name: 'Table',
+    name: t('view.table'),
     icon: Table,
     type: 'table',
   },
   {
-    name: 'Board',
+    name: t('view.board'),
     icon: Columns,
     type: 'board',
   },
   {
-    name: 'Calendar',
+    name: t('view.calendar'),
     icon: Calendar,
     type: 'calendar',
   },
@@ -67,9 +68,11 @@ export const ViewCreateDialog = ({
   open,
   onOpenChange,
 }: ViewCreateDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const database = useDatabase();
   const { mutate, isPending } = useMutation();
+  const viewTypes = getViewTypes(t);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -126,9 +129,9 @@ export const ViewCreateDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create view</DialogTitle>
+          <DialogTitle>{t('view.createView')}</DialogTitle>
           <DialogDescription>
-            Create a new view to display your database records
+            {t('view.createViewDescription')}
           </DialogDescription>
         </DialogHeader>
         <Form {...form}>
@@ -142,9 +145,9 @@ export const ViewCreateDialog = ({
                 name="name"
                 render={({ field }) => (
                   <FormItem className="flex-1">
-                    <FormLabel>Name *</FormLabel>
+                    <FormLabel>{t('account.nameRequired')}</FormLabel>
                     <FormControl>
-                      <Input placeholder="Name" {...field} />
+                      <Input placeholder={t('common.name')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -180,11 +183,11 @@ export const ViewCreateDialog = ({
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={handleCancel}>
-                Cancel
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={isPending}>
                 {isPending && <Spinner className="mr-1" />}
-                Create
+                {t('common.create')}
               </Button>
             </DialogFooter>
           </form>

@@ -10,6 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { cn } from '@colanode/ui/lib/utils';
 
 const getUrlFromString = (str: string): string | null => {
@@ -32,6 +33,7 @@ interface LinkButtonProps {
 }
 
 export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
+  const { t } = useI18n();
   const state = useEditorState({
     editor,
     selector: ({ editor }) => {
@@ -75,7 +77,7 @@ export const LinkButton = ({ editor, isOpen, setIsOpen }: LinkButtonProps) => {
           }}
         >
           <Input
-            placeholder="Write or paste link"
+            placeholder={t('misc.writeOrPasteLink')}
             className="border-0"
             defaultValue={state?.attributes.href || ''}
           />

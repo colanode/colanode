@@ -9,6 +9,7 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useDatabase } from '@colanode/ui/contexts/database';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 interface SelectOptionDeleteDialogProps {
   fieldId: string;
@@ -23,29 +24,27 @@ export const SelectOptionDeleteDialog = ({
   open,
   onOpenChange,
 }: SelectOptionDeleteDialogProps) => {
+  const { t } = useI18n();
   const database = useDatabase();
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            Are you sure you want delete this select option?
-          </AlertDialogTitle>
+          <AlertDialogTitle>{t('field.deleteOptionConfirm')}</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This option will no longer be
-            accessible and all data in the option will be lost.
+            {t('field.deleteOptionDescription')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
           <Button
             variant="destructive"
             onClick={() => {
               database.deleteSelectOption(fieldId, optionId);
             }}
           >
-            Delete
+            {t('common.delete')}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

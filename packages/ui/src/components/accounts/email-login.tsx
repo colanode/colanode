@@ -17,6 +17,7 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useServer } from '@colanode/ui/contexts/server';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -36,6 +37,7 @@ export const EmailLogin = ({
   onForgotPassword,
   onRegister,
 }: EmailLoginProps) => {
+  const { t } = useI18n();
   const server = useServer();
   const { mutate, isPending } = useMutation();
 
@@ -72,10 +74,10 @@ export const EmailLogin = ({
           name="email"
           render={({ field }) => (
             <FormItem>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('common.email')}</Label>
               <FormControl>
                 <Input
-                  placeholder="hi@example.com"
+                  placeholder={t('auth.emailPlaceholder')}
                   {...field}
                   autoComplete="email"
                 />
@@ -90,12 +92,12 @@ export const EmailLogin = ({
           render={({ field }) => (
             <FormItem>
               <div className="flex flex-row gap-2 items-center">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('common.password')}</Label>
                 <p
                   className="text-xs text-muted-foreground cursor-pointer hover:underline w-full text-right"
                   onClick={onForgotPassword}
                 >
-                  Forgot password?
+                  {t('auth.forgotPassword')}
                 </p>
               </div>
               <FormControl>
@@ -103,7 +105,7 @@ export const EmailLogin = ({
                   type="password"
                   {...field}
                   autoComplete="current-password"
-                  placeholder="********"
+                  placeholder={t('auth.passwordPlaceholder')}
                 />
               </FormControl>
               <FormMessage />
@@ -121,7 +123,7 @@ export const EmailLogin = ({
           ) : (
             <Mail className="mr-1 size-4" />
           )}
-          Login
+          {t('common.login')}
         </Button>
         <GoogleLogin context="login" onSuccess={onSuccess} />
         <Button
@@ -130,7 +132,7 @@ export const EmailLogin = ({
           onClick={onRegister}
           type="button"
         >
-          No account yet? Register
+          {t('auth.noAccount')}
         </Button>
       </form>
     </Form>

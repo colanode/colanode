@@ -11,6 +11,7 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -26,6 +27,7 @@ export const RecordDeleteDialog = ({
   open,
   onOpenChange,
 }: RecordDeleteDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const layout = useLayout();
   const { mutate, isPending } = useMutation();
@@ -34,16 +36,13 @@ export const RecordDeleteDialog = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            Are you sure you want delete this record?
-          </AlertDialogTitle>
+          <AlertDialogTitle>{t('record.deleteRecordConfirm')}</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This record will no longer be
-            accessible by you or others you&apos;ve shared it with.
+            {t('record.deleteRecordDescription')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
           <Button
             variant="destructive"
             disabled={isPending}
@@ -66,7 +65,7 @@ export const RecordDeleteDialog = ({
             }}
           >
             {isPending && <Spinner className="mr-1" />}
-            Delete
+            {t('common.delete')}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

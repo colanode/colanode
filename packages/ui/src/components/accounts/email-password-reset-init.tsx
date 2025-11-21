@@ -16,6 +16,7 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useServer } from '@colanode/ui/contexts/server';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -32,6 +33,7 @@ export const EmailPasswordResetInit = ({
   onSuccess,
   onBack,
 }: EmailPasswordResetInitProps) => {
+  const { t } = useI18n();
   const server = useServer();
   const { mutate, isPending } = useMutation();
 
@@ -66,9 +68,9 @@ export const EmailPasswordResetInit = ({
           name="email"
           render={({ field }) => (
             <FormItem>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('common.email')}</Label>
               <FormControl>
-                <Input placeholder="hi@example.com" {...field} />
+                <Input placeholder={t('auth.emailPlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -85,7 +87,7 @@ export const EmailPasswordResetInit = ({
           ) : (
             <Mail className="mr-1 size-4" />
           )}
-          Reset password
+          {t('auth.resetPassword')}
         </Button>
         <Button
           variant="link"
@@ -93,7 +95,7 @@ export const EmailPasswordResetInit = ({
           onClick={onBack}
           type="button"
         >
-          Back to login
+          {t('common.back')}
         </Button>
       </form>
     </Form>

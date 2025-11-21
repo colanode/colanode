@@ -1,7 +1,9 @@
 import { LoginForm } from '@colanode/ui/components/accounts/login-form';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const Login = () => {
+  const { t } = useI18n();
   const accountListQuery = useLiveQuery({
     type: 'account.list',
   });
@@ -23,10 +25,10 @@ export const Login = () => {
         <div className="mx-auto grid w-96 gap-6">
           <div className="grid gap-2 text-center">
             <h1 className="text-2xl font-semibold tracking-tight">
-              Login to Colanode
+              {t('common.login')}
             </h1>
             <p className="text-sm text-muted-foreground">
-              Use one of the following methods to login
+              {t('auth.loginWithEmail')}
             </p>
           </div>
           <LoginForm

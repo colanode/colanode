@@ -19,6 +19,7 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { Textarea } from '@colanode/ui/components/ui/textarea';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { cn } from '@colanode/ui/lib/utils';
 
 const formSchema = z.object({
@@ -46,6 +47,7 @@ export const SpaceForm = ({
   saveText,
   readOnly = false,
 }: SpaceFormProps) => {
+  const { t } = useI18n();
   const id = useRef(generateId(IdType.Space));
 
   const form = useForm<formSchemaType>({
@@ -73,9 +75,9 @@ export const SpaceForm = ({
               <div className="group relative cursor-pointer">
                 <Avatar
                   id={id.current}
-                  name={name.length > 0 ? name : 'New space'}
+                  name={name.length > 0 ? name : t('database.newSpace')}
                   avatar={avatar}
-                  className="size-32"
+                  className="h-32 w-32"
                 />
                 <div
                   className={cn(
@@ -95,9 +97,13 @@ export const SpaceForm = ({
               name="name"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Name *</FormLabel>
+                  <FormLabel>{t('account.nameRequired')}</FormLabel>
                   <FormControl>
-                    <Input readOnly={readOnly} placeholder="Name" {...field} />
+                    <Input
+                      readOnly={readOnly}
+                      placeholder={t('common.name')}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -108,11 +114,11 @@ export const SpaceForm = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t('misc.description')}</FormLabel>
                   <FormControl>
                     <Textarea
                       readOnly={readOnly}
-                      placeholder="Write a short description about the space"
+                      placeholder={t('space.descriptionPlaceholder')}
                       {...field}
                     />
                   </FormControl>
@@ -133,11 +139,11 @@ export const SpaceForm = ({
                   onCancel();
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
             )}
 
-            <Button type="submit" disabled={isSaving} className="w-20">
+            <Button type="submit" disabled={isSaving}>
               {isSaving && <Spinner className="mr-1" />}
               {saveText}
             </Button>

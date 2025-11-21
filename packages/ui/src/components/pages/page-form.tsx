@@ -15,6 +15,7 @@ import {
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),
@@ -40,6 +41,7 @@ export const PageForm = ({
   handleSubmit,
   readOnly = false,
 }: PageFormProps) => {
+  const { t } = useI18n();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: values,
@@ -94,7 +96,11 @@ export const PageForm = ({
             render={({ field }) => (
               <FormItem className="flex-1">
                 <FormControl>
-                  <Input readOnly={readOnly} placeholder="Name" {...field} />
+                  <Input
+                    readOnly={readOnly}
+                    placeholder={t('common.name')}
+                    {...field}
+                  />
                 </FormControl>
                 <FormMessage />
               </FormItem>
@@ -108,7 +114,7 @@ export const PageForm = ({
             disabled={isPending}
             onClick={handleCancel}
           >
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button type="submit" disabled={isPending || readOnly}>
             {isPending && <Spinner className="mr-1" />}

@@ -20,6 +20,7 @@ import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { Textarea } from '@colanode/ui/components/ui/textarea';
 import { useAccount } from '@colanode/ui/contexts/account';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { openFileDialog } from '@colanode/ui/lib/files';
 import { cn } from '@colanode/ui/lib/utils';
@@ -50,6 +51,7 @@ export const WorkspaceForm = ({
   readOnly = false,
 }: WorkspaceFormProps) => {
   const account = useAccount();
+  const { t } = useI18n();
 
   const id = useRef(generateId(IdType.Workspace));
   const { mutate, isPending } = useMutation();
@@ -108,7 +110,7 @@ export const WorkspaceForm = ({
             >
               <Avatar
                 id={id.current}
-                name={name.length > 0 ? name : 'New workspace'}
+                name={name.length > 0 ? name : t('database.newWorkspace')}
                 avatar={avatar}
                 className="h-32 w-32"
               />
@@ -133,9 +135,13 @@ export const WorkspaceForm = ({
               name="name"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Name *</FormLabel>
+                  <FormLabel>{t('account.nameRequired')}</FormLabel>
                   <FormControl>
-                    <Input readOnly={readOnly} placeholder="Name" {...field} />
+                    <Input
+                      readOnly={readOnly}
+                      placeholder={t('common.name')}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -146,11 +152,11 @@ export const WorkspaceForm = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t('misc.description')}</FormLabel>
                   <FormControl>
                     <Textarea
                       readOnly={readOnly}
-                      placeholder="Write a short description about the workspace"
+                      placeholder={t('workspace.descriptionPlaceholder')}
                       {...field}
                     />
                   </FormControl>
@@ -171,15 +177,11 @@ export const WorkspaceForm = ({
                   onCancel();
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
             )}
 
-            <Button
-              type="submit"
-              disabled={isPending || isSaving}
-              className="w-20"
-            >
+            <Button type="submit" disabled={isPending || isSaving}>
               {isSaving && <Spinner className="mr-1" />}
               {saveText}
             </Button>

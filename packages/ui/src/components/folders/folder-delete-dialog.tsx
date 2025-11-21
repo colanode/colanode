@@ -11,14 +11,15 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface FolderDeleteDialogProps {
+  folderId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  folderId: string;
 }
 
 export const FolderDeleteDialog = ({
@@ -26,6 +27,7 @@ export const FolderDeleteDialog = ({
   open,
   onOpenChange,
 }: FolderDeleteDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const layout = useLayout();
   const { mutate, isPending } = useMutation();
@@ -34,16 +36,13 @@ export const FolderDeleteDialog = ({
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            Are you sure you want delete this folder?
-          </AlertDialogTitle>
+          <AlertDialogTitle>{t('folder.deleteFolderConfirm')}</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This folder will no longer be
-            accessible by you or others you&apos;ve shared it with.
+            {t('folder.deleteFolderDescription')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
           <Button
             variant="destructive"
             disabled={isPending}
@@ -66,7 +65,7 @@ export const FolderDeleteDialog = ({
             }}
           >
             {isPending && <Spinner className="mr-1" />}
-            Delete
+            {t('common.delete')}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>
