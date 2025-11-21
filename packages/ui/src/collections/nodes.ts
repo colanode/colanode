@@ -1,8 +1,7 @@
 import { createCollection } from '@tanstack/react-db';
-import { cloneDeep } from 'lodash-es';
 
-import { mapNodeAttributes } from '@colanode/client/lib';
 import { LocalNode } from '@colanode/client/types';
+import { applyNodeTransaction } from '@colanode/ui/lib/nodes';
 
 export const createNodesCollection = (userId: string) => {
   return createCollection<LocalNode, string>({
@@ -62,37 +61,14 @@ export const createNodesCollection = (userId: string) => {
       },
     },
     onInsert: async ({ transaction }) => {
-      for (const mutation of transaction.mutations) {
-        const node = mutation.modified;
-        const attributes = mapNodeAttributes(node);
-        await window.colanode.executeMutation({
-          type: 'node.create',
-          userId,
-          nodeId: node.id,
-          attributes,
-        });
-      }
+      await applyNodeTransaction(userId, transaction);
     },
     onUpdate: async ({ transaction }) => {
-      for (const mutation of transaction.mutations) {
-        const node = cloneDeep(mutation.modified);
-        const attributes = mapNodeAttributes(node);
-        await window.colanode.executeMutation({
-          type: 'node.update',
-          userId,
-          nodeId: mutation.key,
-          attributes,
-        });
-      }
+      console.log('onUpdate', transaction);
+      await applyNodeTransaction(userId, transaction);
     },
     onDelete: async ({ transaction }) => {
-      for (const mutation of transaction.mutations) {
-        await window.colanode.executeMutation({
-          type: 'node.delete',
-          userId,
-          nodeId: mutation.key,
-        });
-      }
+      await applyNodeTransaction(userId, transaction);
     },
   });
 };

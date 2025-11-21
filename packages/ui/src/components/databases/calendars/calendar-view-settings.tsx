@@ -5,6 +5,7 @@ import { AvatarPopover } from '@colanode/ui/components/avatars/avatar-popover';
 import { FieldDeleteDialog } from '@colanode/ui/components/databases/fields/field-delete-dialog';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { ViewIcon } from '@colanode/ui/components/databases/view-icon';
+import { ViewRenameInput } from '@colanode/ui/components/databases/view-rename-input';
 import { ViewSettingsButton } from '@colanode/ui/components/databases/view-settings-button';
 import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -14,7 +15,6 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import {
   Tooltip,
   TooltipContent,
@@ -67,14 +67,10 @@ export const CalendarViewSettings = () => {
                 />
               </Button>
             )}
-            <SmartTextInput
-              value={view.name}
+            <ViewRenameInput
+              id={view.id}
+              name={view.name}
               readOnly={!database.canEdit}
-              onChange={(newName) => {
-                if (newName === view.name) return;
-
-                view.rename(newName);
-              }}
             />
           </div>
           <Separator />

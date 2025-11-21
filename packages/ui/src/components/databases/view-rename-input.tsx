@@ -1,39 +1,31 @@
 import { debounceStrategy, usePacedMutations } from '@tanstack/react-db';
-import { useEffect, useState } from 'react';
 
 import { LocalNode } from '@colanode/client/types';
-import { FieldAttributes } from '@colanode/core';
 import { Input } from '@colanode/ui/components/ui/input';
-import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { applyNodeTransaction } from '@colanode/ui/lib/nodes';
 
-interface FieldRenameInputProps {
-  field: FieldAttributes;
+interface ViewRenameInputProps {
+  id: string;
+  name: string;
+  readOnly?: boolean;
 }
 
-export const FieldRenameInput = ({ field }: FieldRenameInputProps) => {
+export const ViewRenameInput = ({
+  id,
+  name,
+  readOnly,
+}: ViewRenameInputProps) => {
   const workspace = useWorkspace();
-  const database = useDatabase();
-  const [name, setName] = useState(field.name);
-
-  useEffect(() => {
-    setName(field.name);
-  }, [field.name]);
 
   const mutate = usePacedMutations<string, LocalNode>({
     onMutate: (value) => {
-      workspace.collections.nodes.update(database.id, (draft) => {
-        if (draft.type !== 'database') {
+      workspace.collections.nodes.update(id, (draft) => {
+        if (draft.type !== 'database_view') {
           return;
         }
 
-        const fieldAttributes = draft.fields[field.id];
-        if (!fieldAttributes) {
-          return;
-        }
-
-        fieldAttributes.name = value;
+        draft.name = value;
       });
     },
     mutationFn: async ({ transaction }) => {
@@ -46,10 +38,9 @@ export const FieldRenameInput = ({ field }: FieldRenameInputProps) => {
     <div className="w-full p-1">
       <Input
         value={name}
-        readOnly={!database.canEdit}
+        readOnly={readOnly}
         onChange={(event) => {
           const newValue = event.target.value;
-          setName(newValue);
           mutate(newValue);
         }}
       />
