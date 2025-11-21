@@ -34,7 +34,6 @@ import { DocumentUpdateMutationHandler } from './documents/document-update';
 import { FileCreateMutationHandler } from './files/file-create';
 import { FileDownloadMutationHandler } from './files/file-download';
 import { TempFileCreateMutationHandler } from './files/temp-file-create';
-import { FolderUpdateMutationHandler } from './folders/folder-update';
 import { MessageCreateMutationHandler } from './messages/message-create';
 import { NodeCollaboratorCreateMutationHandler } from './nodes/node-collaborator-create';
 import { NodeCollaboratorDeleteMutationHandler } from './nodes/node-collaborator-delete';
@@ -112,7 +111,6 @@ export const buildMutationHandlerMap = (
     'view.delete': new ViewDeleteMutationHandler(app),
     'view.name.update': new ViewNameUpdateMutationHandler(app),
     'page.update': new PageUpdateMutationHandler(app),
-    'folder.update': new FolderUpdateMutationHandler(app),
     'database.update': new DatabaseUpdateMutationHandler(app),
     'document.update': new DocumentUpdateMutationHandler(app),
     'metadata.update': new MetadataUpdateMutationHandler(app),
