@@ -10,8 +10,6 @@ export * from './apps/metadata-delete';
 export * from './apps/metadata-update';
 export * from './avatars/avatar-upload';
 export * from './chats/chat-create';
-export * from './databases/database-create';
-export * from './databases/database-update';
 export * from './databases/field-create';
 export * from './databases/field-delete';
 export * from './databases/field-name-update';

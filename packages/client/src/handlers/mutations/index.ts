@@ -17,9 +17,7 @@ import { EmailVerifyMutationHandler } from './auth/email-verify';
 import { GoogleLoginMutationHandler } from './auth/google-login';
 import { AvatarUploadMutationHandler } from './avatars/avatar-upload';
 import { ChatCreateMutationHandler } from './chats/chat-create';
-import { DatabaseCreateMutationHandler } from './databases/database-create';
 import { DatabaseNameFieldUpdateMutationHandler } from './databases/database-name-field-update';
-import { DatabaseUpdateMutationHandler } from './databases/database-update';
 import { FieldCreateMutationHandler } from './databases/field-create';
 import { FieldDeleteMutationHandler } from './databases/field-delete';
 import { FieldNameUpdateMutationHandler } from './databases/field-name-update';
@@ -73,7 +71,6 @@ export const buildMutationHandlerMap = (
     'node.create': new NodeCreateMutationHandler(app),
     'node.update': new NodeUpdateMutationHandler(app),
     'chat.create': new ChatCreateMutationHandler(app),
-    'database.create': new DatabaseCreateMutationHandler(app),
     'database.name.field.update': new DatabaseNameFieldUpdateMutationHandler(
       app
     ),
@@ -107,7 +104,6 @@ export const buildMutationHandlerMap = (
     'view.update': new ViewUpdateMutationHandler(app),
     'view.delete': new ViewDeleteMutationHandler(app),
     'view.name.update': new ViewNameUpdateMutationHandler(app),
-    'database.update': new DatabaseUpdateMutationHandler(app),
     'document.update': new DocumentUpdateMutationHandler(app),
     'metadata.update': new MetadataUpdateMutationHandler(app),
     'metadata.delete': new MetadataDeleteMutationHandler(app),
