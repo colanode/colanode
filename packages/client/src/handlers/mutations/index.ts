@@ -45,7 +45,6 @@ import { NodeInteractionSeenMutationHandler } from './nodes/node-interaction-see
 import { NodeReactionCreateMutationHandler } from './nodes/node-reaction-create';
 import { NodeReactionDeleteMutationHandler } from './nodes/node-reaction-delete';
 import { NodeUpdateMutationHandler } from './nodes/node-update';
-import { PageUpdateMutationHandler } from './pages/page-update';
 import { ServerCreateMutationHandler } from './servers/server-create';
 import { ServerDeleteMutationHandler } from './servers/server-delete';
 import { ServerSyncMutationHandler } from './servers/server-sync';
@@ -108,7 +107,6 @@ export const buildMutationHandlerMap = (
     'view.update': new ViewUpdateMutationHandler(app),
     'view.delete': new ViewDeleteMutationHandler(app),
     'view.name.update': new ViewNameUpdateMutationHandler(app),
-    'page.update': new PageUpdateMutationHandler(app),
     'database.update': new DatabaseUpdateMutationHandler(app),
     'document.update': new DocumentUpdateMutationHandler(app),
     'metadata.update': new MetadataUpdateMutationHandler(app),

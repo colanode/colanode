@@ -34,7 +34,6 @@ export * from './nodes/node-interaction-opened';
 export * from './nodes/node-interaction-seen';
 export * from './nodes/node-reaction-create';
 export * from './nodes/node-reaction-delete';
-export * from './pages/page-update';
 export * from './servers/server-create';
 export * from './servers/server-delete';
 export * from './spaces/space-child-reorder';
