@@ -1,8 +1,11 @@
+import { debounceStrategy, usePacedMutations } from '@tanstack/react-db';
 import { useEffect, useRef } from 'react';
 
-import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
+import { LocalNode } from '@colanode/client/types';
+import { Input } from '@colanode/ui/components/ui/input';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { applyNodeTransaction } from '@colanode/ui/lib/nodes';
 
 export const RecordName = () => {
   const workspace = useWorkspace();
@@ -20,26 +23,32 @@ export const RecordName = () => {
     return () => clearTimeout(timeoutId);
   }, [record.canEdit, inputRef]);
 
-  return (
-    <SmartTextInput
-      value={record.name}
-      readOnly={!record.canEdit}
-      ref={inputRef}
-      onChange={(value) => {
-        if (value === record.name) {
+  const mutate = usePacedMutations<string, LocalNode>({
+    onMutate: (value) => {
+      workspace.collections.nodes.update(record.id, (draft) => {
+        if (draft.type !== 'record') {
           return;
         }
 
-        const nodes = workspace.collections.nodes;
-        nodes.update(record.id, (draft) => {
-          if (draft.type !== 'record') {
-            return;
-          }
+        draft.name = value;
+      });
+    },
+    mutationFn: async ({ transaction }) => {
+      await applyNodeTransaction(workspace.userId, transaction);
+    },
+    strategy: debounceStrategy({ wait: 500 }),
+  });
 
-          draft.name = value;
-        });
+  return (
+    <Input
+      value={record.name}
+      readOnly={!record.canEdit}
+      ref={inputRef}
+      onChange={(event) => {
+        const newValue = event.target.value;
+        mutate(newValue);
       }}
-      className="font-heading border-b border-none pl-1 text-4xl font-bold shadow-none focus-visible:ring-0"
+      className="font-heading border-b border-none pl-1 md:text-4xl text-2xl font-bold shadow-none focus-visible:ring-0"
       placeholder="Unnamed"
     />
   );

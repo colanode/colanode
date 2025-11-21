@@ -1,9 +1,9 @@
 import { eq, inArray, useLiveQuery } from '@tanstack/react-db';
 import { X } from 'lucide-react';
-import { Fragment, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 
 import { LocalRecordNode } from '@colanode/client/types';
-import { RelationFieldAttributes } from '@colanode/core';
+import { RelationFieldAttributes, StringArrayFieldValue } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { RecordSearch } from '@colanode/ui/components/records/record-search';
 import { Badge } from '@colanode/ui/components/ui/badge';
@@ -15,6 +15,7 @@ import {
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useRecordField } from '@colanode/ui/hooks/use-record-field';
 
 interface RecordRelationValueProps {
   field: RelationFieldAttributes;
@@ -37,10 +38,15 @@ export const RecordRelationValue = ({
 }: RecordRelationValueProps) => {
   const workspace = useWorkspace();
   const record = useRecord();
+  const { value, setValue, clearValue } = useRecordField<StringArrayFieldValue>(
+    {
+      field,
+    }
+  );
 
   const [open, setOpen] = useState(false);
 
-  const relationIds = record.getRelationValue(field) ?? [];
+  const relationIds = useMemo(() => value?.value ?? [], [value]);
   const relationsQuery = useLiveQuery(
     (q) => {
       if (relationIds.length === 0 || !field.databaseId) {
@@ -100,9 +106,9 @@ export const RecordRelationValue = ({
                         );
 
                         if (newRelations.length === 0) {
-                          record.removeFieldValue(field);
+                          clearValue();
                         } else {
-                          record.updateFieldValue(field, {
+                          setValue({
                             type: 'string_array',
                             value: newRelations,
                           });
@@ -130,9 +136,9 @@ export const RecordRelationValue = ({
                 : [...relationIds, selectedRecord.id];
 
               if (newRelations.length === 0) {
-                record.removeFieldValue(field);
+                clearValue();
               } else {
-                record.updateFieldValue(field, {
+                setValue({
                   type: 'string_array',
                   value: newRelations,
                 });

@@ -24,7 +24,7 @@ export const RecordAttributes = () => {
                 <div className="w-60 max-w-60">
                   <RecordField field={field} />
                 </div>
-                <div className="flex-1 max-w-128 p-1">
+                <div className="flex-1 max-w-lg p-1">
                   <RecordFieldValue field={field} />
                 </div>
               </div>

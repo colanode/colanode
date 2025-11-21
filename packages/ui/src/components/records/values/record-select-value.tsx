@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { SelectFieldAttributes } from '@colanode/core';
+import { SelectFieldAttributes, StringFieldValue } from '@colanode/core';
 import { SelectFieldOptions } from '@colanode/ui/components/databases/fields/select-field-options';
 import { SelectOptionBadge } from '@colanode/ui/components/databases/fields/select-option-badge';
 import {
@@ -9,6 +9,7 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useRecord } from '@colanode/ui/contexts/record';
+import { useRecordField } from '@colanode/ui/hooks/use-record-field';
 
 interface RecordSelectValueProps {
   field: SelectFieldAttributes;
@@ -20,17 +21,12 @@ export const RecordSelectValue = ({
   readOnly,
 }: RecordSelectValueProps) => {
   const record = useRecord();
+  const { value, setValue, clearValue } = useRecordField<StringFieldValue>({
+    field,
+  });
 
   const [open, setOpen] = useState(false);
-  const [selectedValue, setSelectedValue] = useState(
-    record.getSelectValue(field)
-  );
-
-  useEffect(() => {
-    setSelectedValue(record.getSelectValue(field));
-  }, [record.localRevision]);
-
-  const selectedOption = field.options?.[selectedValue ?? ''];
+  const selectedOption = field.options?.[value?.value ?? ''];
 
   if (!record.canEdit || readOnly) {
     return (
@@ -64,17 +60,14 @@ export const RecordSelectValue = ({
       <PopoverContent className="w-80 p-1">
         <SelectFieldOptions
           field={field}
-          values={[selectedValue ?? '']}
+          values={[value?.value ?? '']}
           onSelect={(id) => {
             if (!record.canEdit || readOnly) return;
 
-            setSelectedValue(id);
-            setOpen(false);
-
-            if (selectedValue === id) {
-              record.removeFieldValue(field);
+            if (value?.value === id) {
+              clearValue();
             } else {
-              record.updateFieldValue(field, {
+              setValue({
                 type: 'string',
                 value: id,
               });

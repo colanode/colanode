@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react';
-
-import { BooleanFieldAttributes } from '@colanode/core';
+import { BooleanFieldAttributes, BooleanFieldValue } from '@colanode/core';
 import { Checkbox } from '@colanode/ui/components/ui/checkbox';
 import { useRecord } from '@colanode/ui/contexts/record';
+import { useRecordField } from '@colanode/ui/hooks/use-record-field';
 
 interface RecordBooleanValueProps {
   field: BooleanFieldAttributes;
@@ -14,31 +13,27 @@ export const RecordBooleanValue = ({
   readOnly,
 }: RecordBooleanValueProps) => {
   const record = useRecord();
-
-  const [input, setInput] = useState<boolean>(record.getBooleanValue(field));
-
-  useEffect(() => {
-    setInput(record.getBooleanValue(field));
-  }, [record.localRevision]);
+  const { value, setValue, clearValue } = useRecordField<BooleanFieldValue>({
+    field,
+  });
 
   return (
     <div className="flex h-full w-full flex-row items-center justify-start p-0">
       <Checkbox
-        checked={input}
+        checked={value?.value ?? false}
         disabled={!record.canEdit || readOnly}
         onCheckedChange={(e) => {
           if (!record.canEdit || readOnly) return;
 
           if (typeof e === 'boolean') {
-            setInput(e.valueOf());
             const checked = e.valueOf();
             if (checked) {
-              record.updateFieldValue(field, {
+              setValue({
                 type: 'boolean',
                 value: checked,
               });
             } else {
-              record.removeFieldValue(field);
+              clearValue();
             }
           }
         }}

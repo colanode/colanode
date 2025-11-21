@@ -1,6 +1,7 @@
-import { EmailFieldAttributes } from '@colanode/core';
-import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
+import { EmailFieldAttributes, StringFieldValue } from '@colanode/core';
+import { Input } from '@colanode/ui/components/ui/input';
 import { useRecord } from '@colanode/ui/contexts/record';
+import { useRecordField } from '@colanode/ui/hooks/use-record-field';
 
 interface RecordEmailValueProps {
   field: EmailFieldAttributes;
@@ -12,18 +13,22 @@ export const RecordEmailValue = ({
   readOnly,
 }: RecordEmailValueProps) => {
   const record = useRecord();
+  const { value, setValue, clearValue } = useRecordField<StringFieldValue>({
+    field,
+  });
 
   return (
-    <SmartTextInput
-      value={record.getEmailValue(field)}
+    <Input
+      value={value?.value ?? ''}
       readOnly={!record.canEdit || readOnly}
-      onChange={(newValue) => {
+      onChange={(e) => {
+        const newValue = e.target.value;
         if (!record.canEdit) return;
 
         if (newValue === null || newValue === '') {
-          record.removeFieldValue(field);
+          clearValue();
         } else {
-          record.updateFieldValue(field, {
+          setValue({
             type: 'string',
             value: newValue,
           });
