@@ -36,7 +36,6 @@ export * from './nodes/node-interaction-opened';
 export * from './nodes/node-interaction-seen';
 export * from './nodes/node-reaction-create';
 export * from './nodes/node-reaction-delete';
-export * from './pages/page-create';
 export * from './pages/page-update';
 export * from './records/record-avatar-update';
 export * from './records/record-create';

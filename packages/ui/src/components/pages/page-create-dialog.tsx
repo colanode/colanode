@@ -1,8 +1,14 @@
+import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
+import { LocalPageNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
-import { PageForm } from '@colanode/ui/components/pages/page-form';
+import { collections } from '@colanode/ui/collections';
+import {
+  PageForm,
+  PageFormValues,
+} from '@colanode/ui/components/pages/page-form';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +17,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface PageCreateDialogProps {
   spaceId: string;
@@ -26,7 +31,42 @@ export const PageCreateDialog = ({
 }: PageCreateDialogProps) => {
   const workspace = useWorkspace();
   const navigate = useNavigate({ from: '/workspace/$userId' });
-  const { mutate, isPending } = useMutation();
+  const { mutate } = useMutation({
+    mutationFn: async (values: PageFormValues) => {
+      const pageId = generateId(IdType.Page);
+      const nodes = collections.workspace(workspace.userId).nodes;
+
+      const page: LocalPageNode = {
+        id: pageId,
+        type: 'page',
+        name: values.name,
+        avatar: values.avatar,
+        parentId: spaceId,
+        rootId: spaceId,
+        createdAt: new Date().toISOString(),
+        createdBy: workspace.userId,
+        updatedAt: null,
+        updatedBy: null,
+        localRevision: '0',
+        serverRevision: '0',
+      };
+
+      nodes.insert(page);
+      return page;
+    },
+    onSuccess: (page) => {
+      navigate({
+        to: '$nodeId',
+        params: {
+          nodeId: page.id,
+        },
+      });
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -42,39 +82,11 @@ export const PageCreateDialog = ({
           values={{
             name: '',
           }}
-          isPending={isPending}
           submitText="Create"
-          handleCancel={() => {
+          onCancel={() => {
             onOpenChange(false);
           }}
-          handleSubmit={(values) => {
-            if (isPending) {
-              return;
-            }
-
-            mutate({
-              input: {
-                type: 'page.create',
-                parentId: spaceId,
-                name: values.name,
-                avatar: values.avatar,
-                userId: workspace.userId,
-                generateIndex: true,
-              },
-              onSuccess(output) {
-                onOpenChange(false);
-                navigate({
-                  to: '$nodeId',
-                  params: {
-                    nodeId: output.id,
-                  },
-                });
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
-            });
-          }}
+          onSubmit={(values) => mutate(values)}
         />
       </DialogContent>
     </Dialog>

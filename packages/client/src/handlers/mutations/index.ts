@@ -46,7 +46,6 @@ import { NodeInteractionOpenedMutationHandler } from './nodes/node-interaction-o
 import { NodeInteractionSeenMutationHandler } from './nodes/node-interaction-seen';
 import { NodeReactionCreateMutationHandler } from './nodes/node-reaction-create';
 import { NodeReactionDeleteMutationHandler } from './nodes/node-reaction-delete';
-import { PageCreateMutationHandler } from './pages/page-create';
 import { PageUpdateMutationHandler } from './pages/page-update';
 import { RecordAvatarUpdateMutationHandler } from './records/record-avatar-update';
 import { RecordCreateMutationHandler } from './records/record-create';
@@ -94,7 +93,6 @@ export const buildMutationHandlerMap = (
     'node.collaborator.update': new NodeCollaboratorUpdateMutationHandler(app),
     'node.interaction.opened': new NodeInteractionOpenedMutationHandler(app),
     'node.interaction.seen': new NodeInteractionSeenMutationHandler(app),
-    'page.create': new PageCreateMutationHandler(app),
     'node.reaction.create': new NodeReactionCreateMutationHandler(app),
     'node.reaction.delete': new NodeReactionDeleteMutationHandler(app),
     'record.create': new RecordCreateMutationHandler(app),
