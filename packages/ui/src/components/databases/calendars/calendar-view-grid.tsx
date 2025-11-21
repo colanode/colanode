@@ -58,7 +58,8 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
     },
   ];
 
-  const { records } = useRecordsQuery(filters, view.sorts, 200);
+  const { data } = useRecordsQuery(filters, view.sorts, 200);
+  const records = data;
 
   return (
     <DayPicker

@@ -3,12 +3,12 @@ import { InView } from 'react-intersection-observer';
 import { TableViewEmptyPlaceholder } from '@colanode/ui/components/databases/tables/table-view-empty-placeholder';
 import { TableViewRow } from '@colanode/ui/components/databases/tables/table-view-row';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
-import { useRecordsInfiniteQuery } from '@colanode/ui/hooks/use-records-infinite-query';
+import { useRecordsQuery } from '@colanode/ui/hooks/use-records-query';
 
 export const TableViewBody = () => {
   const view = useDatabaseView();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useRecordsInfiniteQuery(view.filters, view.sorts);
+    useRecordsQuery(view.filters, view.sorts);
 
   const records = data;
 

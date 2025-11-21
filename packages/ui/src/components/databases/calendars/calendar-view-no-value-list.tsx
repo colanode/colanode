@@ -17,10 +17,10 @@ export const CalendarViewNoValueList = ({
 }: CalendarViewNoValueListProps) => {
   const view = useDatabaseView();
 
-  const { records, hasMore, loadMore, isPending } = useRecordsQuery(
-    filters,
-    view.sorts
-  );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useRecordsQuery(filters, view.sorts);
+
+  const records = data;
 
   return (
     <div className="flex flex-col gap-2 overflow-y-auto">
@@ -52,8 +52,8 @@ export const CalendarViewNoValueList = ({
       <InView
         rootMargin="200px"
         onChange={(inView) => {
-          if (inView && hasMore && !isPending) {
-            loadMore();
+          if (inView && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
           }
         }}
       ></InView>

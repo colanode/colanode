@@ -66,7 +66,7 @@ const DEFAULT_ORDERING: OrderByDefinition = {
   selector: (record) => record.id,
 };
 
-export const useRecordsInfiniteQuery = (
+export const useRecordsQuery = (
   filters: DatabaseViewFilterAttributes[],
   sorts: DatabaseViewSortAttributes[],
   count?: number

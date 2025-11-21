@@ -1,4 +1,6 @@
-import { extractNodeRole, DatabaseViewFilterAttributes } from '@colanode/core';
+import { useMemo } from 'react';
+
+import { extractNodeRole } from '@colanode/core';
 import { BoardViewRecordCard } from '@colanode/ui/components/databases/boards/board-view-record-card';
 import { BoardViewRecordCreateCard } from '@colanode/ui/components/databases/boards/board-view-record-create-card';
 import { RecordProvider } from '@colanode/ui/components/records/record-provider';
@@ -14,12 +16,14 @@ export const BoardViewColumnRecords = () => {
   const view = useDatabaseView();
   const boardView = useBoardView();
 
-  const filters: DatabaseViewFilterAttributes[] = [
-    ...view.filters,
-    boardView.filter,
-  ];
+  const filters = useMemo(
+    () => [...view.filters, boardView.filter],
+    [view.filters, boardView.filter]
+  );
 
-  const { records } = useRecordsQuery(filters, view.sorts);
+  const { data } = useRecordsQuery(filters, view.sorts);
+  const records = data;
+
   return (
     <div className="mt-3 flex flex-col gap-2">
       {records.map((record) => {

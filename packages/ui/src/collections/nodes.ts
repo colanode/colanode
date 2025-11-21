@@ -64,7 +64,6 @@ export const createNodesCollection = (userId: string) => {
       await applyNodeTransaction(userId, transaction);
     },
     onUpdate: async ({ transaction }) => {
-      console.log('onUpdate', transaction);
       await applyNodeTransaction(userId, transaction);
     },
     onDelete: async ({ transaction }) => {
