@@ -8,10 +8,6 @@ interface FileBreadcrumbItemProps {
 
 export const FileBreadcrumbItem = ({ file }: FileBreadcrumbItemProps) => {
   return (
-    <BreadcrumbItem
-      id={file.id}
-      avatar={defaultIcons.file}
-      name={file.attributes.name}
-    />
+    <BreadcrumbItem id={file.id} avatar={defaultIcons.file} name={file.name} />
   );
 };

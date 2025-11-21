@@ -20,8 +20,8 @@ export const DatabaseViews = ({ inline = false }: DatabaseViewsProps) => {
     (q) =>
       q
         .from({ views: collections.workspace(workspace.userId).views })
-        .where(({ views }) => eq(views.attributes.parentId, database.id))
-        .orderBy(({ views }) => views.attributes.index, 'asc'),
+        .where(({ views }) => eq(views.parentId, database.id))
+        .orderBy(({ views }) => views.index, 'asc'),
     [workspace.userId, database.id]
   );
 

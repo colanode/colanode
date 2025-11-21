@@ -11,63 +11,33 @@ import { SpaceAttributes, spaceModel } from './space';
 
 type NodeBase = {
   id: string;
-  parentId: string;
   rootId: string;
+  parentId: string | null;
   createdAt: string;
   createdBy: string;
   updatedAt: string | null;
   updatedBy: string | null;
 };
 
-export type ChannelNode = NodeBase & {
-  type: 'channel';
-  attributes: ChannelAttributes;
-};
+export type ChannelNode = NodeBase & ChannelAttributes;
 
-export type ChatNode = NodeBase & {
-  type: 'chat';
-  attributes: ChatAttributes;
-};
+export type ChatNode = NodeBase & ChatAttributes;
 
-export type DatabaseNode = NodeBase & {
-  type: 'database';
-  attributes: DatabaseAttributes;
-};
+export type DatabaseNode = NodeBase & DatabaseAttributes;
 
-export type DatabaseViewNode = NodeBase & {
-  type: 'database_view';
-  attributes: DatabaseViewAttributes;
-};
+export type DatabaseViewNode = NodeBase & DatabaseViewAttributes;
 
-export type FolderNode = NodeBase & {
-  type: 'folder';
-  attributes: FolderAttributes;
-};
+export type FolderNode = NodeBase & FolderAttributes;
 
-export type PageNode = NodeBase & {
-  type: 'page';
-  attributes: PageAttributes;
-};
+export type PageNode = NodeBase & PageAttributes;
 
-export type RecordNode = NodeBase & {
-  type: 'record';
-  attributes: RecordAttributes;
-};
+export type RecordNode = NodeBase & RecordAttributes;
 
-export type SpaceNode = NodeBase & {
-  type: 'space';
-  attributes: SpaceAttributes;
-};
+export type SpaceNode = NodeBase & SpaceAttributes;
 
-export type MessageNode = NodeBase & {
-  type: 'message';
-  attributes: MessageAttributes;
-};
+export type MessageNode = NodeBase & MessageAttributes;
 
-export type FileNode = NodeBase & {
-  type: 'file';
-  attributes: FileAttributes;
-};
+export type FileNode = NodeBase & FileAttributes;
 
 export type NodeType = NodeAttributes['type'];
 

@@ -34,7 +34,7 @@ export const FolderSettings = ({ folder, role }: FolderSettingsProps) => {
           <Settings className="size-4 cursor-pointer text-muted-foreground hover:text-foreground" />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" className="mr-2 w-80">
-          <DropdownMenuLabel>{folder.attributes.name}</DropdownMenuLabel>
+          <DropdownMenuLabel>{folder.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="flex items-center gap-2 cursor-pointer"

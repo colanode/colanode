@@ -45,9 +45,7 @@ export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent className="ml-1 w-72">
-          <DropdownMenuLabel>
-            {space.attributes.name ?? 'Unnamed'}
-          </DropdownMenuLabel>
+          <DropdownMenuLabel>{space.name ?? 'Unnamed'}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             onSelect={() => setOpenCreatePage(true)}

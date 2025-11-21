@@ -117,8 +117,8 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
             }}
           >
             {!isMobile && <MessageActions />}
-            {message.attributes.referenceId && (
-              <MessageReference messageId={message.attributes.referenceId} />
+            {message.referenceId && (
+              <MessageReference messageId={message.referenceId} />
             )}
             <MessageContent message={message} />
             <MessageReactionCounts message={message} />

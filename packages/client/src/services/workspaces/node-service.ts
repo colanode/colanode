@@ -7,6 +7,7 @@ import { eventBus } from '@colanode/client/lib/event-bus';
 import {
   mapDownload,
   mapNode,
+  mapNodeAttributes,
   mapNodeReference,
   mapUpload,
 } from '@colanode/client/lib/mappers';
@@ -225,14 +226,18 @@ export class NodeService {
     return createdNode;
   }
 
-  public async insertNode(input: LocalNode): Promise<LocalNode> {
-    debug(`Inserting node ${input.id} with type ${input.attributes.type}`);
+  public async insertNode(
+    id: string,
+    attributes: NodeAttributes
+  ): Promise<LocalNode> {
+    debug(`Inserting node ${id} with type ${attributes.type}`);
 
-    const tree = input.parentId
-      ? await fetchNodeTree(this.workspace.database, input.parentId)
-      : [];
+    let tree: LocalNode[] = [];
+    if (attributes.type !== 'space' && attributes.type !== 'chat') {
+      tree = await fetchNodeTree(this.workspace.database, attributes.parentId!);
+    }
 
-    const model = getNodeModel(input.attributes.type);
+    const model = getNodeModel(attributes.type);
     const canCreateNodeContext: CanCreateNodeContext = {
       user: {
         id: this.workspace.userId,
@@ -241,7 +246,7 @@ export class NodeService {
         accountId: this.workspace.accountId,
       },
       tree: tree,
-      attributes: input.attributes,
+      attributes: attributes,
     };
 
     if (!model.canCreate(canCreateNodeContext)) {
@@ -249,7 +254,7 @@ export class NodeService {
     }
 
     const ydoc = new YDoc();
-    const update = ydoc.update(model.attributesSchema, input.attributes);
+    const update = ydoc.update(model.attributesSchema, attributes);
 
     if (!update) {
       throw new Error('Invalid attributes');
@@ -257,12 +262,12 @@ export class NodeService {
 
     const updateId = generateId(IdType.Update);
     const createdAt = new Date().toISOString();
-    const rootId = tree[0]?.id ?? input.id;
-    const nodeText = model.extractText(input.id, input.attributes);
-    const mentions = model.extractMentions(input.id, input.attributes);
+    const rootId = tree[0]?.id ?? id;
+    const nodeText = model.extractText(id, attributes);
+    const mentions = model.extractMentions(id, attributes);
     const nodeReferencesToCreate: CreateNodeReference[] = mentions.map(
       (mention) => ({
-        node_id: input.id,
+        node_id: id,
         reference_id: mention.target,
         inner_id: mention.id,
         type: 'mention',
@@ -277,9 +282,9 @@ export class NodeService {
           .insertInto('nodes')
           .returningAll()
           .values({
-            id: input.id,
+            id: id,
             root_id: rootId,
-            attributes: JSON.stringify(input.attributes),
+            attributes: JSON.stringify(attributes),
             created_at: createdAt,
             created_by: this.workspace.userId,
             local_revision: '0',
@@ -296,7 +301,7 @@ export class NodeService {
           .returningAll()
           .values({
             id: updateId,
-            node_id: input.id,
+            node_id: id,
             data: update,
             created_at: createdAt,
           })
@@ -307,7 +312,7 @@ export class NodeService {
         }
 
         const mutationData: CreateNodeMutationData = {
-          nodeId: input.id,
+          nodeId: id,
           updateId: updateId,
           data: encodeState(update),
           createdAt: createdAt,
@@ -333,7 +338,7 @@ export class NodeService {
           await trx
             .insertInto('node_texts')
             .values({
-              id: input.id,
+              id: id,
               name: nodeText.name,
               attributes: nodeText.attributes,
             })
@@ -420,7 +425,7 @@ export class NodeService {
 
     const updateId = generateId(IdType.Update);
     const updatedAt = new Date().toISOString();
-    const updatedAttributes = updater(node.attributes as T);
+    const updatedAttributes = updater(mapNodeAttributes(node) as T);
 
     const canUpdateAttributesContext: CanUpdateAttributesContext = {
       user: {
@@ -466,7 +471,7 @@ export class NodeService {
     const localRevision = BigInt(node.localRevision) + BigInt(1);
     const nodeText = model.extractText(nodeId, attributes);
 
-    const beforeMentions = model.extractMentions(nodeId, node.attributes);
+    const beforeMentions = model.extractMentions(nodeId, node);
     const afterMentions = model.extractMentions(nodeId, attributes);
     const mentionChanges = checkMentionChanges(beforeMentions, afterMentions);
 
@@ -617,7 +622,7 @@ export class NodeService {
       return 'not_found';
     }
 
-    const model = getNodeModel(node.attributes.type);
+    const model = getNodeModel(node.type);
     const canDeleteNodeContext: CanDeleteNodeContext = {
       user: {
         id: this.workspace.userId,

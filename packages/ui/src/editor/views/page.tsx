@@ -23,8 +23,8 @@ export const PageNodeView = ({ node }: NodeViewProps) => {
         .where(({ pages }) => eq(pages.id, id))
         .select(({ pages }) => ({
           id: pages.id,
-          name: pages.attributes.name,
-          avatar: pages.attributes.avatar,
+          name: pages.name,
+          avatar: pages.avatar,
         }))
         .findOne(),
     [workspace.userId, id]

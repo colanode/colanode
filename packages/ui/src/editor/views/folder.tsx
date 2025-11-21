@@ -23,8 +23,8 @@ export const FolderNodeView = ({ node }: NodeViewProps) => {
         .where(({ folders }) => eq(folders.id, id))
         .select(({ folders }) => ({
           id: folders.id,
-          name: folders.attributes.name,
-          avatar: folders.attributes.avatar,
+          name: folders.name,
+          avatar: folders.avatar,
         }))
         .findOne(),
     [workspace.userId, id]

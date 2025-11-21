@@ -13,7 +13,7 @@ export class NodeCreateMutationHandler
     input: NodeCreateMutationInput
   ): Promise<NodeCreateMutationOutput> {
     const workspace = this.getWorkspace(input.userId);
-    await workspace.nodes.insertNode(input.node);
+    await workspace.nodes.insertNode(input.nodeId, input.attributes);
 
     return {
       success: true,

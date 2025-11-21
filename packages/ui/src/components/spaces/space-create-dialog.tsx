@@ -35,18 +35,15 @@ export const SpaceCreateDialog = ({
       const spaceId = generateId(IdType.Space);
       const space: LocalSpaceNode = {
         id: spaceId,
+        parentId: null,
         type: 'space',
-        attributes: {
-          type: 'space',
-          name: values.name,
-          description: values.description,
-          avatar: values.avatar,
-          collaborators: {
-            [workspace.userId]: 'admin',
-          },
-          visibility: 'private',
+        name: values.name,
+        description: values.description,
+        avatar: values.avatar,
+        collaborators: {
+          [workspace.userId]: 'admin',
         },
-        parentId: '',
+        visibility: 'private',
         rootId: spaceId,
         createdAt: new Date().toISOString(),
         createdBy: workspace.userId,
@@ -61,11 +58,7 @@ export const SpaceCreateDialog = ({
       const page: LocalPageNode = {
         id: pageId,
         type: 'page',
-        attributes: {
-          type: 'page',
-          name: 'Home',
-          parentId: spaceId,
-        },
+        name: 'Home',
         parentId: spaceId,
         rootId: spaceId,
         createdAt: new Date().toISOString(),

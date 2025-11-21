@@ -30,7 +30,7 @@ export const FolderFiles = ({
     (q) =>
       q
         .from({ files: collections.workspace(workspace.userId).files })
-        .where(({ files }) => eq(files.attributes.parentId, id))
+        .where(({ files }) => eq(files.parentId, id))
         .orderBy(({ files }) => files.id, 'asc'),
     {
       pageSize: FILES_PER_PAGE,

@@ -1,9 +1,10 @@
-import { LocalNode } from '@colanode/client/types';
+import { NodeAttributes } from '@colanode/core';
 
 export type NodeCreateMutationInput = {
   type: 'node.create';
   userId: string;
-  node: LocalNode;
+  nodeId: string;
+  attributes: NodeAttributes;
 };
 
 export type NodeCreateMutationOutput = {

@@ -6,12 +6,6 @@ interface FolderTabProps {
 }
 
 export const FolderTab = ({ folder }: FolderTabProps) => {
-  const name =
-    folder.attributes.name && folder.attributes.name.length > 0
-      ? folder.attributes.name
-      : 'Untitled';
-
-  return (
-    <Tab id={folder.id} avatar={folder.attributes.avatar} name={name} />
-  );
+  const name = folder.name && folder.name.length > 0 ? folder.name : 'Untitled';
+  return <Tab id={folder.id} avatar={folder.avatar} name={name} />;
 };

@@ -39,11 +39,8 @@ export const FolderCreateDialog = ({
       const folder: LocalFolderNode = {
         id: folderId,
         type: 'folder',
-        attributes: {
-          type: 'folder',
-          name: values.name,
-          parentId: spaceId,
-        },
+        name: values.name,
+        avatar: values.avatar,
         parentId: spaceId,
         rootId: spaceId,
         createdAt: new Date().toISOString(),

@@ -40,8 +40,8 @@ export const PageUpdateDialog = ({
         <PageForm
           id={page.id}
           values={{
-            name: page.attributes.name,
-            avatar: page.attributes.avatar,
+            name: page.name,
+            avatar: page.avatar,
           }}
           isPending={isPending}
           submitText="Update"

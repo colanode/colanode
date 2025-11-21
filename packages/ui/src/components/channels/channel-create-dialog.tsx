@@ -40,11 +40,7 @@ export const ChannelCreateDialog = ({
       const channel: LocalChannelNode = {
         id: channelId,
         type: 'channel',
-        attributes: {
-          type: 'channel',
-          name: values.name,
-          parentId: spaceId,
-        },
+        name: values.name,
         parentId: spaceId,
         rootId: spaceId,
         createdAt: new Date().toISOString(),

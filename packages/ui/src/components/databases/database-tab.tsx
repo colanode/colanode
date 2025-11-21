@@ -7,15 +7,7 @@ interface DatabaseTabProps {
 
 export const DatabaseTab = ({ database }: DatabaseTabProps) => {
   const name =
-    database.attributes.name && database.attributes.name.length > 0
-      ? database.attributes.name
-      : 'Untitled';
+    database.name && database.name.length > 0 ? database.name : 'Untitled';
 
-  return (
-    <Tab
-      id={database.id}
-      avatar={database.attributes.avatar}
-      name={name}
-    />
-  );
+  return <Tab id={database.id} avatar={database.avatar} name={name} />;
 };

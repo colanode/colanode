@@ -30,7 +30,7 @@ export const CalendarViewNoValueList = ({
         </div>
       )}
       {records.map((record) => {
-        const name = record.attributes.name ?? 'Unnamed';
+        const name = record.name ?? 'Unnamed';
         return (
           <Link
             from="/workspace/$userId"
@@ -42,7 +42,7 @@ export const CalendarViewNoValueList = ({
             <Avatar
               id={record.id}
               name={name}
-              avatar={record.attributes.avatar}
+              avatar={record.avatar}
               size="small"
             />
             <p>{name}</p>

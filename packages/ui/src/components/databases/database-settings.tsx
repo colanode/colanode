@@ -34,7 +34,7 @@ export const DatabaseSettings = ({ database, role }: DatabaseSettingsProps) => {
           <Settings className="size-4 cursor-pointer text-muted-foreground hover:text-foreground" />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" className="mr-2 w-80">
-          <DropdownMenuLabel>{database.attributes.name}</DropdownMenuLabel>
+          <DropdownMenuLabel>{database.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="flex items-center gap-2 cursor-pointer"

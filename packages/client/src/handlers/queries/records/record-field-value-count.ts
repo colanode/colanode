@@ -56,7 +56,7 @@ export class RecordFieldValueCountQueryHandler
     ) {
       if (
         event.node.type === 'record' &&
-        event.node.attributes.databaseId === input.databaseId
+        event.node.databaseId === input.databaseId
       ) {
         const newResult = await this.handleQuery(input);
         return {
@@ -93,7 +93,7 @@ export class RecordFieldValueCountQueryHandler
 
       if (
         event.node.type === 'record' &&
-        event.node.attributes.databaseId === input.databaseId
+        event.node.databaseId === input.databaseId
       ) {
         const newResult = await this.handleQuery(input);
         return {
@@ -113,7 +113,7 @@ export class RecordFieldValueCountQueryHandler
   ): Promise<RecordFieldValueCountQueryOutput> {
     const workspace = this.getWorkspace(input.userId);
     const database = await this.fetchDatabase(input);
-    const field = database.attributes.fields[input.fieldId];
+    const field = database.fields[input.fieldId];
 
     if (!field) {
       return {
@@ -124,7 +124,7 @@ export class RecordFieldValueCountQueryHandler
 
     const filterQuery = buildFiltersQuery(
       input.filters,
-      database.attributes.fields,
+      database.fields,
       workspace.userId
     );
 

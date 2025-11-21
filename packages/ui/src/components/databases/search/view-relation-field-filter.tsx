@@ -34,15 +34,10 @@ interface ViewRelationFieldFilterProps {
 }
 
 const RelationBadge = ({ record }: { record: LocalRecordNode }) => {
-  const name = record.attributes.name ?? 'Unnamed';
+  const name = record.name ?? 'Unnamed';
   return (
     <div className="flex flex-row items-center gap-1">
-      <Avatar
-        id={record.id}
-        name={name}
-        avatar={record.attributes.avatar}
-        size="small"
-      />
+      <Avatar id={record.id} name={name} avatar={record.avatar} size="small" />
       <p className="text-sm line-clamp-1 w-full">{name}</p>
     </div>
   );

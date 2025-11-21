@@ -40,8 +40,8 @@ export const FolderUpdateDialog = ({
         <FolderForm
           id={folder.id}
           values={{
-            name: folder.attributes.name,
-            avatar: folder.attributes.avatar,
+            name: folder.name,
+            avatar: folder.avatar,
           }}
           submitText="Update"
           readOnly={!canEdit}

@@ -43,8 +43,8 @@ export const DatabaseNodeView = ({ node }: NodeViewProps) => {
     );
   }
 
-  const name = database.attributes.name ?? 'Unnamed';
-  const avatar = database.attributes.avatar;
+  const name = database.name ?? 'Unnamed';
+  const avatar = database.avatar;
 
   return (
     <NodeViewWrapper data-id={node.attrs.id}>

@@ -88,7 +88,7 @@ export const NodeCollaborators = ({
           return null;
         }
 
-        const name = extractNodeName(node.attributes) ?? 'Unknown';
+        const name = extractNodeName(node) ?? 'Unknown';
         return (
           <div key={node.id}>
             <Separator className="my-3" />

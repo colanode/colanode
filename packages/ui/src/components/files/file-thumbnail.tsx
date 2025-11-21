@@ -33,17 +33,14 @@ export const FileImageThumbnail = ({
     return (
       <img
         src={localFile.url}
-        alt={file.attributes.name}
+        alt={file.name}
         className={cn('size-10 object-contain object-center', className)}
       />
     );
   }
 
   return (
-    <FileIcon
-      mimeType={file.attributes.mimeType}
-      className={cn('size-10', className)}
-    />
+    <FileIcon mimeType={file.mimeType} className={cn('size-10', className)} />
   );
 };
 
@@ -52,16 +49,13 @@ export const FileThumbnail = ({
   file,
   className,
 }: FileThumbnailProps) => {
-  if (file.attributes.subtype === 'image') {
+  if (file.subtype === 'image') {
     return (
       <FileImageThumbnail userId={userId} file={file} className={className} />
     );
   }
 
   return (
-    <FileIcon
-      mimeType={file.attributes.mimeType}
-      className={cn('size-10', className)}
-    />
+    <FileIcon mimeType={file.mimeType} className={cn('size-10', className)} />
   );
 };

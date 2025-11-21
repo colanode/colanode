@@ -23,12 +23,8 @@ export const FolderCommand: EditorCommand = {
     const folder: LocalFolderNode = {
       id: folderId,
       type: 'folder',
-      attributes: {
-        type: 'folder',
-        name: 'Untitled',
-        avatar: null,
-        parentId: documentId,
-      },
+      name: 'Untitled',
+      avatar: null,
       parentId: documentId,
       rootId: rootId,
       createdAt: new Date().toISOString(),

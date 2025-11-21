@@ -167,7 +167,7 @@ Sample Records:
 ${db.sampleRecords
   .map(
     (record, i) =>
-      `${i + 1}. ${Object.entries(record.attributes.fields)
+      `${i + 1}. ${Object.entries(record.fields)
         .map(([fieldId, value]) => `${db.fields[fieldId]?.name}: ${value}`)
         .join(', ')}`
   )

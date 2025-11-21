@@ -7,10 +7,6 @@ interface FolderBreadcrumbItemProps {
 
 export const FolderBreadcrumbItem = ({ folder }: FolderBreadcrumbItemProps) => {
   return (
-    <BreadcrumbItem
-      id={folder.id}
-      avatar={folder.attributes.avatar}
-      name={folder.attributes.name}
-    />
+    <BreadcrumbItem id={folder.id} avatar={folder.avatar} name={folder.name} />
   );
 };

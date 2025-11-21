@@ -6,12 +6,6 @@ interface PageTabProps {
 }
 
 export const PageTab = ({ page }: PageTabProps) => {
-  const name =
-    page.attributes.name && page.attributes.name.length > 0
-      ? page.attributes.name
-      : 'Untitled';
-
-  return (
-    <Tab id={page.id} avatar={page.attributes.avatar} name={name} />
-  );
+  const name = page.name && page.name.length > 0 ? page.name : 'Untitled';
+  return <Tab id={page.id} avatar={page.avatar} name={name} />;
 };

@@ -42,8 +42,8 @@ export const DatabaseUpdateDialog = ({
         <DatabaseForm
           id={database.id}
           values={{
-            name: database.attributes.name,
-            avatar: database.attributes.avatar,
+            name: database.name,
+            avatar: database.avatar,
           }}
           isPending={isPending}
           submitText="Update"

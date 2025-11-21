@@ -7,7 +7,7 @@ export const sortSpaceChildren = (
 ) => {
   const sortedById = children.toSorted((a, b) => compareString(a.id, b.id));
   const indexes: Record<string, string> = {};
-  const childrenSettings = space.attributes.children ?? {};
+  const childrenSettings = space.children ?? {};
   let lastIndex: string | null = null;
 
   for (const child of sortedById) {

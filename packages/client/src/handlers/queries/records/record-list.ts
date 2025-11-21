@@ -57,7 +57,7 @@ export class RecordListQueryHandler
     ) {
       if (
         event.node.type === 'record' &&
-        event.node.attributes.databaseId === input.databaseId
+        event.node.databaseId === input.databaseId
       ) {
         if (input.filters.length > 0 || input.sorts.length > 0) {
           const newResult = await this.handleQuery(input);
@@ -101,7 +101,7 @@ export class RecordListQueryHandler
     ) {
       if (
         event.node.type === 'record' &&
-        event.node.attributes.databaseId === input.databaseId
+        event.node.databaseId === input.databaseId
       ) {
         const newResult = await this.handleQuery(input);
         return {
@@ -133,11 +133,11 @@ export class RecordListQueryHandler
     const database = await this.fetchDatabase(input);
     const filterQuery = buildFiltersQuery(
       input.filters,
-      database.attributes.fields,
+      database.fields,
       workspace.userId
     );
 
-    const orderByQuery = `ORDER BY ${input.sorts.length > 0 ? buildSortOrdersQuery(input.sorts, database.attributes.fields) : 'n."id" ASC'}`;
+    const orderByQuery = `ORDER BY ${input.sorts.length > 0 ? buildSortOrdersQuery(input.sorts, database.fields) : 'n."id" ASC'}`;
     const offset = (input.page - 1) * input.count;
     const query = sql<SelectNode>`
         SELECT n.*

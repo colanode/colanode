@@ -63,10 +63,10 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
 
   const { mutate, isPending } = useMutation();
   const canEdit = true;
-  const hasName = record.attributes.name && record.attributes.name.length > 0;
+  const hasName = record.name && record.name.length > 0;
 
   const handleSave = (newName: string) => {
-    if (newName === record.attributes.name) return;
+    if (newName === record.name) return;
 
     mutate({
       input: {
@@ -88,7 +88,7 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
     <div className="group relative flex h-full w-full items-center">
       {isEditing ? (
         <NameEditor
-          initialValue={record.attributes.name ?? ''}
+          initialValue={record.name ?? ''}
           onSave={handleSave}
           onCancel={() => setIsEditing(false)}
         />
@@ -99,7 +99,7 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
             className="flex h-full w-full cursor-pointer flex-row items-center gap-1 p-1 text-sm"
           >
             {hasName ? (
-              <span className="truncate">{record.attributes.name}</span>
+              <span className="truncate">{record.name}</span>
             ) : (
               <span className="text-muted-foreground">Unnamed</span>
             )}

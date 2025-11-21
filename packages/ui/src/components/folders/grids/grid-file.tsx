@@ -23,9 +23,9 @@ export const GridFile = ({ file }: GridFileProps) => {
         </div>
         <p
           className="line-clamp-2 w-full wrap-break-word text-center text-xs text-foreground/80"
-          title={file.attributes.name}
+          title={file.name}
         >
-          {file.attributes.name}
+          {file.name}
         </p>
       </GridItem>
     </FileContextMenu>

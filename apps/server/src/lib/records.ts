@@ -45,14 +45,11 @@ export const retrieveByFilters = async (
   input: FilterInput
 ) => {
   const databaseNode = await fetchDatabase(databaseId, workspaceId);
-  const filterQuery = buildFiltersQuery(
-    input.filters,
-    databaseNode.attributes.fields
-  );
+  const filterQuery = buildFiltersQuery(input.filters, databaseNode.fields);
 
   const orderByQuery =
     input.sorts.length > 0
-      ? buildSortOrdersQuery(input.sorts, databaseNode.attributes.fields)
+      ? buildSortOrdersQuery(input.sorts, databaseNode.fields)
       : 'n.id ASC';
 
   const offset = (input.page - 1) * input.count;

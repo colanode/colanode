@@ -7,10 +7,6 @@ interface RecordBreadcrumbItemProps {
 
 export const RecordBreadcrumbItem = ({ record }: RecordBreadcrumbItemProps) => {
   return (
-    <BreadcrumbItem
-      id={record.id}
-      avatar={record.attributes.avatar}
-      name={record.attributes.name}
-    />
+    <BreadcrumbItem id={record.id} avatar={record.avatar} name={record.name} />
   );
 };

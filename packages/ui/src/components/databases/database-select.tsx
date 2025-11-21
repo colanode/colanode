@@ -58,11 +58,11 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
               <span className="flex flex-row items-center gap-1">
                 <Avatar
                   id={selectedDatabase.id}
-                  name={selectedDatabase.attributes.name}
-                  avatar={selectedDatabase.attributes.avatar}
+                  name={selectedDatabase.name}
+                  avatar={selectedDatabase.avatar}
                   className="size-4"
                 />
-                {selectedDatabase.attributes.name}
+                {selectedDatabase.name}
               </span>
             </Fragment>
           ) : (
@@ -80,7 +80,7 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
               {databases.map((database) => (
                 <CommandItem
                   key={database.id}
-                  value={`${database.id} - ${database.attributes.name}`}
+                  value={`${database.id} - ${database.name}`}
                   onSelect={() => {
                     onChange(database.id);
                     setOpen(false);
@@ -89,11 +89,11 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
                   <div className="flex w-full flex-row items-center gap-2">
                     <Avatar
                       id={database.id}
-                      name={database.attributes.name}
-                      avatar={database.attributes.avatar}
+                      name={database.name}
+                      avatar={database.avatar}
                       className="size-4"
                     />
-                    <p>{database.attributes.name}</p>
+                    <p>{database.name}</p>
                     <Check
                       className={cn(
                         'ml-auto size-4',

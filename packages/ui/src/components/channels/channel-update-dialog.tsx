@@ -42,8 +42,8 @@ export const ChannelUpdateDialog = ({
         <ChannelForm
           id={channel.id}
           values={{
-            name: channel.attributes.name,
-            avatar: channel.attributes.avatar,
+            name: channel.name,
+            avatar: channel.avatar,
           }}
           submitText="Update"
           readOnly={!canEdit}

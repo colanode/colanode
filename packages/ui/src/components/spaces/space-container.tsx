@@ -30,9 +30,9 @@ export const SpaceContainer = ({ space, role }: SpaceContainerProps) => {
         </div>
         <SpaceForm
           values={{
-            name: space.attributes.name,
-            description: space.attributes.description ?? '',
-            avatar: space.attributes.avatar ?? null,
+            name: space.name,
+            description: space.description ?? '',
+            avatar: space.avatar ?? null,
           }}
           readOnly={!canEdit}
           onSubmit={(values) => {

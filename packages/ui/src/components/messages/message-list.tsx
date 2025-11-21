@@ -19,9 +19,7 @@ export const MessageList = () => {
     (q) =>
       q
         .from({ messages: collections.workspace(workspace.userId).messages })
-        .where(({ messages }) =>
-          eq(messages.attributes.parentId, conversation.id)
-        )
+        .where(({ messages }) => eq(messages.parentId, conversation.id))
         .orderBy(({ messages }) => messages.id, 'desc'),
     {
       pageSize: MESSAGES_PER_PAGE,

@@ -21,12 +21,12 @@ export const ViewTab = ({ view, isActive, onClick }: ViewTabProps) => {
     >
       <ViewIcon
         id={view.id}
-        name={view.attributes.name}
-        avatar={view.attributes.avatar}
-        layout={view.attributes.layout}
+        name={view.name}
+        avatar={view.avatar}
+        layout={view.layout}
         className="size-4"
       />
-      {view.attributes.name}
+      {view.name}
     </div>
   );
 };

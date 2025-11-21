@@ -44,7 +44,7 @@ export const extractNodeRole = (
   const nodes = Array.isArray(tree) ? tree : [tree];
   let role: NodeRole | null = null;
   for (const node of nodes) {
-    const collaborators = extractNodeCollaborators(node.attributes);
+    const collaborators = extractNodeCollaborators(node);
     const collaboratorRole = collaborators[collaboratorId];
     if (collaboratorRole) {
       role = collaboratorRole;

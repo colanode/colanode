@@ -14,7 +14,7 @@ export const ChatBreadcrumbItem = ({ chat }: ChatBreadcrumbItemProps) => {
 
   const collaboratorId =
     chat && chat.type === 'chat'
-      ? (Object.keys(chat.attributes.collaborators).find(
+      ? (Object.keys(chat.collaborators).find(
           (id) => id !== workspace.userId
         ) ?? '')
       : '';

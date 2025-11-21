@@ -19,9 +19,7 @@ export const ChatSidebarItem = ({ chat, isActive }: ChatSidebarItemProps) => {
   const radar = useRadar();
 
   const userId =
-    Object.keys(chat.attributes.collaborators).find(
-      (id) => id !== workspace.userId
-    ) ?? '';
+    Object.keys(chat.collaborators).find((id) => id !== workspace.userId) ?? '';
 
   const userQuery = useLiveQuery(
     (q) =>

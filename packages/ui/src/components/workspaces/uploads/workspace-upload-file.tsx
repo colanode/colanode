@@ -65,12 +65,10 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
         className="size-10 text-muted-foreground"
       />
       <div className="grow flex flex-col gap-2 justify-center items-start min-w-0">
-        <p className="font-medium text-sm truncate w-full">
-          {file.attributes.name}
-        </p>
+        <p className="font-medium text-sm truncate w-full">{file.name}</p>
         <p className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span>{file.attributes.mimeType}</span>
-          <span>{formatBytes(file.attributes.size)}</span>
+          <span>{file.mimeType}</span>
+          <span>{formatBytes(file.size)}</span>
           {upload.completedAt && (
             <span>{timeAgo(new Date(upload.completedAt))}</span>
           )}

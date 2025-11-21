@@ -29,7 +29,7 @@ export const FileBlock = ({ id }: FileBlockProps) => {
   }
 
   const file = fileGetQuery.data as LocalFileNode;
-  const canPreview = canPreviewFile(file.attributes.subtype);
+  const canPreview = canPreviewFile(file.subtype);
 
   return (
     <Link
@@ -43,12 +43,10 @@ export const FileBlock = ({ id }: FileBlockProps) => {
         </div>
       ) : (
         <div className="flex flex-row gap-4 items-center w-full cursor-pointer overflow-hidden rounded-md p-2 pl-0 hover:bg-accent">
-          <FileIcon mimeType={file.attributes.mimeType} className="size-10" />
+          <FileIcon mimeType={file.mimeType} className="size-10" />
           <div className="flex flex-col gap-1">
-            <div className="text-sm font-medium">{file.attributes.name}</div>
-            <div className="text-xs text-muted-foreground">
-              {file.attributes.mimeType}
-            </div>
+            <div className="text-sm font-medium">{file.name}</div>
+            <div className="text-xs text-muted-foreground">{file.mimeType}</div>
           </div>
         </div>
       )}

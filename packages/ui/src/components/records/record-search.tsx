@@ -64,11 +64,11 @@ export const RecordSearch = ({
                   <div className="flex w-full flex-row items-center gap-2">
                     <Avatar
                       id={record.id}
-                      name={record.attributes.name}
-                      avatar={record.attributes.avatar}
+                      name={record.name}
+                      avatar={record.avatar}
                       className="size-4"
                     />
-                    <p className="text-sm grow">{record.attributes.name}</p>
+                    <p className="text-sm grow">{record.name}</p>
                   </div>
                 </CommandItem>
               ))}

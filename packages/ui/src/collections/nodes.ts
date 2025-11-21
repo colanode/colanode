@@ -1,6 +1,7 @@
 import { createCollection } from '@tanstack/react-db';
 // import { cloneDeep } from 'lodash-es';
 
+import { mapNodeAttributes } from '@colanode/client/lib';
 import { LocalNode } from '@colanode/client/types';
 
 export const createNodesCollection = (userId: string) => {
@@ -62,10 +63,13 @@ export const createNodesCollection = (userId: string) => {
     },
     onInsert: async ({ transaction }) => {
       for (const mutation of transaction.mutations) {
+        const node = mutation.modified;
+        const attributes = mapNodeAttributes(node);
         await window.colanode.executeMutation({
           type: 'node.create',
           userId,
-          node: mutation.modified,
+          nodeId: node.id,
+          attributes,
         });
       }
     },

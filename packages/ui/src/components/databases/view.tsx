@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { match } from 'ts-pattern';
 
+import { mapNodeAttributes } from '@colanode/client/lib';
 import { LocalDatabaseViewNode, ViewField } from '@colanode/client/types';
 import {
   compareString,
@@ -11,6 +12,7 @@ import {
   DatabaseViewFilterAttributes,
   DatabaseViewSortAttributes,
   SpecialId,
+  DatabaseViewAttributes,
 } from '@colanode/core';
 import { BoardView } from '@colanode/ui/components/databases/boards/board-view';
 import { CalendarView } from '@colanode/ui/components/databases/calendars/calendar-view';
@@ -38,13 +40,11 @@ export const View = ({ view }: ViewProps) => {
 
   const fields: ViewField[] = database.fields
     .map((field) => {
-      const viewField = view.attributes.fields?.[field.id];
+      const viewField = view.fields?.[field.id];
 
       return {
         field,
-        display:
-          viewField?.display ??
-          getDefaultViewFieldDisplay(view.attributes.layout),
+        display: viewField?.display ?? getDefaultViewFieldDisplay(view.layout),
         index: viewField?.index ?? field.index,
         width: viewField?.width ?? getDefaultFieldWidth(field.type),
       };
@@ -60,20 +60,22 @@ export const View = ({ view }: ViewProps) => {
     <DatabaseViewContext.Provider
       value={{
         id: view.id,
-        name: view.attributes.name,
-        avatar: view.attributes.avatar,
-        layout: view.attributes.layout,
+        name: view.name,
+        avatar: view.avatar,
+        layout: view.layout,
         fields,
-        filters: Object.values(view.attributes.filters ?? {}),
-        sorts: Object.values(view.attributes.sorts ?? {}),
-        groupBy: view.attributes.groupBy,
-        nameWidth: view.attributes.nameWidth ?? getDefaultNameWidth(),
+        filters: Object.values(view.filters ?? {}),
+        sorts: Object.values(view.sorts ?? {}),
+        groupBy: view.groupBy,
+        nameWidth: view.nameWidth ?? getDefaultNameWidth(),
         isSearchBarOpened: isSearchBarOpened || openedFieldFilters.length > 0,
         isSortsOpened,
         rename: async (name: string) => {
           if (!database.canEdit) return;
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.name = name;
 
           const result = await window.colanode.executeMutation({
@@ -90,7 +92,9 @@ export const View = ({ view }: ViewProps) => {
         updateAvatar: async (avatar: string) => {
           if (!database.canEdit) return;
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.avatar = avatar;
 
           const result = await window.colanode.executeMutation({
@@ -107,10 +111,12 @@ export const View = ({ view }: ViewProps) => {
         setFieldDisplay: async (id: string, display: boolean) => {
           if (!database.canEdit) return;
 
-          const viewField = view.attributes.fields?.[id];
+          const viewField = view.fields?.[id];
           if (viewField && viewField.display === display) return;
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.fields = viewAttributes.fields ?? {};
           if (!viewAttributes.fields[id]) {
             viewAttributes.fields[id] = {
@@ -137,12 +143,14 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const viewField = view.attributes.fields?.[id];
+          const viewField = view.fields?.[id];
           if (viewField && viewField.width === width) {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.fields = viewAttributes.fields ?? {};
           if (!viewAttributes.fields[id]) {
             viewAttributes.fields[id] = {
@@ -169,11 +177,13 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          if (view.attributes.nameWidth === width) {
+          if (view.nameWidth === width) {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.nameWidth = width;
 
           const result = await window.colanode.executeMutation({
@@ -192,7 +202,9 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.groupBy = fieldId;
 
           const result = await window.colanode.executeMutation({
@@ -213,7 +225,7 @@ export const View = ({ view }: ViewProps) => {
 
           const newIndex = generateViewFieldIndex(
             database.fields,
-            Object.values(view.attributes.fields ?? {}),
+            Object.values(view.fields ?? {}),
             id,
             after
           );
@@ -221,7 +233,9 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.fields = viewAttributes.fields ?? {};
           if (!viewAttributes.fields[id]) {
             viewAttributes.fields[id] = {
@@ -250,12 +264,14 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          if (view.attributes.filters?.[fieldId]) {
+          if (view.filters?.[fieldId]) {
             setOpenedFieldFilters((prev) => [...prev, fieldId]);
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.filters = viewAttributes.filters ?? {};
 
           if (fieldId === SpecialId.Name) {
@@ -306,11 +322,13 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          if (!view.attributes.filters?.[id]) {
+          if (!view.filters?.[id]) {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.filters = viewAttributes.filters ?? {};
           viewAttributes.filters[id] = filter;
 
@@ -332,11 +350,13 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          if (!view.attributes.filters?.[id]) {
+          if (!view.filters?.[id]) {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.filters = viewAttributes.filters ?? {};
           delete viewAttributes.filters[id];
 
@@ -358,12 +378,14 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const existingSort = view.attributes.sorts?.[fieldId];
+          const existingSort = view.sorts?.[fieldId];
           if (existingSort && existingSort.direction === direction) {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.sorts = viewAttributes.sorts ?? {};
 
           if (fieldId === SpecialId.Name) {
@@ -408,11 +430,13 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          if (!view.attributes.sorts?.[id]) {
+          if (!view.sorts?.[id]) {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.sorts = viewAttributes.sorts ?? {};
           viewAttributes.sorts[id] = sort;
 
@@ -435,11 +459,13 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          if (!view.attributes.sorts?.[id]) {
+          if (!view.sorts?.[id]) {
             return;
           }
 
-          const viewAttributes = { ...view.attributes };
+          const viewAttributes = mapNodeAttributes(
+            view
+          ) as DatabaseViewAttributes;
           viewAttributes.sorts = viewAttributes.sorts ?? {};
           delete viewAttributes.sorts[id];
 
@@ -476,8 +502,7 @@ export const View = ({ view }: ViewProps) => {
           setOpenedFieldFilters((prev) => prev.filter((id) => id !== fieldId));
         },
         createRecord: async (filters?: DatabaseViewFilterAttributes[]) => {
-          const viewFilters =
-            Object.values(view.attributes.filters ?? {}) ?? [];
+          const viewFilters = Object.values(view.filters ?? {}) ?? [];
           const extraFilters = filters ?? [];
 
           const allFilters = [...viewFilters, ...extraFilters];
@@ -507,7 +532,7 @@ export const View = ({ view }: ViewProps) => {
       }}
     >
       <div className="w-full h-full group/database">
-        {match(view.attributes.layout)
+        {match(view.layout)
           .with('table', () => <TableView />)
           .with('board', () => <BoardView />)
           .with('calendar', () => <CalendarView />)

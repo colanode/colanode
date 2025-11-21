@@ -90,12 +90,12 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
           <button className="group/space-button flex items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm flex-1 cursor-pointer">
             <Avatar
               id={space.id}
-              avatar={space.attributes.avatar}
-              name={space.attributes.name}
+              avatar={space.avatar}
+              name={space.name}
               className="size-4 group-hover/space-button:hidden"
             />
             <ChevronRight className="hidden size-4 transition-transform duration-200 group-hover/space-button:block group-data-[state=open]/sidebar-space:rotate-90" />
-            <span>{space.attributes.name}</span>
+            <span>{space.name}</span>
           </button>
         </CollapsibleTrigger>
         <SpaceSidebarDropdown space={space} />

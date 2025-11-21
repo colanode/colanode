@@ -32,11 +32,11 @@ export class ViewCreateMutationHandler
     let maxIndex: string | null = null;
     for (const otherView of otherViews) {
       const view = mapNode(otherView);
-      if (view.attributes.type !== 'database_view') {
+      if (view.type !== 'database_view') {
         continue;
       }
 
-      const index = view.attributes.index;
+      const index = view.index;
       if (maxIndex === null || index > maxIndex) {
         maxIndex = index;
       }

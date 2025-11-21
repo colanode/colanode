@@ -7,10 +7,7 @@ interface FileTabProps {
 }
 
 export const FileTab = ({ userId, file }: FileTabProps) => {
-  const name =
-    file.attributes.name && file.attributes.name.length > 0
-      ? file.attributes.name
-      : 'Untitled';
+  const name = file.name && file.name.length > 0 ? file.name : 'Untitled';
 
   return (
     <div className="flex items-center space-x-2">

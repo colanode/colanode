@@ -48,16 +48,16 @@ export const FileSidebar = ({ file }: FileSidebarProps) => {
         />
         <div
           className="line-clamp-3 wrap-break-word text-base font-medium"
-          title={file.attributes.name}
+          title={file.name}
         >
-          {file.attributes.name}
+          {file.name}
         </div>
       </div>
 
       <div className="mt-5 flex flex-col gap-4">
-        <FileMeta title="Name" value={file.attributes.name} />
-        <FileMeta title="Type" value={file.attributes.mimeType} />
-        <FileMeta title="Size" value={formatBytes(file.attributes.size)} />
+        <FileMeta title="Name" value={file.name} />
+        <FileMeta title="Type" value={file.mimeType} />
+        <FileMeta title="Size" value={formatBytes(file.size)} />
         <FileMeta title="Created at" value={formatDate(file.createdAt)} />
 
         {user && (

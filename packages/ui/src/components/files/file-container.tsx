@@ -10,7 +10,7 @@ interface FileContainerProps {
 }
 
 export const FileContainer = ({ file }: FileContainerProps) => {
-  const canPreview = canPreviewFile(file.attributes.subtype);
+  const canPreview = canPreviewFile(file.subtype);
 
   return (
     <div className="flex h-full max-h-full w-full flex-row items-center gap-2">
@@ -23,7 +23,7 @@ export const FileContainer = ({ file }: FileContainerProps) => {
           {canPreview ? (
             <FilePreview file={file} />
           ) : (
-            <FileNoPreview mimeType={file.attributes.mimeType} />
+            <FileNoPreview mimeType={file.mimeType} />
           )}
         </div>
       </div>

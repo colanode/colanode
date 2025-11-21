@@ -5,7 +5,7 @@ export const buildNodeCollaborators = (nodes: Node[]): NodeCollaborator[] => {
   const collaborators: Record<string, NodeCollaborator> = {};
 
   for (const node of nodes) {
-    const nodeCollaborators = extractNodeCollaborators(node.attributes);
+    const nodeCollaborators = extractNodeCollaborators(node);
 
     for (const [collaboratorId, role] of Object.entries(nodeCollaborators)) {
       collaborators[collaboratorId] = {

@@ -90,7 +90,7 @@ export const useRecordsInfiniteQuery = (
     (q) => {
       let query = q
         .from({ records: collections.workspace(workspace.userId).records })
-        .where(({ records }) => eq(records.attributes.databaseId, database.id));
+        .where(({ records }) => eq(records.databaseId, database.id));
 
       if (hasFilterDefinitions) {
         query = query.where(({ records }) => {
@@ -175,7 +175,7 @@ const createSortDefinition = (
   if (sort.fieldId === SpecialId.Name) {
     return {
       direction: sort.direction,
-      selector: (record) => record.attributes.name,
+      selector: (record) => record.name,
     };
   }
 
@@ -200,7 +200,7 @@ const createSortDefinition = (
 
   return {
     direction: sort.direction,
-    selector: (record) => record.attributes.fields[field.id]?.value,
+    selector: (record) => record.fields[field.id]?.value,
   };
 };
 
@@ -254,7 +254,7 @@ const buildFieldFilterExpression = (
   record: RecordRef
 ): BooleanExpression | null => {
   if (filter.fieldId === SpecialId.Name) {
-    return buildStringFilterExpression(filter, record.attributes.name);
+    return buildStringFilterExpression(filter, record.name);
   }
 
   const field = fieldsById[filter.fieldId];
@@ -608,7 +608,7 @@ const getFieldValue = <T = FieldValuePrimitive>(
   record: RecordRef,
   fieldId: string
 ): T => {
-  return record.attributes.fields[fieldId]?.value as unknown as T;
+  return record.fields[fieldId]?.value as unknown as T;
 };
 
 const buildArrayIsEmpty = (

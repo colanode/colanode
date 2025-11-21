@@ -21,10 +21,10 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
     <DatabaseContext.Provider
       value={{
         id: database.id,
-        name: database.attributes.name,
-        nameField: database.attributes.nameField,
+        name: database.name,
+        nameField: database.nameField,
         role,
-        fields: Object.values(database.attributes.fields),
+        fields: Object.values(database.fields),
         canEdit,
         canCreateRecord,
         createField: async (type, name) => {
