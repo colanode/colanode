@@ -27,7 +27,6 @@ export * from './databases/database-name-field-update';
 export * from './documents/document-update';
 export * from './files/file-create';
 export * from './files/file-download';
-export * from './folders/folder-create';
 export * from './folders/folder-update';
 export * from './messages/message-create';
 export * from './nodes/node-collaborator-create';

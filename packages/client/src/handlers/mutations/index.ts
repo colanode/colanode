@@ -35,7 +35,6 @@ import { DocumentUpdateMutationHandler } from './documents/document-update';
 import { FileCreateMutationHandler } from './files/file-create';
 import { FileDownloadMutationHandler } from './files/file-download';
 import { TempFileCreateMutationHandler } from './files/temp-file-create';
-import { FolderCreateMutationHandler } from './folders/folder-create';
 import { FolderUpdateMutationHandler } from './folders/folder-update';
 import { MessageCreateMutationHandler } from './messages/message-create';
 import { NodeCollaboratorCreateMutationHandler } from './nodes/node-collaborator-create';
@@ -117,7 +116,6 @@ export const buildMutationHandlerMap = (
     'workspace.update': new WorkspaceUpdateMutationHandler(app),
     'avatar.upload': new AvatarUploadMutationHandler(app),
     'account.logout': new AccountLogoutMutationHandler(app),
-    'folder.create': new FolderCreateMutationHandler(app),
     'file.create': new FileCreateMutationHandler(app),
     'file.download': new FileDownloadMutationHandler(app),
     'space.update': new SpaceUpdateMutationHandler(app),

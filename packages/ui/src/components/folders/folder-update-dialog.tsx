@@ -43,13 +43,12 @@ export const FolderUpdateDialog = ({
             name: folder.attributes.name,
             avatar: folder.attributes.avatar,
           }}
-          isPending={isPending}
           submitText="Update"
           readOnly={!canEdit}
-          handleCancel={() => {
+          onCancel={() => {
             onOpenChange(false);
           }}
-          handleSubmit={(values) => {
+          onSubmit={(values) => {
             if (isPending) {
               return;
             }

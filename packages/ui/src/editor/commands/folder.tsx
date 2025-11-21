@@ -1,6 +1,8 @@
 import { Folder } from 'lucide-react';
 
-import { EditorCommand } from '@colanode/client/types';
+import { EditorCommand, LocalFolderNode } from '@colanode/client/types';
+import { generateId, IdType } from '@colanode/core/lib/id.js';
+import { collections } from '@colanode/ui/collections';
 
 export const FolderCommand: EditorCommand = {
   key: 'folder',
@@ -14,19 +16,30 @@ export const FolderCommand: EditorCommand = {
       return;
     }
 
-    const { userId, documentId } = context;
-    const output = await window.colanode.executeMutation({
-      type: 'folder.create',
-      name: 'Untitled',
-      avatar: null,
-      userId,
-      parentId: documentId,
-      generateIndex: false,
-    });
+    const { userId, documentId, rootId } = context;
+    const folderId = generateId(IdType.Folder);
+    const nodes = collections.workspace(userId).nodes;
 
-    if (!output.success) {
-      return;
-    }
+    const folder: LocalFolderNode = {
+      id: folderId,
+      type: 'folder',
+      attributes: {
+        type: 'folder',
+        name: 'Untitled',
+        avatar: null,
+        parentId: documentId,
+      },
+      parentId: documentId,
+      rootId: rootId,
+      createdAt: new Date().toISOString(),
+      createdBy: userId,
+      updatedAt: null,
+      updatedBy: null,
+      localRevision: '0',
+      serverRevision: '0',
+    };
+
+    nodes.insert(folder);
 
     editor
       .chain()
@@ -35,7 +48,7 @@ export const FolderCommand: EditorCommand = {
       .insertContent({
         type: 'folder',
         attrs: {
-          id: output.output.id,
+          id: folder.id,
         },
       })
       .run();
