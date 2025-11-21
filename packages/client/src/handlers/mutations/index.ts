@@ -24,9 +24,6 @@ import { FieldNameUpdateMutationHandler } from './databases/field-name-update';
 import { SelectOptionCreateMutationHandler } from './databases/select-option-create';
 import { SelectOptionDeleteMutationHandler } from './databases/select-option-delete';
 import { SelectOptionUpdateMutationHandler } from './databases/select-option-update';
-import { ViewCreateMutationHandler } from './databases/view-create';
-import { ViewDeleteMutationHandler } from './databases/view-delete';
-import { ViewNameUpdateMutationHandler } from './databases/view-name-update';
 import { ViewUpdateMutationHandler } from './databases/view-update';
 import { DocumentUpdateMutationHandler } from './documents/document-update';
 import { FileCreateMutationHandler } from './files/file-create';
@@ -66,7 +63,6 @@ export const buildMutationHandlerMap = (
     'email.register': new EmailRegisterMutationHandler(app),
     'email.verify': new EmailVerifyMutationHandler(app),
     'google.login': new GoogleLoginMutationHandler(app),
-    'view.create': new ViewCreateMutationHandler(app),
     'node.delete': new NodeDeleteMutationHandler(app),
     'node.create': new NodeCreateMutationHandler(app),
     'node.update': new NodeUpdateMutationHandler(app),
@@ -102,8 +98,6 @@ export const buildMutationHandlerMap = (
     'space.child.reorder': new SpaceChildReorderMutationHandler(app),
     'account.update': new AccountUpdateMutationHandler(app),
     'view.update': new ViewUpdateMutationHandler(app),
-    'view.delete': new ViewDeleteMutationHandler(app),
-    'view.name.update': new ViewNameUpdateMutationHandler(app),
     'document.update': new DocumentUpdateMutationHandler(app),
     'metadata.update': new MetadataUpdateMutationHandler(app),
     'metadata.delete': new MetadataDeleteMutationHandler(app),

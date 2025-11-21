@@ -4,9 +4,9 @@ import { Fragment, useState } from 'react';
 import { AvatarPopover } from '@colanode/ui/components/avatars/avatar-popover';
 import { FieldDeleteDialog } from '@colanode/ui/components/databases/fields/field-delete-dialog';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
-import { ViewDeleteDialog } from '@colanode/ui/components/databases/view-delete-dialog';
 import { ViewIcon } from '@colanode/ui/components/databases/view-icon';
 import { ViewSettingsButton } from '@colanode/ui/components/databases/view-settings-button';
+import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   Popover,
@@ -179,7 +179,9 @@ export const BoardViewSettings = () => {
         />
       )}
       {openDelete && (
-        <ViewDeleteDialog
+        <NodeDeleteDialog
+          title="Are you sure you want delete this view?"
+          description="This action cannot be undone. This view will no longer be accessible and all data in the view will be lost."
           id={view.id}
           open={openDelete}
           onOpenChange={setOpenDelete}
