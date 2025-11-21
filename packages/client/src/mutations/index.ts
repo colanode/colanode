@@ -45,7 +45,6 @@ export * from './records/record-field-value-set';
 export * from './records/record-name-update';
 export * from './servers/server-create';
 export * from './servers/server-delete';
-export * from './spaces/space-create';
 export * from './spaces/space-update';
 export * from './spaces/space-child-reorder';
 export * from './workspaces/workspace-create';

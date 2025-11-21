@@ -17,7 +17,6 @@ import {
   FormMessage,
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { Textarea } from '@colanode/ui/components/ui/textarea';
 import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { cn } from '@colanode/ui/lib/utils';
@@ -28,29 +27,27 @@ const formSchema = z.object({
   avatar: z.string().optional().nullable(),
 });
 
-type formSchemaType = z.infer<typeof formSchema>;
+export type SpaceFormValues = z.infer<typeof formSchema>;
 
 interface SpaceFormProps {
-  values?: formSchemaType;
-  onSubmit: (values: formSchemaType) => void;
-  isSaving: boolean;
+  values?: SpaceFormValues;
+  onSubmit: (values: SpaceFormValues) => void;
   onCancel?: () => void;
-  saveText: string;
+  submitText: string;
   readOnly?: boolean;
 }
 
 export const SpaceForm = ({
   values,
   onSubmit,
-  isSaving,
   onCancel,
-  saveText,
+  submitText,
   readOnly = false,
 }: SpaceFormProps) => {
   const id = useRef(generateId(IdType.Space));
   const isMobile = useIsMobile();
 
-  const form = useForm<formSchemaType>({
+  const form = useForm<SpaceFormValues>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       name: values?.name ?? '',
@@ -136,7 +133,6 @@ export const SpaceForm = ({
             {onCancel && (
               <Button
                 type="button"
-                disabled={isSaving}
                 variant="outline"
                 onClick={() => {
                   onCancel();
@@ -146,9 +142,8 @@ export const SpaceForm = ({
               </Button>
             )}
 
-            <Button type="submit" disabled={isSaving} className="w-20">
-              {isSaving && <Spinner className="mr-1" />}
-              {saveText}
+            <Button type="submit" disabled={readOnly} className="w-20">
+              {submitText}
             </Button>
           </div>
         )}

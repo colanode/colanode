@@ -16,7 +16,7 @@ interface SpaceContainerProps {
 
 export const SpaceContainer = ({ space, role }: SpaceContainerProps) => {
   const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
+  const { mutate } = useMutation();
 
   const canEdit = hasNodeRole(role, 'admin');
   const canDelete = hasNodeRole(role, 'admin');
@@ -53,8 +53,7 @@ export const SpaceContainer = ({ space, role }: SpaceContainerProps) => {
               },
             });
           }}
-          isSaving={isPending}
-          saveText="Update"
+          submitText="Update"
         />
       </div>
 

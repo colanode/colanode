@@ -57,7 +57,6 @@ import { ServerCreateMutationHandler } from './servers/server-create';
 import { ServerDeleteMutationHandler } from './servers/server-delete';
 import { ServerSyncMutationHandler } from './servers/server-sync';
 import { SpaceChildReorderMutationHandler } from './spaces/space-child-reorder';
-import { SpaceCreateMutationHandler } from './spaces/space-create';
 import { SpaceUpdateMutationHandler } from './spaces/space-update';
 import { UserRoleUpdateMutationHandler } from './users/user-role-update';
 import { UserStorageUpdateMutationHandler } from './users/user-storage-update';
@@ -109,7 +108,6 @@ export const buildMutationHandlerMap = (
     'server.create': new ServerCreateMutationHandler(app),
     'server.delete': new ServerDeleteMutationHandler(app),
     'server.sync': new ServerSyncMutationHandler(app),
-    'space.create': new SpaceCreateMutationHandler(app),
     'user.role.update': new UserRoleUpdateMutationHandler(app),
     'users.create': new UsersCreateMutationHandler(app),
     'workspace.create': new WorkspaceCreateMutationHandler(app),
