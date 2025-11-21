@@ -46,11 +46,8 @@ import { NodeInteractionOpenedMutationHandler } from './nodes/node-interaction-o
 import { NodeInteractionSeenMutationHandler } from './nodes/node-interaction-seen';
 import { NodeReactionCreateMutationHandler } from './nodes/node-reaction-create';
 import { NodeReactionDeleteMutationHandler } from './nodes/node-reaction-delete';
+import { NodeUpdateMutationHandler } from './nodes/node-update';
 import { PageUpdateMutationHandler } from './pages/page-update';
-import { RecordAvatarUpdateMutationHandler } from './records/record-avatar-update';
-import { RecordFieldValueDeleteMutationHandler } from './records/record-field-value-delete';
-import { RecordFieldValueSetMutationHandler } from './records/record-field-value-set';
-import { RecordNameUpdateMutationHandler } from './records/record-name-update';
 import { ServerCreateMutationHandler } from './servers/server-create';
 import { ServerDeleteMutationHandler } from './servers/server-delete';
 import { ServerSyncMutationHandler } from './servers/server-sync';
@@ -78,6 +75,7 @@ export const buildMutationHandlerMap = (
     'view.create': new ViewCreateMutationHandler(app),
     'node.delete': new NodeDeleteMutationHandler(app),
     'node.create': new NodeCreateMutationHandler(app),
+    'node.update': new NodeUpdateMutationHandler(app),
     'chat.create': new ChatCreateMutationHandler(app),
     'database.create': new DatabaseCreateMutationHandler(app),
     'database.name.field.update': new DatabaseNameFieldUpdateMutationHandler(
@@ -94,10 +92,6 @@ export const buildMutationHandlerMap = (
     'node.interaction.seen': new NodeInteractionSeenMutationHandler(app),
     'node.reaction.create': new NodeReactionCreateMutationHandler(app),
     'node.reaction.delete': new NodeReactionDeleteMutationHandler(app),
-    'record.avatar.update': new RecordAvatarUpdateMutationHandler(app),
-    'record.name.update': new RecordNameUpdateMutationHandler(app),
-    'record.field.value.delete': new RecordFieldValueDeleteMutationHandler(app),
-    'record.field.value.set': new RecordFieldValueSetMutationHandler(app),
     'select.option.create': new SelectOptionCreateMutationHandler(app),
     'select.option.delete': new SelectOptionDeleteMutationHandler(app),
     'select.option.update': new SelectOptionUpdateMutationHandler(app),

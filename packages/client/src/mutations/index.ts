@@ -37,10 +37,6 @@ export * from './nodes/node-interaction-seen';
 export * from './nodes/node-reaction-create';
 export * from './nodes/node-reaction-delete';
 export * from './pages/page-update';
-export * from './records/record-avatar-update';
-export * from './records/record-field-value-delete';
-export * from './records/record-field-value-set';
-export * from './records/record-name-update';
 export * from './servers/server-create';
 export * from './servers/server-delete';
 export * from './spaces/space-update';
@@ -58,6 +54,7 @@ export * from './servers/server-sync';
 export * from './apps/tab-delete';
 export * from './nodes/node-delete';
 export * from './nodes/node-create';
+export * from './nodes/node-update';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MutationMap {}

@@ -2,6 +2,7 @@ import { toast } from 'sonner';
 
 import { LocalRecordNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { RecordContext } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
@@ -34,29 +35,35 @@ export const RecordProvider = ({
         localRevision: record.localRevision,
         canEdit,
         updateFieldValue: async (field, value) => {
-          const result = await window.colanode.executeMutation({
-            type: 'record.field.value.set',
-            recordId: record.id,
-            fieldId: field.id,
-            value,
-            userId: workspace.userId,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
+          const nodes = collections.workspace(workspace.userId).nodes;
+          if (!nodes.has(record.id)) {
+            toast.error('Record not found');
+            return;
           }
+
+          nodes.update(record.id, (draft) => {
+            if (draft.type !== 'record') {
+              return;
+            }
+
+            draft.fields[field.id] = value;
+          });
         },
         removeFieldValue: async (field) => {
-          const result = await window.colanode.executeMutation({
-            type: 'record.field.value.delete',
-            recordId: record.id,
-            fieldId: field.id,
-            userId: workspace.userId,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
+          const nodes = collections.workspace(workspace.userId).nodes;
+          if (!nodes.has(record.id)) {
+            toast.error('Record not found');
+            return;
           }
+
+          nodes.update(record.id, (draft) => {
+            if (draft.type !== 'record') {
+              return;
+            }
+
+            const { [field.id]: _removed, ...rest } = draft.fields;
+            draft.fields = rest;
+          });
         },
         getBooleanValue: (field) => {
           const fieldValue = record.fields[field.id];

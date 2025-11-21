@@ -1,5 +1,5 @@
 import { createCollection } from '@tanstack/react-db';
-// import { cloneDeep } from 'lodash-es';
+import { cloneDeep } from 'lodash-es';
 
 import { mapNodeAttributes } from '@colanode/client/lib';
 import { LocalNode } from '@colanode/client/types';
@@ -73,17 +73,18 @@ export const createNodesCollection = (userId: string) => {
         });
       }
     },
-    // onUpdate: async ({ transaction }) => {
-    //   for (const mutation of transaction.mutations) {
-    //     const attributes = cloneDeep(mutation.modified.attributes);
-    //     await window.colanode.executeMutation({
-    //       type: 'node.update',
-    //       userId,
-    //       nodeId: mutation.key,
-    //       attributes,
-    //     });
-    //   }
-    // },
+    onUpdate: async ({ transaction }) => {
+      for (const mutation of transaction.mutations) {
+        const node = cloneDeep(mutation.modified);
+        const attributes = mapNodeAttributes(node);
+        await window.colanode.executeMutation({
+          type: 'node.update',
+          userId,
+          nodeId: mutation.key,
+          attributes,
+        });
+      }
+    },
     onDelete: async ({ transaction }) => {
       for (const mutation of transaction.mutations) {
         await window.colanode.executeMutation({
