@@ -1,13 +1,14 @@
-import { toast } from 'sonner';
-
 import { LocalSpaceNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { NodeCollaborators } from '@colanode/ui/components/collaborators/node-collaborators';
 import { SpaceDelete } from '@colanode/ui/components/spaces/space-delete';
-import { SpaceForm } from '@colanode/ui/components/spaces/space-form';
+import {
+  SpaceForm,
+  SpaceFormValues,
+} from '@colanode/ui/components/spaces/space-form';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface SpaceContainerProps {
   space: LocalSpaceNode;
@@ -16,10 +17,26 @@ interface SpaceContainerProps {
 
 export const SpaceContainer = ({ space, role }: SpaceContainerProps) => {
   const workspace = useWorkspace();
-  const { mutate } = useMutation();
 
   const canEdit = hasNodeRole(role, 'admin');
   const canDelete = hasNodeRole(role, 'admin');
+
+  const handleSubmit = (values: SpaceFormValues) => {
+    const nodes = collections.workspace(workspace.userId).nodes;
+    if (!nodes.has(space.id)) {
+      return;
+    }
+
+    nodes.update(space.id, (draft) => {
+      if (draft.type !== 'space') {
+        return;
+      }
+
+      draft.name = values.name;
+      draft.description = values.description;
+      draft.avatar = values.avatar;
+    });
+  };
 
   return (
     <div className="max-w-4xl space-y-8 w-full pb-10">
@@ -35,24 +52,7 @@ export const SpaceContainer = ({ space, role }: SpaceContainerProps) => {
             avatar: space.avatar ?? null,
           }}
           readOnly={!canEdit}
-          onSubmit={(values) => {
-            mutate({
-              input: {
-                type: 'space.update',
-                userId: workspace.userId,
-                spaceId: space.id,
-                name: values.name,
-                description: values.description,
-                avatar: values.avatar,
-              },
-              onSuccess() {
-                toast.success('Space updated');
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
-            });
-          }}
+          onSubmit={handleSubmit}
           submitText="Update"
         />
       </div>

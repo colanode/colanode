@@ -50,7 +50,6 @@ import { ServerCreateMutationHandler } from './servers/server-create';
 import { ServerDeleteMutationHandler } from './servers/server-delete';
 import { ServerSyncMutationHandler } from './servers/server-sync';
 import { SpaceChildReorderMutationHandler } from './spaces/space-child-reorder';
-import { SpaceUpdateMutationHandler } from './spaces/space-update';
 import { UserRoleUpdateMutationHandler } from './users/user-role-update';
 import { UserStorageUpdateMutationHandler } from './users/user-storage-update';
 import { UsersCreateMutationHandler } from './users/users-create';
@@ -104,7 +103,6 @@ export const buildMutationHandlerMap = (
     'account.logout': new AccountLogoutMutationHandler(app),
     'file.create': new FileCreateMutationHandler(app),
     'file.download': new FileDownloadMutationHandler(app),
-    'space.update': new SpaceUpdateMutationHandler(app),
     'space.child.reorder': new SpaceChildReorderMutationHandler(app),
     'account.update': new AccountUpdateMutationHandler(app),
     'view.update': new ViewUpdateMutationHandler(app),

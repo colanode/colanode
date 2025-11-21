@@ -37,7 +37,6 @@ export * from './nodes/node-reaction-delete';
 export * from './pages/page-update';
 export * from './servers/server-create';
 export * from './servers/server-delete';
-export * from './spaces/space-update';
 export * from './spaces/space-child-reorder';
 export * from './workspaces/workspace-create';
 export * from './workspaces/workspace-delete';
