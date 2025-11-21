@@ -17,9 +17,6 @@ import { EmailVerifyMutationHandler } from './auth/email-verify';
 import { GoogleLoginMutationHandler } from './auth/google-login';
 import { AvatarUploadMutationHandler } from './avatars/avatar-upload';
 import { ChatCreateMutationHandler } from './chats/chat-create';
-import { SelectOptionCreateMutationHandler } from './databases/select-option-create';
-import { SelectOptionDeleteMutationHandler } from './databases/select-option-delete';
-import { SelectOptionUpdateMutationHandler } from './databases/select-option-update';
 import { ViewUpdateMutationHandler } from './databases/view-update';
 import { DocumentUpdateMutationHandler } from './documents/document-update';
 import { FileCreateMutationHandler } from './files/file-create';
@@ -71,9 +68,6 @@ export const buildMutationHandlerMap = (
     'node.interaction.seen': new NodeInteractionSeenMutationHandler(app),
     'node.reaction.create': new NodeReactionCreateMutationHandler(app),
     'node.reaction.delete': new NodeReactionDeleteMutationHandler(app),
-    'select.option.create': new SelectOptionCreateMutationHandler(app),
-    'select.option.delete': new SelectOptionDeleteMutationHandler(app),
-    'select.option.update': new SelectOptionUpdateMutationHandler(app),
     'server.create': new ServerCreateMutationHandler(app),
     'server.delete': new ServerDeleteMutationHandler(app),
     'server.sync': new ServerSyncMutationHandler(app),

@@ -1,11 +1,15 @@
 import { Check, Plus, X } from 'lucide-react';
 import { Fragment, useState } from 'react';
-import { toast } from 'sonner';
 
 import {
+  compareString,
+  generateFractionalIndex,
+  generateId,
+  IdType,
   MultiSelectFieldAttributes,
   SelectFieldAttributes,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { SelectOptionBadge } from '@colanode/ui/components/databases/fields/select-option-badge';
 import { SelectOptionSettingsPopover } from '@colanode/ui/components/databases/fields/select-option-settings-popover';
 import {
@@ -18,7 +22,6 @@ import {
 } from '@colanode/ui/components/ui/command';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { getRandomSelectOptionColor } from '@colanode/ui/lib/databases';
 
 interface SelectFieldOptionsProps {
@@ -36,7 +39,6 @@ export const SelectFieldOptions = ({
 }: SelectFieldOptionsProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
-  const { mutate, isPending } = useMutation();
 
   const selectOptions = Object.values(field.options ?? {});
 
@@ -104,32 +106,54 @@ export const SelectFieldOptions = ({
               key={inputValue.trim()}
               value={inputValue.trim()}
               onSelect={() => {
-                if (isPending) {
-                  return;
-                }
-
                 if (inputValue.trim().length === 0) {
                   return;
                 }
 
-                mutate({
-                  input: {
-                    type: 'select.option.create',
-                    databaseId: database.id,
-                    fieldId: field.id,
+                const id = generateId(IdType.SelectOption);
+                const nodes = collections.workspace(workspace.userId).nodes;
+                nodes.update(database.id, (draft) => {
+                  if (draft.type !== 'database') {
+                    return;
+                  }
+
+                  const fieldAttributes = draft.fields[field.id];
+                  if (!fieldAttributes) {
+                    return;
+                  }
+
+                  if (
+                    fieldAttributes.type !== 'select' &&
+                    fieldAttributes.type !== 'multi_select'
+                  ) {
+                    return;
+                  }
+
+                  const selectOptions = {
+                    ...(fieldAttributes.options ?? {}),
+                  };
+
+                  const maxIndex = Object.values(selectOptions)
+                    .map((selectOption) => selectOption.index)
+                    .sort((a, b) => -compareString(a, b))[0];
+
+                  const index = generateFractionalIndex(maxIndex, null);
+                  selectOptions[id] = {
+                    id,
+                    index,
                     name: inputValue.trim(),
                     color,
-                    userId: workspace.userId,
-                  },
-                  onSuccess(output) {
-                    setInputValue('');
-                    setColor(getRandomSelectOptionColor());
-                    onSelect(output.id);
-                  },
-                  onError(error) {
-                    toast.error(error.message);
-                  },
+                  };
+
+                  draft.fields[field.id] = {
+                    ...fieldAttributes,
+                    options: selectOptions,
+                  };
                 });
+
+                onSelect(id);
+                setInputValue('');
+                setColor(getRandomSelectOptionColor());
               }}
               className="flex flex-row items-center gap-2"
             >

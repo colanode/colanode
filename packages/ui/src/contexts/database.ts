@@ -4,7 +4,6 @@ import {
   DatabaseNameFieldAttributes,
   FieldAttributes,
   NodeRole,
-  SelectOptionAttributes,
 } from '@colanode/core';
 
 interface DatabaseContext {
@@ -16,12 +15,6 @@ interface DatabaseContext {
   canCreateRecord: boolean;
   role: NodeRole;
   rootId: string;
-  createSelectOption: (fieldId: string, name: string, color: string) => void;
-  updateSelectOption: (
-    fieldId: string,
-    attributes: SelectOptionAttributes
-  ) => void;
-  deleteSelectOption: (fieldId: string, optionId: string) => void;
 }
 
 export const DatabaseContext = createContext<DatabaseContext>(
