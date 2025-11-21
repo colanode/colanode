@@ -4,7 +4,11 @@ import { toast } from 'sonner';
 import { match } from 'ts-pattern';
 
 import { mapNodeAttributes } from '@colanode/client/lib';
-import { LocalDatabaseViewNode, ViewField } from '@colanode/client/types';
+import {
+  LocalDatabaseViewNode,
+  LocalRecordNode,
+  ViewField,
+} from '@colanode/client/types';
 import {
   compareString,
   SortDirection,
@@ -13,7 +17,10 @@ import {
   DatabaseViewSortAttributes,
   SpecialId,
   DatabaseViewAttributes,
+  generateId,
+  IdType,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { BoardView } from '@colanode/ui/components/databases/boards/board-view';
 import { CalendarView } from '@colanode/ui/components/databases/calendars/calendar-view';
 import { TableView } from '@colanode/ui/components/databases/tables/table-view';
@@ -512,22 +519,31 @@ export const View = ({ view }: ViewProps) => {
             workspace.userId
           );
 
-          const result = await window.colanode.executeMutation({
-            type: 'record.create',
+          const recordId = generateId(IdType.Record);
+          const record: LocalRecordNode = {
+            id: recordId,
+            type: 'record',
+            parentId: database.id,
+            rootId: database.rootId,
             databaseId: database.id,
-            userId: workspace.userId,
+            name: '',
             fields,
-          });
+            createdAt: new Date().toISOString(),
+            createdBy: workspace.userId,
+            updatedAt: null,
+            updatedBy: null,
+            localRevision: '0',
+            serverRevision: '0',
+          };
 
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            navigate({
-              from: '/workspace/$userId/$nodeId',
-              to: 'modal/$modalNodeId',
-              params: { modalNodeId: result.output.id },
-            });
-          }
+          const nodes = collections.workspace(workspace.userId).nodes;
+          nodes.insert(record);
+
+          navigate({
+            from: '/workspace/$userId/$nodeId',
+            to: 'modal/$modalNodeId',
+            params: { modalNodeId: record.id },
+          });
         },
       }}
     >

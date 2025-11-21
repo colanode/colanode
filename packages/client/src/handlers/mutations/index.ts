@@ -48,7 +48,6 @@ import { NodeReactionCreateMutationHandler } from './nodes/node-reaction-create'
 import { NodeReactionDeleteMutationHandler } from './nodes/node-reaction-delete';
 import { PageUpdateMutationHandler } from './pages/page-update';
 import { RecordAvatarUpdateMutationHandler } from './records/record-avatar-update';
-import { RecordCreateMutationHandler } from './records/record-create';
 import { RecordFieldValueDeleteMutationHandler } from './records/record-field-value-delete';
 import { RecordFieldValueSetMutationHandler } from './records/record-field-value-set';
 import { RecordNameUpdateMutationHandler } from './records/record-name-update';
@@ -95,7 +94,6 @@ export const buildMutationHandlerMap = (
     'node.interaction.seen': new NodeInteractionSeenMutationHandler(app),
     'node.reaction.create': new NodeReactionCreateMutationHandler(app),
     'node.reaction.delete': new NodeReactionDeleteMutationHandler(app),
-    'record.create': new RecordCreateMutationHandler(app),
     'record.avatar.update': new RecordAvatarUpdateMutationHandler(app),
     'record.name.update': new RecordNameUpdateMutationHandler(app),
     'record.field.value.delete': new RecordFieldValueDeleteMutationHandler(app),

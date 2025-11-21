@@ -38,7 +38,6 @@ export * from './nodes/node-reaction-create';
 export * from './nodes/node-reaction-delete';
 export * from './pages/page-update';
 export * from './records/record-avatar-update';
-export * from './records/record-create';
 export * from './records/record-field-value-delete';
 export * from './records/record-field-value-set';
 export * from './records/record-name-update';

@@ -27,6 +27,7 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
         fields: Object.values(database.fields),
         canEdit,
         canCreateRecord,
+        rootId: database.rootId,
         createField: async (type, name) => {
           if (!canEdit) return;
 

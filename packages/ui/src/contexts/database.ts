@@ -16,6 +16,7 @@ interface DatabaseContext {
   canEdit: boolean;
   canCreateRecord: boolean;
   role: NodeRole;
+  rootId: string;
   createField: (type: FieldType, name: string) => void;
   renameField: (id: string, name: string) => void;
   updateNameField: (name: string) => void;
