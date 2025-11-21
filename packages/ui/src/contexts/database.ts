@@ -3,7 +3,6 @@ import { createContext, useContext } from 'react';
 import {
   DatabaseNameFieldAttributes,
   FieldAttributes,
-  FieldType,
   NodeRole,
   SelectOptionAttributes,
 } from '@colanode/core';
@@ -17,10 +16,6 @@ interface DatabaseContext {
   canCreateRecord: boolean;
   role: NodeRole;
   rootId: string;
-  createField: (type: FieldType, name: string) => void;
-  renameField: (id: string, name: string) => void;
-  updateNameField: (name: string) => void;
-  deleteField: (id: string) => void;
   createSelectOption: (fieldId: string, name: string, color: string) => void;
   updateSelectOption: (
     fieldId: string,

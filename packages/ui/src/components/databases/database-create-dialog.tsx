@@ -49,7 +49,7 @@ export const DatabaseCreateDialog = ({
         name: values.name,
         parentId: spaceId,
         fields: {
-          [generateId(IdType.Field)]: {
+          [fieldId]: {
             id: fieldId,
             type: 'text',
             index: generateFractionalIndex(null, null),

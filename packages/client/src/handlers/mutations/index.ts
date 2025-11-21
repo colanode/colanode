@@ -17,10 +17,6 @@ import { EmailVerifyMutationHandler } from './auth/email-verify';
 import { GoogleLoginMutationHandler } from './auth/google-login';
 import { AvatarUploadMutationHandler } from './avatars/avatar-upload';
 import { ChatCreateMutationHandler } from './chats/chat-create';
-import { DatabaseNameFieldUpdateMutationHandler } from './databases/database-name-field-update';
-import { FieldCreateMutationHandler } from './databases/field-create';
-import { FieldDeleteMutationHandler } from './databases/field-delete';
-import { FieldNameUpdateMutationHandler } from './databases/field-name-update';
 import { SelectOptionCreateMutationHandler } from './databases/select-option-create';
 import { SelectOptionDeleteMutationHandler } from './databases/select-option-delete';
 import { SelectOptionUpdateMutationHandler } from './databases/select-option-update';
@@ -67,12 +63,6 @@ export const buildMutationHandlerMap = (
     'node.create': new NodeCreateMutationHandler(app),
     'node.update': new NodeUpdateMutationHandler(app),
     'chat.create': new ChatCreateMutationHandler(app),
-    'database.name.field.update': new DatabaseNameFieldUpdateMutationHandler(
-      app
-    ),
-    'field.create': new FieldCreateMutationHandler(app),
-    'field.delete': new FieldDeleteMutationHandler(app),
-    'field.name.update': new FieldNameUpdateMutationHandler(app),
     'message.create': new MessageCreateMutationHandler(app),
     'node.collaborator.create': new NodeCollaboratorCreateMutationHandler(app),
     'node.collaborator.delete': new NodeCollaboratorDeleteMutationHandler(app),

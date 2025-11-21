@@ -32,7 +32,7 @@ export const DatabaseCommand: EditorCommand = {
       name: 'Untitled',
       parentId: documentId,
       fields: {
-        [generateId(IdType.Field)]: {
+        [fieldId]: {
           id: fieldId,
           type: 'text',
           index: generateFractionalIndex(null, null),

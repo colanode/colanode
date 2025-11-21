@@ -28,64 +28,6 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
         canEdit,
         canCreateRecord,
         rootId: database.rootId,
-        createField: async (type, name) => {
-          if (!canEdit) return;
-
-          const result = await window.colanode.executeMutation({
-            type: 'field.create',
-            databaseId: database.id,
-            name,
-            fieldType: type,
-            userId: workspace.userId,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          }
-        },
-        renameField: async (id, name) => {
-          if (!canEdit) return;
-
-          const result = await window.colanode.executeMutation({
-            type: 'field.name.update',
-            databaseId: database.id,
-            fieldId: id,
-            name,
-            userId: workspace.userId,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          }
-        },
-        updateNameField: async (name) => {
-          if (!canEdit) return;
-
-          const result = await window.colanode.executeMutation({
-            type: 'database.name.field.update',
-            databaseId: database.id,
-            name,
-            userId: workspace.userId,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          }
-        },
-        deleteField: async (id) => {
-          if (!canEdit) return;
-
-          const result = await window.colanode.executeMutation({
-            type: 'field.delete',
-            databaseId: database.id,
-            fieldId: id,
-            userId: workspace.userId,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          }
-        },
         createSelectOption: async (fieldId, name, color) => {
           if (!canEdit) return;
 
