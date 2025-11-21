@@ -9,7 +9,6 @@ export * from './auth/google-login';
 export * from './apps/metadata-delete';
 export * from './apps/metadata-update';
 export * from './avatars/avatar-upload';
-export * from './channels/channel-update';
 export * from './chats/chat-create';
 export * from './databases/database-create';
 export * from './databases/database-update';

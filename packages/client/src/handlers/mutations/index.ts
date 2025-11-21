@@ -16,7 +16,6 @@ import { EmailRegisterMutationHandler } from './auth/email-register';
 import { EmailVerifyMutationHandler } from './auth/email-verify';
 import { GoogleLoginMutationHandler } from './auth/google-login';
 import { AvatarUploadMutationHandler } from './avatars/avatar-upload';
-import { ChannelUpdateMutationHandler } from './channels/channel-update';
 import { ChatCreateMutationHandler } from './chats/chat-create';
 import { DatabaseCreateMutationHandler } from './databases/database-create';
 import { DatabaseNameFieldUpdateMutationHandler } from './databases/database-name-field-update';
@@ -112,7 +111,6 @@ export const buildMutationHandlerMap = (
     'view.update': new ViewUpdateMutationHandler(app),
     'view.delete': new ViewDeleteMutationHandler(app),
     'view.name.update': new ViewNameUpdateMutationHandler(app),
-    'channel.update': new ChannelUpdateMutationHandler(app),
     'page.update': new PageUpdateMutationHandler(app),
     'folder.update': new FolderUpdateMutationHandler(app),
     'database.update': new DatabaseUpdateMutationHandler(app),
