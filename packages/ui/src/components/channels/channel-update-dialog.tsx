@@ -45,13 +45,12 @@ export const ChannelUpdateDialog = ({
             name: channel.attributes.name,
             avatar: channel.attributes.avatar,
           }}
-          isPending={isPending}
           submitText="Update"
           readOnly={!canEdit}
-          handleCancel={() => {
+          onCancel={() => {
             onOpenChange(false);
           }}
-          handleSubmit={(values) => {
+          onSubmit={(values) => {
             if (isPending) {
               return;
             }

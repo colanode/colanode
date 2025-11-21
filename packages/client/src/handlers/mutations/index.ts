@@ -16,7 +16,6 @@ import { EmailRegisterMutationHandler } from './auth/email-register';
 import { EmailVerifyMutationHandler } from './auth/email-verify';
 import { GoogleLoginMutationHandler } from './auth/google-login';
 import { AvatarUploadMutationHandler } from './avatars/avatar-upload';
-import { ChannelCreateMutationHandler } from './channels/channel-create';
 import { ChannelUpdateMutationHandler } from './channels/channel-update';
 import { ChatCreateMutationHandler } from './chats/chat-create';
 import { DatabaseCreateMutationHandler } from './databases/database-create';
@@ -42,6 +41,7 @@ import { MessageCreateMutationHandler } from './messages/message-create';
 import { NodeCollaboratorCreateMutationHandler } from './nodes/node-collaborator-create';
 import { NodeCollaboratorDeleteMutationHandler } from './nodes/node-collaborator-delete';
 import { NodeCollaboratorUpdateMutationHandler } from './nodes/node-collaborator-update';
+import { NodeCreateMutationHandler } from './nodes/node-create';
 import { NodeDeleteMutationHandler } from './nodes/node-delete';
 import { NodeInteractionOpenedMutationHandler } from './nodes/node-interaction-opened';
 import { NodeInteractionSeenMutationHandler } from './nodes/node-interaction-seen';
@@ -80,8 +80,8 @@ export const buildMutationHandlerMap = (
     'email.verify': new EmailVerifyMutationHandler(app),
     'google.login': new GoogleLoginMutationHandler(app),
     'view.create': new ViewCreateMutationHandler(app),
-    'channel.create': new ChannelCreateMutationHandler(app),
     'node.delete': new NodeDeleteMutationHandler(app),
+    'node.create': new NodeCreateMutationHandler(app),
     'chat.create': new ChatCreateMutationHandler(app),
     'database.create': new DatabaseCreateMutationHandler(app),
     'database.name.field.update': new DatabaseNameFieldUpdateMutationHandler(

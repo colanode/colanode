@@ -9,7 +9,6 @@ export * from './auth/google-login';
 export * from './apps/metadata-delete';
 export * from './apps/metadata-update';
 export * from './avatars/avatar-upload';
-export * from './channels/channel-create';
 export * from './channels/channel-update';
 export * from './chats/chat-create';
 export * from './databases/database-create';
@@ -62,6 +61,7 @@ export * from './apps/tab-update';
 export * from './servers/server-sync';
 export * from './apps/tab-delete';
 export * from './nodes/node-delete';
+export * from './nodes/node-create';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface MutationMap {}

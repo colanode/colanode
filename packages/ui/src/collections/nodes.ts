@@ -60,15 +60,15 @@ export const createNodesCollection = (userId: string) => {
         };
       },
     },
-    // onInsert: async ({ transaction }) => {
-    //   for (const mutation of transaction.mutations) {
-    //     await window.colanode.executeMutation({
-    //       type: 'node.create',
-    //       userId,
-    //       node: mutation.modified,
-    //     });
-    //   }
-    // },
+    onInsert: async ({ transaction }) => {
+      for (const mutation of transaction.mutations) {
+        await window.colanode.executeMutation({
+          type: 'node.create',
+          userId,
+          node: mutation.modified,
+        });
+      }
+    },
     // onUpdate: async ({ transaction }) => {
     //   for (const mutation of transaction.mutations) {
     //     const attributes = cloneDeep(mutation.modified.attributes);
