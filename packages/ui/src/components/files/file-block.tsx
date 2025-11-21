@@ -1,7 +1,6 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { LocalFileNode } from '@colanode/client/types';
-import { collections } from '@colanode/ui/collections';
 import { FileIcon } from '@colanode/ui/components/files/file-icon';
 import { FilePreview } from '@colanode/ui/components/files/file-preview';
 import { Link } from '@colanode/ui/components/ui/link';
@@ -18,7 +17,7 @@ export const FileBlock = ({ id }: FileBlockProps) => {
   const fileGetQuery = useLiveQuery(
     (q) =>
       q
-        .from({ files: collections.workspace(workspace.userId).files })
+        .from({ files: workspace.collections.files })
         .where(({ files }) => eq(files.id, id))
         .findOne(),
     [workspace.userId, id]

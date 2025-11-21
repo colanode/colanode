@@ -1,7 +1,6 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 import { useEffect, useState } from 'react';
 
-import { collections } from '@colanode/ui/collections';
 import { View } from '@colanode/ui/components/databases/view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { DatabaseViewsContext } from '@colanode/ui/contexts/database-views';
@@ -19,7 +18,7 @@ export const DatabaseViews = ({ inline = false }: DatabaseViewsProps) => {
   const databaseViewListQuery = useLiveQuery(
     (q) =>
       q
-        .from({ views: collections.workspace(workspace.userId).views })
+        .from({ views: workspace.collections.views })
         .where(({ views }) => eq(views.parentId, database.id))
         .orderBy(({ views }) => views.index, 'asc'),
     [workspace.userId, database.id]

@@ -1,6 +1,5 @@
 import { LocalSpaceNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { NodeCollaborators } from '@colanode/ui/components/collaborators/node-collaborators';
 import { SpaceDelete } from '@colanode/ui/components/spaces/space-delete';
 import {
@@ -22,7 +21,7 @@ export const SpaceContainer = ({ space, role }: SpaceContainerProps) => {
   const canDelete = hasNodeRole(role, 'admin');
 
   const handleSubmit = (values: SpaceFormValues) => {
-    const nodes = collections.workspace(workspace.userId).nodes;
+    const nodes = workspace.collections.nodes;
     if (!nodes.has(space.id)) {
       return;
     }

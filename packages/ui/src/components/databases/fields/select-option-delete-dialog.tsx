@@ -1,4 +1,3 @@
-import { collections } from '@colanode/ui/collections';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -45,7 +44,7 @@ export const SelectOptionDeleteDialog = ({
           <Button
             variant="destructive"
             onClick={() => {
-              const nodes = collections.workspace(workspace.userId).nodes;
+              const nodes = workspace.collections.nodes;
               nodes.update(database.id, (draft) => {
                 if (draft.type !== 'database') {
                   return;

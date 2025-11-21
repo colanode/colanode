@@ -2,7 +2,6 @@ import { toast } from 'sonner';
 
 import { LocalRecordNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { RecordContext } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
@@ -35,7 +34,7 @@ export const RecordProvider = ({
         localRevision: record.localRevision,
         canEdit,
         updateFieldValue: async (field, value) => {
-          const nodes = collections.workspace(workspace.userId).nodes;
+          const nodes = workspace.collections.nodes;
           if (!nodes.has(record.id)) {
             toast.error('Record not found');
             return;
@@ -50,7 +49,7 @@ export const RecordProvider = ({
           });
         },
         removeFieldValue: async (field) => {
-          const nodes = collections.workspace(workspace.userId).nodes;
+          const nodes = workspace.collections.nodes;
           if (!nodes.has(record.id)) {
             toast.error('Record not found');
             return;

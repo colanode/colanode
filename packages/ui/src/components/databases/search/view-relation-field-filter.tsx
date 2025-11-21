@@ -6,7 +6,6 @@ import {
   DatabaseViewFieldFilterAttributes,
   RelationFieldAttributes,
 } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { RecordSearch } from '@colanode/ui/components/records/record-search';
@@ -64,12 +63,12 @@ export const ViewRelationFieldFilter = ({
     (q) => {
       if (relationIds.length === 0 || !field.databaseId) {
         return q
-          .from({ records: collections.workspace(workspace.userId).records })
+          .from({ records: workspace.collections.records })
           .where(({ records }) => eq(records.id, '')); // Return empty result
       }
 
       return q
-        .from({ records: collections.workspace(workspace.userId).records })
+        .from({ records: workspace.collections.records })
         .where(({ records }) => inArray(records.id, relationIds));
     },
     [workspace.userId, field.databaseId, relationIds]

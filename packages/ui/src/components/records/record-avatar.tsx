@@ -1,4 +1,3 @@
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { AvatarPopover } from '@colanode/ui/components/avatars/avatar-popover';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -27,7 +26,7 @@ export const RecordAvatar = () => {
       onPick={(avatar) => {
         if (avatar === record.avatar) return;
 
-        const nodes = collections.workspace(workspace.userId).nodes;
+        const nodes = workspace.collections.nodes;
         nodes.update(record.id, (draft) => {
           if (draft.type !== 'record') {
             return;

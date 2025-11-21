@@ -20,7 +20,6 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { BoardView } from '@colanode/ui/components/databases/boards/board-view';
 import { CalendarView } from '@colanode/ui/components/databases/calendars/calendar-view';
 import { TableView } from '@colanode/ui/components/databases/tables/table-view';
@@ -536,7 +535,7 @@ export const View = ({ view }: ViewProps) => {
             serverRevision: '0',
           };
 
-          const nodes = collections.workspace(workspace.userId).nodes;
+          const nodes = workspace.collections.nodes;
           nodes.insert(record);
 
           navigate({

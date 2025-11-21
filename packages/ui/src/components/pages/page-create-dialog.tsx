@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 
 import { LocalPageNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import {
   PageForm,
   PageFormValues,
@@ -34,7 +33,7 @@ export const PageCreateDialog = ({
   const { mutate } = useMutation({
     mutationFn: async (values: PageFormValues) => {
       const pageId = generateId(IdType.Page);
-      const nodes = collections.workspace(workspace.userId).nodes;
+      const nodes = workspace.collections.nodes;
 
       const page: LocalPageNode = {
         id: pageId,

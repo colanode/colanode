@@ -3,7 +3,6 @@ import { Fragment, useEffect, useRef } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { compareString } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Message } from '@colanode/ui/components/messages/message';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -18,7 +17,7 @@ export const MessageList = () => {
   const messageListQuery = useLiveInfiniteQuery(
     (q) =>
       q
-        .from({ messages: collections.workspace(workspace.userId).messages })
+        .from({ messages: workspace.collections.messages })
         .where(({ messages }) => eq(messages.parentId, conversation.id))
         .orderBy(({ messages }) => messages.id, 'desc'),
     {

@@ -3,7 +3,6 @@ import { BadgeAlert } from 'lucide-react';
 
 import { Upload, LocalFileNode } from '@colanode/client/types';
 import { formatBytes, timeAgo } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import { Link } from '@colanode/ui/components/ui/link';
 import { WorkspaceUploadStatus } from '@colanode/ui/components/workspaces/uploads/workspace-upload-status';
@@ -19,7 +18,7 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
   const fileQuery = useLiveQuery(
     (q) =>
       q
-        .from({ files: collections.workspace(workspace.userId).files })
+        .from({ files: workspace.collections.files })
         .where(({ files }) => eq(files.id, upload.fileId))
         .findOne(),
     [workspace.userId, upload.fileId]

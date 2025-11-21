@@ -59,7 +59,13 @@ export const Workspace = ({ userId }: WorkspaceProps) => {
   return (
     <ServerProvider domain={server}>
       <WorkspaceContext.Provider
-        value={{ accountId: accountId, workspaceId: workspaceId, userId, role }}
+        value={{
+          accountId: accountId,
+          workspaceId: workspaceId,
+          userId,
+          role,
+          collections: collections.workspace(userId),
+        }}
       >
         <WorkspaceLayout />
       </WorkspaceContext.Provider>

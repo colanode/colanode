@@ -27,7 +27,6 @@ import {
   SpecialId,
   isStringArray,
 } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
@@ -89,7 +88,7 @@ export const useRecordsInfiniteQuery = (
   const result = useLiveInfiniteQuery(
     (q) => {
       let query = q
-        .from({ records: collections.workspace(workspace.userId).records })
+        .from({ records: workspace.collections.records })
         .where(({ records }) => eq(records.databaseId, database.id));
 
       if (hasFilterDefinitions) {

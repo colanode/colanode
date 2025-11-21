@@ -2,7 +2,6 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 import { CircleX } from 'lucide-react';
 
 import { LocalMessageNode } from '@colanode/client/types';
-import { collections } from '@colanode/ui/collections';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 interface MessageReplyBannerProps {
@@ -18,7 +17,7 @@ export const MessageReplyBanner = ({
   const userQuery = useLiveQuery(
     (q) =>
       q
-        .from({ users: collections.workspace(workspace.userId).users })
+        .from({ users: workspace.collections.users })
         .where(({ users }) => eq(users.id, message.createdBy))
         .select(({ users }) => ({
           id: users.id,

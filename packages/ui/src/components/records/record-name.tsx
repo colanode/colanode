@@ -1,6 +1,5 @@
 import { useEffect, useRef } from 'react';
 
-import { collections } from '@colanode/ui/collections';
 import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -31,7 +30,7 @@ export const RecordName = () => {
           return;
         }
 
-        const nodes = collections.workspace(workspace.userId).nodes;
+        const nodes = workspace.collections.nodes;
         nodes.update(record.id, (draft) => {
           if (draft.type !== 'record') {
             return;

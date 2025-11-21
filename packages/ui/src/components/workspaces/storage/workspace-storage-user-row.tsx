@@ -3,7 +3,6 @@ import { Settings } from 'lucide-react';
 import { useState } from 'react';
 
 import { formatBytes, WorkspaceStorageUser } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import { TableCell, TableRow } from '@colanode/ui/components/ui/table';
@@ -61,7 +60,7 @@ export const WorkspaceStorageUserRow = ({
   const userQuery = useLiveQuery(
     (q) =>
       q
-        .from({ users: collections.workspace(workspace.userId).users })
+        .from({ users: workspace.collections.users })
         .where(({ users }) => eq(users.id, user.id))
         .select(({ users }) => ({
           id: users.id,

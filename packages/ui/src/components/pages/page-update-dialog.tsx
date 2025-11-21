@@ -1,6 +1,5 @@
 import { LocalPageNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import {
   PageForm,
   PageFormValues,
@@ -31,7 +30,7 @@ export const PageUpdateDialog = ({
   const canEdit = hasNodeRole(role, 'editor');
 
   const handleSubmit = (values: PageFormValues) => {
-    const nodes = collections.workspace(workspace.userId).nodes;
+    const nodes = workspace.collections.nodes;
     if (!nodes.has(page.id)) {
       return;
     }

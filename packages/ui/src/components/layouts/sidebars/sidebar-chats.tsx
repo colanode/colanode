@@ -1,6 +1,5 @@
 import { useLiveQuery } from '@tanstack/react-db';
 
-import { collections } from '@colanode/ui/collections';
 import { ChatCreatePopover } from '@colanode/ui/components/chats/chat-create-popover';
 import { ChatSidebarItem } from '@colanode/ui/components/chats/chat-sidebar-item';
 import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
@@ -13,7 +12,7 @@ export const SidebarChats = () => {
   const chatListQuery = useLiveQuery(
     (q) =>
       q
-        .from({ chats: collections.workspace(workspace.userId).chats })
+        .from({ chats: workspace.collections.chats })
         .orderBy(({ chats }) => chats.id, 'asc'),
     [workspace.userId]
   );

@@ -27,7 +27,7 @@ import { createUploadsCollection } from '@colanode/ui/collections/uploads';
 import { createUsersCollection } from '@colanode/ui/collections/users';
 import { createWorkspacesCollection } from '@colanode/ui/collections/workspaces';
 
-class WorkspaceCollections {
+export class WorkspaceCollections {
   private readonly userId: string;
 
   public readonly users: Collection<User, string>;
@@ -99,7 +99,7 @@ class WorkspaceCollections {
   }
 }
 
-class AppCollections {
+export class AppCollections {
   public readonly servers = createServersCollection();
   public readonly accounts = createAccountsCollection();
   public readonly tabs = createTabsCollection();

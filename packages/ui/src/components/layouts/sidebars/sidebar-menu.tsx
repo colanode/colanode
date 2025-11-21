@@ -2,7 +2,6 @@ import { count, inArray, useLiveQuery } from '@tanstack/react-db';
 import { LayoutGrid, MessageCircle, Settings } from 'lucide-react';
 
 import { SidebarMenuType, UploadStatus } from '@colanode/client/types';
-import { collections } from '@colanode/ui/collections';
 import { SidebarMenuFooter } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-footer';
 import { SidebarMenuHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-header';
 import { SidebarMenuIcon } from '@colanode/ui/components/layouts/sidebars/sidebar-menu-icon';
@@ -24,7 +23,7 @@ export const SidebarMenu = ({ value, onChange }: SidebarMenuProps) => {
   const pendingUploadsQuery = useLiveQuery(
     (q) =>
       q
-        .from({ uploads: collections.workspace(workspace.userId).uploads })
+        .from({ uploads: workspace.collections.uploads })
         .where(({ uploads }) =>
           inArray(uploads.status, [
             UploadStatus.Pending,

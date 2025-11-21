@@ -4,7 +4,6 @@ import { Fragment, useState } from 'react';
 
 import { LocalRecordNode } from '@colanode/client/types';
 import { RelationFieldAttributes } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { RecordSearch } from '@colanode/ui/components/records/record-search';
 import { Badge } from '@colanode/ui/components/ui/badge';
@@ -46,12 +45,12 @@ export const RecordRelationValue = ({
     (q) => {
       if (relationIds.length === 0 || !field.databaseId) {
         return q
-          .from({ records: collections.workspace(workspace.userId).records })
+          .from({ records: workspace.collections.records })
           .where(({ records }) => eq(records.id, '')); // Return empty result
       }
 
       return q
-        .from({ records: collections.workspace(workspace.userId).records })
+        .from({ records: workspace.collections.records })
         .where(({ records }) => inArray(records.id, relationIds));
     },
     [workspace.userId, field.databaseId, relationIds]

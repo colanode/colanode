@@ -1,6 +1,5 @@
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import {
   DatabaseForm,
   DatabaseFormValues,
@@ -31,7 +30,7 @@ export const DatabaseUpdateDialog = ({
   const canEdit = hasNodeRole(role, 'editor');
 
   const handleSubmit = (values: DatabaseFormValues) => {
-    const nodes = collections.workspace(workspace.userId).nodes;
+    const nodes = workspace.collections.nodes;
     if (!nodes.has(database.id)) {
       return;
     }

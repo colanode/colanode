@@ -2,7 +2,6 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewWrapper } from '@tiptap/react';
 
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -19,7 +18,7 @@ export const FolderNodeView = ({ node }: NodeViewProps) => {
   const folderGetQuery = useLiveQuery(
     (q) =>
       q
-        .from({ folders: collections.workspace(workspace.userId).folders })
+        .from({ folders: workspace.collections.folders })
         .where(({ folders }) => eq(folders.id, id))
         .select(({ folders }) => ({
           id: folders.id,

@@ -1,6 +1,5 @@
 import { useLiveQuery } from '@tanstack/react-db';
 
-import { collections } from '@colanode/ui/collections';
 import { Container } from '@colanode/ui/components/layouts/containers/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { WorkspaceDownloadFile } from '@colanode/ui/components/workspaces/downloads/workspace-download-file';
@@ -13,7 +12,7 @@ export const WorkspaceDownloadsContainer = () => {
   const downloadsQuery = useLiveQuery(
     (q) =>
       q
-        .from({ downloads: collections.workspace(workspace.userId).downloads })
+        .from({ downloads: workspace.collections.downloads })
         .select(({ downloads }) => downloads)
         .orderBy(({ downloads }) => downloads.id, 'desc'),
     [workspace.userId]

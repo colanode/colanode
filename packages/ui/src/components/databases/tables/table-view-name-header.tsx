@@ -4,7 +4,6 @@ import { Fragment, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 
 import { SpecialId } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import {
   Popover,
   PopoverContent,
@@ -93,7 +92,7 @@ export const TableViewNameHeader = () => {
               readOnly={!database.canEdit}
               onChange={(newName) => {
                 if (newName === database.nameField?.name) return;
-                const nodes = collections.workspace(workspace.userId).nodes;
+                const nodes = workspace.collections.nodes;
                 nodes.update(database.id, (draft) => {
                   if (draft.type !== 'database') {
                     return;

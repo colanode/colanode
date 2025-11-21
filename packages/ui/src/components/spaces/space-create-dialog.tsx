@@ -3,7 +3,6 @@ import { toast } from 'sonner';
 
 import { LocalPageNode, LocalSpaceNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import {
   SpaceForm,
   SpaceFormValues,
@@ -30,7 +29,7 @@ export const SpaceCreateDialog = ({
 
   const { mutate } = useMutation({
     mutationFn: async (values: SpaceFormValues) => {
-      const nodes = collections.workspace(workspace.userId).nodes;
+      const nodes = workspace.collections.nodes;
 
       const spaceId = generateId(IdType.Space);
       const space: LocalSpaceNode = {

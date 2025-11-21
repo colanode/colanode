@@ -3,7 +3,6 @@ import { useNavigate } from '@tanstack/react-router';
 import { match } from 'ts-pattern';
 
 import { FolderLayoutType } from '@colanode/client/types';
-import { collections } from '@colanode/ui/collections';
 import { GalleryLayout } from '@colanode/ui/components/folders/galleries/gallery-layout';
 import { GridLayout } from '@colanode/ui/components/folders/grids/grid-layout';
 import { ListLayout } from '@colanode/ui/components/folders/lists/list-layout';
@@ -29,7 +28,7 @@ export const FolderFiles = ({
   const fileListQuery = useLiveInfiniteQuery(
     (q) =>
       q
-        .from({ files: collections.workspace(workspace.userId).files })
+        .from({ files: workspace.collections.files })
         .where(({ files }) => eq(files.parentId, id))
         .orderBy(({ files }) => files.id, 'asc'),
     {

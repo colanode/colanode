@@ -2,7 +2,6 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 import { type NodeViewProps } from '@tiptap/core';
 import { NodeViewWrapper } from '@tiptap/react';
 
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { defaultClasses } from '@colanode/ui/editor/classes';
@@ -14,7 +13,7 @@ export const MentionNodeView = ({ node }: NodeViewProps) => {
   const userQuery = useLiveQuery(
     (q) =>
       q
-        .from({ users: collections.workspace(workspace.userId).users })
+        .from({ users: workspace.collections.users })
         .where(({ users }) => eq(users.id, target))
         .select(({ users }) => ({
           id: users.id,

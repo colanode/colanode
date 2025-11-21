@@ -7,7 +7,6 @@ import {
   LocalDatabaseViewNode,
 } from '@colanode/client/types';
 import { generateFractionalIndex, generateId, IdType } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import {
   DatabaseForm,
   DatabaseFormValues,
@@ -37,7 +36,7 @@ export const DatabaseCreateDialog = ({
 
   const { mutate } = useMutation({
     mutationFn: async (values: DatabaseFormValues) => {
-      const nodes = collections.workspace(workspace.userId).nodes;
+      const nodes = workspace.collections.nodes;
 
       const databaseId = generateId(IdType.Database);
       const fieldId = generateId(IdType.Field);

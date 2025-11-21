@@ -1,7 +1,6 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { LocalMessageNode } from '@colanode/client/types';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
@@ -18,7 +17,7 @@ export const MessageAuthorAvatar = ({
   const userQuery = useLiveQuery(
     (q) =>
       q
-        .from({ users: collections.workspace(workspace.userId).users })
+        .from({ users: workspace.collections.users })
         .where(({ users }) => eq(users.id, message.createdBy))
         .select(({ users }) => ({
           id: users.id,

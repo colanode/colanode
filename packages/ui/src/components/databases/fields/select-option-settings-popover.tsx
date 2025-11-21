@@ -2,7 +2,6 @@ import { Ellipsis, Trash2 } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
 import { SelectOptionAttributes } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { SelectOptionDeleteDialog } from '@colanode/ui/components/databases/fields/select-option-delete-dialog';
 import { Label } from '@colanode/ui/components/ui/label';
 import {
@@ -49,7 +48,7 @@ export const SelectOptionSettingsPopover = ({
               onChange={(newName) => {
                 if (newName === option.name) return;
 
-                const nodes = collections.workspace(workspace.userId).nodes;
+                const nodes = workspace.collections.nodes;
                 nodes.update(database.id, (draft) => {
                   if (draft.type !== 'database') {
                     return;
@@ -89,7 +88,7 @@ export const SelectOptionSettingsPopover = ({
                 key={color.value}
                 className="flex cursor-pointer flex-row items-center gap-2 rounded-md p-1 hover:bg-accent"
                 onClick={() => {
-                  const nodes = collections.workspace(workspace.userId).nodes;
+                  const nodes = workspace.collections.nodes;
                   nodes.update(database.id, (draft) => {
                     if (draft.type !== 'database') {
                       return;

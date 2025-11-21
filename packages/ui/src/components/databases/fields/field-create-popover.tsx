@@ -14,7 +14,6 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { DatabaseSelect } from '@colanode/ui/components/databases/database-select';
 import { FieldTypeSelect } from '@colanode/ui/components/databases/fields/field-type-select';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -93,7 +92,7 @@ export const FieldCreatePopover = ({
 
   const { mutate, isPending } = useMutation({
     mutationFn: async (values: FieldCreateFormValues) => {
-      const nodes = collections.workspace(workspace.userId).nodes;
+      const nodes = workspace.collections.nodes;
 
       if (values.type === 'relation') {
         if (!values.relationDatabaseId) {

@@ -2,7 +2,6 @@ import { useLiveQuery } from '@tanstack/react-db';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -33,7 +32,7 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
   const databaseListQuery = useLiveQuery(
     (q) =>
       q
-        .from({ databases: collections.workspace(workspace.userId).databases })
+        .from({ databases: workspace.collections.databases })
         .orderBy(({ databases }) => databases.id, 'asc'),
     []
   );

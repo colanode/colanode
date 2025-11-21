@@ -1,6 +1,5 @@
 import { LocalFolderNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import {
   FolderForm,
   FolderFormValues,
@@ -31,7 +30,7 @@ export const FolderUpdateDialog = ({
   const canEdit = hasNodeRole(role, 'editor');
 
   const handleSubmit = (values: FolderFormValues) => {
-    const nodes = collections.workspace(workspace.userId).nodes;
+    const nodes = workspace.collections.nodes;
     if (!nodes.has(folder.id)) {
       return;
     }

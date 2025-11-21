@@ -3,7 +3,6 @@ import { Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 import { NodeRole } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { NodeCollaboratorRoleDropdown } from '@colanode/ui/components/collaborators/node-collaborator-role-dropdown';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -30,7 +29,7 @@ export const NodeCollaborator = ({
   const userQuery = useLiveQuery(
     (q) =>
       q
-        .from({ users: collections.workspace(workspace.userId).users })
+        .from({ users: workspace.collections.users })
         .where(({ users }) => eq(users.id, collaboratorId))
         .select(({ users }) => ({
           id: users.id,

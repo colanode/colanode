@@ -3,7 +3,6 @@ import { SquareArrowOutUpRight } from 'lucide-react';
 import React, { Fragment } from 'react';
 
 import { RecordNode } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
@@ -65,7 +64,7 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
   const handleSave = (newName: string) => {
     if (newName === record.name) return;
 
-    const nodes = collections.workspace(workspace.userId).nodes;
+    const nodes = workspace.collections.nodes;
     nodes.update(record.id, (draft) => {
       if (draft.type !== 'record') {
         return;

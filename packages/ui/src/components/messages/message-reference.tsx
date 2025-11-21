@@ -1,7 +1,6 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { LocalMessageNode } from '@colanode/client/types';
-import { collections } from '@colanode/ui/collections';
 import { MessageAuthorAvatar } from '@colanode/ui/components/messages/message-author-avatar';
 import { MessageAuthorName } from '@colanode/ui/components/messages/message-author-name';
 import { MessageContent } from '@colanode/ui/components/messages/message-content';
@@ -16,7 +15,7 @@ export const MessageReference = ({ messageId }: MessageReferenceProps) => {
   const messageGetQuery = useLiveQuery(
     (q) =>
       q
-        .from({ messages: collections.workspace(workspace.userId).messages })
+        .from({ messages: workspace.collections.messages })
         .where(({ messages }) => eq(messages.id, messageId))
         .findOne(),
     [workspace.userId, messageId]

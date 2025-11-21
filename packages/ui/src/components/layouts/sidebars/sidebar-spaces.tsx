@@ -1,6 +1,5 @@
 import { useLiveQuery } from '@tanstack/react-db';
 
-import { collections } from '@colanode/ui/collections';
 import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
 import { SpaceCreateButton } from '@colanode/ui/components/spaces/space-create-button';
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
@@ -14,7 +13,7 @@ export const SidebarSpaces = () => {
   const spaceListQuery = useLiveQuery(
     (q) =>
       q
-        .from({ spaces: collections.workspace(workspace.userId).spaces })
+        .from({ spaces: workspace.collections.spaces })
         .orderBy(({ spaces }) => spaces.id, 'asc'),
     [workspace.userId]
   );

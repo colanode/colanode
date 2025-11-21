@@ -1,6 +1,5 @@
 import { useRouter } from '@tanstack/react-router';
 
-import { collections } from '@colanode/ui/collections';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -34,7 +33,7 @@ export const NodeDeleteDialog = ({
   // if the current node is opened in a modal we just navigate to the node route
   // if the current node is opened in a full screen view we just navigate to the home route
   const handleDelete = () => {
-    collections.workspace(workspace.userId).nodes.delete(id);
+    workspace.collections.nodes.delete(id);
     const matches = router.state.matches.toReversed();
 
     for (const match of matches) {

@@ -4,7 +4,6 @@ import { Folder } from 'lucide-react';
 
 import { LocalFileNode, Download } from '@colanode/client/types';
 import { formatBytes, timeAgo } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { FileIcon } from '@colanode/ui/components/files/file-icon';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import {
@@ -28,7 +27,7 @@ export const WorkspaceDownloadFile = ({
   const fileQuery = useLiveQuery(
     (q) =>
       q
-        .from({ files: collections.workspace(workspace.userId).files })
+        .from({ files: workspace.collections.files })
         .where(({ files }) => eq(files.id, download.fileId))
         .findOne(),
     [workspace.userId, download.fileId]

@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
 import { WorkspaceStorageUser } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -110,7 +109,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
   const userQuery = useLiveQuery(
     (q) =>
       q
-        .from({ users: collections.workspace(workspace.userId).users })
+        .from({ users: workspace.collections.users })
         .where(({ users }) => eq(users.id, user.id))
         .select(({ users }) => ({
           id: users.id,

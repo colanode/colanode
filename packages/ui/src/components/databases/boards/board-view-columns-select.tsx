@@ -5,7 +5,6 @@ import {
   SelectFieldAttributes,
   SelectOptionAttributes,
 } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
 import { SelectOptionBadge } from '@colanode/ui/components/databases/fields/select-option-badge';
 import { BoardViewContext } from '@colanode/ui/contexts/board-view';
@@ -89,7 +88,7 @@ export const BoardViewColumnsSelect = ({
               ),
               canDrag: (record) => record.canEdit,
               onDragEnd: async (record, value) => {
-                const nodes = collections.workspace(workspace.userId).nodes;
+                const nodes = workspace.collections.nodes;
                 if (!value) {
                   nodes.update(record.id, (draft) => {
                     if (draft.type !== 'record') {
@@ -133,7 +132,7 @@ export const BoardViewColumnsSelect = ({
           dragOverClass: noValueDraggingClass,
           canDrag: () => true,
           onDragEnd: async (record, value) => {
-            const nodes = collections.workspace(workspace.userId).nodes;
+            const nodes = workspace.collections.nodes;
             if (!value) {
               nodes.update(record.id, (draft) => {
                 if (draft.type !== 'record') {

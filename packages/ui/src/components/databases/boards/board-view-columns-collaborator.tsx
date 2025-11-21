@@ -6,7 +6,6 @@ import {
   DatabaseViewFilterAttributes,
   FieldValue,
 } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
 import { BoardViewContext } from '@colanode/ui/contexts/board-view';
@@ -80,7 +79,7 @@ export const BoardViewColumnsCollaborator = ({
               ),
               canDrag: (record) => record.canEdit,
               onDragEnd: async (record, value) => {
-                const nodes = collections.workspace(workspace.userId).nodes;
+                const nodes = workspace.collections.nodes;
                 if (!value) {
                   nodes.update(record.id, (draft) => {
                     if (draft.type !== 'record') {
@@ -144,7 +143,7 @@ export const BoardViewColumnsCollaborator = ({
           ),
           canDrag: () => true,
           onDragEnd: async (record, value) => {
-            const nodes = collections.workspace(workspace.userId).nodes;
+            const nodes = workspace.collections.nodes;
             if (!value) {
               nodes.update(record.id, (draft) => {
                 if (draft.type !== 'record') {
@@ -187,7 +186,7 @@ const BoardViewColumnCollaboratorHeader = ({
 
   const userQuery = useLiveQueryTanstack((q) =>
     q
-      .from({ users: collections.workspace(workspace.userId).users })
+      .from({ users: workspace.collections.users })
       .where(({ users }) => eq(users.id, collaborator))
       .select(({ users }) => ({
         id: users.id,

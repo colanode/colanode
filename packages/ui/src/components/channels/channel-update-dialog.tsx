@@ -1,6 +1,5 @@
 import { LocalChannelNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import {
   ChannelForm,
   ChannelFormValues,
@@ -31,7 +30,7 @@ export const ChannelUpdateDialog = ({
   const canEdit = hasNodeRole(role, 'editor');
 
   const handleSubmit = (values: ChannelFormValues) => {
-    const nodes = collections.workspace(workspace.userId).nodes;
+    const nodes = workspace.collections.nodes;
     if (!nodes.has(channel.id)) {
       return;
     }

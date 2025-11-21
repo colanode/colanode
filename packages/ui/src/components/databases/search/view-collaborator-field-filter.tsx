@@ -5,7 +5,6 @@ import {
   DatabaseViewFieldFilterAttributes,
   CollaboratorFieldAttributes,
 } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { Badge } from '@colanode/ui/components/ui/badge';
@@ -75,7 +74,7 @@ export const ViewCollaboratorFieldFilter = ({
   const collaboratorsQuery = useLiveQuery(
     (q) =>
       q
-        .from({ users: collections.workspace(workspace.userId).users })
+        .from({ users: workspace.collections.users })
         .where(({ users }) => inArray(users.id, collaboratorIds))
         .select(({ users }) => ({
           id: users.id,

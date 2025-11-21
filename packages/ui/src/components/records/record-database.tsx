@@ -2,7 +2,6 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { NodeRole } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Database } from '@colanode/ui/components/databases/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
@@ -18,7 +17,7 @@ export const RecordDatabase = ({ id, role, children }: RecordDatabaseProps) => {
   const databaseGetQuery = useLiveQuery(
     (q) =>
       q
-        .from({ databases: collections.workspace(workspace.userId).databases })
+        .from({ databases: workspace.collections.databases })
         .where(({ databases }) => eq(databases.id, id))
         .findOne(),
     [workspace.userId, id]

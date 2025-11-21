@@ -13,7 +13,6 @@ import {
   generateId,
   IdType,
 } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   Dialog,
@@ -100,7 +99,7 @@ export const ViewCreateDialog = ({
         name = type.name;
       }
 
-      const nodes = collections.workspace(workspace.userId).nodes;
+      const nodes = workspace.collections.nodes;
       let maxIndex: string | null = null;
       nodes.forEach((node) => {
         if (node.type === 'database_view' && node.parentId === database.id) {

@@ -6,7 +6,6 @@ import { toast } from 'sonner';
 
 import { LocalSpaceNode } from '@colanode/client/types';
 import { extractNodeRole } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { WorkspaceSidebarItem } from '@colanode/ui/components/layouts/sidebars/sidebar-item';
 import { SpaceSidebarDropdown } from '@colanode/ui/components/spaces/space-sidebar-dropdown';
@@ -35,7 +34,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const nodeChildrenGetQuery = useLiveQuery(
     (q) =>
       q
-        .from({ nodes: collections.workspace(workspace.userId).nodes })
+        .from({ nodes: workspace.collections.nodes })
         .where(({ nodes }) => eq(nodes.parentId, space.id)),
     [workspace.userId, space.id]
   );

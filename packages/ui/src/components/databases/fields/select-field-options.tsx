@@ -9,7 +9,6 @@ import {
   MultiSelectFieldAttributes,
   SelectFieldAttributes,
 } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { SelectOptionBadge } from '@colanode/ui/components/databases/fields/select-option-badge';
 import { SelectOptionSettingsPopover } from '@colanode/ui/components/databases/fields/select-option-settings-popover';
 import {
@@ -111,7 +110,7 @@ export const SelectFieldOptions = ({
                 }
 
                 const id = generateId(IdType.SelectOption);
-                const nodes = collections.workspace(workspace.userId).nodes;
+                const nodes = workspace.collections.nodes;
                 nodes.update(database.id, (draft) => {
                   if (draft.type !== 'database') {
                     return;
