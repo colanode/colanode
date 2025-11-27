@@ -1,9 +1,10 @@
+import { debounceStrategy, usePacedMutations } from '@tanstack/react-db';
 import { ArrowDownAz, ArrowDownZa, EyeOff, Filter, Trash2 } from 'lucide-react';
 import { Resizable } from 're-resizable';
-import { Fragment, useRef, useState } from 'react';
+import { Fragment, useCallback, useRef, useState } from 'react';
 import { useDrag, useDrop } from 'react-dnd';
 
-import { ViewField } from '@colanode/client/types';
+import { LocalNode, ViewField } from '@colanode/client/types';
 import { FieldDeleteDialog } from '@colanode/ui/components/databases/fields/field-delete-dialog';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { FieldRenameInput } from '@colanode/ui/components/databases/fields/field-rename-input';
@@ -15,7 +16,13 @@ import {
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
-import { isFilterableField, isSortableField } from '@colanode/ui/lib/databases';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import {
+  generateViewFieldIndex,
+  isFilterableField,
+  isSortableField,
+} from '@colanode/ui/lib/databases';
+import { applyNodeTransaction } from '@colanode/ui/lib/nodes';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface TableViewFieldHeaderProps {
@@ -25,11 +32,113 @@ interface TableViewFieldHeaderProps {
 export const TableViewFieldHeader = ({
   viewField,
 }: TableViewFieldHeaderProps) => {
+  const workspace = useWorkspace();
   const database = useDatabase();
   const view = useDatabaseView();
 
   const [openPopover, setOpenPopover] = useState(false);
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+
+  const resize = usePacedMutations<number, LocalNode>({
+    onMutate: (value) => {
+      workspace.collections.nodes.update(view.id, (draft) => {
+        if (draft.type !== 'database_view') {
+          return;
+        }
+
+        const fieldId = viewField.field.id;
+        const draftField = draft.fields?.[fieldId];
+        if (draftField && draftField.width === value) {
+          return;
+        }
+
+        if (draftField) {
+          draftField.width = value;
+          return;
+        }
+
+        draft.fields = {
+          ...draft.fields,
+          [fieldId]: {
+            id: fieldId,
+            width: value,
+          },
+        };
+      });
+    },
+    mutationFn: async ({ transaction }) => {
+      await applyNodeTransaction(workspace.userId, transaction);
+    },
+    strategy: debounceStrategy({ wait: 500 }),
+  });
+
+  const hide = useCallback(() => {
+    workspace.collections.nodes.update(view.id, (draft) => {
+      if (draft.type !== 'database_view') {
+        return;
+      }
+
+      const fieldId = viewField.field.id;
+      const draftField = draft.fields?.[fieldId];
+      if (draftField && draftField.display === false) {
+        return;
+      }
+
+      if (draftField) {
+        draftField.display = false;
+        return;
+      }
+
+      draft.fields = {
+        ...draft.fields,
+        [fieldId]: {
+          id: fieldId,
+          display: false,
+        },
+      };
+    });
+  }, [view.id]);
+
+  const move = useCallback(
+    (after: string) => {
+      workspace.collections.nodes.update(view.id, (draft) => {
+        if (draft.type !== 'database_view') {
+          return;
+        }
+
+        const newIndex = generateViewFieldIndex(
+          database.fields,
+          Object.values(draft.fields ?? {}),
+          viewField.field.id,
+          after
+        );
+
+        if (newIndex === null) {
+          return;
+        }
+
+        const fieldId = viewField.field.id;
+        const draftField = draft.fields?.[fieldId];
+        if (draftField && draftField.index === newIndex) {
+          return;
+        }
+
+        if (draftField) {
+          draftField.index = newIndex;
+          return;
+        }
+
+        draft.fields = {
+          ...draft.fields,
+          [fieldId]: {
+            id: fieldId,
+            index: newIndex,
+          },
+        };
+      });
+    },
+    [view.id]
+  );
 
   const [, dragRef] = useDrag<ViewField>({
     type: 'table-field-header',
@@ -39,7 +148,7 @@ export const TableViewFieldHeader = ({
       const dropResult = monitor.getDropResult<{ after: string }>();
       if (!dropResult?.after) return;
 
-      view.moveField(viewField.field.id, dropResult.after);
+      move(dropResult.after);
     },
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
@@ -95,9 +204,9 @@ export const TableViewFieldHeader = ({
             right: '-3px',
           },
         }}
-        onResizeStop={(_e, _direction, ref) => {
+        onResize={(_e, _direction, ref) => {
           const newWidth = ref.offsetWidth;
-          view.resizeField(viewField.field.id, newWidth);
+          resize(newWidth);
         }}
       >
         <Popover modal={true} open={openPopover} onOpenChange={setOpenPopover}>
@@ -159,9 +268,7 @@ export const TableViewFieldHeader = ({
             {database.canEdit && (
               <div
                 className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent rounded-sm"
-                onClick={() => {
-                  view.setFieldDisplay(viewField.field.id, false);
-                }}
+                onClick={hide}
               >
                 <EyeOff className="size-4" />
                 <span>Hide in view</span>

@@ -1,18 +1,35 @@
+import { useCallback } from 'react';
+
 import { FieldType } from '@colanode/core';
 import { FieldCreatePopover } from '@colanode/ui/components/databases/fields/field-create-popover';
 import { FieldSelect } from '@colanode/ui/components/databases/fields/field-select';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 const calendarGroupFields: FieldType[] = ['date', 'created_at', 'updated_at'];
 
 export const CalendarViewNoGroup = () => {
+  const workspace = useWorkspace();
   const database = useDatabase();
   const view = useDatabaseView();
 
   const possibleGroupByFields = database.fields.filter((field) =>
     calendarGroupFields.includes(field.type)
+  );
+
+  const handleFieldSelect = useCallback(
+    (fieldId: string) => {
+      workspace.collections.nodes.update(view.id, (draft) => {
+        if (draft.type !== 'database_view') {
+          return;
+        }
+
+        draft.groupBy = fieldId;
+      });
+    },
+    [view.id]
   );
 
   return (
@@ -26,9 +43,7 @@ export const CalendarViewNoGroup = () => {
             <FieldSelect
               fields={possibleGroupByFields}
               value={view.groupBy ?? null}
-              onChange={(fieldId) => {
-                view.setGroupBy(fieldId);
-              }}
+              onChange={handleFieldSelect}
             />
           </div>
         </div>
@@ -45,9 +60,7 @@ export const CalendarViewNoGroup = () => {
               </Button>
             }
             types={calendarGroupFields}
-            onSuccess={(fieldId) => {
-              view.setGroupBy(fieldId);
-            }}
+            onSuccess={handleFieldSelect}
           />
         </div>
       )}

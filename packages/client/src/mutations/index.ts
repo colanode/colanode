@@ -10,7 +10,6 @@ export * from './apps/metadata-delete';
 export * from './apps/metadata-update';
 export * from './avatars/avatar-upload';
 export * from './chats/chat-create';
-export * from './databases/view-update';
 export * from './documents/document-update';
 export * from './files/file-create';
 export * from './files/file-download';
