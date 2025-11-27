@@ -14,13 +14,21 @@ const ICONS_DB_PATH = path.resolve(ICONS_DIR, 'icons.db');
 const ICONS_MIN_DB_PATH = path.resolve(ICONS_DIR, 'icons.min.db');
 const ICONS_SVG_PATH = path.resolve(ICONS_DIR, 'icons.svg');
 
-const NEOTRAX_FONT_NAME = 'neotrax.otf';
+const SATOSHI_FONT_NAME = 'satoshi-variable.woff2';
+const SATOSHI_ITALIC_FONT_NAME = 'satoshi-variable-italic.woff2';
+const ANTONIO_FONT_NAME = 'antonio.ttf';
 const FONTS_DIR = path.resolve(ASSETS_DIR, 'fonts');
-const FONTS_OTF_PATH = path.resolve(FONTS_DIR, NEOTRAX_FONT_NAME);
+const FONTS_SATOSHI_PATH = path.resolve(FONTS_DIR, SATOSHI_FONT_NAME);
+const FONTS_SATOSHI_ITALIC_PATH = path.resolve(
+  FONTS_DIR,
+  SATOSHI_ITALIC_FONT_NAME
+);
+const FONTS_ANTONIO_PATH = path.resolve(FONTS_DIR, ANTONIO_FONT_NAME);
 
 const DESKTOP_ASSETS_DIR = path.resolve('apps', 'desktop', 'assets');
 const WEB_PUBLIC_DIR = path.resolve('apps', 'web', 'public');
 const WEB_ASSETS_DIR = path.resolve(WEB_PUBLIC_DIR, 'assets');
+const MOBILE_ASSETS_DIR = path.resolve('apps', 'mobile', 'assets');
 
 const copyFile = (source: string, target: string | string[]) => {
   if (!fs.existsSync(source)) {
@@ -41,24 +49,31 @@ const copyFile = (source: string, target: string | string[]) => {
 
 const execute = () => {
   copyFile(EMOJIS_DB_PATH, path.resolve(DESKTOP_ASSETS_DIR, 'emojis.db'));
+  copyFile(EMOJIS_DB_PATH, path.resolve(MOBILE_ASSETS_DIR, 'emojis.db'));
   copyFile(EMOJIS_MIN_DB_PATH, path.resolve(WEB_ASSETS_DIR, 'emojis.db'));
-
-  copyFile(EMOJI_SVG_PATH, [
-    path.resolve(DESKTOP_ASSETS_DIR, 'emojis.svg'),
-    path.resolve(WEB_ASSETS_DIR, 'emojis.svg'),
-  ]);
+  copyFile(EMOJI_SVG_PATH, path.resolve(WEB_ASSETS_DIR, 'emojis.svg'));
 
   copyFile(ICONS_DB_PATH, path.resolve(DESKTOP_ASSETS_DIR, 'icons.db'));
+  copyFile(ICONS_DB_PATH, path.resolve(MOBILE_ASSETS_DIR, 'icons.db'));
   copyFile(ICONS_MIN_DB_PATH, path.resolve(WEB_ASSETS_DIR, 'icons.db'));
+  copyFile(ICONS_SVG_PATH, path.resolve(WEB_ASSETS_DIR, 'icons.svg'));
 
-  copyFile(ICONS_SVG_PATH, [
-    path.resolve(DESKTOP_ASSETS_DIR, 'icons.svg'),
-    path.resolve(WEB_ASSETS_DIR, 'icons.svg'),
+  copyFile(FONTS_SATOSHI_PATH, [
+    path.resolve(DESKTOP_ASSETS_DIR, 'fonts', SATOSHI_FONT_NAME),
+    path.resolve(WEB_ASSETS_DIR, 'fonts', SATOSHI_FONT_NAME),
+    path.resolve(MOBILE_ASSETS_DIR, 'fonts', SATOSHI_FONT_NAME),
   ]);
 
-  copyFile(FONTS_OTF_PATH, [
-    path.resolve(DESKTOP_ASSETS_DIR, 'fonts', NEOTRAX_FONT_NAME),
-    path.resolve(WEB_ASSETS_DIR, 'fonts', NEOTRAX_FONT_NAME),
+  copyFile(FONTS_SATOSHI_ITALIC_PATH, [
+    path.resolve(DESKTOP_ASSETS_DIR, 'fonts', SATOSHI_ITALIC_FONT_NAME),
+    path.resolve(WEB_ASSETS_DIR, 'fonts', SATOSHI_ITALIC_FONT_NAME),
+    path.resolve(MOBILE_ASSETS_DIR, 'fonts', SATOSHI_ITALIC_FONT_NAME),
+  ]);
+
+  copyFile(FONTS_ANTONIO_PATH, [
+    path.resolve(DESKTOP_ASSETS_DIR, 'fonts', ANTONIO_FONT_NAME),
+    path.resolve(WEB_ASSETS_DIR, 'fonts', ANTONIO_FONT_NAME),
+    path.resolve(MOBILE_ASSETS_DIR, 'fonts', ANTONIO_FONT_NAME),
   ]);
 
   copyFile(

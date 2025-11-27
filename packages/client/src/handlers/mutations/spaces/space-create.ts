@@ -20,7 +20,7 @@ export class SpaceCreateMutationHandler
   async handleMutation(
     input: SpaceCreateMutationInput
   ): Promise<SpaceCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     if (!workspace) {
       throw new MutationError(

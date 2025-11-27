@@ -9,8 +9,7 @@ import { AppService } from '@colanode/client/services/app-service';
 
 export type MutationsSyncInput = {
   type: 'mutations.sync';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 declare module '@colanode/client/jobs' {
@@ -30,12 +29,18 @@ export class MutationsSyncJobHandler implements JobHandler<MutationsSyncInput> {
 
   public readonly concurrency: JobConcurrencyConfig<MutationsSyncInput> = {
     limit: 1,
-    key: (input: MutationsSyncInput) =>
-      `mutations.sync.${input.accountId}.${input.workspaceId}`,
+    key: (input: MutationsSyncInput) => `mutations.sync.${input.userId}`,
   };
 
   public async handleJob(input: MutationsSyncInput): Promise<JobOutput> {
-    const account = this.app.getAccount(input.accountId);
+    const workspace = this.app.getWorkspace(input.userId);
+    if (!workspace) {
+      return {
+        type: 'cancel',
+      };
+    }
+
+    const account = this.app.getAccount(workspace.accountId);
     if (!account) {
       return {
         type: 'cancel',
@@ -46,13 +51,6 @@ export class MutationsSyncJobHandler implements JobHandler<MutationsSyncInput> {
       return {
         type: 'retry',
         delay: ms('5 seconds'),
-      };
-    }
-
-    const workspace = account.getWorkspace(input.workspaceId);
-    if (!workspace) {
-      return {
-        type: 'cancel',
       };
     }
 

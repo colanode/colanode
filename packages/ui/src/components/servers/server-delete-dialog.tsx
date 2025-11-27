@@ -1,6 +1,6 @@
 import { toast } from 'sonner';
 
-import { ServerDetails } from '@colanode/client/types';
+import { Server } from '@colanode/client/types';
 import {
   AlertDialog,
   AlertDialogCancel,
@@ -18,7 +18,7 @@ import { useMutation } from '@colanode/ui/hooks/use-mutation';
 interface ServerDeleteDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  server: ServerDetails;
+  server: Server;
 }
 
 export const ServerDeleteDialog = ({

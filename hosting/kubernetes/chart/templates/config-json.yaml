@@ -1,0 +1,20 @@
+{{- $configFile := .Values.colanode.configFile -}}
+{{- if and $configFile.enabled (not $configFile.existingConfigMap) }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "colanode.configJsonConfigMapName" . | trim | quote }}
+  labels:
+    {{- include "colanode.labels" . | nindent 4 }}
+data:
+  {{ default "config.json" $configFile.key | quote }}: |
+{{ if $configFile.data }}
+{{- if kindIs "string" $configFile.data }}
+{{ $configFile.data | nindent 4 }}
+{{- else }}
+{{ $configFile.data | toPrettyJson | nindent 4 }}
+{{- end }}
+{{ else }}
+    {}
+{{ end }}
+{{- end }}

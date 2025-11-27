@@ -1,7 +1,6 @@
 export type ViewNameUpdateMutationInput = {
   type: 'view.name.update';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   databaseId: string;
   viewId: string;
   name: string;

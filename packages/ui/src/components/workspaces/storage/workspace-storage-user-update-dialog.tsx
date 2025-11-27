@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Check, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -6,6 +7,7 @@ import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
 import { WorkspaceStorageUser } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -34,7 +36,6 @@ import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
-import { useQuery } from '@colanode/ui/hooks/use-query';
 
 const UNITS = [
   { label: 'TB', value: 'TB', bytes: 1024 ** 4 },
@@ -106,12 +107,18 @@ export const WorkspaceStorageUserUpdateDialog = ({
     initialMaxFileSize.unit
   );
 
-  const userQuery = useQuery({
-    type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: user.id,
-  });
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, user.id))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+        email: users.email,
+      }))
+      .findOne()
+  );
 
   const name = userQuery.data?.name ?? 'Unknown';
   const email = userQuery.data?.email ?? '';
@@ -151,7 +158,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
       input: {
         type: 'user.storage.update',
         accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        workspaceId: workspace.workspaceId,
         userId: user.id,
         storageLimit: apiValues.storageLimit,
         maxFileSize: apiValues.maxFileSize,
@@ -183,7 +190,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
         </DialogHeader>
         <div className="flex items-center space-x-3 py-4 border-b">
           <Avatar id={user.id} name={name} avatar={avatar} />
-          <div className="flex-grow min-w-0">
+          <div className="grow min-w-0">
             <p className="text-sm font-medium leading-none truncate">{name}</p>
             <p className="text-sm text-muted-foreground truncate">{email}</p>
           </div>
@@ -193,7 +200,7 @@ export const WorkspaceStorageUserUpdateDialog = ({
             className="flex flex-col"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
-            <div className="flex-grow space-y-6 py-2 pb-4">
+            <div className="grow space-y-6 py-2 pb-4">
               <FormField
                 control={form.control}
                 name="storageLimit"

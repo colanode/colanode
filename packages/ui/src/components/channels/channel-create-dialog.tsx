@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import { generateId, IdType } from '@colanode/core';
@@ -9,8 +10,6 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
-import { useI18n } from '@colanode/ui/contexts/i18n';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -25,18 +24,17 @@ export const ChannelCreateDialog = ({
   open,
   onOpenChange,
 }: ChannelCreateDialogProps) => {
-  const { t } = useI18n();
   const workspace = useWorkspace();
-  const layout = useLayout();
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('channel.createChannel')}</DialogTitle>
+          <DialogTitle>Create channel</DialogTitle>
           <DialogDescription>
-            {t('channel.createChannelDescription')}
+            Create a new channel to collaborate with your peers
           </DialogDescription>
         </DialogHeader>
         <ChannelForm
@@ -45,7 +43,7 @@ export const ChannelCreateDialog = ({
             name: '',
           }}
           isPending={isPending}
-          submitText={t('common.create')}
+          submitText="Create"
           handleCancel={() => {
             onOpenChange(false);
           }}
@@ -60,12 +58,16 @@ export const ChannelCreateDialog = ({
                 spaceId: spaceId,
                 name: values.name,
                 avatar: values.avatar,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               },
               onSuccess(output) {
                 onOpenChange(false);
-                layout.openLeft(output.id);
+                navigate({
+                  to: '$nodeId',
+                  params: {
+                    nodeId: output.id,
+                  },
+                });
               },
               onError(error) {
                 toast.error(error.message);

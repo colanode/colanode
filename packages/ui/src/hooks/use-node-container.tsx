@@ -28,8 +28,7 @@ export const useNodeContainer = <T extends LocalNode>(
   const nodeTreeGetQuery = useLiveQuery({
     type: 'node.tree.get',
     nodeId: id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (nodeTreeGetQuery.isPending) {

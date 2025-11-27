@@ -1,7 +1,6 @@
 export type PageUpdateMutationInput = {
   type: 'page.update';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   pageId: string;
   avatar?: string | null;
   name: string;

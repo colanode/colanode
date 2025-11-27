@@ -1,0 +1,17 @@
+import { Outlet } from '@tanstack/react-router';
+
+import { SidebarDesktop } from '@colanode/ui/components/layouts/sidebars/sidebar-desktop';
+import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
+
+export const WorkspaceLayout = () => {
+  const isMobile = useIsMobile();
+
+  return (
+    <div className="w-full h-full flex">
+      {!isMobile && <SidebarDesktop />}
+      <section className="min-w-0 flex-1">
+        <Outlet />
+      </section>
+    </div>
+  );
+};

@@ -71,57 +71,55 @@ colanode:
   autoscaling:
     enabled: false
 
-  # -- Colanode server configuration
-  config:
-    # Core settings
-    NODE_ENV: production
-    PORT: 3000
-    SERVER_NAME: 'Colanode Kubernetes'
-    SERVER_AVATAR: ''
-    SERVER_MODE: 'standalone'
+  # -- Node runtime mode exposed as NODE_ENV. Even without colanode.configFile,
+  #    the container ships with a default config.json that references env://POSTGRES_URL
+  #    and env://REDIS_URL; this chart wires those automatically.
+  nodeEnv: production
 
-    # Logging Config
-    # Possible values: 'trace', 'debug', 'info', 'warn', 'error', 'fatal', 'silent'
-    # Defalt is 'info'
-    # LOGGING_LEVEL=info
+  # -- Additional env vars consumed via env:// pointers in config.json
+  #    Example (secret reference):
+  #    additionalEnv:
+  #      - name: ACCOUNT_GOOGLE_CLIENT_ID
+  #        valueFrom:
+  #          secretKeyRef:
+  #            name: google-oauth
+  #            key: clientId
+  additionalEnv: []
 
-    # Account settings
-    ACCOUNT_VERIFICATION_TYPE: 'automatic'
-    ACCOUNT_OTP_TIMEOUT: '600' # in seconds
-    ACCOUNT_ALLOW_GOOGLE_LOGIN: 'false'
+  # -- Extra volume mounts for file:// pointers (e.g., TLS certs). Combine with
+  #    colanode.extraVolumes below to mount Secrets/ConfigMaps into the pod.
+  #    Example: config.json contains "ca": "file://secrets/postgres-ca.crt".
+  #      extraVolumeMounts:
+  #        - name: postgres-ca
+  #          mountPath: /app/apps/server/secrets
+  #          readOnly: true
+  extraVolumeMounts: []
 
-    # Workspace limits. Leave empty for no limits
-    # WORKSPACE_STORAGE_LIMIT: '10737418240' # 10 GB
-    # WORKSPACE_MAX_FILE_SIZE: '104857600' # 100 MB
+  # -- Extra volumes referenced by extraVolumeMounts. Each item becomes a standard
+  #    Kubernetes volume definition. The example pairs with the mount above and
+  #    assumes a secret created via `kubectl create secret generic postgres-ca \
+  #    --from-file=postgres-ca.crt=./certs/rootCA.crt`.
+  #      extraVolumes:
+  #        - name: postgres-ca
+  #          secret:
+  #            secretName: postgres-ca
+  extraVolumes: []
 
-    # User limits
-    USER_STORAGE_LIMIT: '10737418240' # 10 GB
-    USER_MAX_FILE_SIZE: '104857600' # 100 MB
-
-    # Database connection (PostgreSQL)
-    POSTGRES_URL: 'postgres://colanode_user:$(POSTGRES_PASSWORD)@{{ .Release.Name }}-postgresql:5432/colanode_db'
-    # Optional SSL settings for PostgreSQL
-    # POSTGRES_SSL_REJECT_UNAUTHORIZED: "false"
-    # POSTGRES_SSL_CA: ""
-    # POSTGRES_SSL_KEY: ""
-    # POSTGRES_SSL_CERT: ""
-
-    # Redis/Valkey configuration
-    REDIS_DB: '0'
-    REDIS_JOBS_QUEUE_NAME: 'jobs'
-    REDIS_JOBS_QUEUE_PREFIX: 'colanode'
-    REDIS_TUS_LOCK_PREFIX: 'colanode:tus:lock'
-    REDIS_TUS_KV_PREFIX: 'colanode:tus:kv'
-    REDIS_EVENTS_CHANNEL: 'events'
-
-    # Email configuration
-    SMTP_ENABLED: 'false'
-    # SMTP_HOST: ""
-    # SMTP_PORT: "587"
-    # SMTP_USER: ""
-    # SMTP_PASSWORD: ""
-    # SMTP_EMAIL_FROM: ""
-    # SMTP_EMAIL_FROM_NAME: "Colanode"
+  # -- Optional config.json override
+  configFile:
+    enabled: false
+    # -- Reference an existing ConfigMap instead of inlining data
+    existingConfigMap: ''
+    # -- Name to give the generated ConfigMap (defaults to "<release>-config-json")
+    name: ''
+    # -- Key to use inside the ConfigMap
+    key: config.json
+    # -- Raw config.json content (use --set-file to load your version). When
+    #    disabled, the baked-in config.json remains in place and already expects
+    #    env://POSTGRES_URL and env://REDIS_URL, both supplied automatically by
+    #    this chart.
+    data: |
+      {}
 
   storage:
     # -- Storage backend type. Supported values: file, s3, gcs, azure

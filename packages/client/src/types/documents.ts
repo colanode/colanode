@@ -14,11 +14,11 @@ export type Document = {
 export type DocumentState = {
   id: string;
   revision: string;
-  state: Uint8Array;
+  state: string;
 };
 
 export type DocumentUpdate = {
   id: string;
   documentId: string;
-  data: Uint8Array;
+  data: string;
 };

@@ -1,8 +1,8 @@
-import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib/types';
 import { ServerListQueryInput } from '@colanode/client/queries/servers/server-list';
 import { AppService } from '@colanode/client/services/app-service';
+import { Server } from '@colanode/client/types';
 import { Event } from '@colanode/client/types/events';
-import { ServerDetails } from '@colanode/client/types/servers';
 
 export class ServerListQueryHandler
   implements QueryHandler<ServerListQueryInput>
@@ -13,34 +13,34 @@ export class ServerListQueryHandler
     this.app = app;
   }
 
-  async handleQuery(_: ServerListQueryInput): Promise<ServerDetails[]> {
+  public async handleQuery(_: ServerListQueryInput): Promise<Server[]> {
     return this.getServers();
   }
 
-  async checkForChanges(
-    event: Event,
-    _: ServerListQueryInput,
-    __: ServerDetails[]
+  public async checkForChanges(
+    event: Event
   ): Promise<ChangeCheckResult<ServerListQueryInput>> {
     if (event.type === 'server.created') {
+      const newServers = this.getServers();
       return {
         hasChanges: true,
-        result: this.getServers(),
+        result: newServers,
       };
-    } else if (event.type === 'server.updated') {
+    }
+
+    if (event.type === 'server.updated') {
+      const newServers = this.getServers();
       return {
         hasChanges: true,
-        result: this.getServers(),
+        result: newServers,
       };
-    } else if (event.type === 'server.deleted') {
+    }
+
+    if (event.type === 'server.deleted') {
+      const newServers = this.getServers();
       return {
         hasChanges: true,
-        result: this.getServers(),
-      };
-    } else if (event.type === 'server.availability.changed') {
-      return {
-        hasChanges: true,
-        result: this.getServers(),
+        result: newServers,
       };
     }
 
@@ -49,21 +49,7 @@ export class ServerListQueryHandler
     };
   }
 
-  private getServers(): ServerDetails[] {
-    const serverServices = this.app.getServers();
-    const result: ServerDetails[] = [];
-
-    for (const serverService of serverServices) {
-      const serverDetails: ServerDetails = {
-        ...serverService.server,
-        state: serverService.state,
-        isOutdated: serverService.isOutdated,
-        configUrl: serverService.configUrl,
-      };
-
-      result.push(serverDetails);
-    }
-
-    return result;
+  private getServers(): Server[] {
+    return this.app.getServers().map((server) => server.server);
   }
 }

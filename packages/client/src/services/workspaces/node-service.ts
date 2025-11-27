@@ -70,7 +70,7 @@ export class NodeService {
       user: {
         id: this.workspace.userId,
         role: this.workspace.role,
-        workspaceId: this.workspace.id,
+        workspaceId: this.workspace.workspaceId,
         accountId: this.workspace.accountId,
       },
       tree: tree,
@@ -201,16 +201,22 @@ export class NodeService {
 
     eventBus.publish({
       type: 'node.created',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       node: mapNode(createdNode),
     });
 
     for (const createdNodeReference of createdNodeReferences) {
       eventBus.publish({
         type: 'node.reference.created',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         nodeReference: mapNodeReference(createdNodeReference),
       });
     }
@@ -253,7 +259,7 @@ export class NodeService {
       user: {
         id: this.workspace.userId,
         role: this.workspace.role,
-        workspaceId: this.workspace.id,
+        workspaceId: this.workspace.workspaceId,
         accountId: this.workspace.accountId,
       },
       tree: tree,
@@ -391,8 +397,11 @@ export class NodeService {
 
       eventBus.publish({
         type: 'node.updated',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         node: mapNode(updatedNode),
       });
     } else {
@@ -406,8 +415,11 @@ export class NodeService {
     for (const createdNodeReference of createdNodeReferences) {
       eventBus.publish({
         type: 'node.reference.created',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         nodeReference: mapNodeReference(createdNodeReference),
       });
     }
@@ -415,8 +427,11 @@ export class NodeService {
     for (const deletedNodeReference of deletedNodeReferences) {
       eventBus.publish({
         type: 'node.reference.deleted',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         nodeReference: mapNodeReference(deletedNodeReference),
       });
     }
@@ -440,7 +455,7 @@ export class NodeService {
       user: {
         id: this.workspace.userId,
         role: this.workspace.role,
-        workspaceId: this.workspace.id,
+        workspaceId: this.workspace.workspaceId,
         accountId: this.workspace.accountId,
       },
       tree: tree,
@@ -502,8 +517,11 @@ export class NodeService {
 
     eventBus.publish({
       type: 'node.deleted',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       node: mapNode(deletedNode),
     });
 
@@ -517,8 +535,11 @@ export class NodeService {
       if (deletedUpload) {
         eventBus.publish({
           type: 'upload.deleted',
-          accountId: this.workspace.accountId,
-          workspaceId: this.workspace.id,
+          workspace: {
+            workspaceId: this.workspace.workspaceId,
+            userId: this.workspace.userId,
+            accountId: this.workspace.accountId,
+          },
           upload: mapUpload(deletedUpload),
         });
       }
@@ -542,8 +563,11 @@ export class NodeService {
         for (const updatedDownload of updatedDownloads) {
           eventBus.publish({
             type: 'download.updated',
-            accountId: this.workspace.accountId,
-            workspaceId: this.workspace.id,
+            workspace: {
+              workspaceId: this.workspace.workspaceId,
+              userId: this.workspace.userId,
+              accountId: this.workspace.accountId,
+            },
             download: mapDownload(updatedDownload),
           });
         }
@@ -660,16 +684,22 @@ export class NodeService {
 
     eventBus.publish({
       type: 'node.created',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       node: mapNode(createdNode),
     });
 
     for (const createdNodeReference of createdNodeReferences) {
       eventBus.publish({
         type: 'node.reference.created',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         nodeReference: mapNodeReference(createdNodeReference),
       });
     }
@@ -810,16 +840,22 @@ export class NodeService {
 
     eventBus.publish({
       type: 'node.updated',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       node: mapNode(updatedNode),
     });
 
     for (const createdNodeReference of createdNodeReferences) {
       eventBus.publish({
         type: 'node.reference.created',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         nodeReference: mapNodeReference(createdNodeReference),
       });
     }
@@ -827,8 +863,11 @@ export class NodeService {
     for (const deletedNodeReference of deletedNodeReferences) {
       eventBus.publish({
         type: 'node.reference.deleted',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         nodeReference: mapNodeReference(deletedNodeReference),
       });
     }
@@ -879,8 +918,11 @@ export class NodeService {
       if (deletedUpload) {
         eventBus.publish({
           type: 'upload.deleted',
-          accountId: this.workspace.accountId,
-          workspaceId: this.workspace.id,
+          workspace: {
+            workspaceId: this.workspace.workspaceId,
+            userId: this.workspace.userId,
+            accountId: this.workspace.accountId,
+          },
           upload: mapUpload(deletedUpload),
         });
       }
@@ -904,8 +946,11 @@ export class NodeService {
         for (const updatedDownload of updatedDownloads) {
           eventBus.publish({
             type: 'download.updated',
-            accountId: this.workspace.accountId,
-            workspaceId: this.workspace.id,
+            workspace: {
+              workspaceId: this.workspace.workspaceId,
+              userId: this.workspace.userId,
+              accountId: this.workspace.accountId,
+            },
             download: mapDownload(updatedDownload),
           });
         }
@@ -914,16 +959,22 @@ export class NodeService {
 
     eventBus.publish({
       type: 'node.deleted',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       node: mapNode(deletedNode),
     });
 
     for (const deletedCollaboration of deletedCollaborations) {
       eventBus.publish({
         type: 'collaboration.deleted',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         nodeId: deletedCollaboration.node_id,
       });
     }
@@ -960,16 +1011,22 @@ export class NodeService {
 
     eventBus.publish({
       type: 'node.deleted',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       node: mapNode(deletedNode),
     });
 
     for (const deletedCollaboration of deletedCollaborations) {
       eventBus.publish({
         type: 'collaboration.deleted',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         nodeId: deletedCollaboration.node_id,
       });
     }
@@ -1091,16 +1148,22 @@ export class NodeService {
     if (updatedNode) {
       eventBus.publish({
         type: 'node.updated',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         node: mapNode(updatedNode),
       });
 
       for (const createdNodeReference of createdNodeReferences) {
         eventBus.publish({
           type: 'node.reference.created',
-          accountId: this.workspace.accountId,
-          workspaceId: this.workspace.id,
+          workspace: {
+            workspaceId: this.workspace.workspaceId,
+            userId: this.workspace.userId,
+            accountId: this.workspace.accountId,
+          },
           nodeReference: mapNodeReference(createdNodeReference),
         });
       }
@@ -1108,8 +1171,11 @@ export class NodeService {
       for (const deletedNodeReference of deletedNodeReferences) {
         eventBus.publish({
           type: 'node.reference.deleted',
-          accountId: this.workspace.accountId,
-          workspaceId: this.workspace.id,
+          workspace: {
+            workspaceId: this.workspace.workspaceId,
+            userId: this.workspace.userId,
+            accountId: this.workspace.accountId,
+          },
           nodeReference: mapNodeReference(deletedNodeReference),
         });
       }
@@ -1185,8 +1251,11 @@ export class NodeService {
     if (createdNode) {
       eventBus.publish({
         type: 'node.created',
-        accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
         node: mapNode(createdNode),
       });
 

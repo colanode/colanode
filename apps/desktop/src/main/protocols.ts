@@ -1,9 +1,11 @@
 import { net } from 'electron';
 import path from 'path';
 
-import { app } from '@colanode/desktop/main/app-service';
+import { AssetService, PathService } from '@colanode/client/services';
 
 export const handleLocalRequest = async (
+  paths: PathService,
+  assets: AssetService | null,
   request: Request
 ): Promise<Response> => {
   const url = request.url.replace('local://', '');
@@ -20,14 +22,18 @@ export const handleLocalRequest = async (
       return new Response(null, { status: 400 });
     }
 
-    const emoji = await app.assets.emojis
+    if (!assets) {
+      return new Response(null, { status: 400 });
+    }
+
+    const emoji = await assets.emojis
       .selectFrom('emoji_svgs')
       .selectAll()
       .where('skin_id', '=', skinId)
       .executeTakeFirst();
 
     if (emoji) {
-      return new Response(emoji.svg, {
+      return new Response(emoji.svg.toString('utf-8'), {
         headers: {
           'Content-Type': 'image/svg+xml',
         },
@@ -41,14 +47,18 @@ export const handleLocalRequest = async (
       return new Response(null, { status: 400 });
     }
 
-    const icon = await app.assets.icons
+    if (!assets) {
+      return new Response(null, { status: 400 });
+    }
+
+    const icon = await assets.icons
       .selectFrom('icon_svgs')
       .selectAll()
       .where('id', '=', iconId)
       .executeTakeFirst();
 
     if (icon) {
-      return new Response(icon.svg, {
+      return new Response(icon.svg.toString('utf-8'), {
         headers: {
           'Content-Type': 'image/svg+xml',
         },
@@ -62,7 +72,7 @@ export const handleLocalRequest = async (
       return new Response(null, { status: 400 });
     }
 
-    const filePath = path.join(app.path.assets, 'fonts', fontName);
+    const filePath = path.join(paths.assets, 'fonts', fontName);
     const fileUrl = `file://${filePath}`;
     const subRequest = new Request(fileUrl, request);
     return net.fetch(subRequest);

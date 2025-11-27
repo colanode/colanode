@@ -1,14 +1,15 @@
 import { EventBus } from '@colanode/client/lib';
 import { MutationInput, MutationResult } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
-import { TempFile } from '@colanode/client/types';
+import { AppInitOutput, TempFile } from '@colanode/client/types';
 
 interface SaveDialogOptions {
   name: string;
 }
 
 export interface ColanodeWindowApi {
-  init: () => Promise<void>;
+  init: () => Promise<AppInitOutput>;
+  reset: () => Promise<void>;
   executeMutation: <T extends MutationInput>(
     input: T
   ) => Promise<MutationResult<T>>;

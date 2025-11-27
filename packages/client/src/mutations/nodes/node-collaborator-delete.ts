@@ -1,7 +1,6 @@
 export type NodeCollaboratorDeleteMutationInput = {
   type: 'node.collaborator.delete';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   nodeId: string;
   collaboratorId: string;
 };

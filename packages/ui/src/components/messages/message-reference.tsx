@@ -14,8 +14,7 @@ export const MessageReference = ({ messageId }: MessageReferenceProps) => {
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: messageId,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (nodeGetQuery.isPending) {
@@ -37,7 +36,7 @@ export const MessageReference = ({ messageId }: MessageReferenceProps) => {
   return (
     <div className="flex flex-row gap-2 border-l-4 p-2">
       <MessageAuthorAvatar message={message} className="size-5 mt-1" />
-      <div className='"flex-grow flex-col gap-1'>
+      <div className='"grow flex-col gap-1'>
         <MessageAuthorName message={message} />
         <MessageContent message={message} />
       </div>

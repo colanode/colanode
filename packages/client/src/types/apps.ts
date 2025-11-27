@@ -1,70 +1,28 @@
-import { ThemeColor, ThemeMode } from '@colanode/client/types';
+export type AppType = 'desktop' | 'web' | 'mobile';
 
-export type AppType = 'desktop' | 'web';
-
-export type WindowSize = {
+export type WindowState = {
+  fullscreen: boolean;
   width: number;
   height: number;
-  fullscreen: boolean;
+  x: number;
+  y: number;
 };
 
-export type AppPlatformMetadata = {
-  key: 'platform';
+export type Metadata = {
+  namespace: string;
+  key: string;
   value: string;
   createdAt: string;
   updatedAt: string | null;
 };
 
-export type AppVersionMetadata = {
-  key: 'version';
-  value: string;
+export type Tab = {
+  id: string;
+  location: string;
+  index: string;
+  lastActiveAt: string;
   createdAt: string;
   updatedAt: string | null;
 };
 
-export type AppWindowSizeMetadata = {
-  key: 'window.size';
-  value: WindowSize;
-  createdAt: string;
-  updatedAt: string | null;
-};
-
-export type AppAccountMetadata = {
-  key: 'account';
-  value: string;
-  createdAt: string;
-  updatedAt: string | null;
-};
-
-export type AppThemeModeMetadata = {
-  key: 'theme.mode';
-  value: ThemeMode;
-  createdAt: string;
-  updatedAt: string | null;
-};
-
-export type AppThemeColorMetadata = {
-  key: 'theme.color';
-  value: ThemeColor;
-  createdAt: string;
-  updatedAt: string | null;
-};
-
-export type AppMetadata =
-  | AppPlatformMetadata
-  | AppVersionMetadata
-  | AppWindowSizeMetadata
-  | AppAccountMetadata
-  | AppThemeModeMetadata
-  | AppThemeColorMetadata;
-
-export type AppMetadataKey = AppMetadata['key'];
-
-export type AppMetadataMap = {
-  platform: AppPlatformMetadata;
-  version: AppVersionMetadata;
-  'window.size': AppWindowSizeMetadata;
-  account: AppAccountMetadata;
-  'theme.mode': AppThemeModeMetadata;
-  'theme.color': AppThemeColorMetadata;
-};
+export type AppInitOutput = 'success' | 'reset' | 'error';

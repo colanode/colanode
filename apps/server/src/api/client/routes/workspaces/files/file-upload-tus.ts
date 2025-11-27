@@ -132,7 +132,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
 
           const userStorageUsed = await fetchCounter(
             database,
-            `${user.id}.storage.used`
+            `${user.id}.uploads.size`
           );
 
           if (userStorageUsed >= BigInt(user.storage_limit)) {
@@ -149,7 +149,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
           if (workspace.storage_limit) {
             const workspaceStorageUsed = await fetchCounter(
               database,
-              `${workspaceId}.storage.used`
+              `${workspaceId}.uploads.size`
             );
 
             if (workspaceStorageUsed >= BigInt(workspace.storage_limit)) {

@@ -16,7 +16,7 @@ export const FileCommand: EditorCommand = {
       return;
     }
 
-    const { accountId, workspaceId, documentId } = context;
+    const { userId, documentId } = context;
     const result = await openFileDialog();
 
     if (result.type === 'success') {
@@ -24,8 +24,7 @@ export const FileCommand: EditorCommand = {
         const output = await window.colanode.executeMutation({
           type: 'file.create',
           tempFileId: tempFile.id,
-          accountId,
-          workspaceId,
+          userId,
           parentId: documentId,
         });
 

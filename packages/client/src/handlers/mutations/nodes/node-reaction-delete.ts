@@ -12,7 +12,7 @@ export class NodeReactionDeleteMutationHandler
   async handleMutation(
     input: NodeReactionDeleteMutationInput
   ): Promise<NodeReactionDeleteMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     await workspace.nodeReactions.deleteNodeReaction(
       input.nodeId,
       input.reaction

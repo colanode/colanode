@@ -4,8 +4,7 @@ import { toast } from 'sonner';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { useAccount } from '@colanode/ui/contexts/account';
-import { useI18n } from '@colanode/ui/contexts/i18n';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { openFileDialog } from '@colanode/ui/lib/files';
 
@@ -14,8 +13,7 @@ interface AvatarUploadProps {
 }
 
 export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
-  const { t } = useI18n();
-  const account = useAccount();
+  const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
   const [url, setUrl] = useState<string | undefined>(undefined);
@@ -40,7 +38,7 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
         <Input
           type="text"
           name="url"
-          placeholder={t('ui.pasteImageLink')}
+          placeholder="Paste link to an image..."
           onChange={(e) => setUrl(e.target.value)}
           autoComplete="off"
         />
@@ -49,7 +47,7 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
           className="h-auto px-3 py-0 text-sm"
           disabled={!url}
         >
-          {t('common.submit')}
+          Submit
         </Button>
       </form>
       <Button
@@ -75,7 +73,7 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
             mutate({
               input: {
                 type: 'avatar.upload',
-                accountId: account.id,
+                accountId: workspace.accountId,
                 file,
               },
               onSuccess(output) {
@@ -91,11 +89,11 @@ export const AvatarUpload = ({ onUpload }: AvatarUploadProps) => {
         }}
       >
         {isPending && <Spinner className="mr-1" />}
-        {t('common.upload')} {t('file.file')}
+        Upload file
       </Button>
       <div className="mt-4 flex flex-col gap-2 text-center text-xs text-muted-foreground">
-        <div>{t('misc.recommendedSize', { width: '280', height: '280' })}</div>
-        <div>{t('misc.maxFileSize', { size: '5' })}</div>
+        <div>Recommended size is 280px x 280px</div>
+        <div>The maximum size per file is 5MB.</div>
       </div>
     </div>
   );

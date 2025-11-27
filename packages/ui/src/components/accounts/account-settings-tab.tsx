@@ -1,14 +1,12 @@
-import { Settings } from 'lucide-react';
-
-import { useI18n } from '@colanode/ui/contexts/i18n';
+import { TabItem } from '@colanode/ui/components/layouts/tabs/tab-item';
+import { defaultIcons } from '@colanode/ui/lib/assets';
 
 export const AccountSettingsTab = () => {
-  const { t } = useI18n();
-
   return (
-    <div className="flex items-center space-x-2">
-      <Settings className="size-4" />
-      <span>{t('account.accountSettings')}</span>
-    </div>
+    <TabItem
+      id="settings"
+      avatar={defaultIcons.settings}
+      name="Account Settings"
+    />
   );
 };

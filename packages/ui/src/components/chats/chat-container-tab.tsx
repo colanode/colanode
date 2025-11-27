@@ -1,4 +1,7 @@
+import { eq, useLiveQuery as useLiveQueryTanstack } from '@tanstack/react-db';
+
 import { LocalChatNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useRadar } from '@colanode/ui/contexts/radar';
@@ -20,8 +23,7 @@ export const ChatContainerTab = ({
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: chatId,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   const chat = nodeGetQuery.data as LocalChatNode;
@@ -31,16 +33,20 @@ export const ChatContainerTab = ({
       ) ?? '')
     : '';
 
-  const userGetQuery = useLiveQuery({
-    type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId,
-  });
+  const userQuery = useLiveQueryTanstack((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, userId))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
+  );
+  const user = userQuery.data;
 
-  const user = userGetQuery.data;
-
-  if (nodeGetQuery.isPending || userGetQuery.isPending) {
+  if (nodeGetQuery.isPending || userQuery.isLoading) {
     return <p className="text-sm text-muted-foreground">Loading...</p>;
   }
 
@@ -48,11 +54,7 @@ export const ChatContainerTab = ({
     return <p className="text-sm text-muted-foreground">Not found</p>;
   }
 
-  const unreadState = radar.getNodeState(
-    workspace.accountId,
-    workspace.id,
-    chat.id
-  );
+  const unreadState = radar.getNodeState(workspace.userId, chat.id);
 
   return (
     <div className="flex items-center space-x-2">

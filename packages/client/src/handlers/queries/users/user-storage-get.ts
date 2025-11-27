@@ -32,8 +32,7 @@ export class UserStorageGetQueryHandler
   ): Promise<ChangeCheckResult<UserStorageGetQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -47,8 +46,7 @@ export class UserStorageGetQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'file' &&
       event.node.attributes.status === FileStatus.Ready
     ) {
@@ -61,8 +59,7 @@ export class UserStorageGetQueryHandler
 
     if (
       event.type === 'node.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'file' &&
       event.node.attributes.status === FileStatus.Ready
     ) {
@@ -75,8 +72,7 @@ export class UserStorageGetQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'file' &&
       event.node.attributes.status === FileStatus.Ready
     ) {
@@ -95,7 +91,7 @@ export class UserStorageGetQueryHandler
   private async fetchStorage(
     input: UserStorageGetQueryInput
   ): Promise<UserStorageGetQueryOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const result = await sql<UserStorageAggregateRow>`
       SELECT 

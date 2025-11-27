@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
 import { match } from 'ts-pattern';
 
@@ -7,7 +8,6 @@ import { GalleryLayout } from '@colanode/ui/components/folders/galleries/gallery
 import { GridLayout } from '@colanode/ui/components/folders/grids/grid-layout';
 import { ListLayout } from '@colanode/ui/components/folders/lists/list-layout';
 import { FolderContext } from '@colanode/ui/contexts/folder';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
@@ -25,15 +25,14 @@ export const FolderFiles = ({
   layout: folderLayout,
 }: FolderFilesProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
+  const navigate = useNavigate({ from: '/workspace/$userId/$nodeId' });
 
   const [lastPage] = useState<number>(1);
   const inputs: FileListQueryInput[] = Array.from({
     length: lastPage,
   }).map((_, i) => ({
     type: 'file.list',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     parentId: id,
     count: FILES_PER_PAGE,
     page: i + 1,
@@ -52,7 +51,10 @@ export const FolderFiles = ({
           console.log('onClick');
         },
         onDoubleClick: (_, id) => {
-          layout.previewLeft(id, true);
+          navigate({
+            to: 'modal/$modalNodeId',
+            params: { modalNodeId: id },
+          });
         },
         onMove: () => {},
       }}

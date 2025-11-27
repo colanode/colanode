@@ -13,9 +13,8 @@ export const SidebarSpaces = () => {
 
   const spaceListQuery = useLiveQuery({
     type: 'space.list',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    parentId: workspace.id,
+    userId: workspace.userId,
+    parentId: workspace.workspaceId,
     page: 0,
     count: 100,
   });

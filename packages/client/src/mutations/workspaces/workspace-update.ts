@@ -4,7 +4,7 @@ export type WorkspaceUpdateMutationInput = {
   name: string;
   description: string;
   avatar: string | null;
-  accountId: string;
+  userId: string;
 };
 
 export type WorkspaceUpdateMutationOutput = {

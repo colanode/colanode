@@ -7,8 +7,7 @@ import { AppService } from '@colanode/client/services/app-service';
 
 export type WorkspaceFilesCleanInput = {
   type: 'workspace.files.clean';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 declare module '@colanode/client/jobs' {
@@ -32,18 +31,11 @@ export class WorkspaceFilesCleanJobHandler
     {
       limit: 1,
       key: (input: WorkspaceFilesCleanInput) =>
-        `workspace.files.clean.${input.accountId}.${input.workspaceId}`,
+        `workspace.files.clean.${input.userId}`,
     };
 
   public async handleJob(input: WorkspaceFilesCleanInput): Promise<JobOutput> {
-    const account = this.app.getAccount(input.accountId);
-    if (!account) {
-      return {
-        type: 'cancel',
-      };
-    }
-
-    const workspace = account.getWorkspace(input.workspaceId);
+    const workspace = this.app.getWorkspace(input.userId);
     if (!workspace) {
       return {
         type: 'cancel',

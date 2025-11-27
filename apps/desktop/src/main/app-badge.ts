@@ -31,8 +31,8 @@ export class AppBadge {
       return;
     }
 
-    const accounts = this.app.getAccounts();
-    if (accounts.length === 0) {
+    const workspaces = this.app.getWorkspaces();
+    if (workspaces.length === 0) {
       electronApp?.dock?.setBadge('');
       return;
     }
@@ -40,14 +40,10 @@ export class AppBadge {
     let hasUnread = false;
     let unreadCount = 0;
 
-    for (const account of accounts) {
-      const workspaces = account.getWorkspaces();
-
-      for (const workspace of workspaces) {
-        const radarData = workspace.radar.getData();
-        hasUnread = hasUnread || radarData.state.hasUnread;
-        unreadCount = unreadCount + radarData.state.unreadCount;
-      }
+    for (const workspace of workspaces) {
+      const radarData = workspace.radar.getData();
+      hasUnread = hasUnread || radarData.state.hasUnread;
+      unreadCount = unreadCount + radarData.state.unreadCount;
     }
 
     if (unreadCount > 0) {

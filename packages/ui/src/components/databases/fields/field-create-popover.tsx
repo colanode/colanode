@@ -91,8 +91,7 @@ export const FieldCreatePopover = ({
         databaseId: database.id,
         name: values.name,
         fieldType: values.type,
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        userId: workspace.userId,
         relationDatabaseId: values.relationDatabaseId,
       },
       onSuccess: (output) => {
@@ -113,13 +112,13 @@ export const FieldCreatePopover = ({
   return (
     <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>{button}</PopoverTrigger>
-      <PopoverContent className="mr-5 w-128" side="bottom">
+      <PopoverContent className="mr-5 w-lg" side="bottom">
         <Form {...form}>
           <form
             className="flex flex-col gap-2"
             onSubmit={form.handleSubmit(handleSubmit)}
           >
-            <div className="flex-grow space-y-4 py-2 pb-4">
+            <div className="grow space-y-4 py-2 pb-4">
               <FormField
                 control={form.control}
                 name="name"

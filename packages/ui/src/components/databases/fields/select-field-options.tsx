@@ -123,8 +123,7 @@ export const SelectFieldOptions = ({
                     fieldId: field.id,
                     name: inputValue.trim(),
                     color,
-                    accountId: workspace.accountId,
-                    workspaceId: workspace.id,
+                    userId: workspace.userId,
                   },
                   onSuccess(output) {
                     setInputValue('');

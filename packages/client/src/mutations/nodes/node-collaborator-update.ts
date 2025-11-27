@@ -1,7 +1,6 @@
 export type NodeCollaboratorUpdateMutationInput = {
   type: 'node.collaborator.update';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   nodeId: string;
   collaboratorId: string;
   role: string;

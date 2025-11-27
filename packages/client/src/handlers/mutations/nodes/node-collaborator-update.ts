@@ -16,7 +16,7 @@ export class NodeCollaboratorUpdateMutationHandler
   async handleMutation(
     input: NodeCollaboratorUpdateMutationInput
   ): Promise<NodeCollaboratorUpdateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const result = await workspace.nodes.updateNode(
       input.nodeId,

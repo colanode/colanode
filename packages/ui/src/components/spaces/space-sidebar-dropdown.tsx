@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import {
   Database,
   Ellipsis,
@@ -22,16 +23,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
-import { useI18n } from '@colanode/ui/contexts/i18n';
-import { useLayout } from '@colanode/ui/contexts/layout';
 
 interface SpaceSidebarDropdownProps {
   space: LocalSpaceNode;
 }
 
 export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
-  const { t } = useI18n();
-  const layout = useLayout();
+  const navigate = useNavigate({ from: '/workspace/$userId' });
 
   const [openCreatePage, setOpenCreatePage] = useState(false);
   const [openCreateChannel, setOpenCreateChannel] = useState(false);
@@ -56,43 +54,53 @@ export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <StickyNote className="size-4" />
-            <span>{t('misc.addPage')}</span>
+            <span>Add page</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => setOpenCreateChannel(true)}
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <MessageCircle className="size-4" />
-            <span>{t('misc.addChannel')}</span>
+            <span>Add channel</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => setOpenCreateDatabase(true)}
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <Database className="size-4" />
-            <span>{t('misc.addDatabase')}</span>
+            <span>Add database</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => setOpenCreateFolder(true)}
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <Folder className="size-4" />
-            <span>{t('misc.addFolder')}</span>
+            <span>Add folder</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
-            onClick={() => layout.previewLeft(space.id)}
+            onClick={() =>
+              navigate({
+                to: '$nodeId',
+                params: { nodeId: space.id },
+              })
+            }
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <Settings className="size-4" />
             <span>Settings</span>
           </DropdownMenuItem>
           <DropdownMenuItem
-            onClick={() => layout.previewLeft(space.id)}
+            onClick={() =>
+              navigate({
+                to: '$nodeId',
+                params: { nodeId: space.id },
+              })
+            }
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <Plus className="size-4" />
-            <span>{t('misc.addCollaborators')}</span>
+            <span>Add collaborators</span>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -105,7 +113,7 @@ export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
       )}
       {openCreatePage && (
         <PageCreateDialog
-          parentId={space.id}
+          spaceId={space.id}
           open={openCreatePage}
           onOpenChange={setOpenCreatePage}
         />
@@ -119,7 +127,7 @@ export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
       )}
       {openCreateFolder && (
         <FolderCreateDialog
-          parentId={space.id}
+          spaceId={space.id}
           open={openCreateFolder}
           onOpenChange={setOpenCreateFolder}
         />

@@ -1,7 +1,6 @@
 export type NodeInteractionOpenedMutationInput = {
   type: 'node.interaction.opened';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   nodeId: string;
 };
 

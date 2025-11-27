@@ -5,7 +5,7 @@ import {
   ServerDeleteMutationOutput,
 } from '@colanode/client/mutations/servers/server-delete';
 import { AppService } from '@colanode/client/services/app-service';
-import { isColanodeServer } from '@colanode/core';
+import { isColanodeDomain } from '@colanode/core';
 
 export class ServerDeleteMutationHandler
   implements MutationHandler<ServerDeleteMutationInput>
@@ -19,7 +19,7 @@ export class ServerDeleteMutationHandler
   async handleMutation(
     input: ServerDeleteMutationInput
   ): Promise<ServerDeleteMutationOutput> {
-    if (isColanodeServer(input.domain)) {
+    if (isColanodeDomain(input.domain)) {
       throw new MutationError(
         MutationErrorCode.ServerDeleteForbidden,
         'Cannot delete Colanode server'

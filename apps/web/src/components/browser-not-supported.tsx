@@ -1,52 +1,42 @@
 import { MonitorOff } from 'lucide-react';
 
-import { I18nProvider, useI18n } from '@colanode/ui/contexts/i18n';
-
-const BrowserNotSupportedContent = () => {
-  const { t } = useI18n();
-
+export const BrowserNotSupported = () => {
   return (
     <div className="min-w-screen flex h-full min-h-screen w-full items-center justify-center">
-      <div className="flex flex-col items-center gap-8 text-center w-128">
-        <MonitorOff className="h-10 w-10 text-gray-800" />
-        <h2 className="text-4xl text-gray-800">
-          {t('errors.browserNotSupported')}
-        </h2>
-        <p className="text-sm text-gray-500">
-          {t('errors.browserNotSupportedDescription')}
+      <div className="flex flex-col items-center gap-8 text-center w-lg">
+        <MonitorOff className="h-10 w-10 text-foreground" />
+        <h2 className="text-4xl text-foreground">Browser not supported</h2>
+        <p className="text-sm text-muted-foreground">
+          Unfortunately, your browser does not support the Origin Private File
+          System (OPFS) feature that Colanode requires to function properly.
         </p>
-        <p className="text-sm text-gray-500">
-          {t('errors.browserNotSupportedHttps')}
+        <p className="text-sm text-muted-foreground">
+          If you're self-hosting Colanode make sure you are accessing the web
+          version through a secure 'https' way, because some browsers require
+          HTTPS to use the features required.
         </p>
-        <p className="text-sm text-gray-500 mt-4">
-          {t('errors.browserNotSupportedAlternative')}{' '}
+        <p className="text-sm text-muted-foreground mt-4">
+          You can try using the{' '}
           <a
             href="https://colanode.com/downloads"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-500"
+            className="text-primary"
           >
-            {t('errors.desktopApp')}
+            Desktop app
           </a>{' '}
-          {t('errors.insteadOrTryAnother')}{' '}
+          instead or try another browser. If you think this is a mistake or you
+          have any questions, please open an issue on{' '}
           <a
             href="https://github.com/colanode/colanode"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-500"
+            className="text-primary"
           >
-            {t('errors.github')}
+            Github
           </a>
         </p>
       </div>
     </div>
-  );
-};
-
-export const BrowserNotSupported = () => {
-  return (
-    <I18nProvider>
-      <BrowserNotSupportedContent />
-    </I18nProvider>
   );
 };

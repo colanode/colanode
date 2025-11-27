@@ -1,4 +1,4 @@
-import { SelectWorkspace } from '@colanode/client/databases/account';
+import { SelectWorkspace } from '@colanode/client/databases/app';
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib';
 import { mapWorkspace } from '@colanode/client/lib/mappers';
 import { WorkspaceListQueryInput } from '@colanode/client/queries/workspaces/workspace-list';
@@ -15,10 +15,8 @@ export class WorkspaceListQueryHandler
     this.app = app;
   }
 
-  public async handleQuery(
-    input: WorkspaceListQueryInput
-  ): Promise<Workspace[]> {
-    const rows = await this.fetchWorkspaces(input.accountId);
+  public async handleQuery(): Promise<Workspace[]> {
+    const rows = await this.fetchWorkspaces();
     return rows.map(mapWorkspace);
   }
 
@@ -27,10 +25,7 @@ export class WorkspaceListQueryHandler
     input: WorkspaceListQueryInput,
     output: Workspace[]
   ): Promise<ChangeCheckResult<WorkspaceListQueryInput>> {
-    if (
-      event.type === 'workspace.created' &&
-      event.workspace.accountId === input.accountId
-    ) {
+    if (event.type === 'workspace.created') {
       const newWorkspaces = [...output, event.workspace];
       return {
         hasChanges: true,
@@ -38,12 +33,9 @@ export class WorkspaceListQueryHandler
       };
     }
 
-    if (
-      event.type === 'workspace.updated' &&
-      event.workspace.accountId === input.accountId
-    ) {
+    if (event.type === 'workspace.updated') {
       const updatedWorkspaces = output.map((workspace) => {
-        if (workspace.id === event.workspace.id) {
+        if (workspace.workspaceId === event.workspace.workspaceId) {
           return event.workspace;
         }
         return workspace;
@@ -55,12 +47,9 @@ export class WorkspaceListQueryHandler
       };
     }
 
-    if (
-      event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId
-    ) {
+    if (event.type === 'workspace.deleted') {
       const activeWorkspaces = output.filter(
-        (workspace) => workspace.id !== event.workspace.id
+        (workspace) => workspace.workspaceId !== event.workspace.workspaceId
       );
 
       return {
@@ -74,13 +63,8 @@ export class WorkspaceListQueryHandler
     };
   }
 
-  private async fetchWorkspaces(accountId: string): Promise<SelectWorkspace[]> {
-    const account = this.app.getAccount(accountId);
-    if (!account) {
-      return [];
-    }
-
-    const workspaces = await account.database
+  private async fetchWorkspaces(): Promise<SelectWorkspace[]> {
+    const workspaces = await this.app.database
       .selectFrom('workspaces')
       .selectAll()
       .execute();

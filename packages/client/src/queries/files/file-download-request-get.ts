@@ -1,8 +1,7 @@
 export type FileDownloadRequestGetQueryInput = {
   type: 'file.download.request.get';
   id: string;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 export type FileDownloadRequestGetQueryOutput = {

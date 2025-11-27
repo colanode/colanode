@@ -19,7 +19,7 @@ export class DatabaseCreateMutationHandler
   async handleMutation(
     input: DatabaseCreateMutationInput
   ): Promise<DatabaseCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const databaseId = generateId(IdType.Database);
     const viewId = generateId(IdType.DatabaseView);

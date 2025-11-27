@@ -50,7 +50,7 @@ export class UserSynchronizer extends BaseSynchronizer<SyncUsersInput> {
         .where('workspace_id', '=', this.user.workspaceId)
         .where('revision', '>', this.cursor)
         .orderBy('revision', 'asc')
-        .limit(50)
+        .limit(100)
         .execute();
 
       return users;

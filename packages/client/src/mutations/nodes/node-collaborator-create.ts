@@ -1,7 +1,6 @@
 export type NodeCollaboratorCreateMutationInput = {
   type: 'node.collaborator.create';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   nodeId: string;
   collaboratorIds: string[];
   role: string;

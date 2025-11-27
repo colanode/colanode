@@ -10,7 +10,7 @@ export class NodeTreeGetQueryHandler
   implements QueryHandler<NodeTreeGetQueryInput>
 {
   public async handleQuery(input: NodeTreeGetQueryInput): Promise<LocalNode[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     const tree = await fetchNodeTree(workspace.database, input.nodeId);
     return tree;
   }
@@ -22,8 +22,7 @@ export class NodeTreeGetQueryHandler
   ): Promise<ChangeCheckResult<NodeTreeGetQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -33,8 +32,7 @@ export class NodeTreeGetQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.id === input.nodeId
     ) {
       const newResult = await this.handleQuery(input);
@@ -46,8 +44,7 @@ export class NodeTreeGetQueryHandler
 
     if (
       event.type === 'node.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       const node = output.find((n) => n.id === event.node.id);
       if (node) {
@@ -61,8 +58,7 @@ export class NodeTreeGetQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       const node = output.find((n) => n.id === event.node.id);
       if (node) {

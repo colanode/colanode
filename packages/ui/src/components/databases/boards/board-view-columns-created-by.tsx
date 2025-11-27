@@ -1,9 +1,11 @@
+import { eq, useLiveQuery as useLiveQueryTanstack } from '@tanstack/react-db';
 import { CircleAlert } from 'lucide-react';
 
 import {
   CreatedByFieldAttributes,
   DatabaseViewFilterAttributes,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
@@ -29,8 +31,7 @@ export const BoardViewColumnsCreatedBy = ({
     databaseId: database.id,
     filters: view.filters,
     fieldId: field.id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (createdByCountQuery.isPending) {
@@ -89,14 +90,19 @@ const BoardViewColumnCreatedByHeader = ({
 }: BoardViewColumnCreatedByHeaderProps) => {
   const workspace = useWorkspace();
 
-  const userQuery = useLiveQuery({
-    type: 'user.get',
-    userId: createdBy,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-  });
+  const userQuery = useLiveQueryTanstack((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, createdBy))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
+  );
 
-  if (userQuery.isPending) {
+  if (userQuery.isLoading) {
     return (
       <div className="flex flex-row gap-2 items-center">
         <Spinner className="size-5" />

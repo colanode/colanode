@@ -31,8 +31,7 @@ export class RecordListQueryHandler
   ): Promise<ChangeCheckResult<RecordListQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -42,8 +41,7 @@ export class RecordListQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'record'
     ) {
       const newResult = await this.handleQuery(input);
@@ -55,8 +53,7 @@ export class RecordListQueryHandler
 
     if (
       event.type === 'node.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       if (
         event.node.type === 'record' &&
@@ -100,8 +97,7 @@ export class RecordListQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       if (
         event.node.type === 'record' &&
@@ -133,7 +129,7 @@ export class RecordListQueryHandler
   private async fetchRecords(
     input: RecordListQueryInput
   ): Promise<SelectNode[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     const database = await this.fetchDatabase(input);
     const filterQuery = buildFiltersQuery(
       input.filters,
@@ -159,7 +155,7 @@ export class RecordListQueryHandler
   private async fetchDatabase(
     input: RecordListQueryInput
   ): Promise<DatabaseNode> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const row = await workspace.database
       .selectFrom('nodes')

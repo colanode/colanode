@@ -19,8 +19,8 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { Textarea } from '@colanode/ui/components/ui/textarea';
-import { useAccount } from '@colanode/ui/contexts/account';
-import { useI18n } from '@colanode/ui/contexts/i18n';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { openFileDialog } from '@colanode/ui/lib/files';
 import { cn } from '@colanode/ui/lib/utils';
@@ -50,8 +50,8 @@ export const WorkspaceForm = ({
   saveText,
   readOnly = false,
 }: WorkspaceFormProps) => {
-  const account = useAccount();
-  const { t } = useI18n();
+  const workspace = useWorkspace();
+  const isMobile = useIsMobile();
 
   const id = useRef(generateId(IdType.Workspace));
   const { mutate, isPending } = useMutation();
@@ -71,8 +71,13 @@ export const WorkspaceForm = ({
   return (
     <Form {...form}>
       <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex flex-row gap-1">
-          <div className="h-40 w-40 pt-3">
+        <div className={cn('flex gap-1', isMobile ? 'flex-col' : 'flex-row')}>
+          <div
+            className={cn(
+              'pt-3',
+              isMobile ? 'flex justify-center pb-4' : 'size-40'
+            )}
+          >
             <div
               className="group relative cursor-pointer"
               onClick={async () => {
@@ -93,7 +98,7 @@ export const WorkspaceForm = ({
                   mutate({
                     input: {
                       type: 'avatar.upload',
-                      accountId: account.id,
+                      accountId: workspace.accountId,
                       file,
                     },
                     onSuccess(output) {
@@ -110,13 +115,14 @@ export const WorkspaceForm = ({
             >
               <Avatar
                 id={id.current}
-                name={name.length > 0 ? name : t('database.newWorkspace')}
+                name={name.length > 0 ? name : 'New workspace'}
                 avatar={avatar}
-                className="h-32 w-32"
+                className={isMobile ? 'size-24' : 'size-32'}
               />
               <div
                 className={cn(
-                  `absolute left-0 top-0 hidden h-32 w-32 items-center justify-center overflow-hidden bg-accent/70 group-hover:inline-flex`,
+                  `absolute left-0 top-0 hidden items-center justify-center overflow-hidden bg-accent/70 group-hover:inline-flex`,
+                  isMobile ? 'size-24' : 'size-32',
                   isPending ? 'inline-flex' : 'hidden',
                   readOnly && 'hidden group-hover:hidden'
                 )}
@@ -129,19 +135,17 @@ export const WorkspaceForm = ({
               </div>
             </div>
           </div>
-          <div className="flex-grow space-y-4 py-2 pb-4">
+          <div
+            className={cn('space-y-4 py-2 pb-4', isMobile ? 'w-full' : 'grow')}
+          >
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>{t('account.nameRequired')}</FormLabel>
+                  <FormLabel>Name *</FormLabel>
                   <FormControl>
-                    <Input
-                      readOnly={readOnly}
-                      placeholder={t('common.name')}
-                      {...field}
-                    />
+                    <Input readOnly={readOnly} placeholder="Name" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -152,11 +156,11 @@ export const WorkspaceForm = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>{t('misc.description')}</FormLabel>
+                  <FormLabel>Description</FormLabel>
                   <FormControl>
                     <Textarea
                       readOnly={readOnly}
-                      placeholder={t('workspace.descriptionPlaceholder')}
+                      placeholder="Write a short description about the workspace"
                       {...field}
                     />
                   </FormControl>
@@ -177,11 +181,15 @@ export const WorkspaceForm = ({
                   onCancel();
                 }}
               >
-                {t('common.cancel')}
+                Cancel
               </Button>
             )}
 
-            <Button type="submit" disabled={isPending || isSaving}>
+            <Button
+              type="submit"
+              disabled={isPending || isSaving}
+              className="w-20"
+            >
               {isSaving && <Spinner className="mr-1" />}
               {saveText}
             </Button>

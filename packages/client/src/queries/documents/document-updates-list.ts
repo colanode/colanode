@@ -3,8 +3,7 @@ import { DocumentUpdate } from '@colanode/client/types/documents';
 export type DocumentUpdatesListQueryInput = {
   type: 'document.updates.list';
   documentId: string;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 declare module '@colanode/client/queries' {

@@ -1,12 +1,13 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Fragment } from 'react';
 
 import { LocalFileNode } from '@colanode/client/types';
 import { formatBytes, formatDate } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface FileSidebarProps {
   file: LocalFileNode;
@@ -24,25 +25,29 @@ const FileMeta = ({ title, value }: { title: string; value: string }) => {
 export const FileSidebar = ({ file }: FileSidebarProps) => {
   const { t } = useI18n();
   const workspace = useWorkspace();
-
-  const userQuery = useLiveQuery({
-    type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: file.createdBy,
-  });
-
-  const user = userQuery.data ?? null;
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, file.createdBy))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
+  );
+  const user = userQuery.data;
 
   return (
     <Fragment>
       <div className="flex items-center gap-x-4 p-2">
         <FileThumbnail
+          userId={workspace.userId}
           file={file}
           className="h-12 w-9 min-w-[36px] overflow-hidden rounded object-contain"
         />
         <div
-          className="line-clamp-3 break-words text-base font-medium"
+          className="line-clamp-3 wrap-break-word text-base font-medium"
           title={file.attributes.name}
         >
           {file.attributes.name}

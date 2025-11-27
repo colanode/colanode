@@ -22,8 +22,7 @@ import {
   DocumentUpdate,
 } from '@colanode/client/types';
 import { RichTextContent, richTextContentSchema } from '@colanode/core';
-import { YDoc } from '@colanode/crdt';
-import { useI18n } from '@colanode/ui/contexts/i18n';
+import { encodeState, YDoc } from '@colanode/crdt';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import {
   BlockquoteCommand,
@@ -113,7 +112,6 @@ export const DocumentEditor = ({
   canEdit,
   autoFocus,
 }: DocumentEditorProps) => {
-  const { t } = useI18n();
   const workspace = useWorkspace();
 
   const hasPendingChanges = useRef(false);
@@ -156,10 +154,9 @@ export const DocumentEditor = ({
 
         const result = await window.colanode.executeMutation({
           type: 'document.update',
-          accountId: workspace.accountId,
-          workspaceId: workspace.id,
+          userId: workspace.userId,
           documentId: node.id,
-          update,
+          update: encodeState(update),
         });
 
         if (!result.success) {
@@ -180,7 +177,7 @@ export const DocumentEditor = ({
           context: {
             userId: workspace.userId,
             accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            workspaceId: workspace.workspaceId,
             documentId: node.id,
             rootId: node.rootId,
           },
@@ -199,7 +196,7 @@ export const DocumentEditor = ({
         ListKeymapExtension,
         OrderedListNode,
         PlaceholderExtension.configure({
-          message: t('ui.writeOrCommand'),
+          message: "Write something or '/' for commands",
         }),
         TaskListNode,
         TaskItemNode,
@@ -237,7 +234,7 @@ export const DocumentEditor = ({
             userId: workspace.userId,
             documentId: node.id,
             accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            workspaceId: workspace.workspaceId,
             rootId: node.rootId,
           },
         }),
@@ -354,10 +351,9 @@ export const DocumentEditor = ({
 
     const result = await window.colanode.executeMutation({
       type: 'document.update',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
+      userId: workspace.userId,
       documentId: node.id,
-      update,
+      update: encodeState(update),
     });
 
     if (!result.success) {
@@ -388,10 +384,9 @@ export const DocumentEditor = ({
 
     const result = await window.colanode.executeMutation({
       type: 'document.update',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
+      userId: workspace.userId,
       documentId: node.id,
-      update,
+      update: encodeState(update),
     });
 
     if (!result.success) {

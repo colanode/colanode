@@ -63,7 +63,7 @@ export class NodeReactionService {
         id: this.workspace.userId,
         role: this.workspace.role,
         accountId: this.workspace.accountId,
-        workspaceId: this.workspace.id,
+        workspaceId: this.workspace.workspaceId,
       },
       tree: tree,
       node: node,
@@ -140,8 +140,11 @@ export class NodeReactionService {
 
     eventBus.publish({
       type: 'node.reaction.created',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       nodeReaction: mapNodeReaction(createdNodeReaction),
     });
   }
@@ -227,8 +230,11 @@ export class NodeReactionService {
 
     eventBus.publish({
       type: 'node.reaction.deleted',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       nodeReaction: mapNodeReaction(deletedNodeReaction),
     });
   }
@@ -246,8 +252,11 @@ export class NodeReactionService {
       if (deletedNodeReaction) {
         eventBus.publish({
           type: 'node.reaction.deleted',
-          accountId: this.workspace.accountId,
-          workspaceId: this.workspace.id,
+          workspace: {
+            workspaceId: this.workspace.workspaceId,
+            userId: this.workspace.userId,
+            accountId: this.workspace.accountId,
+          },
           nodeReaction: mapNodeReaction(deletedNodeReaction),
         });
       }
@@ -319,8 +328,11 @@ export class NodeReactionService {
 
     eventBus.publish({
       type: 'node.reaction.created',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       nodeReaction: mapNodeReaction(createdNodeReaction),
     });
 
@@ -346,8 +358,11 @@ export class NodeReactionService {
 
     eventBus.publish({
       type: 'node.reaction.deleted',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       nodeReaction: mapNodeReaction(deletedNodeReaction),
     });
   }
@@ -394,8 +409,11 @@ export class NodeReactionService {
 
     eventBus.publish({
       type: 'node.reaction.created',
-      accountId: this.workspace.accountId,
-      workspaceId: this.workspace.id,
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
       nodeReaction: mapNodeReaction(createdNodeReaction),
     });
   }

@@ -15,19 +15,3 @@ export const redisConfigSchema = z.object({
 });
 
 export type RedisConfig = z.infer<typeof redisConfigSchema>;
-
-export const readRedisConfigVariables = () => {
-  return {
-    url: process.env.REDIS_URL,
-    db: process.env.REDIS_DB,
-    jobs: {
-      name: process.env.REDIS_JOBS_NAME,
-      prefix: process.env.REDIS_JOBS_PREFIX,
-    },
-    tus: {
-      lockPrefix: process.env.REDIS_TUS_LOCK_PREFIX,
-      kvPrefix: process.env.REDIS_TUS_KV_PREFIX,
-    },
-    eventsChannel: process.env.REDIS_EVENTS_CHANNEL,
-  };
-};

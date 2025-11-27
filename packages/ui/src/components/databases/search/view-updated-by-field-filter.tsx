@@ -1,10 +1,11 @@
+import { inArray, useLiveQuery } from '@tanstack/react-db';
 import { ChevronDown, Trash2, X } from 'lucide-react';
 
-import { User } from '@colanode/client/types';
 import {
   DatabaseViewFieldFilterAttributes,
   UpdatedByFieldAttributes,
 } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { Badge } from '@colanode/ui/components/ui/badge';
@@ -24,24 +25,19 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { UserSearch } from '@colanode/ui/components/users/user-search';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 import { updatedByFieldFilterOperators } from '@colanode/ui/lib/databases';
 
-interface ViewUpdatedByFieldFilterProps {
-  field: UpdatedByFieldAttributes;
-  filter: DatabaseViewFieldFilterAttributes;
+interface CollaboratorBadgeProps {
+  id: string;
+  name: string;
+  avatar: string | null;
 }
 
-const CollaboratorBadge = ({ collaborator }: { collaborator: User }) => {
+const CollaboratorBadge = ({ id, name, avatar }: CollaboratorBadgeProps) => {
   return (
     <div className="flex flex-row items-center gap-1 text-sm">
-      <Avatar
-        id={collaborator.id}
-        name={collaborator.name}
-        avatar={collaborator.avatar}
-        size="small"
-      />
-      <p>{collaborator.name}</p>
+      <Avatar id={id} name={name} avatar={avatar} size="small" />
+      <p>{name}</p>
     </div>
   );
 };
@@ -54,6 +50,11 @@ const isOperatorWithoutValue = (operator: string) => {
     operator === 'is_not_empty'
   );
 };
+
+interface ViewUpdatedByFieldFilterProps {
+  field: UpdatedByFieldAttributes;
+  filter: DatabaseViewFieldFilterAttributes;
+}
 
 export const ViewUpdatedByFieldFilter = ({
   field,
@@ -68,21 +69,19 @@ export const ViewUpdatedByFieldFilter = ({
     ) ?? updatedByFieldFilterOperators[0]!;
 
   const collaboratorIds = (filter.value as string[]) ?? [];
-  const results = useLiveQueries(
-    collaboratorIds.map((id) => ({
-      type: 'user.get',
-      userId: id,
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
-    }))
+  const collaboratorsQuery = useLiveQuery((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => inArray(users.id, collaboratorIds))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+        email: users.email,
+      }))
   );
 
-  const collaborators: User[] = [];
-  for (const result of results) {
-    if (result.data) {
-      collaborators.push(result.data);
-    }
-  }
+  const collaborators = collaboratorsQuery.data;
   const hideInput = isOperatorWithoutValue(operator.value);
 
   return (
@@ -114,7 +113,7 @@ export const ViewUpdatedByFieldFilter = ({
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex flex-grow flex-row items-center gap-1 rounded-md p-1 font-semibold cursor-pointer hover:bg-accent">
+              <div className="flex grow flex-row items-center gap-1 rounded-md p-1 font-semibold cursor-pointer hover:bg-accent">
                 <p>{operator.label}</p>
                 <ChevronDown className="size-4 text-muted-foreground" />
               </div>
@@ -157,7 +156,9 @@ export const ViewUpdatedByFieldFilter = ({
                 {collaborators.slice(0, 1).map((collaborator) => (
                   <CollaboratorBadge
                     key={collaborator.id}
-                    collaborator={collaborator}
+                    id={collaborator.id}
+                    name={collaborator.name}
+                    avatar={collaborator.avatar}
                   />
                 ))}
                 {collaborators.length === 0 && (
@@ -189,7 +190,7 @@ export const ViewUpdatedByFieldFilter = ({
                         avatar={collaborator.avatar}
                         className="h-7 w-7"
                       />
-                      <div className="flex flex-grow flex-col">
+                      <div className="flex grow flex-col">
                         <p className="text-sm">{collaborator.name}</p>
                         <p className="text-xs text-muted-foreground">
                           {collaborator.email}

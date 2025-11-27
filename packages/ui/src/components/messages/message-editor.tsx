@@ -4,6 +4,7 @@ import isHotkey from 'is-hotkey';
 import { forwardRef, Fragment, useImperativeHandle } from 'react';
 
 import { TempFile } from '@colanode/client/types';
+import { generateId, IdType } from '@colanode/core/lib/id.js';
 import {
   BoldMark,
   CodeBlockNode,
@@ -94,6 +95,18 @@ export const MessageEditor = forwardRef<
         handleKeyDown: (_, event) => {
           return isHotkey('enter', event);
         },
+      },
+      content: {
+        type: 'message',
+        content: [
+          {
+            type: 'paragraph',
+            content: [],
+            attrs: {
+              id: generateId(IdType.Block),
+            },
+          },
+        ],
       },
       onUpdate: (e) => {
         props.onChange?.(e.editor.getJSON());

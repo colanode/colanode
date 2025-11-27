@@ -12,7 +12,7 @@ export class FileDeleteMutationHandler
   async handleMutation(
     input: FileDeleteMutationInput
   ): Promise<FileDeleteMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     await workspace.nodes.deleteNode(input.fileId);
 
     return {

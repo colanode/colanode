@@ -19,7 +19,7 @@ export class ViewCreateMutationHandler
   async handleMutation(
     input: ViewCreateMutationInput
   ): Promise<ViewCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const id = generateId(IdType.DatabaseView);
     const otherViews = await workspace.database

@@ -36,7 +36,7 @@ export const SpaceDelete = ({ id, onDeleted }: SpaceDeleteProps) => {
             {t('workspace.deleteWorkspaceDescription')}
           </p>
         </div>
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Button
             variant="destructive"
             onClick={() => {
@@ -64,8 +64,7 @@ export const SpaceDelete = ({ id, onDeleted }: SpaceDeleteProps) => {
                 mutate({
                   input: {
                     type: 'space.delete',
-                    accountId: workspace.accountId,
-                    workspaceId: workspace.id,
+                    userId: workspace.userId,
                     spaceId: id,
                   },
                   onSuccess() {

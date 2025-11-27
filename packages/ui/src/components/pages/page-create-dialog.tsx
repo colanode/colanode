@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import { generateId, IdType } from '@colanode/core';
@@ -9,34 +10,31 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
-import { useI18n } from '@colanode/ui/contexts/i18n';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface PageCreateDialogProps {
-  parentId: string;
+  spaceId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
 export const PageCreateDialog = ({
-  parentId,
+  spaceId,
   open,
   onOpenChange,
 }: PageCreateDialogProps) => {
-  const { t } = useI18n();
   const workspace = useWorkspace();
-  const layout = useLayout();
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>{t('page.createPage')}</DialogTitle>
+          <DialogTitle>Create page</DialogTitle>
           <DialogDescription>
-            {t('page.createPageDescription')}
+            Create a new page to collaborate with your peers
           </DialogDescription>
         </DialogHeader>
         <PageForm
@@ -45,7 +43,7 @@ export const PageCreateDialog = ({
             name: '',
           }}
           isPending={isPending}
-          submitText={t('common.create')}
+          submitText="Create"
           handleCancel={() => {
             onOpenChange(false);
           }}
@@ -57,16 +55,20 @@ export const PageCreateDialog = ({
             mutate({
               input: {
                 type: 'page.create',
-                parentId: parentId,
+                parentId: spaceId,
                 name: values.name,
                 avatar: values.avatar,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
                 generateIndex: true,
               },
               onSuccess(output) {
                 onOpenChange(false);
-                layout.openLeft(output.id);
+                navigate({
+                  to: '$nodeId',
+                  params: {
+                    nodeId: output.id,
+                  },
+                });
               },
               onError(error) {
                 toast.error(error.message);

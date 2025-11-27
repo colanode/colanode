@@ -42,7 +42,13 @@ spec:
 {{- $mountFileStorage := eq $storageType "file" }}
 {{- $gcsSecret := .Values.colanode.storage.gcs.credentialsSecret }}
 {{- $mountGcsCredentials := and (eq $storageType "gcs") $gcsSecret.name }}
-{{- if or $mountFileStorage $mountGcsCredentials }}
+{{- $configFile := .Values.colanode.configFile }}
+{{- $mountConfigFile := or $configFile.enabled $configFile.existingConfigMap }}
+{{- $extraVolumeMounts := .Values.colanode.extraVolumeMounts | default (list) }}
+{{- $extraVolumes := .Values.colanode.extraVolumes | default (list) }}
+{{- $hasExtraVolumeMounts := gt (len $extraVolumeMounts) 0 }}
+{{- $hasExtraVolumes := gt (len $extraVolumes) 0 }}
+{{- if or $mountFileStorage $mountGcsCredentials $mountConfigFile $hasExtraVolumeMounts }}
           volumeMounts:
 {{- if $mountFileStorage }}
             - name: storage-data
@@ -53,10 +59,19 @@ spec:
               mountPath: {{ required "colanode.storage.gcs.credentialsSecret.mountPath must be set when mounting GCS credentials" $gcsSecret.mountPath }}
               readOnly: true
 {{- end }}
+{{- if $mountConfigFile }}
+            - name: config-json
+              mountPath: /app/apps/server/config.json
+              subPath: {{ default "config.json" $configFile.key }}
+              readOnly: true
+{{- end }}
+{{- if $hasExtraVolumeMounts }}
+            {{ include "colanode.renderExtraVolumeMounts" $extraVolumeMounts | nindent 12 }}
+{{- end }}
 {{- end }}
           resources:
             {{- toYaml .Values.colanode.resources | nindent 12 }}
-{{- if or $mountFileStorage $mountGcsCredentials }}
+{{- if or $mountFileStorage $mountGcsCredentials $mountConfigFile $hasExtraVolumes }}
       volumes:
 {{- if $mountFileStorage }}
         - name: storage-data
@@ -80,5 +95,13 @@ spec:
             items:
               - key: {{ required "colanode.storage.gcs.credentialsSecret.key must be set when providing a secret" $gcsSecret.key }}
                 path: {{ required "colanode.storage.gcs.credentialsSecret.fileName must be set when providing a secret" $gcsSecret.fileName }}
+{{- end }}
+{{- if $mountConfigFile }}
+        - name: config-json
+          configMap:
+            name: {{ include "colanode.configJsonConfigMapName" . | trim | quote }}
+{{- end }}
+{{- if $hasExtraVolumes }}
+  {{ include "colanode.renderExtraVolumes" $extraVolumes | nindent 8 }}
 {{- end }}
 {{- end }}

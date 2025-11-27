@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import {
@@ -11,15 +12,13 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { useI18n } from '@colanode/ui/contexts/i18n';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface FolderDeleteDialogProps {
-  folderId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  folderId: string;
 }
 
 export const FolderDeleteDialog = ({
@@ -27,22 +26,24 @@ export const FolderDeleteDialog = ({
   open,
   onOpenChange,
 }: FolderDeleteDialogProps) => {
-  const { t } = useI18n();
   const workspace = useWorkspace();
-  const layout = useLayout();
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{t('folder.deleteFolderConfirm')}</AlertDialogTitle>
+          <AlertDialogTitle>
+            Are you sure you want delete this folder?
+          </AlertDialogTitle>
           <AlertDialogDescription>
-            {t('folder.deleteFolderDescription')}
+            This action cannot be undone. This folder will no longer be
+            accessible by you or others you&apos;ve shared it with.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
           <Button
             variant="destructive"
             disabled={isPending}
@@ -51,12 +52,13 @@ export const FolderDeleteDialog = ({
                 input: {
                   type: 'folder.delete',
                   folderId: folderId,
-                  accountId: workspace.accountId,
-                  workspaceId: workspace.id,
+                  userId: workspace.userId,
                 },
                 onSuccess() {
                   onOpenChange(false);
-                  layout.close(folderId);
+                  navigate({
+                    to: '/',
+                  });
                 },
                 onError(error) {
                   toast.error(error.message);
@@ -65,7 +67,7 @@ export const FolderDeleteDialog = ({
             }}
           >
             {isPending && <Spinner className="mr-1" />}
-            {t('common.delete')}
+            Delete
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

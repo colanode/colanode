@@ -384,12 +384,3 @@ export const getThemeVariables = (
     ...colorVariables,
   };
 };
-
-export const getSystemTheme = (): ThemeMode => {
-  if (typeof window === 'undefined' || !window.matchMedia) {
-    return 'light';
-  }
-
-  const isDark = window.matchMedia('(prefers-color-scheme: dark)')?.matches;
-  return isDark ? 'dark' : 'light';
-};

@@ -64,8 +64,7 @@ export const ChannelUpdateDialog = ({
                 channelId: channel.id,
                 name: values.name,
                 avatar: values.avatar,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               },
               onSuccess() {
                 onOpenChange(false);

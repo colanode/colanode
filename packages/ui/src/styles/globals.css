@@ -73,3 +73,54 @@
   width: 100%;
   height: 100%;
 }
+
+[data-radix-scroll-area-viewport] > div {
+  height: 100%;
+}
+
+@keyframes draw-path {
+  from {
+    stroke-dashoffset: 2000;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fade-fill {
+  from {
+    fill-opacity: 0;
+  }
+  to {
+    fill-opacity: 1;
+  }
+}
+
+@keyframes hide-stroke {
+  to {
+    stroke-width: 0;
+  }
+}
+
+.logo-draw-animation svg path {
+  stroke: currentColor;
+  stroke-width: 1;
+  fill: currentColor;
+  fill-opacity: 0;
+  stroke-dasharray: 2000;
+  stroke-dashoffset: 2000;
+  paint-order: stroke fill;
+  animation:
+    draw-path 3s ease-in-out forwards,
+    fade-fill 0.75s ease-in-out 2.85s forwards,
+    hide-stroke 0.15s ease-in-out 3.45s forwards;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.logo-draw-animation svg path:nth-child(2) {
+  animation:
+    draw-path 3s ease-in-out 0.45s forwards,
+    fade-fill 0.75s ease-in-out 3.3s forwards,
+    hide-stroke 0.15s ease-in-out 3.9s forwards;
+}

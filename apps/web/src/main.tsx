@@ -29,7 +29,11 @@ const initializeApp = async () => {
 
   window.colanode = {
     init: async () => {
-      await workerApi.init();
+      return workerApi.init();
+    },
+    reset: async () => {
+      await workerApi.reset();
+      window.location.reload();
     },
     executeMutation: async (input) => {
       return workerApi.executeMutation(input);
