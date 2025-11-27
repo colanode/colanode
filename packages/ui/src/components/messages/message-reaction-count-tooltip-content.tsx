@@ -1,12 +1,9 @@
-import {
-  inArray,
-  useLiveQuery as useLiveQueryTanstack,
-} from '@tanstack/react-db';
+import { eq, inArray, useLiveQuery } from '@tanstack/react-db';
 
 import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
 import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useLiveQuery as useColanodeLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface MessageReactionCountTooltipContentProps {
   message: LocalMessageNode;
@@ -19,25 +16,28 @@ export const MessageReactionCountTooltipContent = ({
 }: MessageReactionCountTooltipContentProps) => {
   const workspace = useWorkspace();
 
-  const emojiGetQuery = useLiveQuery({
+  const emojiGetQuery = useColanodeLiveQuery({
     type: 'emoji.get.by.skin.id',
     id: reactionCount.reaction,
   });
 
-  const nodeReactionListQuery = useLiveQuery({
-    type: 'node.reaction.list',
-    nodeId: message.id,
-    reaction: reactionCount.reaction,
-    userId: workspace.userId,
-    page: 0,
-    count: 3,
-  });
+  const nodeReactionListQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ nodeReactions: workspace.collections.nodeReactions })
+        .where(({ nodeReactions }) => eq(nodeReactions.nodeId, message.id))
+        .where(({ nodeReactions }) =>
+          eq(nodeReactions.reaction, reactionCount.reaction)
+        )
+        .orderBy(({ nodeReactions }) => nodeReactions.createdAt, 'desc')
+        .limit(3),
+    [message.id, reactionCount.reaction]
+  );
 
-  const userIds =
-    nodeReactionListQuery.data?.map((reaction) => reaction.collaboratorId) ??
-    [];
+  const nodeReactions = nodeReactionListQuery.data ?? [];
+  const userIds = nodeReactions.map((reaction) => reaction.collaboratorId);
 
-  const usersQuery = useLiveQueryTanstack((q) =>
+  const usersQuery = useLiveQuery((q) =>
     q
       .from({ users: workspace.collections.users })
       .where(({ users }) => inArray(users.id, userIds))
@@ -47,7 +47,8 @@ export const MessageReactionCountTooltipContent = ({
       }))
   );
 
-  const users = usersQuery.data.map((user) => user.customName ?? user.name);
+  const users =
+    usersQuery.data?.map((user) => user.customName ?? user.name) ?? [];
   const emojiName = `:${emojiGetQuery.data?.code ?? emojiGetQuery.data?.name ?? reactionCount.reaction}:`;
 
   return (

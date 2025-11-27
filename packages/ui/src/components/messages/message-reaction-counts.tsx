@@ -1,13 +1,12 @@
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { count, eq, useLiveQuery } from '@tanstack/react-db';
+import { useCallback, useState } from 'react';
 
 import { LocalMessageNode } from '@colanode/client/types';
 import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
 import { MessageReactionCountTooltip } from '@colanode/ui/components/messages/message-reaction-count-tooltip';
 import { MessageReactionCountsDialog } from '@colanode/ui/components/messages/message-reaction-counts-dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { buildNodeReactionKey } from '@colanode/ui/lib/nodes';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface MessageReactionCountsProps {
@@ -20,15 +19,50 @@ export const MessageReactionCounts = ({
   const workspace = useWorkspace();
   const [openDialog, setOpenDialog] = useState(false);
 
-  const { mutate, isPending } = useMutation();
+  const handleReactionClick = useCallback((reaction: string) => {
+    const reactionKey = buildNodeReactionKey(
+      message.id,
+      workspace.userId,
+      reaction
+    );
+    if (workspace.collections.nodeReactions.has(reactionKey)) {
+      workspace.collections.nodeReactions.delete(reactionKey);
+    } else {
+      workspace.collections.nodeReactions.insert({
+        nodeId: message.id,
+        collaboratorId: workspace.userId,
+        reaction,
+        rootId: message.rootId,
+        createdAt: new Date().toISOString(),
+      });
+    }
+  }, []);
 
-  const nodeReactionsAggregateQuery = useLiveQuery({
-    type: 'node.reactions.aggregate',
-    nodeId: message.id,
-    userId: workspace.userId,
-  });
+  const reactionCountsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ nodeReactions: workspace.collections.nodeReactions })
+        .where(({ nodeReactions }) => eq(nodeReactions.nodeId, message.id))
+        .groupBy(({ nodeReactions }) => nodeReactions.reaction)
+        .select(({ nodeReactions }) => ({
+          reaction: nodeReactions.reaction,
+          count: count(nodeReactions.reaction),
+        })),
+    [message.id]
+  );
 
-  const reactionCounts = nodeReactionsAggregateQuery.data ?? [];
+  const currentUserReactionsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ nodeReactions: workspace.collections.nodeReactions })
+        .where(({ nodeReactions }) => eq(nodeReactions.nodeId, message.id))
+        .where(({ nodeReactions }) =>
+          eq(nodeReactions.collaboratorId, workspace.userId)
+        ),
+    [message.id]
+  );
+
+  const reactionCounts = reactionCountsQuery.data ?? [];
   if (reactionCounts.length === 0) {
     return null;
   }
@@ -40,7 +74,10 @@ export const MessageReactionCounts = ({
           return null;
         }
 
-        const hasReacted = reaction.reacted;
+        const hasReacted = currentUserReactionsQuery.data?.some(
+          (userReaction) => userReaction.reaction === reaction.reaction
+        );
+
         return (
           <MessageReactionCountTooltip
             key={reaction.reaction}
@@ -57,37 +94,7 @@ export const MessageReactionCounts = ({
                 hasReacted && 'font-bold'
               )}
               onClick={() => {
-                if (isPending) {
-                  return;
-                }
-
-                if (hasReacted) {
-                  mutate({
-                    input: {
-                      type: 'node.reaction.delete',
-                      nodeId: message.id,
-                      userId: workspace.userId,
-                      rootId: message.rootId,
-                      reaction: reaction.reaction,
-                    },
-                    onError(error) {
-                      toast.error(error.message);
-                    },
-                  });
-                } else {
-                  mutate({
-                    input: {
-                      type: 'node.reaction.create',
-                      nodeId: message.id,
-                      userId: workspace.userId,
-                      rootId: message.rootId,
-                      reaction: reaction.reaction,
-                    },
-                    onError(error) {
-                      toast.error(error.message);
-                    },
-                  });
-                }
+                handleReactionClick(reaction.reaction);
               }}
             >
               <EmojiElement id={reaction.reaction} className="size-5" />

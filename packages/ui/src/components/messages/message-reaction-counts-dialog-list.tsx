@@ -1,17 +1,17 @@
 import {
+  and,
+  eq,
   inArray,
-  useLiveQuery as useLiveQueryTanstack,
+  useLiveInfiniteQuery,
+  useLiveQuery,
 } from '@tanstack/react-db';
-import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
-import { NodeReactionListQueryInput } from '@colanode/client/queries';
 import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
-const REACTIONS_PER_PAGE = 20;
+const REACTIONS_PER_PAGE = 50;
 
 interface MessageReactionCountsDialogListProps {
   message: LocalMessageNode;
@@ -24,27 +24,29 @@ export const MessageReactionCountsDialogList = ({
 }: MessageReactionCountsDialogListProps) => {
   const workspace = useWorkspace();
 
-  const [lastPage, setLastPage] = useState<number>(1);
-  const inputs: NodeReactionListQueryInput[] = Array.from({
-    length: lastPage,
-  }).map((_, i) => ({
-    type: 'node.reaction.list',
-    nodeId: message.id,
-    reaction: reactionCount.reaction,
-    userId: workspace.userId,
-    page: i + 1,
-    count: REACTIONS_PER_PAGE,
-  }));
+  const reactionsQuery = useLiveInfiniteQuery(
+    (q) =>
+      q
+        .from({ nodeReactions: workspace.collections.nodeReactions })
+        .where(({ nodeReactions }) =>
+          and(
+            eq(nodeReactions.nodeId, message.id),
+            eq(nodeReactions.reaction, reactionCount.reaction)
+          )
+        )
+        .orderBy(({ nodeReactions }) => nodeReactions.createdAt, 'desc'),
+    {
+      pageSize: REACTIONS_PER_PAGE,
+      getNextPageParam: (lastPage, allPages) =>
+        lastPage.length === REACTIONS_PER_PAGE ? allPages.length : undefined,
+    },
+    [workspace.userId, message.id, reactionCount.reaction]
+  );
 
-  const result = useLiveQueries(inputs);
-  const reactions = result.flatMap((data) => data.data ?? []);
-  const isPending = result.some((data) => data.isPending);
-  const hasMore =
-    !isPending && reactions.length === lastPage * REACTIONS_PER_PAGE;
-
+  const reactions = reactionsQuery.data;
   const userIds = reactions?.map((reaction) => reaction.collaboratorId) ?? [];
 
-  const usersQuery = useLiveQueryTanstack((q) =>
+  const usersQuery = useLiveQuery((q) =>
     q
       .from({ users: workspace.collections.users })
       .where(({ users }) => inArray(users.id, userIds))
@@ -72,11 +74,15 @@ export const MessageReactionCountsDialogList = ({
       <InView
         rootMargin="200px"
         onChange={(inView) => {
-          if (inView && hasMore && !isPending) {
-            setLastPage(lastPage + 1);
+          if (
+            inView &&
+            reactionsQuery.hasNextPage &&
+            !reactionsQuery.isFetchingNextPage
+          ) {
+            reactionsQuery.fetchNextPage();
           }
         }}
-      ></InView>
+      />
     </div>
   );
 };

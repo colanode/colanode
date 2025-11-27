@@ -27,7 +27,6 @@ import { IconSvgGetQueryHandler } from './icons/icon-svg-get';
 import { RadarDataGetQueryHandler } from './interactions/radar-data-get';
 import { NodeListQueryHandler } from './nodes/node-list';
 import { NodeReactionsListQueryHandler } from './nodes/node-reaction-list';
-import { NodeReactionsAggregateQueryHandler } from './nodes/node-reactions-aggregate';
 import { NodeTreeGetQueryHandler } from './nodes/node-tree-get';
 import { RecordFieldValueCountQueryHandler } from './records/record-field-value-count';
 import { RecordSearchQueryHandler } from './records/record-search';
@@ -48,7 +47,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'avatar.get': new AvatarGetQueryHandler(app),
     'account.list': new AccountListQueryHandler(app),
     'node.reaction.list': new NodeReactionsListQueryHandler(app),
-    'node.reactions.aggregate': new NodeReactionsAggregateQueryHandler(app),
     'node.list': new NodeListQueryHandler(app),
     'node.tree.get': new NodeTreeGetQueryHandler(app),
     'record.field.value.count': new RecordFieldValueCountQueryHandler(app),

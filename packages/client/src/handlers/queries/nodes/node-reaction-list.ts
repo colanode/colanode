@@ -89,15 +89,10 @@ export class NodeReactionsListQueryHandler
   ): Promise<NodeReaction[]> {
     const workspace = this.getWorkspace(input.userId);
 
-    const offset = (input.page - 1) * input.count;
     const reactions = await workspace.database
       .selectFrom('node_reactions')
       .selectAll()
       .where('node_id', '=', input.nodeId)
-      .where('reaction', '=', input.reaction)
-      .orderBy('created_at', 'desc')
-      .limit(input.count)
-      .offset(offset)
       .execute();
 
     return reactions.map((row) => {

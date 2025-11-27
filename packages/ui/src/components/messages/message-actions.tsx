@@ -1,14 +1,13 @@
 import { MessagesSquare, Reply, Trash2 } from 'lucide-react';
 import { useCallback } from 'react';
-import { toast } from 'sonner';
 
 import { MessageQuickReaction } from '@colanode/ui/components/messages/message-quick-reaction';
 import { MessageReactionCreatePopover } from '@colanode/ui/components/messages/message-reaction-create-popover';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useMessage } from '@colanode/ui/contexts/message';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { defaultEmojis } from '@colanode/ui/lib/assets';
+import { buildNodeReactionKey } from '@colanode/ui/lib/nodes';
 
 const MessageAction = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -22,28 +21,27 @@ export const MessageActions = () => {
   const message = useMessage();
   const workspace = useWorkspace();
   const conversation = useConversation();
-  const { mutate, isPending } = useMutation();
 
   const handleReactionClick = useCallback(
     (reaction: string) => {
-      if (isPending) {
-        return;
-      }
-
-      mutate({
-        input: {
-          type: 'node.reaction.create',
+      const reactionKey = buildNodeReactionKey(
+        message.id,
+        workspace.userId,
+        reaction
+      );
+      if (workspace.collections.nodeReactions.has(reactionKey)) {
+        workspace.collections.nodeReactions.delete(reactionKey);
+      } else {
+        workspace.collections.nodeReactions.insert({
           nodeId: message.id,
-          userId: workspace.userId,
+          collaboratorId: workspace.userId,
           reaction,
           rootId: conversation.rootId,
-        },
-        onError(error) {
-          toast.error(error.message);
-        },
-      });
+          createdAt: new Date().toISOString(),
+        });
+      }
     },
-    [isPending, mutate, workspace.userId, message.id]
+    [workspace.userId, message.id, conversation.rootId]
   );
 
   return (
@@ -66,33 +64,14 @@ export const MessageActions = () => {
           onClick={handleReactionClick}
         />
       </MessageAction>
-      <div className="mx-1 h-6 w-[1px] bg-border" />
+      <div className="mx-1 h-6 w-px bg-border" />
       {message.canReplyInThread && (
         <MessageAction>
           <MessagesSquare className="size-4 cursor-pointer" />
         </MessageAction>
       )}
       <MessageAction>
-        <MessageReactionCreatePopover
-          onReactionClick={(reaction) => {
-            if (isPending) {
-              return;
-            }
-
-            mutate({
-              input: {
-                type: 'node.reaction.create',
-                nodeId: message.id,
-                userId: workspace.userId,
-                reaction,
-                rootId: conversation.rootId,
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
-            });
-          }}
-        />
+        <MessageReactionCreatePopover onReactionClick={handleReactionClick} />
       </MessageAction>
       {conversation.canCreateMessage && (
         <MessageAction>

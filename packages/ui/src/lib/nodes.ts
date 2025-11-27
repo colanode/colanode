@@ -2,7 +2,11 @@ import { OperationType, TransactionWithMutations } from '@tanstack/react-db';
 import { cloneDeep } from 'lodash-es';
 
 import { mapNodeAttributes } from '@colanode/client/lib';
-import { LocalNode, NodeCollaborator } from '@colanode/client/types';
+import {
+  LocalNode,
+  NodeCollaborator,
+  NodeReaction,
+} from '@colanode/client/types';
 import { extractNodeCollaborators, Node } from '@colanode/core';
 
 export const buildNodeCollaborators = (nodes: Node[]): NodeCollaborator[] => {
@@ -54,4 +58,39 @@ export const applyNodeTransaction = async (
       });
     }
   }
+};
+
+export const applyNodeReactionTransaction = async (
+  userId: string,
+  transaction: TransactionWithMutations<NodeReaction, OperationType>
+) => {
+  for (const mutation of transaction.mutations) {
+    if (mutation.type === 'insert') {
+      const reaction = mutation.modified;
+      await window.colanode.executeMutation({
+        type: 'node.reaction.create',
+        userId,
+        nodeId: reaction.nodeId,
+        collaboratorId: reaction.collaboratorId,
+        reaction: reaction.reaction,
+      });
+    } else if (mutation.type === 'delete') {
+      const reaction = mutation.modified;
+      await window.colanode.executeMutation({
+        type: 'node.reaction.delete',
+        userId,
+        nodeId: reaction.nodeId,
+        collaboratorId: reaction.collaboratorId,
+        reaction: reaction.reaction,
+      });
+    }
+  }
+};
+
+export const buildNodeReactionKey = (
+  nodeId: string,
+  collaboratorId: string,
+  reaction: string
+) => {
+  return `${nodeId}.${collaboratorId}.${reaction}`;
 };

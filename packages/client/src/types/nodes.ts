@@ -40,7 +40,6 @@ export type NodeReaction = {
 export type NodeReactionCount = {
   reaction: string;
   count: number;
-  reacted: boolean;
 };
 
 export type NodeReference = {

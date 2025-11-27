@@ -13,12 +13,14 @@ import {
   LocalPageNode,
   LocalRecordNode,
   LocalSpaceNode,
+  NodeReaction,
   Upload,
   User,
 } from '@colanode/client/types';
 import { createAccountsCollection } from '@colanode/ui/collections/accounts';
 import { createDownloadsCollection } from '@colanode/ui/collections/downloads';
 import { createMetadataCollection } from '@colanode/ui/collections/metadata';
+import { createNodeReactionsCollection } from '@colanode/ui/collections/node-reactions';
 import { createNodesCollection } from '@colanode/ui/collections/nodes';
 import { createServersCollection } from '@colanode/ui/collections/servers';
 import { createTabsCollection } from '@colanode/ui/collections/tabs';
@@ -44,6 +46,7 @@ export class WorkspaceCollections {
   public readonly messages: Collection<LocalMessageNode>;
   public readonly folders: Collection<LocalFolderNode>;
   public readonly pages: Collection<LocalPageNode>;
+  public readonly nodeReactions: Collection<NodeReaction, string>;
 
   constructor(userId: string) {
     this.userId = userId;
@@ -51,6 +54,7 @@ export class WorkspaceCollections {
     this.downloads = createDownloadsCollection(userId);
     this.uploads = createUploadsCollection(userId);
     this.nodes = createNodesCollection(userId);
+    this.nodeReactions = createNodeReactionsCollection(userId);
 
     this.databases = createLiveQueryCollection((q) =>
       q

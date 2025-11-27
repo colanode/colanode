@@ -42,7 +42,7 @@ export const MessageReactionCountsDialog = ({
           defaultValue={reactionCounts[0]!.reaction}
           className="flex flex-row gap-4"
         >
-          <TabsList>
+          <TabsList className="flex flex-col gap-4">
             {reactionCounts.map((reactionCount) => (
               <TabsTrigger
                 key={`tab-trigger-${reactionCount.reaction}`}
