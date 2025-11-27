@@ -1,4 +1,5 @@
-import { useLiveQuery } from '@tanstack/react-db';
+import { useLiveInfiniteQuery } from '@tanstack/react-db';
+import { InView } from 'react-intersection-observer';
 
 import { Container } from '@colanode/ui/components/layouts/containers/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
@@ -6,19 +7,25 @@ import { WorkspaceDownloadFile } from '@colanode/ui/components/workspaces/downlo
 import { WorkspaceDownloadsBreadcrumb } from '@colanode/ui/components/workspaces/downloads/workspace-downloads-breadcrumb';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
+const DOWNLOADS_PER_PAGE = 100;
+
 export const WorkspaceDownloadsContainer = () => {
   const workspace = useWorkspace();
 
-  const downloadsQuery = useLiveQuery(
+  const downloadsQuery = useLiveInfiniteQuery(
     (q) =>
       q
         .from({ downloads: workspace.collections.downloads })
-        .select(({ downloads }) => downloads)
         .orderBy(({ downloads }) => downloads.id, 'desc'),
+    {
+      pageSize: DOWNLOADS_PER_PAGE,
+      getNextPageParam: (lastPage, allPages) =>
+        lastPage.length === DOWNLOADS_PER_PAGE ? allPages.length : undefined,
+    },
     [workspace.userId]
   );
 
-  const downloads = downloadsQuery.data ?? [];
+  const downloads = downloadsQuery.data;
 
   return (
     <Container type="full" breadcrumb={<WorkspaceDownloadsBreadcrumb />}>
@@ -33,6 +40,14 @@ export const WorkspaceDownloadsContainer = () => {
               <WorkspaceDownloadFile key={download.id} download={download} />
             ))}
           </div>
+          <InView
+            rootMargin="200px"
+            onChange={(inView) => {
+              if (inView && downloads.length === DOWNLOADS_PER_PAGE) {
+                downloadsQuery.fetchNextPage();
+              }
+            }}
+          />
         </div>
       </div>
     </Container>
