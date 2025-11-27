@@ -25,6 +25,7 @@ import {
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
 import { relationFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewRelationFieldFilterProps {
@@ -52,6 +53,10 @@ export const ViewRelationFieldFilter = ({
 }: ViewRelationFieldFilterProps) => {
   const workspace = useWorkspace();
   const view = useDatabaseView();
+  const { updateFilter, removeFilter } = useViewFilter({
+    viewId: view.id,
+    filterId: filter.id,
+  });
 
   const operator =
     relationFieldFilterOperators.find(
@@ -124,7 +129,7 @@ export const ViewRelationFieldFilter = ({
                       ? []
                       : relationIds;
 
-                    view.updateFilter(filter.id, {
+                    updateFilter({
                       ...filter,
                       operator: operator.value,
                       value: value,
@@ -136,13 +141,7 @@ export const ViewRelationFieldFilter = ({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              view.removeFilter(filter.id);
-            }}
-          >
+          <Button variant="ghost" size="icon" onClick={removeFilter}>
             <Trash2 className="size-4" />
           </Button>
         </div>
@@ -184,7 +183,7 @@ export const ViewRelationFieldFilter = ({
                             (id) => id !== relation.id
                           );
 
-                          view.updateFilter(filter.id, {
+                          updateFilter({
                             ...filter,
                             value: newRelations,
                           });
@@ -203,7 +202,7 @@ export const ViewRelationFieldFilter = ({
                     ? relationIds.filter((id) => id !== record.id)
                     : [...relationIds, record.id];
 
-                  view.updateFilter(filter.id, {
+                  updateFilter({
                     ...filter,
                     value: newRelations,
                   });

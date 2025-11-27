@@ -2,10 +2,10 @@ import { createContext, useContext } from 'react';
 
 import { ViewField } from '@colanode/client/types';
 import {
-  SortDirection,
   DatabaseViewFilterAttributes,
   DatabaseViewSortAttributes,
   DatabaseViewLayout,
+  SortDirection,
 } from '@colanode/core';
 
 interface DatabaseViewContext {
@@ -20,13 +20,9 @@ interface DatabaseViewContext {
   nameWidth: number;
   isSearchBarOpened: boolean;
   isSortsOpened: boolean;
-  isFieldFilterOpened: (fieldId: string) => boolean;
   initFieldFilter: (fieldId: string) => void;
-  updateFilter: (id: string, filter: DatabaseViewFilterAttributes) => void;
-  removeFilter: (id: string) => void;
   initFieldSort: (fieldId: string, direction: SortDirection) => void;
-  updateSort: (id: string, sort: DatabaseViewSortAttributes) => void;
-  removeSort: (id: string) => void;
+  isFieldFilterOpened: (fieldId: string) => boolean;
   openSearchBar: () => void;
   closeSearchBar: () => void;
   openSorts: () => void;

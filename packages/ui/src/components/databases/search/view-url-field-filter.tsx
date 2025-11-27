@@ -19,6 +19,7 @@ import {
 } from '@colanode/ui/components/ui/popover';
 import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
 import { urlFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewUrlFieldFilterProps {
@@ -31,6 +32,10 @@ export const ViewUrlFieldFilter = ({
   filter,
 }: ViewUrlFieldFilterProps) => {
   const view = useDatabaseView();
+  const { updateFilter, removeFilter } = useViewFilter({
+    viewId: view.id,
+    filterId: filter.id,
+  });
 
   const operator =
     urlFieldFilterOperators.find(
@@ -91,7 +96,7 @@ export const ViewUrlFieldFilter = ({
                         ? null
                         : urlValue;
 
-                    view.updateFilter(filter.id, {
+                    updateFilter({
                       ...filter,
                       operator: operator.value,
                       value: value,
@@ -103,13 +108,7 @@ export const ViewUrlFieldFilter = ({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              view.removeFilter(filter.id);
-            }}
-          >
+          <Button variant="ghost" size="icon" onClick={removeFilter}>
             <Trash2 className="size-4" />
           </Button>
         </div>
@@ -117,7 +116,7 @@ export const ViewUrlFieldFilter = ({
           <SmartTextInput
             value={urlValue}
             onChange={(value) => {
-              view.updateFilter(filter.id, {
+              updateFilter({
                 ...filter,
                 value: value,
               });

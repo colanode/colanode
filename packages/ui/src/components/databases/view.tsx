@@ -1,9 +1,7 @@
 import { useNavigate } from '@tanstack/react-router';
 import { useState } from 'react';
-import { toast } from 'sonner';
 import { match } from 'ts-pattern';
 
-import { mapNodeAttributes } from '@colanode/client/lib';
 import {
   LocalDatabaseViewNode,
   LocalRecordNode,
@@ -12,11 +10,9 @@ import {
 import {
   compareString,
   SortDirection,
-  DatabaseViewFieldFilterAttributes,
   DatabaseViewFilterAttributes,
   DatabaseViewSortAttributes,
   SpecialId,
-  DatabaseViewAttributes,
   generateId,
   IdType,
 } from '@colanode/core';
@@ -31,7 +27,6 @@ import {
   getDefaultFieldWidth,
   getDefaultNameWidth,
   getDefaultViewFieldDisplay,
-  getFieldFilterOperators,
 } from '@colanode/ui/lib/databases';
 
 interface ViewProps {
@@ -77,119 +72,40 @@ export const View = ({ view }: ViewProps) => {
         isSortsOpened,
         isFieldFilterOpened: (fieldId: string) =>
           openedFieldFilters.includes(fieldId),
-        initFieldFilter: async (fieldId: string) => {
-          if (!database.canEdit) {
-            return;
-          }
+        initFieldFilter: (fieldId: string) => {
+          workspace.collections.nodes.update(view.id, (draft) => {
+            if (draft.type !== 'database_view') return;
 
-          if (view.filters?.[fieldId]) {
-            setOpenedFieldFilters((prev) => [...prev, fieldId]);
-            return;
-          }
-
-          const viewAttributes = mapNodeAttributes(
-            view
-          ) as DatabaseViewAttributes;
-          viewAttributes.filters = viewAttributes.filters ?? {};
-
-          if (fieldId === SpecialId.Name) {
-            const operators = getFieldFilterOperators('text');
-            const filter: DatabaseViewFieldFilterAttributes = {
-              type: 'field',
-              id: fieldId,
-              fieldId,
-              operator: operators[0]?.value ?? 'contains',
-            };
-
-            viewAttributes.filters[fieldId] = filter;
-          } else {
-            const field = database.fields.find((f) => f.id === fieldId);
-            if (!field) {
+            const existingFilter = draft.filters?.[fieldId];
+            if (existingFilter) {
+              setOpenedFieldFilters((prev) =>
+                prev.filter((id) => id !== fieldId)
+              );
               return;
             }
 
-            const operators = getFieldFilterOperators(field.type);
-            const filter: DatabaseViewFieldFilterAttributes = {
-              type: 'field',
+            if (fieldId !== SpecialId.Name) {
+              const field = database.fields.find((f) => f.id === fieldId);
+              if (!field) {
+                return;
+              }
+            }
+
+            const filter: DatabaseViewFilterAttributes = {
               id: fieldId,
               fieldId,
-              operator: operators[0]?.value ?? '',
+              type: 'field',
+              operator: 'equals',
+              value: '',
             };
 
-            viewAttributes.filters[fieldId] = filter;
-          }
+            draft.filters = {
+              ...draft.filters,
+              [fieldId]: filter,
+            };
 
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
             setOpenedFieldFilters((prev) => [...prev, fieldId]);
-          }
-        },
-        updateFilter: async (
-          id: string,
-          filter: DatabaseViewFilterAttributes
-        ) => {
-          if (!database.canEdit) {
-            return;
-          }
-
-          if (!view.filters?.[id]) {
-            return;
-          }
-
-          const viewAttributes = mapNodeAttributes(
-            view
-          ) as DatabaseViewAttributes;
-          viewAttributes.filters = viewAttributes.filters ?? {};
-          viewAttributes.filters[id] = filter;
-
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
           });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            setIsSearchBarOpened(true);
-          }
-        },
-        removeFilter: async (id: string) => {
-          if (!database.canEdit) {
-            return;
-          }
-
-          if (!view.filters?.[id]) {
-            return;
-          }
-
-          const viewAttributes = mapNodeAttributes(
-            view
-          ) as DatabaseViewAttributes;
-          viewAttributes.filters = viewAttributes.filters ?? {};
-          delete viewAttributes.filters[id];
-
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            setIsSearchBarOpened(true);
-          }
         },
         initFieldSort: async (fieldId: string, direction: SortDirection) => {
           if (!database.canEdit) {
@@ -201,23 +117,19 @@ export const View = ({ view }: ViewProps) => {
             return;
           }
 
-          const viewAttributes = mapNodeAttributes(
-            view
-          ) as DatabaseViewAttributes;
-          viewAttributes.sorts = viewAttributes.sorts ?? {};
+          workspace.collections.nodes.update(view.id, (draft) => {
+            if (draft.type !== 'database_view') return;
 
-          if (fieldId === SpecialId.Name) {
-            const sort: DatabaseViewSortAttributes = {
-              id: fieldId,
-              fieldId,
-              direction,
-            };
-
-            viewAttributes.sorts[fieldId] = sort;
-          } else {
-            const field = database.fields.find((f) => f.id === fieldId);
-            if (!field) {
+            const existingSort = draft.sorts?.[fieldId];
+            if (existingSort && existingSort.direction === direction) {
               return;
+            }
+
+            if (fieldId !== SpecialId.Name) {
+              const field = database.fields.find((f) => f.id === fieldId);
+              if (!field) {
+                return;
+              }
             }
 
             const sort: DatabaseViewSortAttributes = {
@@ -226,80 +138,11 @@ export const View = ({ view }: ViewProps) => {
               direction,
             };
 
-            viewAttributes.sorts[fieldId] = sort;
-          }
-
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
+            draft.sorts = {
+              ...draft.sorts,
+              [fieldId]: sort,
+            };
           });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            setIsSearchBarOpened(true);
-            setIsSortsOpened(true);
-          }
-        },
-        updateSort: async (id: string, sort: DatabaseViewSortAttributes) => {
-          if (!database.canEdit) {
-            return;
-          }
-
-          if (!view.sorts?.[id]) {
-            return;
-          }
-
-          const viewAttributes = mapNodeAttributes(
-            view
-          ) as DatabaseViewAttributes;
-          viewAttributes.sorts = viewAttributes.sorts ?? {};
-          viewAttributes.sorts[id] = sort;
-
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            setIsSearchBarOpened(true);
-            setIsSortsOpened(true);
-          }
-        },
-        removeSort: async (id: string) => {
-          if (!database.canEdit) {
-            return;
-          }
-
-          if (!view.sorts?.[id]) {
-            return;
-          }
-
-          const viewAttributes = mapNodeAttributes(
-            view
-          ) as DatabaseViewAttributes;
-          viewAttributes.sorts = viewAttributes.sorts ?? {};
-          delete viewAttributes.sorts[id];
-
-          const result = await window.colanode.executeMutation({
-            type: 'view.update',
-            userId: workspace.userId,
-            viewId: view.id,
-            view: viewAttributes,
-          });
-
-          if (!result.success) {
-            toast.error(result.error.message);
-          } else {
-            setIsSearchBarOpened(true);
-            setIsSortsOpened(true);
-          }
         },
         openSearchBar: () => {
           setIsSearchBarOpened(true);

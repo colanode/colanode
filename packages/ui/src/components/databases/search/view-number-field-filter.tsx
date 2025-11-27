@@ -19,6 +19,7 @@ import {
 } from '@colanode/ui/components/ui/popover';
 import { SmartNumberInput } from '@colanode/ui/components/ui/smart-number-input';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
 import { numberFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewNumberFieldFilterProps {
@@ -35,6 +36,10 @@ export const ViewNumberFieldFilter = ({
   filter,
 }: ViewNumberFieldFilterProps) => {
   const view = useDatabaseView();
+  const { updateFilter, removeFilter } = useViewFilter({
+    viewId: view.id,
+    filterId: filter.id,
+  });
 
   const operator =
     numberFieldFilterOperators.find(
@@ -92,7 +97,7 @@ export const ViewNumberFieldFilter = ({
                       ? null
                       : numberValue;
 
-                    view.updateFilter(filter.id, {
+                    updateFilter({
                       ...filter,
                       operator: operator.value,
                       value: value,
@@ -104,13 +109,7 @@ export const ViewNumberFieldFilter = ({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              view.removeFilter(filter.id);
-            }}
-          >
+          <Button variant="ghost" size="icon" onClick={removeFilter}>
             <Trash2 className="size-4" />
           </Button>
         </div>
@@ -118,7 +117,7 @@ export const ViewNumberFieldFilter = ({
           <SmartNumberInput
             value={numberValue ?? null}
             onChange={(value) => {
-              view.updateFilter(filter.id, {
+              updateFilter({
                 ...filter,
                 value: value,
               });

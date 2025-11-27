@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useViewSort } from '@colanode/ui/hooks/use-view-sort';
 
 interface ViewSortFieldRowProps {
   sort: DatabaseViewSortAttributes;
@@ -18,6 +19,11 @@ interface ViewSortFieldRowProps {
 
 export const ViewSortFieldRow = ({ sort, field }: ViewSortFieldRowProps) => {
   const view = useDatabaseView();
+
+  const { updateSort, removeSort } = useViewSort({
+    viewId: view.id,
+    sortId: sort.id,
+  });
 
   return (
     <div className="flex flex-row items-center gap-3 text-sm">
@@ -36,7 +42,7 @@ export const ViewSortFieldRow = ({ sort, field }: ViewSortFieldRowProps) => {
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={() => {
-              view.updateSort(sort.id, {
+              updateSort({
                 ...sort,
                 direction: 'asc',
               });
@@ -47,7 +53,7 @@ export const ViewSortFieldRow = ({ sort, field }: ViewSortFieldRowProps) => {
           <DropdownMenuItem
             className="cursor-pointer"
             onClick={() => {
-              view.updateSort(sort.id, {
+              updateSort({
                 ...sort,
                 direction: 'desc',
               });
@@ -57,13 +63,7 @@ export const ViewSortFieldRow = ({ sort, field }: ViewSortFieldRowProps) => {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => {
-          view.removeSort(sort.id);
-        }}
-      >
+      <Button variant="ghost" size="icon" onClick={removeSort}>
         <Trash2 className="size-4" />
       </Button>
     </div>

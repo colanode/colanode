@@ -18,6 +18,7 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
 import { booleanFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewBooleanFieldFilterProps {
@@ -30,6 +31,10 @@ export const ViewBooleanFieldFilter = ({
   filter,
 }: ViewBooleanFieldFilterProps) => {
   const view = useDatabaseView();
+  const { updateFilter, removeFilter } = useViewFilter({
+    viewId: view.id,
+    filterId: filter.id,
+  });
 
   const operator =
     booleanFieldFilterOperators.find(
@@ -79,7 +84,7 @@ export const ViewBooleanFieldFilter = ({
                 <DropdownMenuItem
                   key={operator.value}
                   onSelect={() => {
-                    view.updateFilter(filter.id, {
+                    updateFilter({
                       ...filter,
                       operator: operator.value,
                     });
@@ -90,13 +95,7 @@ export const ViewBooleanFieldFilter = ({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              view.removeFilter(filter.id);
-            }}
-          >
+          <Button variant="ghost" size="icon" onClick={removeFilter}>
             <Trash2 className="size-4" />
           </Button>
         </div>

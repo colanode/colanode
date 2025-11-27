@@ -19,6 +19,7 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
 import { dateFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewDateFieldFilterProps {
@@ -35,6 +36,10 @@ export const ViewDateFieldFilter = ({
   filter,
 }: ViewDateFieldFilterProps) => {
   const view = useDatabaseView();
+  const { updateFilter, removeFilter } = useViewFilter({
+    viewId: view.id,
+    filterId: filter.id,
+  });
 
   const operator =
     dateFieldFilterOperators.find(
@@ -93,7 +98,7 @@ export const ViewDateFieldFilter = ({
                       ? null
                       : dateValue?.toISOString();
 
-                    view.updateFilter(filter.id, {
+                    updateFilter({
                       ...filter,
                       operator: operator.value,
                       value: value ?? null,
@@ -105,13 +110,7 @@ export const ViewDateFieldFilter = ({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              view.removeFilter(filter.id);
-            }}
-          >
+          <Button variant="ghost" size="icon" onClick={removeFilter}>
             <Trash2 className="size-4" />
           </Button>
         </div>
@@ -120,12 +119,12 @@ export const ViewDateFieldFilter = ({
             value={dateValue}
             onChange={(newValue) => {
               if (newValue === null || newValue === undefined) {
-                view.updateFilter(filter.id, {
+                updateFilter({
                   ...filter,
                   value: null,
                 });
               } else {
-                view.updateFilter(filter.id, {
+                updateFilter({
                   ...filter,
                   value: newValue.toISOString(),
                 });
