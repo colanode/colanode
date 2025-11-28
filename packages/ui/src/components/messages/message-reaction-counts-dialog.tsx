@@ -34,7 +34,7 @@ export const MessageReactionCountsDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-hidden p-2 outline-none w-lg min-w-lg max-w-lg h-lg min-h-lg max-h-lg">
+      <DialogContent className="overflow-hidden p-2 outline-none w-lg min-w-lg max-w-lg h-128 min-h-128 max-h-128">
         <VisuallyHidden>
           <DialogTitle>Reactions</DialogTitle>
         </VisuallyHidden>
@@ -42,15 +42,15 @@ export const MessageReactionCountsDialog = ({
           defaultValue={reactionCounts[0]!.reaction}
           className="flex flex-row gap-4"
         >
-          <TabsList className="flex flex-col gap-4">
+          <TabsList className="flex flex-col h-full justify-start items-start shrink-0 w-20">
             {reactionCounts.map((reactionCount) => (
               <TabsTrigger
                 key={`tab-trigger-${reactionCount.reaction}`}
-                className="flex w-full flex-row items-center justify-start gap-2 p-2"
+                className="flex w-full flex-row items-center justify-start gap-2 p-2 h-auto flex-none"
                 value={reactionCount.reaction}
               >
                 <EmojiElement id={reactionCount.reaction} className="size-5" />
-                {reactionCount.count}
+                <span>{reactionCount.count}</span>
               </TabsTrigger>
             ))}
           </TabsList>
