@@ -41,32 +41,40 @@ export const createNodeReactionsCollection = (userId: string) => {
 
         return {
           cleanup: () => window.eventBus.unsubscribe(subscriptionId),
-          loadSubset: async (options) => {
+          loadSubset: (options) => {
             const parsedOptions = parseLoadSubsetOptions(options);
             const nodeId = parsedOptions.filters.find(
               (filter) => filter.field.join('.') === 'nodeId'
             )?.value;
 
             if (!nodeId) {
-              return;
+              return true;
             }
 
             if (loadedNodeIds.has(nodeId)) {
-              return;
+              return true;
             }
 
             loadedNodeIds.add(nodeId);
-            const nodeReactions = await window.colanode.executeQuery({
-              type: 'node.reaction.list',
-              userId,
-              nodeId,
+
+            const promise = new Promise<void>((resolve) => {
+              window.colanode
+                .executeQuery({
+                  type: 'node.reaction.list',
+                  userId,
+                  nodeId,
+                })
+                .then((nodeReactions) => {
+                  begin();
+                  for (const nodeReaction of nodeReactions) {
+                    write({ type: 'insert', value: nodeReaction });
+                  }
+                  commit();
+                  resolve();
+                });
             });
 
-            begin();
-            for (const nodeReaction of nodeReactions) {
-              write({ type: 'insert', value: nodeReaction });
-            }
-            commit();
+            return promise;
           },
         };
       },
