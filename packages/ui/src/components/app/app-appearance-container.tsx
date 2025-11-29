@@ -8,6 +8,7 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import { cn } from '@colanode/ui/lib/utils';
+import { AppLanguageSection } from './app-language-section';
 
 interface ThemeModeOption {
   key: string;
@@ -170,6 +171,7 @@ export const AppAppearanceContainer = () => {
             );
           })}
         </div>
+        <AppLanguageSection />
       </div>
     </Container>
   );
