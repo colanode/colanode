@@ -39,8 +39,7 @@ export const RecordProvider = ({
             recordId: record.id,
             fieldId: field.id,
             value,
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
           });
 
           if (!result.success) {
@@ -52,8 +51,7 @@ export const RecordProvider = ({
             type: 'record.field.value.delete',
             recordId: record.id,
             fieldId: field.id,
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
           });
 
           if (!result.success) {

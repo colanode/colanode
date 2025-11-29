@@ -13,6 +13,7 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -21,6 +22,7 @@ interface MessageDeleteButtonProps {
 }
 
 export const MessageDeleteButton = ({ id }: MessageDeleteButtonProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -35,15 +37,14 @@ export const MessageDeleteButton = ({ id }: MessageDeleteButtonProps) => {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              Are you sure you want delete this message?
+              {t('message.deleteMessageConfirm')}
             </AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This message will no longer be
-              accessible by you or others you&apos;ve shared it with.
+              {t('message.deleteMessageDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <Button
               variant="destructive"
               disabled={isPending}
@@ -65,7 +66,7 @@ export const MessageDeleteButton = ({ id }: MessageDeleteButtonProps) => {
               }}
             >
               {isPending && <Spinner className="mr-1" />}
-              Delete
+              {t('common.delete')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

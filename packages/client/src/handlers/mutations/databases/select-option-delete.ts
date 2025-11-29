@@ -14,7 +14,7 @@ export class SelectOptionDeleteMutationHandler
   async handleMutation(
     input: SelectOptionDeleteMutationInput
   ): Promise<SelectOptionDeleteMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const result = await workspace.nodes.updateNode<DatabaseAttributes>(
       input.databaseId,

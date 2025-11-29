@@ -2,8 +2,7 @@ import { LocalDatabaseViewNode } from '@colanode/client/types/nodes';
 
 export type DatabaseViewListQueryInput = {
   type: 'database.view.list';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   databaseId: string;
 };
 

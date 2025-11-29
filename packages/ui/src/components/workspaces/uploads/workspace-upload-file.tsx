@@ -3,8 +3,8 @@ import { BadgeAlert } from 'lucide-react';
 import { Upload, LocalFileNode } from '@colanode/client/types';
 import { formatBytes, timeAgo } from '@colanode/core';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
+import { Link } from '@colanode/ui/components/ui/link';
 import { WorkspaceUploadStatus } from '@colanode/ui/components/workspaces/uploads/workspace-upload-status';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -14,12 +14,10 @@ interface WorkspaceUploadFileProps {
 
 export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
 
   const fileQuery = useLiveQuery({
     type: 'node.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     nodeId: upload.fileId,
   });
 
@@ -30,7 +28,7 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
       <div className="border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors flex items-center gap-6 cursor-pointer">
         <BadgeAlert className="size-10 text-muted-foreground" />
 
-        <div className="flex-grow flex flex-col gap-2 justify-center items-start min-w-0">
+        <div className="grow flex flex-col gap-2 justify-center items-start min-w-0">
           <p className="font-medium text-sm truncate w-full">
             File not found or has been deleted
           </p>
@@ -38,7 +36,7 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
             <p className="text-xs text-red-500">{upload.errorMessage}</p>
           )}
         </div>
-        <div className="flex items-center gap-2 flex-shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <div className="w-10 flex items-center justify-center">
             <WorkspaceUploadStatus
               status={upload.status}
@@ -51,15 +49,18 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
   }
 
   return (
-    <div
+    <Link
+      from="/workspace/$userId"
+      to="$nodeId"
+      params={{ nodeId: file.id }}
       className="border rounded-lg p-4 bg-card hover:bg-accent/50 transition-colors flex items-center gap-6 cursor-pointer"
-      onClick={() => {
-        layout.previewLeft(file.id, true);
-      }}
     >
-      <FileThumbnail file={file} className="size-10 text-muted-foreground" />
-
-      <div className="flex-grow flex flex-col gap-2 justify-center items-start min-w-0">
+      <FileThumbnail
+        userId={workspace.userId}
+        file={file}
+        className="size-10 text-muted-foreground"
+      />
+      <div className="grow flex flex-col gap-2 justify-center items-start min-w-0">
         <p className="font-medium text-sm truncate w-full">
           {file.attributes.name}
         </p>
@@ -74,7 +75,7 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
           <p className="text-xs text-red-500">{upload.errorMessage}</p>
         )}
       </div>
-      <div className="flex items-center gap-2 flex-shrink-0">
+      <div className="flex items-center gap-2 shrink-0">
         <div className="w-10 flex items-center justify-center">
           <WorkspaceUploadStatus
             status={upload.status}
@@ -82,6 +83,6 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
           />
         </div>
       </div>
-    </div>
+    </Link>
   );
 };

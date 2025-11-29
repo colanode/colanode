@@ -3,20 +3,18 @@ import { NodeViewWrapper } from '@tiptap/react';
 
 import { LocalFolderNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { useLayout } from '@colanode/ui/contexts/layout';
+import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const FolderNodeView = ({ node }: NodeViewProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
 
   const id = node.attrs.id;
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: id,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (!id) {
@@ -36,17 +34,15 @@ export const FolderNodeView = ({ node }: NodeViewProps) => {
   const avatar = folder.attributes.avatar;
 
   return (
-    <NodeViewWrapper
-      data-id={node.attrs.id}
-      className="my-0.5 flex h-10 w-full cursor-pointer flex-row items-center gap-1 rounded-md p-1 hover:bg-accent"
-      onClick={() => {
-        layout.previewLeft(id, true);
-      }}
-    >
-      <Avatar size="small" id={id} name={name} avatar={avatar} />
-      <div role="presentation" className="flex-grow">
-        {name}
-      </div>
+    <NodeViewWrapper data-id={node.attrs.id}>
+      <Link from="/workspace/$userId" to="$nodeId" params={{ nodeId: id }}>
+        <div className="my-0.5 flex h-10 w-full cursor-pointer flex-row items-center gap-1 rounded-md p-1 hover:bg-accent">
+          <Avatar size="small" id={id} name={name} avatar={avatar} />
+          <div role="presentation" className="grow">
+            {name}
+          </div>
+        </div>
+      </Link>
     </NodeViewWrapper>
   );
 };

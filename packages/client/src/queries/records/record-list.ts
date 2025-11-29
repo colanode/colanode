@@ -11,8 +11,7 @@ export type RecordListQueryInput = {
   sorts: DatabaseViewSortAttributes[];
   page: number;
   count: number;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 declare module '@colanode/client/queries' {

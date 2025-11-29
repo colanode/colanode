@@ -4,6 +4,7 @@ import {
   ScrollViewport,
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface IconSearchProps {
@@ -11,6 +12,7 @@ interface IconSearchProps {
 }
 
 export const IconSearch = ({ query }: IconSearchProps) => {
+  const { t } = useI18n();
   const iconSearchQuery = useLiveQuery({
     type: 'icon.search',
     query,
@@ -24,7 +26,9 @@ export const IconSearch = ({ query }: IconSearchProps) => {
       <ScrollViewport>
         <div className="grid w-full min-w-full grid-cols-10 gap-1">
           <div className="col-span-full flex items-center py-1 pl-1 text-sm text-muted-foreground">
-            <p>Search results for &quot;{query}&quot;</p>
+            <p>
+              {t('common.search')}: &quot;{query}&quot;
+            </p>
           </div>
           {icons.map((icon) => (
             <IconPickerItem key={icon.id} icon={icon} />

@@ -15,6 +15,7 @@ import {
   ScrollViewport,
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -29,14 +30,14 @@ export const RecordSearch = ({
   onSelect,
   databaseId,
 }: RecordSearchProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
 
   const [query, setQuery] = useState('');
   const recordSearchQuery = useLiveQuery({
     type: 'record.search',
     searchQuery: query,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     exclude,
     databaseId,
   });
@@ -46,10 +47,10 @@ export const RecordSearch = ({
       <CommandInput
         value={query}
         onValueChange={setQuery}
-        placeholder="Search records..."
+        placeholder={t('database.searchRecords')}
         className="h-9"
       />
-      <CommandEmpty>No record found.</CommandEmpty>
+      <CommandEmpty>{t('view.noRecords')}</CommandEmpty>
       <ScrollArea className="h-80">
         <ScrollViewport>
           <CommandList className="max-h-none overflow-hidden">
@@ -69,9 +70,7 @@ export const RecordSearch = ({
                       avatar={record.attributes.avatar}
                       className="size-4"
                     />
-                    <p className="text-sm flex-grow">
-                      {record.attributes.name}
-                    </p>
+                    <p className="text-sm grow">{record.attributes.name}</p>
                   </div>
                 </CommandItem>
               ))}

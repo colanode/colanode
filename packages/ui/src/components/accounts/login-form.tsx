@@ -13,6 +13,7 @@ import { ServerDropdown } from '@colanode/ui/components/servers/server-dropdown'
 import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useApp } from '@colanode/ui/contexts/app';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { ServerContext } from '@colanode/ui/contexts/server';
 
 interface LoginFormProps {
@@ -53,6 +54,7 @@ type PanelState =
 
 export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
   const app = useApp();
+  const { t } = useI18n();
 
   const [serverDomain, setServerDomain] = useState<string | null>(
     servers[0]?.domain ?? null
@@ -199,7 +201,7 @@ export const LoginForm = ({ accounts, servers }: LoginFormProps) => {
             }}
           >
             <HouseIcon className="mr-1 size-4" />
-            Back to workspace
+            {t('auth.backToWorkspace')}
           </Button>
         </Fragment>
       )}

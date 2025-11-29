@@ -19,6 +19,7 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { dateFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewDateFieldFilterProps {
@@ -34,6 +35,7 @@ export const ViewDateFieldFilter = ({
   field,
   filter,
 }: ViewDateFieldFilterProps) => {
+  const { t } = useI18n();
   const view = useDatabaseView();
 
   const operator =
@@ -79,7 +81,7 @@ export const ViewDateFieldFilter = ({
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <div className="flex flex-grow flex-row items-center gap-1 rounded-md p-1 font-semibold cursor-pointer hover:bg-accent">
+              <div className="flex grow flex-row items-center gap-1 rounded-md p-1 font-semibold cursor-pointer hover:bg-accent">
                 <p>{operator.label}</p>
                 <ChevronDown className="size-4 text-muted-foreground" />
               </div>
@@ -131,7 +133,7 @@ export const ViewDateFieldFilter = ({
                 });
               }
             }}
-            placeholder="Select date"
+            placeholder={t('database.selectDate')}
             className="flex h-full w-full cursor-pointer flex-row items-center gap-1 rounded-md border border-input p-2 text-sm"
           />
         )}

@@ -1,7 +1,6 @@
 export type DatabaseUpdateMutationInput = {
   type: 'database.update';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   databaseId: string;
   name: string;
   avatar?: string | null;

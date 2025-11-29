@@ -26,7 +26,7 @@ export class SpaceChildReorderMutationHandler
   async handleMutation(
     input: SpaceChildReorderMutationInput
   ): Promise<SpaceChildReorderMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     const children = await workspace.database
       .selectFrom('nodes')
       .where('parent_id', '=', input.spaceId)

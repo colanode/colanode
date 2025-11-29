@@ -1,7 +1,6 @@
 export type PageCreateMutationInput = {
   type: 'page.create';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   parentId: string;
   avatar?: string | null;
   name: string;

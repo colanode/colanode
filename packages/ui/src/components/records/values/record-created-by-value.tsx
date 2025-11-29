@@ -1,8 +1,10 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
 import { CreatedByFieldAttributes } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface RecordCreatedByValueProps {
   field: CreatedByFieldAttributes;
@@ -11,35 +13,29 @@ interface RecordCreatedByValueProps {
 export const RecordCreatedByValue = ({ field }: RecordCreatedByValueProps) => {
   const workspace = useWorkspace();
   const record = useRecord();
-  const userGetQuery = useLiveQuery({
-    type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId: record.createdBy,
-  });
+  const userQuery = useLiveQuery((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, record.createdBy))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
+  );
 
-  const createdBy = userGetQuery.data
-    ? {
-        name: userGetQuery.data.name,
-        avatar: userGetQuery.data.avatar,
-      }
-    : {
-        name: 'Unknown',
-        avatar: null,
-      };
+  const user = userQuery.data;
+  const name = user?.name ?? 'Unknown';
+  const avatar = user?.avatar;
 
   return (
     <div
       className="flex h-full w-full flex-row items-center gap-1 text-sm p-0"
       data-field={field.id}
     >
-      <Avatar
-        id={record.createdBy}
-        name={createdBy.name}
-        avatar={createdBy.avatar}
-        size="small"
-      />
-      <p>{createdBy.name}</p>
+      <Avatar id={record.createdBy} name={name} avatar={avatar} size="small" />
+      <p>{name}</p>
     </div>
   );
 };

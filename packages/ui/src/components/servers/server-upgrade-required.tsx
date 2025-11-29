@@ -1,31 +1,31 @@
 import { CircleFadingArrowUp } from 'lucide-react';
 
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useServer } from '@colanode/ui/contexts/server';
 
 export const ServerUpgradeRequired = () => {
+  const { t } = useI18n();
   const server = useServer();
 
   return (
-    <div className="flex h-full w-full items-center justify-center">
-      <div className="flex flex-col items-center gap-8 text-center w-128">
+    <div className="flex h-screen w-full items-center justify-center">
+      <div className="flex flex-col items-center gap-8 text-center w-lg">
         <CircleFadingArrowUp className="h-10 w-10 text-foreground" />
-        <h2 className="text-4xl text-foreground">Server upgrade required</h2>
+        <h2 className="text-4xl text-foreground">
+          {t('misc.serverUpgradeRequired')}
+        </h2>
         <p className="text-sm text-muted-foreground">
-          The Colanode server{' '}
-          <span className="font-semibold">{server.name}</span> with domain{' '}
-          <span className="font-semibold">{server.domain}</span> is running an
-          outdated version and cannot serve this workspace. Please ask your
-          administrator to upgrade it to the latest release.
+          {t('misc.serverUpgradeRequired')} -{' '}
+          <span className="font-semibold">{server.name}</span> ({server.domain})
         </p>
         <p className="text-sm text-muted-foreground">
-          Check the{' '}
           <a
             href="https://github.com/colanode/colanode"
             target="_blank"
             rel="noopener noreferrer"
             className="text-blue-500 underline"
           >
-            Github repository
+            {t('errors.github')}
           </a>
         </p>
       </div>

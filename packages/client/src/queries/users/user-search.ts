@@ -3,8 +3,7 @@ import { User } from '@colanode/client/types/users';
 export type UserSearchQueryInput = {
   type: 'user.search';
   searchQuery: string;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   exclude?: string[];
 };
 

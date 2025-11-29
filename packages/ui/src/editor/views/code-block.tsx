@@ -23,6 +23,7 @@ import {
   ScrollViewport,
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { defaultClasses } from '@colanode/ui/editor/classes';
 import { languages } from '@colanode/ui/lib/lowlight';
 import { cn } from '@colanode/ui/lib/utils';
@@ -31,6 +32,7 @@ export const CodeBlockNodeView = ({
   node,
   updateAttributes,
 }: NodeViewProps) => {
+  const { t } = useI18n();
   const language = node.attrs?.language ?? 'plaintext';
   const languageItem = languages.find((item) => item.code === language);
   const code = node.textContent ?? '';
@@ -52,7 +54,7 @@ export const CodeBlockNodeView = ({
           </PopoverTrigger>
           <PopoverContent className="p-2 overflow-hidden">
             <Command className="min-h-min">
-              <CommandInput placeholder="Search language..." />
+              <CommandInput placeholder={t('misc.searchLanguage')} />
               <CommandEmpty>No languages found.</CommandEmpty>
               <ScrollArea className="h-80">
                 <ScrollViewport>
@@ -97,7 +99,7 @@ export const CodeBlockNodeView = ({
           }}
         >
           <Clipboard className="size-4" />
-          <p>{copied ? 'Copied' : 'Copy code'}</p>
+          <p>{copied ? t('misc.copied') : t('misc.copyCode')}</p>
         </div>
       </div>
       <code>

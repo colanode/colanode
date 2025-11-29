@@ -13,10 +13,10 @@ export const useNodeRadar = (node: Node | null | undefined) => {
       return;
     }
 
-    radar.markNodeAsOpened(workspace.accountId, workspace.id, node.id);
+    radar.markNodeAsOpened(workspace.userId, node.id);
 
     const interval = setInterval(() => {
-      radar.markNodeAsOpened(workspace.accountId, workspace.id, node.id);
+      radar.markNodeAsOpened(workspace.userId, node.id);
     }, 60000);
 
     return () => clearInterval(interval);

@@ -15,7 +15,7 @@ export class FolderUpdateMutationHandler
   async handleMutation(
     input: FolderUpdateMutationInput
   ): Promise<FolderUpdateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const result = await workspace.nodes.updateNode<FolderAttributes>(
       input.folderId,

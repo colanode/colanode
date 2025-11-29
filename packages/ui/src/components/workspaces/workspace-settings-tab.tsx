@@ -1,10 +1,12 @@
-import { Settings } from 'lucide-react';
+import { TabItem } from '@colanode/ui/components/layouts/tabs/tab-item';
+import { defaultIcons } from '@colanode/ui/lib/assets';
 
 export const WorkspaceSettingsTab = () => {
   return (
-    <div className="flex items-center space-x-2">
-      <Settings className="size-4" />
-      <span>Workspace Settings</span>
-    </div>
+    <TabItem
+      id="settings"
+      avatar={defaultIcons.settings}
+      name="Workspace Settings"
+    />
   );
 };

@@ -1,0 +1,68 @@
+import { useNavigate } from '@tanstack/react-router';
+import { toast } from 'sonner';
+
+import { LogoutBreadcrumb } from '@colanode/ui/components/auth/logout-breadcrumb';
+import { Container } from '@colanode/ui/components/layouts/containers/container';
+import { Button } from '@colanode/ui/components/ui/button';
+import { Separator } from '@colanode/ui/components/ui/separator';
+import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
+
+export const LogoutContainer = () => {
+  const { t } = useI18n();
+  const workspace = useWorkspace();
+  const navigate = useNavigate();
+  const { mutate, isPending } = useMutation();
+
+  return (
+    <Container type="full" breadcrumb={<LogoutBreadcrumb />}>
+      <div className="max-w-4xl space-y-8">
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              {t('common.logout')}
+            </h2>
+            <Separator className="mt-3" />
+          </div>
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex-1 space-y-2">
+              <h3 className="font-semibold">{t('auth.signOut')}</h3>
+              <p className="text-sm text-muted-foreground">
+                {t('auth.signOutDescription')}
+              </p>
+            </div>
+            <div className="w-full md:w-auto md:shrink-0">
+              <Button
+                variant="destructive"
+                disabled={isPending}
+                className="w-full cursor-pointer md:w-20"
+                onClick={async () => {
+                  mutate({
+                    input: {
+                      type: 'account.logout',
+                      accountId: workspace.accountId,
+                    },
+                    onSuccess() {
+                      navigate({
+                        to: '/',
+                        replace: true,
+                      });
+                    },
+                    onError(error) {
+                      toast.error(error.message);
+                    },
+                  });
+                }}
+              >
+                {isPending && <Spinner className="mr-1" />}
+                {t('common.logout')}
+              </Button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </Container>
+  );
+};

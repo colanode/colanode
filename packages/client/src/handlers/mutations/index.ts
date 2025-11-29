@@ -3,17 +3,18 @@ import { MutationMap } from '@colanode/client/mutations';
 import { AppService } from '@colanode/client/services';
 
 import { AccountLogoutMutationHandler } from './accounts/account-logout';
-import { AccountMetadataDeleteMutationHandler } from './accounts/account-metadata-delete';
-import { AccountMetadataUpdateMutationHandler } from './accounts/account-metadata-update';
 import { AccountUpdateMutationHandler } from './accounts/account-update';
-import { EmailLoginMutationHandler } from './accounts/email-login';
-import { EmailPasswordResetCompleteMutationHandler } from './accounts/email-password-reset-complete';
-import { EmailPasswordResetInitMutationHandler } from './accounts/email-password-reset-init';
-import { EmailRegisterMutationHandler } from './accounts/email-register';
-import { EmailVerifyMutationHandler } from './accounts/email-verify';
-import { GoogleLoginMutationHandler } from './accounts/google-login';
-import { AppMetadataDeleteMutationHandler } from './apps/app-metadata-delete';
-import { AppMetadataUpdateMutationHandler } from './apps/app-metadata-update';
+import { MetadataDeleteMutationHandler } from './apps/metadata-delete';
+import { MetadataUpdateMutationHandler } from './apps/metadata-update';
+import { TabCreateMutationHandler } from './apps/tab-create';
+import { TabDeleteMutationHandler } from './apps/tab-delete';
+import { TabUpdateMutationHandler } from './apps/tab-update';
+import { EmailLoginMutationHandler } from './auth/email-login';
+import { EmailPasswordResetCompleteMutationHandler } from './auth/email-password-reset-complete';
+import { EmailPasswordResetInitMutationHandler } from './auth/email-password-reset-init';
+import { EmailRegisterMutationHandler } from './auth/email-register';
+import { EmailVerifyMutationHandler } from './auth/email-verify';
+import { GoogleLoginMutationHandler } from './auth/google-login';
 import { AvatarUploadMutationHandler } from './avatars/avatar-upload';
 import { ChannelCreateMutationHandler } from './channels/channel-create';
 import { ChannelDeleteMutationHandler } from './channels/channel-delete';
@@ -61,6 +62,7 @@ import { RecordFieldValueSetMutationHandler } from './records/record-field-value
 import { RecordNameUpdateMutationHandler } from './records/record-name-update';
 import { ServerCreateMutationHandler } from './servers/server-create';
 import { ServerDeleteMutationHandler } from './servers/server-delete';
+import { ServerSyncMutationHandler } from './servers/server-sync';
 import { SpaceChildReorderMutationHandler } from './spaces/space-child-reorder';
 import { SpaceCreateMutationHandler } from './spaces/space-create';
 import { SpaceDeleteMutationHandler } from './spaces/space-delete';
@@ -70,8 +72,6 @@ import { UserStorageUpdateMutationHandler } from './users/user-storage-update';
 import { UsersCreateMutationHandler } from './users/users-create';
 import { WorkspaceCreateMutationHandler } from './workspaces/workspace-create';
 import { WorkspaceDeleteMutationHandler } from './workspaces/workspace-delete';
-import { WorkspaceMetadataDeleteMutationHandler } from './workspaces/workspace-metadata-delete';
-import { WorkspaceMetadataUpdateMutationHandler } from './workspaces/workspace-metadata-update';
 import { WorkspaceUpdateMutationHandler } from './workspaces/workspace-update';
 
 export type MutationHandlerMap = {
@@ -122,6 +122,7 @@ export const buildMutationHandlerMap = (
     'select.option.update': new SelectOptionUpdateMutationHandler(app),
     'server.create': new ServerCreateMutationHandler(app),
     'server.delete': new ServerDeleteMutationHandler(app),
+    'server.sync': new ServerSyncMutationHandler(app),
     'space.create': new SpaceCreateMutationHandler(app),
     'space.delete': new SpaceDeleteMutationHandler(app),
     'user.role.update': new UserRoleUpdateMutationHandler(app),
@@ -143,22 +144,17 @@ export const buildMutationHandlerMap = (
     'page.update': new PageUpdateMutationHandler(app),
     'folder.update': new FolderUpdateMutationHandler(app),
     'database.update': new DatabaseUpdateMutationHandler(app),
-    'workspace.metadata.update': new WorkspaceMetadataUpdateMutationHandler(
-      app
-    ),
-    'workspace.metadata.delete': new WorkspaceMetadataDeleteMutationHandler(
-      app
-    ),
     'document.update': new DocumentUpdateMutationHandler(app),
-    'app.metadata.update': new AppMetadataUpdateMutationHandler(app),
-    'app.metadata.delete': new AppMetadataDeleteMutationHandler(app),
-    'account.metadata.update': new AccountMetadataUpdateMutationHandler(app),
-    'account.metadata.delete': new AccountMetadataDeleteMutationHandler(app),
+    'metadata.update': new MetadataUpdateMutationHandler(app),
+    'metadata.delete': new MetadataDeleteMutationHandler(app),
     'email.password.reset.init': new EmailPasswordResetInitMutationHandler(app),
     'email.password.reset.complete':
       new EmailPasswordResetCompleteMutationHandler(app),
     'workspace.delete': new WorkspaceDeleteMutationHandler(app),
     'user.storage.update': new UserStorageUpdateMutationHandler(app),
     'temp.file.create': new TempFileCreateMutationHandler(app),
+    'tab.create': new TabCreateMutationHandler(app),
+    'tab.update': new TabUpdateMutationHandler(app),
+    'tab.delete': new TabDeleteMutationHandler(app),
   };
 };

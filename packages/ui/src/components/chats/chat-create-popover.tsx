@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { SquarePen } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -8,14 +9,13 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { UserSearch } from '@colanode/ui/components/users/user-search';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export const ChatCreatePopover = () => {
   const workspace = useWorkspace();
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
-  const layout = useLayout();
 
   const [open, setOpen] = useState(false);
 
@@ -33,12 +33,16 @@ export const ChatCreatePopover = () => {
             mutate({
               input: {
                 type: 'chat.create',
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
-                userId: user.id,
+                userId: workspace.userId,
+                collaboratorId: user.id,
               },
               onSuccess(output) {
-                layout.openLeft(output.id);
+                navigate({
+                  to: '$nodeId',
+                  params: {
+                    nodeId: output.id,
+                  },
+                });
                 setOpen(false);
               },
               onError(error) {

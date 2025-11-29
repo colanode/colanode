@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -26,6 +27,7 @@ export const ChannelUpdateDialog = ({
   open,
   onOpenChange,
 }: ChannelUpdateDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
   const canEdit = hasNodeRole(role, 'editor');
@@ -34,9 +36,9 @@ export const ChannelUpdateDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Update channel</DialogTitle>
+          <DialogTitle>{t('channel.updateChannel')}</DialogTitle>
           <DialogDescription>
-            Update the channel name and icon
+            {t('channel.updateChannelDescription')}
           </DialogDescription>
         </DialogHeader>
         <ChannelForm
@@ -46,7 +48,7 @@ export const ChannelUpdateDialog = ({
             avatar: channel.attributes.avatar,
           }}
           isPending={isPending}
-          submitText="Update"
+          submitText={t('common.update')}
           readOnly={!canEdit}
           handleCancel={() => {
             onOpenChange(false);
@@ -62,12 +64,11 @@ export const ChannelUpdateDialog = ({
                 channelId: channel.id,
                 name: values.name,
                 avatar: values.avatar,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               },
               onSuccess() {
                 onOpenChange(false);
-                toast.success('Channel updated');
+                toast.success(t('channel.updateChannel'));
               },
               onError(error) {
                 toast.error(error.message);

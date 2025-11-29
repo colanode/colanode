@@ -38,7 +38,7 @@ export class AccountUpdateMutationHandler
       };
 
       const response = await accountService.client
-        .patch(`v1/accounts`, {
+        .patch(`v1/accounts/me`, {
           json: body,
         })
         .json<AccountUpdateOutput>();

@@ -22,9 +22,11 @@ import {
 } from '@colanode/ui/components/ui/tooltip';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { cn } from '@colanode/ui/lib/utils';
 
 export const TableViewSettings = () => {
+  const { t } = useI18n();
   const database = useDatabase();
   const view = useDatabaseView();
 
@@ -160,7 +162,7 @@ export const TableViewSettings = () => {
                   }}
                 >
                   <Trash2 className="size-4" />
-                  <span>Delete view</span>
+                  <span>{t('view.deleteView')}</span>
                 </div>
               </div>
             </Fragment>

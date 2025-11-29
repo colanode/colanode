@@ -4,8 +4,8 @@ import React, { Fragment } from 'react';
 import { toast } from 'sonner';
 
 import { RecordNode } from '@colanode/core';
+import { Link } from '@colanode/ui/components/ui/link';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -59,7 +59,6 @@ interface TableViewNameCellProps {
 
 export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
   const workspace = useWorkspace();
-  const layout = useLayout();
   const [isEditing, setIsEditing] = React.useState(false);
 
   const { mutate, isPending } = useMutation();
@@ -74,8 +73,7 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
         type: 'record.name.update',
         name: newName,
         recordId: record.id,
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
+        userId: workspace.userId,
       },
       onSuccess() {
         setIsEditing(false);
@@ -106,15 +104,14 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
               <span className="text-muted-foreground">Unnamed</span>
             )}
           </div>
-          <button
-            type="button"
+          <Link
+            from="/workspace/$userId/$nodeId"
+            to="modal/$modalNodeId"
+            params={{ modalNodeId: record.id }}
             className="absolute right-2 flex h-6 cursor-pointer flex-row items-center gap-1 rounded-md border p-1 text-sm text-muted-foreground opacity-0 hover:bg-accent group-hover:opacity-100"
-            onClick={() => {
-              layout.previewLeft(record.id, true);
-            }}
           >
             <SquareArrowOutUpRight className="mr-1 size-4" /> <p>Open</p>
-          </button>
+          </Link>
           {isPending && (
             <span className="absolute right-2 text-muted-foreground">
               <Spinner size="small" />

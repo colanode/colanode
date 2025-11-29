@@ -1,19 +1,18 @@
 import { ChatCreatePopover } from '@colanode/ui/components/chats/chat-create-popover';
 import { ChatSidebarItem } from '@colanode/ui/components/chats/chat-sidebar-item';
 import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
-import { useLayout } from '@colanode/ui/contexts/layout';
+import { Link } from '@colanode/ui/components/ui/link';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
-import { cn } from '@colanode/ui/lib/utils';
 
 export const SidebarChats = () => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
-  const layout = useLayout();
 
   const chatListQuery = useLiveQuery({
     type: 'chat.list',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     page: 0,
     count: 100,
   });
@@ -22,24 +21,23 @@ export const SidebarChats = () => {
 
   return (
     <div className="flex flex-col group/sidebar h-full px-2">
-      <SidebarHeader title="Chats" actions={<ChatCreatePopover />} />
+      <SidebarHeader title={t('chat.chats')} actions={<ChatCreatePopover />} />
       <div className="flex w-full min-w-0 flex-col gap-1">
         {chats.map((item) => (
-          <button
+          <Link
             key={item.id}
-            className={cn(
-              'px-2 flex w-full items-center gap-2 overflow-hidden rounded-md text-left text-sm h-7 cursor-pointer text-foreground hover:bg-muted',
-              layout.activeTab === item.id && 'bg-muted font-medium'
-            )}
-            onClick={() => {
-              layout.preview(item.id);
-            }}
-            onDoubleClick={() => {
-              layout.open(item.id);
+            from="/workspace/$userId"
+            to="$nodeId"
+            params={{ nodeId: item.id }}
+            className="px-2 flex w-full items-center gap-2 overflow-hidden rounded-md text-left text-sm h-7 cursor-pointer text-foreground hover:bg-muted"
+            activeProps={{
+              className: 'bg-muted font-medium',
             }}
           >
-            <ChatSidebarItem chat={item} />
-          </button>
+            {({ isActive }) => (
+              <ChatSidebarItem chat={item} isActive={isActive} />
+            )}
+          </Link>
         ))}
       </div>
     </div>

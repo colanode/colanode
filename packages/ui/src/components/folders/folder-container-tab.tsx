@@ -13,8 +13,7 @@ export const FolderContainerTab = ({ folderId }: FolderContainerTabProps) => {
   const nodeGetQuery = useLiveQuery({
     type: 'node.get',
     nodeId: folderId,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   if (nodeGetQuery.isPending) {

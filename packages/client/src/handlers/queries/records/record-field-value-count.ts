@@ -30,8 +30,7 @@ export class RecordFieldValueCountQueryHandler
   ): Promise<ChangeCheckResult<RecordFieldValueCountQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -41,8 +40,7 @@ export class RecordFieldValueCountQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.type === 'record'
     ) {
       const newResult = await this.handleQuery(input);
@@ -54,8 +52,7 @@ export class RecordFieldValueCountQueryHandler
 
     if (
       event.type === 'node.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       if (
         event.node.type === 'record' &&
@@ -82,8 +79,7 @@ export class RecordFieldValueCountQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       if (
         event.node.type === 'database' &&
@@ -115,7 +111,7 @@ export class RecordFieldValueCountQueryHandler
   private async fetchFieldValueCounts(
     input: RecordFieldValueCountQueryInput
   ): Promise<RecordFieldValueCountQueryOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     const database = await this.fetchDatabase(input);
     const field = database.attributes.fields[input.fieldId];
 
@@ -270,7 +266,7 @@ export class RecordFieldValueCountQueryHandler
   private async fetchDatabase(
     input: RecordFieldValueCountQueryInput
   ): Promise<DatabaseNode> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const row = await workspace.database
       .selectFrom('nodes')

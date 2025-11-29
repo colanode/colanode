@@ -16,7 +16,7 @@ export class NodeCollaboratorDeleteMutationHandler
   async handleMutation(
     input: NodeCollaboratorDeleteMutationInput
   ): Promise<NodeCollaboratorDeleteMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const result = await workspace.nodes.updateNode(
       input.nodeId,

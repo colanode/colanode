@@ -1,7 +1,6 @@
 export type DatabaseDeleteMutationInput = {
   type: 'database.delete';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   databaseId: string;
 };
 

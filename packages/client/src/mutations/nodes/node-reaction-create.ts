@@ -1,7 +1,6 @@
 export type NodeReactionCreateMutationInput = {
   type: 'node.reaction.create';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   nodeId: string;
   reaction: string;
 };

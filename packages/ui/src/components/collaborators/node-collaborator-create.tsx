@@ -54,8 +54,7 @@ export const NodeCollaboratorCreate = ({
                 nodeId,
                 collaboratorIds: users.map((user) => user.id),
                 role: role,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               },
               onSuccess() {
                 setUsers([]);

@@ -1,5 +1,5 @@
 import { LocalSpaceNode } from '@colanode/client/types';
-import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/containers/breadcrumb-item';
 
 interface SpaceBreadcrumbItemProps {
   space: LocalSpaceNode;
@@ -7,14 +7,10 @@ interface SpaceBreadcrumbItemProps {
 
 export const SpaceBreadcrumbItem = ({ space }: SpaceBreadcrumbItemProps) => {
   return (
-    <div className="flex items-center space-x-2">
-      <Avatar
-        id={space.id}
-        name={space.attributes.name}
-        avatar={space.attributes.avatar}
-        className="size-4"
-      />
-      <span>{space.attributes.name}</span>
-    </div>
+    <BreadcrumbItem
+      id={space.id}
+      avatar={space.attributes.avatar}
+      name={space.attributes.name}
+    />
   );
 };

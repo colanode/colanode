@@ -146,6 +146,7 @@ dist/
 .DS_Store
 .turbo
 .tsbuildinfo
+*.pem
 
 # Ignore temporary emoji and icon directories
 src/scripts/emojis/temp/
@@ -154,9 +155,9 @@ src/scripts/icons/temp/
 # Ignore desktop assets
 apps/desktop/assets/emojis.db
 apps/desktop/assets/icons.db
-apps/desktop/assets/emojis.svg
-apps/desktop/assets/icons.svg
-apps/desktop/assets/fonts/neotrax.otf
+apps/desktop/assets/fonts/satoshi-variable.woff2
+apps/desktop/assets/fonts/satoshi-variable-italic.woff2
+apps/desktop/assets/fonts/antonio.ttf
 apps/desktop/assets/colanode-logo.png
 apps/desktop/assets/colanode-logo.ico
 apps/desktop/assets/colanode-logo.icns
@@ -166,6 +167,29 @@ apps/web/public/assets/emojis.db
 apps/web/public/assets/icons.db
 apps/web/public/assets/emojis.svg
 apps/web/public/assets/icons.svg
-apps/web/public/assets/fonts/neotrax.otf
+apps/web/public/assets/fonts/satoshi-variable.woff2
+apps/web/public/assets/fonts/satoshi-variable-italic.woff2
+apps/web/public/assets/fonts/antonio.ttf
 apps/web/public/assets/colanode-logo-192.jpg
 apps/web/public/assets/colanode-logo-512.jpg
+
+# Ignore mobile assets
+apps/mobile/assets/ui/index.html
+apps/mobile/assets/emojis.db
+apps/mobile/assets/icons.db
+apps/mobile/assets/fonts/satoshi-variable.woff2
+apps/mobile/assets/fonts/satoshi-variable-italic.woff2
+apps/mobile/assets/fonts/antonio.ttf
+
+.expo
+web-build/
+expo-env.d.ts
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+/ios
+/android

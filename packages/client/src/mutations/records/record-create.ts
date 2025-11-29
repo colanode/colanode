@@ -2,8 +2,7 @@ import { FieldValue } from '@colanode/core';
 
 export type RecordCreateMutationInput = {
   type: 'record.create';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   databaseId: string;
   name?: string;
   fields?: Record<string, FieldValue>;

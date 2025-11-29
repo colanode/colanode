@@ -17,27 +17,40 @@ class EmailService {
   private from: string | undefined;
 
   public async init() {
-    if (!config.smtp.enabled) {
-      logger.debug('SMTP configuration is not set, skipping initialization');
+    if (!config.email.enabled) {
+      logger.debug('Email configuration is not set, skipping initialization');
       return;
     }
 
-    this.from = `${config.smtp.from.name} <${config.smtp.from.email}>`;
-    this.transporter = nodemailer.createTransport({
-      host: config.smtp.host,
-      port: config.smtp.port,
-      secure: config.smtp.secure,
-      auth: {
-        user: config.smtp.user,
-        pass: config.smtp.password,
-      },
-    });
+    this.from = `${config.email.from.name} <${config.email.from.email}>`;
+    const provider = config.email.provider;
+
+    switch (provider.type) {
+      case 'smtp':
+        this.transporter = nodemailer.createTransport({
+          host: provider.host,
+          port: provider.port,
+          secure: provider.secure,
+          auth: {
+            user: provider.auth.user,
+            pass: provider.auth.password,
+          },
+        });
+        break;
+      default:
+        this.transporter = undefined;
+    }
+
+    if (!this.transporter) {
+      logger.warn('Email provider could not be configured');
+      return;
+    }
 
     await this.transporter.verify();
   }
 
   public async sendEmail(message: EmailMessage): Promise<void> {
-    if (!this.transporter || !this.from) {
+    if (!config.email.enabled || !this.transporter || !this.from) {
       logger.debug('Email service not initialized, skipping email send');
       return;
     }

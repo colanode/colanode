@@ -1,0 +1,215 @@
+{
+  "_comment": "Colanode Server Configuration - Copy this file to config.json and customize as needed",
+  "_migration_guide": {
+    "precedence": "config.json (plus env:// / file:// pointers) > schema defaults",
+    "env_syntax": "Use 'env://VAR_NAME' to reference environment variables. Add '?' suffix for optional variables (e.g., 'env://VAR_NAME?')",
+    "file_syntax": "Use 'file://relative/or/absolute/path' to inline file contents (e.g., PEM certificates). Add '?' to make it optional",
+    "backward_compatibility": "Environment variables are only read when referenced via env://"
+  },
+
+  "server": {
+    "_comment": "Server branding and networking configuration",
+    "name": "Colanode Local",
+    "avatar": null,
+    "mode": "standalone",
+    "pathPrefix": null,
+    "cors": {
+      "origin": "http://localhost:4000",
+      "maxAge": 7200
+    }
+  },
+
+  "account": {
+    "_comment": "User account and authentication configuration",
+    "verificationType": "automatic",
+    "otpTimeout": 600,
+    "google": {
+      "enabled": false,
+      "_comment_when_enabled": "When enabled=true, you must provide clientId and clientSecret",
+      "clientId": "env://ACCOUNT_GOOGLE_CLIENT_ID?",
+      "clientSecret": "env://ACCOUNT_GOOGLE_CLIENT_SECRET?"
+    }
+  },
+
+  "user": {
+    "_comment": "Per-user storage limits (in bytes)",
+    "storageLimit": "10737418240",
+    "maxFileSize": "104857600"
+  },
+
+  "postgres": {
+    "_comment": "PostgreSQL database connection",
+    "url": "env://POSTGRES_URL",
+    "ssl": {
+      "rejectUnauthorized": null,
+      "ca": "env://POSTGRES_SSL_CA?",
+      "key": "env://POSTGRES_SSL_KEY?",
+      "cert": "env://POSTGRES_SSL_CERT?"
+    }
+  },
+
+  "redis": {
+    "_comment": "Redis connection and namespacing",
+    "url": "env://REDIS_URL",
+    "db": 0,
+    "jobs": {
+      "name": "jobs",
+      "prefix": "colanode"
+    },
+    "tus": {
+      "lockPrefix": "colanode:tus:lock",
+      "kvPrefix": "colanode:tus:kv"
+    },
+    "eventsChannel": "events"
+  },
+
+  "storage": {
+    "_comment": "File storage backend configuration. Supports: 'file' (local filesystem), 's3' (S3-compatible like AWS S3, MinIO, Cloudflare R2), 'gcs' (Google Cloud Storage), 'azure' (Azure Blob Storage). For file storage: set 'directory' to the path where user files will be stored. For other backends, set STORAGE_TYPE env var and provide backend-specific credentials via env:// references",
+    "type": "file",
+    "directory": "./colanode"
+  },
+
+  "email": {
+    "_comment": "Email sending configuration. Supported providers: smtp",
+    "enabled": false,
+    "from": {
+      "email": "env://EMAIL_FROM?",
+      "name": "Colanode"
+    },
+    "provider": {
+      "type": "smtp",
+      "host": "env://EMAIL_SMTP_HOST?",
+      "port": 587,
+      "secure": false,
+      "auth": {
+        "user": "env://EMAIL_SMTP_USER?",
+        "password": "env://EMAIL_SMTP_PASSWORD?"
+      }
+    }
+  },
+
+  "ai": {
+    "_comment": "AI features (RAG, embeddings, etc.)",
+    "enabled": false,
+    "_comment_when_enabled": "When enabled=true, configure providers, models, and embedding settings below",
+    "nodeEmbeddingDelay": 5000,
+    "documentEmbeddingDelay": 10000,
+    "providers": {
+      "openai": {
+        "enabled": false,
+        "apiKey": "env://OPENAI_API_KEY?"
+      },
+      "google": {
+        "enabled": false,
+        "apiKey": "env://GOOGLE_API_KEY?"
+      }
+    },
+    "langfuse": {
+      "enabled": false,
+      "publicKey": "env://LANGFUSE_PUBLIC_KEY?",
+      "secretKey": "env://LANGFUSE_SECRET_KEY?",
+      "baseUrl": "https://cloud.langfuse.com"
+    },
+    "models": {
+      "queryRewrite": {
+        "provider": "openai",
+        "modelName": "gpt-4o",
+        "temperature": 0.5
+      },
+      "response": {
+        "provider": "openai",
+        "modelName": "gpt-4o",
+        "temperature": 0.5
+      },
+      "rerank": {
+        "provider": "openai",
+        "modelName": "gpt-4o",
+        "temperature": 0.5
+      },
+      "summarization": {
+        "provider": "openai",
+        "modelName": "gpt-4o",
+        "temperature": 0.5
+      },
+      "contextEnhancer": {
+        "provider": "openai",
+        "modelName": "gpt-4o",
+        "temperature": 0.5
+      },
+      "noContext": {
+        "provider": "openai",
+        "modelName": "gpt-4o",
+        "temperature": 0.5
+      },
+      "intentRecognition": {
+        "provider": "openai",
+        "modelName": "gpt-4o",
+        "temperature": 0.5
+      },
+      "databaseFilter": {
+        "provider": "openai",
+        "modelName": "gpt-4o",
+        "temperature": 0.5
+      }
+    },
+    "embedding": {
+      "provider": "openai",
+      "modelName": "text-embedding-3-large",
+      "dimensions": 2000,
+      "apiKey": "env://EMBEDDING_API_KEY?",
+      "batchSize": 50
+    },
+    "chunking": {
+      "defaultChunkSize": 1000,
+      "defaultOverlap": 200,
+      "enhanceWithContext": false
+    },
+    "retrieval": {
+      "hybridSearch": {
+        "semanticSearchWeight": 0.7,
+        "keywordSearchWeight": 0.3,
+        "maxResults": 20
+      }
+    }
+  },
+
+  "jobs": {
+    "_comment": "Background job configurations",
+    "nodeUpdatesMerge": {
+      "enabled": false,
+      "_comment_when_enabled": "Merges node update events periodically",
+      "cron": "0 5 */2 * * *",
+      "batchSize": 500,
+      "mergeWindow": 3600,
+      "cutoffWindow": 7200
+    },
+    "documentUpdatesMerge": {
+      "enabled": false,
+      "_comment_when_enabled": "Merges document update events periodically",
+      "cron": "0 5 */2 * * *",
+      "batchSize": 500,
+      "mergeWindow": 3600,
+      "cutoffWindow": 7200
+    },
+    "cleanup": {
+      "enabled": false,
+      "_comment_when_enabled": "Cleans up expired upload chunks",
+      "cron": "0 5 */2 * * *"
+    }
+  },
+
+  "logging": {
+    "_comment": "Logging level: trace, debug, info, warn, error, fatal, silent",
+    "level": "info"
+  },
+
+  "workspace": {
+    "_comment": "Per-workspace storage limits (optional)",
+    "storageLimit": "21474836480",
+    "maxFileSize": "524288000"
+  },
+
+  "debug": {
+    "filePointerExample": "file://debug-file-example.txt"
+  }
+}

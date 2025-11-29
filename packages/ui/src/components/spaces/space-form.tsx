@@ -19,6 +19,8 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { Textarea } from '@colanode/ui/components/ui/textarea';
+import { useI18n } from '@colanode/ui/contexts/i18n';
+import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { cn } from '@colanode/ui/lib/utils';
 
 const formSchema = z.object({
@@ -46,7 +48,9 @@ export const SpaceForm = ({
   saveText,
   readOnly = false,
 }: SpaceFormProps) => {
+  const { t } = useI18n();
   const id = useRef(generateId(IdType.Space));
+  const isMobile = useIsMobile();
 
   const form = useForm<formSchemaType>({
     resolver: zodResolver(formSchema),
@@ -63,19 +67,24 @@ export const SpaceForm = ({
   return (
     <Form {...form}>
       <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className="flex flex-row gap-1">
+        <div className={cn('flex gap-1', isMobile ? 'flex-col' : 'flex-row')}>
           <AvatarPopover
             onPick={(avatar) => {
               form.setValue('avatar', avatar);
             }}
           >
-            <div className="size-40 pt-3">
+            <div
+              className={cn(
+                'pt-3',
+                isMobile ? 'flex justify-center pb-4' : 'size-40'
+              )}
+            >
               <div className="group relative cursor-pointer">
                 <Avatar
                   id={id.current}
-                  name={name.length > 0 ? name : 'New space'}
+                  name={name.length > 0 ? name : t('database.newSpace')}
                   avatar={avatar}
-                  className="size-32"
+                  className={isMobile ? 'size-24' : 'size-32'}
                 />
                 <div
                   className={cn(
@@ -89,15 +98,21 @@ export const SpaceForm = ({
             </div>
           </AvatarPopover>
 
-          <div className="flex-grow space-y-4 py-2 pb-4">
+          <div
+            className={cn('space-y-4 py-2 pb-4', isMobile ? 'w-full' : 'grow')}
+          >
             <FormField
               control={form.control}
               name="name"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Name *</FormLabel>
+                  <FormLabel>{t('common.name')} *</FormLabel>
                   <FormControl>
-                    <Input readOnly={readOnly} placeholder="Name" {...field} />
+                    <Input
+                      readOnly={readOnly}
+                      placeholder={t('common.name')}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -108,11 +123,11 @@ export const SpaceForm = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t('misc.description')}</FormLabel>
                   <FormControl>
                     <Textarea
                       readOnly={readOnly}
-                      placeholder="Write a short description about the space"
+                      placeholder={t('space.descriptionPlaceholder')}
                       {...field}
                     />
                   </FormControl>
@@ -133,7 +148,7 @@ export const SpaceForm = ({
                   onCancel();
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
             )}
 

@@ -2,19 +2,16 @@ import { X } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
 
-import { Workspace } from '@colanode/client/types';
 import { isValidEmail } from '@colanode/core';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
-interface WorkspaceUserInviteProps {
-  workspace: Workspace;
-}
-
-export const WorkspaceUserInvite = ({
-  workspace,
-}: WorkspaceUserInviteProps) => {
+export const WorkspaceUserInvite = () => {
+  const { t } = useI18n();
+  const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
   const [input, setInput] = useState('');
@@ -24,7 +21,7 @@ export const WorkspaceUserInvite = ({
   return (
     <div className="flex flex-col space-y-2">
       <p className="text-sm text-muted-foreground">
-        Write the email addresses of the people you want to invite
+        {t('invite.enterEmailAddresses')}
       </p>
       <div className="flex flex-row items-center gap-1">
         <div className="flex h-9 w-full flex-row gap-2 rounded-md border border-input bg-background p-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground">
@@ -44,9 +41,9 @@ export const WorkspaceUserInvite = ({
           ))}
           <input
             value={input}
-            className="flex-grow px-1 focus-visible:outline-none"
+            className="grow px-1 focus-visible:outline-none"
             onChange={(e) => setInput(e.target.value.trim())}
-            placeholder="Enter email addresses"
+            placeholder={t('invite.enterEmailAddresses')}
             onKeyUp={(e) => {
               if (e.key === 'Enter') {
                 if (!input.length) {
@@ -88,8 +85,7 @@ export const WorkspaceUserInvite = ({
                   email,
                   role: 'collaborator',
                 })),
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               },
               onSuccess() {
                 setEmails([]);
@@ -102,7 +98,7 @@ export const WorkspaceUserInvite = ({
           }}
         >
           {isPending && <Spinner className="mr-1" />}
-          Invite
+          {t('common.invite')}
         </Button>
       </div>
     </div>

@@ -1,17 +1,20 @@
 import { Button } from '@colanode/ui/components/ui/button';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 export const AccountDelete = () => {
+  const { t } = useI18n();
+
   return (
     <div className="flex items-center justify-between gap-6">
       <div className="flex-1 space-y-2">
-        <h3 className="font-semibold">Delete account</h3>
+        <h3 className="font-semibold">{t('account.deleteAccount')}</h3>
         <p className="text-sm text-muted-foreground">
-          Account delete will be available soon.
+          {t('account.deleteAccountDescription')}
         </p>
       </div>
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         <Button variant="destructive" className="w-20" disabled>
-          Delete
+          {t('common.delete')}
         </Button>
       </div>
     </div>

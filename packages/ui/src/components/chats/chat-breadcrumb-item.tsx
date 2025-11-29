@@ -1,7 +1,9 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
 import { LocalChatNode } from '@colanode/client/types';
-import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { collections } from '@colanode/ui/collections';
+import { BreadcrumbItem } from '@colanode/ui/components/layouts/containers/breadcrumb-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface ChatBreadcrumbItemProps {
   chat: LocalChatNode;
@@ -10,33 +12,35 @@ interface ChatBreadcrumbItemProps {
 export const ChatBreadcrumbItem = ({ chat }: ChatBreadcrumbItemProps) => {
   const workspace = useWorkspace();
 
-  const userId =
+  const collaboratorId =
     chat && chat.type === 'chat'
       ? (Object.keys(chat.attributes.collaborators).find(
           (id) => id !== workspace.userId
         ) ?? '')
       : '';
 
-  const userGetQuery = useLiveQuery({
-    type: 'user.get',
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
-    userId,
-  });
+  const collaboratorQuery = useLiveQuery((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => eq(users.id, collaboratorId))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
+      .findOne()
+  );
 
-  if (userGetQuery.isPending || !userGetQuery.data) {
+  const collaborator = collaboratorQuery.data;
+  if (!collaborator) {
     return null;
   }
 
   return (
-    <div className="flex items-center space-x-2">
-      <Avatar
-        id={userGetQuery.data.id}
-        name={userGetQuery.data.name}
-        avatar={userGetQuery.data.avatar}
-        className="size-4"
-      />
-      <span>{userGetQuery.data.name}</span>
-    </div>
+    <BreadcrumbItem
+      id={collaborator.id}
+      avatar={collaborator.avatar}
+      name={collaborator.name}
+    />
   );
 };

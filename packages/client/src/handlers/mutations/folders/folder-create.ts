@@ -13,7 +13,7 @@ export class FolderCreateMutationHandler
   async handleMutation(
     input: FolderCreateMutationInput
   ): Promise<FolderCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const id = generateId(IdType.Folder);
     const attributes: FolderAttributes = {

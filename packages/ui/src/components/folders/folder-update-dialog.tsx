@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -26,6 +27,7 @@ export const FolderUpdateDialog = ({
   open,
   onOpenChange,
 }: FolderUpdateDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
   const canEdit = hasNodeRole(role, 'editor');
@@ -34,8 +36,10 @@ export const FolderUpdateDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Update folder</DialogTitle>
-          <DialogDescription>Update the folder name and icon</DialogDescription>
+          <DialogTitle>{t('folder.updateFolder')}</DialogTitle>
+          <DialogDescription>
+            {t('folder.updateFolderDescription')}
+          </DialogDescription>
         </DialogHeader>
         <FolderForm
           id={folder.id}
@@ -44,7 +48,7 @@ export const FolderUpdateDialog = ({
             avatar: folder.attributes.avatar,
           }}
           isPending={isPending}
-          submitText="Update"
+          submitText={t('common.update')}
           readOnly={!canEdit}
           handleCancel={() => {
             onOpenChange(false);
@@ -60,12 +64,11 @@ export const FolderUpdateDialog = ({
                 folderId: folder.id,
                 name: values.name,
                 avatar: values.avatar,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               },
               onSuccess() {
                 onOpenChange(false);
-                toast.success('Folder was updated successfully');
+                toast.success(t('folder.updateFolder'));
               },
               onError(error) {
                 toast.error(error.message);

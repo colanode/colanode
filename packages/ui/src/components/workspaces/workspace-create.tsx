@@ -1,20 +1,33 @@
+import { useRouter } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
-import { useAccount } from '@colanode/ui/contexts/account';
+import { useI18n } from '@colanode/ui/contexts/i18n';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
-interface WorkspaceCreateProps {
-  onSuccess: (id: string) => void;
-  onCancel: (() => void) | undefined;
-}
-
-export const WorkspaceCreate = ({
-  onSuccess,
-  onCancel,
-}: WorkspaceCreateProps) => {
-  const account = useAccount();
+export const WorkspaceCreate = () => {
+  const { t } = useI18n();
+  const workspace = useWorkspace();
+  const router = useRouter();
   const { mutate, isPending } = useMutation();
+
+  const workspacesQuery = useLiveQuery({
+    type: 'workspace.list',
+    accountId: workspace.accountId,
+  });
+
+  const workspaces = workspacesQuery.data ?? [];
+  const handleCancel = router.history.canGoBack()
+    ? () => router.history.back()
+    : workspaces.length > 0
+      ? () =>
+          router.navigate({
+            to: '/workspace/$userId',
+            params: { userId: workspaces[0]!.userId },
+          })
+      : undefined;
 
   return (
     <div className="flex flex-row justify-center w-full">
@@ -22,7 +35,7 @@ export const WorkspaceCreate = ({
         <div className="w-full max-w-[700px]">
           <div className="flex flex-row justify-center py-8">
             <h1 className="text-center text-4xl font-bold leading-tight tracking-tighter lg:leading-[1.1]">
-              Setup your workspace
+              {t('workspace.createWorkspace')}
             </h1>
           </div>
           <WorkspaceForm
@@ -32,11 +45,14 @@ export const WorkspaceCreate = ({
                   type: 'workspace.create',
                   name: values.name,
                   description: values.description,
-                  accountId: account.id,
+                  accountId: workspace.accountId,
                   avatar: values.avatar ?? null,
                 },
                 onSuccess(output) {
-                  onSuccess(output.id);
+                  router.navigate({
+                    to: '/workspace/$userId',
+                    params: { userId: output.userId },
+                  });
                 },
                 onError(error) {
                   toast.error(error.message);
@@ -44,8 +60,8 @@ export const WorkspaceCreate = ({
               });
             }}
             isSaving={isPending}
-            onCancel={onCancel}
-            saveText="Create"
+            onCancel={handleCancel}
+            saveText={t('common.create')}
           />
         </div>
       </div>

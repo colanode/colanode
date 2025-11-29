@@ -6,12 +6,7 @@ import {
   JobOutput,
   JobConcurrencyConfig,
 } from '@colanode/client/jobs';
-import {
-  eventBus,
-  mapDownload,
-  mapLocalFile,
-  mapNode,
-} from '@colanode/client/lib';
+import { eventBus, mapDownload, mapNode } from '@colanode/client/lib';
 import { AppService } from '@colanode/client/services/app-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import { DownloadStatus, LocalFileNode } from '@colanode/client/types';
@@ -19,8 +14,7 @@ import { FileStatus } from '@colanode/core';
 
 export type FileDownloadInput = {
   type: 'file.download';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   downloadId: string;
 };
 
@@ -47,15 +41,15 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
   };
 
   public async handleJob(input: FileDownloadInput): Promise<JobOutput> {
-    const account = this.app.getAccount(input.accountId);
-    if (!account) {
+    const workspace = this.app.getWorkspace(input.userId);
+    if (!workspace) {
       return {
         type: 'cancel',
       };
     }
 
-    const workspace = account.getWorkspace(input.workspaceId);
-    if (!workspace) {
+    const account = this.app.getAccount(workspace.accountId);
+    if (!account) {
       return {
         type: 'cancel',
       };
@@ -110,7 +104,7 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
       });
 
       const response = await workspace.account.client.get(
-        `v1/workspaces/${workspace.id}/files/${file.id}`,
+        `v1/workspaces/${workspace.workspaceId}/files/${file.id}`,
         {
           onDownloadProgress: async (progress, _chunk) => {
             const percentage = Math.round((progress.percent || 0) * 100);
@@ -123,54 +117,6 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
 
       const writeStream = await this.app.fs.writeStream(download.path);
       await response.body?.pipeTo(writeStream);
-
-      const createdLocalFile = await workspace.database
-        .insertInto('local_files')
-        .returningAll()
-        .values({
-          id: file.id,
-          version: file.attributes.version,
-          name: file.attributes.name,
-          extension: file.attributes.extension,
-          subtype: file.attributes.subtype,
-          mime_type: file.attributes.mimeType,
-          size: file.attributes.size,
-          created_at: new Date().toISOString(),
-          path: download.path,
-          opened_at: new Date().toISOString(),
-        })
-        .onConflict((oc) =>
-          oc.column('id').doUpdateSet({
-            version: file.attributes.version,
-            name: file.attributes.name,
-            mime_type: file.attributes.mimeType,
-            size: file.attributes.size,
-            path: download.path,
-          })
-        )
-        .executeTakeFirst();
-
-      if (!createdLocalFile) {
-        await this.updateDownload(workspace, download.id, {
-          status: DownloadStatus.Pending,
-          retries: download.retries + 1,
-          error_code: 'file_download_failed',
-          error_message: 'Failed to create local file',
-        });
-
-        return {
-          type: 'retry',
-          delay: ms('10 seconds'),
-        };
-      }
-
-      const url = await this.app.fs.url(createdLocalFile.path);
-      eventBus.publish({
-        type: 'local.file.created',
-        accountId: workspace.accountId,
-        workspaceId: workspace.id,
-        localFile: mapLocalFile(createdLocalFile, url),
-      });
 
       await this.updateDownload(workspace, download.id, {
         status: DownloadStatus.Completed,
@@ -262,8 +208,11 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
 
     eventBus.publish({
       type: 'download.updated',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
+      workspace: {
+        workspaceId: workspace.workspaceId,
+        userId: workspace.userId,
+        accountId: workspace.accountId,
+      },
       download: mapDownload(updatedDownload),
     });
   }

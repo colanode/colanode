@@ -26,7 +26,7 @@ export class MessageCreateMutationHandler
   async handleMutation(
     input: MessageCreateMutationInput
   ): Promise<MessageCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const messageId = generateId(IdType.Message);
     const editorContent = input.content.content ?? [];

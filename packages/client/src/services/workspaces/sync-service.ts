@@ -6,7 +6,7 @@ import {
   createDebugger,
   SyncCollaborationsInput,
   SyncUsersInput,
-  SyncNodesUpdatesInput,
+  SyncNodeUpdatesInput,
   SyncNodeInteractionsInput,
   SyncNodeReactionsInput,
   SyncNodeTombstonesInput,
@@ -21,7 +21,7 @@ import {
 } from '@colanode/core';
 
 interface RootSynchronizers {
-  nodeUpdates: Synchronizer<SyncNodesUpdatesInput>;
+  nodeUpdates: Synchronizer<SyncNodeUpdatesInput>;
   nodeInteractions: Synchronizer<SyncNodeInteractionsInput>;
   nodeReactions: Synchronizer<SyncNodeReactionsInput>;
   nodeTombstones: Synchronizer<SyncNodeTombstonesInput>;
@@ -84,21 +84,21 @@ export class SyncService {
   private handleEvent(event: Event): void {
     if (
       event.type === 'collaboration.created' &&
-      event.accountId === this.workspace.accountId &&
-      event.workspaceId === this.workspace.id
+      event.workspace.userId === this.workspace.userId
     ) {
       this.initRootSynchronizers(event.nodeId);
     } else if (
       event.type === 'collaboration.deleted' &&
-      event.accountId === this.workspace.accountId &&
-      event.workspaceId === this.workspace.id
+      event.workspace.userId === this.workspace.userId
     ) {
       this.removeRootSynchronizers(event.nodeId);
     }
   }
 
   public async init() {
-    debug(`Initializing sync service for workspace ${this.workspace.id}`);
+    debug(
+      `Initializing sync service for workspace ${this.workspace.workspaceId}`
+    );
 
     if (!this.userSynchronizer) {
       this.userSynchronizer = new Synchronizer(
@@ -153,38 +153,38 @@ export class SyncService {
     }
 
     debug(
-      `Initializing root synchronizers for root ${rootId} in workspace ${this.workspace.id}`
+      `Initializing root synchronizers for root ${rootId} in workspace ${this.workspace.workspaceId}`
     );
 
     const rootSynchronizers = {
       nodeUpdates: new Synchronizer(
         this.workspace,
-        { type: 'nodes.updates', rootId },
-        `${rootId}_nodes_updates`,
+        { type: 'node.updates', rootId },
+        `${rootId}.node.updates`,
         this.syncHandlers.nodeUpdates
       ),
       nodeInteractions: new Synchronizer(
         this.workspace,
         { type: 'node.interactions', rootId },
-        `${rootId}_node_interactions`,
+        `${rootId}.node.interactions`,
         this.syncHandlers.nodeInteractions
       ),
       nodeReactions: new Synchronizer(
         this.workspace,
         { type: 'node.reactions', rootId },
-        `${rootId}_node_reactions`,
+        `${rootId}.node.reactions`,
         this.syncHandlers.nodeReactions
       ),
       nodeTombstones: new Synchronizer(
         this.workspace,
         { type: 'node.tombstones', rootId },
-        `${rootId}_node_tombstones`,
+        `${rootId}.node.tombstones`,
         this.syncHandlers.nodeTombstones
       ),
       documentUpdates: new Synchronizer(
         this.workspace,
         { type: 'document.updates', rootId },
-        `${rootId}_document_updates`,
+        `${rootId}.document.updates`,
         this.syncHandlers.documentUpdates
       ),
     };

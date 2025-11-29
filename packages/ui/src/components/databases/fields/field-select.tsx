@@ -17,6 +17,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface FieldSelectProps {
@@ -26,6 +27,7 @@ interface FieldSelectProps {
 }
 
 export const FieldSelect = ({ fields, value, onChange }: FieldSelectProps) => {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const selectedField = fields.find((field) => field.id === value);
 
@@ -44,15 +46,20 @@ export const FieldSelect = ({ fields, value, onChange }: FieldSelectProps) => {
               type={selectedField?.type as FieldType}
               className="size-4"
             />
-            {value ? selectedField?.name : 'Select field...'}
+            {value ? selectedField?.name : t('field.fields') + '...'}
           </span>
           <ChevronDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
         </Button>
       </PopoverTrigger>
       <PopoverContent className="w-96 p-1">
         <Command className="min-h-min">
-          <CommandInput placeholder="Search field types..." className="h-9" />
-          <CommandEmpty>No field type found.</CommandEmpty>
+          <CommandInput
+            placeholder={t('database.searchFieldTypes')}
+            className="h-9"
+          />
+          <CommandEmpty>
+            {t('field.fieldType')} {t('status.notFound').toLowerCase()}.
+          </CommandEmpty>
           <CommandList>
             <CommandGroup className="h-min">
               {fields.map((field) => (

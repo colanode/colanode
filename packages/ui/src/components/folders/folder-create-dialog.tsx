@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
 import { generateId, IdType } from '@colanode/core';
@@ -9,7 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
-import { useLayout } from '@colanode/ui/contexts/layout';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -24,17 +25,18 @@ export const FolderCreateDialog = ({
   open,
   onOpenChange,
 }: FolderCreateDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
-  const layout = useLayout();
+  const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create folder</DialogTitle>
+          <DialogTitle>{t('folder.createFolder')}</DialogTitle>
           <DialogDescription>
-            Create a new folder to organize your pages
+            {t('folder.createFolderDescription')}
           </DialogDescription>
         </DialogHeader>
         <FolderForm
@@ -43,7 +45,7 @@ export const FolderCreateDialog = ({
             name: '',
           }}
           isPending={isPending}
-          submitText="Create"
+          submitText={t('common.create')}
           handleCancel={() => {
             onOpenChange(false);
           }}
@@ -58,13 +60,15 @@ export const FolderCreateDialog = ({
                 parentId: spaceId,
                 name: values.name,
                 avatar: values.avatar,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
                 generateIndex: true,
               },
               onSuccess(output) {
                 onOpenChange(false);
-                layout.previewLeft(output.id);
+                navigate({
+                  to: '$nodeId',
+                  params: { nodeId: output.id },
+                });
               },
               onError(error) {
                 toast.error(error.message);

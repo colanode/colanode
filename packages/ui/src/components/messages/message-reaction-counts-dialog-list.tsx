@@ -1,8 +1,13 @@
+import {
+  inArray,
+  useLiveQuery as useLiveQueryTanstack,
+} from '@tanstack/react-db';
 import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { NodeReactionListQueryInput } from '@colanode/client/queries';
 import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
@@ -27,8 +32,7 @@ export const MessageReactionCountsDialogList = ({
     type: 'node.reaction.list',
     nodeId: message.id,
     reaction: reactionCount.reaction,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     page: i + 1,
     count: REACTIONS_PER_PAGE,
   }));
@@ -41,19 +45,18 @@ export const MessageReactionCountsDialogList = ({
 
   const userIds = reactions?.map((reaction) => reaction.collaboratorId) ?? [];
 
-  const results = useLiveQueries(
-    userIds.map((userId) => ({
-      type: 'user.get',
-      accountId: workspace.accountId,
-      workspaceId: workspace.id,
-      userId,
-    }))
+  const usersQuery = useLiveQueryTanstack((q) =>
+    q
+      .from({ users: collections.workspace(workspace.userId).users })
+      .where(({ users }) => inArray(users.id, userIds))
+      .select(({ users }) => ({
+        id: users.id,
+        name: users.name,
+        avatar: users.avatar,
+      }))
   );
 
-  const users = results
-    .filter((result) => result.data !== null)
-    .map((result) => result.data!);
-
+  const users = usersQuery.data;
   return (
     <div className="flex flex-col gap-2 p-2">
       {users.map((user) => (
@@ -64,9 +67,7 @@ export const MessageReactionCountsDialogList = ({
             avatar={user.avatar}
             className="size-5"
           />
-          <p className="flex-grow text-sm font-medium leading-none">
-            {user.name}
-          </p>
+          <p className="grow text-sm font-medium leading-none">{user.name}</p>
         </div>
       ))}
       <InView

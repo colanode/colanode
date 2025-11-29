@@ -14,6 +14,7 @@ import {
   TabsList,
   TabsTrigger,
 } from '@colanode/ui/components/ui/tabs';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 interface MessageReactionCountsDialogProps {
   message: LocalMessageNode;
@@ -28,15 +29,17 @@ export const MessageReactionCountsDialog = ({
   open,
   onOpenChange,
 }: MessageReactionCountsDialogProps) => {
+  const { t } = useI18n();
+
   if (reactionCounts.length === 0) {
     return null;
   }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="overflow-hidden p-2 outline-none w-128 min-w-128 max-w-128 h-128 min-h-128 max-h-128">
+      <DialogContent className="overflow-hidden p-2 outline-none w-lg min-w-lg max-w-lg h-lg min-h-lg max-h-lg">
         <VisuallyHidden>
-          <DialogTitle>Reactions</DialogTitle>
+          <DialogTitle>{t('message.reactions')}</DialogTitle>
         </VisuallyHidden>
         <Tabs
           defaultValue={reactionCounts[0]!.reaction}
@@ -54,7 +57,7 @@ export const MessageReactionCountsDialog = ({
               </TabsTrigger>
             ))}
           </TabsList>
-          <div className="flex-grow">
+          <div className="grow">
             {reactionCounts.map((reactionCount) => (
               <TabsContent
                 key={`tab-content-${reactionCount.reaction}`}

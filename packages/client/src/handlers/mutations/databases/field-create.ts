@@ -23,7 +23,7 @@ export class FieldCreateMutationHandler
   async handleMutation(
     input: FieldCreateMutationInput
   ): Promise<FieldCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     if (input.fieldType === 'relation') {
       if (!input.relationDatabaseId) {

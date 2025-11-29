@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@colanode/mobile",
+  "version": "1.0.0",
+  "author": "Colanode",
+  "description": "Colanode mobile application",
+  "main": "src/index.ts",
+  "scripts": {
+    "start": "expo start",
+    "android": "expo start --android",
+    "ios": "expo start --ios",
+    "web": "expo start --web",
+    "dev:ui": "vite",
+    "build:ui": "vite build"
+  },
+  "dependencies": {
+    "expo": "^54.0.25",
+    "expo-asset": "^12.0.10",
+    "expo-crypto": "~15.0.7",
+    "expo-device": "~8.0.8",
+    "expo-file-system": "^19.0.19",
+    "expo-random": "^14.0.1",
+    "expo-sqlite": "^16.0.9",
+    "expo-status-bar": "~3.0.8",
+    "isomorphic-webcrypto": "^2.3.8",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-native": "^0.82.1",
+    "react-native-get-random-values": "^2.0.0",
+    "react-native-safe-area-context": "^5.6.2",
+    "react-native-webview": "^13.16.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
+    "@types/react": "^19.2.6",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.1",
+    "babel-preset-expo": "^54.0.1",
+    "typescript": "~5.9.2",
+    "vite": "^7.2.2",
+    "vite-plugin-singlefile": "^2.3.0"
+  },
+  "private": true
+}

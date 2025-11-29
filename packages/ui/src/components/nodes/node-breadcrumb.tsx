@@ -1,0 +1,90 @@
+import { Fragment } from 'react';
+
+import { LocalNode } from '@colanode/client/types';
+import { NodeBreadcrumbItem } from '@colanode/ui/components/nodes/node-breadcrumb-item';
+import {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from '@colanode/ui/components/ui/breadcrumb';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@colanode/ui/components/ui/dropdown-menu';
+import { Link } from '@colanode/ui/components/ui/link';
+
+interface NodeBreadcrumbProps {
+  nodes: LocalNode[];
+}
+
+export const NodeBreadcrumb = ({ nodes }: NodeBreadcrumbProps) => {
+  const showEllipsis = nodes.length > 3;
+
+  // Get visible entries: first node + last two entries
+  const visibleItems = showEllipsis ? [nodes[0], ...nodes.slice(-2)] : nodes;
+
+  // Get middle entries for ellipsis (everything except first and last two)
+  const ellipsisItems = showEllipsis ? nodes.slice(1, -2) : [];
+
+  return (
+    <Breadcrumb className="grow">
+      <BreadcrumbList>
+        {visibleItems.map((item, index) => {
+          if (!item) {
+            return null;
+          }
+
+          const isFirst = index === 0;
+
+          return (
+            <Fragment key={item.id}>
+              {!isFirst && <BreadcrumbSeparator />}
+              <BreadcrumbItem className="cursor-pointer hover:text-foreground">
+                <Link
+                  from="/workspace/$userId"
+                  to="$nodeId"
+                  params={{ nodeId: item.id }}
+                >
+                  <NodeBreadcrumbItem node={item} />
+                </Link>
+              </BreadcrumbItem>
+              {showEllipsis && isFirst && (
+                <Fragment>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger className="flex items-center gap-1">
+                        <BreadcrumbEllipsis className="h-4 w-4" />
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        {ellipsisItems.map((ellipsisItem) => {
+                          return (
+                            <DropdownMenuItem key={ellipsisItem.id}>
+                              <Link
+                                from="/workspace/$userId"
+                                to="$nodeId"
+                                params={{ nodeId: ellipsisItem.id }}
+                              >
+                                <BreadcrumbItem className="cursor-pointer hover:text-foreground">
+                                  <NodeBreadcrumbItem node={ellipsisItem} />
+                                </BreadcrumbItem>
+                              </Link>
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </BreadcrumbItem>
+                </Fragment>
+              )}
+            </Fragment>
+          );
+        })}
+      </BreadcrumbList>
+    </Breadcrumb>
+  );
+};

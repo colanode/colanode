@@ -12,7 +12,7 @@ export class FolderDeleteMutationHandler
   async handleMutation(
     input: FolderDeleteMutationInput
   ): Promise<FolderDeleteMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     await workspace.nodes.deleteNode(input.folderId);
 

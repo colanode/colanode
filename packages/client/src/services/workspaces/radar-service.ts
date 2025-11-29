@@ -23,7 +23,7 @@ export class RadarService {
     const data: WorkspaceRadarData = {
       accountId: this.workspace.accountId,
       userId: this.workspace.userId,
-      workspaceId: this.workspace.id,
+      workspaceId: this.workspace.workspaceId,
       state: {
         hasUnread: false,
         unreadCount: 0,
@@ -96,10 +96,7 @@ export class RadarService {
   }
 
   private handleNodeCounterUpdated(event: NodeCounterUpdatedEvent) {
-    if (
-      event.accountId !== this.workspace.accountId ||
-      event.workspaceId !== this.workspace.id
-    ) {
+    if (event.workspace.userId !== this.workspace.userId) {
       return;
     }
 
@@ -124,10 +121,7 @@ export class RadarService {
   }
 
   private handleNodeCounterDeleted(event: NodeCounterDeletedEvent) {
-    if (
-      event.accountId !== this.workspace.accountId ||
-      event.workspaceId !== this.workspace.id
-    ) {
+    if (event.workspace.userId !== this.workspace.userId) {
       return;
     }
 

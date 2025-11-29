@@ -1,7 +1,11 @@
+import { useI18n } from '@colanode/ui/contexts/i18n';
+
 export const TableViewEmptyPlaceholder = () => {
+  const { t } = useI18n();
+
   return (
-    <div className="flex w-full flex-col items-center justify-center border-b p-10 text-sm text-muted-foreground">
-      <p>No records</p>
+    <div className="flex h-full w-full items-center justify-center">
+      <p>{t('view.noRecords')}</p>
     </div>
   );
 };

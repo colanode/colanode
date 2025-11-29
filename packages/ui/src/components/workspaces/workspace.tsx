@@ -1,71 +1,62 @@
-import {
-  WorkspaceMetadataKey,
-  WorkspaceMetadataMap,
-  Workspace as WorkspaceType,
-} from '@colanode/client/types';
-import { Layout } from '@colanode/ui/components/layouts/layout';
-import { useAccount } from '@colanode/ui/contexts/account';
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
+import { collections } from '@colanode/ui/collections';
+import { ServerProvider } from '@colanode/ui/components/servers/server-provider';
+import { WorkspaceLayout } from '@colanode/ui/components/workspaces/workspace-layout';
+import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useLocationTracker } from '@colanode/ui/hooks/use-location-tracker';
 
 interface WorkspaceProps {
-  workspace: WorkspaceType;
+  userId: string;
 }
 
-export const Workspace = ({ workspace }: WorkspaceProps) => {
-  const account = useAccount();
+export const Workspace = ({ userId }: WorkspaceProps) => {
+  const workspaceQuery = useLiveQuery((q) =>
+    q
+      .from({ workspaces: collections.workspaces })
+      .where(({ workspaces }) => eq(workspaces.userId, userId))
+      .select(({ workspaces }) => ({
+        userId: workspaces.userId,
+        workspaceId: workspaces.workspaceId,
+        role: workspaces.role,
+        accountId: workspaces.accountId,
+      }))
+      .findOne()
+  );
 
-  const workspaceMetadataListQuery = useLiveQuery({
-    type: 'workspace.metadata.list',
-    accountId: account.id,
-    workspaceId: workspace.id,
-  });
+  const accountQuery = useLiveQuery((q) =>
+    q
+      .from({ accounts: collections.accounts })
+      .where(({ accounts }) => eq(accounts.id, workspaceQuery.data?.accountId))
+      .select(({ accounts }) => ({
+        server: accounts.server,
+      }))
+      .findOne()
+  );
 
-  if (workspaceMetadataListQuery.isPending) {
-    return null;
+  const role = workspaceQuery.data?.role;
+  const workspaceId = workspaceQuery.data?.workspaceId;
+  const accountId = workspaceQuery.data?.accountId;
+  const server = accountQuery.data?.server;
+
+  useLocationTracker(userId!);
+
+  if (!workspaceId || !accountId || !server) {
+    return <WorkspaceNotFound />;
+  }
+
+  if (!userId || !role) {
+    return <WorkspaceNotFound />;
   }
 
   return (
-    <WorkspaceContext.Provider
-      value={{
-        ...workspace,
-        getMetadata<K extends WorkspaceMetadataKey>(key: K) {
-          const value = workspaceMetadataListQuery.data?.find(
-            (m) => m.key === key
-          );
-          if (!value) {
-            return undefined;
-          }
-
-          if (value.key !== key) {
-            return undefined;
-          }
-
-          return value as WorkspaceMetadataMap[K];
-        },
-        setMetadata<K extends WorkspaceMetadataKey>(
-          key: K,
-          value: WorkspaceMetadataMap[K]['value']
-        ) {
-          window.colanode.executeMutation({
-            type: 'workspace.metadata.update',
-            accountId: account.id,
-            workspaceId: workspace.id,
-            key,
-            value,
-          });
-        },
-        deleteMetadata(key: string) {
-          window.colanode.executeMutation({
-            type: 'workspace.metadata.delete',
-            accountId: account.id,
-            workspaceId: workspace.id,
-            key,
-          });
-        },
-      }}
-    >
-      <Layout key={workspace.id} />
-    </WorkspaceContext.Provider>
+    <ServerProvider domain={server}>
+      <WorkspaceContext.Provider
+        value={{ accountId: accountId, workspaceId: workspaceId, userId, role }}
+      >
+        <WorkspaceLayout />
+      </WorkspaceContext.Provider>
+    </ServerProvider>
   );
 };

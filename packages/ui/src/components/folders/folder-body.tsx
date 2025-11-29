@@ -22,11 +22,7 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { Dropzone } from '@colanode/ui/components/ui/dropzone';
-import {
-  ScrollArea,
-  ScrollBar,
-  ScrollViewport,
-} from '@colanode/ui/components/ui/scroll-area';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { openFileDialog } from '@colanode/ui/lib/files';
 
@@ -68,6 +64,7 @@ interface FolderBodyProps {
 }
 
 export const FolderBody = ({ folder }: FolderBodyProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
 
   const [layout, setLayout] = useState<FolderLayoutType>('grid');
@@ -83,8 +80,7 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
         window.colanode
           .executeMutation({
             type: 'file.create',
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
             tempFileId: tempFile.id,
             parentId: folder.id,
           })
@@ -101,7 +97,7 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
 
   return (
     <Dropzone
-      text="Drop files here to upload them in the folder"
+      text={t('file.dropFilesHere')}
       onDrop={(files) => {
         files.forEach((file) => console.log(file));
       }}
@@ -135,7 +131,7 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
                   >
                     <div className="flex w-full flex-row items-center gap-2">
                       <item.icon className="size-4" />
-                      <p className="flex-grow">{item.name}</p>
+                      <p className="grow">{item.name}</p>
                       {layout === item.value && <Check className="size-4" />}
                     </div>
                   </DropdownMenuItem>
@@ -144,13 +140,7 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
             </DropdownMenu>
           </div>
         </div>
-        <ScrollArea className="flex-grow">
-          <ScrollViewport>
-            <FolderFiles id={folder.id} name="Folder" layout={layout} />
-            <ScrollBar orientation="horizontal" />
-            <ScrollBar orientation="vertical" />
-          </ScrollViewport>
-        </ScrollArea>
+        <FolderFiles id={folder.id} name="Folder" layout={layout} />
       </div>
     </Dropzone>
   );

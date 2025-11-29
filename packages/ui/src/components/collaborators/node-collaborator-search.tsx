@@ -23,6 +23,7 @@ import {
   ScrollViewport,
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -37,6 +38,7 @@ export const NodeCollaboratorSearch = ({
   value,
   onChange,
 }: NodeCollaboratorSearchProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
 
   const [query, setQuery] = useState('');
@@ -46,8 +48,7 @@ export const NodeCollaboratorSearch = ({
     type: 'user.search',
     searchQuery: query,
     exclude: excluded,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
   });
 
   const users = userSearchQuery.data ?? [];
@@ -88,10 +89,13 @@ export const NodeCollaboratorSearch = ({
           <CommandInput
             value={query}
             onValueChange={setQuery}
-            placeholder="Search collaborators..."
+            placeholder={t('collaborator.searchCollaborators')}
             className="h-9"
           />
-          <CommandEmpty>No collaborator found.</CommandEmpty>
+          <CommandEmpty>
+            {t('collaborator.collaborators')}{' '}
+            {t('status.notFound').toLowerCase()}.
+          </CommandEmpty>
           <ScrollArea className="h-80">
             <ScrollViewport>
               <CommandList className="max-h-none overflow-hidden">
@@ -111,7 +115,7 @@ export const NodeCollaboratorSearch = ({
                           avatar={user.avatar}
                           className="h-7 w-7"
                         />
-                        <div className="flex flex-grow flex-col">
+                        <div className="flex grow flex-col">
                           <p className="text-sm">{user.name}</p>
                           <p className="text-xs text-muted-foreground">
                             {user.email}

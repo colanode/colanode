@@ -6,12 +6,14 @@ import { EmojiSearch } from '@colanode/ui/components/emojis/emoji-search';
 import { EmojiSkinToneSelector } from '@colanode/ui/components/emojis/emoji-skin-tone-selector';
 import { Input } from '@colanode/ui/components/ui/input';
 import { EmojiPickerContext } from '@colanode/ui/contexts/emoji-picker';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 interface EmojiPickerProps {
   onPick: (emoji: Emoji, skinTone: number) => void;
 }
 
 export const EmojiPicker = ({ onPick }: EmojiPickerProps) => {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
   const [skinTone, setSkinTone] = useState(0);
 
@@ -20,7 +22,7 @@ export const EmojiPicker = ({ onPick }: EmojiPickerProps) => {
       <div className="flex flex-row items-center gap-1">
         <Input
           type="text"
-          placeholder="Search emojis..."
+          placeholder={t('misc.emojis')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />

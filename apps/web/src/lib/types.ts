@@ -1,11 +1,12 @@
 import { EventBus } from '@colanode/client/lib';
 import { MutationInput, MutationResult } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
-import { Event, TempFile } from '@colanode/client/types';
+import { AppInitOutput, Event, TempFile } from '@colanode/client/types';
 import { ColanodeWindowApi } from '@colanode/ui';
 
 export interface ColanodeWorkerApi {
-  init: () => Promise<void>;
+  init: () => Promise<AppInitOutput>;
+  reset: () => Promise<void>;
   executeMutation: <T extends MutationInput>(
     input: T
   ) => Promise<MutationResult<T>>;
@@ -29,6 +30,15 @@ declare global {
     eventBus: EventBus;
   }
 }
+
+export type BroadcastInitMessage = {
+  type: 'init';
+};
+
+export type BroadcastInitResultMessage = {
+  type: 'init_result';
+  result: AppInitOutput;
+};
 
 export type BroadcastMutationMessage = {
   type: 'mutation';
@@ -83,6 +93,8 @@ export type BroadcastEventMessage = {
 };
 
 export type BroadcastMessage =
+  | BroadcastInitMessage
+  | BroadcastInitResultMessage
   | BroadcastMutationMessage
   | BroadcastMutationResultMessage
   | BroadcastQueryMessage
@@ -91,6 +103,12 @@ export type BroadcastMessage =
   | BroadcastQueryAndSubscribeResultMessage
   | BroadcastQueryUnsubscribeMessage
   | BroadcastEventMessage;
+
+export type PendingInit = {
+  type: 'init';
+  resolve: (result: AppInitOutput) => void;
+  reject: (error: string) => void;
+};
 
 export type PendingQuery = {
   type: 'query';
@@ -119,6 +137,7 @@ export type PendingMutation = {
 };
 
 export type PendingPromise =
+  | PendingInit
   | PendingQuery
   | PendingQueryAndSubscribe
   | PendingMutation;

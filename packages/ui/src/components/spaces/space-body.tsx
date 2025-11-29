@@ -12,6 +12,7 @@ import {
   ScrollViewport,
 } from '@colanode/ui/components/ui/scroll-area';
 import { Separator } from '@colanode/ui/components/ui/separator';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useLayout } from '@colanode/ui/contexts/layout';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -22,6 +23,7 @@ interface SpaceBodyProps {
 }
 
 export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
@@ -61,7 +63,7 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
                         avatar: values.avatar,
                       },
                       onSuccess() {
-                        toast.success('Space updated');
+                        toast.success(t('space.createSpace'));
                       },
                       onError(error) {
                         toast.error(error.message);
@@ -69,14 +71,14 @@ export const SpaceBody = ({ space, role }: SpaceBodyProps) => {
                     });
                   }}
                   isSaving={isPending}
-                  saveText="Update"
+                  saveText={t('common.update')}
                 />
               </div>
 
               <div className="space-y-6">
                 <div>
                   <h2 className="text-2xl font-semibold tracking-tight">
-                    Collaborators
+                    {t('collaborator.collaborators')}
                   </h2>
                   <Separator className="mt-3" />
                 </div>

@@ -1,23 +1,17 @@
-import { Download, LocalFile } from '@colanode/client/types';
+import { LocalFile } from '@colanode/client/types';
 
 export type LocalFileGetQueryInput = {
   type: 'local.file.get';
   fileId: string;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   autoDownload?: boolean;
-};
-
-export type LocalFileGetQueryOutput = {
-  localFile: LocalFile | null;
-  download: Download | null;
 };
 
 declare module '@colanode/client/queries' {
   interface QueryMap {
     'local.file.get': {
       input: LocalFileGetQueryInput;
-      output: LocalFileGetQueryOutput;
+      output: LocalFile | null;
     };
   }
 }

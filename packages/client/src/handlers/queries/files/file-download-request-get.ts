@@ -13,10 +13,10 @@ export class FileDownloadRequestGetQueryHandler
   public async handleQuery(
     input: FileDownloadRequestGetQueryInput
   ): Promise<FileDownloadRequestGetQueryOutput | null> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     const baseUrl = workspace.account.server.httpBaseUrl;
 
-    const url = `${baseUrl}/v1/workspaces/${workspace.id}/files/${input.id}`;
+    const url = `${baseUrl}/v1/workspaces/${workspace.workspaceId}/files/${input.id}`;
     const headers: Record<string, string> = {
       Authorization: `Bearer ${workspace.account.token}`,
       [ApiHeader.ClientType]: this.app.meta.type,

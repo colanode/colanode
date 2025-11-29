@@ -1,7 +1,10 @@
+import { useLiveQuery } from '@tanstack/react-db';
+import { useNavigate } from '@tanstack/react-router';
 import { Check, Plus } from 'lucide-react';
 import { useState } from 'react';
 
 import { UnreadState } from '@colanode/client/types';
+import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import {
   DropdownMenu,
@@ -12,23 +15,24 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
-import { AccountContext, useAccount } from '@colanode/ui/contexts/account';
-import { useApp } from '@colanode/ui/contexts/app';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useRadar } from '@colanode/ui/contexts/radar';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 export function SidebarMenuFooter() {
-  const app = useApp();
-  const account = useAccount();
+  const { t } = useI18n();
+  const workspace = useWorkspace();
   const radar = useRadar();
+  const navigate = useNavigate();
+
   const [open, setOpen] = useState(false);
 
-  const accountListQuery = useLiveQuery({
-    type: 'account.list',
-  });
-
-  const accounts = accountListQuery.data ?? [];
-  const otherAccounts = accounts.filter((a) => a.id !== account.id);
+  const accountsQuery = useLiveQuery((q) =>
+    q.from({ accounts: collections.accounts })
+  );
+  const accounts = accountsQuery.data ?? [];
+  const currentAccount = accounts.find((a) => a.id === workspace.accountId);
+  const otherAccounts = accounts.filter((a) => a.id !== workspace.accountId);
   const accountUnreadStates: Record<string, UnreadState> = {};
   for (const accountItem of otherAccounts) {
     accountUnreadStates[accountItem.id] = radar.getAccountState(accountItem.id);
@@ -43,14 +47,18 @@ export function SidebarMenuFooter() {
     0
   );
 
+  if (!currentAccount) {
+    return null;
+  }
+
   return (
     <DropdownMenu open={open} onOpenChange={setOpen}>
       <DropdownMenuTrigger asChild>
         <button className="flex w-full items-center justify-center relative mb-2 cursor-pointer outline-none">
           <Avatar
-            id={account.id}
-            name={account.name}
-            avatar={account.avatar}
+            id={currentAccount.id}
+            name={currentAccount.name}
+            avatar={currentAccount.avatar}
             className="size-10 rounded-lg shadow-md"
           />
           <UnreadBadge
@@ -66,7 +74,9 @@ export function SidebarMenuFooter() {
         align="end"
         sideOffset={4}
       >
-        <DropdownMenuLabel className="mb-1">Accounts</DropdownMenuLabel>
+        <DropdownMenuLabel className="mb-1">
+          {t('app.accounts')}
+        </DropdownMenuLabel>
         {accounts.map((accountItem) => {
           const state = accountUnreadStates[accountItem.id] ?? {
             unreadCount: 0,
@@ -78,41 +88,34 @@ export function SidebarMenuFooter() {
               key={accountItem.id}
               className="p-0"
               onClick={() => {
-                app.openAccount(accountItem.id);
+                navigate({
+                  to: '/workspace/$userId',
+                  params: { userId: accountItem.id },
+                });
               }}
             >
-              <AccountContext.Provider
-                value={{
-                  ...accountItem,
-                  openWorkspace: () => {},
-                  openWorkspaceCreate: () => {},
-                }}
-              >
-                <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                  <Avatar
-                    className="h-8 w-8 rounded-lg"
-                    id={accountItem.id}
-                    name={accountItem.name}
-                    avatar={accountItem.avatar}
-                  />
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-semibold">
-                      {accountItem.name}
-                    </span>
-                    <span className="truncate text-xs">
-                      {accountItem.email}
-                    </span>
-                  </div>
-                  {accountItem.id === account.id ? (
-                    <Check className="size-4" />
-                  ) : (
-                    <UnreadBadge
-                      count={state.unreadCount}
-                      unread={state.hasUnread}
-                    />
-                  )}
+              <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">
+                <Avatar
+                  className="h-8 w-8 rounded-lg"
+                  id={accountItem.id}
+                  name={accountItem.name}
+                  avatar={accountItem.avatar}
+                />
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-semibold">
+                    {accountItem.name}
+                  </span>
+                  <span className="truncate text-xs">{accountItem.email}</span>
                 </div>
-              </AccountContext.Provider>
+                {accountItem.id === workspace.accountId ? (
+                  <Check className="size-4" />
+                ) : (
+                  <UnreadBadge
+                    count={state.unreadCount}
+                    unread={state.hasUnread}
+                  />
+                )}
+              </div>
             </DropdownMenuItem>
           );
         })}
@@ -121,7 +124,7 @@ export function SidebarMenuFooter() {
         <DropdownMenuItem
           className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
           onClick={() => {
-            app.openLogin();
+            navigate({ to: '/auth/login' });
           }}
         >
           <Plus className="size-4" />

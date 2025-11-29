@@ -2,11 +2,13 @@ import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 
 import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export const RecordName = () => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const record = useRecord();
   const { mutate, isPending } = useMutation();
@@ -42,8 +44,7 @@ export const RecordName = () => {
             type: 'record.name.update',
             recordId: record.id,
             name: value,
-            accountId: workspace.accountId,
-            workspaceId: workspace.id,
+            userId: workspace.userId,
           },
           onError(error) {
             toast.error(error.message);
@@ -51,7 +52,7 @@ export const RecordName = () => {
         });
       }}
       className="font-heading border-b border-none pl-1 text-4xl font-bold shadow-none focus-visible:ring-0"
-      placeholder="Unnamed"
+      placeholder={t('common.unnamed')}
     />
   );
 };

@@ -15,6 +15,7 @@ import {
   ScrollViewport,
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -24,14 +25,14 @@ interface UserSearchProps {
 }
 
 export const UserSearch = ({ exclude, onSelect }: UserSearchProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
 
   const [query, setQuery] = useState('');
   const userSearchQuery = useLiveQuery({
     type: 'user.search',
     searchQuery: query,
-    accountId: workspace.accountId,
-    workspaceId: workspace.id,
+    userId: workspace.userId,
     exclude,
   });
 
@@ -40,7 +41,7 @@ export const UserSearch = ({ exclude, onSelect }: UserSearchProps) => {
       <CommandInput
         value={query}
         onValueChange={setQuery}
-        placeholder="Search users..."
+        placeholder={t('misc.user')}
         className="h-9"
       />
       <CommandEmpty>No user found.</CommandEmpty>
@@ -63,7 +64,7 @@ export const UserSearch = ({ exclude, onSelect }: UserSearchProps) => {
                       avatar={user.avatar}
                       className="h-7 w-7"
                     />
-                    <div className="flex flex-grow flex-col">
+                    <div className="flex grow flex-col">
                       <p className="text-sm">{user.name}</p>
                       <p className="text-xs text-muted-foreground">
                         {user.email}

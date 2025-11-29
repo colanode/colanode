@@ -3,8 +3,7 @@ import { LocalNode } from '@colanode/client/types/nodes';
 export type NodeGetQueryInput = {
   type: 'node.get';
   nodeId: string;
-  accountId: string;
-  workspaceId: string;
+  userId: string;
 };
 
 declare module '@colanode/client/queries' {

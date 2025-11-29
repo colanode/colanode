@@ -34,15 +34,3 @@ export const accountConfigSchema = z.object({
 });
 
 export type AccountConfig = z.infer<typeof accountConfigSchema>;
-
-export const readAccountConfigVariables = () => {
-  return {
-    verificationType: process.env.ACCOUNT_VERIFICATION_TYPE,
-    otpTimeout: process.env.ACCOUNT_OTP_TIMEOUT,
-    google: {
-      enabled: process.env.ACCOUNT_GOOGLE_ENABLED === 'true',
-      clientId: process.env.ACCOUNT_GOOGLE_CLIENT_ID,
-      clientSecret: process.env.ACCOUNT_GOOGLE_CLIENT_SECRET,
-    },
-  };
-};

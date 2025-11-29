@@ -1,7 +1,6 @@
 export type SpaceChildReorderMutationInput = {
   type: 'space.child.reorder';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   spaceId: string;
   childId: string;
   after: string | null;

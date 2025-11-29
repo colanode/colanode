@@ -17,6 +17,7 @@ import {
   CommandList,
 } from '@colanode/ui/components/ui/command';
 import { useDatabase } from '@colanode/ui/contexts/database';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { getRandomSelectOptionColor } from '@colanode/ui/lib/databases';
@@ -34,6 +35,7 @@ export const SelectFieldOptions = ({
   onSelect,
   allowAdd,
 }: SelectFieldOptionsProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const database = useDatabase();
   const { mutate, isPending } = useMutation();
@@ -50,12 +52,14 @@ export const SelectFieldOptions = ({
   return (
     <Command className="min-h-min">
       <CommandInput
-        placeholder="Search options..."
+        placeholder={t('database.searchOptions')}
         className="h-9"
         value={inputValue}
         onValueChange={setInputValue}
       />
-      <CommandEmpty>No options found.</CommandEmpty>
+      <CommandEmpty>
+        {t('database.searchOptions')} {t('status.notFound').toLowerCase()}.
+      </CommandEmpty>
       <CommandList>
         <CommandGroup className="h-min">
           {selectOptions.map((option) => {
@@ -119,8 +123,7 @@ export const SelectFieldOptions = ({
                     fieldId: field.id,
                     name: inputValue.trim(),
                     color,
-                    accountId: workspace.accountId,
-                    workspaceId: workspace.id,
+                    userId: workspace.userId,
                   },
                   onSuccess(output) {
                     setInputValue('');

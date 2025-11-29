@@ -1,13 +1,18 @@
 import { BadgeAlert } from 'lucide-react';
 
+import { useI18n } from '@colanode/ui/contexts/i18n';
+
 export const FileNotFound = () => {
+  const { t } = useI18n();
+
   return (
     <div className="flex flex-col items-center justify-center h-full p-6 text-center">
       <BadgeAlert className="size-12 mb-4" />
-      <h1 className="text-2xl font-semibold tracking-tight">File not found</h1>
+      <h1 className="text-2xl font-semibold tracking-tight">
+        {t('misc.fileNotFound')}
+      </h1>
       <p className="mt-2 text-sm font-medium text-muted-foreground">
-        The file you are looking for does not exist. It may have been deleted or
-        your access has been removed.
+        {t('channel.channelNotFoundDescription')}
       </p>
     </div>
   );

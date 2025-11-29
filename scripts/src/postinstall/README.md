@@ -10,14 +10,14 @@ The script copies different types of assets to different Colanode apps based on 
 
 - **Full databases**: `emojis.db` and `icons.db` (with SVG BLOBs) for offline capability
 - **SVG sprites**: `emojis.svg` and `icons.svg` for efficient rendering
-- **Fonts**: Custom fonts like `neotrax.otf`
+- **Fonts**: Custom fonts like `satoshi-variable.woff2`
 - **Images**: Application logos and icons in various formats (.png, .ico, .icns)
 
 **Web Application (`apps/web/public/assets/`)**:
 
 - **Minimal databases**: `emojis.min.db` and `icons.min.db` (renamed to `emojis.db` and `icons.db`) without SVG BLOBs for faster loading
 - **SVG sprites**: `emojis.svg` and `icons.svg` for rendering (since SVG data isn't in the minimal databases)
-- **Fonts**: Custom fonts like `neotrax.otf`
+- **Fonts**: Custom fonts like `satoshi-variable.woff2`
 - **Images**: Web-specific logo files in PNG format
 
 ## Why This Approach?

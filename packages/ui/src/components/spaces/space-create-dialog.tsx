@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -20,16 +21,17 @@ export const SpaceCreateDialog = ({
   open,
   onOpenChange,
 }: SpaceCreateDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="w-xl max-w-xl min-w-xl">
+      <DialogContent className="w-xl max-w-full">
         <DialogHeader>
-          <DialogTitle>Create space</DialogTitle>
+          <DialogTitle>{t('space.createSpace')}</DialogTitle>
           <DialogDescription>
-            Create a new space to collaborate with your peers
+            {t('space.descriptionPlaceholder')}
           </DialogDescription>
         </DialogHeader>
         <SpaceForm
@@ -48,8 +50,7 @@ export const SpaceCreateDialog = ({
                 name: values.name,
                 description: values.description,
                 avatar: values.avatar,
-                accountId: workspace.accountId,
-                workspaceId: workspace.id,
+                userId: workspace.userId,
               },
               onSuccess() {
                 onOpenChange(false);
@@ -63,7 +64,7 @@ export const SpaceCreateDialog = ({
           onCancel={() => {
             onOpenChange(false);
           }}
-          saveText="Create"
+          saveText={t('common.create')}
         />
       </DialogContent>
     </Dialog>

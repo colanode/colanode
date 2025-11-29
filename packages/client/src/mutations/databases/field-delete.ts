@@ -1,7 +1,6 @@
 export type FieldDeleteMutationInput = {
   type: 'field.delete';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   databaseId: string;
   fieldId: string;
 };

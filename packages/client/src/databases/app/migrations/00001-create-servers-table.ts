@@ -12,28 +12,6 @@ export const createServersTable: Migration = {
       .addColumn('created_at', 'text', (col) => col.notNull())
       .addColumn('synced_at', 'text')
       .execute();
-
-    await db
-      .insertInto('servers')
-      .values([
-        {
-          domain: 'eu.colanode.com',
-          name: 'Colanode Cloud (EU)',
-          avatar: 'https://colanode.com/assets/flags/eu.svg',
-          attributes: '{}',
-          version: '0.2.0',
-          created_at: new Date().toISOString(),
-        },
-        {
-          domain: 'us.colanode.com',
-          name: 'Colanode Cloud (US)',
-          avatar: 'https://colanode.com/assets/flags/us.svg',
-          attributes: '{}',
-          version: '0.2.0',
-          created_at: new Date().toISOString(),
-        },
-      ])
-      .execute();
   },
   down: async (db) => {
     await db.schema.dropTable('servers').execute();

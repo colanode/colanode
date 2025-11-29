@@ -12,7 +12,7 @@ export class ViewDeleteMutationHandler
   async handleMutation(
     input: ViewDeleteMutationInput
   ): Promise<ViewDeleteMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
     await workspace.nodes.deleteNode(input.viewId);
 
     return {

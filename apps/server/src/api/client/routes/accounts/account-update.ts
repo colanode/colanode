@@ -17,7 +17,7 @@ export const accountUpdateRoute: FastifyPluginCallbackZod = (
 ) => {
   instance.route({
     method: 'PATCH',
-    url: '/',
+    url: '/me',
     schema: {
       body: accountUpdateInputSchema,
       response: {

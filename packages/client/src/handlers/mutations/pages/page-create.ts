@@ -13,7 +13,7 @@ export class PageCreateMutationHandler
   async handleMutation(
     input: PageCreateMutationInput
   ): Promise<PageCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const id = generateId(IdType.Page);
     const attributes: PageAttributes = {

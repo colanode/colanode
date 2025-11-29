@@ -22,8 +22,7 @@ export class FileListQueryHandler
   ): Promise<ChangeCheckResult<FileListQueryInput>> {
     if (
       event.type === 'workspace.deleted' &&
-      event.workspace.accountId === input.accountId &&
-      event.workspace.id === input.workspaceId
+      event.workspace.userId === input.userId
     ) {
       return {
         hasChanges: true,
@@ -33,8 +32,7 @@ export class FileListQueryHandler
 
     if (
       event.type === 'node.created' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.parentId === input.parentId
     ) {
       const output = await this.handleQuery(input);
@@ -46,8 +44,7 @@ export class FileListQueryHandler
 
     if (
       event.type === 'node.updated' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.parentId === input.parentId
     ) {
       const file = output.find((file) => file.id === event.node.id);
@@ -69,8 +66,7 @@ export class FileListQueryHandler
 
     if (
       event.type === 'node.deleted' &&
-      event.accountId === input.accountId &&
-      event.workspaceId === input.workspaceId &&
+      event.workspace.userId === input.userId &&
       event.node.parentId === input.parentId
     ) {
       const file = output.find((file) => file.id === event.node.id);
@@ -91,7 +87,7 @@ export class FileListQueryHandler
   private async fetchFiles(
     input: FileListQueryInput
   ): Promise<LocalFileNode[]> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const offset = (input.page - 1) * input.count;
     const files = await workspace.database

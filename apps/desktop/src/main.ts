@@ -8,6 +8,8 @@ import {
   dialog,
   nativeTheme,
 } from 'electron';
+import fs from 'fs';
+import path from 'path';
 
 import started from 'electron-squirrel-startup';
 import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
@@ -15,15 +17,34 @@ import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
 import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationMap } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
-import { TempFile } from '@colanode/client/types';
+import { AppMeta, AppService } from '@colanode/client/services';
+import { AppInitOutput, TempFile, ThemeMode } from '@colanode/client/types';
 import {
+  build,
   createDebugger,
   extractFileSubtype,
   generateId,
   IdType,
 } from '@colanode/core';
-import { app, appBadge } from '@colanode/desktop/main/app-service';
+import { AppBadge } from '@colanode/desktop/main/app-badge';
+import { BootstrapService } from '@colanode/desktop/main/bootstrap';
+import { DesktopFileSystem } from '@colanode/desktop/main/file-system';
+import { DesktopKyselyService } from '@colanode/desktop/main/kysely-service';
+import { DesktopPathService } from '@colanode/desktop/main/path-service';
 import { handleLocalRequest } from '@colanode/desktop/main/protocols';
+
+const appMeta: AppMeta = {
+  type: 'desktop',
+  platform: process.platform,
+};
+
+const fileSystem = new DesktopFileSystem();
+const pathService = new DesktopPathService();
+const kyselyService = new DesktopKyselyService();
+const bootstrap = new BootstrapService(pathService);
+
+let app: AppService | null = null;
+let appBadge: AppBadge | null = null;
 
 const debug = createDebugger('desktop:main');
 
@@ -46,62 +67,46 @@ updateElectronApp({
 });
 
 const createWindow = async () => {
-  await app.migrate();
-
-  const themeMode = (await app.metadata.get('theme.mode'))?.value;
-  if (themeMode) {
-    nativeTheme.themeSource = themeMode;
-  }
+  nativeTheme.themeSource = bootstrap.theme ?? 'system';
 
   // Create the browser window.
-  let windowSize = (await app.metadata.get('window.size'))?.value;
   const mainWindow = new BrowserWindow({
-    width: windowSize?.width ?? 1200,
-    height: windowSize?.height ?? 800,
-    fullscreen: windowSize?.fullscreen ?? false,
+    width: bootstrap.window.width,
+    height: bootstrap.window.height,
+    fullscreen: bootstrap.window.fullscreen,
+    x: bootstrap.window.x,
+    y: bootstrap.window.y,
     fullscreenable: true,
     minWidth: 800,
     minHeight: 600,
-    icon: app.path.join(app.path.assets, 'colanode-logo.png'),
+    icon: path.join(pathService.assets, 'colanode-logo.png'),
     webPreferences: {
-      preload: app.path.join(__dirname, 'preload.js'),
+      preload: path.join(__dirname, 'preload.js'),
     },
     autoHideMenuBar: true,
     titleBarStyle: 'hiddenInset',
-    trafficLightPosition: { x: 5, y: 5 },
   });
 
   mainWindow.setMenuBarVisibility(false);
 
-  mainWindow.on('resized', () => {
-    windowSize = {
+  const updateWindowState = () => {
+    bootstrap.updateWindow({
+      fullscreen: mainWindow.isFullScreen(),
       width: mainWindow.getBounds().width,
       height: mainWindow.getBounds().height,
-      fullscreen: false,
-    };
+      x: mainWindow.getBounds().x,
+      y: mainWindow.getBounds().y,
+    });
 
-    app.metadata.set('window.size', windowSize);
-  });
+    if (app) {
+      app.metadata.set('app', 'window', bootstrap.window);
+    }
+  };
 
-  mainWindow.on('enter-full-screen', () => {
-    windowSize = {
-      width: windowSize?.width ?? mainWindow.getBounds().width,
-      height: windowSize?.height ?? mainWindow.getBounds().height,
-      fullscreen: true,
-    };
-
-    app.metadata.set('window.size', windowSize);
-  });
-
-  mainWindow.on('leave-full-screen', () => {
-    windowSize = {
-      width: windowSize?.width ?? mainWindow.getBounds().width,
-      height: windowSize?.height ?? mainWindow.getBounds().height,
-      fullscreen: false,
-    };
-
-    app.metadata.set('window.size', windowSize);
-  });
+  mainWindow.on('resized', updateWindowState);
+  mainWindow.on('enter-full-screen', updateWindowState);
+  mainWindow.on('leave-full-screen', updateWindowState);
+  mainWindow.on('moved', updateWindowState);
 
   // and load the index.html of the app.
   if (MAIN_WINDOW_VITE_DEV_SERVER_URL) {
@@ -110,32 +115,35 @@ const createWindow = async () => {
     // mainWindow.webContents.openDevTools();
   } else {
     mainWindow.loadFile(
-      app.path.join(
-        __dirname,
-        `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`
-      )
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
 
   const subscriptionId = eventBus.subscribe((event) => {
-    if (event.type === 'query.result.updated') {
-      mainWindow.webContents.send('event', event);
-    } else if (
-      event.type === 'app.metadata.updated' &&
+    mainWindow.webContents.send('event', event);
+    if (
+      event.type === 'metadata.updated' &&
       event.metadata.key === 'theme.mode'
     ) {
-      nativeTheme.themeSource = event.metadata.value;
+      const themeMode = JSON.parse(event.metadata.value) as ThemeMode;
+      nativeTheme.themeSource = themeMode;
+      bootstrap.updateTheme(themeMode);
     } else if (
-      event.type === 'app.metadata.deleted' &&
+      event.type === 'metadata.deleted' &&
       event.metadata.key === 'theme.mode'
     ) {
       nativeTheme.themeSource = 'system';
+      bootstrap.updateTheme(null);
     }
   });
 
   if (!protocol.isProtocolHandled('local')) {
     protocol.handle('local', (request) => {
-      return handleLocalRequest(request);
+      if (!app) {
+        throw new Error('App is not initialized');
+      }
+
+      return handleLocalRequest(pathService, app?.assets, request);
     });
   }
 
@@ -156,6 +164,35 @@ const createWindow = async () => {
   debug('Window created');
 };
 
+const initApp = async (): Promise<AppInitOutput> => {
+  if (bootstrap.needsFreshStart) {
+    return 'reset';
+  }
+
+  app = new AppService(appMeta, fileSystem, kyselyService, pathService);
+  appBadge = new AppBadge(app);
+
+  await app.init();
+  appBadge.init();
+
+  await bootstrap.updateVersion(build.version);
+
+  await app.metadata.set('app', 'version', bootstrap.version);
+  await app.metadata.set('app', 'platform', appMeta.platform);
+  await app.metadata.set('app', 'window', bootstrap.window);
+  if (bootstrap.theme) {
+    await app.metadata.set('app', 'theme.mode', bootstrap.theme);
+  } else {
+    await app.metadata.delete('app', 'theme.mode');
+  }
+
+  // add default Colanode servers
+  await app.createServer(new URL('https://eu.colanode.com/config'));
+  await app.createServer(new URL('https://us.colanode.com/config'));
+
+  return 'success';
+};
+
 protocol.registerSchemesAsPrivileged([
   { scheme: 'local', privileges: { standard: true, stream: true } },
 ]);
@@ -173,7 +210,9 @@ electronApp.on('window-all-closed', () => {
     electronApp.quit();
   }
 
-  app.mediator.clearSubscriptions();
+  if (app) {
+    app.mediator.clearSubscriptions();
+  }
 });
 
 electronApp.on('activate', () => {
@@ -187,8 +226,13 @@ electronApp.on('activate', () => {
 // In this file you can include the rest of your app's specific main process
 // code. You can also put them in separate files and import them here.
 ipcMain.handle('init', async () => {
-  await app.init();
-  appBadge.init();
+  return initApp();
+});
+
+ipcMain.handle('reset', async () => {
+  await fs.promises.rm(pathService.app, { recursive: true, force: true });
+  electronApp.relaunch();
+  electronApp.exit(0);
 });
 
 ipcMain.handle(
@@ -197,6 +241,10 @@ ipcMain.handle(
     _: unknown,
     input: T
   ): Promise<MutationMap[T['type']]['output']> => {
+    if (!app) {
+      throw new Error('App is not initialized');
+    }
+
     return app.mediator.executeMutation(input);
   }
 );
@@ -207,6 +255,10 @@ ipcMain.handle(
     _: unknown,
     input: T
   ): Promise<QueryMap[T['type']]['output']> => {
+    if (!app) {
+      throw new Error('App is not initialized');
+    }
+
     return app.mediator.executeQuery(input);
   }
 );
@@ -219,6 +271,10 @@ ipcMain.handle(
     windowId: string,
     input: T
   ): Promise<QueryMap[T['type']]['output']> => {
+    if (!app) {
+      throw new Error('App is not initialized');
+    }
+
     return app.mediator.executeQueryAndSubscribe(key, windowId, input);
   }
 );
@@ -226,6 +282,10 @@ ipcMain.handle(
 ipcMain.handle(
   'unsubscribe-query',
   (_: unknown, key: string, windowId: string): void => {
+    if (!app) {
+      throw new Error('App is not initialized');
+    }
+
     app.mediator.unsubscribeQuery(key, windowId);
   }
 );
@@ -237,10 +297,14 @@ ipcMain.handle(
     file: { name: string; size: number; type: string; buffer: Buffer }
   ): Promise<TempFile> => {
     const id = generateId(IdType.TempFile);
+    if (!app) {
+      throw new Error('App is not initialized');
+    }
+
     const extension = app.path.extension(file.name);
     const mimeType = file.type;
     const subtype = extractFileSubtype(mimeType);
-    const filePath = app.path.tempFile(file.name);
+    const filePath = app.path.tempFile(id + extension);
 
     await app.fs.writeFile(filePath, file.buffer);
     await app.database
@@ -259,6 +323,15 @@ ipcMain.handle(
       .execute();
 
     const url = await app.fs.url(filePath);
+    if (!url) {
+      await app.fs.delete(filePath);
+      await app.database
+        .deleteFrom('temp_files')
+        .where('id', '=', id)
+        .execute();
+
+      throw new Error('Failed to save temp file');
+    }
 
     return {
       id,

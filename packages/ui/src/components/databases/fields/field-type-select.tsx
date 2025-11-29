@@ -22,6 +22,7 @@ import {
   ScrollViewport,
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface FieldTypeOption {
@@ -103,6 +104,7 @@ export const FieldTypeSelect = ({
   onChange,
   types,
 }: FieldTypeSelectProps) => {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const filteredFieldTypes = fieldTypes.filter((fieldType) =>
     types ? types.includes(fieldType.type) : true
@@ -129,8 +131,13 @@ export const FieldTypeSelect = ({
       </PopoverTrigger>
       <PopoverContent className="w-96 p-1 overflow-hidden">
         <Command className="min-h-min">
-          <CommandInput placeholder="Search field types..." className="h-9" />
-          <CommandEmpty>No field type found.</CommandEmpty>
+          <CommandInput
+            placeholder={t('database.searchFieldTypes')}
+            className="h-9"
+          />
+          <CommandEmpty>
+            {t('field.fieldType')} {t('status.notFound').toLowerCase()}.
+          </CommandEmpty>
           <ScrollArea className="h-80">
             <ScrollViewport>
               <CommandList className="max-h-none overflow-hidden">

@@ -4,6 +4,7 @@ import { Icon } from '@colanode/client/types';
 import { IconBrowser } from '@colanode/ui/components/icons/icon-browser';
 import { IconSearch } from '@colanode/ui/components/icons/icon-search';
 import { Input } from '@colanode/ui/components/ui/input';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { IconPickerContext } from '@colanode/ui/contexts/icon-picker';
 
 interface IconPickerProps {
@@ -11,6 +12,7 @@ interface IconPickerProps {
 }
 
 export const IconPicker = ({ onPick }: IconPickerProps) => {
+  const { t } = useI18n();
   const [query, setQuery] = useState('');
 
   return (
@@ -18,7 +20,7 @@ export const IconPicker = ({ onPick }: IconPickerProps) => {
       <div className="flex flex-col gap-1 p-1">
         <Input
           type="text"
-          placeholder="Search icons..."
+          placeholder={t('misc.icons')}
           value={query}
           onChange={(e) => setQuery(e.target.value)}
         />

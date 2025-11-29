@@ -14,7 +14,7 @@ export class ChannelCreateMutationHandler
   async handleMutation(
     input: ChannelCreateMutationInput
   ): Promise<ChannelCreateMutationOutput> {
-    const workspace = this.getWorkspace(input.accountId, input.workspaceId);
+    const workspace = this.getWorkspace(input.userId);
 
     const space = await workspace.database
       .selectFrom('nodes')

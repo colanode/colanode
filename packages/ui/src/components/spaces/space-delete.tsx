@@ -12,6 +12,7 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -21,45 +22,41 @@ interface SpaceDeleteProps {
 }
 
 export const SpaceDelete = ({ id, onDeleted }: SpaceDeleteProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
-
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   return (
     <>
       <div className="flex items-center justify-between gap-6">
         <div className="flex-1 space-y-2">
-          <h3 className="font-semibold">Delete space</h3>
+          <h3 className="font-semibold">{t('space.deleteSpace')}</h3>
           <p className="text-sm text-muted-foreground">
-            Once you delete a space, there is no going back. Please be certain.
+            {t('workspace.deleteWorkspaceDescription')}
           </p>
         </div>
-        <div className="flex-shrink-0">
+        <div className="shrink-0">
           <Button
             variant="destructive"
             onClick={() => {
               setShowDeleteModal(true);
             }}
-            className="w-20"
           >
-            Delete
+            {t('common.delete')}
           </Button>
         </div>
       </div>
       <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Are you sure you want delete this space?
-            </AlertDialogTitle>
+            <AlertDialogTitle>{t('space.deleteSpaceConfirm')}</AlertDialogTitle>
             <AlertDialogDescription>
-              This action cannot be undone. This space will no longer be
-              accessible by you or others you&apos;ve shared it with.
+              {t('space.deleteSpaceDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
             <Button
               variant="destructive"
               disabled={isPending}
@@ -67,14 +64,13 @@ export const SpaceDelete = ({ id, onDeleted }: SpaceDeleteProps) => {
                 mutate({
                   input: {
                     type: 'space.delete',
-                    accountId: workspace.accountId,
-                    workspaceId: workspace.id,
+                    userId: workspace.userId,
                     spaceId: id,
                   },
                   onSuccess() {
                     setShowDeleteModal(false);
                     onDeleted();
-                    toast.success('Space deleted');
+                    toast.success(t('space.deleteSpace'));
                   },
                   onError(error) {
                     toast.error(error.message);
@@ -83,7 +79,7 @@ export const SpaceDelete = ({ id, onDeleted }: SpaceDeleteProps) => {
               }}
             >
               {isPending && <Spinner className="mr-1" />}
-              Delete
+              {t('common.delete')}
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>

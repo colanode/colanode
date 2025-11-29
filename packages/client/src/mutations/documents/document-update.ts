@@ -1,9 +1,8 @@
 export type DocumentUpdateMutationInput = {
   type: 'document.update';
-  accountId: string;
-  workspaceId: string;
+  userId: string;
   documentId: string;
-  update: Uint8Array;
+  update: string;
 };
 
 export type DocumentUpdateMutationOutput = {
