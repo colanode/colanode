@@ -14,6 +14,7 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useCountdown } from '@colanode/ui/hooks/use-countdown';
 
 const formSchema = z.object({
@@ -31,6 +32,7 @@ export const EmailVerifyForm = ({
   isPending,
   onSubmit,
 }: EmailVerifyFormProps) => {
+  const { t } = useI18n();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -48,14 +50,14 @@ export const EmailVerifyForm = ({
           name="otp"
           render={({ field }) => (
             <FormItem>
-              <Label htmlFor="otp">Code</Label>
+              <Label htmlFor="otp">{t('auth.code')}</Label>
               <FormControl>
-                <Input placeholder="123456" {...field} />
+                <Input placeholder={t('auth.codePlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
               <div className="flex flex-col items-center gap-1">
                 <p className="text-sm text-muted-foreground w-full text-center">
-                  We sent a verification code to your email.
+                  {t('auth.verificationCodeSent')}
                 </p>
                 <p className="text-xs text-muted-foreground w-full text-center">
                   {formattedTime}
@@ -75,7 +77,7 @@ export const EmailVerifyForm = ({
           ) : (
             <Mail className="mr-1 size-4" />
           )}
-          Confirm
+          {t('common.confirm')}
         </Button>
       </form>
     </Form>

@@ -19,6 +19,7 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { Textarea } from '@colanode/ui/components/ui/textarea';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -50,6 +51,7 @@ export const WorkspaceForm = ({
   saveText,
   readOnly = false,
 }: WorkspaceFormProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const isMobile = useIsMobile();
 
@@ -115,7 +117,7 @@ export const WorkspaceForm = ({
             >
               <Avatar
                 id={id.current}
-                name={name.length > 0 ? name : 'New workspace'}
+                name={name.length > 0 ? name : t('database.newWorkspace')}
                 avatar={avatar}
                 className={isMobile ? 'size-24' : 'size-32'}
               />
@@ -143,9 +145,13 @@ export const WorkspaceForm = ({
               name="name"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Name *</FormLabel>
+                  <FormLabel>{t('common.name')} *</FormLabel>
                   <FormControl>
-                    <Input readOnly={readOnly} placeholder="Name" {...field} />
+                    <Input
+                      readOnly={readOnly}
+                      placeholder={t('common.name')}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -156,11 +162,11 @@ export const WorkspaceForm = ({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Description</FormLabel>
+                  <FormLabel>{t('misc.description')}</FormLabel>
                   <FormControl>
                     <Textarea
                       readOnly={readOnly}
-                      placeholder="Write a short description about the workspace"
+                      placeholder={t('workspace.descriptionPlaceholder')}
                       {...field}
                     />
                   </FormControl>
@@ -181,7 +187,7 @@ export const WorkspaceForm = ({
                   onCancel();
                 }}
               >
-                Cancel
+                {t('common.cancel')}
               </Button>
             )}
 

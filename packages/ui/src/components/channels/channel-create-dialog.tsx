@@ -10,6 +10,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -24,6 +25,7 @@ export const ChannelCreateDialog = ({
   open,
   onOpenChange,
 }: ChannelCreateDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
@@ -32,9 +34,9 @@ export const ChannelCreateDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Create channel</DialogTitle>
+          <DialogTitle>{t('channel.createChannel')}</DialogTitle>
           <DialogDescription>
-            Create a new channel to collaborate with your peers
+            {t('channel.createChannelDescription')}
           </DialogDescription>
         </DialogHeader>
         <ChannelForm
@@ -43,7 +45,7 @@ export const ChannelCreateDialog = ({
             name: '',
           }}
           isPending={isPending}
-          submitText="Create"
+          submitText={t('common.create')}
           handleCancel={() => {
             onOpenChange(false);
           }}

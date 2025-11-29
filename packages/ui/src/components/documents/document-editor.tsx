@@ -23,6 +23,7 @@ import {
 } from '@colanode/client/types';
 import { RichTextContent, richTextContentSchema } from '@colanode/core';
 import { encodeState, YDoc } from '@colanode/crdt';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import {
   BlockquoteCommand,
@@ -112,6 +113,7 @@ export const DocumentEditor = ({
   canEdit,
   autoFocus,
 }: DocumentEditorProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
 
   const hasPendingChanges = useRef(false);
@@ -196,7 +198,7 @@ export const DocumentEditor = ({
         ListKeymapExtension,
         OrderedListNode,
         PlaceholderExtension.configure({
-          message: "Write something or '/' for commands",
+          message: t('ui.writeOrCommand'),
         }),
         TaskListNode,
         TaskItemNode,

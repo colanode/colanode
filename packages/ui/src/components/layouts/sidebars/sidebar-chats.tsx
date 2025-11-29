@@ -2,10 +2,12 @@ import { ChatCreatePopover } from '@colanode/ui/components/chats/chat-create-pop
 import { ChatSidebarItem } from '@colanode/ui/components/chats/chat-sidebar-item';
 import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
 import { Link } from '@colanode/ui/components/ui/link';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export const SidebarChats = () => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
 
   const chatListQuery = useLiveQuery({
@@ -19,7 +21,7 @@ export const SidebarChats = () => {
 
   return (
     <div className="flex flex-col group/sidebar h-full px-2">
-      <SidebarHeader title="Chats" actions={<ChatCreatePopover />} />
+      <SidebarHeader title={t('chat.chats')} actions={<ChatCreatePopover />} />
       <div className="flex w-full min-w-0 flex-col gap-1">
         {chats.map((item) => (
           <Link

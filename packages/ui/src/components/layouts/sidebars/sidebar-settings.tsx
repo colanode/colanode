@@ -16,9 +16,11 @@ import { SidebarSettingsItem } from '@colanode/ui/components/layouts/sidebars/si
 import { Link } from '@colanode/ui/components/ui/link';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useApp } from '@colanode/ui/contexts/app';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 export const SidebarSettings = () => {
+  const { t } = useI18n();
   const app = useApp();
   const workspace = useWorkspace();
 
@@ -39,11 +41,11 @@ export const SidebarSettings = () => {
   return (
     <div className="flex flex-col gap-4 h-full px-2 group/sidebar">
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <SidebarHeader title="Workspace settings" />
+        <SidebarHeader title={t('workspace.workspaceSettings')} />
         <Link from="/workspace/$userId" to="settings">
           {({ isActive }) => (
             <SidebarSettingsItem
-              title="General"
+              title={t('common.general')}
               icon={Settings}
               isActive={isActive}
             />
@@ -53,7 +55,7 @@ export const SidebarSettings = () => {
         <Link from="/workspace/$userId" to="users">
           {({ isActive }) => (
             <SidebarSettingsItem
-              title="Users"
+              title={t('workspace.users')}
               icon={Users}
               isActive={isActive}
             />
@@ -62,7 +64,7 @@ export const SidebarSettings = () => {
         <Link from="/workspace/$userId" to="storage">
           {({ isActive }) => (
             <SidebarSettingsItem
-              title="Storage"
+              title={t('workspace.storage')}
               icon={Cylinder}
               isActive={isActive}
             />
@@ -71,7 +73,7 @@ export const SidebarSettings = () => {
         <Link from="/workspace/$userId" to="uploads">
           {({ isActive }) => (
             <SidebarSettingsItem
-              title="Uploads"
+              title={t('workspace.uploads')}
               icon={Upload}
               isActive={isActive}
               unreadBadge={{
@@ -87,7 +89,7 @@ export const SidebarSettings = () => {
           <Link from="/workspace/$userId" to="downloads">
             {({ isActive }) => (
               <SidebarSettingsItem
-                title="Downloads"
+                title={t('workspace.downloads')}
                 icon={Download}
                 isActive={isActive}
               />
@@ -96,11 +98,11 @@ export const SidebarSettings = () => {
         )}
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <SidebarHeader title="Account settings" />
+        <SidebarHeader title={t('account.accountSettings')} />
         <Link from="/workspace/$userId" to="account">
           {({ isActive }) => (
             <SidebarSettingsItem
-              title="General"
+              title={t('common.general')}
               icon={Settings}
               isActive={isActive}
             />
@@ -108,11 +110,11 @@ export const SidebarSettings = () => {
         </Link>
       </div>
       <div className="flex w-full min-w-0 flex-col gap-1">
-        <SidebarHeader title="App settings" />
+        <SidebarHeader title={t('app.appSettings')} />
         <Link from="/workspace/$userId" to="appearance">
           {({ isActive }) => (
             <SidebarSettingsItem
-              title="Appearance"
+              title={t('common.appearance')}
               icon={Palette}
               isActive={isActive}
             />
@@ -124,7 +126,7 @@ export const SidebarSettings = () => {
         <Link from="/workspace/$userId" to="logout">
           {({ isActive }) => (
             <SidebarSettingsItem
-              title="Logout"
+              title={t('common.logout')}
               icon={LogOut}
               isActive={isActive}
             />

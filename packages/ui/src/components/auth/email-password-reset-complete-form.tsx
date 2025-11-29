@@ -14,26 +14,25 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useCountdown } from '@colanode/ui/hooks/use-countdown';
 
-const formSchema = z
-  .object({
-    otp: z.string().min(6, 'OTP must be 6 characters long'),
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters long')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(
-        /[^A-Za-z0-9]/,
-        'Password must contain at least one special character'
-      ),
-    confirmPassword: z.string(),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match",
-    path: ['confirmPassword'], // path of error
-  });
+const getFormSchema = (t: (key: string) => string) =>
+  z
+    .object({
+      otp: z.string().min(6, 'OTP must be 6 characters long'),
+      password: z
+        .string()
+        .min(8, t('auth.passwordRequirements.minLength'))
+        .regex(/[A-Z]/, t('auth.passwordRequirements.uppercase'))
+        .regex(/[a-z]/, t('auth.passwordRequirements.lowercase'))
+        .regex(/[^A-Za-z0-9]/, t('auth.passwordRequirements.special')),
+      confirmPassword: z.string(),
+    })
+    .refine((data) => data.password === data.confirmPassword, {
+      message: t('auth.passwordRequirements.noMatch'),
+      path: ['confirmPassword'], // path of error
+    });
 
 interface PasswordResetCompleteFormProps {
   expiresAt: Date;
@@ -46,6 +45,8 @@ export const PasswordResetCompleteForm = ({
   isPending,
   onSubmit,
 }: PasswordResetCompleteFormProps) => {
+  const { t } = useI18n();
+  const formSchema = getFormSchema(t);
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -65,13 +66,13 @@ export const PasswordResetCompleteForm = ({
           name="password"
           render={({ field }) => (
             <FormItem>
-              <Label htmlFor="password">New Password</Label>
+              <Label htmlFor="password">{t('auth.newPassword')}</Label>
               <FormControl>
                 <Input
                   type="password"
                   {...field}
                   autoComplete="new-password"
-                  placeholder="********"
+                  placeholder={t('auth.passwordPlaceholder')}
                 />
               </FormControl>
               <FormMessage />
@@ -83,13 +84,15 @@ export const PasswordResetCompleteForm = ({
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
+              <Label htmlFor="confirmPassword">
+                {t('auth.confirmNewPassword')}
+              </Label>
               <FormControl>
                 <Input
                   type="password"
                   {...field}
                   autoComplete="new-password"
-                  placeholder="********"
+                  placeholder={t('auth.passwordPlaceholder')}
                 />
               </FormControl>
               <FormMessage />
@@ -101,9 +104,9 @@ export const PasswordResetCompleteForm = ({
           name="otp"
           render={({ field }) => (
             <FormItem>
-              <Label htmlFor="otp">Code</Label>
+              <Label htmlFor="otp">{t('auth.code')}</Label>
               <FormControl>
-                <Input placeholder="123456" {...field} />
+                <Input placeholder={t('auth.codePlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
               <p className="text-xs text-muted-foreground w-full text-center">
@@ -123,7 +126,7 @@ export const PasswordResetCompleteForm = ({
           ) : (
             <Lock className="mr-1 size-4" />
           )}
-          Reset password
+          {t('auth.resetPassword')}
         </Button>
       </form>
     </Form>

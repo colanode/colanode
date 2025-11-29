@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { Dropzone } from '@colanode/ui/components/ui/dropzone';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { openFileDialog } from '@colanode/ui/lib/files';
 
@@ -63,6 +64,7 @@ interface FolderBodyProps {
 }
 
 export const FolderBody = ({ folder }: FolderBodyProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
 
   const [layout, setLayout] = useState<FolderLayoutType>('grid');
@@ -95,7 +97,7 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
 
   return (
     <Dropzone
-      text="Drop files here to upload them in the folder"
+      text={t('file.dropFilesHere')}
       onDrop={(files) => {
         files.forEach((file) => console.log(file));
       }}

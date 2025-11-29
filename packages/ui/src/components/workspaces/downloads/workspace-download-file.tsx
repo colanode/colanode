@@ -11,6 +11,7 @@ import {
   TooltipTrigger,
 } from '@colanode/ui/components/ui/tooltip';
 import { WorkspaceDownloadStatus } from '@colanode/ui/components/workspaces/downloads/workspace-download-status';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
@@ -21,6 +22,7 @@ interface WorkspaceDownloadFileProps {
 export const WorkspaceDownloadFile = ({
   download,
 }: WorkspaceDownloadFileProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const navigate = useNavigate({ from: '/workspace/$userId' });
 
@@ -76,7 +78,7 @@ export const WorkspaceDownloadFile = ({
               <span className="truncate">{download.path}</span>
             </p>
           </TooltipTrigger>
-          <TooltipContent>Show in folder</TooltipContent>
+          <TooltipContent>{t('folder.showInFolder')}</TooltipContent>
         </Tooltip>
         {download.errorMessage && (
           <p className="text-xs text-red-500">{download.errorMessage}</p>

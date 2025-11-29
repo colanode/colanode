@@ -6,10 +6,12 @@ import { Container } from '@colanode/ui/components/layouts/containers/container'
 import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export const LogoutContainer = () => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const navigate = useNavigate();
   const { mutate, isPending } = useMutation();
@@ -19,16 +21,16 @@ export const LogoutContainer = () => {
       <div className="max-w-4xl space-y-8">
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight">Logout</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              {t('common.logout')}
+            </h2>
             <Separator className="mt-3" />
           </div>
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="flex-1 space-y-2">
-              <h3 className="font-semibold">Sign out of your account</h3>
+              <h3 className="font-semibold">{t('auth.signOut')}</h3>
               <p className="text-sm text-muted-foreground">
-                All your data will be removed from this device. If there are
-                pending changes, they will be lost. If you login again, all the
-                data will be re-synced.
+                {t('auth.signOutDescription')}
               </p>
             </div>
             <div className="w-full md:w-auto md:shrink-0">
@@ -55,7 +57,7 @@ export const LogoutContainer = () => {
                 }}
               >
                 {isPending && <Spinner className="mr-1" />}
-                Logout
+                {t('common.logout')}
               </Button>
             </div>
           </div>

@@ -18,6 +18,7 @@ import {
 } from '@colanode/ui/components/ui/form';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
@@ -31,6 +32,7 @@ const formSchema = z.object({
 });
 
 export const AccountUpdate = () => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const accountQuery = useLiveQuery((q) =>
     q
@@ -73,7 +75,7 @@ export const AccountUpdate = () => {
         avatar: values.avatar,
       },
       onSuccess() {
-        toast.success('Account updated');
+        toast.success(t('ui.accountUpdated'));
       },
       onError(error) {
         toast.error(error.message);
@@ -82,7 +84,7 @@ export const AccountUpdate = () => {
   };
 
   if (!accountData) {
-    return <p>Account not found</p>;
+    return <p>{t('status.notFound')}</p>;
   }
 
   return (
@@ -161,9 +163,12 @@ export const AccountUpdate = () => {
               name="name"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Name *</FormLabel>
+                  <FormLabel>{t('account.nameRequired')}</FormLabel>
                   <FormControl>
-                    <Input placeholder="Name" {...field} />
+                    <Input
+                      placeholder={t('account.namePlaceholder')}
+                      {...field}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -174,9 +179,14 @@ export const AccountUpdate = () => {
               name="email"
               render={({ field }) => (
                 <FormItem className="flex-1">
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel>{t('common.email')}</FormLabel>
                   <FormControl>
-                    <Input readOnly placeholder="Email" {...field} disabled />
+                    <Input
+                      readOnly
+                      placeholder={t('account.emailPlaceholder')}
+                      {...field}
+                      disabled
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -192,7 +202,7 @@ export const AccountUpdate = () => {
             className="w-20"
           >
             {isUpdatingAccount && <Spinner className="mr-1" />}
-            Save
+            {t('common.save')}
           </Button>
         </div>
       </form>

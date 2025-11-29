@@ -23,12 +23,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 interface SpaceSidebarDropdownProps {
   space: LocalSpaceNode;
 }
 
 export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
+  const { t } = useI18n();
   const navigate = useNavigate({ from: '/workspace/$userId' });
 
   const [openCreatePage, setOpenCreatePage] = useState(false);
@@ -46,7 +48,7 @@ export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent className="ml-1 w-72">
           <DropdownMenuLabel>
-            {space.attributes.name ?? 'Unnamed'}
+            {space.attributes.name ?? t('common.unnamed')}
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -54,28 +56,28 @@ export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <StickyNote className="size-4" />
-            <span>Add page</span>
+            <span>{t('misc.addPage')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => setOpenCreateChannel(true)}
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <MessageCircle className="size-4" />
-            <span>Add channel</span>
+            <span>{t('misc.addChannel')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => setOpenCreateDatabase(true)}
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <Database className="size-4" />
-            <span>Add database</span>
+            <span>{t('misc.addDatabase')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onSelect={() => setOpenCreateFolder(true)}
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <Folder className="size-4" />
-            <span>Add folder</span>
+            <span>{t('misc.addFolder')}</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem
@@ -88,7 +90,7 @@ export const SpaceSidebarDropdown = ({ space }: SpaceSidebarDropdownProps) => {
             className="flex flex-row items-center gap-2 cursor-pointer"
           >
             <Settings className="size-4" />
-            <span>Settings</span>
+            <span>{t('common.settings')}</span>
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() =>

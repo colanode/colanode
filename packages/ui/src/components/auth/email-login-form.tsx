@@ -15,6 +15,7 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 const formSchema = z.object({
   email: z.string().min(2).email(),
@@ -27,6 +28,7 @@ interface LoginFormProps {
 }
 
 export const LoginForm = ({ isPending, onSubmit }: LoginFormProps) => {
+  const { t } = useI18n();
   const navigate = useNavigate();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -44,10 +46,10 @@ export const LoginForm = ({ isPending, onSubmit }: LoginFormProps) => {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('common.email')}</Label>
               <FormControl>
                 <Input
-                  placeholder="hi@example.com"
+                  placeholder={t('auth.emailPlaceholder')}
                   {...field}
                   autoComplete="email"
                 />
@@ -62,14 +64,14 @@ export const LoginForm = ({ isPending, onSubmit }: LoginFormProps) => {
           render={({ field }) => (
             <FormItem>
               <div className="flex flex-row gap-2 items-center">
-                <Label htmlFor="password">Password</Label>
+                <Label htmlFor="password">{t('common.password')}</Label>
                 <p
                   className="text-xs text-muted-foreground cursor-pointer hover:underline w-full text-right"
                   onClick={() => {
                     navigate({ to: '/auth/reset' });
                   }}
                 >
-                  Forgot password?
+                  {t('auth.forgotPassword')}
                 </p>
               </div>
               <FormControl>
@@ -77,7 +79,7 @@ export const LoginForm = ({ isPending, onSubmit }: LoginFormProps) => {
                   type="password"
                   {...field}
                   autoComplete="current-password"
-                  placeholder="********"
+                  placeholder={t('auth.passwordPlaceholder')}
                 />
               </FormControl>
               <FormMessage />
@@ -95,7 +97,7 @@ export const LoginForm = ({ isPending, onSubmit }: LoginFormProps) => {
           ) : (
             <Mail className="mr-1 size-4" />
           )}
-          Login
+          {t('common.login')}
         </Button>
       </form>
     </Form>

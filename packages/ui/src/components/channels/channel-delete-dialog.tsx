@@ -12,6 +12,7 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
@@ -26,6 +27,7 @@ export const ChannelDeleteDialog = ({
   open,
   onOpenChange,
 }: ChannelDeleteDialogProps) => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const navigate = useNavigate({ from: '/workspace/$userId' });
   const { mutate, isPending } = useMutation();
@@ -35,15 +37,14 @@ export const ChannelDeleteDialog = ({
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Are you sure you want delete this channel?
+            {t('channel.deleteChannelConfirm')}
           </AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This channel will no longer be
-            accessible by you or others you&apos;ve shared it with.
+            {t('channel.deleteChannelDescription')}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>{t('common.cancel')}</AlertDialogCancel>
           <Button
             variant="destructive"
             disabled={isPending}
@@ -68,7 +69,7 @@ export const ChannelDeleteDialog = ({
             }}
           >
             {isPending && <Spinner className="mr-1" />}
-            Delete
+            {t('common.delete')}
           </Button>
         </AlertDialogFooter>
       </AlertDialogContent>

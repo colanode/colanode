@@ -5,6 +5,7 @@ import { GoogleIcon } from '@colanode/ui/components/ui/icons';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useApp } from '@colanode/ui/contexts/app';
 import { useAuth } from '@colanode/ui/contexts/auth';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 interface GoogleLoginProps {
   context: 'login' | 'register';
@@ -17,6 +18,7 @@ const GoogleLoginButton = ({
   onLogin,
   isPending,
 }: GoogleLoginProps) => {
+  const { t } = useI18n();
   const login = useGoogleLogin({
     onSuccess: async (response) => {
       onLogin(response.code);
@@ -37,7 +39,9 @@ const GoogleLoginButton = ({
       ) : (
         <GoogleIcon className="mr-1 size-4" />
       )}
-      {context === 'login' ? 'Login' : 'Register'} with Google
+      {context === 'login'
+        ? t('auth.loginWithGoogle')
+        : t('auth.registerWithGoogle')}
     </Button>
   );
 };

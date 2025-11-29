@@ -8,10 +8,12 @@ import { WorkspaceDelete } from '@colanode/ui/components/workspaces/workspace-de
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
 import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
 import { WorkspaceSettingsBreadcrumb } from '@colanode/ui/components/workspaces/workspace-settings-breadcrumb';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export const WorkspaceSettingsContainer = () => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
@@ -38,7 +40,9 @@ export const WorkspaceSettingsContainer = () => {
       <div className="max-w-4xl space-y-8">
         <div className="space-y-6">
           <div>
-            <h2 className="text-2xl font-semibold tracking-tight">General</h2>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              {t('common.general')}
+            </h2>
             <Separator className="mt-3" />
           </div>
           <WorkspaceForm
@@ -59,7 +63,7 @@ export const WorkspaceSettingsContainer = () => {
                   avatar: values.avatar ?? null,
                 },
                 onSuccess() {
-                  toast.success('Workspace updated');
+                  toast.success(t('ui.accountUpdated'));
                 },
                 onError(error) {
                   toast.error(error.message);
@@ -67,14 +71,14 @@ export const WorkspaceSettingsContainer = () => {
               });
             }}
             isSaving={isPending}
-            saveText="Update"
+            saveText={t('common.update')}
           />
         </div>
 
         <div className="space-y-6">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">
-              Danger Zone
+              {t('account.dangerZone')}
             </h2>
             <Separator className="mt-3" />
           </div>

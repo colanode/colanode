@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useEffect } from 'react';
 
+import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import ar from '@colanode/ui/locales/ar.json';
 import de from '@colanode/ui/locales/de.json';
 import en from '@colanode/ui/locales/en.json';
@@ -28,8 +29,6 @@ const translations: Record<LanguageCode, TranslationKeys> = {
   ar,
 };
 
-const LOCALE_STORAGE_KEY = 'colanode_locale';
-
 const detectBrowserLocale = (): LanguageCode => {
   const browserLang = navigator.language.toLowerCase();
 
@@ -42,25 +41,8 @@ const detectBrowserLocale = (): LanguageCode => {
   return 'en';
 };
 
-const isValidLanguageCode = (code: string): code is LanguageCode => {
-  return ['en', 'fr', 'de', 'es', 'zh', 'ar'].includes(code);
-};
-
-interface I18nProviderProps {
-  children: React.ReactNode;
-}
-
-export const I18nProvider = ({ children }: I18nProviderProps) => {
-  const [locale, setLocaleState] = useState<LanguageCode>(() => {
-    const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
-    if (stored && isValidLanguageCode(stored)) {
-      return stored;
-    }
-    return detectBrowserLocale();
-  });
-
+const useApplyLocale = (locale: LanguageCode) => {
   useEffect(() => {
-    localStorage.setItem(LOCALE_STORAGE_KEY, locale);
     try {
       const doc = globalThis as unknown as { document: Document };
       doc.document.documentElement.lang = locale;
@@ -73,12 +55,11 @@ export const I18nProvider = ({ children }: I18nProviderProps) => {
       // Document not available
     }
   }, [locale]);
+};
 
-  const setLocale = (newLocale: LanguageCode) => {
-    setLocaleState(newLocale);
-  };
-
-  const t = (key: string, params?: Record<string, string | number>): string => {
+const createTranslationFunction =
+  (locale: LanguageCode) =>
+  (key: string, params?: Record<string, string | number>): string => {
     const keys = key.split('.');
     let value: unknown = translations[locale];
 
@@ -103,11 +84,69 @@ export const I18nProvider = ({ children }: I18nProviderProps) => {
     });
   };
 
+const I18nProviderInitialized = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const [storedLocale, setStoredLocale] = useMetadata<LanguageCode>(
+    'app',
+    'locale'
+  );
+
+  const locale = storedLocale ?? detectBrowserLocale();
+
+  useApplyLocale(locale);
+
+  const setLocale = (newLocale: LanguageCode) => {
+    setStoredLocale(newLocale);
+  };
+
+  const t = createTranslationFunction(locale);
+
   return (
     <I18nContext.Provider value={{ locale, setLocale, t }}>
       {children}
     </I18nContext.Provider>
   );
+};
+
+const I18nProviderUninitialized = ({
+  children,
+}: {
+  children: React.ReactNode;
+}) => {
+  const locale = detectBrowserLocale();
+
+  useApplyLocale(locale);
+
+  const setLocale = (_newLocale: LanguageCode) => {
+    // No-op when uninitialized
+  };
+
+  const t = createTranslationFunction(locale);
+
+  return (
+    <I18nContext.Provider value={{ locale, setLocale, t }}>
+      {children}
+    </I18nContext.Provider>
+  );
+};
+
+interface I18nProviderProps {
+  children: React.ReactNode;
+  initialized?: boolean;
+}
+
+export const I18nProvider = ({
+  children,
+  initialized = false,
+}: I18nProviderProps) => {
+  if (!initialized) {
+    return <I18nProviderUninitialized>{children}</I18nProviderUninitialized>;
+  }
+
+  return <I18nProviderInitialized>{children}</I18nProviderInitialized>;
 };
 
 export const useI18n = () => {

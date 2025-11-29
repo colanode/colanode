@@ -14,10 +14,12 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 export const SidebarMenuHeader = () => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const radar = useRadar();
   const navigate = useNavigate();
@@ -73,7 +75,9 @@ export const SidebarMenuHeader = () => {
         side="right"
         sideOffset={4}
       >
-        <DropdownMenuLabel className="mb-1">Workspaces</DropdownMenuLabel>
+        <DropdownMenuLabel className="mb-1">
+          {t('workspace.workspaces')}
+        </DropdownMenuLabel>
         {workspaces.map((workspaceItem) => {
           const workspaceUnreadState = radar.getWorkspaceState(
             workspaceItem.userId

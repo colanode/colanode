@@ -15,10 +15,12 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 export function SidebarMenuFooter() {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const radar = useRadar();
   const navigate = useNavigate();
@@ -72,7 +74,9 @@ export function SidebarMenuFooter() {
         align="end"
         sideOffset={4}
       >
-        <DropdownMenuLabel className="mb-1">Accounts</DropdownMenuLabel>
+        <DropdownMenuLabel className="mb-1">
+          {t('app.accounts')}
+        </DropdownMenuLabel>
         {accounts.map((accountItem) => {
           const state = accountUnreadStates[accountItem.id] ?? {
             unreadCount: 0,

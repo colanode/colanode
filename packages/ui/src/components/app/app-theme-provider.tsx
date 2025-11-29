@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 
 import { AppInitOutput, ThemeColor, ThemeMode } from '@colanode/client/types';
+import { I18nProvider } from '@colanode/ui/contexts/i18n';
 import { ThemeContext } from '@colanode/ui/contexts/theme';
 import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import { useSystemTheme } from '@colanode/ui/hooks/use-system-theme';
@@ -58,7 +59,7 @@ const AppThemeProviderInitialized = ({
     <ThemeContext.Provider
       value={{ mode: resolvedThemeMode, color: themeColor }}
     >
-      {children}
+      <I18nProvider initialized={true}>{children}</I18nProvider>
     </ThemeContext.Provider>
   );
 };
@@ -73,7 +74,7 @@ export const AppThemeProviderUninitialized = ({
 
   return (
     <ThemeContext.Provider value={{ mode: systemTheme, color: undefined }}>
-      {children}
+      <I18nProvider initialized={false}>{children}</I18nProvider>
     </ThemeContext.Provider>
   );
 };

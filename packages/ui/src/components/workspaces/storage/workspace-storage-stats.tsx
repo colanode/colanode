@@ -4,10 +4,12 @@ import { Button } from '@colanode/ui/components/ui/button';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { StorageStats } from '@colanode/ui/components/workspaces/storage/storage-stats';
 import { WorkspaceStorageCloud } from '@colanode/ui/components/workspaces/storage/workspace-storage-cloud';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useQuery } from '@colanode/ui/hooks/use-query';
 
 export const WorkspaceStorageStats = () => {
+  const { t } = useI18n();
   const workspace = useWorkspace();
   const canManageStorage =
     workspace.role === 'owner' || workspace.role === 'admin';
@@ -25,25 +27,27 @@ export const WorkspaceStorageStats = () => {
     <div className="max-w-4xl space-y-10">
       <div className="space-y-4">
         <div>
-          <h2 className="text-2xl font-semibold tracking-tight">My storage</h2>
+          <h2 className="text-2xl font-semibold tracking-tight">
+            {t('storage.myStorage')}
+          </h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            Your personal storage usage.
+            {t('storage.updateStorageSettings')}
           </p>
         </div>
         {storageQuery.isPending ? (
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
             <Spinner className="size-5" />
-            <span>Loading storage data from the server...</span>
+            <span>{t('storage.loadingStorageData')}</span>
           </div>
         ) : showUserError ? (
           <div className="space-y-2 text-sm text-muted-foreground">
-            <p>Couldn't load your storage information. Please try again.</p>
+            <p>{t('storage.loadingStorageData')}</p>
             <Button
               variant="outline"
               size="sm"
               onClick={() => storageQuery.refetch()}
             >
-              Try again
+              {t('common.cancel')}
             </Button>
           </div>
         ) : storageQuery.data?.user?.usage ? (
@@ -57,31 +61,29 @@ export const WorkspaceStorageStats = () => {
         <div className="space-y-4">
           <div>
             <h2 className="text-2xl font-semibold tracking-tight">
-              Workspace storage
+              {t('storage.workspaceStorage')}
             </h2>
             <p className="mt-2 text-sm text-muted-foreground">
-              Total storage usage for the workspace.
+              {t('storage.updateStorageSettings')}
             </p>
           </div>
           {storageQuery.isPending ? (
             <div className="flex items-center gap-4 text-sm text-muted-foreground">
               <Spinner className="size-5" />
-              <span>Loading storage data from the server...</span>
+              <span>{t('storage.loadingStorageData')}</span>
             </div>
           ) : showWorkspaceError ? (
             <div className="flex flex-col gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-4">
                 <BadgeAlert className="size-8 text-red-400" />
-                <span>
-                  Couldn't load workspace storage information. Please try again.
-                </span>
+                <span>{t('storage.loadingStorageData')}</span>
               </div>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={() => storageQuery.refetch()}
               >
-                Retry
+                {t('common.cancel')}
               </Button>
             </div>
           ) : storageQuery.data?.workspace?.usage ? (

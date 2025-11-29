@@ -15,7 +15,7 @@ This directory contains all translation files for the Colanode UI.
 
 - ✅ **Automatic language detection** from browser settings
 - ✅ **Real-time language switching** without page reload
-- ✅ **Persistent language preference** in localStorage
+- ✅ **Persistent language preference** in app-metadata
 - ✅ **RTL support** for Arabic
 - ✅ **Parameter interpolation** for dynamic content
 - ✅ **Type-safe** language codes with TypeScript
@@ -116,7 +116,7 @@ t('misc.maxFileSize', { size: '5' })
 
 ## Best Practices
 
-### ✅ DO:
+### DO:
 - Use parameters for dynamic values (numbers, sizes, names, etc.)
 - Keep keys descriptive and organized by feature
 - Use lowercase for parameter names
@@ -140,7 +140,6 @@ t('misc.maxFileSize', { size: '5' })
    - Add the locale code to the `LanguageCode` type
    - Add the translation to the `translations` object
    - Update the `detectBrowserLocale` function
-   - Update the `isValidLanguageCode` function
 5. Update `packages/ui/src/components/app/app-appearance-settings.tsx`:
    - Add a new button for the language selector
 

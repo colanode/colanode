@@ -14,6 +14,7 @@ import {
 import { Input } from '@colanode/ui/components/ui/input';
 import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useI18n } from '@colanode/ui/contexts/i18n';
 
 const formSchema = z.object({
   email: z.string().min(2).email(),
@@ -28,6 +29,7 @@ export const PasswordResetInitForm = ({
   isPending,
   onSubmit,
 }: PasswordResetInitFormProps) => {
+  const { t } = useI18n();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -43,9 +45,9 @@ export const PasswordResetInitForm = ({
           name="email"
           render={({ field }) => (
             <FormItem>
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{t('common.email')}</Label>
               <FormControl>
-                <Input placeholder="hi@example.com" {...field} />
+                <Input placeholder={t('auth.emailPlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -62,7 +64,7 @@ export const PasswordResetInitForm = ({
           ) : (
             <Mail className="mr-1 size-4" />
           )}
-          Reset password
+          {t('auth.resetPassword')}
         </Button>
       </form>
     </Form>
