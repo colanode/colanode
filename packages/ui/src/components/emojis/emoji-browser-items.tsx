@@ -1,6 +1,6 @@
 import { EmojiPickerItemsRow } from '@colanode/client/types';
 import { EmojiPickerItem } from '@colanode/ui/components/emojis/emoji-picker-item';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface EmojiBrowserItemsProps {
   row: EmojiPickerItemsRow;
@@ -8,7 +8,7 @@ interface EmojiBrowserItemsProps {
 }
 
 export const EmojiBrowserItems = ({ row, style }: EmojiBrowserItemsProps) => {
-  const emojiListQuery = useLiveQuery({
+  const emojiListQuery = useQuery({
     type: 'emoji.list',
     category: row.category,
     page: row.page,

@@ -9,12 +9,12 @@ import {
   ScrollViewport,
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 const EMOJIS_PER_ROW = 10;
 
 export const EmojiBrowser = () => {
-  const emojiCategoryListQuery = useLiveQuery({
+  const emojiCategoryListQuery = useQuery({
     type: 'emoji.category.list',
   });
 

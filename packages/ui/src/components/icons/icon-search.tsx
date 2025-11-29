@@ -4,14 +4,14 @@ import {
   ScrollViewport,
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface IconSearchProps {
   query: string;
 }
 
 export const IconSearch = ({ query }: IconSearchProps) => {
-  const iconSearchQuery = useLiveQuery({
+  const iconSearchQuery = useQuery({
     type: 'icon.search',
     query,
     count: 100,

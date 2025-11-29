@@ -9,12 +9,12 @@ import {
   ScrollViewport,
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 const ICONS_PER_ROW = 10;
 
 export const IconBrowser = () => {
-  const iconCategoryListQuery = useLiveQuery({
+  const iconCategoryListQuery = useQuery({
     type: 'icon.category.list',
   });
 

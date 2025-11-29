@@ -3,7 +3,7 @@ import { eq, inArray, useLiveQuery } from '@tanstack/react-db';
 import { NodeReactionCount, LocalMessageNode } from '@colanode/client/types';
 import { EmojiElement } from '@colanode/ui/components/emojis/emoji-element';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery as useColanodeLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface MessageReactionCountTooltipContentProps {
   message: LocalMessageNode;
@@ -16,7 +16,7 @@ export const MessageReactionCountTooltipContent = ({
 }: MessageReactionCountTooltipContentProps) => {
   const workspace = useWorkspace();
 
-  const emojiGetQuery = useColanodeLiveQuery({
+  const emojiGetQuery = useQuery({
     type: 'emoji.get.by.skin.id',
     id: reactionCount.reaction,
   });
