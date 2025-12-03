@@ -1,9 +1,10 @@
+import { useLiveQuery } from '@tanstack/react-db';
 import { useRouter } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
+import { collections } from '@colanode/ui/collections';
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export const WorkspaceCreate = () => {
@@ -11,10 +12,15 @@ export const WorkspaceCreate = () => {
   const router = useRouter();
   const { mutate, isPending } = useMutation();
 
-  const workspacesQuery = useLiveQuery({
-    type: 'workspace.list',
-    accountId: workspace.accountId,
-  });
+  const workspacesQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ workspaces: collections.workspaces })
+        .select(({ workspaces }) => ({
+          userId: workspaces.userId,
+        })),
+    []
+  );
 
   const workspaces = workspacesQuery.data ?? [];
   const handleCancel = router.history.canGoBack()
