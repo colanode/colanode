@@ -207,9 +207,5 @@
     "_comment": "Per-workspace storage limits (optional)",
     "storageLimit": "21474836480",
     "maxFileSize": "524288000"
-  },
-
-  "debug": {
-    "filePointerExample": "file://debug-file-example.txt"
   }
 }
