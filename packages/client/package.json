@@ -24,6 +24,7 @@
     "coverage": "vitest run --coverage "
   },
   "dependencies": {
+    "@tanstack/db": "^0.5.10",
     "@tiptap/core": "^3.11.0",
     "@tiptap/pm": "^3.4.2",
     "async-lock": "^1.4.1",
