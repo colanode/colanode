@@ -141,8 +141,8 @@ export class FileUploadJobHandler implements JobHandler<FileUploadInput> {
             ms('20 seconds'),
           ],
           metadata: {
-            filename: file.attributes.name,
-            contentType: file.attributes.mimeType,
+            filename: file.name,
+            contentType: file.mimeType,
           },
           headers: {
             Authorization: `Bearer ${account.token}`,

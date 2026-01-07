@@ -1,8 +1,9 @@
-import { toast } from 'sonner';
-
 import { LocalFolderNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
-import { FolderForm } from '@colanode/ui/components/folders/folder-form';
+import {
+  FolderForm,
+  FolderFormValues,
+} from '@colanode/ui/components/folders/folder-form';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface FolderUpdateDialogProps {
   folder: LocalFolderNode;
@@ -27,8 +27,25 @@ export const FolderUpdateDialog = ({
   onOpenChange,
 }: FolderUpdateDialogProps) => {
   const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
   const canEdit = hasNodeRole(role, 'editor');
+
+  const handleSubmit = (values: FolderFormValues) => {
+    const nodes = workspace.collections.nodes;
+    if (!nodes.has(folder.id)) {
+      return;
+    }
+
+    nodes.update(folder.id, (draft) => {
+      if (draft.type !== 'folder') {
+        return;
+      }
+
+      draft.name = values.name;
+      draft.avatar = values.avatar;
+    });
+
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -40,37 +57,15 @@ export const FolderUpdateDialog = ({
         <FolderForm
           id={folder.id}
           values={{
-            name: folder.attributes.name,
-            avatar: folder.attributes.avatar,
+            name: folder.name,
+            avatar: folder.avatar,
           }}
-          isPending={isPending}
           submitText="Update"
           readOnly={!canEdit}
-          handleCancel={() => {
+          onCancel={() => {
             onOpenChange(false);
           }}
-          handleSubmit={(values) => {
-            if (isPending) {
-              return;
-            }
-
-            mutate({
-              input: {
-                type: 'folder.update',
-                folderId: folder.id,
-                name: values.name,
-                avatar: values.avatar,
-                userId: workspace.userId,
-              },
-              onSuccess() {
-                onOpenChange(false);
-                toast.success('Folder was updated successfully');
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
-            });
-          }}
+          onSubmit={handleSubmit}
         />
       </DialogContent>
     </Dialog>

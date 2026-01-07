@@ -16,7 +16,7 @@ interface FilePreviewProps {
 export const FilePreview = ({ file }: FilePreviewProps) => {
   const workspace = useWorkspace();
 
-  const isReady = file.attributes.status === FileStatus.Ready;
+  const isReady = file.status === FileStatus.Ready;
   const localFileQuery = useLiveQuery({
     type: 'local.file.get',
     fileId: file.id,
@@ -31,10 +31,10 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
   const localFile = localFileQuery.data;
   if (!localFile) {
     if (!isReady) {
-      return <FileNotUploaded mimeType={file.attributes.mimeType} />;
+      return <FileNotUploaded mimeType={file.mimeType} />;
     }
 
-    return <FileNoPreview mimeType={file.attributes.mimeType} />;
+    return <FileNoPreview mimeType={file.mimeType} />;
   }
 
   if (localFile.downloadStatus !== DownloadStatus.Completed) {
@@ -42,22 +42,18 @@ export const FilePreview = ({ file }: FilePreviewProps) => {
   }
 
   if (localFile.downloadStatus === DownloadStatus.Completed && localFile.url) {
-    if (file.attributes.subtype === 'image') {
-      return (
-        <FilePreviewImage url={localFile.url} name={file.attributes.name} />
-      );
+    if (file.subtype === 'image') {
+      return <FilePreviewImage url={localFile.url} name={file.name} />;
     }
 
-    if (file.attributes.subtype === 'video') {
+    if (file.subtype === 'video') {
       return <FilePreviewVideo url={localFile.url} />;
     }
 
-    if (file.attributes.subtype === 'audio') {
-      return (
-        <FilePreviewAudio url={localFile.url} name={file.attributes.name} />
-      );
+    if (file.subtype === 'audio') {
+      return <FilePreviewAudio url={localFile.url} name={file.name} />;
     }
   }
 
-  return <FileNoPreview mimeType={file.attributes.mimeType} />;
+  return <FileNoPreview mimeType={file.mimeType} />;
 };

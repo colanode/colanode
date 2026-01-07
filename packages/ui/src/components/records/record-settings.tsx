@@ -4,7 +4,7 @@ import { Fragment, useState } from 'react';
 import { LocalRecordNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { NodeCollaboratorAudit } from '@colanode/ui/components/collaborators/node-collaborator-audit';
-import { RecordDeleteDialog } from '@colanode/ui/components/records/record-delete-dialog';
+import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -33,7 +33,7 @@ export const RecordSettings = ({ record, role }: RecordSettingsProps) => {
           <Settings className="size-4 cursor-pointer text-muted-foreground hover:text-foreground" />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" className="mr-2 w-80">
-          <DropdownMenuLabel>{record.attributes.name}</DropdownMenuLabel>
+          <DropdownMenuLabel>{record.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="flex items-center gap-2" disabled>
             <Copy className="size-4" />
@@ -75,8 +75,10 @@ export const RecordSettings = ({ record, role }: RecordSettingsProps) => {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-      <RecordDeleteDialog
-        recordId={record.id}
+      <NodeDeleteDialog
+        id={record.id}
+        title="Are you sure you want delete this record?"
+        description="This action cannot be undone. This record will no longer be accessible by you or others you've shared it with."
         open={showDeleteDialog}
         onOpenChange={setShowDeleteModal}
       />

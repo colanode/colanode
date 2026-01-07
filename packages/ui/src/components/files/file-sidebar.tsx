@@ -3,7 +3,6 @@ import { Fragment } from 'react';
 
 import { LocalFileNode } from '@colanode/client/types';
 import { formatBytes, formatDate } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -23,16 +22,18 @@ const FileMeta = ({ title, value }: { title: string; value: string }) => {
 
 export const FileSidebar = ({ file }: FileSidebarProps) => {
   const workspace = useWorkspace();
-  const userQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, file.createdBy))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-      }))
-      .findOne()
+  const userQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: workspace.collections.users })
+        .where(({ users }) => eq(users.id, file.createdBy))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+        }))
+        .findOne(),
+    [workspace.userId, file.createdBy]
   );
   const user = userQuery.data;
 
@@ -46,16 +47,16 @@ export const FileSidebar = ({ file }: FileSidebarProps) => {
         />
         <div
           className="line-clamp-3 wrap-break-word text-base font-medium"
-          title={file.attributes.name}
+          title={file.name}
         >
-          {file.attributes.name}
+          {file.name}
         </div>
       </div>
 
       <div className="mt-5 flex flex-col gap-4">
-        <FileMeta title="Name" value={file.attributes.name} />
-        <FileMeta title="Type" value={file.attributes.mimeType} />
-        <FileMeta title="Size" value={formatBytes(file.attributes.size)} />
+        <FileMeta title="Name" value={file.name} />
+        <FileMeta title="Type" value={file.mimeType} />
+        <FileMeta title="Size" value={formatBytes(file.size)} />
         <FileMeta title="Created at" value={formatDate(file.createdAt)} />
 
         {user && (

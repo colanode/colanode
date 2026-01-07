@@ -21,8 +21,8 @@ export const PageSidebarItem = ({ page, isActive }: PageSidebarItemProps) => {
     >
       <Avatar
         id={page.id}
-        avatar={page.attributes.avatar}
-        name={page.attributes.name}
+        avatar={page.avatar}
+        name={page.name}
         className="h-4 w-4"
       />
       <span
@@ -31,7 +31,7 @@ export const PageSidebarItem = ({ page, isActive }: PageSidebarItemProps) => {
           isUnread && 'font-bold'
         )}
       >
-        {page.attributes.name ?? 'Unnamed'}
+        {page.name ?? 'Unnamed'}
       </span>
       {mentionsCount > 0 && (
         <span className="mr-1 rounded-md bg-sidebar-accent px-1 py-0.5 text-xs text-sidebar-accent-foreground">

@@ -1,5 +1,4 @@
 import { CircleDashed } from 'lucide-react';
-import { toast } from 'sonner';
 
 import {
   DatabaseViewFilterAttributes,
@@ -89,29 +88,24 @@ export const BoardViewColumnsSelect = ({
               ),
               canDrag: (record) => record.canEdit,
               onDragEnd: async (record, value) => {
+                const nodes = workspace.collections.nodes;
                 if (!value) {
-                  const result = await window.colanode.executeMutation({
-                    type: 'record.field.value.delete',
-                    recordId: record.id,
-                    fieldId: field.id,
-                    userId: workspace.userId,
-                  });
+                  nodes.update(record.id, (draft) => {
+                    if (draft.type !== 'record') {
+                      return;
+                    }
 
-                  if (!result.success) {
-                    toast.error(result.error.message);
-                  }
+                    const { [field.id]: _removed, ...rest } = draft.fields;
+                    draft.fields = rest;
+                  });
                 } else {
-                  const result = await window.colanode.executeMutation({
-                    type: 'record.field.value.set',
-                    recordId: record.id,
-                    fieldId: field.id,
-                    value,
-                    userId: workspace.userId,
-                  });
+                  nodes.update(record.id, (draft) => {
+                    if (draft.type !== 'record') {
+                      return;
+                    }
 
-                  if (!result.success) {
-                    toast.error(result.error.message);
-                  }
+                    draft.fields[field.id] = value;
+                  });
                 }
               },
             }}
@@ -138,29 +132,24 @@ export const BoardViewColumnsSelect = ({
           dragOverClass: noValueDraggingClass,
           canDrag: () => true,
           onDragEnd: async (record, value) => {
+            const nodes = workspace.collections.nodes;
             if (!value) {
-              const result = await window.colanode.executeMutation({
-                type: 'record.field.value.delete',
-                recordId: record.id,
-                fieldId: field.id,
-                userId: workspace.userId,
-              });
+              nodes.update(record.id, (draft) => {
+                if (draft.type !== 'record') {
+                  return;
+                }
 
-              if (!result.success) {
-                toast.error(result.error.message);
-              }
+                const { [field.id]: _removed, ...rest } = draft.fields;
+                draft.fields = rest;
+              });
             } else {
-              const result = await window.colanode.executeMutation({
-                type: 'record.field.value.set',
-                recordId: record.id,
-                fieldId: field.id,
-                value,
-                userId: workspace.userId,
-              });
+              nodes.update(record.id, (draft) => {
+                if (draft.type !== 'record') {
+                  return;
+                }
 
-              if (!result.success) {
-                toast.error(result.error.message);
-              }
+                draft.fields[field.id] = value;
+              });
             }
           },
         }}

@@ -24,7 +24,7 @@ import {
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface NodeCollaboratorSearchProps {
   excluded: string[];
@@ -42,7 +42,7 @@ export const NodeCollaboratorSearch = ({
   const [query, setQuery] = useState('');
   const [open, setOpen] = useState(false);
 
-  const userSearchQuery = useLiveQuery({
+  const userSearchQuery = useQuery({
     type: 'user.search',
     searchQuery: query,
     exclude: excluded,

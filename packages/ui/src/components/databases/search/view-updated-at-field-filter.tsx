@@ -19,6 +19,7 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
 import { updatedAtFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewUpdatedAtFieldFilterProps {
@@ -35,6 +36,10 @@ export const ViewUpdatedAtFieldFilter = ({
   filter,
 }: ViewUpdatedAtFieldFilterProps) => {
   const view = useDatabaseView();
+  const { updateFilter, removeFilter } = useViewFilter({
+    viewId: view.id,
+    filterId: filter.id,
+  });
 
   const operator =
     updatedAtFieldFilterOperators.find(
@@ -91,7 +96,7 @@ export const ViewUpdatedAtFieldFilter = ({
                       ? null
                       : dateValue?.toISOString();
 
-                    view.updateFilter(filter.id, {
+                    updateFilter({
                       ...filter,
                       operator: operator.value,
                       value: value ?? null,
@@ -103,13 +108,7 @@ export const ViewUpdatedAtFieldFilter = ({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              view.removeFilter(filter.id);
-            }}
-          >
+          <Button variant="ghost" size="icon" onClick={removeFilter}>
             <Trash2 className="size-4" />
           </Button>
         </div>
@@ -117,12 +116,12 @@ export const ViewUpdatedAtFieldFilter = ({
           value={dateValue}
           onChange={(newValue) => {
             if (newValue === null || newValue === undefined) {
-              view.updateFilter(filter.id, {
+              updateFilter({
                 ...filter,
                 value: null,
               });
             } else {
-              view.updateFilter(filter.id, {
+              updateFilter({
                 ...filter,
                 value: newValue.toISOString(),
               });

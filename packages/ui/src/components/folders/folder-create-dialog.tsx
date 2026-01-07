@@ -1,8 +1,13 @@
+import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
+import { LocalFolderNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
-import { FolderForm } from '@colanode/ui/components/folders/folder-form';
+import {
+  FolderForm,
+  FolderFormValues,
+} from '@colanode/ui/components/folders/folder-form';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +16,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface FolderCreateDialogProps {
   spaceId: string;
@@ -26,7 +30,42 @@ export const FolderCreateDialog = ({
 }: FolderCreateDialogProps) => {
   const workspace = useWorkspace();
   const navigate = useNavigate({ from: '/workspace/$userId' });
-  const { mutate, isPending } = useMutation();
+  const { mutate } = useMutation({
+    mutationFn: async (values: FolderFormValues) => {
+      const folderId = generateId(IdType.Folder);
+      const nodes = workspace.collections.nodes;
+
+      const folder: LocalFolderNode = {
+        id: folderId,
+        type: 'folder',
+        name: values.name,
+        avatar: values.avatar,
+        parentId: spaceId,
+        rootId: spaceId,
+        createdAt: new Date().toISOString(),
+        createdBy: workspace.userId,
+        updatedAt: null,
+        updatedBy: null,
+        localRevision: '0',
+        serverRevision: '0',
+      };
+
+      nodes.insert(folder);
+      return folder;
+    },
+    onSuccess: (folder) => {
+      navigate({
+        to: '$nodeId',
+        params: {
+          nodeId: folder.id,
+        },
+      });
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -42,36 +81,12 @@ export const FolderCreateDialog = ({
           values={{
             name: '',
           }}
-          isPending={isPending}
           submitText="Create"
-          handleCancel={() => {
+          onCancel={() => {
             onOpenChange(false);
           }}
-          handleSubmit={(values) => {
-            if (isPending) {
-              return;
-            }
-
-            mutate({
-              input: {
-                type: 'folder.create',
-                parentId: spaceId,
-                name: values.name,
-                avatar: values.avatar,
-                userId: workspace.userId,
-                generateIndex: true,
-              },
-              onSuccess(output) {
-                onOpenChange(false);
-                navigate({
-                  to: '$nodeId',
-                  params: { nodeId: output.id },
-                });
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
-            });
+          onSubmit={(values) => {
+            mutate(values);
           }}
         />
       </DialogContent>

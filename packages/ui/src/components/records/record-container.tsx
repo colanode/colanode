@@ -18,7 +18,7 @@ export const RecordContainer = ({ record, role }: RecordContainerProps) => {
   const canEdit =
     record.createdBy === workspace.userId || hasNodeRole(role, 'editor');
   return (
-    <RecordDatabase id={record.attributes.databaseId} role={role}>
+    <RecordDatabase id={record.databaseId} role={role}>
       <RecordProvider record={record} role={role}>
         <RecordAttributes />
       </RecordProvider>

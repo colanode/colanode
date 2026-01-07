@@ -23,7 +23,7 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
 
   const handleDownloadDesktop = async () => {
     const path = await window.colanode.showFileSaveDialog({
-      name: file.attributes.name,
+      name: file.name,
     });
 
     if (!path) {
@@ -62,7 +62,7 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
         // the file is already downloaded locally, so we can just trigger a download
         const link = document.createElement('a');
         link.href = localFile.url;
-        link.download = file.attributes.name;
+        link.download = file.name;
         link.style.display = 'none';
         document.body.appendChild(link);
         link.click();
@@ -97,7 +97,7 @@ export const FileSaveButton = ({ file }: FileSaveButtonProps) => {
 
       const link = document.createElement('a');
       link.href = downloadBlobUrl;
-      link.download = file.attributes.name;
+      link.download = file.name;
       link.style.display = 'none';
       document.body.appendChild(link);
       link.click();

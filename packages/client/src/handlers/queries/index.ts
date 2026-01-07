@@ -6,9 +6,6 @@ import { AccountListQueryHandler } from './accounts/accounts-list';
 import { MetadataListQueryHandler } from './apps/metadata-list';
 import { TabsListQueryHandler } from './apps/tabs-list';
 import { AvatarGetQueryHandler } from './avatars/avatar-get';
-import { ChatListQueryHandler } from './chats/chat-list';
-import { DatabaseListQueryHandler } from './databases/database-list';
-import { DatabaseViewListQueryHandler } from './databases/database-view-list';
 import { DocumentGetQueryHandler } from './documents/document-get';
 import { DocumentStateGetQueryHandler } from './documents/document-state-get';
 import { DocumentUpdatesListQueryHandler } from './documents/document-update-list';
@@ -20,7 +17,6 @@ import { EmojiSearchQueryHandler } from './emojis/emoji-search';
 import { EmojiSvgGetQueryHandler } from './emojis/emoji-svg-get';
 import { DownloadListQueryHandler } from './files/download-list';
 import { FileDownloadRequestGetQueryHandler } from './files/file-download-request-get';
-import { FileListQueryHandler } from './files/file-list';
 import { LocalFileGetQueryHandler } from './files/local-file-get';
 import { TempFileListQueryHandler } from './files/temp-file-list';
 import { UploadListQueryHandler } from './files/upload-list';
@@ -29,20 +25,13 @@ import { IconListQueryHandler } from './icons/icon-list';
 import { IconSearchQueryHandler } from './icons/icon-search';
 import { IconSvgGetQueryHandler } from './icons/icon-svg-get';
 import { RadarDataGetQueryHandler } from './interactions/radar-data-get';
-import { MessageListQueryHandler } from './messages/message-list';
-import { NodeChildrenGetQueryHandler } from './nodes/node-children-get';
-import { NodeGetQueryHandler } from './nodes/node-get';
+import { NodeListQueryHandler } from './nodes/node-list';
 import { NodeReactionsListQueryHandler } from './nodes/node-reaction-list';
-import { NodeReactionsAggregateQueryHandler } from './nodes/node-reactions-aggregate';
-import { NodeTreeGetQueryHandler } from './nodes/node-tree-get';
 import { RecordFieldValueCountQueryHandler } from './records/record-field-value-count';
-import { RecordListQueryHandler } from './records/record-list';
 import { RecordSearchQueryHandler } from './records/record-search';
 import { ServerListQueryHandler } from './servers/server-list';
-import { SpaceListQueryHandler } from './spaces/space-list';
 import { UserListQueryHandler } from './users/user-list';
 import { UserSearchQueryHandler } from './users/user-search';
-import { UserStorageGetQueryHandler } from './users/user-storage-get';
 import { WorkspaceListQueryHandler } from './workspaces/workspace-list';
 import { WorkspaceStorageGetQueryHandler } from './workspaces/workspace-storage-get';
 import { WorkspaceStorageUsersGetQueryHandler } from './workspaces/workspace-storage-users-get';
@@ -56,19 +45,16 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'metadata.list': new MetadataListQueryHandler(app),
     'avatar.get': new AvatarGetQueryHandler(app),
     'account.list': new AccountListQueryHandler(app),
-    'message.list': new MessageListQueryHandler(app),
     'node.reaction.list': new NodeReactionsListQueryHandler(app),
-    'node.reactions.aggregate': new NodeReactionsAggregateQueryHandler(app),
-    'node.get': new NodeGetQueryHandler(app),
-    'node.tree.get': new NodeTreeGetQueryHandler(app),
-    'record.list': new RecordListQueryHandler(app),
+    'node.list': new NodeListQueryHandler(app),
     'record.field.value.count': new RecordFieldValueCountQueryHandler(app),
     'user.search': new UserSearchQueryHandler(app),
     'workspace.list': new WorkspaceListQueryHandler(app),
     'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
-    'workspace.storage.users.get': new WorkspaceStorageUsersGetQueryHandler(app),
+    'workspace.storage.users.get': new WorkspaceStorageUsersGetQueryHandler(
+      app
+    ),
     'user.list': new UserListQueryHandler(app),
-    'file.list': new FileListQueryHandler(app),
     'emoji.list': new EmojiListQueryHandler(app),
     'emoji.get': new EmojiGetQueryHandler(app),
     'emoji.get.by.skin.id': new EmojiGetBySkinIdQueryHandler(app),
@@ -77,16 +63,10 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'icon.list': new IconListQueryHandler(app),
     'icon.search': new IconSearchQueryHandler(app),
     'icon.category.list': new IconCategoryListQueryHandler(app),
-    'node.children.get': new NodeChildrenGetQueryHandler(app),
     'radar.data.get': new RadarDataGetQueryHandler(app),
-    'database.list': new DatabaseListQueryHandler(app),
-    'database.view.list': new DatabaseViewListQueryHandler(app),
     'record.search': new RecordSearchQueryHandler(app),
-    'user.storage.get': new UserStorageGetQueryHandler(app),
     'local.file.get': new LocalFileGetQueryHandler(app),
     'file.download.request.get': new FileDownloadRequestGetQueryHandler(app),
-    'chat.list': new ChatListQueryHandler(app),
-    'space.list': new SpaceListQueryHandler(app),
     'document.get': new DocumentGetQueryHandler(app),
     'document.state.get': new DocumentStateGetQueryHandler(app),
     'document.updates.list': new DocumentUpdatesListQueryHandler(app),

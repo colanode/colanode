@@ -7,6 +7,7 @@ import { eventBus } from '@colanode/client/lib/event-bus';
 import {
   mapDownload,
   mapNode,
+  mapNodeAttributes,
   mapNodeReference,
   mapUpload,
 } from '@colanode/client/lib/mappers';
@@ -16,7 +17,7 @@ import {
 } from '@colanode/client/lib/mentions';
 import { deleteNodeRelations, fetchNodeTree } from '@colanode/client/lib/utils';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
-import { DownloadStatus } from '@colanode/client/types';
+import { DownloadStatus, LocalNode } from '@colanode/client/types';
 import {
   generateId,
   IdType,
@@ -225,6 +226,177 @@ export class NodeService {
     return createdNode;
   }
 
+  public async insertNode(
+    id: string,
+    attributes: NodeAttributes
+  ): Promise<LocalNode> {
+    debug(`Inserting node ${id} with type ${attributes.type}`);
+
+    let tree: LocalNode[] = [];
+    if (attributes.type !== 'space' && attributes.type !== 'chat') {
+      tree = await fetchNodeTree(this.workspace.database, attributes.parentId!);
+    }
+
+    const model = getNodeModel(attributes.type);
+    const canCreateNodeContext: CanCreateNodeContext = {
+      user: {
+        id: this.workspace.userId,
+        role: this.workspace.role,
+        workspaceId: this.workspace.workspaceId,
+        accountId: this.workspace.accountId,
+      },
+      tree: tree,
+      attributes: attributes,
+    };
+
+    if (!model.canCreate(canCreateNodeContext)) {
+      throw new Error('Insufficient permissions');
+    }
+
+    const ydoc = new YDoc();
+    const update = ydoc.update(model.attributesSchema, attributes);
+
+    if (!update) {
+      throw new Error('Invalid attributes');
+    }
+
+    const updateId = generateId(IdType.Update);
+    const createdAt = new Date().toISOString();
+    const rootId = tree[0]?.id ?? id;
+    const nodeText = model.extractText(id, attributes);
+    const mentions = model.extractMentions(id, attributes);
+    const nodeReferencesToCreate: CreateNodeReference[] = mentions.map(
+      (mention) => ({
+        node_id: id,
+        reference_id: mention.target,
+        inner_id: mention.id,
+        type: 'mention',
+        created_at: createdAt,
+        created_by: this.workspace.userId,
+      })
+    );
+
+    const { createdNode, createdMutation, createdNodeReferences } =
+      await this.workspace.database.transaction().execute(async (trx) => {
+        const createdNode = await trx
+          .insertInto('nodes')
+          .returningAll()
+          .values({
+            id: id,
+            root_id: rootId,
+            attributes: JSON.stringify(attributes),
+            created_at: createdAt,
+            created_by: this.workspace.userId,
+            local_revision: '0',
+            server_revision: '0',
+          })
+          .executeTakeFirst();
+
+        if (!createdNode) {
+          throw new Error('Failed to create node');
+        }
+
+        const createdNodeUpdate = await trx
+          .insertInto('node_updates')
+          .returningAll()
+          .values({
+            id: updateId,
+            node_id: id,
+            data: update,
+            created_at: createdAt,
+          })
+          .executeTakeFirst();
+
+        if (!createdNodeUpdate) {
+          throw new Error('Failed to create node update');
+        }
+
+        const mutationData: CreateNodeMutationData = {
+          nodeId: id,
+          updateId: updateId,
+          data: encodeState(update),
+          createdAt: createdAt,
+        };
+
+        const createdMutation = await trx
+          .insertInto('mutations')
+          .returningAll()
+          .values({
+            id: generateId(IdType.Mutation),
+            type: 'node.create',
+            data: JSON.stringify(mutationData),
+            created_at: createdAt,
+            retries: 0,
+          })
+          .executeTakeFirst();
+
+        if (!createdMutation) {
+          throw new Error('Failed to create mutation');
+        }
+
+        if (nodeText) {
+          await trx
+            .insertInto('node_texts')
+            .values({
+              id: id,
+              name: nodeText.name,
+              attributes: nodeText.attributes,
+            })
+            .execute();
+        }
+
+        let createdNodeReferences: SelectNodeReference[] = [];
+        if (nodeReferencesToCreate.length > 0) {
+          createdNodeReferences = await trx
+            .insertInto('node_references')
+            .values(nodeReferencesToCreate)
+            .returningAll()
+            .execute();
+        }
+
+        return {
+          createdNode,
+          createdMutation,
+          createdNodeReferences,
+        };
+      });
+
+    if (!createdNode) {
+      throw new Error('Failed to create node');
+    }
+
+    if (!createdMutation) {
+      throw new Error('Failed to create mutation');
+    }
+
+    debug(`Created node ${createdNode.id} with type ${createdNode.type}`);
+
+    eventBus.publish({
+      type: 'node.created',
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
+      node: mapNode(createdNode),
+    });
+
+    for (const createdNodeReference of createdNodeReferences) {
+      eventBus.publish({
+        type: 'node.reference.created',
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
+        nodeReference: mapNodeReference(createdNodeReference),
+      });
+    }
+
+    this.workspace.mutations.scheduleSync();
+    return mapNode(createdNode);
+  }
+
   public async updateNode<T extends NodeAttributes>(
     nodeId: string,
     updater: (attributes: T) => T
@@ -253,7 +425,7 @@ export class NodeService {
 
     const updateId = generateId(IdType.Update);
     const updatedAt = new Date().toISOString();
-    const updatedAttributes = updater(node.attributes as T);
+    const updatedAttributes = updater(mapNodeAttributes(node) as T);
 
     const canUpdateAttributesContext: CanUpdateAttributesContext = {
       user: {
@@ -299,7 +471,7 @@ export class NodeService {
     const localRevision = BigInt(node.localRevision) + BigInt(1);
     const nodeText = model.extractText(nodeId, attributes);
 
-    const beforeMentions = model.extractMentions(nodeId, node.attributes);
+    const beforeMentions = model.extractMentions(nodeId, node);
     const afterMentions = model.extractMentions(nodeId, attributes);
     const mentionChanges = checkMentionChanges(beforeMentions, afterMentions);
 
@@ -450,7 +622,7 @@ export class NodeService {
       return 'not_found';
     }
 
-    const model = getNodeModel(node.attributes.type);
+    const model = getNodeModel(node.type);
     const canDeleteNodeContext: CanDeleteNodeContext = {
       user: {
         id: this.workspace.userId,

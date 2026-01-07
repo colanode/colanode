@@ -1,9 +1,11 @@
 import { inArray, useLiveQuery } from '@tanstack/react-db';
 import { X } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 
-import { CollaboratorFieldAttributes } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
+import {
+  CollaboratorFieldAttributes,
+  StringArrayFieldValue,
+} from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Badge } from '@colanode/ui/components/ui/badge';
 import {
@@ -15,6 +17,7 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { UserSearch } from '@colanode/ui/components/users/user-search';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useRecordField } from '@colanode/ui/hooks/use-record-field';
 
 interface CollaboratorBadgeProps {
   id: string;
@@ -42,20 +45,27 @@ export const RecordCollaboratorValue = ({
 }: RecordCollaboratorValueProps) => {
   const workspace = useWorkspace();
   const record = useRecord();
+  const { value, setValue, clearValue } = useRecordField<StringArrayFieldValue>(
+    {
+      field,
+    }
+  );
 
   const [open, setOpen] = useState(false);
 
-  const collaboratorIds = record.getCollaboratorValue(field) ?? [];
-  const collaboratorsQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => inArray(users.id, collaboratorIds))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-        email: users.email,
-      }))
+  const collaboratorIds = useMemo(() => value?.value ?? [], [value]);
+  const collaboratorsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: workspace.collections.users })
+        .where(({ users }) => inArray(users.id, collaboratorIds))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+          email: users.email,
+        })),
+    [workspace.userId, collaboratorIds]
   );
 
   const collaborators = collaboratorsQuery.data;
@@ -114,9 +124,9 @@ export const RecordCollaboratorValue = ({
                       );
 
                       if (newCollaborators.length === 0) {
-                        record.removeFieldValue(field);
+                        clearValue();
                       } else {
-                        record.updateFieldValue(field, {
+                        setValue({
                           type: 'string_array',
                           value: newCollaborators,
                         });
@@ -140,9 +150,9 @@ export const RecordCollaboratorValue = ({
                 : [...collaboratorIds, user.id];
 
               if (newCollaborators.length === 0) {
-                record.removeFieldValue(field);
+                clearValue();
               } else {
-                record.updateFieldValue(field, {
+                setValue({
                   type: 'string_array',
                   value: newCollaborators,
                 });

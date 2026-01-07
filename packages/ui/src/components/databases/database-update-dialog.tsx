@@ -1,8 +1,9 @@
-import { toast } from 'sonner';
-
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
-import { DatabaseForm } from '@colanode/ui/components/databases/database-form';
+import {
+  DatabaseForm,
+  DatabaseFormValues,
+} from '@colanode/ui/components/databases/database-form';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface DatabaseUpdateDialogProps {
   database: LocalDatabaseNode;
@@ -27,8 +27,25 @@ export const DatabaseUpdateDialog = ({
   onOpenChange,
 }: DatabaseUpdateDialogProps) => {
   const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
   const canEdit = hasNodeRole(role, 'editor');
+
+  const handleSubmit = (values: DatabaseFormValues) => {
+    const nodes = workspace.collections.nodes;
+    if (!nodes.has(database.id)) {
+      return;
+    }
+
+    nodes.update(database.id, (draft) => {
+      if (draft.type !== 'database') {
+        return;
+      }
+
+      draft.name = values.name;
+      draft.avatar = values.avatar;
+    });
+
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -42,37 +59,15 @@ export const DatabaseUpdateDialog = ({
         <DatabaseForm
           id={database.id}
           values={{
-            name: database.attributes.name,
-            avatar: database.attributes.avatar,
+            name: database.name,
+            avatar: database.avatar,
           }}
-          isPending={isPending}
           submitText="Update"
           readOnly={!canEdit}
-          handleCancel={() => {
+          onCancel={() => {
             onOpenChange(false);
           }}
-          handleSubmit={(values) => {
-            if (isPending) {
-              return;
-            }
-
-            mutate({
-              input: {
-                type: 'database.update',
-                databaseId: database.id,
-                name: values.name,
-                avatar: values.avatar,
-                userId: workspace.userId,
-              },
-              onSuccess() {
-                onOpenChange(false);
-                toast.success('Database updated');
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
-            });
-          }}
+          onSubmit={handleSubmit}
         />
       </DialogContent>
     </Dialog>

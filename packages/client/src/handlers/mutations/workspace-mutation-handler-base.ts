@@ -12,7 +12,6 @@ export abstract class WorkspaceMutationHandlerBase {
   protected getWorkspace(userId: string): WorkspaceService {
     const workspace = this.app.getWorkspace(userId);
     if (!workspace) {
-      console.log('Workspace not found', userId);
       throw new MutationError(
         MutationErrorCode.WorkspaceNotFound,
         'Workspace not found or has been deleted.'

@@ -1,8 +1,16 @@
+import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from '@tanstack/react-router';
 import { toast } from 'sonner';
 
-import { generateId, IdType } from '@colanode/core';
-import { DatabaseForm } from '@colanode/ui/components/databases/database-form';
+import {
+  LocalDatabaseNode,
+  LocalDatabaseViewNode,
+} from '@colanode/client/types';
+import { generateFractionalIndex, generateId, IdType } from '@colanode/core';
+import {
+  DatabaseForm,
+  DatabaseFormValues,
+} from '@colanode/ui/components/databases/database-form';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +19,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface DatabaseCreateDialogProps {
   spaceId: string;
@@ -26,7 +33,69 @@ export const DatabaseCreateDialog = ({
 }: DatabaseCreateDialogProps) => {
   const workspace = useWorkspace();
   const navigate = useNavigate({ from: '/workspace/$userId' });
-  const { mutate, isPending } = useMutation();
+
+  const { mutate } = useMutation({
+    mutationFn: async (values: DatabaseFormValues) => {
+      const nodes = workspace.collections.nodes;
+
+      const databaseId = generateId(IdType.Database);
+      const fieldId = generateId(IdType.Field);
+      const viewId = generateId(IdType.DatabaseView);
+
+      const database: LocalDatabaseNode = {
+        id: databaseId,
+        type: 'database',
+        name: values.name,
+        parentId: spaceId,
+        fields: {
+          [fieldId]: {
+            id: fieldId,
+            type: 'text',
+            index: generateFractionalIndex(null, null),
+            name: 'Comment',
+          },
+        },
+        rootId: spaceId,
+        createdAt: new Date().toISOString(),
+        createdBy: workspace.userId,
+        updatedAt: null,
+        updatedBy: null,
+        localRevision: '0',
+        serverRevision: '0',
+      };
+
+      const view: LocalDatabaseViewNode = {
+        id: viewId,
+        type: 'database_view',
+        name: 'Default',
+        index: generateFractionalIndex(null, null),
+        layout: 'table',
+        parentId: databaseId,
+        rootId: databaseId,
+        createdAt: new Date().toISOString(),
+        createdBy: workspace.userId,
+        updatedAt: null,
+        updatedBy: null,
+        localRevision: '0',
+        serverRevision: '0',
+      };
+
+      nodes.insert([database, view]);
+      return database;
+    },
+    onSuccess: (database) => {
+      navigate({
+        to: '$nodeId',
+        params: {
+          nodeId: database.id,
+        },
+      });
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -42,38 +111,11 @@ export const DatabaseCreateDialog = ({
           values={{
             name: '',
           }}
-          isPending={isPending}
           submitText="Create"
-          handleCancel={() => {
+          onCancel={() => {
             onOpenChange(false);
           }}
-          handleSubmit={(values) => {
-            if (isPending) {
-              return;
-            }
-
-            mutate({
-              input: {
-                type: 'database.create',
-                parentId: spaceId,
-                name: values.name,
-                avatar: values.avatar,
-                userId: workspace.userId,
-              },
-              onSuccess(output) {
-                onOpenChange(false);
-                navigate({
-                  to: '$nodeId',
-                  params: {
-                    nodeId: output.id,
-                  },
-                });
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
-            });
-          }}
+          onSubmit={(values) => mutate(values)}
         />
       </DialogContent>
     </Dialog>

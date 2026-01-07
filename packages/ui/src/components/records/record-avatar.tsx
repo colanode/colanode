@@ -1,17 +1,12 @@
-import { toast } from 'sonner';
-
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { AvatarPopover } from '@colanode/ui/components/avatars/avatar-popover';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export const RecordAvatar = () => {
   const workspace = useWorkspace();
   const record = useRecord();
-
-  const { mutate, isPending } = useMutation();
 
   if (!record.canEdit) {
     return (
@@ -29,19 +24,14 @@ export const RecordAvatar = () => {
   return (
     <AvatarPopover
       onPick={(avatar) => {
-        if (isPending) return;
         if (avatar === record.avatar) return;
 
-        mutate({
-          input: {
-            type: 'record.avatar.update',
-            recordId: record.id,
-            avatar,
-            userId: workspace.userId,
-          },
-          onError(error) {
-            toast.error(error.message);
-          },
+        const nodes = workspace.collections.nodes;
+        nodes.update(record.id, (draft) => {
+          if (draft.type !== 'record') {
+            return;
+          }
+          draft.avatar = avatar;
         });
       }}
     >

@@ -1,15 +1,15 @@
+import { debounceStrategy, usePacedMutations } from '@tanstack/react-db';
 import { useEffect, useRef } from 'react';
-import { toast } from 'sonner';
 
-import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
+import { LocalNode } from '@colanode/client/types';
+import { Input } from '@colanode/ui/components/ui/input';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { applyNodeTransaction } from '@colanode/ui/lib/nodes';
 
 export const RecordName = () => {
   const workspace = useWorkspace();
   const record = useRecord();
-  const { mutate, isPending } = useMutation();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -23,33 +23,32 @@ export const RecordName = () => {
     return () => clearTimeout(timeoutId);
   }, [record.canEdit, inputRef]);
 
+  const mutate = usePacedMutations<string, LocalNode>({
+    onMutate: (value) => {
+      workspace.collections.nodes.update(record.id, (draft) => {
+        if (draft.type !== 'record') {
+          return;
+        }
+
+        draft.name = value;
+      });
+    },
+    mutationFn: async ({ transaction }) => {
+      await applyNodeTransaction(workspace.userId, transaction);
+    },
+    strategy: debounceStrategy({ wait: 500 }),
+  });
+
   return (
-    <SmartTextInput
+    <Input
       value={record.name}
       readOnly={!record.canEdit}
       ref={inputRef}
-      onChange={(value) => {
-        if (isPending) {
-          return;
-        }
-
-        if (value === record.name) {
-          return;
-        }
-
-        mutate({
-          input: {
-            type: 'record.name.update',
-            recordId: record.id,
-            name: value,
-            userId: workspace.userId,
-          },
-          onError(error) {
-            toast.error(error.message);
-          },
-        });
+      onChange={(event) => {
+        const newValue = event.target.value;
+        mutate(newValue);
       }}
-      className="font-heading border-b border-none pl-1 text-4xl font-bold shadow-none focus-visible:ring-0"
+      className="font-heading border-b border-none pl-1 md:text-4xl text-2xl font-bold shadow-none focus-visible:ring-0"
       placeholder="Unnamed"
     />
   );

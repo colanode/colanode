@@ -52,7 +52,7 @@ export const fileDownloadRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      if (file.attributes.status !== FileStatus.Ready) {
+      if (file.status !== FileStatus.Ready) {
         return reply.code(400).send({
           code: ApiErrorCode.FileNotReady,
           message: 'File is not ready to be downloaded.',
@@ -88,7 +88,7 @@ export const fileDownloadRoute: FastifyPluginCallbackZod = (
         }
 
         return reply.send(stream);
-      } catch (error) {
+      } catch {
         return reply.code(404).send({
           code: ApiErrorCode.FileNotFound,
           message: 'File not found.',

@@ -1,29 +1,13 @@
 import { useState } from 'react';
-import { toast } from 'sonner';
 
-import {
-  AlertDialog,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@colanode/ui/components/ui/alert-dialog';
+import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface SpaceDeleteProps {
-  id: string;
-  onDeleted: () => void;
+  spaceId: string;
 }
 
-export const SpaceDelete = ({ id, onDeleted }: SpaceDeleteProps) => {
-  const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
-
+export const SpaceDelete = ({ spaceId }: SpaceDeleteProps) => {
   const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   return (
@@ -47,46 +31,13 @@ export const SpaceDelete = ({ id, onDeleted }: SpaceDeleteProps) => {
           </Button>
         </div>
       </div>
-      <AlertDialog open={showDeleteModal} onOpenChange={setShowDeleteModal}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>
-              Are you sure you want delete this space?
-            </AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This space will no longer be
-              accessible by you or others you&apos;ve shared it with.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <Button
-              variant="destructive"
-              disabled={isPending}
-              onClick={() => {
-                mutate({
-                  input: {
-                    type: 'space.delete',
-                    userId: workspace.userId,
-                    spaceId: id,
-                  },
-                  onSuccess() {
-                    setShowDeleteModal(false);
-                    onDeleted();
-                    toast.success('Space deleted');
-                  },
-                  onError(error) {
-                    toast.error(error.message);
-                  },
-                });
-              }}
-            >
-              {isPending && <Spinner className="mr-1" />}
-              Delete
-            </Button>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <NodeDeleteDialog
+        id={spaceId}
+        title="Are you sure you want delete this space?"
+        description="This action cannot be undone. This space will no longer be accessible by you or others you've shared it with."
+        open={showDeleteModal}
+        onOpenChange={setShowDeleteModal}
+      />
     </>
   );
 };

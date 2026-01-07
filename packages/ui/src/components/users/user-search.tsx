@@ -16,7 +16,7 @@ import {
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface UserSearchProps {
   exclude?: string[];
@@ -27,7 +27,7 @@ export const UserSearch = ({ exclude, onSelect }: UserSearchProps) => {
   const workspace = useWorkspace();
 
   const [query, setQuery] = useState('');
-  const userSearchQuery = useLiveQuery({
+  const userSearchQuery = useQuery({
     type: 'user.search',
     searchQuery: query,
     userId: workspace.userId,

@@ -7,17 +7,19 @@ export const useMetadata = <T = string,>(
   namespace: string,
   key: string
 ): [T | undefined, (value: T | undefined) => void] => {
-  const metadataQuery = useLiveQuery((q) =>
-    q
-      .from({ metadata: collections.metadata })
-      .where(
-        ({ metadata }) =>
-          eq(metadata.namespace, namespace) && eq(metadata.key, key)
-      )
-      .select(({ metadata }) => ({
-        value: metadata.value,
-      }))
-      .findOne()
+  const metadataQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ metadata: collections.metadata })
+        .where(
+          ({ metadata }) =>
+            eq(metadata.namespace, namespace) && eq(metadata.key, key)
+        )
+        .select(({ metadata }) => ({
+          value: metadata.value,
+        }))
+        .findOne(),
+    [namespace, key]
   );
 
   const setValue = (value: T | undefined) => {

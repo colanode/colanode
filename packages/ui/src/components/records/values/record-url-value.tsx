@@ -1,13 +1,18 @@
 import { ExternalLink } from 'lucide-react';
 
-import { isValidUrl, UrlFieldAttributes } from '@colanode/core';
+import {
+  isValidUrl,
+  StringFieldValue,
+  UrlFieldAttributes,
+} from '@colanode/core';
 import {
   HoverCard,
   HoverCardContent,
   HoverCardTrigger,
 } from '@colanode/ui/components/ui/hover-card';
-import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
+import { Input } from '@colanode/ui/components/ui/input';
 import { useRecord } from '@colanode/ui/contexts/record';
+import { useRecordField } from '@colanode/ui/hooks/use-record-field';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface RecordUrlValueProps {
@@ -17,17 +22,20 @@ interface RecordUrlValueProps {
 
 export const RecordUrlValue = ({ field, readOnly }: RecordUrlValueProps) => {
   const record = useRecord();
-
-  const url = record.getUrlValue(field);
+  const { value, setValue, clearValue } = useRecordField<StringFieldValue>({
+    field,
+  });
+  const url = value?.value ?? '';
   const canOpen = url && isValidUrl(url);
 
   return (
     <HoverCard openDelay={300}>
       <HoverCardTrigger>
-        <SmartTextInput
+        <Input
           value={url}
           readOnly={!record.canEdit || readOnly}
-          onChange={(newValue) => {
+          onChange={(e) => {
+            const newValue = e.target.value;
             if (!record.canEdit || readOnly) return;
 
             if (newValue === url) {
@@ -35,9 +43,9 @@ export const RecordUrlValue = ({ field, readOnly }: RecordUrlValueProps) => {
             }
 
             if (newValue === null || newValue === '') {
-              record.removeFieldValue(field);
+              clearValue();
             } else {
-              record.updateFieldValue(field, {
+              setValue({
                 type: 'string',
                 value: newValue,
               });
@@ -48,7 +56,7 @@ export const RecordUrlValue = ({ field, readOnly }: RecordUrlValueProps) => {
       </HoverCardTrigger>
       <HoverCardContent
         className={cn(
-          'flex w-full min-w-80 max-w-128 flex-row items-center justify-between gap-2 overflow-hidden',
+          'flex w-full min-w-80 max-w-lg flex-row items-center justify-between gap-2 overflow-hidden',
           !canOpen && 'hidden'
         )}
       >

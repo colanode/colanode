@@ -1,9 +1,17 @@
 import { Collection } from '@tanstack/react-db';
 
-import { Download, Upload, User } from '@colanode/client/types';
+import {
+  Download,
+  LocalNode,
+  NodeReaction,
+  Upload,
+  User,
+} from '@colanode/client/types';
 import { createAccountsCollection } from '@colanode/ui/collections/accounts';
 import { createDownloadsCollection } from '@colanode/ui/collections/downloads';
 import { createMetadataCollection } from '@colanode/ui/collections/metadata';
+import { createNodeReactionsCollection } from '@colanode/ui/collections/node-reactions';
+import { createNodesCollection } from '@colanode/ui/collections/nodes';
 import { createServersCollection } from '@colanode/ui/collections/servers';
 import { createTabsCollection } from '@colanode/ui/collections/tabs';
 import { createTempFilesCollection } from '@colanode/ui/collections/temp-files';
@@ -11,22 +19,26 @@ import { createUploadsCollection } from '@colanode/ui/collections/uploads';
 import { createUsersCollection } from '@colanode/ui/collections/users';
 import { createWorkspacesCollection } from '@colanode/ui/collections/workspaces';
 
-class WorkspaceCollections {
+export class WorkspaceCollections {
   private readonly userId: string;
 
   public readonly users: Collection<User, string>;
   public readonly downloads: Collection<Download, string>;
   public readonly uploads: Collection<Upload, string>;
+  public readonly nodes: Collection<LocalNode, string>;
+  public readonly nodeReactions: Collection<NodeReaction, string>;
 
   constructor(userId: string) {
     this.userId = userId;
     this.users = createUsersCollection(userId);
     this.downloads = createDownloadsCollection(userId);
     this.uploads = createUploadsCollection(userId);
+    this.nodes = createNodesCollection(userId);
+    this.nodeReactions = createNodeReactionsCollection(userId);
   }
 }
 
-class AppCollections {
+export class AppCollections {
   public readonly servers = createServersCollection();
   public readonly accounts = createAccountsCollection();
   public readonly tabs = createTabsCollection();

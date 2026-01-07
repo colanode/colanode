@@ -25,8 +25,9 @@ export function SidebarMenuFooter() {
 
   const [open, setOpen] = useState(false);
 
-  const accountsQuery = useLiveQuery((q) =>
-    q.from({ accounts: collections.accounts })
+  const accountsQuery = useLiveQuery(
+    (q) => q.from({ accounts: collections.accounts }),
+    []
   );
   const accounts = accountsQuery.data ?? [];
   const currentAccount = accounts.find((a) => a.id === workspace.accountId);

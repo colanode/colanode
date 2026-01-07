@@ -8,14 +8,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
+import { Input } from '@colanode/ui/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
-import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
 import { nameFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewNameFieldFilterProps {
@@ -29,6 +30,10 @@ const isOperatorWithoutValue = (operator: string) => {
 export const ViewNameFieldFilter = ({ filter }: ViewNameFieldFilterProps) => {
   const database = useDatabase();
   const view = useDatabaseView();
+  const { updateFilter, removeFilter } = useViewFilter({
+    viewId: view.id,
+    filterId: filter.id,
+  });
 
   const operator =
     nameFieldFilterOperators.find(
@@ -86,7 +91,7 @@ export const ViewNameFieldFilter = ({ filter }: ViewNameFieldFilterProps) => {
                       ? null
                       : textValue;
 
-                    view.updateFilter(filter.id, {
+                    updateFilter({
                       ...filter,
                       operator: operator.value,
                       value: value,
@@ -98,21 +103,16 @@ export const ViewNameFieldFilter = ({ filter }: ViewNameFieldFilterProps) => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              view.removeFilter(filter.id);
-            }}
-          >
+          <Button variant="ghost" size="icon" onClick={removeFilter}>
             <Trash2 className="size-4" />
           </Button>
         </div>
         {!hideInput && (
-          <SmartTextInput
-            value={textValue}
-            onChange={(value) => {
-              view.updateFilter(filter.id, {
+          <Input
+            value={textValue ?? ''}
+            onChange={(e) => {
+              const value = e.target.value;
+              updateFilter({
                 ...filter,
                 value: value,
               });

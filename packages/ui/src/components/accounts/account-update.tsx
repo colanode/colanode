@@ -32,15 +32,17 @@ const formSchema = z.object({
 
 export const AccountUpdate = () => {
   const workspace = useWorkspace();
-  const accountQuery = useLiveQuery((q) =>
-    q
-      .from({ accounts: collections.accounts })
-      .where(({ accounts }) => eq(accounts.id, workspace.accountId))
-      .select(({ accounts }) => ({
-        name: accounts.name,
-        avatar: accounts.avatar,
-        email: accounts.email,
-      }))
+  const accountQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ accounts: collections.accounts })
+        .where(({ accounts }) => eq(accounts.id, workspace.accountId))
+        .select(({ accounts }) => ({
+          name: accounts.name,
+          avatar: accounts.avatar,
+          email: accounts.email,
+        })),
+    [workspace.accountId]
   );
 
   const isMobile = useIsMobile();

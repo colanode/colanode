@@ -75,7 +75,7 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
       };
     }
 
-    if (file.attributes.status === FileStatus.Pending) {
+    if (file.status === FileStatus.Pending) {
       return {
         type: 'retry',
         delay: ms('5 seconds'),

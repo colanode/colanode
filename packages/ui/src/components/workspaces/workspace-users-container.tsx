@@ -1,38 +1,35 @@
-import { useState } from 'react';
+import { useLiveInfiniteQuery } from '@tanstack/react-db';
 import { InView } from 'react-intersection-observer';
 
-import { UserListQueryInput } from '@colanode/client/queries';
 import { WorkspaceRole } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Container } from '@colanode/ui/components/layouts/containers/container';
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { WorkspaceUserInvite } from '@colanode/ui/components/workspaces/workspace-user-invite';
 import { WorkspaceUserRoleDropdown } from '@colanode/ui/components/workspaces/workspace-user-role-dropdown';
 import { WorkspaceUsersBreadcrumb } from '@colanode/ui/components/workspaces/workspace-users-breadcrumb';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
 
 const USERS_PER_PAGE = 50;
 
 export const WorkspaceUsersContainer = () => {
   const workspace = useWorkspace();
   const canEditUsers = workspace.role === 'owner' || workspace.role === 'admin';
-  const [lastPage, setLastPage] = useState<number>(1);
 
-  const inputs: UserListQueryInput[] = Array.from({
-    length: lastPage,
-  }).map((_, i) => ({
-    type: 'user.list',
-    page: i + 1,
-    count: USERS_PER_PAGE,
-    userId: workspace.userId,
-  }));
+  const usersQuery = useLiveInfiniteQuery(
+    (q) =>
+      q
+        .from({ users: workspace.collections.users })
+        .orderBy(({ users }) => users.id, 'asc'),
+    {
+      pageSize: USERS_PER_PAGE,
+      getNextPageParam: (lastPage, allPages) =>
+        lastPage.length === USERS_PER_PAGE ? allPages.length : undefined,
+    },
+    [workspace.userId]
+  );
 
-  const result = useLiveQueries(inputs);
-  const users = result.flatMap((data) => data.data ?? []);
-  const isPending = result.some((data) => data.isPending);
-  const hasMore = !isPending && users.length === lastPage * USERS_PER_PAGE;
+  const users = usersQuery.data;
 
   return (
     <Container type="full" breadcrumb={<WorkspaceUsersBreadcrumb />}>
@@ -81,14 +78,11 @@ export const WorkspaceUsersContainer = () => {
                 </div>
               );
             })}
-            <div className="flex items-center justify-center space-x-3">
-              {isPending && <Spinner />}
-            </div>
             <InView
               rootMargin="200px"
               onChange={(inView) => {
-                if (inView && hasMore && !isPending) {
-                  setLastPage(lastPage + 1);
+                if (inView && users.length === USERS_PER_PAGE) {
+                  usersQuery.fetchNextPage();
                 }
               }}
             />

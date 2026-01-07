@@ -1,6 +1,5 @@
 import { Outlet } from '@tanstack/react-router';
 
-import { LocalNode } from '@colanode/client/types';
 import { ChannelContainer } from '@colanode/ui/components/channels/channel-container';
 import { ChatContainer } from '@colanode/ui/components/chats/chat-container';
 import { DatabaseContainer } from '@colanode/ui/components/databases/database-container';
@@ -9,12 +8,13 @@ import { FolderContainer } from '@colanode/ui/components/folders/folder-containe
 import { Container } from '@colanode/ui/components/layouts/containers/container';
 import { MessageContainer } from '@colanode/ui/components/messages/message-container';
 import { NodeBreadcrumb } from '@colanode/ui/components/nodes/node-breadcrumb';
+import { NodeProvider } from '@colanode/ui/components/nodes/node-provider';
 import { NodeSettings } from '@colanode/ui/components/nodes/node-settings';
 import { PageContainer } from '@colanode/ui/components/pages/page-container';
 import { RecordContainer } from '@colanode/ui/components/records/record-container';
 import { SpaceContainer } from '@colanode/ui/components/spaces/space-container';
 import { ContainerType } from '@colanode/ui/contexts/container';
-import { useNodeContainer } from '@colanode/ui/hooks/use-node-container';
+import { useNode } from '@colanode/ui/contexts/node';
 import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
 
 interface NodeContainerProps {
@@ -22,18 +22,14 @@ interface NodeContainerProps {
   nodeId: string;
   onFullscreen?: () => void;
 }
+interface NodeContentProps {
+  type: ContainerType;
+  onFullscreen?: () => void;
+}
 
-const NodeContent = ({ type, nodeId, onFullscreen }: NodeContainerProps) => {
-  const data = useNodeContainer<LocalNode>(nodeId);
+const NodeContent = ({ type, onFullscreen }: NodeContentProps) => {
+  const data = useNode();
   useNodeRadar(data.node);
-
-  if (data.isPending) {
-    return null;
-  }
-
-  if (!data.node) {
-    return null;
-  }
 
   return (
     <Container
@@ -78,7 +74,9 @@ export const NodeContainer = ({
 }: NodeContainerProps) => {
   return (
     <>
-      <NodeContent type={type} nodeId={nodeId} onFullscreen={onFullscreen} />
+      <NodeProvider nodeId={nodeId}>
+        <NodeContent type={type} onFullscreen={onFullscreen} />
+      </NodeProvider>
       <Outlet />
     </>
   );

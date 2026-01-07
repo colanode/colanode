@@ -4,7 +4,7 @@ import { Fragment, useState } from 'react';
 import { LocalPageNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { NodeCollaboratorAudit } from '@colanode/ui/components/collaborators/node-collaborator-audit';
-import { PageDeleteDialog } from '@colanode/ui/components/pages/page-delete-dialog';
+import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import { PageUpdateDialog } from '@colanode/ui/components/pages/page-update-dialog';
 import {
   DropdownMenu,
@@ -34,7 +34,7 @@ export const PageSettings = ({ page, role }: PageSettingsProps) => {
           <Settings className="size-4 cursor-pointer text-muted-foreground hover:text-foreground" />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" className="mr-2 w-80">
-          <DropdownMenuLabel>{page.attributes.name}</DropdownMenuLabel>
+          <DropdownMenuLabel>{page.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="flex items-center gap-2 cursor-pointer"
@@ -107,8 +107,10 @@ export const PageSettings = ({ page, role }: PageSettingsProps) => {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-      <PageDeleteDialog
-        pageId={page.id}
+      <NodeDeleteDialog
+        id={page.id}
+        title="Are you sure you want delete this page?"
+        description="This action cannot be undone. This page will no longer be accessible by you or others you've shared it with."
         open={showDeleteDialog}
         onOpenChange={setShowDeleteModal}
       />

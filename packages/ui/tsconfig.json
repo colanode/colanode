@@ -19,6 +19,6 @@
     "baseUrl": ".",
     "paths": {
       "@colanode/ui/*": ["src/*"]
-    },
+    }
   }
 }

@@ -1,6 +1,12 @@
 import { Database } from 'lucide-react';
 
-import { EditorCommand } from '@colanode/client/types';
+import {
+  EditorCommand,
+  LocalDatabaseNode,
+  LocalDatabaseViewNode,
+} from '@colanode/client/types';
+import { IdType, generateId, generateFractionalIndex } from '@colanode/core';
+import { collections } from '@colanode/ui/collections';
 
 export const DatabaseCommand: EditorCommand = {
   key: 'database',
@@ -14,17 +20,51 @@ export const DatabaseCommand: EditorCommand = {
       return;
     }
 
-    const { userId, documentId } = context;
-    const output = await window.colanode.executeMutation({
-      type: 'database.create',
-      name: 'Untitled',
-      userId,
-      parentId: documentId,
-    });
+    const { userId, documentId, rootId } = context;
+    const nodes = collections.workspace(userId).nodes;
+    const databaseId = generateId(IdType.Database);
+    const fieldId = generateId(IdType.Field);
+    const viewId = generateId(IdType.DatabaseView);
 
-    if (!output.success) {
-      return;
-    }
+    const database: LocalDatabaseNode = {
+      id: databaseId,
+      type: 'database',
+      name: 'Untitled',
+      parentId: documentId,
+      fields: {
+        [fieldId]: {
+          id: fieldId,
+          type: 'text',
+          index: generateFractionalIndex(null, null),
+          name: 'Comment',
+        },
+      },
+      rootId: rootId,
+      createdAt: new Date().toISOString(),
+      createdBy: userId,
+      updatedAt: null,
+      updatedBy: null,
+      localRevision: '0',
+      serverRevision: '0',
+    };
+
+    const view: LocalDatabaseViewNode = {
+      id: viewId,
+      type: 'database_view',
+      name: 'Default',
+      index: generateFractionalIndex(null, null),
+      layout: 'table',
+      parentId: databaseId,
+      rootId: databaseId,
+      createdAt: new Date().toISOString(),
+      createdBy: userId,
+      updatedAt: null,
+      updatedBy: null,
+      localRevision: '0',
+      serverRevision: '0',
+    };
+
+    nodes.insert([database, view]);
 
     editor
       .chain()
@@ -33,7 +73,7 @@ export const DatabaseCommand: EditorCommand = {
       .insertContent({
         type: 'database',
         attrs: {
-          id: output.output.id,
+          id: database.id,
         },
       })
       .run();

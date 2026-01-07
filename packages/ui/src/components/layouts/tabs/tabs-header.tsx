@@ -12,17 +12,19 @@ export const TabsHeader = () => {
   const showMacOsPlaceholder =
     platform === 'darwin' && windowState?.fullscreen !== true;
 
-  const tabsQuery = useLiveQuery((q) =>
-    q
-      .from({ tabs: collections.tabs })
-      .orderBy(({ tabs }) => tabs.index, `asc`)
-      .select(({ tabs }) => {
-        return {
-          id: tabs.id,
-          index: tabs.index,
-          lastActiveAt: tabs.lastActiveAt,
-        };
-      })
+  const tabsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ tabs: collections.tabs })
+        .orderBy(({ tabs }) => tabs.index, `asc`)
+        .select(({ tabs }) => {
+          return {
+            id: tabs.id,
+            index: tabs.index,
+            lastActiveAt: tabs.lastActiveAt,
+          };
+        }),
+    []
   );
 
   const tabs = tabsQuery.data;

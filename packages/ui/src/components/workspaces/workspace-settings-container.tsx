@@ -15,15 +15,19 @@ export const WorkspaceSettingsContainer = () => {
   const workspace = useWorkspace();
   const { mutate, isPending } = useMutation();
 
-  const currentWorkspaceQuery = useLiveQuery((q) =>
-    q
-      .from({ workspaces: collections.workspaces })
-      .where(({ workspaces }) => eq(workspaces.accountId, workspace.accountId))
-      .select(({ workspaces }) => ({
-        name: workspaces.name,
-        description: workspaces.description,
-        avatar: workspaces.avatar,
-      }))
+  const currentWorkspaceQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ workspaces: collections.workspaces })
+        .where(({ workspaces }) =>
+          eq(workspaces.accountId, workspace.accountId)
+        )
+        .select(({ workspaces }) => ({
+          name: workspaces.name,
+          description: workspaces.description,
+          avatar: workspaces.avatar,
+        })),
+    [workspace.accountId]
   );
 
   const currentWorkspace = currentWorkspaceQuery.data?.[0];

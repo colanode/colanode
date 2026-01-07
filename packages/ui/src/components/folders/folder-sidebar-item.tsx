@@ -24,8 +24,8 @@ export const FolderSidebarItem = ({
     >
       <Avatar
         id={folder.id}
-        avatar={folder.attributes.avatar}
-        name={folder.attributes.name}
+        avatar={folder.avatar}
+        name={folder.name}
         className="h-4 w-4"
       />
       <span
@@ -34,7 +34,7 @@ export const FolderSidebarItem = ({
           isUnread && 'font-bold'
         )}
       >
-        {folder.attributes.name ?? 'Unnamed'}
+        {folder.name ?? 'Unnamed'}
       </span>
       {mentionsCount > 0 && (
         <span className="mr-1 rounded-md bg-sidebar-accent px-1 py-0.5 text-xs text-sidebar-accent-foreground">

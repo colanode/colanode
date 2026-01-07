@@ -230,7 +230,7 @@ export class FileService {
       return;
     }
 
-    const filePath = this.buildFilePath(file.id, file.attributes.extension);
+    const filePath = this.buildFilePath(file.id, file.extension);
     await this.app.fs.delete(filePath);
   }
 
@@ -273,9 +273,9 @@ export class FileService {
       .returningAll()
       .values({
         id: fileId,
-        version: file.attributes.version,
+        version: file.version,
         created_at: now,
-        path: this.buildFilePath(fileId, file.attributes.extension),
+        path: this.buildFilePath(fileId, file.extension),
         opened_at: now,
         download_status: DownloadStatus.Pending,
         download_progress: 0,
@@ -329,7 +329,7 @@ export class FileService {
     }
 
     const file = mapNode(node) as LocalFileNode;
-    if (file.attributes.status !== FileStatus.Ready) {
+    if (file.status !== FileStatus.Ready) {
       throw new MutationError(
         MutationErrorCode.FileNotReady,
         'The file you are trying to download is not uploaded by the author yet.'
@@ -343,11 +343,11 @@ export class FileService {
       .values({
         id: generateId(IdType.Download),
         file_id: fileId,
-        version: file.attributes.version,
+        version: file.version,
         name: name,
         path: path,
-        size: file.attributes.size,
-        mime_type: file.attributes.mimeType,
+        size: file.size,
+        mime_type: file.mimeType,
         status: DownloadStatus.Pending,
         progress: 0,
         retries: 0,

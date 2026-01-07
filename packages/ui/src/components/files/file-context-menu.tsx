@@ -2,7 +2,7 @@ import { useNavigate } from '@tanstack/react-router';
 import { Folder, Trash2 } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
-import { FileDeleteDialog } from '@colanode/ui/components/files/file-delete-dialog';
+import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import {
   ContextMenu,
   ContextMenuContent,
@@ -51,8 +51,10 @@ export const FileContextMenu = ({ id, children }: FileContextMenuProps) => {
           </ContextMenuItem>
         </ContextMenuContent>
       </ContextMenu>
-      <FileDeleteDialog
-        fileId={id}
+      <NodeDeleteDialog
+        id={id}
+        title="Are you sure you want delete this file?"
+        description="This action cannot be undone. This file will no longer be accessible and all data in the file will be lost."
         open={openDelete}
         onOpenChange={setOpenDelete}
       />

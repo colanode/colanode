@@ -1,3 +1,4 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { useNavigate } from '@tanstack/react-router';
 import { Folder } from 'lucide-react';
 
@@ -12,7 +13,6 @@ import {
 } from '@colanode/ui/components/ui/tooltip';
 import { WorkspaceDownloadStatus } from '@colanode/ui/components/workspaces/downloads/workspace-download-status';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface WorkspaceDownloadFileProps {
   download: Download;
@@ -24,11 +24,14 @@ export const WorkspaceDownloadFile = ({
   const workspace = useWorkspace();
   const navigate = useNavigate({ from: '/workspace/$userId' });
 
-  const fileQuery = useLiveQuery({
-    type: 'node.get',
-    userId: workspace.userId,
-    nodeId: download.fileId,
-  });
+  const fileQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.id, download.fileId))
+        .findOne(),
+    [workspace.userId, download.fileId]
+  );
 
   const file = fileQuery.data as LocalFileNode | undefined;
 

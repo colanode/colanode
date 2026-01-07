@@ -1,8 +1,9 @@
+import { eq, inArray, useLiveQuery } from '@tanstack/react-db';
 import { X } from 'lucide-react';
-import { Fragment, useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 
 import { LocalRecordNode } from '@colanode/client/types';
-import { RelationFieldAttributes } from '@colanode/core';
+import { RelationFieldAttributes, StringArrayFieldValue } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { RecordSearch } from '@colanode/ui/components/records/record-search';
 import { Badge } from '@colanode/ui/components/ui/badge';
@@ -14,7 +15,7 @@ import {
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
+import { useRecordField } from '@colanode/ui/hooks/use-record-field';
 
 interface RecordRelationValueProps {
   field: RelationFieldAttributes;
@@ -22,15 +23,10 @@ interface RecordRelationValueProps {
 }
 
 const RelationBadge = ({ record }: { record: LocalRecordNode }) => {
-  const name = record.attributes.name ?? 'Unnamed';
+  const name = record.name ?? 'Unnamed';
   return (
     <div className="flex flex-row items-center gap-1">
-      <Avatar
-        id={record.id}
-        name={name}
-        avatar={record.attributes.avatar}
-        size="small"
-      />
+      <Avatar id={record.id} name={name} avatar={record.avatar} size="small" />
       <p className="text-sm line-clamp-1 w-full">{name}</p>
     </div>
   );
@@ -42,25 +38,31 @@ export const RecordRelationValue = ({
 }: RecordRelationValueProps) => {
   const workspace = useWorkspace();
   const record = useRecord();
+  const { value, setValue, clearValue } = useRecordField<StringArrayFieldValue>(
+    {
+      field,
+    }
+  );
 
   const [open, setOpen] = useState(false);
 
-  const relationIds = record.getRelationValue(field) ?? [];
-  const results = useLiveQueries(
-    relationIds.map((id) => ({
-      type: 'node.get',
-      nodeId: id,
-      userId: workspace.userId,
-    }))
+  const relationIds = useMemo(() => value?.value ?? [], [value]);
+  const relationsQuery = useLiveQuery(
+    (q) => {
+      if (relationIds.length === 0 || !field.databaseId) {
+        return q
+          .from({ nodes: workspace.collections.nodes })
+          .where(({ nodes }) => eq(nodes.id, '')); // Return empty result
+      }
+
+      return q
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => inArray(nodes.id, relationIds));
+    },
+    [workspace.userId, field.databaseId, relationIds]
   );
 
-  const relations: LocalRecordNode[] = [];
-  for (const result of results) {
-    if (result.data && result.data.type === 'record') {
-      relations.push(result.data);
-    }
-  }
-
+  const relations = relationsQuery.data.map((node) => node as LocalRecordNode);
   if (!field.databaseId) {
     return null;
   }
@@ -104,9 +106,9 @@ export const RecordRelationValue = ({
                         );
 
                         if (newRelations.length === 0) {
-                          record.removeFieldValue(field);
+                          clearValue();
                         } else {
-                          record.updateFieldValue(field, {
+                          setValue({
                             type: 'string_array',
                             value: newRelations,
                           });
@@ -134,9 +136,9 @@ export const RecordRelationValue = ({
                 : [...relationIds, selectedRecord.id];
 
               if (newRelations.length === 0) {
-                record.removeFieldValue(field);
+                clearValue();
               } else {
-                record.updateFieldValue(field, {
+                setValue({
                   type: 'string_array',
                   value: newRelations,
                 });

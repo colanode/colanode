@@ -44,17 +44,17 @@ const logger = createLogger('server:lib:nodes');
 const UPDATE_RETRIES_LIMIT = 10;
 
 export const mapNode = (node: SelectNode): Node => {
+  const attributes = node.attributes as NodeAttributes;
   return {
     id: node.id,
-    parentId: node.parent_id,
     rootId: node.root_id,
-    type: node.type,
-    attributes: node.attributes,
+    parentId: node.parent_id,
     createdAt: node.created_at.toISOString(),
     createdBy: node.created_by,
     updatedAt: node.updated_at?.toISOString() ?? null,
     updatedBy: node.updated_by ?? null,
-  } as Node;
+    ...attributes,
+  };
 };
 
 export const fetchNode = async (nodeId: string): Promise<SelectNode | null> => {

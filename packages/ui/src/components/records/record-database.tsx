@@ -1,8 +1,9 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { NodeRole } from '@colanode/core';
 import { Database } from '@colanode/ui/components/databases/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface RecordDatabaseProps {
   id: string;
@@ -13,21 +14,24 @@ interface RecordDatabaseProps {
 export const RecordDatabase = ({ id, role, children }: RecordDatabaseProps) => {
   const workspace = useWorkspace();
 
-  const nodeGetQuery = useLiveQuery({
-    type: 'node.get',
-    userId: workspace.userId,
-    nodeId: id,
-  });
+  const databaseGetQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.id, id))
+        .findOne(),
+    [workspace.userId, id]
+  );
 
-  if (nodeGetQuery.isPending) {
+  if (databaseGetQuery.isLoading) {
     return null;
   }
 
-  if (!nodeGetQuery.data) {
+  if (!databaseGetQuery.data || databaseGetQuery.data.type !== 'database') {
     return null;
   }
 
-  const database = nodeGetQuery.data as LocalDatabaseNode;
+  const database = databaseGetQuery.data as LocalDatabaseNode;
   return (
     <Database database={database} role={role}>
       {children}

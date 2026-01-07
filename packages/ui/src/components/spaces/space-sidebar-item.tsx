@@ -1,3 +1,4 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { ChevronRight } from 'lucide-react';
 import { RefAttributes, useRef } from 'react';
 import { useDrop } from 'react-dnd';
@@ -15,7 +16,6 @@ import {
 } from '@colanode/ui/components/ui/collapsible';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { sortSpaceChildren } from '@colanode/ui/lib/spaces';
 import { cn } from '@colanode/ui/lib/utils';
@@ -31,12 +31,13 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const role = extractNodeRole(space, workspace.userId);
   const canEdit = role === 'admin';
 
-  const nodeChildrenGetQuery = useLiveQuery({
-    type: 'node.children.get',
-    nodeId: space.id,
-    userId: workspace.userId,
-    types: ['page', 'channel', 'database', 'folder'],
-  });
+  const nodeChildrenGetQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.parentId, space.id)),
+    [workspace.userId, space.id]
+  );
 
   const [dropMonitor, dropRef] = useDrop({
     accept: 'sidebar-item',
@@ -52,7 +53,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
   const divRef = useRef<HTMLDivElement>(null);
   const dropDivRef = dropRef(divRef);
 
-  const children = sortSpaceChildren(space, nodeChildrenGetQuery.data ?? []);
+  const children = sortSpaceChildren(space, nodeChildrenGetQuery.data);
 
   const handleDragEnd = (childId: string, after: string | null) => {
     mutation.mutate({
@@ -88,12 +89,12 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
           <button className="group/space-button flex items-center gap-2 overflow-hidden rounded-md p-2 text-left text-sm flex-1 cursor-pointer">
             <Avatar
               id={space.id}
-              avatar={space.attributes.avatar}
-              name={space.attributes.name}
+              avatar={space.avatar}
+              name={space.name}
               className="size-4 group-hover/space-button:hidden"
             />
             <ChevronRight className="hidden size-4 transition-transform duration-200 group-hover/space-button:block group-data-[state=open]/sidebar-space:rotate-90" />
-            <span>{space.attributes.name}</span>
+            <span>{space.name}</span>
           </button>
         </CollapsibleTrigger>
         <SpaceSidebarDropdown space={space} />

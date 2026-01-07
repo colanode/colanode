@@ -1,7 +1,7 @@
 import { ShieldQuestionMark } from 'lucide-react';
 
 import { useApp } from '@colanode/ui/contexts/app';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface EmojiElementProps {
@@ -21,7 +21,7 @@ const EmojiElementWeb = ({ id, className, onClick }: EmojiElementProps) => {
 };
 
 const EmojiElementDesktop = ({ id, className, onClick }: EmojiElementProps) => {
-  const svgQuery = useLiveQuery({
+  const svgQuery = useQuery({
     type: 'emoji.svg.get',
     id,
   });

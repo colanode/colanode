@@ -4,14 +4,16 @@ import { collections } from '@colanode/ui/collections';
 import { TabsContentItem } from '@colanode/ui/components/layouts/tabs/tabs-content-item';
 
 export const TabsContent = () => {
-  const tabsQuery = useLiveQuery((q) =>
-    q
-      .from({ tabs: collections.tabs })
-      .orderBy(({ tabs }) => tabs.index, `asc`)
-      .select(({ tabs }) => ({
-        id: tabs.id,
-        lastActiveAt: tabs.lastActiveAt,
-      }))
+  const tabsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ tabs: collections.tabs })
+        .orderBy(({ tabs }) => tabs.index, `asc`)
+        .select(({ tabs }) => ({
+          id: tabs.id,
+          lastActiveAt: tabs.lastActiveAt,
+        })),
+    []
   );
 
   const tabs = tabsQuery.data;

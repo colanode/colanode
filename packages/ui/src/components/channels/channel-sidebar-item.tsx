@@ -36,8 +36,8 @@ export const ChannelSidebarItem = ({
     >
       <Avatar
         id={channel.id}
-        avatar={channel.attributes.avatar}
-        name={channel.attributes.name}
+        avatar={channel.avatar}
+        name={channel.name}
         className="h-4 w-4"
       />
       <span
@@ -46,7 +46,7 @@ export const ChannelSidebarItem = ({
           !isActive && unreadState.hasUnread && 'font-semibold'
         )}
       >
-        {channel.attributes.name ?? 'Unnamed'}
+        {channel.name ?? 'Unnamed'}
       </span>
       {!isActive && (
         <UnreadBadge

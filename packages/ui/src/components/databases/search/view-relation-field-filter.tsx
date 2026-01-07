@@ -1,3 +1,4 @@
+import { eq, inArray, useLiveQuery } from '@tanstack/react-db';
 import { ChevronDown, Trash2, X } from 'lucide-react';
 
 import { LocalRecordNode } from '@colanode/client/types';
@@ -24,7 +25,7 @@ import {
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQueries } from '@colanode/ui/hooks/use-live-queries';
+import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
 import { relationFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface ViewRelationFieldFilterProps {
@@ -33,15 +34,10 @@ interface ViewRelationFieldFilterProps {
 }
 
 const RelationBadge = ({ record }: { record: LocalRecordNode }) => {
-  const name = record.attributes.name ?? 'Unnamed';
+  const name = record.name ?? 'Unnamed';
   return (
     <div className="flex flex-row items-center gap-1">
-      <Avatar
-        id={record.id}
-        name={name}
-        avatar={record.attributes.avatar}
-        size="small"
-      />
+      <Avatar id={record.id} name={name} avatar={record.avatar} size="small" />
       <p className="text-sm line-clamp-1 w-full">{name}</p>
     </div>
   );
@@ -57,6 +53,10 @@ export const ViewRelationFieldFilter = ({
 }: ViewRelationFieldFilterProps) => {
   const workspace = useWorkspace();
   const view = useDatabaseView();
+  const { updateFilter, removeFilter } = useViewFilter({
+    viewId: view.id,
+    filterId: filter.id,
+  });
 
   const operator =
     relationFieldFilterOperators.find(
@@ -64,21 +64,22 @@ export const ViewRelationFieldFilter = ({
     ) ?? relationFieldFilterOperators[0]!;
 
   const relationIds = (filter.value as string[]) ?? [];
-  const results = useLiveQueries(
-    relationIds.map((id) => ({
-      type: 'node.get',
-      nodeId: id,
-      userId: workspace.userId,
-    }))
+  const relationsQuery = useLiveQuery(
+    (q) => {
+      if (relationIds.length === 0 || !field.databaseId) {
+        return q
+          .from({ nodes: workspace.collections.nodes })
+          .where(({ nodes }) => eq(nodes.id, '')); // Return empty result
+      }
+
+      return q
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => inArray(nodes.id, relationIds));
+    },
+    [workspace.userId, field.databaseId, relationIds]
   );
 
-  const relations: LocalRecordNode[] = [];
-  for (const result of results) {
-    if (result.data && result.data.type === 'record') {
-      relations.push(result.data);
-    }
-  }
-
+  const relations = relationsQuery.data.map((node) => node as LocalRecordNode);
   const hideInput = isOperatorWithoutValue(operator.value);
 
   if (!field.databaseId) {
@@ -128,7 +129,7 @@ export const ViewRelationFieldFilter = ({
                       ? []
                       : relationIds;
 
-                    view.updateFilter(filter.id, {
+                    updateFilter({
                       ...filter,
                       operator: operator.value,
                       value: value,
@@ -140,13 +141,7 @@ export const ViewRelationFieldFilter = ({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              view.removeFilter(filter.id);
-            }}
-          >
+          <Button variant="ghost" size="icon" onClick={removeFilter}>
             <Trash2 className="size-4" />
           </Button>
         </div>
@@ -188,7 +183,7 @@ export const ViewRelationFieldFilter = ({
                             (id) => id !== relation.id
                           );
 
-                          view.updateFilter(filter.id, {
+                          updateFilter({
                             ...filter,
                             value: newRelations,
                           });
@@ -207,7 +202,7 @@ export const ViewRelationFieldFilter = ({
                     ? relationIds.filter((id) => id !== record.id)
                     : [...relationIds, record.id];
 
-                  view.updateFilter(filter.id, {
+                  updateFilter({
                     ...filter,
                     value: newRelations,
                   });

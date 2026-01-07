@@ -11,8 +11,8 @@ export const ChannelBreadcrumbItem = ({
   return (
     <BreadcrumbItem
       id={channel.id}
-      avatar={channel.attributes.avatar}
-      name={channel.attributes.name}
+      avatar={channel.avatar}
+      name={channel.name}
     />
   );
 };

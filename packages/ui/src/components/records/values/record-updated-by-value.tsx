@@ -1,7 +1,6 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { UpdatedByFieldAttributes } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -14,16 +13,18 @@ export const RecordUpdatedByValue = ({ field }: RecordUpdatedByValueProps) => {
   const workspace = useWorkspace();
   const record = useRecord();
 
-  const userQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, record.updatedBy))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-      }))
-      .findOne()
+  const userQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: workspace.collections.users })
+        .where(({ users }) => eq(users.id, record.updatedBy))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+        }))
+        .findOne(),
+    [workspace.userId, record.updatedBy]
   );
 
   const user = userQuery.data;

@@ -1,7 +1,6 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { timeAgo } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
@@ -16,17 +15,20 @@ export const NodeCollaboratorAudit = ({
 }: NodeCollaboratorAuditProps) => {
   const workspace = useWorkspace();
 
-  const userQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, collaboratorId))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-      }))
-      .findOne()
+  const userQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: workspace.collections.users })
+        .where(({ users }) => eq(users.id, collaboratorId))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+        }))
+        .findOne(),
+    [collaboratorId]
   );
+
   const user = userQuery.data;
   if (!user) {
     return null;

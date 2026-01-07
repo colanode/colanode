@@ -1,13 +1,10 @@
 import isHotkey from 'is-hotkey';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import React, { Fragment } from 'react';
-import { toast } from 'sonner';
 
 import { RecordNode } from '@colanode/core';
 import { Link } from '@colanode/ui/components/ui/link';
-import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface NameEditorProps {
   initialValue: string;
@@ -61,34 +58,28 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
   const workspace = useWorkspace();
   const [isEditing, setIsEditing] = React.useState(false);
 
-  const { mutate, isPending } = useMutation();
   const canEdit = true;
-  const hasName = record.attributes.name && record.attributes.name.length > 0;
+  const hasName = record.name && record.name.length > 0;
 
   const handleSave = (newName: string) => {
-    if (newName === record.attributes.name) return;
+    if (newName === record.name) return;
 
-    mutate({
-      input: {
-        type: 'record.name.update',
-        name: newName,
-        recordId: record.id,
-        userId: workspace.userId,
-      },
-      onSuccess() {
-        setIsEditing(false);
-      },
-      onError(error) {
-        toast.error(error.message);
-      },
+    const nodes = workspace.collections.nodes;
+    nodes.update(record.id, (draft) => {
+      if (draft.type !== 'record') {
+        return;
+      }
+      draft.name = newName;
     });
+
+    setIsEditing(false);
   };
 
   return (
     <div className="group relative flex h-full w-full items-center">
       {isEditing ? (
         <NameEditor
-          initialValue={record.attributes.name ?? ''}
+          initialValue={record.name ?? ''}
           onSave={handleSave}
           onCancel={() => setIsEditing(false)}
         />
@@ -99,7 +90,7 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
             className="flex h-full w-full cursor-pointer flex-row items-center gap-1 p-1 text-sm"
           >
             {hasName ? (
-              <span className="truncate">{record.attributes.name}</span>
+              <span className="truncate">{record.name}</span>
             ) : (
               <span className="text-muted-foreground">Unnamed</span>
             )}
@@ -112,11 +103,6 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
           >
             <SquareArrowOutUpRight className="mr-1 size-4" /> <p>Open</p>
           </Link>
-          {isPending && (
-            <span className="absolute right-2 text-muted-foreground">
-              <Spinner size="small" />
-            </span>
-          )}
         </Fragment>
       )}
     </div>

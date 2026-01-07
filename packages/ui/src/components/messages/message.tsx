@@ -6,11 +6,11 @@ import { MessageActions } from '@colanode/ui/components/messages/message-actions
 import { MessageAuthorAvatar } from '@colanode/ui/components/messages/message-author-avatar';
 import { MessageAuthorName } from '@colanode/ui/components/messages/message-author-name';
 import { MessageContent } from '@colanode/ui/components/messages/message-content';
-import { MessageDeleteDialog } from '@colanode/ui/components/messages/message-delete-dialog';
 import { MessageMenuMobile } from '@colanode/ui/components/messages/message-menu-mobile';
 import { MessageReactionCounts } from '@colanode/ui/components/messages/message-reaction-counts';
 import { MessageReference } from '@colanode/ui/components/messages/message-reference';
 import { MessageTime } from '@colanode/ui/components/messages/message-time';
+import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { MessageContext } from '@colanode/ui/contexts/message';
 import { useRadar } from '@colanode/ui/contexts/radar';
@@ -117,8 +117,8 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
             }}
           >
             {!isMobile && <MessageActions />}
-            {message.attributes.referenceId && (
-              <MessageReference messageId={message.attributes.referenceId} />
+            {message.referenceId && (
+              <MessageReference messageId={message.referenceId} />
             )}
             <MessageContent message={message} />
             <MessageReactionCounts message={message} />
@@ -133,8 +133,10 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
           />
         )}
         {openDeleteDialog && (
-          <MessageDeleteDialog
+          <NodeDeleteDialog
             id={message.id}
+            title="Are you sure you want delete this message?"
+            description="This action cannot be undone. This message will no longer be accessible by you or others you've shared it with."
             open={openDeleteDialog}
             onOpenChange={setOpenDeleteDialog}
           />

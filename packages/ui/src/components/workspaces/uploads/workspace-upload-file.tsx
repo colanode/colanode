@@ -1,3 +1,4 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { BadgeAlert } from 'lucide-react';
 
 import { Upload, LocalFileNode } from '@colanode/client/types';
@@ -6,7 +7,6 @@ import { FileThumbnail } from '@colanode/ui/components/files/file-thumbnail';
 import { Link } from '@colanode/ui/components/ui/link';
 import { WorkspaceUploadStatus } from '@colanode/ui/components/workspaces/uploads/workspace-upload-status';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 interface WorkspaceUploadFileProps {
   upload: Upload;
@@ -15,13 +15,16 @@ interface WorkspaceUploadFileProps {
 export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
   const workspace = useWorkspace();
 
-  const fileQuery = useLiveQuery({
-    type: 'node.get',
-    userId: workspace.userId,
-    nodeId: upload.fileId,
-  });
+  const fileQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.id, upload.fileId))
+        .findOne(),
+    [workspace.userId, upload.fileId]
+  );
 
-  const file = fileQuery.data as LocalFileNode;
+  const file = fileQuery.data as LocalFileNode | undefined;
 
   if (!file) {
     return (
@@ -61,12 +64,10 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
         className="size-10 text-muted-foreground"
       />
       <div className="grow flex flex-col gap-2 justify-center items-start min-w-0">
-        <p className="font-medium text-sm truncate w-full">
-          {file.attributes.name}
-        </p>
+        <p className="font-medium text-sm truncate w-full">{file.name}</p>
         <p className="flex items-center gap-4 text-xs text-muted-foreground">
-          <span>{file.attributes.mimeType}</span>
-          <span>{formatBytes(file.attributes.size)}</span>
+          <span>{file.mimeType}</span>
+          <span>{formatBytes(file.size)}</span>
           {upload.completedAt && (
             <span>{timeAgo(new Date(upload.completedAt))}</span>
           )}

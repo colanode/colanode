@@ -5,7 +5,6 @@ import {
   CreatedByFieldAttributes,
   DatabaseViewFilterAttributes,
 } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
@@ -92,7 +91,7 @@ const BoardViewColumnCreatedByHeader = ({
 
   const userQuery = useLiveQueryTanstack((q) =>
     q
-      .from({ users: collections.workspace(workspace.userId).users })
+      .from({ users: workspace.collections.users })
       .where(({ users }) => eq(users.id, createdBy))
       .select(({ users }) => ({
         id: users.id,

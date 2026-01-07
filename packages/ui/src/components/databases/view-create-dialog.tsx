@@ -1,10 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useMutation } from '@tanstack/react-query';
 import { Calendar, Columns, Table } from 'lucide-react';
 import { FC } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
+import { LocalDatabaseViewNode } from '@colanode/client/types';
+import {
+  compareString,
+  generateFractionalIndex,
+  generateId,
+  IdType,
+} from '@colanode/core';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   Dialog,
@@ -26,13 +34,14 @@ import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { cn } from '@colanode/ui/lib/utils';
 
 const formSchema = z.object({
   name: z.string(),
   type: z.enum(['table', 'board', 'calendar']),
 });
+
+type ViewCreateFormValues = z.infer<typeof formSchema>;
 
 interface ViewTypeOption {
   name: string;
@@ -69,7 +78,6 @@ export const ViewCreateDialog = ({
 }: ViewCreateDialogProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
-  const { mutate, isPending } = useMutation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -79,42 +87,60 @@ export const ViewCreateDialog = ({
     },
   });
 
+  const { mutate, isPending } = useMutation({
+    mutationFn: async (values: ViewCreateFormValues) => {
+      const type = viewTypes.find((viewType) => viewType.type === values.type);
+      if (!type) {
+        return;
+      }
+
+      let name = values.name;
+      if (name === '') {
+        name = type.name;
+      }
+
+      const nodes = workspace.collections.nodes;
+      let maxIndex: string | null = null;
+      nodes.forEach((node) => {
+        if (node.type === 'database_view' && node.parentId === database.id) {
+          const index = node.index;
+          if (maxIndex === null || compareString(index, maxIndex) > 0) {
+            maxIndex = index;
+          }
+        }
+      });
+
+      const viewId = generateId(IdType.DatabaseView);
+      const view: LocalDatabaseViewNode = {
+        id: viewId,
+        type: 'database_view',
+        name: name,
+        parentId: database.id,
+        layout: type.type,
+        index: generateFractionalIndex(maxIndex, null),
+        rootId: database.id,
+        createdAt: new Date().toISOString(),
+        createdBy: workspace.userId,
+        updatedAt: null,
+        updatedBy: null,
+        localRevision: '0',
+        serverRevision: '0',
+      };
+      nodes.insert(view);
+      return viewId;
+    },
+    onSuccess: () => {
+      form.reset();
+      onOpenChange(false);
+    },
+    onError: (error) => {
+      toast.error(error.message);
+    },
+  });
+
   const handleCancel = () => {
     form.reset();
     onOpenChange(false);
-  };
-
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (isPending) {
-      return;
-    }
-
-    const type = viewTypes.find((viewType) => viewType.type === values.type);
-    if (!type) {
-      return;
-    }
-
-    let name = values.name;
-    if (name === '') {
-      name = type.name;
-    }
-
-    mutate({
-      input: {
-        type: 'view.create',
-        viewType: type.type,
-        databaseId: database.id,
-        name: name,
-        userId: workspace.userId,
-      },
-      onSuccess() {
-        form.reset();
-        onOpenChange(false);
-      },
-      onError(error) {
-        toast.error(error.message);
-      },
-    });
   };
 
   if (!database.canEdit) {
@@ -133,7 +159,7 @@ export const ViewCreateDialog = ({
         <Form {...form}>
           <form
             className="flex flex-col"
-            onSubmit={form.handleSubmit(handleSubmit)}
+            onSubmit={form.handleSubmit((values) => mutate(values))}
           >
             <div className="grow space-y-4 py-2 pb-4">
               <FormField

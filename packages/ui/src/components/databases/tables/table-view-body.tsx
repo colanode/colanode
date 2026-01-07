@@ -7,10 +7,10 @@ import { useRecordsQuery } from '@colanode/ui/hooks/use-records-query';
 
 export const TableViewBody = () => {
   const view = useDatabaseView();
-  const { records, hasMore, loadMore, isPending } = useRecordsQuery(
-    view.filters,
-    view.sorts
-  );
+  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useRecordsQuery(view.filters, view.sorts);
+
+  const records = data;
 
   return (
     <div className="border-t">
@@ -21,8 +21,8 @@ export const TableViewBody = () => {
       <InView
         rootMargin="200px"
         onChange={(inView) => {
-          if (inView && hasMore && !isPending) {
-            loadMore();
+          if (inView && hasNextPage && !isFetchingNextPage) {
+            fetchNextPage();
           }
         }}
       ></InView>

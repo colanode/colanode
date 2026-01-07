@@ -1,8 +1,9 @@
-import { toast } from 'sonner';
-
 import { LocalChannelNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
-import { ChannelForm } from '@colanode/ui/components/channels/channel-form';
+import {
+  ChannelForm,
+  ChannelFormValues,
+} from '@colanode/ui/components/channels/channel-form';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface ChannelUpdateDialogProps {
   channel: LocalChannelNode;
@@ -27,8 +27,25 @@ export const ChannelUpdateDialog = ({
   onOpenChange,
 }: ChannelUpdateDialogProps) => {
   const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
   const canEdit = hasNodeRole(role, 'editor');
+
+  const handleSubmit = (values: ChannelFormValues) => {
+    const nodes = workspace.collections.nodes;
+    if (!nodes.has(channel.id)) {
+      return;
+    }
+
+    nodes.update(channel.id, (draft) => {
+      if (draft.type !== 'channel') {
+        return;
+      }
+
+      draft.name = values.name;
+      draft.avatar = values.avatar;
+    });
+
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -42,37 +59,15 @@ export const ChannelUpdateDialog = ({
         <ChannelForm
           id={channel.id}
           values={{
-            name: channel.attributes.name,
-            avatar: channel.attributes.avatar,
+            name: channel.name,
+            avatar: channel.avatar,
           }}
-          isPending={isPending}
           submitText="Update"
           readOnly={!canEdit}
-          handleCancel={() => {
+          onCancel={() => {
             onOpenChange(false);
           }}
-          handleSubmit={(values) => {
-            if (isPending) {
-              return;
-            }
-
-            mutate({
-              input: {
-                type: 'channel.update',
-                channelId: channel.id,
-                name: values.name,
-                avatar: values.avatar,
-                userId: workspace.userId,
-              },
-              onSuccess() {
-                onOpenChange(false);
-                toast.success('Channel updated');
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
-            });
-          }}
+          onSubmit={handleSubmit}
         />
       </DialogContent>
     </Dialog>

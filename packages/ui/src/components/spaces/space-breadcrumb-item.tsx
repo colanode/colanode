@@ -7,10 +7,6 @@ interface SpaceBreadcrumbItemProps {
 
 export const SpaceBreadcrumbItem = ({ space }: SpaceBreadcrumbItemProps) => {
   return (
-    <BreadcrumbItem
-      id={space.id}
-      avatar={space.attributes.avatar}
-      name={space.attributes.name}
-    />
+    <BreadcrumbItem id={space.id} avatar={space.avatar} name={space.name} />
   );
 };

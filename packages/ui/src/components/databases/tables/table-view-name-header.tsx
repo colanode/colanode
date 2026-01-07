@@ -1,25 +1,50 @@
+import { debounceStrategy, usePacedMutations } from '@tanstack/react-db';
 import { ArrowDownAz, ArrowDownZa, Filter, Type } from 'lucide-react';
 import { Resizable } from 're-resizable';
 import { Fragment, useRef, useState } from 'react';
 import { useDrop } from 'react-dnd';
 
+import { LocalNode } from '@colanode/client/types';
 import { SpecialId } from '@colanode/core';
+import { Input } from '@colanode/ui/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { applyNodeTransaction } from '@colanode/ui/lib/nodes';
 import { cn } from '@colanode/ui/lib/utils';
 
 export const TableViewNameHeader = () => {
+  const workspace = useWorkspace();
   const database = useDatabase();
   const view = useDatabaseView();
 
   const [openPopover, setOpenPopover] = useState(false);
+
+  const resize = usePacedMutations<number, LocalNode>({
+    onMutate: (value) => {
+      workspace.collections.nodes.update(view.id, (draft) => {
+        if (draft.type !== 'database_view') {
+          return;
+        }
+
+        if (draft.nameWidth === value) {
+          return;
+        }
+
+        draft.nameWidth = value;
+      });
+    },
+    mutationFn: async ({ transaction }) => {
+      await applyNodeTransaction(workspace.userId, transaction);
+    },
+    strategy: debounceStrategy({ wait: 500 }),
+  });
 
   const [dropMonitor, dropRef] = useDrop({
     accept: 'table-field-header',
@@ -63,9 +88,9 @@ export const TableViewNameHeader = () => {
           right: '-3px',
         },
       }}
-      onResizeStop={(_, __, ref) => {
+      onResize={(_, __, ref) => {
         const newWidth = ref.offsetWidth;
-        view.resizeName(newWidth);
+        resize(newWidth);
       }}
     >
       <Popover modal={true} open={openPopover} onOpenChange={setOpenPopover}>
@@ -85,12 +110,20 @@ export const TableViewNameHeader = () => {
         </PopoverTrigger>
         <PopoverContent className="ml-1 flex w-72 flex-col gap-1 p-2 text-sm">
           <div className="p-1">
-            <SmartTextInput
+            <Input
               value={database.nameField?.name ?? 'Name'}
               readOnly={!database.canEdit}
-              onChange={(newName) => {
+              onChange={(e) => {
+                const newName = e.target.value;
                 if (newName === database.nameField?.name) return;
-                database.updateNameField(newName);
+                const nodes = workspace.collections.nodes;
+                nodes.update(database.id, (draft) => {
+                  if (draft.type !== 'database') {
+                    return;
+                  }
+
+                  draft.nameField = { name: newName };
+                });
               }}
             />
           </div>

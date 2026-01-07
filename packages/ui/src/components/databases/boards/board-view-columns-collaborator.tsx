@@ -1,13 +1,11 @@
 import { eq, useLiveQuery as useLiveQueryTanstack } from '@tanstack/react-db';
 import { CircleAlert, CircleDashed } from 'lucide-react';
-import { toast } from 'sonner';
 
 import {
   CollaboratorFieldAttributes,
   DatabaseViewFilterAttributes,
   FieldValue,
 } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
 import { BoardViewContext } from '@colanode/ui/contexts/board-view';
@@ -81,17 +79,16 @@ export const BoardViewColumnsCollaborator = ({
               ),
               canDrag: (record) => record.canEdit,
               onDragEnd: async (record, value) => {
+                const nodes = workspace.collections.nodes;
                 if (!value) {
-                  const result = await window.colanode.executeMutation({
-                    type: 'record.field.value.delete',
-                    recordId: record.id,
-                    fieldId: field.id,
-                    userId: workspace.userId,
-                  });
+                  nodes.update(record.id, (draft) => {
+                    if (draft.type !== 'record') {
+                      return;
+                    }
 
-                  if (!result.success) {
-                    toast.error(result.error.message);
-                  }
+                    const { [field.id]: _removed, ...rest } = draft.fields;
+                    draft.fields = rest;
+                  });
                 } else {
                   if (value.type !== 'string_array') {
                     return;
@@ -114,17 +111,13 @@ export const BoardViewColumnsCollaborator = ({
                     };
                   }
 
-                  const result = await window.colanode.executeMutation({
-                    type: 'record.field.value.set',
-                    recordId: record.id,
-                    fieldId: field.id,
-                    value: newValue,
-                    userId: workspace.userId,
-                  });
+                  nodes.update(record.id, (draft) => {
+                    if (draft.type !== 'record') {
+                      return;
+                    }
 
-                  if (!result.success) {
-                    toast.error(result.error.message);
-                  }
+                    draft.fields[field.id] = newValue;
+                  });
                 }
               },
             }}
@@ -150,29 +143,24 @@ export const BoardViewColumnsCollaborator = ({
           ),
           canDrag: () => true,
           onDragEnd: async (record, value) => {
+            const nodes = workspace.collections.nodes;
             if (!value) {
-              const result = await window.colanode.executeMutation({
-                type: 'record.field.value.delete',
-                recordId: record.id,
-                fieldId: field.id,
-                userId: workspace.userId,
-              });
+              nodes.update(record.id, (draft) => {
+                if (draft.type !== 'record') {
+                  return;
+                }
 
-              if (!result.success) {
-                toast.error(result.error.message);
-              }
+                const { [field.id]: _removed, ...rest } = draft.fields;
+                draft.fields = rest;
+              });
             } else {
-              const result = await window.colanode.executeMutation({
-                type: 'record.field.value.set',
-                recordId: record.id,
-                fieldId: field.id,
-                value,
-                userId: workspace.userId,
-              });
+              nodes.update(record.id, (draft) => {
+                if (draft.type !== 'record') {
+                  return;
+                }
 
-              if (!result.success) {
-                toast.error(result.error.message);
-              }
+                draft.fields[field.id] = value;
+              });
             }
           },
         }}
@@ -198,7 +186,7 @@ const BoardViewColumnCollaboratorHeader = ({
 
   const userQuery = useLiveQueryTanstack((q) =>
     q
-      .from({ users: collections.workspace(workspace.userId).users })
+      .from({ users: workspace.collections.users })
       .where(({ users }) => eq(users.id, collaborator))
       .select(({ users }) => ({
         id: users.id,

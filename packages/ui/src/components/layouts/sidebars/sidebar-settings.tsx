@@ -10,7 +10,6 @@ import {
 } from 'lucide-react';
 
 import { UploadStatus } from '@colanode/client/types';
-import { collections } from '@colanode/ui/collections';
 import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
 import { SidebarSettingsItem } from '@colanode/ui/components/layouts/sidebars/sidebar-settings-item';
 import { Link } from '@colanode/ui/components/ui/link';
@@ -22,16 +21,21 @@ export const SidebarSettings = () => {
   const app = useApp();
   const workspace = useWorkspace();
 
-  const pendingUploadsQuery = useLiveQuery((q) =>
-    q
-      .from({ uploads: collections.workspace(workspace.userId).uploads })
-      .where(({ uploads }) =>
-        inArray(uploads.status, [UploadStatus.Pending, UploadStatus.Uploading])
-      )
-      .select(({ uploads }) => ({
-        count: count(uploads.fileId),
-      }))
-      .findOne()
+  const pendingUploadsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ uploads: workspace.collections.uploads })
+        .where(({ uploads }) =>
+          inArray(uploads.status, [
+            UploadStatus.Pending,
+            UploadStatus.Uploading,
+          ])
+        )
+        .select(({ uploads }) => ({
+          count: count(uploads.fileId),
+        }))
+        .findOne(),
+    [workspace.userId]
   );
 
   const pendingUploads = pendingUploadsQuery.data?.count ?? 0;

@@ -6,11 +6,5 @@ interface PageBreadcrumbItemProps {
 }
 
 export const PageBreadcrumbItem = ({ page }: PageBreadcrumbItemProps) => {
-  return (
-    <BreadcrumbItem
-      id={page.id}
-      avatar={page.attributes.avatar}
-      name={page.attributes.name}
-    />
-  );
+  return <BreadcrumbItem id={page.id} avatar={page.avatar} name={page.name} />;
 };

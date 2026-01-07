@@ -4,8 +4,8 @@ import { Fragment, useState } from 'react';
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
 import { NodeCollaboratorAudit } from '@colanode/ui/components/collaborators/node-collaborator-audit';
-import { DatabaseDeleteDialog } from '@colanode/ui/components/databases/database-delete-dialog';
 import { DatabaseUpdateDialog } from '@colanode/ui/components/databases/database-update-dialog';
+import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -34,7 +34,7 @@ export const DatabaseSettings = ({ database, role }: DatabaseSettingsProps) => {
           <Settings className="size-4 cursor-pointer text-muted-foreground hover:text-foreground" />
         </DropdownMenuTrigger>
         <DropdownMenuContent side="bottom" className="mr-2 w-80">
-          <DropdownMenuLabel>{database.attributes.name}</DropdownMenuLabel>
+          <DropdownMenuLabel>{database.name}</DropdownMenuLabel>
           <DropdownMenuSeparator />
           <DropdownMenuItem
             className="flex items-center gap-2 cursor-pointer"
@@ -107,8 +107,10 @@ export const DatabaseSettings = ({ database, role }: DatabaseSettingsProps) => {
           )}
         </DropdownMenuContent>
       </DropdownMenu>
-      <DatabaseDeleteDialog
-        databaseId={database.id}
+      <NodeDeleteDialog
+        id={database.id}
+        title="Are you sure you want delete this database?"
+        description="This action cannot be undone. This database will no longer be accessible by you or others you've shared it with."
         open={showDeleteDialog}
         onOpenChange={setShowDeleteModal}
       />

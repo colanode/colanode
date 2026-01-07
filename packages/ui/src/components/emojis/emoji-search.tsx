@@ -4,14 +4,14 @@ import {
   ScrollViewport,
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface EmojiSearchProps {
   query: string;
 }
 
 export const EmojiSearch = ({ query }: EmojiSearchProps) => {
-  const emojiSearchQuery = useLiveQuery({
+  const emojiSearchQuery = useQuery({
     type: 'emoji.search',
     query,
     count: 100,

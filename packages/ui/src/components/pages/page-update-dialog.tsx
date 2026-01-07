@@ -1,8 +1,9 @@
-import { toast } from 'sonner';
-
 import { LocalPageNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
-import { PageForm } from '@colanode/ui/components/pages/page-form';
+import {
+  PageForm,
+  PageFormValues,
+} from '@colanode/ui/components/pages/page-form';
 import {
   Dialog,
   DialogContent,
@@ -11,7 +12,6 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface PageUpdateDialogProps {
   page: LocalPageNode;
@@ -27,8 +27,25 @@ export const PageUpdateDialog = ({
   onOpenChange,
 }: PageUpdateDialogProps) => {
   const workspace = useWorkspace();
-  const { mutate, isPending } = useMutation();
   const canEdit = hasNodeRole(role, 'editor');
+
+  const handleSubmit = (values: PageFormValues) => {
+    const nodes = workspace.collections.nodes;
+    if (!nodes.has(page.id)) {
+      return;
+    }
+
+    nodes.update(page.id, (draft) => {
+      if (draft.type !== 'page') {
+        return;
+      }
+
+      draft.name = values.name;
+      draft.avatar = values.avatar;
+    });
+
+    onOpenChange(false);
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -40,37 +57,15 @@ export const PageUpdateDialog = ({
         <PageForm
           id={page.id}
           values={{
-            name: page.attributes.name,
-            avatar: page.attributes.avatar,
+            name: page.name,
+            avatar: page.avatar,
           }}
-          isPending={isPending}
           submitText="Update"
           readOnly={!canEdit}
-          handleCancel={() => {
+          onCancel={() => {
             onOpenChange(false);
           }}
-          handleSubmit={(values) => {
-            if (isPending) {
-              return;
-            }
-
-            mutate({
-              input: {
-                type: 'page.update',
-                pageId: page.id,
-                name: values.name,
-                avatar: values.avatar,
-                userId: workspace.userId,
-              },
-              onSuccess() {
-                onOpenChange(false);
-                toast.success('Page was updated successfully');
-              },
-              onError(error) {
-                toast.error(error.message);
-              },
-            });
-          }}
+          onSubmit={handleSubmit}
         />
       </DialogContent>
     </Dialog>

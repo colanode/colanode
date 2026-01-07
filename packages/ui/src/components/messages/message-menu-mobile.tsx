@@ -1,7 +1,6 @@
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
 import { MessagesSquare, Reply, Trash2 } from 'lucide-react';
 import { useCallback } from 'react';
-import { toast } from 'sonner';
 
 import { LocalMessageNode } from '@colanode/client/types';
 import { MessageQuickReaction } from '@colanode/ui/components/messages/message-quick-reaction';
@@ -15,8 +14,8 @@ import {
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useMessage } from '@colanode/ui/contexts/message';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { defaultEmojis } from '@colanode/ui/lib/assets';
+import { buildNodeReactionKey } from '@colanode/ui/lib/nodes';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface MessageMenuMobileProps {
@@ -55,39 +54,30 @@ export const MessageMenuMobile = ({
   const conversation = useConversation();
   const message = useMessage();
 
-  const { mutate, isPending } = useMutation();
-
   const canReplyInThread = false;
 
   const handleReactionClick = useCallback(
     (reaction: string) => {
-      if (isPending) {
-        return;
-      }
-
-      mutate({
-        input: {
-          type: 'node.reaction.create',
+      const reactionKey = buildNodeReactionKey(
+        message.id,
+        workspace.userId,
+        reaction
+      );
+      if (workspace.collections.nodeReactions.has(reactionKey)) {
+        workspace.collections.nodeReactions.delete(reactionKey);
+      } else {
+        workspace.collections.nodeReactions.insert({
           nodeId: message.id,
-          userId: workspace.userId,
+          collaboratorId: workspace.userId,
           reaction,
           rootId: conversation.rootId,
-        },
-        onError(error) {
-          toast.error(error.message);
-        },
-      });
+          createdAt: new Date().toISOString(),
+        });
+      }
 
       onOpenChange(false);
     },
-    [
-      isPending,
-      mutate,
-      workspace.accountId,
-      message.id,
-      conversation.rootId,
-      onOpenChange,
-    ]
+    [workspace.userId, message.id, conversation.rootId]
   );
 
   const handleReply = () => {
@@ -132,11 +122,7 @@ export const MessageMenuMobile = ({
               </div>
               <div className="flex items-center justify-center w-12 h-12 rounded-xl border hover:bg-accent transition-colors">
                 <MessageReactionCreatePopover
-                  onReactionClick={(reaction) => {
-                    if (!isPending) {
-                      handleReactionClick(reaction);
-                    }
-                  }}
+                  onReactionClick={handleReactionClick}
                 />
               </div>
             </div>

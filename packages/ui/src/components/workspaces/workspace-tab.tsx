@@ -8,16 +8,18 @@ interface WorkspaceTabProps {
 }
 
 export const WorkspaceTab = ({ userId }: WorkspaceTabProps) => {
-  const workspaceQuery = useLiveQuery((q) =>
-    q
-      .from({ workspaces: collections.workspaces })
-      .where(({ workspaces }) => eq(workspaces.userId, userId))
-      .select(({ workspaces }) => ({
-        workspaceId: workspaces.workspaceId,
-        name: workspaces.name,
-        avatar: workspaces.avatar,
-      }))
-      .findOne()
+  const workspaceQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ workspaces: collections.workspaces })
+        .where(({ workspaces }) => eq(workspaces.userId, userId))
+        .select(({ workspaces }) => ({
+          workspaceId: workspaces.workspaceId,
+          name: workspaces.name,
+          avatar: workspaces.avatar,
+        }))
+        .findOne(),
+    [userId]
   );
 
   const workspace = workspaceQuery.data;

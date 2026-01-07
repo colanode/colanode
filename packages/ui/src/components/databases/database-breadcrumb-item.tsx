@@ -11,8 +11,8 @@ export const DatabaseBreadcrumbItem = ({
   return (
     <BreadcrumbItem
       id={database.id}
-      avatar={database.attributes.avatar}
-      name={database.attributes.name}
+      avatar={database.avatar}
+      name={database.name}
     />
   );
 };

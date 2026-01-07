@@ -1,6 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
-import { MultiSelectFieldAttributes } from '@colanode/core';
+import {
+  MultiSelectFieldAttributes,
+  StringArrayFieldValue,
+} from '@colanode/core';
 import { SelectFieldOptions } from '@colanode/ui/components/databases/fields/select-field-options';
 import { SelectOptionBadge } from '@colanode/ui/components/databases/fields/select-option-badge';
 import {
@@ -9,6 +12,7 @@ import {
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { useRecord } from '@colanode/ui/contexts/record';
+import { useRecordField } from '@colanode/ui/hooks/use-record-field';
 
 interface RecordMultiSelectValueProps {
   field: MultiSelectFieldAttributes;
@@ -22,17 +26,16 @@ export const RecordMultiSelectValue = ({
   const record = useRecord();
 
   const [open, setOpen] = useState(false);
-  const [selectedValues, setSelectedValues] = useState(
-    record.getMultiSelectValue(field)
+  const { value, setValue, clearValue } = useRecordField<StringArrayFieldValue>(
+    {
+      field,
+    }
   );
 
-  useEffect(() => {
-    setSelectedValues(record.getMultiSelectValue(field));
-  }, [record.localRevision]);
-
   const selectOptions = Object.values(field.options ?? {});
+  const selectedOptionIds = value?.value ?? [];
   const selectedOptions = selectOptions.filter((option) =>
-    selectedValues.includes(option.id)
+    selectedOptionIds.includes(option.id)
   );
 
   if (!record.canEdit || readOnly) {
@@ -67,20 +70,18 @@ export const RecordMultiSelectValue = ({
       <PopoverContent className="w-80 p-1">
         <SelectFieldOptions
           field={field}
-          values={selectedValues}
+          values={selectedOptionIds}
           onSelect={(id) => {
             if (!record.canEdit || readOnly) return;
 
-            const newValues = selectedValues.includes(id)
-              ? selectedValues.filter((v) => v !== id)
-              : [...selectedValues, id];
-
-            setSelectedValues(newValues);
+            const newValues = selectedOptionIds.includes(id)
+              ? selectedOptionIds.filter((v) => v !== id)
+              : [...selectedOptionIds, id];
 
             if (newValues.length === 0) {
-              record.removeFieldValue(field);
+              clearValue();
             } else {
-              record.updateFieldValue(field, {
+              setValue({
                 type: 'string_array',
                 value: newValues,
               });

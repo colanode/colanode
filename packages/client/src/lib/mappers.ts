@@ -46,7 +46,7 @@ import {
 } from '@colanode/client/types/nodes';
 import { User } from '@colanode/client/types/users';
 import { Workspace } from '@colanode/client/types/workspaces';
-import { Mutation } from '@colanode/core';
+import { Mutation, NodeAttributes } from '@colanode/core';
 import { encodeState } from '@colanode/crdt';
 
 export const mapUser = (row: SelectUser): User => {
@@ -64,19 +64,35 @@ export const mapUser = (row: SelectUser): User => {
 };
 
 export const mapNode = (row: SelectNode): LocalNode => {
+  const attributes = JSON.parse(row.attributes) as NodeAttributes;
   return {
     id: row.id,
-    type: row.type,
-    parentId: row.parent_id,
     rootId: row.root_id,
-    attributes: JSON.parse(row.attributes),
+    parentId: row.parent_id,
     createdAt: row.created_at,
     createdBy: row.created_by,
     updatedAt: row.updated_at,
     updatedBy: row.updated_by,
     localRevision: row.local_revision,
     serverRevision: row.server_revision,
-  } as LocalNode;
+    ...attributes,
+  };
+};
+
+export const mapNodeAttributes = (node: LocalNode): NodeAttributes => {
+  const {
+    id: _id,
+    rootId: _rootId,
+    createdAt: _createdAt,
+    createdBy: _createdBy,
+    updatedAt: _updatedAt,
+    updatedBy: _updatedBy,
+    localRevision: _localRevision,
+    serverRevision: _serverRevision,
+    ...attributes
+  } = node;
+
+  return attributes as NodeAttributes;
 };
 
 export const mapDocument = (row: SelectDocument): Document => {

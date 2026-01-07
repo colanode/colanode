@@ -1,7 +1,6 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { LocalChatNode } from '@colanode/client/types';
-import { collections } from '@colanode/ui/collections';
 import { BreadcrumbItem } from '@colanode/ui/components/layouts/containers/breadcrumb-item';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
@@ -14,21 +13,23 @@ export const ChatBreadcrumbItem = ({ chat }: ChatBreadcrumbItemProps) => {
 
   const collaboratorId =
     chat && chat.type === 'chat'
-      ? (Object.keys(chat.attributes.collaborators).find(
+      ? (Object.keys(chat.collaborators).find(
           (id) => id !== workspace.userId
         ) ?? '')
       : '';
 
-  const collaboratorQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, collaboratorId))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-      }))
-      .findOne()
+  const collaboratorQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: workspace.collections.users })
+        .where(({ users }) => eq(users.id, collaboratorId))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+        }))
+        .findOne(),
+    [collaboratorId]
   );
 
   const collaborator = collaboratorQuery.data;

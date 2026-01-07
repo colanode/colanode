@@ -1,6 +1,7 @@
-import { DateFieldAttributes } from '@colanode/core';
+import { DateFieldAttributes, StringFieldValue } from '@colanode/core';
 import { DatePicker } from '@colanode/ui/components/ui/date-picker';
 import { useRecord } from '@colanode/ui/contexts/record';
+import { useRecordField } from '@colanode/ui/hooks/use-record-field';
 
 interface RecordDateValueProps {
   field: DateFieldAttributes;
@@ -9,18 +10,21 @@ interface RecordDateValueProps {
 
 export const RecordDateValue = ({ field, readOnly }: RecordDateValueProps) => {
   const record = useRecord();
+  const { value, setValue, clearValue } = useRecordField<StringFieldValue>({
+    field,
+  });
 
   return (
     <DatePicker
-      value={record.getDateValue(field)}
+      value={value ? new Date(value.value) : null}
       readonly={!record.canEdit || readOnly}
       onChange={(newValue) => {
         if (!record.canEdit || readOnly) return;
 
         if (newValue === null || newValue === undefined) {
-          record.removeFieldValue(field);
+          clearValue();
         } else {
-          record.updateFieldValue(field, {
+          setValue({
             type: 'string',
             value: newValue.toISOString(),
           });

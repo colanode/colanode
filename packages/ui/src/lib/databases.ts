@@ -678,7 +678,7 @@ const recordMatchesBooleanFilter = (
   filter: DatabaseViewFieldFilterAttributes,
   field: FieldAttributes
 ) => {
-  const fieldValue = record.attributes.fields[field.id];
+  const fieldValue = record.fields[field.id];
   if (filter.operator === 'is_true') {
     return (
       fieldValue && fieldValue.type === 'boolean' && fieldValue.value === true
@@ -777,7 +777,7 @@ const recordMatchesDateFilter = (
   filter: DatabaseViewFieldFilterAttributes,
   field: FieldAttributes
 ) => {
-  const fieldValue = record.attributes.fields[field.id];
+  const fieldValue = record.fields[field.id];
   if (filter.operator === 'is_empty') {
     return !fieldValue;
   }
@@ -823,7 +823,7 @@ const recordMatchesEmailFilter = (
   filter: DatabaseViewFieldFilterAttributes,
   field: FieldAttributes
 ) => {
-  const fieldValue = record.attributes.fields[field.id];
+  const fieldValue = record.fields[field.id];
 
   if (filter.operator === 'is_empty') {
     return !fieldValue;
@@ -873,7 +873,7 @@ const recordMatchesMultiSelectFilter = (
   filter: DatabaseViewFieldFilterAttributes,
   field: FieldAttributes
 ) => {
-  const fieldValue = record.attributes.fields[field.id];
+  const fieldValue = record.fields[field.id];
   const selectValues =
     fieldValue?.type === 'string_array' ? fieldValue.value : [];
 
@@ -904,7 +904,7 @@ const recordMatchesNumberFilter = (
   filter: DatabaseViewFieldFilterAttributes,
   field: FieldAttributes
 ) => {
-  const fieldValue = record.attributes.fields[field.id];
+  const fieldValue = record.fields[field.id];
 
   if (filter.operator === 'is_empty') {
     return !fieldValue;
@@ -950,7 +950,7 @@ const recordMatchesPhoneFilter = (
   filter: DatabaseViewFieldFilterAttributes,
   field: FieldAttributes
 ) => {
-  const fieldValue = record.attributes.fields[field.id];
+  const fieldValue = record.fields[field.id];
 
   if (filter.operator === 'is_empty') {
     return !fieldValue;
@@ -992,7 +992,7 @@ const recordMatchesSelectFilter = (
   filter: DatabaseViewFieldFilterAttributes,
   field: FieldAttributes
 ) => {
-  const fieldValue = record.attributes.fields[field.id];
+  const fieldValue = record.fields[field.id];
 
   if (filter.operator === 'is_empty') {
     return !fieldValue;
@@ -1027,7 +1027,7 @@ const recordMatchesTextFilter = (
   filter: DatabaseViewFieldFilterAttributes,
   field: FieldAttributes
 ) => {
-  const fieldValue = record.attributes.fields[field.id];
+  const fieldValue = record.fields[field.id];
 
   if (filter.operator === 'is_empty') {
     return !fieldValue;
@@ -1069,7 +1069,7 @@ const recordMatchesUrlFilter = (
   filter: DatabaseViewFieldFilterAttributes,
   field: FieldAttributes
 ) => {
-  const fieldValue = record.attributes.fields[field.id];
+  const fieldValue = record.fields[field.id];
 
   if (filter.operator === 'is_empty') {
     return !fieldValue;

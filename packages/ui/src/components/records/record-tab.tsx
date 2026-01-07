@@ -6,12 +6,6 @@ interface RecordTabProps {
 }
 
 export const RecordTab = ({ record }: RecordTabProps) => {
-  const name =
-    record.attributes.name && record.attributes.name.length > 0
-      ? record.attributes.name
-      : 'Untitled';
-
-  return (
-    <Tab id={record.id} avatar={record.attributes.avatar} name={name} />
-  );
+  const name = record.name && record.name.length > 0 ? record.name : 'Untitled';
+  return <Tab id={record.id} avatar={record.avatar} name={name} />;
 };

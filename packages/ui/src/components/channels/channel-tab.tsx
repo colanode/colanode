@@ -7,15 +7,7 @@ interface ChannelTabProps {
 
 export const ChannelTab = ({ channel }: ChannelTabProps) => {
   const name =
-    channel.attributes.name && channel.attributes.name.length > 0
-      ? channel.attributes.name
-      : 'Unnamed';
+    channel.name && channel.name.length > 0 ? channel.name : 'Unnamed';
 
-  return (
-    <Tab
-      id={channel.id}
-      avatar={channel.attributes.avatar}
-      name={name}
-    />
-  );
+  return <Tab id={channel.id} avatar={channel.avatar} name={name} />;
 };

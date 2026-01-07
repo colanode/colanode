@@ -1,9 +1,10 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
+
 import { LocalFileNode } from '@colanode/client/types';
 import { FileIcon } from '@colanode/ui/components/files/file-icon';
 import { FilePreview } from '@colanode/ui/components/files/file-preview';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { canPreviewFile } from '@colanode/ui/lib/files';
 
 interface FileBlockProps {
@@ -13,18 +14,25 @@ interface FileBlockProps {
 export const FileBlock = ({ id }: FileBlockProps) => {
   const workspace = useWorkspace();
 
-  const nodeGetQuery = useLiveQuery({
-    type: 'node.get',
-    nodeId: id,
-    userId: workspace.userId,
-  });
+  const fileGetQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.id, id))
+        .findOne(),
+    [workspace.userId, id]
+  );
 
-  if (nodeGetQuery.isPending || !nodeGetQuery.data) {
+  if (
+    fileGetQuery.isLoading ||
+    !fileGetQuery.data ||
+    fileGetQuery.data.type !== 'file'
+  ) {
     return null;
   }
 
-  const file = nodeGetQuery.data as LocalFileNode;
-  const canPreview = canPreviewFile(file.attributes.subtype);
+  const file = fileGetQuery.data as LocalFileNode;
+  const canPreview = canPreviewFile(file.subtype);
 
   return (
     <Link
@@ -38,12 +46,10 @@ export const FileBlock = ({ id }: FileBlockProps) => {
         </div>
       ) : (
         <div className="flex flex-row gap-4 items-center w-full cursor-pointer overflow-hidden rounded-md p-2 pl-0 hover:bg-accent">
-          <FileIcon mimeType={file.attributes.mimeType} className="size-10" />
+          <FileIcon mimeType={file.mimeType} className="size-10" />
           <div className="flex flex-col gap-1">
-            <div className="text-sm font-medium">{file.attributes.name}</div>
-            <div className="text-xs text-muted-foreground">
-              {file.attributes.mimeType}
-            </div>
+            <div className="text-sm font-medium">{file.name}</div>
+            <div className="text-xs text-muted-foreground">{file.mimeType}</div>
           </div>
         </div>
       )}

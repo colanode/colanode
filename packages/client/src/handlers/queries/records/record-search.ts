@@ -42,7 +42,7 @@ export class RecordSearchQueryHandler
       event.type === 'node.created' &&
       event.workspace.userId === input.userId &&
       event.node.type === 'record' &&
-      event.node.attributes.databaseId === input.databaseId
+      event.node.databaseId === input.databaseId
     ) {
       const newResult = await this.handleQuery(input);
       return {
@@ -55,7 +55,7 @@ export class RecordSearchQueryHandler
       event.type === 'node.updated' &&
       event.workspace.userId === input.userId &&
       event.node.type === 'record' &&
-      event.node.attributes.databaseId === input.databaseId
+      event.node.databaseId === input.databaseId
     ) {
       const newResult = await this.handleQuery(input);
       return {
@@ -68,7 +68,7 @@ export class RecordSearchQueryHandler
       event.type === 'node.deleted' &&
       event.workspace.userId === input.userId &&
       event.node.type === 'record' &&
-      event.node.attributes.databaseId === input.databaseId
+      event.node.databaseId === input.databaseId
     ) {
       const newResult = await this.handleQuery(input);
       return {

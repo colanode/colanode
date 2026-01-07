@@ -12,27 +12,33 @@ interface WorkspaceProps {
 }
 
 export const Workspace = ({ userId }: WorkspaceProps) => {
-  const workspaceQuery = useLiveQuery((q) =>
-    q
-      .from({ workspaces: collections.workspaces })
-      .where(({ workspaces }) => eq(workspaces.userId, userId))
-      .select(({ workspaces }) => ({
-        userId: workspaces.userId,
-        workspaceId: workspaces.workspaceId,
-        role: workspaces.role,
-        accountId: workspaces.accountId,
-      }))
-      .findOne()
+  const workspaceQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ workspaces: collections.workspaces })
+        .where(({ workspaces }) => eq(workspaces.userId, userId))
+        .select(({ workspaces }) => ({
+          userId: workspaces.userId,
+          workspaceId: workspaces.workspaceId,
+          role: workspaces.role,
+          accountId: workspaces.accountId,
+        }))
+        .findOne(),
+    [userId]
   );
 
-  const accountQuery = useLiveQuery((q) =>
-    q
-      .from({ accounts: collections.accounts })
-      .where(({ accounts }) => eq(accounts.id, workspaceQuery.data?.accountId))
-      .select(({ accounts }) => ({
-        server: accounts.server,
-      }))
-      .findOne()
+  const accountQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ accounts: collections.accounts })
+        .where(({ accounts }) =>
+          eq(accounts.id, workspaceQuery.data?.accountId)
+        )
+        .select(({ accounts }) => ({
+          server: accounts.server,
+        }))
+        .findOne(),
+    [workspaceQuery.data?.accountId]
   );
 
   const role = workspaceQuery.data?.role;
@@ -53,7 +59,13 @@ export const Workspace = ({ userId }: WorkspaceProps) => {
   return (
     <ServerProvider domain={server}>
       <WorkspaceContext.Provider
-        value={{ accountId: accountId, workspaceId: workspaceId, userId, role }}
+        value={{
+          accountId: accountId,
+          workspaceId: workspaceId,
+          userId,
+          role,
+          collections: collections.workspace(userId),
+        }}
       >
         <WorkspaceLayout />
       </WorkspaceContext.Provider>

@@ -8,7 +8,6 @@ import { redis } from '@colanode/server/data/redis';
 import { config } from '@colanode/server/lib/config';
 import { fetchCounter } from '@colanode/server/lib/counters';
 import { generateUrl } from '@colanode/server/lib/fastify';
-import { buildFilePath } from '@colanode/server/lib/files';
 import { mapNode, updateNode } from '@colanode/server/lib/nodes';
 import { storage } from '@colanode/server/lib/storage';
 import { RedisLocker } from '@colanode/server/lib/storage/tus/redis-locker';
@@ -79,7 +78,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const path = buildFilePath(workspaceId, fileId, file.attributes);
+      const path = `files/${workspaceId}/${fileId}_${file.version}${file.extension}`;
       const url = generateUrl(
         request,
         `/client/v1/workspaces/${workspaceId}/files/${fileId}/tus`
@@ -106,7 +105,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
             };
           }
 
-          if (file.attributes.size > BigInt(user.max_file_size)) {
+          if (file.size > BigInt(user.max_file_size)) {
             throw {
               status_code: 400,
               body: JSON.stringify({
@@ -118,7 +117,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
           }
 
           if (workspace.max_file_size) {
-            if (file.attributes.size > BigInt(workspace.max_file_size)) {
+            if (file.size > BigInt(workspace.max_file_size)) {
               throw {
                 status_code: 400,
                 body: JSON.stringify({
@@ -172,19 +171,19 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
               upload_id: generateId(IdType.Upload),
               workspace_id: workspaceId,
               root_id: file.rootId,
-              mime_type: file.attributes.mimeType,
-              size: file.attributes.size,
+              mime_type: file.mimeType,
+              size: file.size,
               path: path,
-              version_id: file.attributes.version,
+              version_id: file.version,
               created_at: new Date(),
               created_by: request.user.id,
             })
             .onConflict((oc) =>
               oc.columns(['file_id']).doUpdateSet({
-                mime_type: file.attributes.mimeType,
-                size: file.attributes.size,
+                mime_type: file.mimeType,
+                size: file.size,
                 path: path,
-                version_id: file.attributes.version,
+                version_id: file.version,
               })
             )
             .executeTakeFirst();
@@ -202,7 +201,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
           return {
             metadata: {
               uploadId: createdUpload.upload_id,
-              contentType: file.attributes.mimeType,
+              contentType: file.mimeType,
             },
           };
         },

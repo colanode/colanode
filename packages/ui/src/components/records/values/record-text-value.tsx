@@ -1,6 +1,7 @@
-import { TextFieldAttributes } from '@colanode/core';
-import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
+import { TextFieldAttributes, TextFieldValue } from '@colanode/core';
+import { Input } from '@colanode/ui/components/ui/input';
 import { useRecord } from '@colanode/ui/contexts/record';
+import { useRecordField } from '@colanode/ui/hooks/use-record-field';
 
 interface RecordTextValueProps {
   field: TextFieldAttributes;
@@ -9,22 +10,26 @@ interface RecordTextValueProps {
 
 export const RecordTextValue = ({ field, readOnly }: RecordTextValueProps) => {
   const record = useRecord();
+  const { value, setValue, clearValue } = useRecordField<TextFieldValue>({
+    field,
+  });
 
   return (
-    <SmartTextInput
-      value={record.getTextValue(field)}
+    <Input
+      value={value?.value ?? ''}
       readOnly={!record.canEdit || readOnly}
-      onChange={(newValue) => {
+      onChange={(e) => {
+        const newValue = e.target.value;
         if (!record.canEdit || readOnly) return;
 
-        if (newValue === record.getTextValue(field)) {
+        if (newValue === value?.value) {
           return;
         }
 
         if (newValue === null || newValue === '') {
-          record.removeFieldValue(field);
+          clearValue();
         } else {
-          record.updateFieldValue(field, {
+          setValue({
             type: 'text',
             value: newValue,
           });

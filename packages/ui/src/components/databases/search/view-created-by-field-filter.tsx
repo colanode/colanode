@@ -5,7 +5,6 @@ import {
   DatabaseViewFieldFilterAttributes,
   CreatedByFieldAttributes,
 } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { Badge } from '@colanode/ui/components/ui/badge';
@@ -25,6 +24,7 @@ import { Separator } from '@colanode/ui/components/ui/separator';
 import { UserSearch } from '@colanode/ui/components/users/user-search';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
 import { createdByFieldFilterOperators } from '@colanode/ui/lib/databases';
 
 interface CollaboratorBadgeProps {
@@ -57,6 +57,10 @@ export const ViewCreatedByFieldFilter = ({
 }: ViewCreatedByFieldFilterProps) => {
   const workspace = useWorkspace();
   const view = useDatabaseView();
+  const { updateFilter, removeFilter } = useViewFilter({
+    viewId: view.id,
+    filterId: filter.id,
+  });
 
   const operator =
     createdByFieldFilterOperators.find(
@@ -64,16 +68,18 @@ export const ViewCreatedByFieldFilter = ({
     ) ?? createdByFieldFilterOperators[0]!;
 
   const collaboratorIds = (filter.value as string[]) ?? [];
-  const collaboratorsQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => inArray(users.id, collaboratorIds))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-        email: users.email,
-      }))
+  const collaboratorsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: workspace.collections.users })
+        .where(({ users }) => inArray(users.id, collaboratorIds))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+          email: users.email,
+        })),
+    [workspace.userId, collaboratorIds]
   );
 
   const collaborators = collaboratorsQuery.data;
@@ -122,7 +128,7 @@ export const ViewCreatedByFieldFilter = ({
                       ? []
                       : collaboratorIds;
 
-                    view.updateFilter(filter.id, {
+                    updateFilter({
                       ...filter,
                       operator: operator.value,
                       value: value,
@@ -134,13 +140,7 @@ export const ViewCreatedByFieldFilter = ({
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              view.removeFilter(filter.id);
-            }}
-          >
+          <Button variant="ghost" size="icon" onClick={removeFilter}>
             <Trash2 className="size-4" />
           </Button>
         </div>
@@ -198,7 +198,7 @@ export const ViewCreatedByFieldFilter = ({
                             (id) => id !== collaborator.id
                           );
 
-                          view.updateFilter(filter.id, {
+                          updateFilter({
                             ...filter,
                             value: newCollaborators,
                           });
@@ -216,7 +216,7 @@ export const ViewCreatedByFieldFilter = ({
                     ? collaboratorIds.filter((id) => id !== user.id)
                     : [...collaboratorIds, user.id];
 
-                  view.updateFilter(filter.id, {
+                  updateFilter({
                     ...filter,
                     value: newCollaborators,
                   });

@@ -3,7 +3,7 @@ import { Fragment, useState } from 'react';
 
 import { LocalFileNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
-import { FileDeleteDialog } from '@colanode/ui/components/files/file-delete-dialog';
+import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -52,8 +52,10 @@ export const FileSettings = ({ file, role }: FileSettingsProps) => {
         </DropdownMenuContent>
       </DropdownMenu>
       {canDelete && (
-        <FileDeleteDialog
-          fileId={file.id}
+        <NodeDeleteDialog
+          id={file.id}
+          title="Are you sure you want delete this file?"
+          description="This action cannot be undone. This file will no longer be accessible and all data in the file will be lost."
           open={showDeleteModal}
           onOpenChange={setShowDeleteModal}
         />

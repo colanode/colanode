@@ -6,11 +6,5 @@ interface SpaceTabProps {
 }
 
 export const SpaceTab = ({ space }: SpaceTabProps) => {
-  return (
-    <Tab
-      id={space.id}
-      avatar={space.attributes.avatar}
-      name={space.attributes.name}
-    />
-  );
+  return <Tab id={space.id} avatar={space.avatar} name={space.name} />;
 };

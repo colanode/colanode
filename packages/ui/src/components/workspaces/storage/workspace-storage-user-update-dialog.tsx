@@ -7,7 +7,6 @@ import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
 import { WorkspaceStorageUser } from '@colanode/core';
-import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -107,17 +106,19 @@ export const WorkspaceStorageUserUpdateDialog = ({
     initialMaxFileSize.unit
   );
 
-  const userQuery = useLiveQuery((q) =>
-    q
-      .from({ users: collections.workspace(workspace.userId).users })
-      .where(({ users }) => eq(users.id, user.id))
-      .select(({ users }) => ({
-        id: users.id,
-        name: users.name,
-        avatar: users.avatar,
-        email: users.email,
-      }))
-      .findOne()
+  const userQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ users: workspace.collections.users })
+        .where(({ users }) => eq(users.id, user.id))
+        .select(({ users }) => ({
+          id: users.id,
+          name: users.name,
+          avatar: users.avatar,
+          email: users.email,
+        }))
+        .findOne(),
+    [workspace.userId, user.id]
   );
 
   const name = userQuery.data?.name ?? 'Unknown';

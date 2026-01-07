@@ -1,5 +1,5 @@
 import { ChevronDown, ChevronLeft, ChevronRight } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { DayPicker, DayProps, getDefaultClassNames } from 'react-day-picker';
 
 import {
@@ -38,27 +38,31 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
   const defaultClassNames = getDefaultClassNames();
 
   const [month, setMonth] = useState(new Date());
-  const { first, last } = getDisplayedDates(month);
+  const { first, last } = useMemo(() => getDisplayedDates(month), [month]);
 
-  const filters: DatabaseViewFilterAttributes[] = [
-    ...view.filters,
-    {
-      id: 'start_date',
-      type: 'field',
-      fieldId: field.id,
-      operator: 'is_on_or_after',
-      value: first.toISOString(),
-    },
-    {
-      id: 'end_date',
-      type: 'field',
-      fieldId: field.id,
-      operator: 'is_on_or_before',
-      value: last.toISOString(),
-    },
-  ];
+  const filters: DatabaseViewFilterAttributes[] = useMemo(
+    () => [
+      ...view.filters,
+      {
+        id: 'start_date',
+        type: 'field',
+        fieldId: field.id,
+        operator: 'is_on_or_after',
+        value: first.toISOString(),
+      },
+      {
+        id: 'end_date',
+        type: 'field',
+        fieldId: field.id,
+        operator: 'is_on_or_before',
+        value: last.toISOString(),
+      },
+    ],
+    [view.filters, field.id, first, last]
+  );
 
-  const { records } = useRecordsQuery(filters, view.sorts, 200);
+  const { data } = useRecordsQuery(filters, view.sorts, 200);
+  const records = data;
 
   return (
     <DayPicker

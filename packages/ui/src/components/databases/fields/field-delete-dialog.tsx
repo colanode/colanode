@@ -9,6 +9,7 @@ import {
 } from '@colanode/ui/components/ui/alert-dialog';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useDatabase } from '@colanode/ui/contexts/database';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 interface FieldDeleteDialogProps {
   id: string;
@@ -21,6 +22,7 @@ export const FieldDeleteDialog = ({
   open,
   onOpenChange,
 }: FieldDeleteDialogProps) => {
+  const workspace = useWorkspace();
   const database = useDatabase();
 
   return (
@@ -40,7 +42,15 @@ export const FieldDeleteDialog = ({
           <Button
             variant="destructive"
             onClick={async () => {
-              database.deleteField(id);
+              const nodes = workspace.collections.nodes;
+              nodes.update(database.id, (draft) => {
+                if (draft.type !== 'database') {
+                  return;
+                }
+
+                const { [id]: _removed, ...rest } = draft.fields;
+                draft.fields = rest;
+              });
               onOpenChange(false);
             }}
           >

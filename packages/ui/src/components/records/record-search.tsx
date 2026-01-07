@@ -16,7 +16,7 @@ import {
   ScrollBar,
 } from '@colanode/ui/components/ui/scroll-area';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface RecordSearchProps {
   exclude?: string[];
@@ -32,7 +32,7 @@ export const RecordSearch = ({
   const workspace = useWorkspace();
 
   const [query, setQuery] = useState('');
-  const recordSearchQuery = useLiveQuery({
+  const recordSearchQuery = useQuery({
     type: 'record.search',
     searchQuery: query,
     userId: workspace.userId,
@@ -64,11 +64,11 @@ export const RecordSearch = ({
                   <div className="flex w-full flex-row items-center gap-2">
                     <Avatar
                       id={record.id}
-                      name={record.attributes.name}
-                      avatar={record.attributes.avatar}
+                      name={record.name}
+                      avatar={record.avatar}
                       className="size-4"
                     />
-                    <p className="text-sm grow">{record.attributes.name}</p>
+                    <p className="text-sm grow">{record.name}</p>
                   </div>
                 </CommandItem>
               ))}

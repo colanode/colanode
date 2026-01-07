@@ -7,7 +7,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 import { defaultEmojis } from '@colanode/ui/lib/assets';
 
 interface EmojiSkinToneSelectorProps {
@@ -21,7 +21,7 @@ export const EmojiSkinToneSelector = ({
 }: EmojiSkinToneSelectorProps) => {
   const [open, setOpen] = useState<boolean>(false);
 
-  const emojiGetQuery = useLiveQuery({
+  const emojiGetQuery = useQuery({
     type: 'emoji.get',
     id: defaultEmojis.hand,
   });
