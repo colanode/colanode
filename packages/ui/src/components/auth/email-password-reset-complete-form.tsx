@@ -1,18 +1,15 @@
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from '@tanstack/react-form';
 import { Lock } from 'lucide-react';
-import { useForm } from 'react-hook-form';
 import { z } from 'zod/v4';
 
 import { Button } from '@colanode/ui/components/ui/button';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@colanode/ui/components/ui/form';
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@colanode/ui/components/ui/field';
 import { Input } from '@colanode/ui/components/ui/input';
-import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useCountdown } from '@colanode/ui/hooks/use-countdown';
 
@@ -46,86 +43,120 @@ export const PasswordResetCompleteForm = ({
   isPending,
   onSubmit,
 }: PasswordResetCompleteFormProps) => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
     defaultValues: {
       otp: '',
       password: '',
       confirmPassword: '',
+    },
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      onSubmit(value);
     },
   });
 
   const [remainingSeconds, formattedTime] = useCountdown(expiresAt);
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-        <FormField
-          control={form.control}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+      className="space-y-3"
+    >
+      <FieldGroup>
+        <form.Field
           name="password"
-          render={({ field }) => (
-            <FormItem>
-              <Label htmlFor="password">New Password</Label>
-              <FormControl>
+          children={(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
                 <Input
+                  id={field.name}
+                  name={field.name}
                   type="password"
-                  {...field}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  aria-invalid={isInvalid}
                   autoComplete="new-password"
                   placeholder="********"
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
         />
-        <FormField
-          control={form.control}
+        <form.Field
           name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <Label htmlFor="confirmPassword">Confirm New Password</Label>
-              <FormControl>
+          children={(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>
+                  Confirm New Password
+                </FieldLabel>
                 <Input
+                  id={field.name}
+                  name={field.name}
                   type="password"
-                  {...field}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  aria-invalid={isInvalid}
                   autoComplete="new-password"
                   placeholder="********"
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
         />
-        <FormField
-          control={form.control}
+        <form.Field
           name="otp"
-          render={({ field }) => (
-            <FormItem>
-              <Label htmlFor="otp">Code</Label>
-              <FormControl>
-                <Input placeholder="123456" {...field} />
-              </FormControl>
-              <FormMessage />
-              <p className="text-xs text-muted-foreground w-full text-center">
-                {formattedTime}
-              </p>
-            </FormItem>
-          )}
+          children={(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Code</FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  aria-invalid={isInvalid}
+                  placeholder="123456"
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                <p className="text-xs text-muted-foreground w-full text-center">
+                  {formattedTime}
+                </p>
+              </Field>
+            );
+          }}
         />
-        <Button
-          type="submit"
-          variant="outline"
-          className="w-full"
-          disabled={isPending || remainingSeconds <= 0}
-        >
-          {isPending ? (
-            <Spinner className="mr-1 size-4" />
-          ) : (
-            <Lock className="mr-1 size-4" />
-          )}
-          Reset password
-        </Button>
-      </form>
-    </Form>
+      </FieldGroup>
+      <Button
+        type="submit"
+        variant="outline"
+        className="w-full"
+        disabled={isPending || remainingSeconds <= 0}
+      >
+        {isPending ? (
+          <Spinner className="mr-1 size-4" />
+        ) : (
+          <Lock className="mr-1 size-4" />
+        )}
+        Reset password
+      </Button>
+    </form>
   );
 };

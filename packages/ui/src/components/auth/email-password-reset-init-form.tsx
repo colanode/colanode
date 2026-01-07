@@ -1,18 +1,15 @@
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from '@tanstack/react-form';
 import { Mail } from 'lucide-react';
-import { useForm } from 'react-hook-form';
 import { z } from 'zod/v4';
 
 import { Button } from '@colanode/ui/components/ui/button';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@colanode/ui/components/ui/form';
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@colanode/ui/components/ui/field';
 import { Input } from '@colanode/ui/components/ui/input';
-import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 
 const formSchema = z.object({
@@ -28,43 +25,63 @@ export const PasswordResetInitForm = ({
   isPending,
   onSubmit,
 }: PasswordResetInitFormProps) => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
     defaultValues: {
       email: '',
+    },
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      onSubmit(value);
     },
   });
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-3">
-        <FormField
-          control={form.control}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+      className="space-y-3"
+    >
+      <FieldGroup>
+        <form.Field
           name="email"
-          render={({ field }) => (
-            <FormItem>
-              <Label htmlFor="email">Email</Label>
-              <FormControl>
-                <Input placeholder="hi@example.com" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+          children={(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  aria-invalid={isInvalid}
+                  placeholder="hi@example.com"
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
         />
-        <Button
-          type="submit"
-          variant="outline"
-          className="w-full"
-          disabled={isPending}
-        >
-          {isPending ? (
-            <Spinner className="mr-1 size-4" />
-          ) : (
-            <Mail className="mr-1 size-4" />
-          )}
-          Reset password
-        </Button>
-      </form>
-    </Form>
+      </FieldGroup>
+      <Button
+        type="submit"
+        variant="outline"
+        className="w-full"
+        disabled={isPending}
+      >
+        {isPending ? (
+          <Spinner className="mr-1 size-4" />
+        ) : (
+          <Mail className="mr-1 size-4" />
+        )}
+        Reset password
+      </Button>
+    </form>
   );
 };

@@ -1,8 +1,7 @@
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from '@tanstack/react-form';
 import { useMutation } from '@tanstack/react-query';
 import { Calendar, Columns, Table } from 'lucide-react';
 import { FC } from 'react';
-import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
@@ -23,13 +22,11 @@ import {
   DialogTitle,
 } from '@colanode/ui/components/ui/dialog';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@colanode/ui/components/ui/form';
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@colanode/ui/components/ui/field';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useDatabase } from '@colanode/ui/contexts/database';
@@ -42,6 +39,11 @@ const formSchema = z.object({
 });
 
 type ViewCreateFormValues = z.infer<typeof formSchema>;
+
+const defaultValues: ViewCreateFormValues = {
+  name: '',
+  type: 'table',
+};
 
 interface ViewTypeOption {
   name: string;
@@ -79,11 +81,13 @@ export const ViewCreateDialog = ({
   const workspace = useWorkspace();
   const database = useDatabase();
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      type: 'table',
+  const form = useForm({
+    defaultValues,
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      mutate(value);
     },
   });
 
@@ -156,29 +160,42 @@ export const ViewCreateDialog = ({
             Create a new view to display your database records
           </DialogDescription>
         </DialogHeader>
-        <Form {...form}>
-          <form
-            className="flex flex-col"
-            onSubmit={form.handleSubmit((values) => mutate(values))}
-          >
-            <div className="grow space-y-4 py-2 pb-4">
-              <FormField
-                control={form.control}
+        <form
+          className="flex flex-col"
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+        >
+          <div className="grow space-y-4 py-2 pb-4">
+            <FieldGroup>
+              <form.Field
                 name="name"
-                render={({ field }) => (
-                  <FormItem className="flex-1">
-                    <FormLabel>Name *</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid} className="flex-1">
+                      <FieldLabel htmlFor={field.name}>Name *</FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        placeholder="Name"
+                      />
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
               />
-              <FormField
-                control={form.control}
+              <form.Field
                 name="type"
-                render={({ field }) => (
+                children={(field) => (
                   <div className="grid grid-cols-3 gap-4">
                     {viewTypes.map((viewType) => (
                       <div
@@ -187,12 +204,12 @@ export const ViewCreateDialog = ({
                         className={cn(
                           'flex cursor-pointer flex-col items-center gap-2 rounded-md border p-3 text-muted-foreground',
                           'hover:bg-accent cursor-pointer',
-                          viewType.type === field.value
+                          viewType.type === field.state.value
                             ? 'border-foreground text-foreground'
                             : ''
                         )}
                         onClick={() => {
-                          field.onChange(viewType.type);
+                          field.handleChange(viewType.type);
                         }}
                       >
                         <viewType.icon />
@@ -202,18 +219,18 @@ export const ViewCreateDialog = ({
                   </div>
                 )}
               />
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending && <Spinner className="mr-1" />}
-                Create
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+            </FieldGroup>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending && <Spinner className="mr-1" />}
+              Create
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

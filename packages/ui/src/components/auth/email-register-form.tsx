@@ -1,18 +1,15 @@
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from '@tanstack/react-form';
 import { Mail } from 'lucide-react';
-import { useForm } from 'react-hook-form';
 import { z } from 'zod/v4';
 
 import { Button } from '@colanode/ui/components/ui/button';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@colanode/ui/components/ui/form';
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@colanode/ui/components/ui/field';
 import { Input } from '@colanode/ui/components/ui/input';
-import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 
 const formSchema = z
@@ -41,99 +38,138 @@ interface RegisterFormProps {
 }
 
 export const RegisterForm = ({ isPending, onSubmit }: RegisterFormProps) => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
     defaultValues: {
       name: '',
       email: '',
       password: '',
       confirmPassword: '',
     },
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      onSubmit(value);
+    },
   });
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+      className="space-y-4"
+    >
+      <FieldGroup>
+        <form.Field
           name="name"
-          render={({ field }) => (
-            <FormItem>
-              <Label htmlFor="name">Name</Label>
-              <FormControl>
-                <Input placeholder="John Doe" {...field} autoComplete="name" />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <Label htmlFor="email">Email</Label>
-              <FormControl>
+          children={(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Name</FieldLabel>
                 <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  aria-invalid={isInvalid}
+                  placeholder="John Doe"
+                  autoComplete="name"
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
+        />
+        <form.Field
+          name="email"
+          children={(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  aria-invalid={isInvalid}
                   placeholder="hi@example.com"
-                  {...field}
                   autoComplete="email"
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
         />
-        <FormField
-          control={form.control}
+        <form.Field
           name="password"
-          render={({ field }) => (
-            <FormItem>
-              <Label htmlFor="password">Password</Label>
-              <FormControl>
+          children={(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
                 <Input
+                  id={field.name}
+                  name={field.name}
                   type="password"
-                  {...field}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  aria-invalid={isInvalid}
                   autoComplete="new-password"
                   placeholder="********"
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
         />
-        <FormField
-          control={form.control}
+        <form.Field
           name="confirmPassword"
-          render={({ field }) => (
-            <FormItem>
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
-              <FormControl>
+          children={(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Confirm Password</FieldLabel>
                 <Input
+                  id={field.name}
+                  name={field.name}
                   type="password"
-                  {...field}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  aria-invalid={isInvalid}
                   autoComplete="new-password"
                   placeholder="********"
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              </Field>
+            );
+          }}
         />
-        <Button
-          type="submit"
-          variant="outline"
-          className="w-full"
-          disabled={isPending}
-        >
-          {isPending ? (
-            <Spinner className="mr-1 size-4" />
-          ) : (
-            <Mail className="mr-1 size-4" />
-          )}
-          Register
-        </Button>
-      </form>
-    </Form>
+      </FieldGroup>
+      <Button
+        type="submit"
+        variant="outline"
+        className="w-full"
+        disabled={isPending}
+      >
+        {isPending ? (
+          <Spinner className="mr-1 size-4" />
+        ) : (
+          <Mail className="mr-1 size-4" />
+        )}
+        Register
+      </Button>
+    </form>
   );
 };

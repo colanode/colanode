@@ -1,18 +1,15 @@
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from '@tanstack/react-form';
 import { Mail } from 'lucide-react';
-import { useForm } from 'react-hook-form';
 import { z } from 'zod/v4';
 
 import { Button } from '@colanode/ui/components/ui/button';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from '@colanode/ui/components/ui/form';
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@colanode/ui/components/ui/field';
 import { Input } from '@colanode/ui/components/ui/input';
-import { Label } from '@colanode/ui/components/ui/label';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useCountdown } from '@colanode/ui/hooks/use-countdown';
 
@@ -31,53 +28,73 @@ export const EmailVerifyForm = ({
   isPending,
   onSubmit,
 }: EmailVerifyFormProps) => {
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
     defaultValues: {
       otp: '',
+    },
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      onSubmit(value);
     },
   });
 
   const [remainingSeconds, formattedTime] = useCountdown(expiresAt);
 
   return (
-    <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-        <FormField
-          control={form.control}
+    <form
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+      className="space-y-4"
+    >
+      <FieldGroup>
+        <form.Field
           name="otp"
-          render={({ field }) => (
-            <FormItem>
-              <Label htmlFor="otp">Code</Label>
-              <FormControl>
-                <Input placeholder="123456" {...field} />
-              </FormControl>
-              <FormMessage />
-              <div className="flex flex-col items-center gap-1">
-                <p className="text-sm text-muted-foreground w-full text-center">
-                  We sent a verification code to your email.
-                </p>
-                <p className="text-xs text-muted-foreground w-full text-center">
-                  {formattedTime}
-                </p>
-              </div>
-            </FormItem>
-          )}
+          children={(field) => {
+            const isInvalid =
+              field.state.meta.isTouched && !field.state.meta.isValid;
+            return (
+              <Field data-invalid={isInvalid}>
+                <FieldLabel htmlFor={field.name}>Code</FieldLabel>
+                <Input
+                  id={field.name}
+                  name={field.name}
+                  value={field.state.value}
+                  onBlur={field.handleBlur}
+                  onChange={(e) => field.handleChange(e.target.value)}
+                  aria-invalid={isInvalid}
+                  placeholder="123456"
+                />
+                {isInvalid && <FieldError errors={field.state.meta.errors} />}
+                <div className="flex flex-col items-center gap-1">
+                  <p className="text-sm text-muted-foreground w-full text-center">
+                    We sent a verification code to your email.
+                  </p>
+                  <p className="text-xs text-muted-foreground w-full text-center">
+                    {formattedTime}
+                  </p>
+                </div>
+              </Field>
+            );
+          }}
         />
-        <Button
-          type="submit"
-          variant="outline"
-          className="w-full"
-          disabled={isPending || remainingSeconds <= 0}
-        >
-          {isPending ? (
-            <Spinner className="mr-1 size-4" />
-          ) : (
-            <Mail className="mr-1 size-4" />
-          )}
-          Confirm
-        </Button>
-      </form>
-    </Form>
+      </FieldGroup>
+      <Button
+        type="submit"
+        variant="outline"
+        className="w-full"
+        disabled={isPending || remainingSeconds <= 0}
+      >
+        {isPending ? (
+          <Spinner className="mr-1 size-4" />
+        ) : (
+          <Mail className="mr-1 size-4" />
+        )}
+        Confirm
+      </Button>
+    </form>
   );
 };

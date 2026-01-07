@@ -1,7 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { eq, useLiveQuery } from '@tanstack/react-db';
+import { useForm } from '@tanstack/react-form';
 import { Upload } from 'lucide-react';
-import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
@@ -9,13 +8,11 @@ import { collections } from '@colanode/ui/collections';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@colanode/ui/components/ui/form';
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@colanode/ui/components/ui/field';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -26,7 +23,7 @@ import { cn } from '@colanode/ui/lib/utils';
 
 const formSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters long.'),
-  avatar: z.string().optional().nullable(),
+  avatar: z.string().nullable(),
   email: z.email('Invalid email address'),
 });
 
@@ -51,36 +48,69 @@ export const AccountUpdate = () => {
 
   const accountData = accountQuery.data?.[0];
   const form = useForm({
-    resolver: zodResolver(formSchema),
     defaultValues: {
-      name: accountData?.name,
-      avatar: accountData?.avatar,
-      email: accountData?.email,
+      name: accountData?.name ?? '',
+      email: accountData?.email ?? '',
+      avatar: accountData?.avatar ?? null,
+    },
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      if (isUpdatingAccount) {
+        return;
+      }
+
+      updateAccount({
+        input: {
+          type: 'account.update',
+          id: workspace.accountId,
+          name: value.name,
+          avatar: value.avatar,
+        },
+        onSuccess() {
+          toast.success('Account updated');
+        },
+        onError(error) {
+          toast.error(error.message);
+        },
+      });
     },
   });
 
-  const name = form.watch('name');
-  const avatar = form.watch('avatar');
-
-  const onSubmit = (values: z.output<typeof formSchema>) => {
-    if (isUpdatingAccount) {
+  const handleAvatarClick = async () => {
+    if (isUpdatingAccount || isUploadingAvatar) {
       return;
     }
 
-    updateAccount({
-      input: {
-        type: 'account.update',
-        id: workspace.accountId,
-        name: values.name,
-        avatar: values.avatar,
-      },
-      onSuccess() {
-        toast.success('Account updated');
-      },
-      onError(error) {
-        toast.error(error.message);
-      },
+    const result = await openFileDialog({
+      accept: 'image/jpeg, image/jpg, image/png, image/webp',
     });
+
+    if (result.type === 'success') {
+      const file = result.files[0];
+      if (!file) {
+        return;
+      }
+
+      uploadAvatar({
+        input: {
+          type: 'avatar.upload',
+          accountId: workspace.accountId,
+          file,
+        },
+        onSuccess(output) {
+          if (output.id) {
+            form.setFieldValue('avatar', output.id);
+          }
+        },
+        onError(error) {
+          toast.error(error.message);
+        },
+      });
+    } else if (result.type === 'error') {
+      toast.error(result.error);
+    }
   };
 
   if (!accountData) {
@@ -88,116 +118,121 @@ export const AccountUpdate = () => {
   }
 
   return (
-    <Form {...form}>
-      <form className="flex flex-col" onSubmit={form.handleSubmit(onSubmit)}>
-        <div className={cn('flex gap-1', isMobile ? 'flex-col' : 'flex-row')}>
+    <form
+      className="flex flex-col"
+      onSubmit={(e) => {
+        e.preventDefault();
+        form.handleSubmit();
+      }}
+    >
+      <div className={cn('flex gap-1', isMobile ? 'flex-col' : 'flex-row')}>
+        <div
+          className={cn(
+            'pt-3',
+            isMobile ? 'flex justify-center pb-4' : 'size-40'
+          )}
+        >
           <div
-            className={cn(
-              'pt-3',
-              isMobile ? 'flex justify-center pb-4' : 'size-40'
-            )}
+            className="group relative cursor-pointer"
+            onClick={handleAvatarClick}
           >
+            <form.Subscribe
+              selector={(state) => ({
+                avatar: state.values.avatar,
+                name: state.values.name,
+              })}
+              children={({ avatar, name }) => (
+                <Avatar
+                  id={workspace.accountId}
+                  name={name}
+                  avatar={avatar}
+                  className={isMobile ? 'size-24' : 'size-32'}
+                />
+              )}
+            />
             <div
-              className="group relative cursor-pointer"
-              onClick={async () => {
-                if (isUpdatingAccount || isUploadingAvatar) {
-                  return;
-                }
-
-                const result = await openFileDialog({
-                  accept: 'image/jpeg, image/jpg, image/png, image/webp',
-                });
-
-                if (result.type === 'success') {
-                  const file = result.files[0];
-                  if (!file) {
-                    return;
-                  }
-
-                  uploadAvatar({
-                    input: {
-                      type: 'avatar.upload',
-                      accountId: workspace.accountId,
-                      file,
-                    },
-                    onSuccess(output) {
-                      if (output.id) {
-                        form.setValue('avatar', output.id);
-                      }
-                    },
-                    onError(error) {
-                      toast.error(error.message);
-                    },
-                  });
-                } else if (result.type === 'error') {
-                  toast.error(result.error);
-                }
-              }}
+              className={cn(
+                `absolute left-0 top-0 hidden items-center justify-center overflow-hidden bg-accent/50 group-hover:inline-flex`,
+                isMobile ? 'size-24' : 'size-32',
+                isUploadingAvatar ? 'inline-flex' : 'hidden'
+              )}
             >
-              <Avatar
-                id={workspace.accountId}
-                name={name}
-                avatar={avatar}
-                className={isMobile ? 'size-24' : 'size-32'}
-              />
-              <div
-                className={cn(
-                  `absolute left-0 top-0 hidden items-center justify-center overflow-hidden bg-accent/50 group-hover:inline-flex`,
-                  isMobile ? 'size-24' : 'size-32',
-                  isUploadingAvatar ? 'inline-flex' : 'hidden'
-                )}
-              >
-                {isUploadingAvatar ? (
-                  <Spinner className="size-5" />
-                ) : (
-                  <Upload className="size-5 text-foreground" />
-                )}
-              </div>
+              {isUploadingAvatar ? (
+                <Spinner className="size-5" />
+              ) : (
+                <Upload className="size-5 text-foreground" />
+              )}
             </div>
           </div>
-          <div
-            className={cn('space-y-4 py-2 pb-4', isMobile ? 'w-full' : 'grow')}
-          >
-            <FormField
-              control={form.control}
+        </div>
+        <div
+          className={cn('space-y-4 py-2 pb-4', isMobile ? 'w-full' : 'grow')}
+        >
+          <FieldGroup>
+            <form.Field
               name="name"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>Name *</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Name" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid} className="flex-1">
+                    <FieldLabel htmlFor={field.name}>Name *</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      placeholder="Name"
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
             />
-            <FormField
-              control={form.control}
+            <form.Field
               name="email"
-              render={({ field }) => (
-                <FormItem className="flex-1">
-                  <FormLabel>Email</FormLabel>
-                  <FormControl>
-                    <Input readOnly placeholder="Email" {...field} disabled />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
+              children={(field) => {
+                const isInvalid =
+                  field.state.meta.isTouched && !field.state.meta.isValid;
+                return (
+                  <Field data-invalid={isInvalid} className="flex-1">
+                    <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+                    <Input
+                      id={field.name}
+                      name={field.name}
+                      value={field.state.value}
+                      onBlur={field.handleBlur}
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      aria-invalid={isInvalid}
+                      readOnly
+                      placeholder="Email"
+                      disabled
+                    />
+                    {isInvalid && (
+                      <FieldError errors={field.state.meta.errors} />
+                    )}
+                  </Field>
+                );
+              }}
             />
-          </div>
+          </FieldGroup>
         </div>
+      </div>
 
-        <div className="flex flex-row justify-end gap-2">
-          <Button
-            type="submit"
-            disabled={isUpdatingAccount || isUploadingAvatar}
-            className="w-20"
-          >
-            {isUpdatingAccount && <Spinner className="mr-1" />}
-            Save
-          </Button>
-        </div>
-      </form>
-    </Form>
+      <div className="flex flex-row justify-end gap-2">
+        <Button
+          type="submit"
+          disabled={isUpdatingAccount || isUploadingAvatar}
+          className="w-20"
+        >
+          {isUpdatingAccount && <Spinner className="mr-1" />}
+          Save
+        </Button>
+      </div>
+    </form>
   );
 };

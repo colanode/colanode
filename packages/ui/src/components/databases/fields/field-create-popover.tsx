@@ -1,7 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm, useStore } from '@tanstack/react-form';
 import { useMutation } from '@tanstack/react-query';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
@@ -18,13 +17,11 @@ import { DatabaseSelect } from '@colanode/ui/components/databases/database-selec
 import { FieldTypeSelect } from '@colanode/ui/components/databases/fields/field-type-select';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@colanode/ui/components/ui/form';
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@colanode/ui/components/ui/field';
 import { Input } from '@colanode/ui/components/ui/input';
 import {
   Popover,
@@ -58,6 +55,12 @@ const formSchema = z.object({
   relationDatabaseId: z.string().optional().nullable(),
 });
 
+const defaultValues: FieldCreateFormValues = {
+  name: '',
+  type: 'text',
+  relationDatabaseId: null,
+};
+
 type FieldCreateFormValues = z.infer<typeof formSchema>;
 
 interface FieldCreatePopoverProps {
@@ -75,15 +78,17 @@ export const FieldCreatePopover = ({
   const workspace = useWorkspace();
   const database = useDatabase();
 
-  const form = useForm<FieldCreateFormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      type: 'text',
+  const form = useForm({
+    defaultValues,
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      mutate(value);
     },
   });
 
-  const type = form.watch('type');
+  const type = useStore(form.store, (state) => state.values.type);
 
   const handleCancelClick = () => {
     setOpen(false);
@@ -164,75 +169,87 @@ export const FieldCreatePopover = ({
     <Popover open={open} onOpenChange={setOpen} modal={true}>
       <PopoverTrigger asChild>{button}</PopoverTrigger>
       <PopoverContent className="mr-5 w-lg" side="bottom">
-        <Form {...form}>
-          <form
-            className="flex flex-col gap-2"
-            onSubmit={form.handleSubmit((values) => mutate(values))}
-          >
-            <div className="grow space-y-4 py-2 pb-4">
-              <FormField
-                control={form.control}
+        <form
+          className="flex flex-col gap-2"
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+        >
+          <div className="grow space-y-4 py-2 pb-4">
+            <FieldGroup>
+              <form.Field
                 name="name"
-                render={({ field, formState }) => (
-                  <FormItem>
-                    <FormLabel>Name</FormLabel>
-                    <FormControl>
-                      <Input id="name" placeholder="Field name" {...field} />
-                    </FormControl>
-                    <FormMessage>{formState.errors.name?.message}</FormMessage>
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="type"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Field type</FormLabel>
-                    <FormControl>
-                      <FieldTypeSelect
-                        value={field.value}
-                        onChange={field.onChange}
-                        types={types}
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>Name</FieldLabel>
+                      <Input
+                        id={field.name}
+                        name={field.name}
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        aria-invalid={isInvalid}
+                        placeholder="Field name"
                       />
-                    </FormControl>
-                  </FormItem>
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
+              />
+              <form.Field
+                name="type"
+                children={(field) => (
+                  <Field>
+                    <FieldLabel htmlFor={field.name}>Field type</FieldLabel>
+                    <FieldTypeSelect
+                      value={field.state.value}
+                      onChange={(value) =>
+                        field.handleChange(
+                          value as FieldCreateFormValues['type']
+                        )
+                      }
+                      types={types}
+                    />
+                  </Field>
                 )}
               />
               {type === 'relation' && (
-                <FormField
-                  control={form.control}
+                <form.Field
                   name="relationDatabaseId"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Database</FormLabel>
-                      <FormControl>
-                        <DatabaseSelect
-                          id={field.value}
-                          onChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
+                  children={(field) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>Database</FieldLabel>
+                      <DatabaseSelect
+                        id={field.state.value}
+                        onChange={(value) => field.handleChange(value)}
+                      />
+                    </Field>
                   )}
                 />
               )}
-            </div>
-            <div className="mt-2 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleCancelClick}
-              >
-                Cancel
-              </Button>
-              <Button type="submit" size="sm" disabled={isPending}>
-                {isPending && <Spinner className="mr-1" />}
-                Create
-              </Button>
-            </div>
-          </form>
-        </Form>
+            </FieldGroup>
+          </div>
+          <div className="mt-2 flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleCancelClick}
+            >
+              Cancel
+            </Button>
+            <Button type="submit" size="sm" disabled={isPending}>
+              {isPending && <Spinner className="mr-1" />}
+              Create
+            </Button>
+          </div>
+        </form>
       </PopoverContent>
     </Popover>
   );
