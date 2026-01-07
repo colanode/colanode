@@ -1,8 +1,7 @@
-import { zodResolver } from '@hookform/resolvers/zod';
 import { eq, useLiveQuery } from '@tanstack/react-db';
+import { useForm } from '@tanstack/react-form';
 import { Check, ChevronDown } from 'lucide-react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 import { z } from 'zod/v4';
 
@@ -24,13 +23,11 @@ import {
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
 import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from '@colanode/ui/components/ui/form';
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+} from '@colanode/ui/components/ui/field';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -125,11 +122,47 @@ export const WorkspaceStorageUserUpdateDialog = ({
   const email = userQuery.data?.email ?? '';
   const avatar = userQuery.data?.avatar ?? null;
 
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
+  const form = useForm({
     defaultValues: {
       storageLimit: initialStorageLimit.value,
       maxFileSize: initialMaxFileSize.value,
+    },
+    validators: {
+      onSubmit: formSchema,
+    },
+    onSubmit: async ({ value }) => {
+      if (isPending) {
+        return;
+      }
+
+      const apiValues = {
+        storageLimit: convertUnitToBytes(value.storageLimit, storageLimitUnit),
+        maxFileSize: convertUnitToBytes(value.maxFileSize, maxFileSizeUnit),
+      };
+
+      if (BigInt(apiValues.maxFileSize) > BigInt(apiValues.storageLimit)) {
+        toast.error('Max file size cannot be larger than storage limit');
+        return;
+      }
+
+      mutate({
+        input: {
+          type: 'user.storage.update',
+          accountId: workspace.accountId,
+          workspaceId: workspace.workspaceId,
+          userId: user.id,
+          storageLimit: apiValues.storageLimit,
+          maxFileSize: apiValues.maxFileSize,
+        },
+        onSuccess: () => {
+          toast.success('User storage settings updated');
+          form.reset();
+          onUpdate();
+        },
+        onError: (error) => {
+          toast.error(error.message);
+        },
+      });
     },
   });
 
@@ -138,41 +171,6 @@ export const WorkspaceStorageUserUpdateDialog = ({
     setStorageLimitUnit(initialStorageLimit.unit);
     setMaxFileSizeUnit(initialMaxFileSize.unit);
     onOpenChange(false);
-  };
-
-  const handleSubmit = async (values: z.infer<typeof formSchema>) => {
-    if (isPending) {
-      return;
-    }
-
-    const apiValues = {
-      storageLimit: convertUnitToBytes(values.storageLimit, storageLimitUnit),
-      maxFileSize: convertUnitToBytes(values.maxFileSize, maxFileSizeUnit),
-    };
-
-    if (BigInt(apiValues.maxFileSize) > BigInt(apiValues.storageLimit)) {
-      toast.error('Max file size cannot be larger than storage limit');
-      return;
-    }
-
-    mutate({
-      input: {
-        type: 'user.storage.update',
-        accountId: workspace.accountId,
-        workspaceId: workspace.workspaceId,
-        userId: user.id,
-        storageLimit: apiValues.storageLimit,
-        maxFileSize: apiValues.maxFileSize,
-      },
-      onSuccess: () => {
-        toast.success('User storage settings updated');
-        form.reset();
-        onUpdate();
-      },
-      onError: (error) => {
-        toast.error(error.message);
-      },
-    });
   };
 
   const storageLimitUnitData = UNITS.find((u) => u.value === storageLimitUnit);
@@ -196,24 +194,35 @@ export const WorkspaceStorageUserUpdateDialog = ({
             <p className="text-sm text-muted-foreground truncate">{email}</p>
           </div>
         </div>
-        <Form {...form}>
-          <form
-            className="flex flex-col"
-            onSubmit={form.handleSubmit(handleSubmit)}
-          >
-            <div className="grow space-y-6 py-2 pb-4">
-              <FormField
-                control={form.control}
+        <form
+          className="flex flex-col"
+          onSubmit={(e) => {
+            e.preventDefault();
+            form.handleSubmit();
+          }}
+        >
+          <div className="grow space-y-6 py-2 pb-4">
+            <FieldGroup>
+              <form.Field
                 name="storageLimit"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Storage Limit</FormLabel>
-                    <FormControl>
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Storage Limit
+                      </FieldLabel>
                       <div className="flex space-x-2">
                         <Input
+                          id={field.name}
+                          name={field.name}
                           type="number"
                           placeholder="5"
-                          {...field}
+                          value={field.state.value}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          aria-invalid={isInvalid}
                           className="flex-1"
                           min="1"
                           step="1"
@@ -244,31 +253,43 @@ export const WorkspaceStorageUserUpdateDialog = ({
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                    </FormControl>
-                    <div className="text-xs text-muted-foreground">
-                      ={' '}
-                      {formatBytes(
-                        convertUnitToBytes(field.value || '0', storageLimitUnit)
-                      )}{' '}
-                      bytes
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                      <div className="text-xs text-muted-foreground">
+                        ={' '}
+                        {formatBytes(
+                          convertUnitToBytes(
+                            field.state.value || '0',
+                            storageLimitUnit
+                          )
+                        )}{' '}
+                        bytes
+                      </div>
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
               />
-              <FormField
-                control={form.control}
+              <form.Field
                 name="maxFileSize"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Max File Size</FormLabel>
-                    <FormControl>
+                children={(field) => {
+                  const isInvalid =
+                    field.state.meta.isTouched && !field.state.meta.isValid;
+                  return (
+                    <Field data-invalid={isInvalid}>
+                      <FieldLabel htmlFor={field.name}>
+                        Max File Size
+                      </FieldLabel>
                       <div className="flex space-x-2">
                         <Input
+                          id={field.name}
+                          name={field.name}
                           type="number"
                           placeholder="10"
-                          {...field}
-                          value={field.value || ''}
+                          value={field.state.value || ''}
+                          onBlur={field.handleBlur}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                          aria-invalid={isInvalid}
                           className="flex-1"
                           min="1"
                           step="1"
@@ -299,30 +320,35 @@ export const WorkspaceStorageUserUpdateDialog = ({
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
-                    </FormControl>
-                    <div className="text-xs text-muted-foreground">
-                      ={' '}
-                      {formatBytes(
-                        convertUnitToBytes(field.value || '0', maxFileSizeUnit)
-                      )}{' '}
-                      bytes
-                    </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
+                      <div className="text-xs text-muted-foreground">
+                        ={' '}
+                        {formatBytes(
+                          convertUnitToBytes(
+                            field.state.value || '0',
+                            maxFileSizeUnit
+                          )
+                        )}{' '}
+                        bytes
+                      </div>
+                      {isInvalid && (
+                        <FieldError errors={field.state.meta.errors} />
+                      )}
+                    </Field>
+                  );
+                }}
               />
-            </div>
-            <DialogFooter>
-              <Button type="button" variant="outline" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button type="submit" disabled={isPending}>
-                {isPending && <Spinner className="mr-1" />}
-                Update
-              </Button>
-            </DialogFooter>
-          </form>
-        </Form>
+            </FieldGroup>
+          </div>
+          <DialogFooter>
+            <Button type="button" variant="outline" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button type="submit" disabled={isPending}>
+              {isPending && <Spinner className="mr-1" />}
+              Update
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
