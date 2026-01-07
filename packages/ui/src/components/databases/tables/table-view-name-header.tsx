@@ -6,13 +6,13 @@ import { useDrop } from 'react-dnd';
 
 import { LocalNode } from '@colanode/client/types';
 import { SpecialId } from '@colanode/core';
+import { Input } from '@colanode/ui/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
 import { Separator } from '@colanode/ui/components/ui/separator';
-import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -110,10 +110,11 @@ export const TableViewNameHeader = () => {
         </PopoverTrigger>
         <PopoverContent className="ml-1 flex w-72 flex-col gap-1 p-2 text-sm">
           <div className="p-1">
-            <SmartTextInput
+            <Input
               value={database.nameField?.name ?? 'Name'}
               readOnly={!database.canEdit}
-              onChange={(newName) => {
+              onChange={(e) => {
+                const newName = e.target.value;
                 if (newName === database.nameField?.name) return;
                 const nodes = workspace.collections.nodes;
                 nodes.update(database.id, (draft) => {

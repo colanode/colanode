@@ -12,12 +12,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
+import { Input } from '@colanode/ui/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
-import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
 import { phoneFieldFilterOperators } from '@colanode/ui/lib/databases';
@@ -114,9 +114,10 @@ export const ViewPhoneFieldFilter = ({
           </Button>
         </div>
         {!hideInput && (
-          <SmartTextInput
-            value={phoneValue}
-            onChange={(value) => {
+          <Input
+            value={phoneValue ?? ''}
+            onChange={(e) => {
+              const value = e.target.value;
               updateFilter({
                 ...filter,
                 value: value,

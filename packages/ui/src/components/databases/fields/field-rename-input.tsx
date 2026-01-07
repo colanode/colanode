@@ -1,5 +1,4 @@
 import { debounceStrategy, usePacedMutations } from '@tanstack/react-db';
-import { useEffect, useState } from 'react';
 
 import { LocalNode } from '@colanode/client/types';
 import { FieldAttributes } from '@colanode/core';
@@ -15,11 +14,6 @@ interface FieldRenameInputProps {
 export const FieldRenameInput = ({ field }: FieldRenameInputProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
-  const [name, setName] = useState(field.name);
-
-  useEffect(() => {
-    setName(field.name);
-  }, [field.name]);
 
   const mutate = usePacedMutations<string, LocalNode>({
     onMutate: (value) => {
@@ -45,11 +39,10 @@ export const FieldRenameInput = ({ field }: FieldRenameInputProps) => {
   return (
     <div className="w-full p-1">
       <Input
-        value={name}
+        value={field.name}
         readOnly={!database.canEdit}
         onChange={(event) => {
           const newValue = event.target.value;
-          setName(newValue);
           mutate(newValue);
         }}
       />

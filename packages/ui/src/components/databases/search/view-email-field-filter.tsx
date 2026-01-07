@@ -12,12 +12,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
+import { Input } from '@colanode/ui/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
-import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
 import { emailFieldFilterOperators } from '@colanode/ui/lib/databases';
@@ -51,7 +51,6 @@ export const ViewEmailFieldFilter = ({
   }
 
   const textValue = filter.value as string | null;
-
   const hideInput = isOperatorWithoutValue(operator.value);
 
   return (
@@ -114,9 +113,10 @@ export const ViewEmailFieldFilter = ({
           </Button>
         </div>
         {!hideInput && (
-          <SmartTextInput
-            value={textValue}
-            onChange={(value) => {
+          <Input
+            value={textValue ?? ''}
+            onChange={(e) => {
+              const value = e.target.value;
               updateFilter({
                 ...filter,
                 value: value,

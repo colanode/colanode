@@ -8,12 +8,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
+import { Input } from '@colanode/ui/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
-import { SmartTextInput } from '@colanode/ui/components/ui/smart-text-input';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
@@ -108,9 +108,10 @@ export const ViewNameFieldFilter = ({ filter }: ViewNameFieldFilterProps) => {
           </Button>
         </div>
         {!hideInput && (
-          <SmartTextInput
-            value={textValue}
-            onChange={(value) => {
+          <Input
+            value={textValue ?? ''}
+            onChange={(e) => {
+              const value = e.target.value;
               updateFilter({
                 ...filter,
                 value: value,

@@ -12,12 +12,12 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
+import { Input } from '@colanode/ui/components/ui/input';
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from '@colanode/ui/components/ui/popover';
-import { SmartNumberInput } from '@colanode/ui/components/ui/smart-number-input';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useViewFilter } from '@colanode/ui/hooks/use-view-filter';
 import { numberFieldFilterOperators } from '@colanode/ui/lib/databases';
@@ -114,12 +114,18 @@ export const ViewNumberFieldFilter = ({
           </Button>
         </div>
         {!hideInput && (
-          <SmartNumberInput
-            value={numberValue ?? null}
-            onChange={(value) => {
+          <Input
+            type="number"
+            value={numberValue ?? ''}
+            onChange={(e) => {
+              const numberValue = parseFloat(e.target.value);
+              if (isNaN(numberValue)) {
+                return;
+              }
+
               updateFilter({
                 ...filter,
-                value: value,
+                value: numberValue,
               });
             }}
           />
