@@ -1,4 +1,4 @@
-import { createCollection } from '@tanstack/react-db';
+import { createCollection, parseLoadSubsetOptions } from '@tanstack/react-db';
 
 import { LocalNode } from '@colanode/client/types';
 import { applyNodeTransaction } from '@colanode/ui/lib/nodes';
@@ -8,15 +8,20 @@ export const createNodesCollection = (userId: string) => {
     getKey(item) {
       return item.id;
     },
+    syncMode: 'on-demand',
+
     sync: {
+      rowUpdateMode: 'full',
       sync({ begin, write, commit, markReady }) {
         window.colanode
           .executeQuery({
             type: 'node.list',
             userId,
+            filters: [],
+            sorts: [],
           })
           .then((nodes) => {
-            console.log('nodes', nodes);
+            // console.log('nodes', nodes);
             begin();
 
             for (const node of nodes) {
@@ -55,7 +60,8 @@ export const createNodesCollection = (userId: string) => {
         return {
           cleanup: () => window.eventBus.unsubscribe(subscriptionId),
           loadSubset: async (options) => {
-            console.log('loadSubset', options);
+            const parsedOptions = parseLoadSubsetOptions(options);
+            console.log('nodes loadSubset', parsedOptions);
           },
         };
       },

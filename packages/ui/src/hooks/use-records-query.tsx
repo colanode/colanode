@@ -119,7 +119,7 @@ export const useRecordsQuery = (
       getNextPageParam: (lastPage, allPages) =>
         lastPage.length === pageSize ? allPages.length : undefined,
     },
-    [workspace.userId, database.id, database.fields, filters, sorts, pageSize]
+    [database.id, database.fields, pageSize, filters, sorts]
   );
 
   return result;
@@ -603,7 +603,7 @@ const buildSelectFilterExpression = (
   return filter.operator === 'is_in' ? combined : not(combined);
 };
 
-const getFieldValue = <T = FieldValuePrimitive>(
+const getFieldValue = <T = FieldValuePrimitive,>(
   record: RecordRef,
   fieldId: string
 ): T => {

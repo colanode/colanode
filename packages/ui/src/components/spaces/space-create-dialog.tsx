@@ -51,7 +51,6 @@ export const SpaceCreateDialog = ({
         localRevision: '0',
         serverRevision: '0',
       };
-      console.log('space', JSON.stringify(space, null, 2));
 
       const pageId = generateId(IdType.Page);
       const page: LocalPageNode = {

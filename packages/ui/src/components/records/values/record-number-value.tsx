@@ -31,7 +31,6 @@ export const RecordNumberValue = ({
         }
 
         const newValue = parseFloat(newStringValue);
-        console.log('newValue', newValue, newStringValue);
         if (isNaN(newValue)) {
           return;
         }
