@@ -1,7 +1,8 @@
-import { useLiveQuery } from '@tanstack/react-db';
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Check, ChevronsUpDown } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
+import { LocalDatabaseNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -32,12 +33,15 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
   const databaseListQuery = useLiveQuery(
     (q) =>
       q
-        .from({ databases: workspace.collections.databases })
-        .orderBy(({ databases }) => databases.id, 'asc'),
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.type, 'database'))
+        .orderBy(({ nodes }) => nodes.id, 'asc'),
     []
   );
 
-  const databases = databaseListQuery.data;
+  const databases = databaseListQuery.data.map(
+    (node) => node as LocalDatabaseNode
+  );
   const selectedDatabase = id
     ? databases.find((database) => database.id === id)
     : undefined;

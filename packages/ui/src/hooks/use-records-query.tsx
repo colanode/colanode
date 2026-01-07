@@ -88,17 +88,20 @@ export const useRecordsQuery = (
   const result = useLiveInfiniteQuery(
     (q) => {
       let query = q
-        .from({ records: workspace.collections.records })
-        .where(({ records }) => eq(records.databaseId, database.id));
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.type, 'record'))
+        .where(({ nodes }) =>
+          eq((nodes as unknown as LocalRecordNode).databaseId, database.id)
+        );
 
       if (hasFilterDefinitions) {
-        query = query.where(({ records }) => {
+        query = query.where(({ nodes }) => {
           return (
             buildFiltersExpression(
               filters,
               fieldsById,
               workspace.userId,
-              records
+              nodes as unknown as RecordRef
             ) ?? eq(1, 1)
           );
         });
@@ -109,7 +112,10 @@ export const useRecordsQuery = (
         orderings.length > 0 ? orderings : [DEFAULT_ORDERING];
 
       effectiveOrderings.forEach(({ selector, direction }) => {
-        query = query.orderBy(({ records }) => selector(records), direction);
+        query = query.orderBy(
+          ({ nodes }) => selector(nodes as unknown as RecordRef),
+          direction
+        );
       });
 
       return query;
@@ -122,7 +128,10 @@ export const useRecordsQuery = (
     [database.id, database.fields, pageSize, filters, sorts]
   );
 
-  return result;
+  return {
+    ...result,
+    data: result.data.map((node) => node as LocalRecordNode),
+  };
 };
 
 const buildFieldsById = (fields: FieldAttributes[]) => {

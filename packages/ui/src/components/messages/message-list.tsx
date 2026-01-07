@@ -2,6 +2,7 @@ import { eq, useLiveInfiniteQuery } from '@tanstack/react-db';
 import { Fragment, useEffect, useRef } from 'react';
 import { InView } from 'react-intersection-observer';
 
+import { LocalMessageNode } from '@colanode/client/types';
 import { compareString } from '@colanode/core';
 import { Message } from '@colanode/ui/components/messages/message';
 import { useConversation } from '@colanode/ui/contexts/conversation';
@@ -17,9 +18,10 @@ export const MessageList = () => {
   const messageListQuery = useLiveInfiniteQuery(
     (q) =>
       q
-        .from({ messages: workspace.collections.messages })
-        .where(({ messages }) => eq(messages.parentId, conversation.id))
-        .orderBy(({ messages }) => messages.id, 'desc'),
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.type, 'message'))
+        .where(({ nodes }) => eq(nodes.parentId, conversation.id))
+        .orderBy(({ nodes }) => nodes.id, 'desc'),
     {
       pageSize: MESSAGES_PER_PAGE,
       getNextPageParam: (lastPage, allPages) =>
@@ -28,9 +30,9 @@ export const MessageList = () => {
     [workspace.userId, conversation.id]
   );
 
-  const messages = messageListQuery.data.toSorted((a, b) =>
-    compareString(a.id, b.id)
-  );
+  const messages: LocalMessageNode[] = messageListQuery.data
+    .map((node) => node as LocalMessageNode)
+    .toSorted((a, b) => compareString(a.id, b.id));
 
   useEffect(() => {
     if (messages.length > 0) {

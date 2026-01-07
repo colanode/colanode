@@ -27,8 +27,8 @@ export const WorkspaceDownloadFile = ({
   const fileQuery = useLiveQuery(
     (q) =>
       q
-        .from({ files: workspace.collections.files })
-        .where(({ files }) => eq(files.id, download.fileId))
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.id, download.fileId))
         .findOne(),
     [workspace.userId, download.fileId]
   );

@@ -1,18 +1,8 @@
-import { Collection, createLiveQueryCollection, eq } from '@tanstack/react-db';
+import { Collection } from '@tanstack/react-db';
 
 import {
   Download,
-  LocalChannelNode,
-  LocalChatNode,
-  LocalDatabaseNode,
-  LocalDatabaseViewNode,
-  LocalFileNode,
-  LocalFolderNode,
-  LocalMessageNode,
   LocalNode,
-  LocalPageNode,
-  LocalRecordNode,
-  LocalSpaceNode,
   NodeReaction,
   Upload,
   User,
@@ -36,16 +26,6 @@ export class WorkspaceCollections {
   public readonly downloads: Collection<Download, string>;
   public readonly uploads: Collection<Upload, string>;
   public readonly nodes: Collection<LocalNode, string>;
-  public readonly databases: Collection<LocalDatabaseNode>;
-  public readonly views: Collection<LocalDatabaseViewNode>;
-  public readonly records: Collection<LocalRecordNode>;
-  public readonly chats: Collection<LocalChatNode>;
-  public readonly channels: Collection<LocalChannelNode>;
-  public readonly spaces: Collection<LocalSpaceNode>;
-  public readonly files: Collection<LocalFileNode>;
-  public readonly messages: Collection<LocalMessageNode>;
-  public readonly folders: Collection<LocalFolderNode>;
-  public readonly pages: Collection<LocalPageNode>;
   public readonly nodeReactions: Collection<NodeReaction, string>;
 
   constructor(userId: string) {
@@ -55,51 +35,6 @@ export class WorkspaceCollections {
     this.uploads = createUploadsCollection(userId);
     this.nodes = createNodesCollection(userId);
     this.nodeReactions = createNodeReactionsCollection(userId);
-
-    this.databases = createLiveQueryCollection((q) =>
-      q
-        .from({ nodes: this.nodes })
-        .where(({ nodes }) => eq(nodes.type, 'database'))
-    );
-    this.views = createLiveQueryCollection((q) =>
-      q
-        .from({ nodes: this.nodes })
-        .where(({ nodes }) => eq(nodes.type, 'database_view'))
-    );
-    this.chats = createLiveQueryCollection((q) =>
-      q.from({ nodes: this.nodes }).where(({ nodes }) => eq(nodes.type, 'chat'))
-    );
-    this.channels = createLiveQueryCollection((q) =>
-      q
-        .from({ nodes: this.nodes })
-        .where(({ nodes }) => eq(nodes.type, 'channel'))
-    );
-    this.spaces = createLiveQueryCollection((q) =>
-      q
-        .from({ nodes: this.nodes })
-        .where(({ nodes }) => eq(nodes.type, 'space'))
-    );
-    this.records = createLiveQueryCollection((q) =>
-      q
-        .from({ nodes: this.nodes })
-        .where(({ nodes }) => eq(nodes.type, 'record'))
-    );
-    this.files = createLiveQueryCollection((q) =>
-      q.from({ nodes: this.nodes }).where(({ nodes }) => eq(nodes.type, 'file'))
-    );
-    this.messages = createLiveQueryCollection((q) =>
-      q
-        .from({ nodes: this.nodes })
-        .where(({ nodes }) => eq(nodes.type, 'message'))
-    );
-    this.folders = createLiveQueryCollection((q) =>
-      q
-        .from({ nodes: this.nodes })
-        .where(({ nodes }) => eq(nodes.type, 'folder'))
-    );
-    this.pages = createLiveQueryCollection((q) =>
-      q.from({ nodes: this.nodes }).where(({ nodes }) => eq(nodes.type, 'page'))
-    );
   }
 }
 

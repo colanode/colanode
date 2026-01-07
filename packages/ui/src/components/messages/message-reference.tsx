@@ -15,13 +15,17 @@ export const MessageReference = ({ messageId }: MessageReferenceProps) => {
   const messageGetQuery = useLiveQuery(
     (q) =>
       q
-        .from({ messages: workspace.collections.messages })
-        .where(({ messages }) => eq(messages.id, messageId))
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.id, messageId))
         .findOne(),
     [workspace.userId, messageId]
   );
 
-  if (messageGetQuery.isLoading) {
+  if (
+    messageGetQuery.isLoading ||
+    !messageGetQuery.data ||
+    messageGetQuery.data.type !== 'message'
+  ) {
     return null;
   }
 

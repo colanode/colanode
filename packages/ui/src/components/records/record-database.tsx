@@ -17,8 +17,8 @@ export const RecordDatabase = ({ id, role, children }: RecordDatabaseProps) => {
   const databaseGetQuery = useLiveQuery(
     (q) =>
       q
-        .from({ databases: workspace.collections.databases })
-        .where(({ databases }) => eq(databases.id, id))
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.id, id))
         .findOne(),
     [workspace.userId, id]
   );
@@ -27,7 +27,7 @@ export const RecordDatabase = ({ id, role, children }: RecordDatabaseProps) => {
     return null;
   }
 
-  if (!databaseGetQuery.data) {
+  if (!databaseGetQuery.data || databaseGetQuery.data.type !== 'database') {
     return null;
   }
 

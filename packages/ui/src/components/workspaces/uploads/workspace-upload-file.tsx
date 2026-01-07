@@ -18,13 +18,13 @@ export const WorkspaceUploadFile = ({ upload }: WorkspaceUploadFileProps) => {
   const fileQuery = useLiveQuery(
     (q) =>
       q
-        .from({ files: workspace.collections.files })
-        .where(({ files }) => eq(files.id, upload.fileId))
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.id, upload.fileId))
         .findOne(),
     [workspace.userId, upload.fileId]
   );
 
-  const file = fileQuery.data as LocalFileNode;
+  const file = fileQuery.data as LocalFileNode | undefined;
 
   if (!file) {
     return (

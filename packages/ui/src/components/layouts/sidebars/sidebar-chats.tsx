@@ -1,5 +1,6 @@
-import { useLiveQuery } from '@tanstack/react-db';
+import { eq, useLiveQuery } from '@tanstack/react-db';
 
+import { LocalChatNode } from '@colanode/client/types';
 import { ChatCreatePopover } from '@colanode/ui/components/chats/chat-create-popover';
 import { ChatSidebarItem } from '@colanode/ui/components/chats/chat-sidebar-item';
 import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
@@ -12,12 +13,13 @@ export const SidebarChats = () => {
   const chatListQuery = useLiveQuery(
     (q) =>
       q
-        .from({ chats: workspace.collections.chats })
-        .orderBy(({ chats }) => chats.id, 'asc'),
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.type, 'chat'))
+        .orderBy(({ nodes }) => nodes.id, 'asc'),
     [workspace.userId]
   );
 
-  const chats = chatListQuery.data;
+  const chats = chatListQuery.data.map((node) => node as LocalChatNode);
 
   return (
     <div className="flex flex-col group/sidebar h-full px-2">

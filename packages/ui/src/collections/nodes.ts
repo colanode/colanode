@@ -17,17 +17,20 @@ export const createNodesCollection = (userId: string) => {
           .executeQuery({
             type: 'node.list',
             userId,
-            filters: [],
+            filters: [
+              {
+                field: ['type'],
+                operator: 'in',
+                value: ['space', 'chat', 'database', 'channel'],
+              },
+            ],
             sorts: [],
           })
           .then((nodes) => {
-            // console.log('nodes', nodes);
             begin();
-
             for (const node of nodes) {
               write({ type: 'insert', value: node });
             }
-
             commit();
             markReady();
           });
@@ -61,7 +64,20 @@ export const createNodesCollection = (userId: string) => {
           cleanup: () => window.eventBus.unsubscribe(subscriptionId),
           loadSubset: async (options) => {
             const parsedOptions = parseLoadSubsetOptions(options);
-            console.log('nodes loadSubset', parsedOptions);
+
+            const nodes = await window.colanode.executeQuery({
+              type: 'node.list',
+              userId,
+              filters: parsedOptions.filters,
+              sorts: parsedOptions.sorts,
+              limit: parsedOptions.limit,
+            });
+
+            begin();
+            for (const node of nodes) {
+              write({ type: 'insert', value: node });
+            }
+            commit();
           },
         };
       },

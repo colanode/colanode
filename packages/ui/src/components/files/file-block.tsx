@@ -17,13 +17,17 @@ export const FileBlock = ({ id }: FileBlockProps) => {
   const fileGetQuery = useLiveQuery(
     (q) =>
       q
-        .from({ files: workspace.collections.files })
-        .where(({ files }) => eq(files.id, id))
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.id, id))
         .findOne(),
     [workspace.userId, id]
   );
 
-  if (fileGetQuery.isLoading || !fileGetQuery.data) {
+  if (
+    fileGetQuery.isLoading ||
+    !fileGetQuery.data ||
+    fileGetQuery.data.type !== 'file'
+  ) {
     return null;
   }
 

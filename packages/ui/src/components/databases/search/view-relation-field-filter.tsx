@@ -68,18 +68,18 @@ export const ViewRelationFieldFilter = ({
     (q) => {
       if (relationIds.length === 0 || !field.databaseId) {
         return q
-          .from({ records: workspace.collections.records })
-          .where(({ records }) => eq(records.id, '')); // Return empty result
+          .from({ nodes: workspace.collections.nodes })
+          .where(({ nodes }) => eq(nodes.id, '')); // Return empty result
       }
 
       return q
-        .from({ records: workspace.collections.records })
-        .where(({ records }) => inArray(records.id, relationIds));
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => inArray(nodes.id, relationIds));
     },
     [workspace.userId, field.databaseId, relationIds]
   );
 
-  const relations = relationsQuery.data;
+  const relations = relationsQuery.data.map((node) => node as LocalRecordNode);
   const hideInput = isOperatorWithoutValue(operator.value);
 
   if (!field.databaseId) {

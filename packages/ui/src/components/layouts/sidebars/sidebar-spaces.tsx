@@ -1,5 +1,6 @@
-import { useLiveQuery } from '@tanstack/react-db';
+import { eq, useLiveQuery } from '@tanstack/react-db';
 
+import { LocalSpaceNode } from '@colanode/client/types';
 import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
 import { SpaceCreateButton } from '@colanode/ui/components/spaces/space-create-button';
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
@@ -13,12 +14,13 @@ export const SidebarSpaces = () => {
   const spaceListQuery = useLiveQuery(
     (q) =>
       q
-        .from({ spaces: workspace.collections.spaces })
-        .orderBy(({ spaces }) => spaces.id, 'asc'),
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.type, 'space'))
+        .orderBy(({ nodes }) => nodes.id, 'asc'),
     [workspace.userId]
   );
 
-  const spaces = spaceListQuery.data;
+  const spaces = spaceListQuery.data.map((node) => node as LocalSpaceNode);
 
   return (
     <div className="flex flex-col group/sidebar h-full px-2">
