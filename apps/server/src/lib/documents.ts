@@ -12,7 +12,6 @@ import {
 import { decodeState, YDoc } from '@colanode/crdt';
 import { database } from '@colanode/server/data/database';
 import { SelectUser } from '@colanode/server/data/schema';
-import { scheduleDocumentEmbedding } from '@colanode/server/lib/ai/embeddings';
 import { eventBus } from '@colanode/server/lib/event-bus';
 import { createLogger } from '@colanode/server/lib/logger';
 import { fetchNode, fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
@@ -278,8 +277,6 @@ const tryUpdateDocumentFromMutation = async (
       workspaceId: user.workspace_id,
     });
 
-    await scheduleDocumentEmbedding(mutation.documentId);
-
     return {
       type: 'success',
       output: MutationStatus.OK,
@@ -422,8 +419,6 @@ const tryUpdateDocument = async (
       rootId: node.root_id,
       workspaceId: input.workspaceId,
     });
-
-    await scheduleDocumentEmbedding(input.documentId);
 
     return {
       type: 'success',
