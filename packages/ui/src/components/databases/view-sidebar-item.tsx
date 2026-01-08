@@ -3,13 +3,11 @@ import { ViewIcon } from '@colanode/ui/components/databases/view-icon';
 import { Link } from '@colanode/ui/components/ui/link';
 import { cn } from '@colanode/ui/lib/utils';
 
-interface DatabaseViewSidebarItemProps {
+interface ViewSidebarItemProps {
   view: LocalDatabaseViewNode;
 }
 
-export const DatabaseViewSidebarItem = ({
-  view,
-}: DatabaseViewSidebarItemProps) => {
+export const ViewSidebarItem = ({ view }: ViewSidebarItemProps) => {
   return (
     <Link from="/workspace/$userId" to="$nodeId" params={{ nodeId: view.id }}>
       {({ isActive }) => (
@@ -25,7 +23,7 @@ export const DatabaseViewSidebarItem = ({
             name={view.name}
             avatar={view.avatar}
             layout={view.layout}
-            className="size-4"
+            className="size-4 shrink-0"
           />
           <span className="line-clamp-1 w-full grow text-left">
             {view.name ?? 'Unnamed View'}

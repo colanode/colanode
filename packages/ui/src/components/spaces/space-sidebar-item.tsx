@@ -43,7 +43,7 @@ export const SpaceSidebarItem = ({ space }: SpaceSidebarItemProps) => {
               id={space.id}
               avatar={space.avatar}
               name={space.name}
-              className="size-4 group-hover/space-row:hidden"
+              className="size-4 group-hover/space-row:hidden shrink-0"
             />
             <ChevronRight className="hidden size-4 transition-transform duration-200 group-hover/space-row:block group-data-[state=open]/sidebar-space:rotate-90 cursor-pointer rounded hover:bg-sidebar-accent/50" />
             <span>{space.name}</span>

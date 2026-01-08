@@ -8,37 +8,44 @@ import { DatabaseViews } from '@colanode/ui/components/databases/database-views'
 import { NodeProvider } from '@colanode/ui/components/nodes/node-provider';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useNode } from '@colanode/ui/contexts/node';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 
-const DatabaseNodeViewContent = ({
-  id,
-  inline,
-}: {
-  id: string;
-  inline?: boolean;
-}) => {
+const DatabaseNodeViewInline = ({ id }: { id: string }) => {
+  const workspace = useWorkspace();
   const { node: database, role } = useNode<LocalDatabaseNode>();
+  const [activeViewId, setActiveViewId] = useMetadata<string>(
+    workspace.userId,
+    `${database.id}.activeViewId`
+  );
 
-  if (inline) {
-    return (
-      <NodeViewWrapper
-        data-id={id}
-        className="my-4 w-full"
-        contentEditable={false}
-        onDragStart={(e: React.DragEvent<HTMLDivElement>) => {
-          e.stopPropagation();
-          e.preventDefault();
-        }}
-        onDragOver={(e: React.DragEvent<HTMLDivElement>) => {
-          e.preventDefault();
-          e.stopPropagation();
-        }}
-      >
-        <Database database={database} role={role}>
-          <DatabaseViews inline />
-        </Database>
-      </NodeViewWrapper>
-    );
-  }
+  return (
+    <NodeViewWrapper
+      data-id={id}
+      className="my-4 w-full"
+      contentEditable={false}
+      onDragStart={(e: React.DragEvent<HTMLDivElement>) => {
+        e.stopPropagation();
+        e.preventDefault();
+      }}
+      onDragOver={(e: React.DragEvent<HTMLDivElement>) => {
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+    >
+      <Database database={database} role={role}>
+        <DatabaseViews
+          inline
+          viewId={activeViewId}
+          onViewChange={setActiveViewId}
+        />
+      </Database>
+    </NodeViewWrapper>
+  );
+};
+
+const DatabaseNodeViewLink = ({ id }: { id: string }) => {
+  const { node: database } = useNode<LocalDatabaseNode>();
 
   const name = database.name ?? 'Unnamed';
   const avatar = database.avatar;
@@ -61,7 +68,11 @@ export const DatabaseNodeView = ({ node }: NodeViewProps) => {
   const id = node.attrs.id;
   return (
     <NodeProvider nodeId={id}>
-      <DatabaseNodeViewContent id={id} inline={node.attrs.inline} />
+      {node.attrs.inline ? (
+        <DatabaseNodeViewInline id={id} />
+      ) : (
+        <DatabaseNodeViewLink id={id} />
+      )}
     </NodeProvider>
   );
 };

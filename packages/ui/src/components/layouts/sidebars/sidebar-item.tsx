@@ -2,7 +2,7 @@ import { LocalNode } from '@colanode/client/types';
 import { ChannelSidebarItem } from '@colanode/ui/components/channels/channel-sidebar-item';
 import { ChatSidebarItem } from '@colanode/ui/components/chats/chat-sidebar-item';
 import { DatabaseSidebarItem } from '@colanode/ui/components/databases/database-sidiebar-item';
-import { DatabaseViewSidebarItem } from '@colanode/ui/components/databases/database-view-sidebar-item';
+import { ViewSidebarItem } from '@colanode/ui/components/databases/view-sidebar-item';
 import { FolderSidebarItem } from '@colanode/ui/components/folders/folder-sidebar-item';
 import { PageSidebarItem } from '@colanode/ui/components/pages/page-sidebar-item';
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
@@ -24,7 +24,7 @@ export const SidebarItem = ({ node }: SidebarItemProps): React.ReactNode => {
     case 'database':
       return <DatabaseSidebarItem database={node} />;
     case 'database_view':
-      return <DatabaseViewSidebarItem view={node} />;
+      return <ViewSidebarItem view={node} />;
     case 'folder':
       return <FolderSidebarItem folder={node} />;
     default:

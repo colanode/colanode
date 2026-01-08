@@ -68,15 +68,15 @@ export const DatabaseSidebarItem = ({ database }: DatabaseSidebarItemProps) => {
                     e.stopPropagation();
                     setOpen(!open);
                   }}
-                  className="flex items-center cursor-pointer rounded size-4 hover:bg-sidebar-border"
+                  className="flex items-center cursor-pointer rounded-sm hover:bg-sidebar-border"
                 >
                   <Avatar
                     id={database.id}
                     avatar={database.avatar}
                     name={database.name}
-                    className="group-hover/database-row:hidden"
+                    className="group-hover/database-row:hidden size-4 shrink-0"
                   />
-                  <ChevronRight className="hidden transition-transform group-hover/database-row:block group-data-[state=open]/database-item:rotate-90" />
+                  <ChevronRight className="hidden transition-transform group-hover/database-row:block group-data-[state=open]/database-item:rotate-90 size-4 shrink-0" />
                 </button>
               </CollapsibleTrigger>
             ) : (

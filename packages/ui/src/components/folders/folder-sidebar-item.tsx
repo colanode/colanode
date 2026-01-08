@@ -22,7 +22,7 @@ export const FolderSidebarItem = ({ folder }: FolderSidebarItemProps) => {
             id={folder.id}
             avatar={folder.avatar}
             name={folder.name}
-            className="size-4"
+            className="size-4 shrink-0"
           />
           <span className="line-clamp-1 w-full grow text-left">
             {folder.name ?? 'Unnamed'}

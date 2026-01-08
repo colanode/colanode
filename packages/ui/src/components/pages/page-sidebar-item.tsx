@@ -60,15 +60,15 @@ export const PageSidebarItem = ({ page }: PageSidebarItemProps) => {
                     e.stopPropagation();
                     setOpen(!open);
                   }}
-                  className="flex items-center cursor-pointer rounded size-4 hover:bg-sidebar-border"
+                  className="flex items-center cursor-pointer rounded-sm hover:bg-sidebar-border"
                 >
                   <Avatar
                     id={page.id}
                     avatar={page.avatar}
                     name={page.name}
-                    className="group-hover/page-row:hidden"
+                    className="group-hover/page-row:hidden size-4 shrink-0"
                   />
-                  <ChevronRight className="hidden transition-transform group-hover/page-row:block group-data-[state=open]/page-item:rotate-90" />
+                  <ChevronRight className="hidden transition-transform group-hover/page-row:block group-data-[state=open]/page-item:rotate-90 size-4 shrink-0" />
                 </button>
               </CollapsibleTrigger>
             ) : (
@@ -76,7 +76,7 @@ export const PageSidebarItem = ({ page }: PageSidebarItemProps) => {
                 id={page.id}
                 avatar={page.avatar}
                 name={page.name}
-                className="size-4"
+                className="size-4 shrink-0"
               />
             )}
             <span className="line-clamp-1 w-full grow text-left">

@@ -61,7 +61,7 @@ export const ChatSidebarItem = ({ chat }: ChatSidebarItemProps) => {
             id={user.id}
             avatar={user.avatar}
             name={user.name}
-            className="size-5"
+            className="size-5 shrink-0"
           />
           <span
             className={cn(

@@ -1,5 +1,4 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
-import { useEffect, useState } from 'react';
 
 import { LocalDatabaseViewNode } from '@colanode/client/types';
 import { View } from '@colanode/ui/components/databases/view';
@@ -9,12 +8,17 @@ import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 interface DatabaseViewsProps {
   inline?: boolean;
+  viewId?: string;
+  onViewChange: (viewId: string) => void;
 }
 
-export const DatabaseViews = ({ inline = false }: DatabaseViewsProps) => {
+export const DatabaseViews = ({
+  inline = false,
+  viewId,
+  onViewChange,
+}: DatabaseViewsProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
-  const [activeViewId, setActiveViewId] = useState<string | null>(null);
 
   const databaseViewListQuery = useLiveQuery(
     (q) =>
@@ -32,20 +36,14 @@ export const DatabaseViews = ({ inline = false }: DatabaseViewsProps) => {
   const views = databaseViewListQuery.data.map(
     (node) => node as LocalDatabaseViewNode
   );
-  const activeView = views.find((view) => view.id === activeViewId);
-
-  useEffect(() => {
-    if (views.length > 0 && !views.some((view) => view.id === activeViewId)) {
-      setActiveViewId(views[0]?.id ?? null);
-    }
-  }, [views, activeViewId]);
+  const activeView = views.find((view) => view.id === viewId) ?? views[0];
 
   return (
     <DatabaseViewsContext.Provider
       value={{
         views,
-        activeViewId: activeViewId ?? '',
-        setActiveViewId,
+        viewId: activeView?.id ?? '',
+        onViewChange,
         inline,
       }}
     >
