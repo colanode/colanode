@@ -24,7 +24,6 @@ import {
   SelectNodeUpdate,
   SelectUser,
 } from '@colanode/server/data/schema';
-import { scheduleNodeEmbedding } from '@colanode/server/lib/ai/embeddings';
 import {
   applyCollaboratorUpdates,
   checkCollaboratorChanges,
@@ -132,7 +131,7 @@ export const createNode = async (input: CreateNodeInput): Promise<boolean> => {
   }));
 
   try {
-    const { createdNode, createdCollaborations } = await database
+    const { createdCollaborations } = await database
       .transaction()
       .execute(async (trx) => {
         const createdNodeUpdate = await trx
@@ -199,8 +198,6 @@ export const createNode = async (input: CreateNodeInput): Promise<boolean> => {
         workspaceId: input.workspaceId,
       });
     }
-
-    await scheduleNodeEmbedding(createdNode);
 
     return true;
   } catch (error) {
@@ -341,8 +338,6 @@ export const tryUpdateNode = async (
       });
     }
 
-    await scheduleNodeEmbedding(updatedNode);
-
     return {
       type: 'success',
       output: updatedNode,
@@ -400,7 +395,7 @@ export const createNodeFromMutation = async (
   }));
 
   try {
-    const { createdNode, createdCollaborations } = await database
+    const { createdCollaborations } = await database
       .transaction()
       .execute(async (trx) => {
         const createdNodeUpdate = await trx
@@ -467,8 +462,6 @@ export const createNodeFromMutation = async (
         workspaceId: user.workspace_id,
       });
     }
-
-    await scheduleNodeEmbedding(createdNode);
 
     return MutationStatus.CREATED;
   } catch (error) {
@@ -555,8 +548,9 @@ const tryUpdateNodeFromMutation = async (
   );
 
   try {
-    const { updatedNode, createdCollaborations, updatedCollaborations } =
-      await database.transaction().execute(async (trx) => {
+    const { createdCollaborations, updatedCollaborations } = await database
+      .transaction()
+      .execute(async (trx) => {
         const createdNodeUpdate = await trx
           .insertInto('node_updates')
           .returningAll()
@@ -632,8 +626,6 @@ const tryUpdateNodeFromMutation = async (
         workspaceId: user.workspace_id,
       });
     }
-
-    await scheduleNodeEmbedding(updatedNode);
 
     return { type: 'success', output: MutationStatus.OK };
   } catch {

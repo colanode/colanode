@@ -85,62 +85,62 @@ class JobService {
   };
 
   private async initRecurringJobs(): Promise<void> {
-    await this.initNodeEmbedScanRecurringJob();
-    await this.initDocumentEmbedScanRecurringJob();
+    // await this.initNodeEmbedScanRecurringJob();
+    // await this.initDocumentEmbedScanRecurringJob();
     await this.initNodeUpdatesMergeRecurringJob();
     await this.initDocumentUpdatesMergeRecurringJob();
     await this.initCleanupRecurringJob();
   }
 
-  private async initNodeEmbedScanRecurringJob(): Promise<void> {
-    if (!this.jobQueue) {
-      return;
-    }
+  // private async initNodeEmbedScanRecurringJob(): Promise<void> {
+  //   if (!this.jobQueue) {
+  //     return;
+  //   }
 
-    const id = 'node.embed.scan';
-    if (config.ai.enabled) {
-      this.jobQueue.upsertJobScheduler(
-        id,
-        { pattern: '0 */30 * * * *' },
-        {
-          name: id,
-          data: { type: 'node.embed.scan' } as JobInput,
-          opts: {
-            backoff: 3,
-            attempts: 5,
-            removeOnFail: 1000,
-          },
-        }
-      );
-    } else {
-      this.jobQueue.removeJobScheduler(id);
-    }
-  }
+  //   const id = 'node.embed.scan';
+  //   if (config.ai.enabled) {
+  //     this.jobQueue.upsertJobScheduler(
+  //       id,
+  //       { pattern: '0 */30 * * * *' },
+  //       {
+  //         name: id,
+  //         data: { type: 'node.embed.scan' } as JobInput,
+  //         opts: {
+  //           backoff: 3,
+  //           attempts: 5,
+  //           removeOnFail: 1000,
+  //         },
+  //       }
+  //     );
+  //   } else {
+  //     this.jobQueue.removeJobScheduler(id);
+  //   }
+  // }
 
-  private async initDocumentEmbedScanRecurringJob(): Promise<void> {
-    if (!this.jobQueue) {
-      return;
-    }
+  // private async initDocumentEmbedScanRecurringJob(): Promise<void> {
+  //   if (!this.jobQueue) {
+  //     return;
+  //   }
 
-    const id = 'document.embed.scan';
-    if (config.ai.enabled) {
-      this.jobQueue.upsertJobScheduler(
-        id,
-        { pattern: '0 */30 * * * *' },
-        {
-          name: id,
-          data: { type: 'document.embed.scan' } as JobInput,
-          opts: {
-            backoff: 3,
-            attempts: 5,
-            removeOnFail: 1000,
-          },
-        }
-      );
-    } else {
-      this.jobQueue.removeJobScheduler(id);
-    }
-  }
+  //   const id = 'document.embed.scan';
+  //   if (config.ai.enabled) {
+  //     this.jobQueue.upsertJobScheduler(
+  //       id,
+  //       { pattern: '0 */30 * * * *' },
+  //       {
+  //         name: id,
+  //         data: { type: 'document.embed.scan' } as JobInput,
+  //         opts: {
+  //           backoff: 3,
+  //           attempts: 5,
+  //           removeOnFail: 1000,
+  //         },
+  //       }
+  //     );
+  //   } else {
+  //     this.jobQueue.removeJobScheduler(id);
+  //   }
+  // }
 
   private async initNodeUpdatesMergeRecurringJob(): Promise<void> {
     if (!this.jobQueue) {

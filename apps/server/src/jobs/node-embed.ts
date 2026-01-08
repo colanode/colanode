@@ -1,161 +1,161 @@
-import { OpenAIEmbeddings } from '@langchain/openai';
-import { sql } from 'kysely';
+// import { OpenAIEmbeddings } from '@langchain/openai';
+// import { sql } from 'kysely';
 
-import { getNodeModel } from '@colanode/core';
-import { database } from '@colanode/server/data/database';
-import { CreateNodeEmbedding } from '@colanode/server/data/schema';
-import { JobHandler } from '@colanode/server/jobs';
-import { chunkText } from '@colanode/server/lib/ai/chunking';
-import { config } from '@colanode/server/lib/config';
-import { fetchNode } from '@colanode/server/lib/nodes';
+// import { getNodeModel } from '@colanode/core';
+// import { database } from '@colanode/server/data/database';
+// import { CreateNodeEmbedding } from '@colanode/server/data/schema';
+// import { JobHandler } from '@colanode/server/jobs';
+// import { chunkText } from '@colanode/server/lib/ai/chunking';
+// import { config } from '@colanode/server/lib/config';
+// import { fetchNode } from '@colanode/server/lib/nodes';
 
-export type NodeEmbedInput = {
-  type: 'node.embed';
-  nodeId: string;
-};
+// export type NodeEmbedInput = {
+//   type: 'node.embed';
+//   nodeId: string;
+// };
 
-declare module '@colanode/server/jobs' {
-  interface JobMap {
-    'node.embed': {
-      input: NodeEmbedInput;
-    };
-  }
-}
+// declare module '@colanode/server/jobs' {
+//   interface JobMap {
+//     'node.embed': {
+//       input: NodeEmbedInput;
+//     };
+//   }
+// }
 
-export const nodeEmbedHandler: JobHandler<NodeEmbedInput> = async (input) => {
-  if (!config.ai.enabled) {
-    return;
-  }
+// export const nodeEmbedHandler: JobHandler<NodeEmbedInput> = async (input) => {
+//   if (!config.ai.enabled) {
+//     return;
+//   }
 
-  const { nodeId } = input;
-  const node = await fetchNode(nodeId);
+//   const { nodeId } = input;
+//   const node = await fetchNode(nodeId);
 
-  if (!node) {
-    return;
-  }
+//   if (!node) {
+//     return;
+//   }
 
-  const nodeModel = getNodeModel(node.attributes.type);
-  if (!nodeModel) {
-    return;
-  }
+//   const nodeModel = getNodeModel(node.attributes.type);
+//   if (!nodeModel) {
+//     return;
+//   }
 
-  const nodeText = nodeModel.extractText(node.id, node.attributes);
-  if (!nodeText) {
-    return;
-  }
+//   const nodeText = nodeModel.extractText(node.id, node.attributes);
+//   if (!nodeText) {
+//     return;
+//   }
 
-  if (nodeText === null) {
-    return;
-  }
+//   if (nodeText === null) {
+//     return;
+//   }
 
-  if (!nodeText.attributes || nodeText.attributes.trim() === '') {
-    await database
-      .deleteFrom('node_embeddings')
-      .where('node_id', '=', nodeId)
-      .execute();
+//   if (!nodeText.attributes || nodeText.attributes.trim() === '') {
+//     await database
+//       .deleteFrom('node_embeddings')
+//       .where('node_id', '=', nodeId)
+//       .execute();
 
-    return;
-  }
+//     return;
+//   }
 
-  const embeddings = new OpenAIEmbeddings({
-    apiKey: config.ai.embedding.apiKey,
-    modelName: config.ai.embedding.modelName,
-    dimensions: config.ai.embedding.dimensions,
-  });
+//   const embeddings = new OpenAIEmbeddings({
+//     apiKey: config.ai.embedding.apiKey,
+//     modelName: config.ai.embedding.modelName,
+//     dimensions: config.ai.embedding.dimensions,
+//   });
 
-  const existingEmbeddings = await database
-    .selectFrom('node_embeddings')
-    .select(['chunk', 'revision', 'text', 'summary'])
-    .where('node_id', '=', nodeId)
-    .execute();
+//   const existingEmbeddings = await database
+//     .selectFrom('node_embeddings')
+//     .select(['chunk', 'revision', 'text', 'summary'])
+//     .where('node_id', '=', nodeId)
+//     .execute();
 
-  const revision =
-    existingEmbeddings.length > 0 ? existingEmbeddings[0]!.revision : 0n;
+//   const revision =
+//     existingEmbeddings.length > 0 ? existingEmbeddings[0]!.revision : 0n;
 
-  if (revision >= node.revision) {
-    return;
-  }
+//   if (revision >= node.revision) {
+//     return;
+//   }
 
-  const fullText =
-    `${nodeText.name ?? ''}\n\n${nodeText.attributes ?? ''}`.trim();
+//   const fullText =
+//     `${nodeText.name ?? ''}\n\n${nodeText.attributes ?? ''}`.trim();
 
-  const textChunks = await chunkText(
-    fullText,
-    existingEmbeddings.map((e) => ({
-      text: e.text,
-      summary: e.summary ?? undefined,
-    })),
-    node.type
-  );
+//   const textChunks = await chunkText(
+//     fullText,
+//     existingEmbeddings.map((e) => ({
+//       text: e.text,
+//       summary: e.summary ?? undefined,
+//     })),
+//     node.type
+//   );
 
-  const embeddingsToUpsert: CreateNodeEmbedding[] = [];
-  for (let i = 0; i < textChunks.length; i++) {
-    const chunk = textChunks[i];
-    if (!chunk) {
-      continue;
-    }
+//   const embeddingsToUpsert: CreateNodeEmbedding[] = [];
+//   for (let i = 0; i < textChunks.length; i++) {
+//     const chunk = textChunks[i];
+//     if (!chunk) {
+//       continue;
+//     }
 
-    const existing = existingEmbeddings.find((e) => e.chunk === i);
-    if (existing && existing.text === chunk.text) {
-      continue;
-    }
+//     const existing = existingEmbeddings.find((e) => e.chunk === i);
+//     if (existing && existing.text === chunk.text) {
+//       continue;
+//     }
 
-    embeddingsToUpsert.push({
-      node_id: nodeId,
-      chunk: i,
-      revision: node.revision,
-      workspace_id: node.workspace_id,
-      text: chunk.text,
-      summary: chunk.summary,
-      embedding_vector: [],
-      created_at: new Date(),
-    });
-  }
+//     embeddingsToUpsert.push({
+//       node_id: nodeId,
+//       chunk: i,
+//       revision: node.revision,
+//       workspace_id: node.workspace_id,
+//       text: chunk.text,
+//       summary: chunk.summary,
+//       embedding_vector: [],
+//       created_at: new Date(),
+//     });
+//   }
 
-  if (embeddingsToUpsert.length === 0) {
-    return;
-  }
+//   if (embeddingsToUpsert.length === 0) {
+//     return;
+//   }
 
-  const batchSize = config.ai.embedding.batchSize;
-  for (let i = 0; i < embeddingsToUpsert.length; i += batchSize) {
-    const batch = embeddingsToUpsert.slice(i, i + batchSize);
-    const textsToEmbed = batch.map((item) =>
-      item.summary ? `${item.summary}\n\n${item.text}` : item.text
-    );
+//   const batchSize = config.ai.embedding.batchSize;
+//   for (let i = 0; i < embeddingsToUpsert.length; i += batchSize) {
+//     const batch = embeddingsToUpsert.slice(i, i + batchSize);
+//     const textsToEmbed = batch.map((item) =>
+//       item.summary ? `${item.summary}\n\n${item.text}` : item.text
+//     );
 
-    const embeddingVectors = await embeddings.embedDocuments(textsToEmbed);
-    for (let j = 0; j < batch.length; j++) {
-      const vector = embeddingVectors[j];
-      const batchItem = batch[j];
-      if (batchItem) {
-        batchItem.embedding_vector = vector ?? [];
-      }
-    }
-  }
+//     const embeddingVectors = await embeddings.embedDocuments(textsToEmbed);
+//     for (let j = 0; j < batch.length; j++) {
+//       const vector = embeddingVectors[j];
+//       const batchItem = batch[j];
+//       if (batchItem) {
+//         batchItem.embedding_vector = vector ?? [];
+//       }
+//     }
+//   }
 
-  await database
-    .insertInto('node_embeddings')
-    .values(
-      embeddingsToUpsert.map((embedding) => ({
-        node_id: embedding.node_id,
-        chunk: embedding.chunk,
-        revision: embedding.revision,
-        workspace_id: embedding.workspace_id,
-        text: embedding.text,
-        summary: embedding.summary,
-        embedding_vector: sql.raw(
-          `'[${embedding.embedding_vector.join(',')}]'::vector`
-        ),
-        created_at: embedding.created_at,
-      }))
-    )
-    .onConflict((oc) =>
-      oc.columns(['node_id', 'chunk']).doUpdateSet({
-        text: sql.ref('excluded.text'),
-        summary: sql.ref('excluded.summary'),
-        embedding_vector: sql.ref('excluded.embedding_vector'),
-        updated_at: new Date(),
-      })
-    )
-    .execute();
-};
+//   await database
+//     .insertInto('node_embeddings')
+//     .values(
+//       embeddingsToUpsert.map((embedding) => ({
+//         node_id: embedding.node_id,
+//         chunk: embedding.chunk,
+//         revision: embedding.revision,
+//         workspace_id: embedding.workspace_id,
+//         text: embedding.text,
+//         summary: embedding.summary,
+//         embedding_vector: sql.raw(
+//           `'[${embedding.embedding_vector.join(',')}]'::vector`
+//         ),
+//         created_at: embedding.created_at,
+//       }))
+//     )
+//     .onConflict((oc) =>
+//       oc.columns(['node_id', 'chunk']).doUpdateSet({
+//         text: sql.ref('excluded.text'),
+//         summary: sql.ref('excluded.summary'),
+//         embedding_vector: sql.ref('excluded.embedding_vector'),
+//         updated_at: new Date(),
+//       })
+//     )
+//     .execute();
+// };
