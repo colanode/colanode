@@ -16,7 +16,7 @@ export const ViewFullscreenButton = () => {
     <Link
       from="/workspace/$userId"
       to="$nodeId"
-      params={{ nodeId: views.viewId ?? database.id }}
+      params={{ nodeId: database.id }}
       className="flex cursor-pointer items-center rounded-md p-1.5 hover:bg-accent"
     >
       <Fullscreen className="size-4" />

@@ -4,8 +4,8 @@ import { LocalDatabaseViewNode } from '@colanode/client/types';
 
 interface DatabaseViewsContext {
   views: LocalDatabaseViewNode[];
-  viewId: string;
-  onViewChange: (viewId: string) => void;
+  activeViewId: string;
+  onActiveViewChange: (viewId: string) => void;
   inline: boolean;
 }
 

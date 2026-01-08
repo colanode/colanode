@@ -3,7 +3,6 @@ import { Outlet } from '@tanstack/react-router';
 import { ChannelContainer } from '@colanode/ui/components/channels/channel-container';
 import { ChatContainer } from '@colanode/ui/components/chats/chat-container';
 import { DatabaseContainer } from '@colanode/ui/components/databases/database-container';
-import { ViewContainer } from '@colanode/ui/components/databases/view-container';
 import { FileContainer } from '@colanode/ui/components/files/file-container';
 import { FolderContainer } from '@colanode/ui/components/folders/folder-container';
 import { Container } from '@colanode/ui/components/layouts/containers/container';
@@ -64,9 +63,6 @@ const NodeContent = ({ type, onFullscreen }: NodeContentProps) => {
         <MessageContainer message={data.node} role={data.role} />
       )}
       {data.node.type === 'file' && <FileContainer file={data.node} />}
-      {data.node.type === 'database_view' && (
-        <ViewContainer view={data.node} role={data.role} />
-      )}
     </Container>
   );
 };
