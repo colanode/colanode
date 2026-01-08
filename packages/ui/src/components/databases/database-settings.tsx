@@ -1,5 +1,13 @@
-import { Copy, Image, LetterText, Settings, Trash2 } from 'lucide-react';
-import { Fragment, useState } from 'react';
+import {
+  Copy,
+  Image,
+  LetterText,
+  Settings,
+  Trash2,
+  Lock,
+  LockOpen,
+} from 'lucide-react';
+import { Fragment, useCallback, useState } from 'react';
 
 import { LocalDatabaseNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
@@ -14,6 +22,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@colanode/ui/components/ui/dropdown-menu';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 interface DatabaseSettingsProps {
   database: LocalDatabaseNode;
@@ -21,11 +30,33 @@ interface DatabaseSettingsProps {
 }
 
 export const DatabaseSettings = ({ database, role }: DatabaseSettingsProps) => {
+  const workspace = useWorkspace();
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
   const [showDeleteDialog, setShowDeleteModal] = useState(false);
 
   const canEdit = hasNodeRole(role, 'editor');
   const canDelete = hasNodeRole(role, 'admin');
+  const isLocked = database.locked ?? false;
+
+  const handleLockDatabase = useCallback(() => {
+    if (!canEdit) {
+      return;
+    }
+
+    const nodes = workspace.collections.nodes;
+    if (!nodes.has(database.id)) {
+      return;
+    }
+
+    nodes.update(database.id, (draft) => {
+      if (draft.type !== 'database') {
+        return;
+      }
+
+      const currentLocked = draft.locked ?? false;
+      draft.locked = !currentLocked;
+    });
+  }, [canEdit, database.id, workspace.userId]);
 
   return (
     <Fragment>
@@ -63,6 +94,18 @@ export const DatabaseSettings = ({ database, role }: DatabaseSettingsProps) => {
           >
             <Image className="size-4" />
             Update icon
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="flex items-center gap-2 cursor-pointer"
+            disabled={!canEdit}
+            onClick={handleLockDatabase}
+          >
+            {isLocked ? (
+              <LockOpen className="size-4" />
+            ) : (
+              <Lock className="size-4" />
+            )}
+            {isLocked ? 'Unlock database' : 'Lock database'}
           </DropdownMenuItem>
           <DropdownMenuItem
             className="flex items-center gap-2 cursor-pointer"

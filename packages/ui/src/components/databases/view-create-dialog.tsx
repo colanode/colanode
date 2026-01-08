@@ -147,7 +147,7 @@ export const ViewCreateDialog = ({
     onOpenChange(false);
   };
 
-  if (!database.canEdit) {
+  if (!database.canEdit || database.isLocked) {
     return null;
   }
 

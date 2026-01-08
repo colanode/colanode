@@ -161,7 +161,7 @@ export const FieldCreatePopover = ({
     },
   });
 
-  if (!database.canEdit) {
+  if (!database.canEdit || database.isLocked) {
     return null;
   }
 

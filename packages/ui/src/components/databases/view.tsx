@@ -108,7 +108,7 @@ export const View = ({ view }: ViewProps) => {
           });
         },
         initFieldSort: async (fieldId: string, direction: SortDirection) => {
-          if (!database.canEdit) {
+          if (!database.canEdit || database.isLocked) {
             return;
           }
 

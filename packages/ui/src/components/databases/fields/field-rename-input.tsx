@@ -40,7 +40,7 @@ export const FieldRenameInput = ({ field }: FieldRenameInputProps) => {
     <div className="w-full p-1">
       <Input
         value={field.name}
-        readOnly={!database.canEdit}
+        readOnly={!database.canEdit || database.isLocked}
         onChange={(event) => {
           const newValue = event.target.value;
           mutate(newValue);

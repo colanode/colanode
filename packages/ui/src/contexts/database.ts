@@ -12,9 +12,11 @@ interface DatabaseContext {
   nameField: DatabaseNameFieldAttributes | null | undefined;
   fields: FieldAttributes[];
   canEdit: boolean;
+  isLocked: boolean;
   canCreateRecord: boolean;
   role: NodeRole;
   rootId: string;
+  toggleLock: () => void;
 }
 
 export const DatabaseContext = createContext<DatabaseContext>(

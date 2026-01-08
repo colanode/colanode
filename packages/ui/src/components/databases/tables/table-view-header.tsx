@@ -17,7 +17,7 @@ export const TableViewHeader = () => {
       {view.fields.map((field) => {
         return <TableViewFieldHeader viewField={field} key={field.field.id} />;
       })}
-      {database.canEdit && (
+      {database.canEdit && !database.isLocked && (
         <FieldCreatePopover
           button={<Plus className="ml-2 size-4 cursor-pointer" />}
         />

@@ -33,7 +33,7 @@ export const RecordField = ({ field }: RecordFieldProps) => {
         <PopoverContent className="ml-1 flex w-72 flex-col gap-1 p-2 text-sm">
           <FieldRenameInput field={field} />
           <Separator />
-          {database.canEdit && (
+          {database.canEdit && !database.isLocked && (
             <div
               className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent"
               onClick={() => {

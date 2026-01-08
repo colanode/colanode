@@ -20,6 +20,7 @@ export const databaseAttributesSchema = z.object({
   parentId: z.string(),
   fields: z.record(z.string(), fieldAttributesSchema),
   nameField: databaseNameFieldAttributesSchema.nullable().optional(),
+  locked: z.boolean().nullable().optional(),
 });
 
 export type DatabaseAttributes = z.infer<typeof databaseAttributesSchema>;
