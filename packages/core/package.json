@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "fractional-indexing-jittered": "^1.0.0",
-    "ulid": "^3.0.1",
-    "zod": "^4.1.12"
+    "ulid": "^3.0.2",
+    "zod": "^4.3.5"
   }
 }

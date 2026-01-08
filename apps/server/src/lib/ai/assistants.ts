@@ -1,3 +1,4 @@
+import type { Callbacks } from '@langchain/core/callbacks/manager';
 import { Document } from '@langchain/core/documents';
 import { StateGraph } from '@langchain/langgraph';
 import { CallbackHandler } from 'langfuse-langchain';
@@ -350,7 +351,9 @@ export const runAssistantResponseChain = async (
     databaseFilters: { shouldFilter: false, filters: [] },
   };
 
-  const callbacks = langfuseCallback ? [langfuseCallback] : undefined;
+  const callbacks: Callbacks | undefined = langfuseCallback
+    ? ([langfuseCallback] as Callbacks)
+    : undefined;
 
   const result = await assistantResponseChain.invoke(chainInput, {
     callbacks,
