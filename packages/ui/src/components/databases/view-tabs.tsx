@@ -14,7 +14,7 @@ export const ViewTabs = () => {
           key={view.id}
           view={view}
           isActive={view.id === databaseViews.activeViewId}
-          onClick={() => databaseViews.setActiveViewId(view.id)}
+          onClick={() => databaseViews.onActiveViewChange(view.id)}
         />
       ))}
       {database.canEdit && !database.isLocked && <ViewCreateButton />}

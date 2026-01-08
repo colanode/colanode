@@ -1,102 +1,33 @@
-import { RefAttributes, useRef } from 'react';
-import { useDrag, useDrop } from 'react-dnd';
-
 import { LocalNode } from '@colanode/client/types';
 import { ChannelSidebarItem } from '@colanode/ui/components/channels/channel-sidebar-item';
 import { ChatSidebarItem } from '@colanode/ui/components/chats/chat-sidebar-item';
 import { DatabaseSidebarItem } from '@colanode/ui/components/databases/database-sidiebar-item';
+import { ViewSidebarItem } from '@colanode/ui/components/databases/view-sidebar-item';
 import { FolderSidebarItem } from '@colanode/ui/components/folders/folder-sidebar-item';
 import { PageSidebarItem } from '@colanode/ui/components/pages/page-sidebar-item';
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
-import { cn } from '@colanode/ui/lib/utils';
 
-interface SidebarItemContentProps {
+interface SidebarItemProps {
   node: LocalNode;
-  isActive: boolean;
 }
 
-export const SidebarItemContent = ({
-  node,
-  isActive,
-}: SidebarItemContentProps): React.ReactNode => {
+export const SidebarItem = ({ node }: SidebarItemProps): React.ReactNode => {
   switch (node.type) {
     case 'space':
       return <SpaceSidebarItem space={node} />;
     case 'channel':
-      return <ChannelSidebarItem channel={node} isActive={isActive} />;
+      return <ChannelSidebarItem channel={node} />;
     case 'chat':
-      return <ChatSidebarItem chat={node} isActive={isActive} />;
+      return <ChatSidebarItem chat={node} />;
     case 'page':
-      return <PageSidebarItem page={node} isActive={isActive} />;
+      return <PageSidebarItem page={node} />;
     case 'database':
-      return <DatabaseSidebarItem database={node} isActive={isActive} />;
+      return <DatabaseSidebarItem database={node} />;
+    case 'database_view':
+      return <ViewSidebarItem view={node} />;
     case 'folder':
-      return <FolderSidebarItem folder={node} isActive={isActive} />;
+      return <FolderSidebarItem folder={node} />;
     default:
       return null;
   }
-};
-
-interface WorkspaceSidebarItemProps {
-  node: LocalNode;
-  isActive: boolean;
-  canDrag: boolean;
-  onDragEnd: (after: string | null) => void;
-}
-
-export const WorkspaceSidebarItem = ({
-  node,
-  isActive,
-  canDrag,
-  onDragEnd,
-}: WorkspaceSidebarItemProps): React.ReactNode => {
-  const [, dragRef] = useDrag({
-    type: 'sidebar-item',
-    canDrag: () => canDrag,
-    end: (_item, monitor) => {
-      const dropResult = monitor.getDropResult<{ after: string | null }>();
-      if (!dropResult) {
-        return;
-      }
-
-      if (dropResult.after === node.id) {
-        return;
-      }
-
-      onDragEnd(dropResult.after);
-    },
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging(),
-    }),
-  });
-
-  const [dropMonitor, dropRef] = useDrop({
-    accept: 'sidebar-item',
-    drop: () => ({
-      after: node.id,
-    }),
-    collect: (monitor) => ({
-      isOver: monitor.isOver(),
-      canDrop: monitor.canDrop(),
-    }),
-  });
-
-  const divRef = useRef<HTMLDivElement>(null);
-  const dragDropRef = dragRef(dropRef(divRef));
-
-  return (
-    <div
-      className={cn(
-        'text-sm flex h-7 min-w-0 -translate-x-px items-center gap-2 overflow-hidden rounded-md px-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer',
-        isActive &&
-          'bg-sidebar-accent text-sidebar-accent-foreground font-medium',
-        dropMonitor.isOver &&
-          dropMonitor.canDrop &&
-          'border-b-2 border-blue-300'
-      )}
-      ref={dragDropRef as RefAttributes<HTMLDivElement>['ref']}
-    >
-      <SidebarItemContent node={node} isActive={isActive} />
-    </div>
-  );
 };

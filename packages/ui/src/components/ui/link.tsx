@@ -47,10 +47,12 @@ const BasicLinkComponent = React.forwardRef<
 >((props, ref) => {
   const app = useApp();
   if (app.type === 'desktop') {
-    return <DesktopLinkComponent ref={ref} {...props} />;
+    return (
+      <DesktopLinkComponent ref={ref} {...props} data-router-link="true" />
+    );
   }
 
-  return <a ref={ref} {...props} />;
+  return <a ref={ref} {...props} data-router-link="true" />;
 });
 
 const CreatedLinkComponent = createLink(BasicLinkComponent);

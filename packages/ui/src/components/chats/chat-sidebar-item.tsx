@@ -3,6 +3,7 @@ import { InView } from 'react-intersection-observer';
 
 import { LocalChatNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { Link } from '@colanode/ui/components/ui/link';
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -10,10 +11,9 @@ import { cn } from '@colanode/ui/lib/utils';
 
 interface ChatSidebarItemProps {
   chat: LocalChatNode;
-  isActive: boolean;
 }
 
-export const ChatSidebarItem = ({ chat, isActive }: ChatSidebarItemProps) => {
+export const ChatSidebarItem = ({ chat }: ChatSidebarItemProps) => {
   const workspace = useWorkspace();
   const radar = useRadar();
 
@@ -42,38 +42,43 @@ export const ChatSidebarItem = ({ chat, isActive }: ChatSidebarItemProps) => {
   const unreadState = radar.getNodeState(workspace.userId, chat.id);
 
   return (
-    <InView
-      rootMargin="20px"
-      onChange={(inView) => {
-        if (inView) {
-          radar.markNodeAsSeen(workspace.userId, chat.id);
-        }
-      }}
-      className={cn(
-        'flex w-full items-center cursor-pointer',
-        isActive && 'bg-sidebar-accent'
+    <Link from="/workspace/$userId" to="$nodeId" params={{ nodeId: chat.id }}>
+      {({ isActive }) => (
+        <InView
+          rootMargin="20px"
+          onChange={(inView) => {
+            if (inView) {
+              radar.markNodeAsSeen(workspace.userId, chat.id);
+            }
+          }}
+          className={cn(
+            'text-sm flex h-7 min-w-0 items-center gap-2 rounded-md px-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer',
+            isActive &&
+              'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+          )}
+        >
+          <Avatar
+            id={user.id}
+            avatar={user.avatar}
+            name={user.name}
+            className="size-5 shrink-0"
+          />
+          <span
+            className={cn(
+              'line-clamp-1 w-full grow text-left',
+              !isActive && unreadState.hasUnread && 'font-semibold'
+            )}
+          >
+            {user.name ?? 'Unnamed'}
+          </span>
+          {!isActive && (
+            <UnreadBadge
+              count={unreadState.unreadCount}
+              unread={unreadState.hasUnread}
+            />
+          )}
+        </InView>
       )}
-    >
-      <Avatar
-        id={user.id}
-        avatar={user.avatar}
-        name={user.name}
-        className="h-5 w-5"
-      />
-      <span
-        className={cn(
-          'line-clamp-1 w-full grow pl-2 text-left',
-          !isActive && unreadState.hasUnread && 'font-semibold'
-        )}
-      >
-        {user.name ?? 'Unnamed'}
-      </span>
-      {!isActive && (
-        <UnreadBadge
-          count={unreadState.unreadCount}
-          unread={unreadState.hasUnread}
-        />
-      )}
-    </InView>
+    </Link>
   );
 };

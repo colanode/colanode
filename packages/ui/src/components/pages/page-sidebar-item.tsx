@@ -1,46 +1,101 @@
-import { LocalPageNode } from '@colanode/client/types';
+import { eq, inArray, useLiveQuery } from '@tanstack/react-db';
+import { ChevronRight } from 'lucide-react';
+import { useState } from 'react';
+
+import { LocalNode, LocalPageNode } from '@colanode/client/types';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { SidebarItem } from '@colanode/ui/components/layouts/sidebars/sidebar-item';
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from '@colanode/ui/components/ui/collapsible';
+import { Link } from '@colanode/ui/components/ui/link';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface PageSidebarItemProps {
   page: LocalPageNode;
-  isActive: boolean;
 }
 
-export const PageSidebarItem = ({ page, isActive }: PageSidebarItemProps) => {
-  const isUnread = false;
-  const mentionsCount = 0;
+export const PageSidebarItem = ({ page }: PageSidebarItemProps) => {
+  const workspace = useWorkspace();
+  const [open, setOpen] = useState(false);
+
+  const childrenQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.parentId, page.id))
+        .where(({ nodes }) =>
+          inArray(nodes.type, ['page', 'database', 'folder'])
+        )
+        .orderBy(({ nodes }) => nodes.id, 'asc'),
+    [workspace.userId, page.id]
+  );
+
+  const children = (childrenQuery.data ?? []) as LocalNode[];
+  const hasChildren = children.length > 0;
 
   return (
-    <button
-      key={page.id}
-      className={cn(
-        'flex w-full items-center cursor-pointer',
-        isActive && 'bg-sidebar-accent'
-      )}
+    <Collapsible
+      open={open}
+      onOpenChange={setOpen}
+      className="group/page-item w-full"
     >
-      <Avatar
-        id={page.id}
-        avatar={page.avatar}
-        name={page.name}
-        className="h-4 w-4"
-      />
-      <span
-        className={cn(
-          'line-clamp-1 w-full grow pl-2 text-left',
-          isUnread && 'font-bold'
+      <Link from="/workspace/$userId" to="$nodeId" params={{ nodeId: page.id }}>
+        {({ isActive }) => (
+          <div
+            className={cn(
+              'group/page-row text-sm flex h-7 min-w-0 items-center gap-2 rounded-md px-2 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground cursor-pointer',
+              isActive &&
+                'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
+            )}
+          >
+            {hasChildren ? (
+              <CollapsibleTrigger asChild>
+                <button
+                  onClick={(e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    setOpen(!open);
+                  }}
+                  className="flex items-center cursor-pointer rounded-sm hover:bg-sidebar-border"
+                >
+                  <Avatar
+                    id={page.id}
+                    avatar={page.avatar}
+                    name={page.name}
+                    className="group-hover/page-row:hidden size-4 shrink-0"
+                  />
+                  <ChevronRight className="hidden transition-transform group-hover/page-row:block group-data-[state=open]/page-item:rotate-90 size-4 shrink-0" />
+                </button>
+              </CollapsibleTrigger>
+            ) : (
+              <Avatar
+                id={page.id}
+                avatar={page.avatar}
+                name={page.name}
+                className="size-4 shrink-0"
+              />
+            )}
+            <span className="line-clamp-1 w-full grow text-left">
+              {page.name ?? 'Unnamed'}
+            </span>
+          </div>
         )}
-      >
-        {page.name ?? 'Unnamed'}
-      </span>
-      {mentionsCount > 0 && (
-        <span className="mr-1 rounded-md bg-sidebar-accent px-1 py-0.5 text-xs text-sidebar-accent-foreground">
-          {mentionsCount}
-        </span>
+      </Link>
+      {hasChildren && (
+        <CollapsibleContent>
+          <ul className="ml-3 flex min-w-0 flex-col gap-0.5 py-0.5">
+            {children.map((child) => (
+              <li key={child.id}>
+                <SidebarItem node={child} />
+              </li>
+            ))}
+          </ul>
+        </CollapsibleContent>
       )}
-      {mentionsCount == 0 && isUnread && (
-        <span className="size-2 rounded-full bg-red-500" />
-      )}
-    </button>
+    </Collapsible>
   );
 };
