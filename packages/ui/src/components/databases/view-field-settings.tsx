@@ -79,10 +79,12 @@ export const ViewFieldSettings = () => {
                   <TooltipTrigger>
                     <span
                       className={cn(
-                        database.canEdit ? 'cursor-pointer' : 'opacity-50'
+                        database.canEdit && !database.isLocked
+                          ? 'cursor-pointer'
+                          : 'opacity-50'
                       )}
                       onClick={() => {
-                        if (!database.canEdit) return;
+                        if (!database.canEdit || database.isLocked) return;
 
                         handleDisplayChange({
                           id: field.id,
@@ -103,13 +105,15 @@ export const ViewFieldSettings = () => {
                       : 'Show field in this view'}
                   </TooltipContent>
                 </Tooltip>
-                {database.canEdit && (
+                {database.canEdit && !database.isLocked && (
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Trash2
                         className={cn(
                           'size-4',
-                          database.canEdit ? 'cursor-pointer' : 'opacity-50'
+                          database.canEdit && !database.isLocked
+                            ? 'cursor-pointer'
+                            : 'opacity-50'
                         )}
                         onClick={() => {
                           setDeleteFieldId(field.id);

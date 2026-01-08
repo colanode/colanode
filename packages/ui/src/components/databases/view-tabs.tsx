@@ -17,7 +17,7 @@ export const ViewTabs = () => {
           onClick={() => databaseViews.setActiveViewId(view.id)}
         />
       ))}
-      {database.canEdit && <ViewCreateButton />}
+      {database.canEdit && !database.isLocked && <ViewCreateButton />}
     </div>
   );
 };

@@ -74,7 +74,7 @@ export const TableViewNameHeader = () => {
         bottomLeft: false,
         bottomRight: false,
         left: false,
-        right: database.canEdit,
+        right: database.canEdit && !database.isLocked,
         top: false,
         topLeft: false,
         topRight: false,
@@ -112,7 +112,7 @@ export const TableViewNameHeader = () => {
           <div className="p-1">
             <Input
               value={database.nameField?.name ?? 'Name'}
-              readOnly={!database.canEdit}
+              readOnly={!database.canEdit || database.isLocked}
               onChange={(e) => {
                 const newName = e.target.value;
                 if (newName === database.nameField?.name) return;
@@ -128,7 +128,7 @@ export const TableViewNameHeader = () => {
             />
           </div>
           <Separator />
-          {database.canEdit && (
+          {database.canEdit && !database.isLocked && (
             <Fragment>
               <div
                 className="flex cursor-pointer flex-row items-center gap-2 p-1 hover:bg-accent rounded-sm"

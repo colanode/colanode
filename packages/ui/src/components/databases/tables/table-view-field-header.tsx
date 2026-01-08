@@ -143,7 +143,7 @@ export const TableViewFieldHeader = ({
   const [, dragRef] = useDrag<ViewField>({
     type: 'table-field-header',
     item: viewField,
-    canDrag: () => database.canEdit,
+    canDrag: () => database.canEdit && !database.isLocked,
     end: (_item, monitor) => {
       const dropResult = monitor.getDropResult<{ after: string }>();
       if (!dropResult?.after) return;
@@ -190,7 +190,7 @@ export const TableViewFieldHeader = ({
           bottomLeft: false,
           bottomRight: false,
           left: false,
-          right: database.canEdit,
+          right: database.canEdit && !database.isLocked,
           top: false,
           topLeft: false,
           topRight: false,

@@ -1,4 +1,4 @@
-import { Trash2 } from 'lucide-react';
+import { Lock, LockOpen, Trash2 } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
 import { ViewAvatarInput } from '@colanode/ui/components/databases/view-avatar-input';
@@ -35,12 +35,12 @@ export const CalendarViewSettings = () => {
               name={view.name}
               avatar={view.avatar}
               layout={view.layout}
-              readOnly={!database.canEdit}
+              readOnly={!database.canEdit || database.isLocked}
             />
             <ViewRenameInput
               id={view.id}
               name={view.name}
-              readOnly={!database.canEdit}
+              readOnly={!database.canEdit || database.isLocked}
             />
           </div>
           <Separator />
@@ -53,13 +53,30 @@ export const CalendarViewSettings = () => {
                 <div
                   className="flex cursor-pointer flex-row items-center gap-1 rounded-md p-0.5 hover:bg-accent"
                   onClick={() => {
-                    setOpenDelete(true);
-                    setOpen(false);
+                    database.toggleLock();
                   }}
                 >
-                  <Trash2 className="size-4" />
-                  <span>Delete view</span>
+                  {database.isLocked ? (
+                    <LockOpen className="size-4" />
+                  ) : (
+                    <Lock className="size-4" />
+                  )}
+                  <span>
+                    {database.isLocked ? 'Unlock database' : 'Lock database'}
+                  </span>
                 </div>
+                {!database.isLocked && (
+                  <div
+                    className="flex cursor-pointer flex-row items-center gap-1 rounded-md p-0.5 hover:bg-accent"
+                    onClick={() => {
+                      setOpenDelete(true);
+                      setOpen(false);
+                    }}
+                  >
+                    <Trash2 className="size-4" />
+                    <span>Delete view</span>
+                  </div>
+                )}
               </div>
             </Fragment>
           )}
