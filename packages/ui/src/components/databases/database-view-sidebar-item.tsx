@@ -1,15 +1,17 @@
-import { LocalFolderNode } from '@colanode/client/types';
-import { Avatar } from '@colanode/ui/components/avatars/avatar';
+import { LocalDatabaseViewNode } from '@colanode/client/types';
+import { ViewIcon } from '@colanode/ui/components/databases/view-icon';
 import { Link } from '@colanode/ui/components/ui/link';
 import { cn } from '@colanode/ui/lib/utils';
 
-interface FolderSidebarItemProps {
-  folder: LocalFolderNode;
+interface DatabaseViewSidebarItemProps {
+  view: LocalDatabaseViewNode;
 }
 
-export const FolderSidebarItem = ({ folder }: FolderSidebarItemProps) => {
+export const DatabaseViewSidebarItem = ({
+  view,
+}: DatabaseViewSidebarItemProps) => {
   return (
-    <Link from="/workspace/$userId" to="$nodeId" params={{ nodeId: folder.id }}>
+    <Link from="/workspace/$userId" to="$nodeId" params={{ nodeId: view.id }}>
       {({ isActive }) => (
         <div
           className={cn(
@@ -18,14 +20,15 @@ export const FolderSidebarItem = ({ folder }: FolderSidebarItemProps) => {
               'bg-sidebar-accent text-sidebar-accent-foreground font-medium'
           )}
         >
-          <Avatar
-            id={folder.id}
-            avatar={folder.avatar}
-            name={folder.name}
+          <ViewIcon
+            id={view.id}
+            name={view.name}
+            avatar={view.avatar}
+            layout={view.layout}
             className="size-4"
           />
           <span className="line-clamp-1 w-full grow text-left">
-            {folder.name ?? 'Unnamed'}
+            {view.name ?? 'Unnamed View'}
           </span>
         </div>
       )}
