@@ -27,7 +27,7 @@ export const CalendarViewDay = ({
   const isToday = isSameDay(date, new Date());
 
   return (
-    <div className="animate-fade-in group/calendar-day flex w-full flex-col gap-1 h-40 p-2 border-r first:border-l border-border overflow-auto">
+    <td className="animate-fade-in group/calendar-day flex w-full flex-col gap-1 h-40 p-2 border-r first:border-l border-border overflow-auto">
       <div
         className={cn(
           'flex w-full justify-end text-sm',
@@ -61,6 +61,6 @@ export const CalendarViewDay = ({
           </RecordProvider>
         );
       })}
-    </div>
+    </td>
   );
 };
