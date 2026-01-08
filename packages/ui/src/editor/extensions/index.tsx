@@ -27,11 +27,13 @@ import { IdExtension } from '@colanode/ui/editor/extensions/id';
 import { LinkMark } from '@colanode/ui/editor/extensions/link';
 import { ListItemNode } from '@colanode/ui/editor/extensions/list-item';
 import { ListKeymapExtension } from '@colanode/ui/editor/extensions/list-keymap';
+import { Markdown } from '@colanode/ui/editor/extensions/markdown';
 import { MentionExtension } from '@colanode/ui/editor/extensions/mention';
 import { MessageNode } from '@colanode/ui/editor/extensions/message';
 import { OrderedListNode } from '@colanode/ui/editor/extensions/ordered-list';
 import { PageNode } from '@colanode/ui/editor/extensions/page';
 import { ParagraphNode } from '@colanode/ui/editor/extensions/paragraph';
+import { ParserExtension } from '@colanode/ui/editor/extensions/parser';
 import { PlaceholderExtension } from '@colanode/ui/editor/extensions/placeholder';
 import { TabKeymapExtension } from '@colanode/ui/editor/extensions/tab-keymap';
 import { TableNode } from '@colanode/ui/editor/extensions/table';
@@ -87,4 +89,6 @@ export {
   AutoJoiner,
   MentionExtension,
   HardBreakNode,
+  ParserExtension,
+  Markdown,
 };

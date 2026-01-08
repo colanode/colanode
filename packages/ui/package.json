@@ -66,6 +66,7 @@
     "@tiptap/extension-text": "^3.15.3",
     "@tiptap/extension-underline": "^3.15.3",
     "@tiptap/extensions": "^3.15.3",
+    "@tiptap/markdown": "^3.15.3",
     "@tiptap/pm": "^3.15.3",
     "@tiptap/react": "^3.15.3",
     "@tiptap/suggestion": "^3.15.3",

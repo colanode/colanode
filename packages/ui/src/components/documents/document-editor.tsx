@@ -83,6 +83,8 @@ import {
   DatabaseNode,
   AutoJoiner,
   HardBreakNode,
+  ParserExtension,
+  Markdown,
 } from '@colanode/ui/editor/extensions';
 import { ToolbarMenu, ActionMenu } from '@colanode/ui/editor/menus';
 
@@ -170,6 +172,8 @@ export const DocumentEditor = ({
     {
       extensions: [
         IdExtension,
+        ParserExtension,
+        Markdown,
         DocumentNode,
         PageNode,
         FolderNode,
