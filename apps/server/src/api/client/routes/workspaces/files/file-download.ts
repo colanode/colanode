@@ -59,7 +59,7 @@ export const fileDownloadRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      const role = extractNodeRole(nodes, request.user.id);
+      const role = extractNodeRole(nodes, request.workspace.user.id);
       if (role === null || !hasNodeRole(role, 'viewer')) {
         return reply.code(403).send({
           code: ApiErrorCode.FileNoAccess,

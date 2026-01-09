@@ -10,9 +10,7 @@ import {
 import { AppService } from '@colanode/client/services/app-service';
 import { WorkspaceCreateInput, WorkspaceOutput } from '@colanode/core';
 
-export class WorkspaceCreateMutationHandler
-  implements MutationHandler<WorkspaceCreateMutationInput>
-{
+export class WorkspaceCreateMutationHandler implements MutationHandler<WorkspaceCreateMutationInput> {
   private readonly app: AppService;
 
   constructor(app: AppService) {
@@ -55,9 +53,9 @@ export class WorkspaceCreateMutationHandler
           description: response.description,
           avatar: response.avatar,
           role: response.user.role,
-          storage_limit: response.user.storageLimit,
-          max_file_size: response.user.maxFileSize,
+          max_file_size: response.maxFileSize,
           created_at: new Date().toISOString(),
+          status: response.status,
         })
         .onConflict((cb) => cb.doNothing())
         .executeTakeFirst();

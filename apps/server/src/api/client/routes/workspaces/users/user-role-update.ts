@@ -7,6 +7,7 @@ import {
   userRoleUpdateInputSchema,
   apiErrorOutputSchema,
   userOutputSchema,
+  WorkspaceStatus,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { eventBus } from '@colanode/server/lib/event-bus';
@@ -34,9 +35,16 @@ export const userRoleUpdateRoute: FastifyPluginCallbackZod = (
     handler: async (request, reply) => {
       const userId = request.params.userId;
       const input = request.body;
-      const user = request.user;
+      const workspace = request.workspace;
 
-      if (user.role !== 'owner' && user.role !== 'admin') {
+      if (workspace.status === WorkspaceStatus.Readonly) {
+        return reply.code(403).send({
+          code: ApiErrorCode.WorkspaceReadonly,
+          message: 'Workspace is readonly and you cannot update user roles.',
+        });
+      }
+
+      if (workspace.user.role !== 'owner' && workspace.user.role !== 'admin') {
         return reply.code(403).send({
           code: ApiErrorCode.UserUpdateNoAccess,
           message: 'You do not have access to update users to this workspace.',
@@ -66,7 +74,7 @@ export const userRoleUpdateRoute: FastifyPluginCallbackZod = (
           role: input.role,
           status,
           updated_at: new Date(),
-          updated_by: user.account_id,
+          updated_by: request.account.id,
         })
         .where('id', '=', userToUpdate.id)
         .executeTakeFirst();

@@ -7,6 +7,7 @@ import {
   apiErrorOutputSchema,
   workspaceOutputSchema,
   workspaceUpdateInputSchema,
+  WorkspaceStatus,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { eventBus } from '@colanode/server/lib/event-bus';
@@ -36,7 +37,15 @@ export const workspaceUpdateRoute: FastifyPluginCallbackZod = (
       const workspaceId = request.params.workspaceId;
       const input = request.body;
 
-      if (request.user.role !== 'owner') {
+      if (request.workspace.status === WorkspaceStatus.Readonly) {
+        return reply.code(403).send({
+          code: ApiErrorCode.WorkspaceReadonly,
+          message:
+            'Workspace is readonly and you cannot update this workspace.',
+        });
+      }
+
+      if (request.workspace.user.role !== 'owner') {
         return reply.code(403).send({
           code: ApiErrorCode.WorkspaceUpdateNotAllowed,
           message:
@@ -51,7 +60,7 @@ export const workspaceUpdateRoute: FastifyPluginCallbackZod = (
           description: input.description,
           avatar: input.avatar,
           updated_at: new Date(),
-          updated_by: request.user.id,
+          updated_by: request.account.id,
         })
         .where('id', '=', workspaceId)
         .returningAll()
@@ -74,12 +83,11 @@ export const workspaceUpdateRoute: FastifyPluginCallbackZod = (
         name: updatedWorkspace.name,
         description: updatedWorkspace.description,
         avatar: updatedWorkspace.avatar,
+        status: updatedWorkspace.status,
         user: {
-          id: request.user.id,
-          accountId: request.user.account_id,
-          role: request.user.role,
-          storageLimit: request.user.storage_limit,
-          maxFileSize: request.user.max_file_size,
+          id: request.workspace.user.id,
+          accountId: request.workspace.user.accountId,
+          role: request.workspace.user.role,
         },
       };
 

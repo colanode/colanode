@@ -1,4 +1,4 @@
-import { WorkspaceRole } from '@colanode/core';
+import { WorkspaceRole, WorkspaceStatus } from '@colanode/core';
 
 export type Workspace = {
   userId: string;
@@ -8,8 +8,8 @@ export type Workspace = {
   avatar?: string | null;
   accountId: string;
   role: WorkspaceRole;
-  maxFileSize: string;
-  storageLimit: string;
+  maxFileSize?: string | null;
+  status: WorkspaceStatus;
 };
 
 export type SidebarMenuType = 'chats' | 'spaces' | 'settings';

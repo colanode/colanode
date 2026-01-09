@@ -4,11 +4,11 @@ import fp from 'fastify-plugin';
 import { ApiErrorCode } from '@colanode/core';
 import { isDeviceApiRateLimited } from '@colanode/server/lib/rate-limits';
 import { parseToken, verifyToken } from '@colanode/server/lib/tokens';
-import { RequestAccount } from '@colanode/server/types/api';
+import { AccountContext } from '@colanode/server/types/api';
 
 declare module 'fastify' {
   interface FastifyRequest {
-    account: RequestAccount;
+    account: AccountContext;
   }
 }
 

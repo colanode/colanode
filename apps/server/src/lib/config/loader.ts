@@ -1,6 +1,7 @@
 import fs from 'fs';
-import path from 'path';
 import { fileURLToPath } from 'node:url';
+import path from 'path';
+
 import { Configuration } from './index';
 
 type ConfigSource = Partial<Configuration>;

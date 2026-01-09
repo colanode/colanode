@@ -11,7 +11,7 @@ import {
   mapNode,
   mapUpload,
 } from '@colanode/client/lib/mappers';
-import { fetchNode, fetchUserStorageUsed } from '@colanode/client/lib/utils';
+import { fetchNode } from '@colanode/client/lib/utils';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import { AppService } from '@colanode/client/services/app-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
@@ -82,31 +82,16 @@ export class FileService {
     }
 
     const fileSize = BigInt(tempFile.size);
-    const maxFileSize = BigInt(this.workspace.maxFileSize);
-    if (fileSize > maxFileSize) {
-      throw new MutationError(
-        MutationErrorCode.FileTooLarge,
-        'The file you are trying to upload is too large. The maximum file size is ' +
-          formatBytes(maxFileSize)
-      );
-    }
 
-    const storageUsed = await fetchUserStorageUsed(
-      this.workspace.database,
-      this.workspace.userId
-    );
-
-    const storageLimit = BigInt(this.workspace.storageLimit);
-    if (storageUsed + fileSize > storageLimit) {
-      throw new MutationError(
-        MutationErrorCode.StorageLimitExceeded,
-        'You have reached your storage limit. You have used ' +
-          formatBytes(storageUsed) +
-          ' and you are trying to upload a file of size ' +
-          formatBytes(fileSize) +
-          '. Your storage limit is ' +
-          formatBytes(storageLimit)
-      );
+    if (this.workspace.maxFileSize) {
+      const maxFileSize = BigInt(this.workspace.maxFileSize);
+      if (fileSize > maxFileSize) {
+        throw new MutationError(
+          MutationErrorCode.FileTooLarge,
+          'The file you are trying to upload is too large. The maximum file size is ' +
+            formatBytes(maxFileSize)
+        );
+      }
     }
 
     const node = await fetchNode(this.workspace.database, parentId);

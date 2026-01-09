@@ -32,7 +32,7 @@ export const workspaceDeleteRoute: FastifyPluginCallbackZod = (
     handler: async (request, reply) => {
       const workspaceId = request.params.workspaceId;
 
-      if (request.user.role !== 'owner') {
+      if (request.workspace.user.role !== 'owner') {
         return reply.code(403).send({
           code: ApiErrorCode.WorkspaceDeleteNotAllowed,
           message:
@@ -79,12 +79,11 @@ export const workspaceDeleteRoute: FastifyPluginCallbackZod = (
         name: workspace.name,
         description: workspace.description,
         avatar: workspace.avatar,
+        status: workspace.status,
         user: {
-          id: request.user.id,
-          accountId: request.user.account_id,
-          role: request.user.role,
-          storageLimit: request.user.storage_limit,
-          maxFileSize: request.user.max_file_size,
+          id: request.workspace.user.id,
+          accountId: request.workspace.user.accountId,
+          role: request.workspace.user.role,
         },
       };
     },

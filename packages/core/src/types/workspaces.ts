@@ -3,6 +3,7 @@ import { z } from 'zod/v4';
 export enum WorkspaceStatus {
   Active = 1,
   Inactive = 2,
+  Readonly = 3,
 }
 
 export enum UserStatus {
@@ -32,8 +33,6 @@ export const workspaceUserOutputSchema = z.object({
   id: z.string(),
   accountId: z.string(),
   role: workspaceRoleSchema,
-  storageLimit: z.string(),
-  maxFileSize: z.string(),
 });
 
 export type WorkspaceUserOutput = z.infer<typeof workspaceUserOutputSchema>;
@@ -44,6 +43,8 @@ export const workspaceOutputSchema = z.object({
   description: z.string().nullable().optional(),
   avatar: z.string().nullable().optional(),
   user: workspaceUserOutputSchema,
+  status: z.enum(WorkspaceStatus),
+  maxFileSize: z.string().optional(),
 });
 
 export type WorkspaceOutput = z.infer<typeof workspaceOutputSchema>;

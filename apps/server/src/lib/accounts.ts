@@ -86,12 +86,11 @@ export const buildLoginSuccessOutput = async (
         name: workspace.name,
         avatar: workspace.avatar,
         description: workspace.description,
+        status: workspace.status,
         user: {
           id: user.id,
           accountId: user.account_id,
           role: user.role as WorkspaceRole,
-          storageLimit: user.storage_limit,
-          maxFileSize: user.max_file_size,
         },
       });
     }

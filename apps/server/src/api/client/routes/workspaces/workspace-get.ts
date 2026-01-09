@@ -65,12 +65,11 @@ export const workspaceGetRoute: FastifyPluginCallbackZod = (
         name: workspace.name,
         description: workspace.description,
         avatar: workspace.avatar,
+        status: workspace.status,
         user: {
           id: user.id,
           accountId: user.account_id,
           role: user.role as WorkspaceRole,
-          storageLimit: user.storage_limit,
-          maxFileSize: user.max_file_size,
         },
       };
 

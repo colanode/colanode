@@ -150,8 +150,8 @@ export const mapWorkspace = (row: SelectWorkspace): Workspace => {
     role: row.role,
     avatar: row.avatar,
     description: row.description,
-    maxFileSize: row.max_file_size.toString(),
-    storageLimit: row.storage_limit.toString(),
+    maxFileSize: row.max_file_size?.toString() ?? undefined,
+    status: row.status,
   };
 };
 

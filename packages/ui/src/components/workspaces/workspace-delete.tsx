@@ -24,7 +24,7 @@ export const WorkspaceDelete = () => {
   return (
     <>
       <div className="flex items-center justify-between gap-6">
-        <div className="flex-1 space-y-2">
+        <div className="flex-1 space-y-1">
           <h3 className="font-semibold">Delete workspace</h3>
           <p className="text-sm text-muted-foreground">
             Once you delete a workspace, there is no going back. Please be

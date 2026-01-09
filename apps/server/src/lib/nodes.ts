@@ -22,7 +22,6 @@ import {
   SelectCollaboration,
   SelectNode,
   SelectNodeUpdate,
-  SelectUser,
 } from '@colanode/server/data/schema';
 import {
   applyCollaboratorUpdates,
@@ -32,6 +31,7 @@ import { eventBus } from '@colanode/server/lib/event-bus';
 import { createLogger } from '@colanode/server/lib/logger';
 import { storage } from '@colanode/server/lib/storage';
 import { jobService } from '@colanode/server/services/job-service';
+import { WorkspaceContext } from '@colanode/server/types/api';
 import {
   ConcurrentUpdateResult,
   CreateNodeInput,
@@ -348,7 +348,7 @@ export const tryUpdateNode = async (
 };
 
 export const createNodeFromMutation = async (
-  user: SelectUser,
+  workspace: WorkspaceContext,
   mutation: CreateNodeMutationData
 ): Promise<MutationStatus> => {
   const existingNode = await fetchNode(mutation.nodeId);
@@ -369,10 +369,10 @@ export const createNodeFromMutation = async (
   const tree = parentId ? await fetchNodeTree(parentId) : [];
   const canCreateNodeContext: CanCreateNodeContext = {
     user: {
-      id: user.id,
-      role: user.role,
-      workspaceId: user.workspace_id,
-      accountId: user.account_id,
+      id: workspace.user.id,
+      role: workspace.user.role,
+      workspaceId: workspace.id,
+      accountId: workspace.user.accountId,
     },
     tree: tree.map(mapNode),
     attributes,
@@ -388,10 +388,10 @@ export const createNodeFromMutation = async (
   ).map(([userId, role]) => ({
     collaborator_id: userId,
     node_id: mutation.nodeId,
-    workspace_id: user.workspace_id,
+    workspace_id: workspace.id,
     role,
     created_at: new Date(),
-    created_by: user.id,
+    created_by: workspace.user.id,
   }));
 
   try {
@@ -405,10 +405,10 @@ export const createNodeFromMutation = async (
             id: mutation.updateId,
             node_id: mutation.nodeId,
             root_id: rootId,
-            workspace_id: user.workspace_id,
+            workspace_id: workspace.id,
             data: ydoc.getState(),
             created_at: new Date(mutation.createdAt),
-            created_by: user.id,
+            created_by: workspace.user.id,
           })
           .executeTakeFirst();
 
@@ -423,9 +423,9 @@ export const createNodeFromMutation = async (
             id: mutation.nodeId,
             root_id: rootId,
             attributes: JSON.stringify(attributes),
-            workspace_id: user.workspace_id,
+            workspace_id: workspace.id,
             created_at: new Date(mutation.createdAt),
-            created_by: user.id,
+            created_by: workspace.user.id,
             revision: createdNodeUpdate.revision,
           })
           .executeTakeFirst();
@@ -451,7 +451,7 @@ export const createNodeFromMutation = async (
       type: 'node.created',
       nodeId: mutation.nodeId,
       rootId,
-      workspaceId: user.workspace_id,
+      workspaceId: workspace.id,
     });
 
     for (const createdCollaboration of createdCollaborations) {
@@ -459,7 +459,7 @@ export const createNodeFromMutation = async (
         type: 'collaboration.created',
         collaboratorId: createdCollaboration.collaborator_id,
         nodeId: mutation.nodeId,
-        workspaceId: user.workspace_id,
+        workspaceId: workspace.id,
       });
     }
 
@@ -471,7 +471,7 @@ export const createNodeFromMutation = async (
 };
 
 export const updateNodeFromMutation = async (
-  user: SelectUser,
+  workspace: WorkspaceContext,
   mutation: UpdateNodeMutationData
 ): Promise<MutationStatus> => {
   for (let count = 0; count < UPDATE_RETRIES_LIMIT; count++) {
@@ -485,7 +485,7 @@ export const updateNodeFromMutation = async (
       return MutationStatus.OK;
     }
 
-    const result = await tryUpdateNodeFromMutation(user, mutation);
+    const result = await tryUpdateNodeFromMutation(workspace, mutation);
 
     if (result.type === 'success') {
       return result.output;
@@ -500,7 +500,7 @@ export const updateNodeFromMutation = async (
 };
 
 const tryUpdateNodeFromMutation = async (
-  user: SelectUser,
+  workspace: WorkspaceContext,
   mutation: UpdateNodeMutationData
 ): Promise<ConcurrentUpdateResult<MutationStatus>> => {
   const tree = await fetchNodeTree(mutation.nodeId);
@@ -527,10 +527,10 @@ const tryUpdateNodeFromMutation = async (
 
   const canUpdateNodeContext: CanUpdateAttributesContext = {
     user: {
-      id: user.id,
-      role: user.role,
-      workspaceId: user.workspace_id,
-      accountId: user.account_id,
+      id: workspace.user.id,
+      role: workspace.user.role,
+      workspaceId: workspace.id,
+      accountId: workspace.user.accountId,
     },
     tree: tree.map(mapNode),
     node: mapNode(node),
@@ -558,10 +558,10 @@ const tryUpdateNodeFromMutation = async (
             id: mutation.updateId,
             node_id: mutation.nodeId,
             root_id: node.root_id,
-            workspace_id: user.workspace_id,
+            workspace_id: workspace.id,
             data: update,
             created_at: new Date(mutation.createdAt),
-            created_by: user.id,
+            created_by: workspace.user.id,
           })
           .executeTakeFirst();
 
@@ -575,7 +575,7 @@ const tryUpdateNodeFromMutation = async (
           .set({
             attributes: attributesJson,
             updated_at: new Date(mutation.createdAt),
-            updated_by: user.id,
+            updated_by: workspace.user.id,
             revision: createdNodeUpdate.revision,
           })
           .where('id', '=', mutation.nodeId)
@@ -590,8 +590,8 @@ const tryUpdateNodeFromMutation = async (
           await applyCollaboratorUpdates(
             trx,
             mutation.nodeId,
-            user.id,
-            user.workspace_id,
+            workspace.user.id,
+            workspace.id,
             collaboratorChanges
           );
 
@@ -606,7 +606,7 @@ const tryUpdateNodeFromMutation = async (
       type: 'node.updated',
       nodeId: mutation.nodeId,
       rootId: node.root_id,
-      workspaceId: user.workspace_id,
+      workspaceId: workspace.id,
     });
 
     for (const createdCollaboration of createdCollaborations) {
@@ -614,7 +614,7 @@ const tryUpdateNodeFromMutation = async (
         type: 'collaboration.created',
         collaboratorId: createdCollaboration.collaborator_id,
         nodeId: mutation.nodeId,
-        workspaceId: user.workspace_id,
+        workspaceId: workspace.id,
       });
     }
 
@@ -623,7 +623,7 @@ const tryUpdateNodeFromMutation = async (
         type: 'collaboration.updated',
         collaboratorId: updatedCollaboration.collaborator_id,
         nodeId: mutation.nodeId,
-        workspaceId: user.workspace_id,
+        workspaceId: workspace.id,
       });
     }
 
@@ -634,7 +634,7 @@ const tryUpdateNodeFromMutation = async (
 };
 
 export const deleteNodeFromMutation = async (
-  user: SelectUser,
+  workspace: WorkspaceContext,
   mutation: DeleteNodeMutationData
 ): Promise<MutationStatus> => {
   const tree = await fetchNodeTree(mutation.nodeId);
@@ -650,10 +650,10 @@ export const deleteNodeFromMutation = async (
   const model = getNodeModel(node.type);
   const canDeleteNodeContext: CanDeleteNodeContext = {
     user: {
-      id: user.id,
-      role: user.role,
-      workspaceId: user.workspace_id,
-      accountId: user.account_id,
+      id: workspace.user.id,
+      role: workspace.user.role,
+      workspaceId: workspace.id,
+      accountId: workspace.user.accountId,
     },
     tree: tree.map(mapNode),
     node: mapNode(node),
@@ -682,7 +682,7 @@ export const deleteNodeFromMutation = async (
         root_id: node.root_id,
         workspace_id: node.workspace_id,
         deleted_at: new Date(mutation.deletedAt),
-        deleted_by: user.id,
+        deleted_by: workspace.user.id,
       })
       .executeTakeFirst();
 
@@ -716,15 +716,15 @@ export const deleteNodeFromMutation = async (
     type: 'node.deleted',
     nodeId: mutation.nodeId,
     rootId: node.root_id,
-    workspaceId: user.workspace_id,
+    workspaceId: workspace.id,
   });
 
   await jobService.addJob({
     type: 'node.clean',
     nodeId: mutation.nodeId,
     parentId: node.parent_id,
-    workspaceId: user.workspace_id,
-    userId: user.id,
+    workspaceId: workspace.id,
+    userId: workspace.user.id,
   });
 
   return MutationStatus.OK;

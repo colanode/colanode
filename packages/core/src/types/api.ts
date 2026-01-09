@@ -7,6 +7,7 @@ export enum ApiHeader {
 }
 
 export enum ApiErrorCode {
+  WorkspaceReadonly = 'workspace_readonly',
   AccountNotFound = 'account_not_found',
   DeviceNotFound = 'device_not_found',
   AccountMismatch = 'account_mismatch',

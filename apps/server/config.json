@@ -31,12 +31,6 @@
     }
   },
 
-  "user": {
-    "_comment": "Per-user storage limits (in bytes)",
-    "storageLimit": "10737418240",
-    "maxFileSize": "104857600"
-  },
-
   "postgres": {
     "_comment": "PostgreSQL database connection",
     "url": "env://POSTGRES_URL",
@@ -116,11 +110,5 @@
   "logging": {
     "_comment": "Logging level: trace, debug, info, warn, error, fatal, silent",
     "level": "info"
-  },
-
-  "workspace": {
-    "_comment": "Per-workspace storage limits (optional)",
-    "storageLimit": "21474836480",
-    "maxFileSize": "524288000"
   }
 }
