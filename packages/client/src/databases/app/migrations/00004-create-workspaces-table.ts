@@ -11,10 +11,10 @@ export const createWorkspacesTable: Migration = {
       .addColumn('description', 'text')
       .addColumn('avatar', 'text')
       .addColumn('role', 'text', (col) => col.notNull())
-      .addColumn('storage_limit', 'integer', (col) => col.notNull())
-      .addColumn('max_file_size', 'integer', (col) => col.notNull())
+      .addColumn('max_file_size', 'integer')
       .addColumn('created_at', 'text', (col) => col.notNull())
       .addColumn('updated_at', 'text')
+      .addColumn('status', 'integer', (col) => col.notNull())
       .execute();
   },
   down: async (db) => {

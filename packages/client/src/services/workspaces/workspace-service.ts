@@ -19,7 +19,7 @@ import { RadarService } from '@colanode/client/services/workspaces/radar-service
 import { SyncService } from '@colanode/client/services/workspaces/sync-service';
 import { UserService } from '@colanode/client/services/workspaces/user-service';
 import { Workspace } from '@colanode/client/types/workspaces';
-import { createDebugger, WorkspaceRole } from '@colanode/core';
+import { createDebugger, WorkspaceRole, WorkspaceStatus } from '@colanode/core';
 
 const debug = createDebugger('desktop:service:workspace');
 
@@ -83,12 +83,12 @@ export class WorkspaceService {
     return this.workspace.role;
   }
 
-  public get maxFileSize(): string {
+  public get maxFileSize(): string | null | undefined {
     return this.workspace.maxFileSize;
   }
 
-  public get storageLimit(): string {
-    return this.workspace.storageLimit;
+  public get status(): WorkspaceStatus {
+    return this.workspace.status;
   }
 
   public updateWorkspace(workspace: Workspace): void {

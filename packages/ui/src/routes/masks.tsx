@@ -63,18 +63,6 @@ export const workspaceUsersRouteMask = createRouteMask({
   },
 });
 
-export const workspaceStorageRouteMask = createRouteMask({
-  routeTree: routeTree,
-  from: '/workspace/$userId/storage',
-  to: '/$workspaceId/storage',
-  params: (ctx) => {
-    const workspace = collections.workspaces.get(ctx.userId);
-    return {
-      workspaceId: workspace?.workspaceId ?? 'unknown',
-    };
-  },
-});
-
 export const workspaceUploadsRouteMask = createRouteMask({
   routeTree: routeTree,
   from: '/workspace/$userId/uploads',
@@ -155,7 +143,6 @@ export const routeMasks = [
   modalNodeRouteMask,
   workspaceSettingsRouteMask,
   workspaceUsersRouteMask,
-  workspaceStorageRouteMask,
   workspaceUploadsRouteMask,
   workspaceDownloadsRouteMask,
   accountSettingsRouteMask,

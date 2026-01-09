@@ -81,6 +81,7 @@ export enum MutationErrorCode {
   EmailVerificationFailed = 'email_verification_failed',
   ServerNotFound = 'server_not_found',
   WorkspaceNotFound = 'workspace_not_found',
+  WorkspaceReadonly = 'workspace_readonly',
   WorkspaceNotCreated = 'workspace_not_created',
   WorkspaceNotUpdated = 'workspace_not_updated',
   SpaceNotFound = 'space_not_found',

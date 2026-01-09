@@ -6,12 +6,12 @@ import {
   MutationStatus,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
-import { SelectUser } from '@colanode/server/data/schema';
 import { eventBus } from '@colanode/server/lib/event-bus';
 import { mapNode } from '@colanode/server/lib/nodes';
+import { WorkspaceContext } from '@colanode/server/types/api';
 
 export const markNodeAsSeen = async (
-  user: SelectUser,
+  workspace: WorkspaceContext,
   mutation: NodeInteractionSeenMutation
 ): Promise<MutationStatus> => {
   const node = await database
@@ -35,7 +35,7 @@ export const markNodeAsSeen = async (
   }
 
   const rootNode = mapNode(root);
-  const role = extractNodeRole(rootNode, user.id);
+  const role = extractNodeRole(rootNode, workspace.user.id);
   if (!role || !hasNodeRole(role, 'viewer')) {
     return MutationStatus.FORBIDDEN;
   }
@@ -44,7 +44,7 @@ export const markNodeAsSeen = async (
     .selectFrom('node_interactions')
     .selectAll()
     .where('node_id', '=', mutation.data.nodeId)
-    .where('collaborator_id', '=', user.id)
+    .where('collaborator_id', '=', workspace.user.id)
     .executeTakeFirst();
 
   if (
@@ -62,7 +62,7 @@ export const markNodeAsSeen = async (
     .returningAll()
     .values({
       node_id: mutation.data.nodeId,
-      collaborator_id: user.id,
+      collaborator_id: workspace.user.id,
       first_seen_at: firstSeenAt,
       last_seen_at: lastSeenAt,
       root_id: root.id,
@@ -92,7 +92,7 @@ export const markNodeAsSeen = async (
 };
 
 export const markNodeAsOpened = async (
-  user: SelectUser,
+  workspace: WorkspaceContext,
   mutation: NodeInteractionOpenedMutation
 ): Promise<MutationStatus> => {
   const node = await database
@@ -116,7 +116,7 @@ export const markNodeAsOpened = async (
   }
 
   const rootNode = mapNode(root);
-  const role = extractNodeRole(rootNode, user.id);
+  const role = extractNodeRole(rootNode, workspace.user.id);
   if (!role || !hasNodeRole(role, 'viewer')) {
     return MutationStatus.FORBIDDEN;
   }
@@ -125,7 +125,7 @@ export const markNodeAsOpened = async (
     .selectFrom('node_interactions')
     .selectAll()
     .where('node_id', '=', mutation.data.nodeId)
-    .where('collaborator_id', '=', user.id)
+    .where('collaborator_id', '=', workspace.user.id)
     .executeTakeFirst();
 
   if (
@@ -143,7 +143,7 @@ export const markNodeAsOpened = async (
     .returningAll()
     .values({
       node_id: mutation.data.nodeId,
-      collaborator_id: user.id,
+      collaborator_id: workspace.user.id,
       first_opened_at: firstOpenedAt,
       last_opened_at: lastOpenedAt,
       root_id: root.id,

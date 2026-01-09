@@ -21,8 +21,6 @@ export * from './records/record-search';
 export * from './users/user-list';
 export * from './users/user-search';
 export * from './workspaces/workspace-list';
-export * from './workspaces/workspace-storage-get';
-export * from './workspaces/workspace-storage-users-get';
 export * from './avatars/avatar-get';
 export * from './records/record-field-value-count';
 export * from './files/upload-list';

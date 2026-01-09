@@ -36,7 +36,6 @@ export const createWorkspace = async (
       created_at: date,
       created_by: account.id,
       status: WorkspaceStatus.Active,
-      storage_limit: config.workspace.storageLimit,
       max_file_size: config.workspace.maxFileSize,
     })
     .returningAll()
@@ -56,11 +55,11 @@ export const createWorkspace = async (
       name: account.name,
       email: account.email,
       avatar: account.avatar,
-      storage_limit: config.user.storageLimit,
-      max_file_size: config.user.maxFileSize,
       created_at: date,
       created_by: account.id,
       status: UserStatus.Active,
+      max_file_size: '0',
+      storage_limit: '0',
     })
     .returningAll()
     .executeTakeFirst();
@@ -154,12 +153,11 @@ export const createWorkspace = async (
     name: workspace.name,
     description: workspace.description,
     avatar: workspace.avatar,
+    status: workspace.status,
     user: {
       id: user.id,
       accountId: user.account_id,
       role: user.role,
-      storageLimit: user.storage_limit,
-      maxFileSize: user.max_file_size,
     },
   };
 };

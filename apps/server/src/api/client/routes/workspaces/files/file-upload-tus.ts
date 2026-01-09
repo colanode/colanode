@@ -2,11 +2,16 @@ import { Server } from '@tus/server';
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 import { z } from 'zod/v4';
 
-import { ApiErrorCode, FileStatus, generateId, IdType } from '@colanode/core';
+import {
+  ApiErrorCode,
+  FileStatus,
+  generateId,
+  IdType,
+  WorkspaceStatus,
+} from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { redis } from '@colanode/server/data/redis';
 import { config } from '@colanode/server/lib/config';
-import { fetchCounter } from '@colanode/server/lib/counters';
 import { generateUrl } from '@colanode/server/lib/fastify';
 import { mapNode, updateNode } from '@colanode/server/lib/nodes';
 import { storage } from '@colanode/server/lib/storage';
@@ -35,18 +40,12 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
     },
     handler: async (request, reply) => {
       const { workspaceId, fileId } = request.params;
-      const user = request.user;
+      const user = request.workspace.user;
 
-      const workspace = await database
-        .selectFrom('workspaces')
-        .selectAll()
-        .where('id', '=', workspaceId)
-        .executeTakeFirst();
-
-      if (!workspace) {
-        return reply.code(404).send({
-          code: ApiErrorCode.WorkspaceNotFound,
-          message: 'Workspace not found.',
+      if (request.workspace.status === WorkspaceStatus.Readonly) {
+        return reply.code(403).send({
+          code: ApiErrorCode.WorkspaceReadonly,
+          message: 'Workspace is readonly and you cannot upload files.',
         });
       }
 
@@ -105,59 +104,14 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
             };
           }
 
-          if (file.size > BigInt(user.max_file_size)) {
-            throw {
-              status_code: 400,
-              body: JSON.stringify({
-                code: ApiErrorCode.UserMaxFileSizeExceeded,
-                message:
-                  'The file size exceeds the maximum allowed size for your account.',
-              }),
-            };
-          }
-
-          if (workspace.max_file_size) {
-            if (file.size > BigInt(workspace.max_file_size)) {
+          if (request.workspace.maxFileSize) {
+            if (file.size > BigInt(request.workspace.maxFileSize)) {
               throw {
                 status_code: 400,
                 body: JSON.stringify({
                   code: ApiErrorCode.WorkspaceMaxFileSizeExceeded,
                   message:
                     'The file size exceeds the maximum allowed size for this workspace.',
-                }),
-              };
-            }
-          }
-
-          const userStorageUsed = await fetchCounter(
-            database,
-            `${user.id}.uploads.size`
-          );
-
-          if (userStorageUsed >= BigInt(user.storage_limit)) {
-            throw {
-              status_code: 400,
-              body: JSON.stringify({
-                code: ApiErrorCode.UserStorageLimitExceeded,
-                message:
-                  'You have reached the maximum storage limit for your account.',
-              }),
-            };
-          }
-
-          if (workspace.storage_limit) {
-            const workspaceStorageUsed = await fetchCounter(
-              database,
-              `${workspaceId}.uploads.size`
-            );
-
-            if (workspaceStorageUsed >= BigInt(workspace.storage_limit)) {
-              throw {
-                status_code: 400,
-                body: JSON.stringify({
-                  code: ApiErrorCode.WorkspaceStorageLimitExceeded,
-                  message:
-                    'The workspace has reached the maximum storage limit for this workspace.',
                 }),
               };
             }
@@ -176,7 +130,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
               path: path,
               version_id: file.version,
               created_at: new Date(),
-              created_by: request.user.id,
+              created_by: request.workspace.user.id,
             })
             .onConflict((oc) =>
               oc.columns(['file_id']).doUpdateSet({
@@ -239,7 +193,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
 
           const result = await updateNode({
             nodeId: fileId,
-            userId: request.user.id,
+            userId: request.workspace.user.id,
             workspaceId: workspaceId,
             updater(attributes) {
               if (attributes.type !== 'file') {

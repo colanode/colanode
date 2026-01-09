@@ -42,10 +42,6 @@ import {
   workspaceSettingsRoute,
 } from '@colanode/ui/routes/workspace/settings';
 import {
-  workspaceStorageMaskRoute,
-  workspaceStorageRoute,
-} from '@colanode/ui/routes/workspace/storage';
-import {
   workspaceUploadsMaskRoute,
   workspaceUploadsRoute,
 } from '@colanode/ui/routes/workspace/uploads';
@@ -64,7 +60,6 @@ export const routeTree = rootRoute.addChildren([
     nodeRoute.addChildren([modalNodeRoute]),
     workspaceDownloadsRoute,
     workspaceUploadsRoute,
-    workspaceStorageRoute,
     workspaceUsersRoute,
     workspaceSettingsRoute,
     accountSettingsRoute,
@@ -77,7 +72,6 @@ export const routeTree = rootRoute.addChildren([
     nodeMaskRoute,
     workspaceSettingsMaskRoute,
     workspaceUsersMaskRoute,
-    workspaceStorageMaskRoute,
     workspaceUploadsMaskRoute,
     workspaceDownloadsMaskRoute,
     accountSettingsMaskRoute,

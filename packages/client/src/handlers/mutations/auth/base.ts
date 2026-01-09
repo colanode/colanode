@@ -53,11 +53,11 @@ export abstract class AuthMutationHandlerBase {
                 user_id: workspace.user.id,
                 account_id: createdAccount.id,
                 role: workspace.user.role,
-                storage_limit: workspace.user.storageLimit,
-                max_file_size: workspace.user.maxFileSize,
+                max_file_size: workspace.maxFileSize ?? undefined,
                 avatar: workspace.avatar,
                 description: workspace.description,
                 created_at: new Date().toISOString(),
+                status: workspace.status,
               })
               .executeTakeFirst();
 

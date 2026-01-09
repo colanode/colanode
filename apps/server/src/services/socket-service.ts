@@ -4,7 +4,7 @@ import { generateId, IdType } from '@colanode/core';
 import { redis } from '@colanode/server/data/redis';
 import { eventBus } from '@colanode/server/lib/event-bus';
 import { SocketConnection } from '@colanode/server/services/socket-connection';
-import { ClientContext, RequestAccount } from '@colanode/server/types/api';
+import { ClientContext, AccountContext } from '@colanode/server/types/api';
 import { SocketContext } from '@colanode/server/types/sockets';
 
 class SocketService {
@@ -28,7 +28,7 @@ class SocketService {
     });
   }
 
-  public async initSocket(account: RequestAccount, client: ClientContext) {
+  public async initSocket(account: AccountContext, client: ClientContext) {
     const id = generateId(IdType.Socket);
     const context: SocketContext = {
       id,

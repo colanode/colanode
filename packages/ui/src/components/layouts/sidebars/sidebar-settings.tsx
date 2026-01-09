@@ -1,6 +1,5 @@
 import { count, inArray, useLiveQuery } from '@tanstack/react-db';
 import {
-  Cylinder,
   Download,
   LogOut,
   Palette,
@@ -59,15 +58,6 @@ export const SidebarSettings = () => {
             <SidebarSettingsItem
               title="Users"
               icon={Users}
-              isActive={isActive}
-            />
-          )}
-        </Link>
-        <Link from="/workspace/$userId" to="storage">
-          {({ isActive }) => (
-            <SidebarSettingsItem
-              title="Storage"
-              icon={Cylinder}
               isActive={isActive}
             />
           )}

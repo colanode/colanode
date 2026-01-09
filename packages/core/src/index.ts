@@ -37,5 +37,4 @@ export * from './types/mentions';
 export * from './types/avatars';
 export * from './types/build';
 export * from './lib/servers';
-export * from './types/storage';
 export * from './types/auth';

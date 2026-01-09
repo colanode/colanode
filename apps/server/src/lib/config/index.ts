@@ -10,13 +10,11 @@ import { postgresConfigSchema } from './postgres';
 import { redisConfigSchema } from './redis';
 import { serverConfigSchema } from './server';
 import { storageConfigSchema } from './storage';
-import { userConfigSchema } from './user';
 import { workspaceConfigSchema } from './workspace';
 
 const configSchema = z.object({
   server: serverConfigSchema,
   account: accountConfigSchema,
-  user: userConfigSchema,
   postgres: postgresConfigSchema,
   redis: redisConfigSchema,
   storage: storageConfigSchema,

@@ -1,7 +1,7 @@
 import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
 
 import { JobScheduleStatus, JobStatus } from '@colanode/client/jobs';
-import { FileSubtype, WorkspaceRole } from '@colanode/core';
+import { FileSubtype, WorkspaceRole, WorkspaceStatus } from '@colanode/core';
 
 interface ServerTable {
   domain: ColumnType<string, string, never>;
@@ -119,10 +119,10 @@ interface WorkspacesTable {
   description: ColumnType<string | null, string | null, string | null>;
   avatar: ColumnType<string | null, string | null, string | null>;
   role: ColumnType<WorkspaceRole, WorkspaceRole, WorkspaceRole>;
-  storage_limit: ColumnType<string, string, string>;
-  max_file_size: ColumnType<string, string, string>;
+  max_file_size: ColumnType<string | null, string | null, string | null>;
   created_at: ColumnType<string, string, string>;
   updated_at: ColumnType<string | null, string | null, string | null>;
+  status: ColumnType<WorkspaceStatus, WorkspaceStatus, WorkspaceStatus>;
 }
 
 export type SelectWorkspace = Selectable<WorkspacesTable>;

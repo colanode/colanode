@@ -1,13 +1,18 @@
 import { FastifyPluginCallback } from 'fastify';
 import fp from 'fastify-plugin';
 
-import { ApiErrorCode, UserStatus } from '@colanode/core';
+import {
+  ApiErrorCode,
+  UserStatus,
+  WorkspaceRole,
+  WorkspaceStatus,
+} from '@colanode/core';
 import { database } from '@colanode/server/data/database';
-import { SelectUser } from '@colanode/server/data/schema';
+import { WorkspaceContext } from '@colanode/server/types/api';
 
 declare module 'fastify' {
   interface FastifyRequest {
-    user: SelectUser;
+    workspace: WorkspaceContext;
   }
 }
 
@@ -34,21 +39,45 @@ const workspaceAuthenticatorCallback: FastifyPluginCallback = (
       });
     }
 
-    const user = await database
-      .selectFrom('users')
-      .selectAll()
-      .where('workspace_id', '=', workspaceId)
-      .where('account_id', '=', request.account.id)
+    const workspace = await database
+      .selectFrom('workspaces')
+      .innerJoin('users', 'workspaces.id', 'users.workspace_id')
+      .select([
+        'workspaces.id as workspace_id',
+        'workspaces.max_file_size as max_file_size',
+        'workspaces.status as status',
+        'users.id as user_id',
+        'users.role as user_role',
+        'users.status as user_status',
+      ])
+      .where('workspaces.id', '=', workspaceId)
+      .where('users.account_id', '=', request.account.id)
       .executeTakeFirst();
 
-    if (!user || user.status !== UserStatus.Active || user.role === 'none') {
+    if (
+      !workspace ||
+      workspace.status !== WorkspaceStatus.Active ||
+      workspace.user_role === 'none' ||
+      workspace.user_status !== UserStatus.Active
+    ) {
       return reply.code(403).send({
         code: ApiErrorCode.WorkspaceNoAccess,
         message: 'You do not have access to this workspace.',
       });
     }
 
-    request.user = user;
+    const context: WorkspaceContext = {
+      id: workspace.workspace_id,
+      maxFileSize: workspace.max_file_size,
+      status: workspace.status,
+      user: {
+        id: workspace.user_id,
+        accountId: request.account.id,
+        role: workspace.user_role as WorkspaceRole,
+      },
+    };
+
+    request.workspace = context;
   });
 
   done();

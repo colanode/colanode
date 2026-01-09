@@ -1,4 +1,4 @@
-import { Kysely, sql, Transaction } from 'kysely';
+import { Kysely, Transaction } from 'kysely';
 
 import { WorkspaceDatabaseSchema } from '@colanode/client/databases/workspace';
 import { mapNode } from '@colanode/client/lib/mappers';
@@ -47,24 +47,6 @@ export const fetchNode = async (
     .executeTakeFirst();
 
   return node ? mapNode(node) : undefined;
-};
-
-export const fetchUserStorageUsed = async (
-  database:
-    | Kysely<WorkspaceDatabaseSchema>
-    | Transaction<WorkspaceDatabaseSchema>,
-  userId: string
-): Promise<bigint> => {
-  const storageUsedRow = await database
-    .selectFrom('nodes')
-    .select(({ fn }) => [
-      fn.sum(sql`json_extract(attributes, '$.size')`).as('storage_used'),
-    ])
-    .where('type', '=', 'file')
-    .where('created_by', '=', userId)
-    .executeTakeFirst();
-
-  return BigInt(storageUsedRow?.storage_used ?? 0);
 };
 
 export const deleteNodeRelations = async (

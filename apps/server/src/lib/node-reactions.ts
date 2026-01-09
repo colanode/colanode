@@ -6,12 +6,12 @@ import {
   MutationStatus,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
-import { SelectUser } from '@colanode/server/data/schema';
 import { eventBus } from '@colanode/server/lib/event-bus';
 import { fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
+import { WorkspaceContext } from '@colanode/server/types/api';
 
 export const createNodeReaction = async (
-  user: SelectUser,
+  workspace: WorkspaceContext,
   mutation: CreateNodeReactionMutation
 ): Promise<MutationStatus> => {
   const tree = await fetchNodeTree(mutation.data.nodeId);
@@ -32,10 +32,10 @@ export const createNodeReaction = async (
   const model = getNodeModel(node.type);
   const context: CanReactNodeContext = {
     user: {
-      id: user.id,
-      role: user.role,
-      accountId: user.account_id,
-      workspaceId: user.workspace_id,
+      id: workspace.user.id,
+      role: workspace.user.role,
+      accountId: workspace.user.accountId,
+      workspaceId: workspace.id,
     },
     tree: tree.map(mapNode),
     node: mapNode(node),
@@ -50,7 +50,7 @@ export const createNodeReaction = async (
     .returningAll()
     .values({
       node_id: mutation.data.nodeId,
-      collaborator_id: user.id,
+      collaborator_id: workspace.user.id,
       reaction: mutation.data.reaction,
       workspace_id: root.workspace_id,
       root_id: root.id,
@@ -80,7 +80,7 @@ export const createNodeReaction = async (
 };
 
 export const deleteNodeReaction = async (
-  user: SelectUser,
+  workspace: WorkspaceContext,
   mutation: DeleteNodeReactionMutation
 ): Promise<MutationStatus> => {
   const tree = await fetchNodeTree(mutation.data.nodeId);
@@ -101,10 +101,10 @@ export const deleteNodeReaction = async (
   const model = getNodeModel(node.type);
   const context: CanReactNodeContext = {
     user: {
-      id: user.id,
-      role: user.role,
-      accountId: user.account_id,
-      workspaceId: user.workspace_id,
+      id: workspace.user.id,
+      role: workspace.user.role,
+      accountId: workspace.user.accountId,
+      workspaceId: workspace.id,
     },
     tree: tree.map(mapNode),
     node: mapNode(node),
@@ -120,7 +120,7 @@ export const deleteNodeReaction = async (
       deleted_at: new Date(mutation.data.deletedAt),
     })
     .where('node_id', '=', mutation.data.nodeId)
-    .where('collaborator_id', '=', user.id)
+    .where('collaborator_id', '=', workspace.user.id)
     .where('reaction', '=', mutation.data.reaction)
     .executeTakeFirst();
 
@@ -131,7 +131,7 @@ export const deleteNodeReaction = async (
   eventBus.publish({
     type: 'node.reaction.deleted',
     nodeId: mutation.data.nodeId,
-    collaboratorId: user.id,
+    collaboratorId: workspace.user.id,
     rootId: node.root_id,
     workspaceId: node.workspace_id,
   });

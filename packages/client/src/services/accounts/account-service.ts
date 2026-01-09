@@ -229,8 +229,6 @@ export class AccountService {
                   description: workspace.description,
                   avatar: workspace.avatar,
                   role: workspace.user.role,
-                  storage_limit: workspace.user.storageLimit,
-                  max_file_size: workspace.user.maxFileSize,
                 })
                 .where('workspace_id', '=', workspace.id)
                 .executeTakeFirst();
@@ -251,9 +249,9 @@ export class AccountService {
                   description: workspace.description,
                   avatar: workspace.avatar,
                   role: workspace.user.role,
-                  storage_limit: workspace.user.storageLimit,
-                  max_file_size: workspace.user.maxFileSize,
+                  max_file_size: workspace.maxFileSize ?? undefined,
                   created_at: new Date().toISOString(),
+                  status: workspace.status,
                 })
                 .executeTakeFirst();
 

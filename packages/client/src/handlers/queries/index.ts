@@ -33,8 +33,6 @@ import { ServerListQueryHandler } from './servers/server-list';
 import { UserListQueryHandler } from './users/user-list';
 import { UserSearchQueryHandler } from './users/user-search';
 import { WorkspaceListQueryHandler } from './workspaces/workspace-list';
-import { WorkspaceStorageGetQueryHandler } from './workspaces/workspace-storage-get';
-import { WorkspaceStorageUsersGetQueryHandler } from './workspaces/workspace-storage-users-get';
 
 export type QueryHandlerMap = {
   [K in keyof QueryMap]: QueryHandler<QueryMap[K]['input']>;
@@ -50,10 +48,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'record.field.value.count': new RecordFieldValueCountQueryHandler(app),
     'user.search': new UserSearchQueryHandler(app),
     'workspace.list': new WorkspaceListQueryHandler(app),
-    'workspace.storage.get': new WorkspaceStorageGetQueryHandler(app),
-    'workspace.storage.users.get': new WorkspaceStorageUsersGetQueryHandler(
-      app
-    ),
     'user.list': new UserListQueryHandler(app),
     'emoji.list': new EmojiListQueryHandler(app),
     'emoji.get': new EmojiGetQueryHandler(app),

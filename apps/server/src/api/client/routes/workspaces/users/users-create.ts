@@ -11,10 +11,10 @@ import {
   UsersCreateOutput,
   usersCreateOutputSchema,
   UserStatus,
+  WorkspaceStatus,
 } from '@colanode/core';
 import { database } from '@colanode/server/data/database';
 import { SelectAccount } from '@colanode/server/data/schema';
-import { config } from '@colanode/server/lib/config';
 import { eventBus } from '@colanode/server/lib/event-bus';
 import { getNameFromEmail } from '@colanode/server/lib/utils';
 
@@ -41,7 +41,14 @@ export const usersCreateRoute: FastifyPluginCallbackZod = (
     handler: async (request, reply) => {
       const workspaceId = request.params.workspaceId;
       const input = request.body;
-      const user = request.user;
+      const workspace = request.workspace;
+
+      if (workspace.status === WorkspaceStatus.Readonly) {
+        return reply.code(403).send({
+          code: ApiErrorCode.WorkspaceReadonly,
+          message: 'Workspace is readonly and you cannot invite users.',
+        });
+      }
 
       if (!input.users || input.users.length === 0) {
         return reply.code(400).send({
@@ -50,7 +57,7 @@ export const usersCreateRoute: FastifyPluginCallbackZod = (
         });
       }
 
-      if (user.role !== 'owner' && user.role !== 'admin') {
+      if (workspace.user.role !== 'owner' && workspace.user.role !== 'admin') {
         return reply.code(403).send({
           code: ApiErrorCode.UserInviteNoAccess,
           message: 'You do not have access to invite users to this workspace.',
@@ -108,11 +115,11 @@ export const usersCreateRoute: FastifyPluginCallbackZod = (
             name: account.name,
             email: account.email,
             avatar: account.avatar,
-            storage_limit: config.user.storageLimit,
-            max_file_size: config.user.maxFileSize,
             created_at: new Date(),
             created_by: request.account.id,
             status: UserStatus.Active,
+            max_file_size: '0',
+            storage_limit: '0',
           })
           .executeTakeFirst();
 

@@ -11,10 +11,10 @@ import {
 } from '@colanode/core';
 import { decodeState, YDoc } from '@colanode/crdt';
 import { database } from '@colanode/server/data/database';
-import { SelectUser } from '@colanode/server/data/schema';
 import { eventBus } from '@colanode/server/lib/event-bus';
 import { createLogger } from '@colanode/server/lib/logger';
 import { fetchNode, fetchNodeTree, mapNode } from '@colanode/server/lib/nodes';
+import { WorkspaceContext } from '@colanode/server/types/api';
 import {
   CreateDocumentInput,
   CreateDocumentOutput,
@@ -114,7 +114,7 @@ export const createDocument = async (
 };
 
 export const updateDocumentFromMutation = async (
-  user: SelectUser,
+  workspace: WorkspaceContext,
   mutation: UpdateDocumentMutationData
 ): Promise<MutationStatus> => {
   for (let count = 0; count < UPDATE_RETRIES_LIMIT; count++) {
@@ -128,7 +128,7 @@ export const updateDocumentFromMutation = async (
       return MutationStatus.OK;
     }
 
-    const result = await tryUpdateDocumentFromMutation(user, mutation);
+    const result = await tryUpdateDocumentFromMutation(workspace, mutation);
 
     if (result.type === 'success') {
       return result.output;
@@ -143,7 +143,7 @@ export const updateDocumentFromMutation = async (
 };
 
 const tryUpdateDocumentFromMutation = async (
-  user: SelectUser,
+  workspace: WorkspaceContext,
   mutation: UpdateDocumentMutationData
 ): Promise<ConcurrentUpdateResult<MutationStatus>> => {
   const tree = await fetchNodeTree(mutation.documentId);
@@ -163,10 +163,10 @@ const tryUpdateDocumentFromMutation = async (
 
   const context: CanUpdateDocumentContext = {
     user: {
-      id: user.id,
-      role: user.role,
-      workspaceId: user.workspace_id,
-      accountId: user.account_id,
+      id: workspace.user.id,
+      role: workspace.user.role,
+      workspaceId: workspace.id,
+      accountId: workspace.user.accountId,
     },
     node: mapNode(node),
     tree: tree.map((node) => mapNode(node)),
@@ -211,10 +211,10 @@ const tryUpdateDocumentFromMutation = async (
             id: mutation.updateId,
             document_id: mutation.documentId,
             root_id: node.root_id,
-            workspace_id: user.workspace_id,
+            workspace_id: workspace.id,
             data: decodeState(mutation.data),
             created_at: new Date(mutation.createdAt),
-            created_by: user.id,
+            created_by: workspace.user.id,
             merged_updates: null,
           })
           .executeTakeFirst();
@@ -230,7 +230,7 @@ const tryUpdateDocumentFromMutation = async (
               .set({
                 content: JSON.stringify(content),
                 updated_at: new Date(mutation.createdAt),
-                updated_by: user.id,
+                updated_by: workspace.user.id,
                 revision: createdDocumentUpdate.revision,
               })
               .where('id', '=', mutation.documentId)
@@ -241,10 +241,10 @@ const tryUpdateDocumentFromMutation = async (
               .returningAll()
               .values({
                 id: mutation.documentId,
-                workspace_id: user.workspace_id,
+                workspace_id: workspace.id,
                 content: JSON.stringify(content),
                 created_at: new Date(mutation.createdAt),
-                created_by: user.id,
+                created_by: workspace.user.id,
                 revision: createdDocumentUpdate.revision,
               })
               .onConflict((cb) => cb.doNothing())
@@ -267,14 +267,14 @@ const tryUpdateDocumentFromMutation = async (
     eventBus.publish({
       type: 'document.updated',
       documentId: mutation.documentId,
-      workspaceId: user.workspace_id,
+      workspaceId: workspace.id,
     });
 
     eventBus.publish({
       type: 'document.update.created',
       documentId: mutation.documentId,
       rootId: node.root_id,
-      workspaceId: user.workspace_id,
+      workspaceId: workspace.id,
     });
 
     return {
