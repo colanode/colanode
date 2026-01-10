@@ -8,7 +8,7 @@ export const generateUrl = (request: FastifyRequest, path: string) => {
       ? `:${request.port}`
       : '';
 
-  const prefix = config.server.pathPrefix ? `/${config.server.pathPrefix}` : '';
+  const prefix = config.pathPrefix ? `/${config.pathPrefix}` : '';
 
   return `${request.protocol}://${request.hostname}${port}${prefix}${path}`;
 };

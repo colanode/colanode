@@ -1,6 +1,6 @@
 import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod';
 
-import { ServerConfig, serverConfigSchema } from '@colanode/core';
+import { build, ServerConfig, serverConfigSchema } from '@colanode/core';
 import { config } from '@colanode/server/lib/config';
 
 export const configGetRoute: FastifyPluginCallbackZod = (instance, _, done) => {
@@ -14,12 +14,12 @@ export const configGetRoute: FastifyPluginCallbackZod = (instance, _, done) => {
     },
     handler: async (request) => {
       const output: ServerConfig = {
-        name: config.server.name,
-        avatar: config.server.avatar ?? '',
-        version: config.server.version,
-        sha: config.server.sha,
+        name: config.name,
+        avatar: config.avatar ?? '',
+        version: build.version,
+        sha: build.sha,
         ip: request.client.ip,
-        pathPrefix: config.server.pathPrefix,
+        pathPrefix: config.pathPrefix,
         account: {
           google: config.account.google.enabled
             ? {

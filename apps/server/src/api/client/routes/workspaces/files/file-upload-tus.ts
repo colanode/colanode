@@ -86,7 +86,10 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
       const tusServer = new Server({
         path: '/tus',
         datastore: tusStore,
-        locker: new RedisLocker(redis, config.redis.tus.lockPrefix),
+        locker:
+          config.storage.tus.locker.type === 'redis'
+            ? new RedisLocker(redis, config.storage.tus.locker.prefix)
+            : undefined,
         async onUploadCreate() {
           const upload = await database
             .selectFrom('uploads')

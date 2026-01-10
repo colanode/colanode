@@ -95,23 +95,20 @@ services:
       # ------------------------------------------------------------------
       NODE_ENV: production
 
-      # Required env:// secrets (config.json marks these as env://VAR)
+      # Required env:// secrets (default configuration references these as env://VAR)
       POSTGRES_URL: postgres://colanode_user:postgrespass123@postgres:5432/colanode_db
       REDIS_URL: redis://:your_valkey_password@valkey:6379/0
 
-      # Optional env://? secrets – include only the entries referenced in JSON
-      # Use file://path entries in config.json when you want to read the value from mounted files instead.
-      # ACCOUNT_GOOGLE_CLIENT_ID: ''
-      # ACCOUNT_GOOGLE_CLIENT_SECRET: ''
-      # ...
+      # If you want to override the default configuration mount a config.json as explained below
+      # and add the config.json path as an environment variable:
+      # CONFIG: /config.json
 
     ports:
       - '3000:3000'
     volumes:
       - server_storage:/var/lib/colanode/storage
       # Mount a config.json sitting next to this compose file to override defaults.
-      # If omitted, the already included config.json inside the server image is used.
-      - ./config.json:/app/apps/server/config.json:ro
+      # - ./config.json:/config.json:ro
     networks:
       - colanode_network
 

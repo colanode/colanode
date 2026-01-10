@@ -170,6 +170,13 @@ Colanode Server Environment Variables
 - name: REDIS_URL
   value: "redis://:$(REDIS_PASSWORD)@{{ include "colanode.redis.hostname" . }}:6379/0"
 
+{{- $configFile := .Values.colanode.configFile }}
+{{- $mountConfigFile := or $configFile.enabled $configFile.existingConfigMap }}
+{{- if $mountConfigFile }}
+- name: CONFIG
+  value: "/config.json"
+{{- end }}
+
 {{- range $index, $env := .Values.colanode.additionalEnv }}
 - name: {{ required (printf "colanode.additionalEnv[%d].name is required" $index) $env.name }}
   {{- if hasKey $env "valueFrom" }}
