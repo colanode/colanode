@@ -6,7 +6,7 @@ import { homeRoute } from '@colanode/server/api/home';
 import { config } from '@colanode/server/lib/config';
 
 export const apiRoutes: FastifyPluginCallback = (instance, _, done) => {
-  const prefix = config.server.pathPrefix ? `/${config.server.pathPrefix}` : '';
+  const prefix = config.pathPrefix ? `/${config.pathPrefix}` : '';
 
   instance.register(homeRoute, { prefix });
   instance.register(configGetRoute, { prefix });

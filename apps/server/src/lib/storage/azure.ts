@@ -8,38 +8,45 @@ import {
 import { AzureStore } from '@tus/azure-store';
 import { DataStore } from '@tus/server';
 
-import type { AzureStorageConfig } from '@colanode/server/lib/config/storage';
+import { redis } from '@colanode/server/data/redis';
+import type {
+  AzureStorageProviderConfig,
+  TusConfig,
+} from '@colanode/server/lib/config/storage';
+import { RedisKvStore } from '@colanode/server/lib/storage/tus/redis-kv';
 
 import type { Storage } from './core';
 
 export class AzureBlobStorage implements Storage {
   private readonly containerName: string;
   private readonly blobServiceClient: BlobServiceClient;
-  private readonly config: AzureStorageConfig;
-  private readonly azureStore: AzureStore;
+  private readonly store: AzureStore;
 
-  constructor(config: AzureStorageConfig) {
-    this.config = { ...config };
+  constructor(config: AzureStorageProviderConfig, tusConfig: TusConfig) {
     const sharedKeyCredential = new StorageSharedKeyCredential(
-      this.config.account,
-      this.config.accountKey
+      config.account,
+      config.accountKey
     );
 
     this.blobServiceClient = new BlobServiceClient(
-      `https://${this.config.account}.blob.core.windows.net`,
+      `https://${config.account}.blob.core.windows.net`,
       sharedKeyCredential
     );
-    this.containerName = this.config.containerName;
+    this.containerName = config.containerName;
 
-    this.azureStore = new AzureStore({
-      account: this.config.account,
-      accountKey: this.config.accountKey,
+    this.store = new AzureStore({
+      account: config.account,
+      accountKey: config.accountKey,
       containerName: this.containerName,
+      cache:
+        tusConfig.cache.type === 'redis'
+          ? new RedisKvStore(redis, tusConfig.cache.prefix)
+          : undefined,
     });
   }
 
   public get tusStore(): DataStore {
-    return this.azureStore;
+    return this.store;
   }
 
   private getBlockBlobClient(path: string): BlockBlobClient {

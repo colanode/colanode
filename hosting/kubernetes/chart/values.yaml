@@ -91,7 +91,7 @@ colanode:
   #    Example: config.json contains "ca": "file://secrets/postgres-ca.crt".
   #      extraVolumeMounts:
   #        - name: postgres-ca
-  #          mountPath: /app/apps/server/secrets
+  #          mountPath: /config/secrets
   #          readOnly: true
   extraVolumeMounts: []
 

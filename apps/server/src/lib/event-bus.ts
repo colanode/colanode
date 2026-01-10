@@ -37,7 +37,7 @@ export class EventBusService {
 
     this.initialized = true;
 
-    if (config.server.mode === 'standalone') {
+    if (config.mode === 'standalone') {
       return;
     }
 
@@ -72,7 +72,7 @@ export class EventBusService {
   public publish(event: Event) {
     this.processEvent(event);
 
-    if (config.server.mode === 'standalone') {
+    if (config.mode === 'standalone') {
       return;
     }
 

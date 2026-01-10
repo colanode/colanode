@@ -36,7 +36,7 @@ export const initApp = () => {
       process.exit(1);
     }
 
-    const path = config.server.pathPrefix ? `/${config.server.pathPrefix}` : '';
+    const path = config.pathPrefix ? `/${config.pathPrefix}` : '';
     logger.info(`Server is running at ${address}${path}`);
   });
 };

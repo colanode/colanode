@@ -1,19 +1,32 @@
+import fs from 'fs';
+
 import { z } from 'zod/v4';
 
 import { accountConfigSchema } from './account';
 import { aiConfigSchema } from './ai';
+import { corsSchema } from './cors';
 import { emailConfigSchema } from './email';
 import { jobsConfigSchema } from './jobs';
-import { loadRawConfig } from './loader';
 import { loggingConfigSchema } from './logging';
 import { postgresConfigSchema } from './postgres';
 import { redisConfigSchema } from './redis';
-import { serverConfigSchema } from './server';
 import { storageConfigSchema } from './storage';
+import {
+  resolveConfigReference,
+  resolveOptionalConfigReference,
+} from './utils';
 import { workspaceConfigSchema } from './workspace';
 
+const serverModeSchema = z.enum(['standalone', 'cluster']);
+
 const configSchema = z.object({
-  server: serverConfigSchema,
+  name: z.string().default('Colanode Server').transform(resolveConfigReference),
+  avatar: z.string().optional().transform(resolveOptionalConfigReference),
+  mode: serverModeSchema
+    .default('standalone')
+    .transform(resolveConfigReference),
+  pathPrefix: z.string().optional().transform(resolveOptionalConfigReference),
+  cors: corsSchema,
   account: accountConfigSchema,
   postgres: postgresConfigSchema,
   redis: redisConfigSchema,
@@ -27,9 +40,20 @@ const configSchema = z.object({
 
 export type Configuration = z.infer<typeof configSchema>;
 
-const readConfigVariables = (): Configuration => {
+const loadConfigFromPath = (configPath: string): Partial<Configuration> => {
+  if (!fs.existsSync(configPath)) {
+    throw new Error(`Configuration file not found: ${configPath}`);
+  }
+
+  const raw = fs.readFileSync(configPath, 'utf-8');
+  const parsed = JSON.parse(raw);
+  return parsed;
+};
+
+const buildConfig = (): Configuration => {
   try {
-    const input = loadRawConfig();
+    const configPath = process.env.CONFIG;
+    const input = configPath ? loadConfigFromPath(configPath) : {};
     return configSchema.parse(input);
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -45,4 +69,4 @@ const readConfigVariables = (): Configuration => {
   }
 };
 
-export const config = readConfigVariables();
+export const config = buildConfig();

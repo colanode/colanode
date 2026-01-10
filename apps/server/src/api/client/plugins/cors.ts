@@ -5,15 +5,11 @@ import fp from 'fastify-plugin';
 import { config } from '@colanode/server/lib/config';
 
 const corsCallback: FastifyPluginCallback = (fastify, _, done) => {
-  const origin = config.server.cors.origin.includes(',')
-    ? config.server.cors.origin.split(',').map((o) => o.trim())
-    : config.server.cors.origin;
-
   fastify.register(cors, {
-    origin,
+    origin: config.cors.origin,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
     credentials: true,
-    maxAge: config.server.cors.maxAge,
+    maxAge: config.cors.maxAge,
   });
 
   done();
