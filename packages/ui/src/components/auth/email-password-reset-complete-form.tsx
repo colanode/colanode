@@ -6,7 +6,6 @@ import { Button } from '@colanode/ui/components/ui/button';
 import {
   Field,
   FieldError,
-  FieldGroup,
   FieldLabel,
 } from '@colanode/ui/components/ui/field';
 import { Input } from '@colanode/ui/components/ui/input';
@@ -67,83 +66,79 @@ export const PasswordResetCompleteForm = ({
       }}
       className="space-y-3"
     >
-      <FieldGroup>
-        <form.Field
-          name="password"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  autoComplete="new-password"
-                  placeholder="********"
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        />
-        <form.Field
-          name="confirmPassword"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>
-                  Confirm New Password
-                </FieldLabel>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  autoComplete="new-password"
-                  placeholder="********"
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        />
-        <form.Field
-          name="otp"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Code</FieldLabel>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  placeholder="123456"
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                <p className="text-xs text-muted-foreground w-full text-center">
-                  {formattedTime}
-                </p>
-              </Field>
-            );
-          }}
-        />
-      </FieldGroup>
+      <form.Field
+        name="password"
+        children={(field) => {
+          const isInvalid =
+            field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid}>
+              <FieldLabel htmlFor={field.name}>New Password</FieldLabel>
+              <Input
+                id={field.name}
+                name={field.name}
+                type="password"
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                aria-invalid={isInvalid}
+                autoComplete="new-password"
+                placeholder="********"
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      />
+      <form.Field
+        name="confirmPassword"
+        children={(field) => {
+          const isInvalid =
+            field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid}>
+              <FieldLabel htmlFor={field.name}>Confirm New Password</FieldLabel>
+              <Input
+                id={field.name}
+                name={field.name}
+                type="password"
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                aria-invalid={isInvalid}
+                autoComplete="new-password"
+                placeholder="********"
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      />
+      <form.Field
+        name="otp"
+        children={(field) => {
+          const isInvalid =
+            field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid}>
+              <FieldLabel htmlFor={field.name}>Code</FieldLabel>
+              <Input
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                aria-invalid={isInvalid}
+                placeholder="123456"
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              <p className="text-xs text-muted-foreground w-full text-center">
+                {formattedTime}
+              </p>
+            </Field>
+          );
+        }}
+      />
       <Button
         type="submit"
         variant="outline"

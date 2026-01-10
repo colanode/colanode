@@ -186,6 +186,8 @@ apps/mobile/assets/fonts/satoshi-variable.woff2
 apps/mobile/assets/fonts/satoshi-variable-italic.woff2
 apps/mobile/assets/fonts/antonio.ttf
 
+apps/server/data/
+
 .expo
 web-build/
 expo-env.d.ts

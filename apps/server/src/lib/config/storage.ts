@@ -24,7 +24,7 @@ const fileStorageProviderConfigSchema = z.object({
   type: z.literal('file'),
   directory: z
     .string({ error: 'Storage file directory is required' })
-    .default('./colanode')
+    .default('./data')
     .transform(resolveConfigReference),
 });
 
