@@ -22,7 +22,6 @@
   "postgres": {
     "url": "env://POSTGRES_URL",
     "ssl": {
-      "rejectUnauthorized": null,
       "ca": "env://POSTGRES_SSL_CA",
       "key": "env://POSTGRES_SSL_KEY",
       "cert": "env://POSTGRES_SSL_CERT"
@@ -95,7 +94,7 @@
     }
   },
   "workspace": {
-    "maxFileSize": null
+    "maxFileSize": "524288000"
   },
   "logging": {
     "level": "info"

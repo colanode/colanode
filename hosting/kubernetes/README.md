@@ -87,29 +87,30 @@ helm install my-colanode ./hosting/kubernetes/chart \
 
 - Alternatively, create a ConfigMap yourself (`kubectl create configmap colanode-config --from-file=config.json`) and set `colanode.configFile.existingConfigMap=colanode-config`.
 - Environment variables no longer override config values. Only secrets referenced via `env://` (and values from files via `file://`) are read at runtime. Keep non-secret settings in your JSON, mount it with `colanode.configFile`, and surface additional env vars through `colanode.additionalEnv` when a pointer needs a value from Kubernetes secrets.
-- To use `file://` pointers, mount the target files next to `config.json` (the chart stores it at `/app/apps/server/config.json`). For example, to load a PostgreSQL CA cert via `"file://secrets/postgres-ca.crt"`:
-  1. Create a secret with the cert contents:
+- To use `file://` pointers, mount the target files next to `config.json` (the chart stores it at `/config/config.json`). For example, to load a PostgreSQL CA cert via `"file://secrets/postgres-ca.crt"`:
 
-     ```bash
-     kubectl create secret generic postgres-ca \
-       --from-file=postgres-ca.crt=./certs/rootCA.crt
-     ```
+1.  Create a secret with the cert contents:
 
-  2. Mount the secret and expose it inside the pod:
+    ```bash
+    kubectl create secret generic postgres-ca \
+      --from-file=postgres-ca.crt=./certs/rootCA.crt
+    ```
 
-     ```yaml
-     colanode:
-       extraVolumes:
-         - name: postgres-ca
-           secret:
-             secretName: postgres-ca
-       extraVolumeMounts:
-         - name: postgres-ca
-           mountPath: /app/apps/server/secrets
-           readOnly: true
-     ```
+2.  Mount the secret and expose it inside the pod:
 
-  3. Point your `config.json` field to `"file://secrets/postgres-ca.crt"`. The loader resolves the path relative to the directory containing `config.json`.
+    ```yaml
+    colanode:
+      extraVolumes:
+        - name: postgres-ca
+          secret:
+            secretName: postgres-ca
+      extraVolumeMounts:
+        - name: postgres-ca
+          mountPath: /config/secrets
+          readOnly: true
+    ```
+
+3.  Point your `config.json` field to `"file://secrets/postgres-ca.crt"`. The loader resolves the path relative to the directory containing `config.json`.
 
 ### Storage Configuration
 

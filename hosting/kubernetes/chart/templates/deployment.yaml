@@ -61,7 +61,7 @@ spec:
 {{- end }}
 {{- if $mountConfigFile }}
             - name: config-json
-              mountPath: /app/apps/server/config.json
+              mountPath: /config/config.json
               subPath: {{ default "config.json" $configFile.key }}
               readOnly: true
 {{- end }}
