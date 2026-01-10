@@ -3,9 +3,7 @@
   "_docs": "https://colanode.com/docs/self-hosting/configuration/",
 
   "name": "Colanode Local",
-  "avatar": null,
   "mode": "standalone",
-  "pathPrefix": null,
   "cors": {
     "origin": "http://localhost:4000",
     "maxAge": 7200

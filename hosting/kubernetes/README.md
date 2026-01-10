@@ -75,9 +75,9 @@ helm install my-colanode ./hosting/kubernetes/chart \
 
 ### Using config.json with Helm
 
-- The server image already ships with a default `config.json`. Only two env vars are strictly required: `POSTGRES_URL` and `REDIS_URL` (because the JSON references them via `env://`).
-- If you do not override `config.json`, the bundled file still expects those pointers. The chart wires them up automatically via `POSTGRES_URL=env://POSTGRES_URL` and `REDIS_URL=env://REDIS_URL`, so a vanilla install works without extra values.
-- To supply your own JSON file, copy `apps/server/config.json`, edit it, and enable the new override:
+- The server image already ships with a default configuration. Only two env vars are strictly required: `POSTGRES_URL` and `REDIS_URL` (because the default configuration references them via `env://`).
+- If you do add your own `config.json`, the default configuration still expects those pointers. The chart wires them up automatically via `POSTGRES_URL=env://POSTGRES_URL` and `REDIS_URL=env://REDIS_URL`, so a vanilla install works without extra values.
+- To supply your own JSON file, copy `apps/server/config.example.json`, edit it, and enable the new override:
 
   ```bash
   helm install my-colanode ./hosting/kubernetes/chart \
@@ -87,7 +87,7 @@ helm install my-colanode ./hosting/kubernetes/chart \
 
 - Alternatively, create a ConfigMap yourself (`kubectl create configmap colanode-config --from-file=config.json`) and set `colanode.configFile.existingConfigMap=colanode-config`.
 - Environment variables no longer override config values. Only secrets referenced via `env://` (and values from files via `file://`) are read at runtime. Keep non-secret settings in your JSON, mount it with `colanode.configFile`, and surface additional env vars through `colanode.additionalEnv` when a pointer needs a value from Kubernetes secrets.
-- To use `file://` pointers, mount the target files next to `config.json` (the chart stores it at `/config/config.json`). For example, to load a PostgreSQL CA cert via `"file://secrets/postgres-ca.crt"`:
+- To use `file://` pointers, mount the target files next to `config.json` (the chart stores it at `/config.json`). For example, to load a PostgreSQL CA cert via `"file://secrets/postgres-ca.crt"`:
 
 1.  Create a secret with the cert contents:
 

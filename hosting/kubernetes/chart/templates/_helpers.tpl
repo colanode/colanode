@@ -174,7 +174,7 @@ Colanode Server Environment Variables
 {{- $mountConfigFile := or $configFile.enabled $configFile.existingConfigMap }}
 {{- if $mountConfigFile }}
 - name: CONFIG
-  value: "/config/config.json"
+  value: "/config.json"
 {{- end }}
 
 {{- range $index, $env := .Values.colanode.additionalEnv }}
