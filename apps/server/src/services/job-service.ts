@@ -16,15 +16,15 @@ class JobService {
 
   // for more information, see: https://docs.bullmq.io/bull/patterns/redis-cluster
 
-  private readonly queueName = config.redis.jobs.name;
-  private readonly prefix = `{${config.redis.jobs.prefix}}`;
+  private readonly queueName = config.jobs.queue.name;
+  private readonly prefix = `{${config.jobs.queue.prefix}}`;
 
   public async initQueue(): Promise<void> {
     if (this.jobQueue) {
       return;
     }
 
-    this.jobQueue = new Queue(this.queueName, {
+    this.jobQueue = new Queue(this.queueName!, {
       prefix: this.prefix,
       connection: {
         db: config.redis.db,

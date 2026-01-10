@@ -1,7 +1,9 @@
 import { z } from 'zod/v4';
 
-export const workspaceConfigSchema = z.object({
-  maxFileSize: z.string().optional().nullable(),
-});
+export const workspaceConfigSchema = z
+  .object({
+    maxFileSize: z.string().optional().nullable(),
+  })
+  .prefault({});
 
 export type WorkspaceConfig = z.infer<typeof workspaceConfigSchema>;

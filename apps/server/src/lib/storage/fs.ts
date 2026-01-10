@@ -4,17 +4,32 @@ import { Readable } from 'stream';
 import { FileStore } from '@tus/file-store';
 import { DataStore } from '@tus/server';
 
-import type { FileStorageConfig } from '@colanode/server/lib/config/storage';
+import { redis } from '@colanode/server/data/redis';
+import type {
+  FileStorageProviderConfig,
+  TusConfig,
+} from '@colanode/server/lib/config/storage';
+import { RedisKvStore } from '@colanode/server/lib/storage/tus/redis-kv';
 
 import type { Storage } from './core';
 
 export class FileSystemStorage implements Storage {
   private readonly directory: string;
-  public readonly tusStore: DataStore;
+  private readonly store: DataStore;
 
-  constructor(config: FileStorageConfig) {
+  constructor(config: FileStorageProviderConfig, tusConfig: TusConfig) {
     this.directory = config.directory;
-    this.tusStore = new FileStore({ directory: this.directory });
+    this.store = new FileStore({
+      directory: this.directory,
+      configstore:
+        tusConfig.cache.type === 'redis'
+          ? new RedisKvStore(redis, tusConfig.cache.prefix)
+          : undefined,
+    });
+  }
+
+  public get tusStore(): DataStore {
+    return this.store;
   }
 
   async download(

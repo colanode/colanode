@@ -1,45 +1,131 @@
 import { z } from 'zod/v4';
 
-const s3StorageConfigSchema = z.object({
+import { resolveConfigReference } from './utils';
+
+const s3StorageProviderConfigSchema = z.object({
   type: z.literal('s3'),
-  endpoint: z.string({ error: 'STORAGE_S3_ENDPOINT is required' }),
-  accessKey: z.string({ error: 'STORAGE_S3_ACCESS_KEY is required' }),
-  secretKey: z.string({ error: 'STORAGE_S3_SECRET_KEY is required' }),
-  bucket: z.string({ error: 'STORAGE_S3_BUCKET is required' }),
-  region: z.string({ error: 'STORAGE_S3_REGION is required' }),
+  endpoint: z
+    .string({ error: 'Storage S3 endpoint is required' })
+    .transform(resolveConfigReference),
+  accessKey: z
+    .string({ error: 'Storage S3 access key is required' })
+    .transform(resolveConfigReference),
+  secretKey: z
+    .string({ error: 'Storage S3 secret key is required' })
+    .transform(resolveConfigReference),
+  bucket: z
+    .string({ error: 'Storage S3 bucket is required' })
+    .transform(resolveConfigReference),
+  region: z.string({ error: 'Storage S3 region is required' }),
   forcePathStyle: z.boolean().optional(),
 });
 
-const fileStorageConfigSchema = z.object({
+const fileStorageProviderConfigSchema = z.object({
   type: z.literal('file'),
-  directory: z.string({ error: 'STORAGE_FILE_DIRECTORY is required' }),
+  directory: z
+    .string({ error: 'Storage file directory is required' })
+    .default('./colanode')
+    .transform(resolveConfigReference),
 });
 
-const gcsStorageConfigSchema = z.object({
+const gcsStorageProviderConfigSchema = z.object({
   type: z.literal('gcs'),
-  bucket: z.string({ error: 'STORAGE_GCS_BUCKET is required' }),
-  projectId: z.string({ error: 'STORAGE_GCS_PROJECT_ID is required' }),
-  credentials: z.string({ error: 'STORAGE_GCS_CREDENTIALS is required' }),
+  bucket: z
+    .string({ error: 'Storage GCS bucket is required' })
+    .transform(resolveConfigReference),
+  projectId: z
+    .string({ error: 'Storage GCS project ID is required' })
+    .transform(resolveConfigReference),
+  credentials: z
+    .string({ error: 'Storage GCS credentials is required' })
+    .transform(resolveConfigReference),
 });
 
-const azureStorageConfigSchema = z.object({
+const azureStorageProviderConfigSchema = z.object({
   type: z.literal('azure'),
-  account: z.string({ error: 'STORAGE_AZURE_ACCOUNT is required' }),
-  accountKey: z.string({ error: 'STORAGE_AZURE_ACCOUNT_KEY is required' }),
-  containerName: z.string({
-    error: 'STORAGE_AZURE_CONTAINER_NAME is required',
-  }),
+  account: z
+    .string({ error: 'Storage Azure account is required' })
+    .transform(resolveConfigReference),
+  accountKey: z
+    .string({ error: 'Storage Azure account key is required' })
+    .transform(resolveConfigReference),
+  containerName: z
+    .string({ error: 'Storage Azure container name is required' })
+    .transform(resolveConfigReference),
 });
 
-export const storageConfigSchema = z.discriminatedUnion('type', [
-  s3StorageConfigSchema,
-  fileStorageConfigSchema,
-  gcsStorageConfigSchema,
-  azureStorageConfigSchema,
-]);
+export const storageProviderConfigSchema = z
+  .discriminatedUnion('type', [
+    s3StorageProviderConfigSchema,
+    fileStorageProviderConfigSchema,
+    gcsStorageProviderConfigSchema,
+    azureStorageProviderConfigSchema,
+  ])
+  .prefault({
+    type: 'file',
+  });
 
+export const tusLockerSchema = z
+  .discriminatedUnion('type', [
+    z.object({
+      type: z.literal('redis'),
+      prefix: z
+        .string()
+        .default('colanode:tus:lock')
+        .transform(resolveConfigReference),
+    }),
+    z.object({
+      type: z.literal('memory'),
+    }),
+  ])
+  .prefault({
+    type: 'memory',
+  });
+
+export const tusCacheSchema = z
+  .discriminatedUnion('type', [
+    z.object({ type: z.literal('none') }),
+    z.object({
+      type: z.literal('redis'),
+      prefix: z
+        .string()
+        .default('colanode:tus:kv')
+        .transform(resolveConfigReference),
+    }),
+  ])
+  .prefault({
+    type: 'none',
+  });
+
+export const tusConfigSchema = z
+  .object({
+    locker: tusLockerSchema,
+    cache: tusCacheSchema,
+  })
+  .prefault({});
+
+export const storageConfigSchema = z
+  .object({
+    tus: tusConfigSchema,
+    provider: storageProviderConfigSchema,
+  })
+  .prefault({});
+
+export type TusLockerConfig = z.infer<typeof tusLockerSchema>;
+export type TusCacheConfig = z.infer<typeof tusCacheSchema>;
+export type TusConfig = z.infer<typeof tusConfigSchema>;
+
+export type StorageProviderConfig = z.infer<typeof storageProviderConfigSchema>;
+export type S3StorageProviderConfig = z.infer<
+  typeof s3StorageProviderConfigSchema
+>;
+export type FileStorageProviderConfig = z.infer<
+  typeof fileStorageProviderConfigSchema
+>;
+export type GCSStorageProviderConfig = z.infer<
+  typeof gcsStorageProviderConfigSchema
+>;
+export type AzureStorageProviderConfig = z.infer<
+  typeof azureStorageProviderConfigSchema
+>;
 export type StorageConfig = z.infer<typeof storageConfigSchema>;
-export type S3StorageConfig = z.infer<typeof s3StorageConfigSchema>;
-export type FileStorageConfig = z.infer<typeof fileStorageConfigSchema>;
-export type GCSStorageConfig = z.infer<typeof gcsStorageConfigSchema>;
-export type AzureStorageConfig = z.infer<typeof azureStorageConfigSchema>;

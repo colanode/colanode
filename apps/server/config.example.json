@@ -1,0 +1,103 @@
+{
+  "_comment": "Colanode Server Configuration - Copy this file to config.local.json for local development or use it as a template for your self-hosted server",
+  "_docs": "https://colanode.com/docs/self-hosting/configuration/",
+
+  "name": "Colanode Local",
+  "avatar": null,
+  "mode": "standalone",
+  "pathPrefix": null,
+  "cors": {
+    "origin": "http://localhost:4000",
+    "maxAge": 7200
+  },
+  "account": {
+    "verificationType": "automatic",
+    "otpTimeout": 600,
+    "google": {
+      "enabled": false,
+      "clientId": "env://ACCOUNT_GOOGLE_CLIENT_ID",
+      "clientSecret": "env://ACCOUNT_GOOGLE_CLIENT_SECRET"
+    }
+  },
+  "postgres": {
+    "url": "env://POSTGRES_URL",
+    "ssl": {
+      "rejectUnauthorized": null,
+      "ca": "env://POSTGRES_SSL_CA",
+      "key": "env://POSTGRES_SSL_KEY",
+      "cert": "env://POSTGRES_SSL_CERT"
+    }
+  },
+  "redis": {
+    "url": "env://REDIS_URL",
+    "db": 0,
+    "eventsChannel": "events"
+  },
+  "storage": {
+    "tus": {
+      "locker": {
+        "type": "redis",
+        "prefix": "colanode:tus:lock"
+      },
+      "cache": {
+        "type": "none"
+      }
+    },
+    "provider": {
+      "type": "s3",
+      "endpoint": "env://S3_ENDPOINT",
+      "accessKey": "env://S3_ACCESS_KEY",
+      "secretKey": "env://S3_SECRET_KEY",
+      "bucket": "env://S3_BUCKET",
+      "region": "env://S3_REGION",
+      "forcePathStyle": false
+    }
+  },
+  "email": {
+    "enabled": false,
+    "from": {
+      "email": "colanode@example.com",
+      "name": "Colanode"
+    },
+    "provider": {
+      "type": "smtp",
+      "host": "env://EMAIL_SMTP_HOST",
+      "port": 587,
+      "secure": false,
+      "auth": {
+        "user": "env://EMAIL_SMTP_USER",
+        "password": "env://EMAIL_SMTP_PASSWORD"
+      }
+    }
+  },
+  "jobs": {
+    "queue": {
+      "name": "jobs",
+      "prefix": "colanode"
+    },
+    "nodeUpdatesMerge": {
+      "enabled": false,
+      "cron": "0 5 */2 * * *",
+      "batchSize": 500,
+      "mergeWindow": 3600,
+      "cutoffWindow": 7200
+    },
+    "documentUpdatesMerge": {
+      "enabled": false,
+      "cron": "0 5 */2 * * *",
+      "batchSize": 500,
+      "mergeWindow": 3600,
+      "cutoffWindow": 7200
+    },
+    "cleanup": {
+      "enabled": false,
+      "cron": "0 5 */2 * * *"
+    }
+  },
+  "workspace": {
+    "maxFileSize": null
+  },
+  "logging": {
+    "level": "info"
+  }
+}
