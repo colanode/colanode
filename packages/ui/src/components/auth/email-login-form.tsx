@@ -7,7 +7,6 @@ import { Button } from '@colanode/ui/components/ui/button';
 import {
   Field,
   FieldError,
-  FieldGroup,
   FieldLabel,
 } from '@colanode/ui/components/ui/field';
 import { Input } from '@colanode/ui/components/ui/input';
@@ -46,65 +45,63 @@ export const LoginForm = ({ isPending, onSubmit }: LoginFormProps) => {
       }}
       className="space-y-4"
     >
-      <FieldGroup>
-        <form.Field
-          name="email"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Email</FieldLabel>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  placeholder="hi@example.com"
-                  autoComplete="email"
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        />
-        <form.Field
-          name="password"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <div className="flex flex-row gap-2 items-center">
-                  <FieldLabel htmlFor={field.name}>Password</FieldLabel>
-                  <p
-                    className="text-xs text-muted-foreground cursor-pointer hover:underline w-full text-right"
-                    onClick={() => {
-                      navigate({ to: '/auth/reset' });
-                    }}
-                  >
-                    Forgot password?
-                  </p>
-                </div>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  type="password"
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  autoComplete="current-password"
-                  placeholder="********"
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-              </Field>
-            );
-          }}
-        />
-      </FieldGroup>
+      <form.Field
+        name="email"
+        children={(field) => {
+          const isInvalid =
+            field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid}>
+              <FieldLabel htmlFor={field.name}>Email</FieldLabel>
+              <Input
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                aria-invalid={isInvalid}
+                placeholder="hi@example.com"
+                autoComplete="email"
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      />
+      <form.Field
+        name="password"
+        children={(field) => {
+          const isInvalid =
+            field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid}>
+              <div className="flex flex-row gap-2 items-center">
+                <FieldLabel htmlFor={field.name}>Password</FieldLabel>
+                <p
+                  className="text-xs text-muted-foreground cursor-pointer hover:underline w-full text-right"
+                  onClick={() => {
+                    navigate({ to: '/auth/reset' });
+                  }}
+                >
+                  Forgot password?
+                </p>
+              </div>
+              <Input
+                id={field.name}
+                name={field.name}
+                type="password"
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                aria-invalid={isInvalid}
+                autoComplete="current-password"
+                placeholder="********"
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+            </Field>
+          );
+        }}
+      />
       <Button
         type="submit"
         variant="outline"
