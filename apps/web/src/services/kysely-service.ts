@@ -4,6 +4,7 @@ import sqlite3InitModule, {
   type BindableValue,
   type Database,
 } from '@sqlite.org/sqlite-wasm';
+import sqlite3WasmUrl from '@sqlite.org/sqlite-wasm/sqlite3.wasm?url';
 import {
   CompiledQuery,
   type DatabaseConnection,
@@ -18,6 +19,17 @@ import {
 
 import { KyselyBuildOptions, KyselyService } from '@colanode/client/services';
 import { WebFileSystem } from '@colanode/web/services/file-system';
+
+const configureSqliteWasmUrl = () => {
+  const globalState = globalThis as typeof globalThis & {
+    sqlite3InitModuleState?: {
+      wasmFilename?: string;
+    };
+  };
+  const sqliteState = globalState.sqlite3InitModuleState ?? {};
+  sqliteState.wasmFilename = sqlite3WasmUrl;
+  globalState.sqlite3InitModuleState = sqliteState;
+};
 
 export class WebKyselyService implements KyselyService {
   private readonly pools: Map<string, SAHPoolUtil> = new Map();
@@ -37,14 +49,8 @@ export class WebKyselyService implements KyselyService {
       await pool.removeVfs();
       this.pools.delete(path);
     } else {
-      if (!this.sqlite3) {
-        this.sqlite3 = await sqlite3InitModule({
-          print: console.log,
-          printErr: console.error,
-        });
-      }
-
-      const pool = await this.sqlite3.installOpfsSAHPoolVfs({
+      const sqlite3 = await this.getSqlite3();
+      const pool = await sqlite3.installOpfsSAHPoolVfs({
         name: this.buildVfsName(path),
       });
 
@@ -53,19 +59,25 @@ export class WebKyselyService implements KyselyService {
   }
 
   public async buildPool(path: string): Promise<SAHPoolUtil> {
+    const sqlite3 = await this.getSqlite3();
+    const pool = await sqlite3.installOpfsSAHPoolVfs({
+      name: this.buildVfsName(path),
+    });
+
+    this.pools.set(path, pool);
+    return pool;
+  }
+
+  private async getSqlite3(): Promise<Sqlite3Static> {
     if (!this.sqlite3) {
+      configureSqliteWasmUrl();
       this.sqlite3 = await sqlite3InitModule({
         print: console.log,
         printErr: console.error,
       });
     }
 
-    const pool = await this.sqlite3.installOpfsSAHPoolVfs({
-      name: this.buildVfsName(path),
-    });
-
-    this.pools.set(path, pool);
-    return pool;
+    return this.sqlite3;
   }
 
   private buildVfsName(path: string): string {
