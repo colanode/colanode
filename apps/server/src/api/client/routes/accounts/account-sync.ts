@@ -16,6 +16,14 @@ export const accountSyncRoute: FastifyPluginCallbackZod = (
   _,
   done
 ) => {
+  // This endpoint doesn't expect a body, so we remove all content type parsers
+  // to prevent Fastify from throwing FST_ERR_CTP_EMPTY_JSON_BODY when browsers
+  // send Content-Type: application/json with an empty body
+  instance.removeAllContentTypeParsers();
+  instance.addContentTypeParser('*', (_req, _payload, done) => {
+    done(null, undefined);
+  });
+
   instance.route({
     method: 'POST',
     url: '/sync',
