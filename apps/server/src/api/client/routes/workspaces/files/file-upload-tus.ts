@@ -17,7 +17,13 @@ import { mapNode, updateNode } from '@colanode/server/lib/nodes';
 import { storage } from '@colanode/server/lib/storage';
 import { RedisLocker } from '@colanode/server/lib/storage/tus/redis-locker';
 
-const tusStore = storage.tusStore;
+const tryDeleteFile = async (path: string): Promise<void> => {
+  try {
+    await storage.delete(path);
+  } catch {
+    // Best effort cleanup - ignore errors if file doesn't exist or can't be deleted
+  }
+};
 
 export const fileUploadTusRoute: FastifyPluginCallbackZod = (
   instance,
@@ -85,8 +91,11 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
 
       const tusServer = new Server({
         path: '/tus',
-        datastore: tusStore,
-        locker: new RedisLocker(redis, config.redis.tus.lockPrefix),
+        datastore: storage.tusStore,
+        locker:
+          config.storage.tus.locker.type === 'redis'
+            ? new RedisLocker(redis, config.storage.tus.locker.prefix)
+            : undefined,
         async onUploadCreate() {
           const upload = await database
             .selectFrom('uploads')
@@ -215,7 +224,7 @@ export const fileUploadTusRoute: FastifyPluginCallbackZod = (
           }
 
           const tusInfoPath = `${path}.info`;
-          await storage.delete(tusInfoPath);
+          await tryDeleteFile(tusInfoPath);
 
           return {
             status_code: 200,

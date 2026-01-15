@@ -41,47 +41,48 @@ export const retrievalConfigSchema = z.object({
 
 export type RetrievalConfig = z.infer<typeof retrievalConfigSchema>;
 
-export const aiConfigSchema = z.discriminatedUnion('enabled', [
-  z.object({
-    enabled: z.literal(true),
-    nodeEmbeddingDelay: z.coerce.number().default(5000),
-    documentEmbeddingDelay: z.coerce.number().default(10000),
-    providers: z.object({
-      openai: aiProviderConfigSchema,
-      google: aiProviderConfigSchema,
+export const aiConfigSchema = z
+  .discriminatedUnion('enabled', [
+    z.object({
+      enabled: z.literal(true),
+      nodeEmbeddingDelay: z.coerce.number().default(5000),
+      documentEmbeddingDelay: z.coerce.number().default(10000),
+      providers: z.object({
+        openai: aiProviderConfigSchema,
+        google: aiProviderConfigSchema,
+      }),
+      langfuse: z.object({
+        enabled: z.boolean().default(false),
+        publicKey: z.string().default(''),
+        secretKey: z.string().default(''),
+        baseUrl: z.string().default('https://cloud.langfuse.com'),
+      }),
+      models: z.object({
+        queryRewrite: aiModelConfigSchema,
+        response: aiModelConfigSchema,
+        rerank: aiModelConfigSchema,
+        summarization: aiModelConfigSchema,
+        contextEnhancer: aiModelConfigSchema,
+        noContext: aiModelConfigSchema,
+        intentRecognition: aiModelConfigSchema,
+        databaseFilter: aiModelConfigSchema,
+      }),
+      embedding: z.object({
+        provider: aiProviderSchema.default('openai'),
+        modelName: z.string().default('text-embedding-3-large'),
+        dimensions: z.coerce.number().default(2000),
+        apiKey: z.string().default(''),
+        batchSize: z.coerce.number().default(50),
+      }),
+      chunking: chunkingConfigSchema,
+      retrieval: retrievalConfigSchema,
     }),
-    langfuse: z.object({
-      enabled: z.preprocess(
-        (val) => val === 'true',
-        z.boolean().default(false)
-      ),
-      publicKey: z.string().default(''),
-      secretKey: z.string().default(''),
-      baseUrl: z.string().default('https://cloud.langfuse.com'),
+    z.object({
+      enabled: z.literal(false),
     }),
-    models: z.object({
-      queryRewrite: aiModelConfigSchema,
-      response: aiModelConfigSchema,
-      rerank: aiModelConfigSchema,
-      summarization: aiModelConfigSchema,
-      contextEnhancer: aiModelConfigSchema,
-      noContext: aiModelConfigSchema,
-      intentRecognition: aiModelConfigSchema,
-      databaseFilter: aiModelConfigSchema,
-    }),
-    embedding: z.object({
-      provider: aiProviderSchema.default('openai'),
-      modelName: z.string().default('text-embedding-3-large'),
-      dimensions: z.coerce.number().default(2000),
-      apiKey: z.string().default(''),
-      batchSize: z.coerce.number().default(50),
-    }),
-    chunking: chunkingConfigSchema,
-    retrieval: retrievalConfigSchema,
-  }),
-  z.object({
-    enabled: z.literal(false),
-  }),
-]);
+  ])
+  .prefault({
+    enabled: false,
+  });
 
 export type AiConfig = z.infer<typeof aiConfigSchema>;

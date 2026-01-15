@@ -1,13 +1,54 @@
-import { createRoute } from '@tanstack/react-router';
+import { createRoute, redirect } from '@tanstack/react-router';
 
+import { collections } from '@colanode/ui/collections';
+import { buildMetadataKey } from '@colanode/ui/collections/metadata';
 import { WorkspaceCreate } from '@colanode/ui/components/workspaces/workspace-create';
 import { WorkspaceCreateTab } from '@colanode/ui/components/workspaces/workspace-create-tab';
 import { rootRoute } from '@colanode/ui/routes/root';
 
+const Component = () => {
+  const { accountId } = workspaceCreateRoute.useLoaderData();
+  return <WorkspaceCreate accountId={accountId} />;
+};
+
 export const workspaceCreateRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/create',
-  component: WorkspaceCreate,
+  component: Component,
+  beforeLoad: () => {
+    const accountsCount = collections.accounts.size;
+    if (accountsCount === 0) {
+      throw redirect({ to: '/auth/login', replace: true });
+    }
+  },
+  loader: () => {
+    const accounts = collections.accounts.map((account) => account);
+    const workspaces = collections.workspaces.map((workspace) => workspace);
+
+    const lastWorkspaceMetadataKey = buildMetadataKey('app', 'workspace');
+    const lastWorkspace = collections.metadata.get(lastWorkspaceMetadataKey);
+    if (lastWorkspace) {
+      const workspace = workspaces.find(
+        (workspace) => workspace.userId === lastWorkspace.value
+      );
+
+      if (workspace) {
+        return {
+          accountId: workspace.accountId,
+        };
+      }
+    }
+
+    const firstAccount = accounts[0];
+    if (firstAccount) {
+      return {
+        accountId: firstAccount.id,
+      };
+    }
+
+    // this should never happen
+    throw new Error('No accounts found');
+  },
   context: () => {
     return {
       tab: <WorkspaceCreateTab />,

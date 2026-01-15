@@ -1,5 +1,6 @@
 import { FastifyPluginCallback } from 'fastify';
 
+import { build } from '@colanode/core';
 import { config } from '@colanode/server/lib/config';
 import { generateUrl } from '@colanode/server/lib/fastify';
 import { homeTemplate } from '@colanode/server/templates';
@@ -12,10 +13,10 @@ export const homeRoute: FastifyPluginCallback = (instance, _, done) => {
       const configUrl = generateUrl(request, '/config');
 
       const template = homeTemplate({
-        name: config.server.name,
+        name: config.name,
         url: configUrl,
-        version: config.server.version,
-        sha: config.server.sha,
+        version: build.version,
+        sha: build.sha,
       });
 
       reply.type('text/html').send(template);

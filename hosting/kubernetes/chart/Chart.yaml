@@ -2,7 +2,7 @@ apiVersion: v2
 name: colanode
 description: A Helm chart for Colanode - open-source & local-first collaboration workspace
 type: application
-version: 0.2.0
+version: 0.2.2
 # appVersion is auto-updated by the release workflow
 appVersion: '1.0.0'
 
@@ -12,7 +12,7 @@ dependencies:
     repository: 'https://charts.bitnami.com/bitnami'
     condition: postgresql.enabled
   - name: valkey
-    version: '3.0.4'
+    version: '5.1.0'
     repository: 'https://charts.bitnami.com/bitnami'
     alias: redis
     condition: redis.enabled

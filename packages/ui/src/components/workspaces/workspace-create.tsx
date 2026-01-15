@@ -4,11 +4,13 @@ import { toast } from 'sonner';
 
 import { collections } from '@colanode/ui/collections';
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
-export const WorkspaceCreate = () => {
-  const workspace = useWorkspace();
+interface WorkspaceCreateProps {
+  accountId: string;
+}
+
+export const WorkspaceCreate = ({ accountId }: WorkspaceCreateProps) => {
   const router = useRouter();
   const { mutate, isPending } = useMutation();
 
@@ -49,7 +51,7 @@ export const WorkspaceCreate = () => {
                   type: 'workspace.create',
                   name: values.name,
                   description: values.description,
-                  accountId: workspace.accountId,
+                  accountId: accountId,
                   avatar: values.avatar ?? null,
                 },
                 onSuccess(output) {

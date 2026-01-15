@@ -29,7 +29,7 @@ export const NodeModal = ({ nodeId }: NodeModalProps) => {
       modal={true}
     >
       <DialogContent
-        className="w-[90vw] h-[90vh] max-w-[90vw] max-h-[90vh] min-w-[90vw] min-h-[90vh] p-2"
+        className="w-[90vw] h-[90vh] max-w-[90vw] max-h-[90vh] min-w-[90vw] min-h-[90vh] p-2 overflow-hidden"
         showCloseButton={false}
       >
         <VisuallyHidden>
@@ -39,19 +39,21 @@ export const NodeModal = ({ nodeId }: NodeModalProps) => {
             window.
           </DialogDescription>
         </VisuallyHidden>
-        <NodeContainer
-          type="modal"
-          nodeId={nodeId}
-          onFullscreen={() => {
-            navigate({
-              from: '/workspace/$userId/$nodeId/modal/$modalNodeId',
-              to: '/workspace/$userId/$nodeId',
-              params: {
-                nodeId: nodeId,
-              },
-            });
-          }}
-        />
+        <div className="h-full w-full overflow-hidden">
+          <NodeContainer
+            type="modal"
+            nodeId={nodeId}
+            onFullscreen={() => {
+              navigate({
+                from: '/workspace/$userId/$nodeId/modal/$modalNodeId',
+                to: '/workspace/$userId/$nodeId',
+                params: {
+                  nodeId: nodeId,
+                },
+              });
+            }}
+          />
+        </div>
       </DialogContent>
     </Dialog>
   );

@@ -7,7 +7,8 @@ const formatTime = (seconds: number): string => {
   return `This code expires in ${minutes}:${remainingSecs.toString().padStart(2, '0')}`;
 };
 
-export const useCountdown = (date: Date): [number, string] => {
+export const useCountdown = (dateArg: string): [number, string] => {
+  const date = new Date(dateArg);
   const [remainingSeconds, setRemainingSeconds] = useState<number>(0);
 
   useEffect(() => {

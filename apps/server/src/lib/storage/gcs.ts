@@ -4,7 +4,7 @@ import { Storage as GoogleStorage, Bucket, File } from '@google-cloud/storage';
 import { GCSStore } from '@tus/gcs-store';
 import { DataStore } from '@tus/server';
 
-import type { GCSStorageConfig } from '@colanode/server/lib/config/storage';
+import type { GCSStorageProviderConfig } from '@colanode/server/lib/config/storage';
 
 import type { Storage } from './core';
 
@@ -12,7 +12,7 @@ export class GCSStorage implements Storage {
   private readonly bucket: Bucket;
   private readonly gcsStore: GCSStore;
 
-  constructor(config: GCSStorageConfig) {
+  constructor(config: GCSStorageProviderConfig) {
     const storage = new GoogleStorage({
       projectId: config.projectId,
       keyFilename: config.credentials,

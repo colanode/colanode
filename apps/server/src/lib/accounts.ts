@@ -145,7 +145,7 @@ export const buildLoginVerifyOutput = async (
   const id = generateId(IdType.OtpCode);
   const expiresAt = new Date(
     Date.now() + ms(`${config.account.otpTimeout} seconds`)
-  );
+  ).toISOString();
   const otpCode = generateOtpCode();
 
   const otp: Otp<AccountVerifyOtpAttributes> = {

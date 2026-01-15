@@ -6,7 +6,6 @@ import { Button } from '@colanode/ui/components/ui/button';
 import {
   Field,
   FieldError,
-  FieldGroup,
   FieldLabel,
 } from '@colanode/ui/components/ui/field';
 import { Input } from '@colanode/ui/components/ui/input';
@@ -18,7 +17,7 @@ const formSchema = z.object({
 });
 
 interface EmailVerifyFormProps {
-  expiresAt: Date;
+  expiresAt: string;
   isPending: boolean;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
 }
@@ -50,38 +49,36 @@ export const EmailVerifyForm = ({
       }}
       className="space-y-4"
     >
-      <FieldGroup>
-        <form.Field
-          name="otp"
-          children={(field) => {
-            const isInvalid =
-              field.state.meta.isTouched && !field.state.meta.isValid;
-            return (
-              <Field data-invalid={isInvalid}>
-                <FieldLabel htmlFor={field.name}>Code</FieldLabel>
-                <Input
-                  id={field.name}
-                  name={field.name}
-                  value={field.state.value}
-                  onBlur={field.handleBlur}
-                  onChange={(e) => field.handleChange(e.target.value)}
-                  aria-invalid={isInvalid}
-                  placeholder="123456"
-                />
-                {isInvalid && <FieldError errors={field.state.meta.errors} />}
-                <div className="flex flex-col items-center gap-1">
-                  <p className="text-sm text-muted-foreground w-full text-center">
-                    We sent a verification code to your email.
-                  </p>
-                  <p className="text-xs text-muted-foreground w-full text-center">
-                    {formattedTime}
-                  </p>
-                </div>
-              </Field>
-            );
-          }}
-        />
-      </FieldGroup>
+      <form.Field
+        name="otp"
+        children={(field) => {
+          const isInvalid =
+            field.state.meta.isTouched && !field.state.meta.isValid;
+          return (
+            <Field data-invalid={isInvalid}>
+              <FieldLabel htmlFor={field.name}>Code</FieldLabel>
+              <Input
+                id={field.name}
+                name={field.name}
+                value={field.state.value}
+                onBlur={field.handleBlur}
+                onChange={(e) => field.handleChange(e.target.value)}
+                aria-invalid={isInvalid}
+                placeholder="123456"
+              />
+              {isInvalid && <FieldError errors={field.state.meta.errors} />}
+              <div className="flex flex-col items-center gap-1">
+                <p className="text-sm text-muted-foreground w-full text-center">
+                  We sent a verification code to your email.
+                </p>
+                <p className="text-xs text-muted-foreground w-full text-center">
+                  {formattedTime}
+                </p>
+              </div>
+            </Field>
+          );
+        }}
+      />
       <Button
         type="submit"
         variant="outline"
