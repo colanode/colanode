@@ -18,8 +18,9 @@ export const fetchOtp = async <T>(id: string): Promise<Otp<T> | null> => {
 
 export const saveOtp = async <T>(id: string, otp: Otp<T>): Promise<void> => {
   const redisKey = getOtpRedisKey(id);
+  const expiresAt = new Date(otp.expiresAt);
   const expireSeconds = Math.max(
-    Math.floor((otp.expiresAt.getTime() - Date.now()) / 1000),
+    Math.floor((expiresAt.getTime() - Date.now()) / 1000),
     1
   );
   await redis.set(redisKey, JSON.stringify(otp), {

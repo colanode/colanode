@@ -10,7 +10,7 @@ export type AccountPasswordResetOtpAttributes = {
 
 export type Otp<T> = {
   id: string;
-  expiresAt: Date;
+  expiresAt: string;
   otp: string;
   attributes: T;
 };

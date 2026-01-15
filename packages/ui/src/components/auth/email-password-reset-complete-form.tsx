@@ -32,7 +32,7 @@ const formSchema = z
   });
 
 interface PasswordResetCompleteFormProps {
-  expiresAt: Date;
+  expiresAt: string;
   isPending: boolean;
   onSubmit: (values: z.infer<typeof formSchema>) => void;
 }

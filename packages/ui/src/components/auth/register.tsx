@@ -17,7 +17,7 @@ type RegisterState =
   | {
       type: 'verify';
       id: string;
-      expiresAt: Date;
+      expiresAt: string;
     };
 
 export const Register = () => {
