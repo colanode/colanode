@@ -29,12 +29,17 @@ Colanode is a local-first collaboration workspace. Clients keep a local SQLite c
 - Use `@colanode/*` imports and follow ESLint import grouping; keep filenames consistent with nearby code.
 
 ## Server Configuration
-- Primary config: `apps/server/config.json` (shipped with Docker image).
-- Supports environment variable pointers: `env://VAR_NAME` or `env://VAR_NAME?` (optional).
-- Supports file content inlining: `file://path/to/secret.pem`.
-- Only `POSTGRES_URL` and `REDIS_URL` are required env vars.
-- For Docker: mount a custom `config.json` to override defaults.
-- For Kubernetes: use the Helm chart with `--set-file colanode.configFile.data=./config.json`.
+- Config file location: set via `CONFIG` environment variable (e.g., `CONFIG=/path/to/config.json`).
+- If `CONFIG` is not set, server uses schema defaults from `apps/server/src/lib/config/`.
+- Template: `apps/server/config.example.json`.
+- Reference resolution in JSON:
+  - `env://VAR_NAME` - resolves to environment variable (required, fails if not set).
+  - `file://path/to/file` - reads and inlines file contents (useful for certificates).
+  - Direct values - plain strings/numbers/booleans for non-sensitive settings.
+- Only `postgres.url` is required (defaults to `env://POSTGRES_URL`); all other settings have schema defaults.
+- For production: copy `config.example.json`, update values, mount it, and set `CONFIG` + required env vars.
+- Storage config via `storage.provider.type`: `file` (default), `s3`, `gcs`, or `azure`.
+- See `apps/server/src/lib/config/` for full schemas and validation.
 
 ## Testing
 Automated tests are not in place yet. Validate changes manually and note verification steps.

@@ -26,14 +26,8 @@ npm run build
 # Compile TypeScript without emitting files (type checking)
 npm run compile
 
-# Lint all packages
-npm run lint
-
 # Format code
 npm run format
-
-# Clean build artifacts
-npm run clean
 ```
 
 **Note:** Test commands exist in the codebase but there are currently no automated tests. Do not rely on `npm run test` for validation.
@@ -41,6 +35,7 @@ npm run clean
 ### Individual App Development
 
 **Server:**
+
 ```bash
 cd apps/server
 cp .env.example .env  # Configure environment variables
@@ -54,12 +49,14 @@ docker compose -f hosting/docker/docker-compose.yaml --profile s3 up -d
 ```
 
 **Web:**
+
 ```bash
 cd apps/web
 npm run dev
 ```
 
 **Desktop:**
+
 ```bash
 cd apps/desktop
 npm run dev
@@ -105,6 +102,7 @@ This is a Turborepo monorepo with npm workspaces:
 **Core Principle:** All data operations happen locally first, then sync to the server in the background.
 
 **Client Write Path:**
+
 1. User makes a change (e.g., edits a document)
 2. Change is immediately applied to local SQLite database
 3. CRDT update is generated using Yjs (as binary `Uint8Array`)
@@ -114,12 +112,14 @@ This is a Turborepo monorepo with npm workspaces:
 7. Server broadcasts changes to other clients via WebSocket
 
 **Client Read Path:**
+
 - All reads happen from local SQLite (instant response)
 - `Synchronizer` services pull updates from server via WebSocket
 - Updates are applied to local database in background
 - UI reactively updates when local data changes
 
 **Key Files:**
+
 - `packages/client/src/services/workspaces/mutation-service.ts` - Mutation batching/syncing
 - `packages/client/src/services/workspaces/synchronizer.ts` - Real-time sync via WebSocket
 - `packages/client/src/databases/workspace/schema.ts` - Local SQLite schema
@@ -131,6 +131,7 @@ This is a Turborepo monorepo with npm workspaces:
 **Purpose:** Enable conflict-free collaborative editing with automatic merge resolution.
 
 **Implementation:**
+
 - `packages/crdt/src/index.ts` contains the `YDoc` class wrapping Yjs documents
 - Each node (page, database record, etc.) has a corresponding Yjs document
 - Updates are encoded as binary blobs (Base64 for storage, Uint8Array for processing)
@@ -138,10 +139,12 @@ This is a Turborepo monorepo with npm workspaces:
 
 **Storage Strategy:**
 Both client and server maintain two layers:
+
 1. **Current State** - JSON representation of latest merged state (for querying)
 2. **Update History** - Binary CRDT updates (for syncing and conflict resolution)
 
 **Tables:**
+
 - `nodes` / `documents` - Current state as JSON/JSONB
 - `node_updates` / `document_updates` - Individual CRDT updates as binary blobs
 - `node_states` / `document_states` - Merged CRDT state (client-side)
@@ -154,6 +157,7 @@ Server jobs periodically merge old updates to reduce storage (`apps/server/src/j
 **Local (SQLite) ↔ Server (Postgres):**
 
 Cursor-based streaming synchronization:
+
 - Each data stream (users, nodes, documents, collaborations, etc.) has a `Synchronizer`
 - Synchronizers track a cursor (last synced revision number)
 - Client requests updates via WebSocket: `synchronizer.input { cursor: 12345 }`
@@ -161,6 +165,7 @@ Cursor-based streaming synchronization:
 - Client applies updates to local database and persists new cursor
 
 **Synchronizer Types:**
+
 - `users` - User list changes
 - `collaborations` - Access control updates
 - `node.updates` - Node CRDT updates (per workspace root)
@@ -169,6 +174,7 @@ Cursor-based streaming synchronization:
 - `node.interactions` - Read receipts and activity tracking
 
 **Key Files:**
+
 - `packages/client/src/services/workspaces/synchronizer.ts`
 - `apps/server/src/synchronizers/*` - Server-side data fetchers
 - `apps/server/src/lib/event-bus.ts` - Event system for triggering syncs
@@ -178,6 +184,7 @@ Cursor-based streaming synchronization:
 **Location:** `packages/core/src/registry/nodes/`
 
 Each node type (workspace, page, database, message, etc.) defines:
+
 - **Attribute Schema** - Zod schema for node metadata
 - **Document Schema** (optional) - Zod schema for collaborative content
 - **Permission Checks** - `canCreate`, `canUpdate`, `canDelete`, `canRead`
@@ -185,6 +192,7 @@ Each node type (workspace, page, database, message, etc.) defines:
 - **Mention Extraction** - For @mentions and notifications
 
 **Example Node Types:**
+
 - `workspace` - Top-level container
 - `page` - Rich text document
 - `database` - Structured data with custom fields and views
@@ -197,24 +205,75 @@ Each node type (workspace, page, database, message, etc.) defines:
 ### Configuration System
 
 **Server Configuration:**
-- Primary config: `apps/server/config.json` (shipped with Docker image)
-- Supports environment variable pointers: `env://VAR_NAME` or `env://VAR_NAME?` (optional)
-- Supports file content inlining: `file://path/to/secret.pem`
-- Only `POSTGRES_URL` and `REDIS_URL` are required env vars
-- For Docker: mount custom `config.json` to override defaults
-- For Kubernetes: use Helm chart with `--set-file colanode.configFile.data=./config.json`
+
+The server uses a JSON-based configuration system with smart reference resolution:
+
+- **Config File Location**: Set via `CONFIG` environment variable (e.g., `CONFIG=/path/to/config.json`)
+- **Default Behavior**: If `CONFIG` is not set, server uses schema defaults from `apps/server/src/lib/config/`
+- **Example Config**: See `apps/server/config.example.json` for a complete template
+
+**Reference Resolution:**
+
+The config system supports special prefixes for dynamic value loading:
+
+- `env://VAR_NAME` - Resolves to environment variable at runtime (required, fails if not set)
+- `file://path/to/file` - Reads and inlines file contents at runtime (useful for certificates/secrets)
+- Direct values - Plain strings/numbers/booleans in JSON
+
+**Example:**
+```json
+{
+  "postgres": {
+    "url": "env://POSTGRES_URL",
+    "ssl": {
+      "ca": "file:///secrets/postgres-ca.pem"
+    }
+  },
+  "storage": {
+    "provider": {
+      "type": "s3",
+      "endpoint": "env://S3_ENDPOINT",
+      "accessKey": "env://S3_ACCESS_KEY",
+      "secretKey": "env://S3_SECRET_KEY"
+    }
+  }
+}
+```
+
+**Required Configuration:**
+- Only `postgres.url` is truly required (defaults to `env://POSTGRES_URL`)
+- All other settings have sensible defaults in the Zod schemas
+- Storage defaults to `file` type with `./data` directory
+- Redis defaults to `env://REDIS_URL` but has fallback behavior
+
+**For Docker/Production:**
+1. Copy `apps/server/config.example.json` to your own config file
+2. Update values (use `env://` for secrets, direct values for non-sensitive settings)
+3. Mount your config file and set `CONFIG=/path/to/mounted/config.json`
+4. Set required environment variables referenced by `env://` pointers
+
+**For Local Development:**
+- Use `.env` file in `apps/server/` directory
+- Server will use schema defaults if no config file is provided
+- See `apps/server/.env.example` for available environment variables
+
+**Config Validation:**
+- All config is validated using Zod schemas at startup
+- Validation errors show clear messages about missing/invalid values
+- Server exits immediately if config is invalid
 
 **Client Apps:**
+
 - Use standard `.env` files for build-time configuration
 - Runtime configuration fetched from server
 
 ## Testing
 
 **Current State:**
+
 - There are currently **no automated tests** in this codebase
 - Test commands exist in package.json files but will not run any actual tests
 - Focus on manual verification for all changes
-- Always run `npm run lint` before committing to catch TypeScript/ESLint issues
 - Run `npm run build` to ensure TypeScript compilation succeeds
 - Include clear manual verification steps in pull request descriptions
 
@@ -223,6 +282,7 @@ Each node type (workspace, page, database, message, etc.) defines:
 ### Working with CRDTs
 
 When modifying node or document schemas:
+
 1. Update Zod schema in `packages/core/src/registry/nodes/<type>.ts`
 2. The CRDT layer automatically handles schema validation via `YDoc.update()`
 3. Test with multiple clients to verify conflict resolution
@@ -231,11 +291,13 @@ When modifying node or document schemas:
 ### Debugging Synchronization
 
 **Client-side:**
+
 - Check `mutations` table for pending operations
 - Check `cursors` table for sync position
 - Use browser DevTools WebSocket tab to inspect messages
 
 **Server-side:**
+
 - Logs are in JSON format (Pino logger)
 - Look for `synchronizer.input` / `synchronizer.output` messages
 - Check `node_updates` table for stored updates
@@ -244,11 +306,13 @@ When modifying node or document schemas:
 ### Database Migrations
 
 **Server (Postgres):**
+
 - Schema defined in `apps/server/src/data/schema.ts`
 - No formal migration system yet; schema changes require careful coordination
 - For local dev: drop and recreate database if needed
 
 **Client (SQLite):**
+
 - Schema versioning handled in `packages/client/src/databases/workspace/schema.ts`
 - Migration logic in `packages/client/src/databases/workspace/migrations.ts`
 - Migrations run automatically on app startup
@@ -265,32 +329,101 @@ When modifying node or document schemas:
 ### Storage Backends
 
 Server supports multiple storage backends for files:
-- **Filesystem** (default) - Local storage
+
+- **File** (default) - Local filesystem storage in `./data` directory
 - **S3** - AWS S3 or compatible (MinIO, DigitalOcean Spaces, etc.)
 - **GCS** - Google Cloud Storage
-- **Azure Blob Storage**
+- **Azure** - Azure Blob Storage
 
-Configure via `STORAGE_TYPE` in `config.json`. See `apps/server/src/lib/storage/` for implementations.
+**Configuration:**
+
+Configure via `storage.provider.type` in your config file. Examples:
+
+**Filesystem (default):**
+```json
+{
+  "storage": {
+    "provider": {
+      "type": "file",
+      "directory": "./data"
+    }
+  }
+}
+```
+
+**S3-compatible:**
+```json
+{
+  "storage": {
+    "provider": {
+      "type": "s3",
+      "endpoint": "env://S3_ENDPOINT",
+      "accessKey": "env://S3_ACCESS_KEY",
+      "secretKey": "env://S3_SECRET_KEY",
+      "bucket": "env://S3_BUCKET",
+      "region": "env://S3_REGION",
+      "forcePathStyle": false
+    }
+  }
+}
+```
+
+**GCS:**
+```json
+{
+  "storage": {
+    "provider": {
+      "type": "gcs",
+      "bucket": "env://GCS_BUCKET",
+      "projectId": "env://GCS_PROJECT_ID",
+      "credentials": "file:///secrets/gcs-credentials.json"
+    }
+  }
+}
+```
+
+**Azure:**
+```json
+{
+  "storage": {
+    "provider": {
+      "type": "azure",
+      "account": "env://AZURE_STORAGE_ACCOUNT",
+      "accountKey": "env://AZURE_STORAGE_ACCOUNT_KEY",
+      "containerName": "env://AZURE_CONTAINER_NAME"
+    }
+  }
+}
+```
+
+See `apps/server/src/lib/storage/` for implementations and `apps/server/src/lib/config/storage.ts` for full schema.
 
 ## Common Patterns
 
 ### Service Layer Pattern
+
 Services encapsulate business logic and coordinate between database and API:
+
 - `packages/client/src/services/` - Client-side services
 - `apps/server/src/services/` - Server-side services
 
 ### Repository Pattern
+
 Database access abstracted through clear interfaces:
+
 - `packages/client/src/databases/` - Client database layer
 - `apps/server/src/data/` - Server database layer
 
 ### Event-Driven Updates
+
 - Client: Uses React Query for reactive data fetching
 - Server: Uses EventBus (Redis-backed) for cross-instance communication
 - Background jobs via BullMQ for asynchronous processing
 
 ### Optimistic Updates
+
 All mutations are optimistic:
+
 1. Update local state immediately
 2. Show UI change instantly
 3. Send mutation to server in background
