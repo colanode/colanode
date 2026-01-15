@@ -51,7 +51,7 @@ export const emailPasswordResetInitRoute: FastifyPluginCallbackZod = (
       const id = generateId(IdType.OtpCode);
       const expiresAt = new Date(
         Date.now() + ms(`${config.account.otpTimeout} seconds`)
-      );
+      ).toISOString();
       const otpCode = generateOtpCode();
 
       const account = await database

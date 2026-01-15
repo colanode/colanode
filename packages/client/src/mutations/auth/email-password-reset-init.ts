@@ -6,7 +6,7 @@ export type EmailPasswordResetInitMutationInput = {
 
 export type EmailPasswordResetInitMutationOutput = {
   id: string;
-  expiresAt: Date;
+  expiresAt: string;
 };
 
 declare module '@colanode/client/mutations' {

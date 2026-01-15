@@ -17,7 +17,7 @@ type ResetState =
   | {
       type: 'complete';
       id: string;
-      expiresAt: Date;
+      expiresAt: string;
     }
   | {
       type: 'success';

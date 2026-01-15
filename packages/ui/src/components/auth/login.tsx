@@ -17,7 +17,7 @@ type LoginState =
   | {
       type: 'verify';
       id: string;
-      expiresAt: Date;
+      expiresAt: string;
     };
 
 export const Login = () => {

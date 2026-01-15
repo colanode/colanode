@@ -35,7 +35,7 @@ export type LoginSuccessOutput = z.infer<typeof loginSuccessOutputSchema>;
 export const loginVerifyOutputSchema = z.object({
   type: z.literal('verify'),
   id: z.string(),
-  expiresAt: z.date(),
+  expiresAt: z.string(),
 });
 
 export type LoginVerifyOutput = z.infer<typeof loginVerifyOutputSchema>;
@@ -82,7 +82,7 @@ export type EmailPasswordResetCompleteInput = z.infer<
 
 export const emailPasswordResetInitOutputSchema = z.object({
   id: z.string(),
-  expiresAt: z.date(),
+  expiresAt: z.string(),
 });
 
 export type EmailPasswordResetInitOutput = z.infer<
