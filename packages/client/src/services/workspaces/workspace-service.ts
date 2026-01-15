@@ -6,6 +6,7 @@ import {
   workspaceDatabaseMigrations,
 } from '@colanode/client/databases/workspace';
 import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapMetadata } from '@colanode/client/lib/mappers';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { CollaborationService } from '@colanode/client/services/workspaces/collaboration-service';
 import { DocumentService } from '@colanode/client/services/workspaces/document-service';
@@ -161,10 +162,20 @@ export class WorkspaceService {
         .where('user_id', '=', this.workspace.userId)
         .execute();
 
-      await this.account.app.database
+      const deletedMetadata = await this.account.app.database
         .deleteFrom('metadata')
+        .returningAll()
         .where('namespace', '=', this.workspace.userId)
         .execute();
+
+      if (deletedMetadata.length > 0) {
+        for (const metadata of deletedMetadata) {
+          eventBus.publish({
+            type: 'metadata.deleted',
+            metadata: mapMetadata(metadata),
+          });
+        }
+      }
 
       await this.account.app.jobs.removeJobSchedule(
         this.workspaceFilesCleanJobScheduleId

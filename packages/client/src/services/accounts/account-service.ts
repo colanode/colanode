@@ -4,7 +4,11 @@ import ms from 'ms';
 import { SelectWorkspace } from '@colanode/client/databases';
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { parseApiError } from '@colanode/client/lib/ky';
-import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
+import {
+  mapAccount,
+  mapMetadata,
+  mapWorkspace,
+} from '@colanode/client/lib/mappers';
 import { AccountSocket } from '@colanode/client/services/accounts/account-socket';
 import { AppService } from '@colanode/client/services/app-service';
 import { ServerService } from '@colanode/client/services/server-service';
@@ -117,10 +121,20 @@ export class AccountService {
         throw new Error('Failed to delete account');
       }
 
-      await this.app.database
+      const deletedMetadata = await this.app.database
         .deleteFrom('metadata')
+        .returningAll()
         .where('namespace', '=', this.account.id)
         .execute();
+
+      if (deletedMetadata.length > 0) {
+        for (const metadata of deletedMetadata) {
+          eventBus.publish({
+            type: 'metadata.deleted',
+            metadata: mapMetadata(metadata),
+          });
+        }
+      }
 
       await this.app.jobs.addJob(
         {
