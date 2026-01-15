@@ -31,6 +31,7 @@ export const AppProvider = ({ type }: AppProviderProps) => {
             setInitOutput('success');
           })
           .catch((err) => {
+            setInitOutput('error');
             console.error('Colanode | Error preloading', err);
           });
       } else {

@@ -85,6 +85,8 @@ export class AppService {
     this.eventSubscriptionId = eventBus.subscribe((event) => {
       if (event.type === 'account.deleted') {
         this.accounts.delete(event.account.id);
+      } else if (event.type === 'workspace.deleted') {
+        this.workspaces.delete(event.workspace.userId);
       }
     });
   }

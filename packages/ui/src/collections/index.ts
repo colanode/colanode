@@ -1,5 +1,6 @@
 import { Collection } from '@tanstack/react-db';
 
+import { eventBus } from '@colanode/client/lib';
 import {
   Download,
   LocalNode,
@@ -36,6 +37,16 @@ export class WorkspaceCollections {
     this.nodes = createNodesCollection(userId);
     this.nodeReactions = createNodeReactionsCollection(userId);
   }
+
+  public async cleanup(): Promise<void> {
+    await Promise.all([
+      this.users.cleanup(),
+      this.downloads.cleanup(),
+      this.uploads.cleanup(),
+      this.nodes.cleanup(),
+      this.nodeReactions.cleanup(),
+    ]);
+  }
 }
 
 export class AppCollections {
@@ -62,6 +73,21 @@ export class AppCollections {
   }
 
   public async preload(): Promise<void> {
+    eventBus.subscribe((event) => {
+      if (event.type === 'workspace.deleted') {
+        try {
+          const workspaceCollections = this.workspaceCollections.get(
+            event.workspace.userId
+          );
+          if (workspaceCollections) {
+            this.workspaceCollections.delete(event.workspace.userId);
+          }
+        } catch {
+          // ignore
+        }
+      }
+    });
+
     await Promise.all([
       this.servers.preload(),
       this.accounts.preload(),
