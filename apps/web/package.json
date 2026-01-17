@@ -8,7 +8,7 @@
     "start": "vite --port 4000",
     "build": "vite build && tsc",
     "serve": "vite preview",
-    "test": "vitest run"
+    "test": "vitest --passWithNoTests"
   },
   "dependencies": {
     "@colanode/client": "*",
@@ -19,6 +19,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
     "@vitejs/plugin-react": "^5.1.2",
+    "jsdom": "^27.4.0",
     "tailwindcss": "^4.1.18",
     "vite": "^7.3.1",
     "vite-plugin-pwa": "^1.2.0"

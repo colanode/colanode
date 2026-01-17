@@ -1,6 +1,5 @@
 {
   "extends": ["//"],
-  "globalDependencies": [".env"],
   "tasks": {
     "build": {
       "env": ["DEMO_ENV_VAR"],

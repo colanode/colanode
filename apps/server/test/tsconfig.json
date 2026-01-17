@@ -1,0 +1,12 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "display": "Server Tests",
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "baseUrl": "..",
+    "rootDir": ".",
+    "types": ["vitest/globals", "node"]
+  },
+  "include": ["./**/*.ts"]
+}

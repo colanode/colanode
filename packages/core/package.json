@@ -16,7 +16,7 @@
   ],
   "scripts": {
     "compile": "tsc --noEmit",
-    "test": "vitest",
+    "test": "vitest --passWithNoTests",
     "lint": "eslint src --ext .ts --max-warnings 0",
     "build": "tsc",
     "coverage": "vitest run --coverage "
