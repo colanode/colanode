@@ -15,15 +15,21 @@
     "build": "npm run compile && tsup-node",
     "clean": "del-cli dist isolate tsconfig.tsbuildinfo",
     "lint": "eslint . --max-warnings 0",
-    "dev": "tsx watch --env-file .env src/index.ts"
+    "dev": "tsx watch --env-file .env src/index.ts",
+    "test": "vitest run --config vitest.config.ts"
   },
   "description": "",
   "devDependencies": {
+    "@testcontainers/postgresql": "^11.11.0",
+    "@testcontainers/redis": "^11.11.0",
     "@types/node": "^25.0.3",
     "@types/nodemailer": "^7.0.4",
     "@types/pg": "^8.16.0",
     "@types/ws": "^8.18.1",
-    "tsup": "^8.5.1"
+    "testcontainers": "^11.11.0",
+    "tsup": "^8.5.1",
+    "vite-tsconfig-paths": "^6.0.4",
+    "vitest": "^4.0.17"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.965.0",
