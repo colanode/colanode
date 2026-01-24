@@ -12,7 +12,7 @@ Colanode is a local-first collaboration workspace. Clients keep a local SQLite c
 
 ## Development Guide (Quick Start)
 - Install dependencies: `npm install`.
-- Repo-level tasks: `npm run dev`, `npm run build`, `npm run lint`, `npm run format`.
+- Prefer running tasks in individual app/package directories; repo-level scripts run the entire monorepo.
 - Run apps directly:
   - `apps/server`: `cp .env.example .env && npm run dev`
   - `apps/web`: `npm run dev` (Vite on port 4000)
@@ -25,7 +25,7 @@ Colanode is a local-first collaboration workspace. Clients keep a local SQLite c
 - Server routes use Fastify plugins with Zod schemas from `@colanode/core`. Update schemas and error codes before handlers.
 - Client operations follow the query/mutation pattern: define typed `type: 'feature.action'` inputs/outputs in `packages/client/src/queries` or `packages/client/src/mutations`, then wire handlers in `packages/client/src/handlers`.
 - Use Kysely (`database`) for SQL access and limit raw SQL.
-- UI styling uses Tailwind utilities and shared styles in `packages/ui/src/styles`. Prefer shared components over one-off styling.
+- UI styling uses Tailwind utilities, shared styles in `packages/ui/src/styles`, and shadcn components in `packages/ui/src/components/ui`. Prefer shared components over one-off styling.
 - Use `@colanode/*` imports and follow ESLint import grouping; keep filenames consistent with nearby code.
 
 ## Server Configuration
@@ -42,4 +42,6 @@ Colanode is a local-first collaboration workspace. Clients keep a local SQLite c
 - See `apps/server/src/lib/config/` for full schemas and validation.
 
 ## Testing
-Automated tests are not in place yet. Validate changes manually and note verification steps.
+- Tests live in `apps/server` and `apps/web` and run with Vitest.
+- Run `npm run test` in the relevant app directory; `npm run test` at the repo root runs them via Turbo.
+- Validate changes manually where tests do not apply and note verification steps.

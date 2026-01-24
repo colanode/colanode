@@ -13,24 +13,11 @@ Colanode is an open-source, local-first collaboration platform supporting real-t
 ```bash
 # Install dependencies (also runs postinstall script to generate emoji/icon assets)
 npm install
-
-# Development mode (runs all apps in watch mode)
-npm run dev
-
-# Watch core packages only (useful when developing core, crdt, or server)
-npm run watch
-
-# Build all packages and apps
-npm run build
-
-# Compile TypeScript without emitting files (type checking)
-npm run compile
-
-# Format code
-npm run format
 ```
 
-**Note:** Test commands exist in the codebase but there are currently no automated tests. Do not rely on `npm run test` for validation.
+Prefer running dev/build/compile/format commands inside the specific app or package directory.
+
+**Note:** Tests exist for `apps/server` and `apps/web` and are run with Vitest. Prefer running tests in the relevant app directory; `npm run test` at the repo root runs the same suites via Turbo.
 
 ### Individual App Development
 
@@ -138,16 +125,19 @@ This is a Turborepo monorepo with npm workspaces:
 - Server merges concurrent updates automatically using Yjs CRDT semantics
 
 **Storage Strategy:**
-Both client and server maintain two layers:
+Client storage maintains multiple layers:
 
-1. **Current State** - JSON representation of latest merged state (for querying)
-2. **Update History** - Binary CRDT updates (for syncing and conflict resolution)
+1. **Current State** - JSON representation of latest merged state (for querying/UI)
+2. **Merged CRDT State** - Binary Yjs state in `node_states` / `document_states`
+3. **Pending Updates** - Local, unsynced CRDT updates in `node_updates` / `document_updates` kept separately so they can be reverted; once synced they are merged into `*_states` and removed
+
+Server storage keeps current JSON state (`nodes` / `documents`) plus CRDT update history (`node_updates` / `document_updates`); background jobs merge older updates.
 
 **Tables:**
 
 - `nodes` / `documents` - Current state as JSON/JSONB
-- `node_updates` / `document_updates` - Individual CRDT updates as binary blobs
 - `node_states` / `document_states` - Merged CRDT state (client-side)
+- `node_updates` / `document_updates` - Pending local CRDT updates (client-side) and CRDT update history (server-side)
 
 **Background Merging:**
 Server jobs periodically merge old updates to reduce storage (`apps/server/src/jobs/node-updates-merge.ts`).
@@ -183,7 +173,7 @@ Cursor-based streaming synchronization:
 
 **Location:** `packages/core/src/registry/nodes/`
 
-Each node type (workspace, page, database, message, etc.) defines:
+Each node type (space, page, database, message, etc.) defines:
 
 - **Attribute Schema** - Zod schema for node metadata
 - **Document Schema** (optional) - Zod schema for collaborative content
@@ -193,9 +183,13 @@ Each node type (workspace, page, database, message, etc.) defines:
 
 **Example Node Types:**
 
-- `workspace` - Top-level container
+- `space` - Top-level container
 - `page` - Rich text document
 - `database` - Structured data with custom fields and views
+- `record` - Database row
+- `database_view` - Saved database view
+- `chat` - Chat container
+- `channel` - Chat channel
 - `message` - Chat message
 - `file` - File attachment
 - `folder` - Organizational container
@@ -269,13 +263,13 @@ The config system supports special prefixes for dynamic value loading:
 
 ## Testing
 
-**Current State:**
+**Automated Tests (Vitest):**
 
-- There are currently **no automated tests** in this codebase
-- Test commands exist in package.json files but will not run any actual tests
-- Focus on manual verification for all changes
-- Run `npm run build` to ensure TypeScript compilation succeeds
-- Include clear manual verification steps in pull request descriptions
+- `apps/server`: `npm run test`
+- `apps/web`: `npm run test`
+- Repo root: `npm run test` (runs app tests via Turbo)
+- Focus manual verification on areas without test coverage
+- Include clear verification steps in pull request descriptions
 
 ## Development Tips
 
@@ -308,8 +302,8 @@ When modifying node or document schemas:
 **Server (Postgres):**
 
 - Schema defined in `apps/server/src/data/schema.ts`
-- No formal migration system yet; schema changes require careful coordination
-- For local dev: drop and recreate database if needed
+- Migrations live in `apps/server/src/data/migrations` and run via the Kysely migrator in `apps/server/src/data/database.ts`
+- Add a migration for schema changes; avoid manual production edits. For local dev, dropping the DB is a last resort.
 
 **Client (SQLite):**
 
@@ -416,7 +410,7 @@ Database access abstracted through clear interfaces:
 
 ### Event-Driven Updates
 
-- Client: Uses React Query for reactive data fetching
+- Client: Uses TanStack DB for reactive data fetching alongside TanStack Query
 - Server: Uses EventBus (Redis-backed) for cross-instance communication
 - Background jobs via BullMQ for asynchronous processing
 
