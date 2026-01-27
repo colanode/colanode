@@ -158,12 +158,16 @@
       };
 
       config = mkIf cfg.enable {
-        users.users.${cfg.user} = {
-          isSystemUser = true;
-          group = cfg.group;
+        users.users = mkIf (cfg.user == "colanode") {
+          ${cfg.user} = {
+            isSystemUser = true;
+            group = cfg.group;
+          };
         };
 
-        users.groups.${cfg.group} = {};
+        users.groups = mkIf (cfg.group == "colanode") {
+          ${cfg.group} = {};
+        };
 
         systemd.services.colanode-server = {
           description = "Colanode Server";
