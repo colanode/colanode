@@ -148,14 +148,19 @@
           default = "/var/www/colanode";
           description = "Directory where the web interface is served from";
         };
+
+        environmentFile = mkOption {
+          type = types.nullOr types.path;
+          default = null;
+          description = "Environment file containing secrets";
+          example = "/run/secrets/colanode";
+        };
       };
 
       config = mkIf cfg.enable {
         users.users.${cfg.user} = {
           isSystemUser = true;
           group = cfg.group;
-          home = cfg.dataDir;
-          createHome = true;
         };
 
         users.groups.${cfg.group} = {};
@@ -165,25 +170,29 @@
           wantedBy = ["multi-user.target"];
           after = ["network.target"];
 
-          serviceConfig = {
-            Type = "simple";
+          serviceConfig =
+            {
+              Type = "simple";
 
-            User = cfg.user;
-            Group = cfg.group;
-            WorkingDirectory = cfg.dataDir;
+              User = cfg.user;
+              Group = cfg.group;
+              WorkingDirectory = cfg.dataDir;
 
-            ExecStartPre = "${getExe' pkgs.coreutils "ln"} -sf ${configFile} ${cfg.dataDir}/config.json";
-            ExecStart = getExe cfg.server;
-            Restart = "on-failure";
-            RestartSec = "5s";
+              ExecStartPre = "${getExe' pkgs.coreutils "ln"} -sf ${configFile} ${cfg.dataDir}/config.json";
+              ExecStart = getExe cfg.server;
+              Restart = "on-failure";
+              RestartSec = "5s";
 
-            ProtectSystem = "strict";
-            PrivateTmp = true;
-            ProtectHome = true;
-            NoNewPrivileges = true;
-            ReadWritePaths = [cfg.dataDir];
-            Environment = "CONFIG=${cfg.dataDir}/config.json";
-          };
+              ProtectSystem = "strict";
+              PrivateTmp = true;
+              ProtectHome = true;
+              NoNewPrivileges = true;
+              ReadWritePaths = [cfg.dataDir];
+              Environment = "CONFIG=${cfg.dataDir}/config.json";
+            }
+            // lib.optionalAttrs (cfg.environmentFile != null) {
+              EnvironmentFile = cfg.environmentFile;
+            };
         };
       };
     };
