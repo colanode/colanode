@@ -191,10 +191,23 @@
                 Restart = "on-failure";
                 RestartSec = "5s";
 
-                ProtectSystem = "strict";
                 PrivateTmp = true;
                 ProtectHome = true;
+                PrivateDevices = true;
                 NoNewPrivileges = true;
+                LockPersonality = true;
+                RestrictRealtime = true;
+                RestrictSUIDSGID = true;
+                RestrictNamespaces = true;
+                ProtectControlGroups = true;
+                ProtectKernelModules = true;
+                ProtectKernelTunables = true;
+
+                CapabilityBoundingSet = "";
+                ProtectSystem = "strict";
+                SystemCallArchitectures = "native";
+                RestrictAddressFamilies = ["AF_UNIX" "AF_INET" "AF_INET6"];
+                SystemCallFilter = ["@system-service" "~@privileged"];
 
                 ReadWritePaths = [cfg.dataDir];
                 Environment = "CONFIG=${configFile}";
