@@ -94,7 +94,7 @@
       cfg = config.services.colanode;
       configFile = pkgs.writeText "colanode-config.json" (builtins.toJSON cfg.config);
 
-      inherit (lib) mkEnableOption mkOption mkIf types literalExpression getExe getExe';
+      inherit (lib) mkEnableOption mkOption mkIf types literalExpression getExe;
     in {
       options.services.colanode = {
         enable = mkEnableOption "Colanode";
@@ -169,34 +169,40 @@
           ${cfg.group} = {};
         };
 
-        systemd.services.colanode-server = {
-          description = "Colanode Server";
-          wantedBy = ["multi-user.target"];
-          after = ["network.target"];
+        systemd = {
+          tmpfiles.rules = [
+            "d '${cfg.dataDir}' 0750 ${cfg.user} ${cfg.group} - -"
+          ];
 
-          serviceConfig =
-            {
-              Type = "simple";
+          services.colanode-server = {
+            description = "Colanode Server";
+            wantedBy = ["multi-user.target"];
+            after = ["network.target"];
 
-              User = cfg.user;
-              Group = cfg.group;
-              WorkingDirectory = cfg.dataDir;
+            serviceConfig =
+              {
+                Type = "simple";
 
-              ExecStartPre = "${getExe' pkgs.coreutils "ln"} -sf ${configFile} ${cfg.dataDir}/config.json";
-              ExecStart = getExe cfg.server;
-              Restart = "on-failure";
-              RestartSec = "5s";
+                User = cfg.user;
+                Group = cfg.group;
+                WorkingDirectory = cfg.dataDir;
 
-              ProtectSystem = "strict";
-              PrivateTmp = true;
-              ProtectHome = true;
-              NoNewPrivileges = true;
-              ReadWritePaths = [cfg.dataDir];
-              Environment = "CONFIG=${cfg.dataDir}/config.json";
-            }
-            // lib.optionalAttrs (cfg.environmentFile != null) {
-              EnvironmentFile = cfg.environmentFile;
-            };
+                ExecStart = getExe cfg.server;
+                Restart = "on-failure";
+                RestartSec = "5s";
+
+                ProtectSystem = "strict";
+                PrivateTmp = true;
+                ProtectHome = true;
+                NoNewPrivileges = true;
+
+                ReadWritePaths = [cfg.dataDir];
+                Environment = "CONFIG=${configFile}";
+              }
+              // lib.optionalAttrs (cfg.environmentFile != null) {
+                EnvironmentFile = cfg.environmentFile;
+              };
+          };
         };
       };
     };
