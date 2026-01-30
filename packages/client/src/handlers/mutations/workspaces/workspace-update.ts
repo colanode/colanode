@@ -12,9 +12,7 @@ import { AppService } from '@colanode/client/services/app-service';
 import { Workspace } from '@colanode/client/types';
 import { WorkspaceUpdateInput } from '@colanode/core';
 
-export class WorkspaceUpdateMutationHandler
-  implements MutationHandler<WorkspaceUpdateMutationInput>
-{
+export class WorkspaceUpdateMutationHandler implements MutationHandler<WorkspaceUpdateMutationInput> {
   private readonly app: AppService;
 
   constructor(app: AppService) {
@@ -24,15 +22,6 @@ export class WorkspaceUpdateMutationHandler
   async handleMutation(
     input: WorkspaceUpdateMutationInput
   ): Promise<WorkspaceUpdateMutationOutput> {
-    const accountService = this.app.getAccount(input.userId);
-
-    if (!accountService) {
-      throw new MutationError(
-        MutationErrorCode.AccountNotFound,
-        'Account not found or has been logged out.'
-      );
-    }
-
     const workspaceService = this.app.getWorkspace(input.userId);
     if (!workspaceService) {
       throw new MutationError(
@@ -48,8 +37,8 @@ export class WorkspaceUpdateMutationHandler
         avatar: input.avatar,
       };
 
-      const response = await accountService.client
-        .patch(`v1/workspaces/${input.id}`, {
+      const response = await workspaceService.account.client
+        .patch(`v1/workspaces/${workspaceService.workspace.workspaceId}`, {
           json: body,
         })
         .json<Workspace>();
