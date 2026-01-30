@@ -25,11 +25,12 @@ export const workspaceCreateRoute = createRoute({
     const accounts = collections.accounts.map((account) => account);
     const workspaces = collections.workspaces.map((workspace) => workspace);
 
-    const lastWorkspaceMetadataKey = buildMetadataKey('app', 'workspace');
-    const lastWorkspace = collections.metadata.get(lastWorkspaceMetadataKey);
-    if (lastWorkspace) {
+    const metadataKey = buildMetadataKey('app', 'workspace');
+    const metadataValue = collections.metadata.get(metadataKey)?.value;
+    if (metadataValue) {
+      const userId = JSON.parse(metadataValue) as string;
       const workspace = workspaces.find(
-        (workspace) => workspace.userId === lastWorkspace.value
+        (workspace) => workspace.userId === userId
       );
 
       if (workspace) {

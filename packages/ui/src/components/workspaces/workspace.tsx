@@ -3,9 +3,9 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 import { collections } from '@colanode/ui/collections';
 import { ServerProvider } from '@colanode/ui/components/servers/server-provider';
 import { WorkspaceLayout } from '@colanode/ui/components/workspaces/workspace-layout';
+import { WorkspaceLocationTracker } from '@colanode/ui/components/workspaces/workspace-location-tracker';
 import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
-import { useLocationTracker } from '@colanode/ui/hooks/use-location-tracker';
 
 interface WorkspaceProps {
   userId: string;
@@ -46,8 +46,6 @@ export const Workspace = ({ userId }: WorkspaceProps) => {
   const accountId = workspaceQuery.data?.accountId;
   const server = accountQuery.data?.server;
 
-  useLocationTracker(userId!);
-
   if (!workspaceId || !accountId || !server) {
     return <WorkspaceNotFound />;
   }
@@ -67,6 +65,7 @@ export const Workspace = ({ userId }: WorkspaceProps) => {
           collections: collections.workspace(userId),
         }}
       >
+        <WorkspaceLocationTracker />
         <WorkspaceLayout />
       </WorkspaceContext.Provider>
     </ServerProvider>
