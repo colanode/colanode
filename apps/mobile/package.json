@@ -14,7 +14,7 @@
     "build:ui": "vite build"
   },
   "dependencies": {
-    "expo": "^54.0.31",
+    "expo": "^54.0.32",
     "expo-asset": "^12.0.12",
     "expo-crypto": "~15.0.8",
     "expo-device": "~8.0.10",
@@ -23,8 +23,8 @@
     "expo-sqlite": "^16.0.10",
     "expo-status-bar": "~3.0.9",
     "isomorphic-webcrypto": "^2.3.8",
-    "react": "^19.2.3",
-    "react-dom": "^19.2.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "react-native": "^0.83.1",
     "react-native-get-random-values": "^2.0.0",
     "react-native-safe-area-context": "^5.6.2",
@@ -32,10 +32,10 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
-    "@types/react": "^19.2.7",
+    "@types/react": "^19.2.10",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.2",
-    "babel-preset-expo": "^54.0.9",
+    "babel-preset-expo": "^54.0.10",
     "typescript": "~5.9.2",
     "vite": "^7.3.1",
     "vite-plugin-singlefile": "^2.3.0"
