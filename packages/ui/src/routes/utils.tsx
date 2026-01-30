@@ -7,12 +7,12 @@ export const getDefaultWorkspaceUserId = () => {
   );
 
   const metadataKey = buildMetadataKey('app', 'workspace');
-  const lastUsedWorkspaceId = collections.metadata.get(metadataKey)?.value as
-    | string
-    | undefined;
-
-  if (lastUsedWorkspaceId && workspaceIds.includes(lastUsedWorkspaceId)) {
-    return lastUsedWorkspaceId;
+  const metadataValue = collections.metadata.get(metadataKey)?.value;
+  if (metadataValue) {
+    const lastUsedWorkspaceId = JSON.parse(metadataValue) as string;
+    if (workspaceIds.includes(lastUsedWorkspaceId)) {
+      return lastUsedWorkspaceId;
+    }
   }
 
   return workspaceIds[0];
