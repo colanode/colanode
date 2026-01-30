@@ -71,10 +71,7 @@ export class WebKyselyService implements KyselyService {
   private async getSqlite3(): Promise<Sqlite3Static> {
     if (!this.sqlite3) {
       configureSqliteWasmUrl();
-      this.sqlite3 = await sqlite3InitModule({
-        print: console.log,
-        printErr: console.error,
-      });
+      this.sqlite3 = await sqlite3InitModule();
     }
 
     return this.sqlite3;
