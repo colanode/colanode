@@ -17,6 +17,7 @@ import {
 import { UnreadBadge } from '@colanode/ui/components/ui/unread-badge';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { getAccountWorkspaceUserId } from '@colanode/ui/routes/utils';
 
 export function SidebarMenuFooter() {
   const workspace = useWorkspace();
@@ -85,10 +86,13 @@ export function SidebarMenuFooter() {
               key={accountItem.id}
               className="p-0"
               onClick={() => {
-                navigate({
-                  to: '/workspace/$userId',
-                  params: { userId: accountItem.id },
-                });
+                const userId = getAccountWorkspaceUserId(accountItem.id);
+                if (userId) {
+                  navigate({
+                    to: '/workspace/$userId',
+                    params: { userId: userId },
+                  });
+                }
               }}
             >
               <div className="w-full flex items-center gap-2 px-1 py-1.5 text-left text-sm">

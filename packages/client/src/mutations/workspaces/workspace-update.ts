@@ -1,10 +1,9 @@
 export type WorkspaceUpdateMutationInput = {
   type: 'workspace.update';
-  id: string;
+  userId: string;
   name: string;
   description: string;
   avatar: string | null;
-  userId: string;
 };
 
 export type WorkspaceUpdateMutationOutput = {

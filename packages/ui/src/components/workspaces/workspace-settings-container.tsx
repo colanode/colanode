@@ -20,15 +20,13 @@ export const WorkspaceSettingsContainer = () => {
     (q) =>
       q
         .from({ workspaces: collections.workspaces })
-        .where(({ workspaces }) =>
-          eq(workspaces.accountId, workspace.accountId)
-        )
+        .where(({ workspaces }) => eq(workspaces.userId, workspace.userId))
         .select(({ workspaces }) => ({
           name: workspaces.name,
           description: workspaces.description,
           avatar: workspaces.avatar,
         })),
-    [workspace.accountId]
+    [workspace.userId]
   );
 
   const currentWorkspace = currentWorkspaceQuery.data?.[0];
@@ -57,7 +55,6 @@ export const WorkspaceSettingsContainer = () => {
               mutate({
                 input: {
                   type: 'workspace.update',
-                  id: workspace.workspaceId,
                   userId: workspace.userId,
                   name: values.name,
                   description: values.description,
