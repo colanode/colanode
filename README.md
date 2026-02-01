@@ -133,6 +133,28 @@ To run Colanode locally in development mode:
    npm run dev
    ```
 
+## Testing
+
+Colanode includes tests for both server and web.
+
+### Server tests
+
+From `apps/server`:
+
+```bash
+npm run test
+```
+
+Server tests use Testcontainers for Postgres and Redis, so Docker must be running. See [`apps/server/README.md`](apps/server/README.md) for details.
+
+### Web tests
+
+From `apps/web`:
+
+```bash
+npm run test
+```
+
 ## License
 
 Colanode is released under the [Apache 2.0 License](LICENSE).
