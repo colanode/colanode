@@ -23,22 +23,27 @@ export const LinkMark = Link.extend({
           props: {
             handleClick: (_, __, event) => {
               // Don't handle clicks on links that are created and handled by Tanstack Router
+              // Find the link element that is closest to the target - based on the original Tiptap link implementation
 
               let link: HTMLAnchorElement | null = null;
 
               if (event.target instanceof HTMLAnchorElement) {
                 link = event.target;
               } else {
-                let a = event.target as HTMLElement;
-                const els = [];
-
-                while (a.nodeName !== 'DIV') {
-                  els.push(a);
-                  a = a.parentNode as HTMLElement;
+                const target = event.target as HTMLElement | null;
+                if (!target) {
+                  return false;
                 }
-                link = els.find(
-                  (value) => value.nodeName === 'A'
-                ) as HTMLAnchorElement;
+
+                const root = this.editor.view.dom;
+
+                // Tntentionally limit the lookup to the editor root.
+                // Using tag names like DIV as boundaries breaks with custom NodeViews,
+                link = target.closest<HTMLAnchorElement>('a');
+
+                if (link && !root.contains(link)) {
+                  link = null;
+                }
               }
 
               if (!link) {
