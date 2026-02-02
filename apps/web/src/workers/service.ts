@@ -25,11 +25,11 @@ registerRoute(
   })
 );
 
-const downloadDbs = async () => {
+export const downloadDbs = async () => {
   await Promise.all([downloadEmojis(), downloadIcons()]);
 };
 
-const downloadEmojis = async () => {
+export const downloadEmojis = async () => {
   try {
     const emojiResponse = await fetch('/assets/emojis.db');
     if (!emojiResponse.ok) {
@@ -44,7 +44,7 @@ const downloadEmojis = async () => {
   }
 };
 
-const downloadIcons = async () => {
+export const downloadIcons = async () => {
   try {
     const iconResponse = await fetch('/assets/icons.db');
     if (!iconResponse.ok) {

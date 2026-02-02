@@ -8,7 +8,7 @@
     "start": "vite --port 4000",
     "build": "vite build && tsc",
     "serve": "vite preview",
-    "test": "vitest --passWithNoTests"
+    "test": "vitest"
   },
   "dependencies": {
     "@colanode/client": "*",
@@ -18,10 +18,14 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@testing-library/user-event": "^14.6.1",
     "@vitejs/plugin-react": "^5.1.2",
     "jsdom": "^27.4.0",
     "tailwindcss": "^4.1.18",
     "vite": "^7.3.1",
-    "vite-plugin-pwa": "^1.2.0"
+    "vite-plugin-pwa": "^1.2.0",
+    "vitest": "^4.0.17"
   }
 }
