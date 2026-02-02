@@ -27,7 +27,7 @@ export class YDoc {
 
   constructor(state?: Uint8Array | string | Uint8Array[] | string[]) {
     this.doc = new Y.Doc();
-    this.undoManager = new Y.UndoManager(this.doc, {
+    this.undoManager = new Y.UndoManager(this.doc.getMap('object'), {
       trackedOrigins: new Set([ORIGIN]),
     });
 
