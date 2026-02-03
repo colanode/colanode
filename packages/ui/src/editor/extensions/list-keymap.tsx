@@ -10,5 +10,9 @@ export const ListKeymapExtension = ListKeymap.configure({
       itemName: 'taskItem',
       wrapperNames: ['taskList'],
     },
+    {
+      itemName: 'toggleItem',
+      wrapperNames: ['toggleList'],
+    },
   ],
 });

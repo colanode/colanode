@@ -15,6 +15,7 @@ import { PageCommand } from '@colanode/ui/editor/commands/page';
 import { ParagraphCommand } from '@colanode/ui/editor/commands/paragraph';
 import { TableCommand } from '@colanode/ui/editor/commands/table';
 import { TodoCommand } from '@colanode/ui/editor/commands/todo';
+import { ToggleListCommand } from '@colanode/ui/editor/commands/toggle-list';
 
 export type { EditorCommand, EditorCommandProps };
 
@@ -33,6 +34,7 @@ export {
   ParagraphCommand,
   TableCommand,
   TodoCommand,
+  ToggleListCommand,
   DatabaseCommand,
   DatabaseInlineCommand,
 };

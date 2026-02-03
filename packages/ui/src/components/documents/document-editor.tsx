@@ -7,7 +7,7 @@ import {
   useEditor,
 } from '@tiptap/react';
 import { debounce, isEqual } from 'lodash-es';
-import { Fragment, useEffect, useMemo, useRef } from 'react';
+import { Fragment, useCallback, useEffect, useMemo, useRef } from 'react';
 import { toast } from 'sonner';
 
 import {
@@ -39,6 +39,7 @@ import {
   ParagraphCommand,
   TableCommand,
   TodoCommand,
+  ToggleListCommand,
   DatabaseCommand,
   DatabaseInlineCommand,
 } from '@colanode/ui/editor/commands';
@@ -77,6 +78,8 @@ import {
   TableCellNode,
   TaskItemNode,
   TaskListNode,
+  ToggleItemNode,
+  ToggleListNode,
   TextNode,
   TrailingNode,
   UnderlineMark,
@@ -107,84 +110,6 @@ const buildYDoc = (
   return ydoc;
 };
 
-interface UndoRedoParams {
-  editor: ReturnType<typeof useEditor>;
-  ydoc: YDoc;
-  nodeId: string;
-  userId: string;
-}
-
-const performUndo = async ({
-  editor,
-  ydoc,
-  nodeId,
-  userId,
-}: UndoRedoParams) => {
-  const beforeContent = ydoc.getObject<RichTextContent>();
-  const update = ydoc.undo();
-
-  if (!update) {
-    return;
-  }
-
-  const afterContent = ydoc.getObject<RichTextContent>();
-
-  if (isEqual(beforeContent, afterContent)) {
-    return;
-  }
-
-  const editorContent = buildEditorContent(nodeId, afterContent);
-  editor.chain().setContent(editorContent).run();
-
-  const result = await window.colanode.executeMutation({
-    type: 'document.update',
-    userId,
-    documentId: nodeId,
-    update: encodeState(update),
-  });
-
-  if (!result.success) {
-    toast.error(result.error.message);
-  }
-};
-
-const performRedo = async ({
-  editor,
-  ydoc,
-  nodeId,
-  userId,
-}: UndoRedoParams) => {
-  const beforeContent = ydoc.getObject<RichTextContent>();
-  console.log('beforeContent', beforeContent);
-  const update = ydoc.redo();
-  console.log('afterContent', ydoc.getObject<RichTextContent>());
-  console.log('update', update);
-
-  if (!update) {
-    return;
-  }
-
-  const afterContent = ydoc.getObject<RichTextContent>();
-
-  if (isEqual(beforeContent, afterContent)) {
-    return;
-  }
-
-  const editorContent = buildEditorContent(nodeId, afterContent);
-  editor.chain().setContent(editorContent).run();
-
-  const result = await window.colanode.executeMutation({
-    type: 'document.update',
-    userId,
-    documentId: nodeId,
-    update: encodeState(update),
-  });
-
-  if (!result.success) {
-    toast.error(result.error.message);
-  }
-};
-
 export const DocumentEditor = ({
   node,
   state,
@@ -197,7 +122,6 @@ export const DocumentEditor = ({
   const hasPendingChanges = useRef(false);
   const revisionRef = useRef(state?.revision ?? 0);
   const ydocRef = useRef<YDoc>(buildYDoc(state, updates));
-  const editorRef = useRef<ReturnType<typeof useEditor>>(null);
 
   const debouncedSave = useMemo(
     () =>
@@ -283,6 +207,8 @@ export const DocumentEditor = ({
         }),
         TaskListNode,
         TaskItemNode,
+        ToggleListNode,
+        ToggleItemNode,
         TableNode,
         TableRowNode,
         TableCellNode,
@@ -310,6 +236,7 @@ export const DocumentEditor = ({
             DatabaseCommand,
             DividerCommand,
             TodoCommand,
+            ToggleListCommand,
             FileCommand,
             FolderCommand,
           ],
@@ -336,38 +263,19 @@ export const DocumentEditor = ({
           spellCheck: 'false',
         },
         handleKeyDown: (_, event) => {
-          if (!editorRef.current) {
-            return false;
-          }
-
           if (event.key === 'z' && event.metaKey && !event.shiftKey) {
             event.preventDefault();
-            performUndo({
-              editor: editorRef.current,
-              ydoc: ydocRef.current,
-              nodeId: node.id,
-              userId: workspace.userId,
-            });
+            undo();
             return true;
           }
           if (event.key === 'z' && event.metaKey && event.shiftKey) {
             event.preventDefault();
-            performRedo({
-              editor: editorRef.current,
-              ydoc: ydocRef.current,
-              nodeId: node.id,
-              userId: workspace.userId,
-            });
+            redo();
             return true;
           }
           if (event.key === 'y' && event.metaKey) {
             event.preventDefault();
-            performRedo({
-              editor: editorRef.current,
-              ydoc: ydocRef.current,
-              nodeId: node.id,
-              userId: workspace.userId,
-            });
+            redo();
             return true;
           }
         },
@@ -430,8 +338,71 @@ export const DocumentEditor = ({
     }
   }, [state, updates, editor]);
 
-  // Keep editorRef updated so handleKeyDown can access the current editor
-  editorRef.current = editor;
+  const undo = useCallback(async () => {
+    if (!editor) {
+      return;
+    }
+
+    const beforeContent = ydocRef.current.getObject<RichTextContent>();
+    const update = ydocRef.current.undo();
+
+    if (!update) {
+      return;
+    }
+
+    const afterContent = ydocRef.current.getObject<RichTextContent>();
+
+    if (isEqual(beforeContent, afterContent)) {
+      return;
+    }
+
+    const editorContent = buildEditorContent(node.id, afterContent);
+    editor.chain().setContent(editorContent).run();
+
+    const result = await window.colanode.executeMutation({
+      type: 'document.update',
+      userId: workspace.userId,
+      documentId: node.id,
+      update: encodeState(update),
+    });
+
+    if (!result.success) {
+      toast.error(result.error.message);
+    }
+  }, [node.id, editor]);
+
+  const redo = useCallback(async () => {
+    if (!editor) {
+      return;
+    }
+
+    const beforeContent = ydocRef.current.getObject<RichTextContent>();
+    const update = ydocRef.current.redo();
+
+    if (!update) {
+      return;
+    }
+
+    const afterContent = ydocRef.current.getObject<RichTextContent>();
+
+    if (isEqual(beforeContent, afterContent)) {
+      return;
+    }
+
+    const editorContent = buildEditorContent(node.id, afterContent);
+    editor.chain().setContent(editorContent).run();
+
+    const result = await window.colanode.executeMutation({
+      type: 'document.update',
+      userId: workspace.userId,
+      documentId: node.id,
+      update: encodeState(update),
+    });
+
+    if (!result.success) {
+      toast.error(result.error.message);
+    }
+  }, [node.id, editor]);
 
   return (
     <>

@@ -42,6 +42,8 @@ import { TableHeaderNode } from '@colanode/ui/editor/extensions/table-header';
 import { TableRowNode } from '@colanode/ui/editor/extensions/table-row';
 import { TaskItemNode } from '@colanode/ui/editor/extensions/task-item';
 import { TaskListNode } from '@colanode/ui/editor/extensions/task-list';
+import { ToggleItemNode } from '@colanode/ui/editor/extensions/toggle-item';
+import { ToggleListNode } from '@colanode/ui/editor/extensions/toggle-list';
 import { TempFileNode } from '@colanode/ui/editor/extensions/temp-file';
 import { TrailingNode } from '@colanode/ui/editor/extensions/trailing-node';
 
@@ -82,6 +84,8 @@ export {
   TableCellNode,
   TaskItemNode,
   TaskListNode,
+  ToggleItemNode,
+  ToggleListNode,
   TextNode,
   TrailingNode,
   UnderlineMark,
