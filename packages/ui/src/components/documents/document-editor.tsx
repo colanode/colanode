@@ -39,6 +39,7 @@ import {
   ParagraphCommand,
   TableCommand,
   TodoCommand,
+  ToggleListCommand,
   DatabaseCommand,
   DatabaseInlineCommand,
 } from '@colanode/ui/editor/commands';
@@ -77,6 +78,8 @@ import {
   TableCellNode,
   TaskItemNode,
   TaskListNode,
+  ToggleItemNode,
+  ToggleListNode,
   TextNode,
   TrailingNode,
   UnderlineMark,
@@ -283,6 +286,8 @@ export const DocumentEditor = ({
         }),
         TaskListNode,
         TaskItemNode,
+        ToggleListNode,
+        ToggleItemNode,
         TableNode,
         TableRowNode,
         TableCellNode,
@@ -310,6 +315,7 @@ export const DocumentEditor = ({
             DatabaseCommand,
             DividerCommand,
             TodoCommand,
+            ToggleListCommand,
             FileCommand,
             FolderCommand,
           ],
@@ -339,7 +345,6 @@ export const DocumentEditor = ({
           if (!editorRef.current) {
             return false;
           }
-
           if (event.key === 'z' && event.metaKey && !event.shiftKey) {
             event.preventDefault();
             performUndo({
@@ -348,7 +353,6 @@ export const DocumentEditor = ({
               nodeId: node.id,
               userId: workspace.userId,
             });
-            return true;
           }
           if (event.key === 'z' && event.metaKey && event.shiftKey) {
             event.preventDefault();
@@ -358,7 +362,6 @@ export const DocumentEditor = ({
               nodeId: node.id,
               userId: workspace.userId,
             });
-            return true;
           }
           if (event.key === 'y' && event.metaKey) {
             event.preventDefault();
@@ -368,7 +371,6 @@ export const DocumentEditor = ({
               nodeId: node.id,
               userId: workspace.userId,
             });
-            return true;
           }
         },
       },
@@ -430,8 +432,74 @@ export const DocumentEditor = ({
     }
   }, [state, updates, editor]);
 
-  // Keep editorRef updated so handleKeyDown can access the current editor
+    // Keep editorRef updated so handleKeyDown can access the current editor
   editorRef.current = editor;
+
+  const undo = useCallback(async () => {
+    if (!editor) {
+      return;
+    }
+
+    const beforeContent = ydocRef.current.getObject<RichTextContent>();
+    const update = ydocRef.current.undo();
+
+    if (!update) {
+      return;
+    }
+
+    const afterContent = ydocRef.current.getObject<RichTextContent>();
+
+    if (isEqual(beforeContent, afterContent)) {
+      return;
+    }
+
+    const editorContent = buildEditorContent(node.id, afterContent);
+    editor.chain().setContent(editorContent).run();
+
+    const result = await window.colanode.executeMutation({
+      type: 'document.update',
+      userId: workspace.userId,
+      documentId: node.id,
+      update: encodeState(update),
+    });
+
+    if (!result.success) {
+      toast.error(result.error.message);
+    }
+  }, [node.id, editor]);
+
+  const redo = useCallback(async () => {
+    if (!editor) {
+      return;
+    }
+
+    const beforeContent = ydocRef.current.getObject<RichTextContent>();
+    const update = ydocRef.current.redo();
+
+    if (!update) {
+      return;
+    }
+
+    const afterContent = ydocRef.current.getObject<RichTextContent>();
+
+    if (isEqual(beforeContent, afterContent)) {
+      return;
+    }
+
+    const editorContent = buildEditorContent(node.id, afterContent);
+    editor.chain().setContent(editorContent).run();
+
+    const result = await window.colanode.executeMutation({
+      type: 'document.update',
+      userId: workspace.userId,
+      documentId: node.id,
+      update: encodeState(update),
+    });
+
+    if (!result.success) {
+      toast.error(result.error.message);
+    }
+  }, [node.id, editor]);
 
   return (
     <>
