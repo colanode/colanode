@@ -263,20 +263,35 @@ export const DocumentEditor = ({
           spellCheck: 'false',
         },
         handleKeyDown: (_, event) => {
+          if (!editorRef.current) {
+            return false;
+          }
           if (event.key === 'z' && event.metaKey && !event.shiftKey) {
             event.preventDefault();
-            undo();
-            return true;
+            performUndo({
+              editor: editorRef.current,
+              ydoc: ydocRef.current,
+              nodeId: node.id,
+              userId: workspace.userId,
+            });
           }
           if (event.key === 'z' && event.metaKey && event.shiftKey) {
             event.preventDefault();
-            redo();
-            return true;
+            performRedo({
+              editor: editorRef.current,
+              ydoc: ydocRef.current,
+              nodeId: node.id,
+              userId: workspace.userId,
+            });
           }
           if (event.key === 'y' && event.metaKey) {
             event.preventDefault();
-            redo();
-            return true;
+            performRedo({
+              editor: editorRef.current,
+              ydoc: ydocRef.current,
+              nodeId: node.id,
+              userId: workspace.userId,
+            });
           }
         },
       },
@@ -337,6 +352,9 @@ export const DocumentEditor = ({
       restoreRelativeSelection(editor, relativeSelection);
     }
   }, [state, updates, editor]);
+
+    // Keep editorRef updated so handleKeyDown can access the current editor
+  editorRef.current = editor;
 
   const undo = useCallback(async () => {
     if (!editor) {
