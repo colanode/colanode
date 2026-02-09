@@ -27,6 +27,7 @@ import { jobService } from '@colanode/server/services/job-service';
 import {
   emailPasswordResetTemplate,
   emailVerifyTemplate,
+  workspaceInvitationTemplate,
 } from '@colanode/server/templates';
 import { ClientContext } from '@colanode/server/types/api';
 import { DeviceType } from '@colanode/server/types/devices';
@@ -258,6 +259,57 @@ export const sendEmailPasswordResetEmail = async (
   await emailService.sendEmail({
     subject: 'Your Colanode password reset code',
     to: email,
+    html,
+  });
+};
+
+export const sendWorkspaceInvitationEmail = async (
+  userId: string
+): Promise<void> => {
+  if (!config.email.enabled || !config.web) {
+    return;
+  }
+
+  const user = await database
+    .selectFrom('users')
+    .where('id', '=', userId)
+    .selectAll()
+    .executeTakeFirst();
+
+  if (!user) {
+    return;
+  }
+
+  const workspace = await database
+    .selectFrom('workspaces')
+    .where('id', '=', user.workspace_id)
+    .selectAll()
+    .executeTakeFirst();
+
+  if (!workspace) {
+    return;
+  }
+
+  const inviterAccount = await database
+    .selectFrom('accounts')
+    .where('id', '=', user.created_by)
+    .selectAll()
+    .executeTakeFirst();
+
+  if (!inviterAccount) {
+    return;
+  }
+
+  const html = workspaceInvitationTemplate({
+    inviteeName: user.name,
+    inviterName: inviterAccount.name,
+    workspaceName: workspace.name,
+    invitationUrl: `${config.web.protocol}://${config.web.domain}`,
+  });
+
+  await emailService.sendEmail({
+    subject: `${inviterAccount.name} invited you to ${workspace.name} on Colanode`,
+    to: user.email,
     html,
   });
 };

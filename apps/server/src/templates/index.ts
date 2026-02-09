@@ -17,6 +17,13 @@ export const emailPasswordResetTemplate = handlebars.compile(
   fs.readFileSync(path.join(templatesDir, 'email-password-reset.html'), 'utf8')
 );
 
+export const workspaceInvitationTemplate = handlebars.compile(
+  fs.readFileSync(
+    path.join(templatesDir, 'workspace-invitation.html'),
+    'utf8'
+  )
+);
+
 export const homeTemplate = handlebars.compile(
   fs.readFileSync(path.join(templatesDir, 'home.html'), 'utf8')
 );
