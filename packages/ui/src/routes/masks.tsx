@@ -123,6 +123,18 @@ export const appAppearanceRouteMask = createRouteMask({
   },
 });
 
+export const infoRouteMask = createRouteMask({
+  routeTree: routeTree,
+  from: '/workspace/$userId/info',
+  to: '/$workspaceId/info',
+  params: (ctx) => {
+    const workspace = collections.workspaces.get(ctx.userId);
+    return {
+      workspaceId: workspace?.workspaceId ?? 'unknown',
+    };
+  },
+});
+
 export const modalNodeRouteMask = createRouteMask({
   routeTree: routeTree,
   from: '/workspace/$userId/$nodeId/modal/$modalNodeId',
@@ -148,4 +160,5 @@ export const routeMasks = [
   accountSettingsRouteMask,
   accountLogoutRouteMask,
   appAppearanceRouteMask,
+  infoRouteMask,
 ];

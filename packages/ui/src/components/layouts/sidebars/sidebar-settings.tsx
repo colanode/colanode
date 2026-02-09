@@ -1,6 +1,7 @@
 import { count, inArray, useLiveQuery } from '@tanstack/react-db';
 import {
   Download,
+  Info,
   LogOut,
   Palette,
   Settings,
@@ -108,6 +109,15 @@ export const SidebarSettings = () => {
             <SidebarSettingsItem
               title="Appearance"
               icon={Palette}
+              isActive={isActive}
+            />
+          )}
+        </Link>
+        <Link from="/workspace/$userId" to="info">
+          {({ isActive }) => (
+            <SidebarSettingsItem
+              title="Info"
+              icon={Info}
               isActive={isActive}
             />
           )}

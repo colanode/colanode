@@ -27,6 +27,7 @@ import {
   workspaceHomeMaskRoute,
   workspaceHomeRoute,
 } from '@colanode/ui/routes/workspace/home';
+import { infoMaskRoute, infoRoute } from '@colanode/ui/routes/workspace/info';
 import {
   logoutMaskRoute,
   logoutRoute,
@@ -64,6 +65,7 @@ export const routeTree = rootRoute.addChildren([
     workspaceSettingsRoute,
     accountSettingsRoute,
     logoutRoute,
+    infoRoute,
     appAppearanceRoute,
   ]),
   workspaceMaskRoute.addChildren([
@@ -76,6 +78,7 @@ export const routeTree = rootRoute.addChildren([
     workspaceDownloadsMaskRoute,
     accountSettingsMaskRoute,
     logoutMaskRoute,
+    infoMaskRoute,
     appAppearanceMaskRoute,
   ]),
 ]);
