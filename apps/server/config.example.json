@@ -3,6 +3,9 @@
   "_docs": "https://colanode.com/docs/self-hosting/configuration/",
 
   "name": "Colanode Local",
+  "web": {
+    "domain": "localhost:4000"
+  },
   "mode": "standalone",
   "cors": {
     "origin": "http://localhost:4000",

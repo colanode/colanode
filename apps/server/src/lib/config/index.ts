@@ -22,6 +22,12 @@ const serverModeSchema = z.enum(['standalone', 'cluster']);
 const configSchema = z.object({
   name: z.string().default('Colanode Server').transform(resolveConfigReference),
   avatar: z.string().optional().transform(resolveOptionalConfigReference),
+  web: z
+    .object({
+      domain: z.string().transform(resolveConfigReference),
+      protocol: z.string().default('https').transform(resolveConfigReference),
+    })
+    .optional(),
   mode: serverModeSchema
     .default('standalone')
     .transform(resolveConfigReference),

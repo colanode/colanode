@@ -5,6 +5,7 @@ import { cleanupHandler } from '@colanode/server/jobs/cleanup';
 import { documentUpdatesMergeHandler } from '@colanode/server/jobs/document-updates-merge';
 import { emailPasswordResetSendHandler } from '@colanode/server/jobs/email-password-reset-sent';
 import { emailVerifySendHandler } from '@colanode/server/jobs/email-verify-send';
+import { emailWorkspaceInvitationSendHandler } from '@colanode/server/jobs/email-workspace-invitation-send';
 import { nodeCleanHandler } from '@colanode/server/jobs/node-clean';
 // import { nodeEmbedHandler } from '@colanode/server/jobs/node-embed';
 // import { nodeEmbedScanHandler } from '@colanode/server/jobs/node-embed-scan';
@@ -25,6 +26,7 @@ type JobHandlerMap = {
 export const jobHandlerMap: JobHandlerMap = {
   'email.verify.send': emailVerifySendHandler,
   'email.password.reset.send': emailPasswordResetSendHandler,
+  'email.workspace.invitation.send': emailWorkspaceInvitationSendHandler,
   'workspace.clean': workspaceCleanHandler,
   'node.clean': nodeCleanHandler,
   // 'node.embed': nodeEmbedHandler,

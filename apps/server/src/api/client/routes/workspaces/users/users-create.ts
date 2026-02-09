@@ -17,6 +17,7 @@ import { database } from '@colanode/server/data/database';
 import { SelectAccount } from '@colanode/server/data/schema';
 import { eventBus } from '@colanode/server/lib/event-bus';
 import { getNameFromEmail } from '@colanode/server/lib/utils';
+import { jobService } from '@colanode/server/services/job-service';
 
 export const usersCreateRoute: FastifyPluginCallbackZod = (
   instance,
@@ -136,6 +137,11 @@ export const usersCreateRoute: FastifyPluginCallbackZod = (
           accountId: account.id,
           userId: userId,
           workspaceId: workspaceId,
+        });
+
+        await jobService.addJob({
+          type: 'email.workspace.invitation.send',
+          userId: userId,
         });
 
         output.users.push({
