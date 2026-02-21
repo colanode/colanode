@@ -1,0 +1,44 @@
+name: PR - Server and Web tests
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+# Cancel older runs for the same PR so only the latest commit is tested.
+concurrency:
+  group: pr-tests-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  tests:
+    name: Run affected tests
+    runs-on: ubuntu-latest
+    env:
+      TURBO_SCM_BASE: origin/main
+      TURBO_SCM_HEAD: HEAD
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Ensure main ref is available
+        run: git fetch origin main --depth=1
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Turbo compares this PR against main and runs test tasks only for affected packages.
+      # `--watch false` prevents web Vitest from staying in interactive watch mode.
+      - name: Run affected tests with Turbo
+        run: npx turbo run test --affected -- --watch false
