@@ -26,4 +26,6 @@ export const defaultClasses = {
   tableCell: 'flex p-1 px-2 items-center',
   tableHeaderWrapper: 'border',
   tableHeader: 'flex p-1 px-2 items-center font-semibold bg-muted',
+  toggleList: 'list-none pl-0 my-1',
+  toggleItem: 'my-0.5',
 };
