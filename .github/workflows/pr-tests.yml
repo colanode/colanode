@@ -14,56 +14,20 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # Detect what changed in this PR so we can run only needed test suites.
-  changes:
-    name: Detect changed areas
+  tests:
+    name: Run affected tests
     runs-on: ubuntu-latest
-    outputs:
-      server: ${{ steps.filter.outputs.server }}
-      web: ${{ steps.filter.outputs.web }}
+    env:
+      TURBO_SCM_BASE: origin/main
+      TURBO_SCM_HEAD: HEAD
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
-      - name: Detect changed paths
-        id: filter
-        uses: dorny/paths-filter@v3
         with:
-          # If any pattern in a group changes, that group's output becomes "true".
-          filters: |
-            server:
-              # Server app + shared packages used by server tests.
-              - 'apps/server/**'
-              - 'packages/core/**'
-              - 'packages/crdt/**'
-              # Monorepo-level files that can affect test behavior.
-              - 'scripts/**'
-              - 'package.json'
-              - 'package-lock.json'
-              - 'turbo.json'
-              - 'tsconfig.base.json'
-            web:
-              # Web app + shared packages used by web tests.
-              - 'apps/web/**'
-              - 'packages/ui/**'
-              - 'packages/client/**'
-              - 'packages/core/**'
-              - 'packages/crdt/**'
-              # Monorepo-level files that can affect test behavior.
-              - 'scripts/**'
-              - 'package.json'
-              - 'package-lock.json'
-              - 'turbo.json'
-              - 'tsconfig.base.json'
+          fetch-depth: 0
 
-  server-tests:
-    name: Server tests
-    runs-on: ubuntu-latest
-    needs: changes
-    if: ${{ needs.changes.outputs.server == 'true' }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Ensure main ref is available
+        run: git fetch origin main --depth=1
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -74,51 +38,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run server tests
-        run: npm run test --workspace=@colanode/server
-
-  web-tests:
-    name: Web tests
-    runs-on: ubuntu-latest
-    needs: changes
-    if: ${{ needs.changes.outputs.web == 'true' }}
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '22'
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Run web tests
-        run: npm run test --workspace=@colanode/web -- --run
-
-  required:
-    name: CI status
-    runs-on: ubuntu-latest
-    needs:
-      - changes
-      - server-tests
-      - web-tests
-    if: ${{ always() }}
-    steps:
-      # This job always runs so branch protection can require one stable check.
-      # It fails only when a test job that actually ran failed/cancelled.
-      - name: Validate required test jobs
-        run: |
-          if [[ "${{ needs.server-tests.result }}" == "failure" || "${{ needs.server-tests.result }}" == "cancelled" ]]; then
-            echo "Server tests failed or were cancelled."
-            exit 1
-          fi
-
-          if [[ "${{ needs.web-tests.result }}" == "failure" || "${{ needs.web-tests.result }}" == "cancelled" ]]; then
-            echo "Web tests failed or were cancelled."
-            exit 1
-          fi
-
-          echo "Required test suites passed (or were not needed for this PR)."
+      # Turbo compares this PR against main and runs test tasks only for affected packages.
+      # `--watch false` prevents web Vitest from staying in interactive watch mode.
+      - name: Run affected tests with Turbo
+        run: npx turbo run test --affected -- --watch false
