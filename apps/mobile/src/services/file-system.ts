@@ -67,7 +67,11 @@ export class MobileFileSystem implements FileSystem {
       throw new Error(`File not found: ${path}`);
     }
 
-    return file as unknown as FileReadStream;
+    // RN Blob doesn't support ArrayBuffer/Uint8Array construction.
+    // Use fetch on the local file URI to get a proper RN Blob.
+    const response = await fetch(file.uri);
+    const blob = await response.blob();
+    return blob as unknown as FileReadStream;
   }
 
   public async writeStream(path: string): Promise<WritableStream<Uint8Array>> {

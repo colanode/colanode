@@ -4,16 +4,10 @@ import { Directory, File } from 'expo-file-system';
 import { PathService } from '@colanode/client/services';
 
 import emojisDatabaseAsset from '../../assets/emojis.db';
-import neotraxFontAsset from '../../assets/fonts/neotrax.otf';
+import antonioFontAsset from '../../assets/fonts/antonio.ttf';
 import iconsDatabaseAsset from '../../assets/icons.db';
-import indexHtmlAsset from '../../assets/ui/index.html';
 
-export {
-  indexHtmlAsset,
-  emojisDatabaseAsset,
-  iconsDatabaseAsset,
-  neotraxFontAsset,
-};
+export { emojisDatabaseAsset, iconsDatabaseAsset, antonioFontAsset };
 
 export const copyAssets = async (paths: PathService) => {
   try {
@@ -29,8 +23,8 @@ export const copyAssets = async (paths: PathService) => {
     );
     await copyAsset(Asset.fromModule(iconsDatabaseAsset), paths.iconsDatabase);
     await copyAsset(
-      Asset.fromModule(neotraxFontAsset),
-      paths.font('neotrax.otf')
+      Asset.fromModule(antonioFontAsset),
+      paths.font('antonio.ttf')
     );
   } catch (error) {
     console.error(error);

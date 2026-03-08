@@ -23,7 +23,9 @@
     "lint": "turbo run lint --parallel",
     "test": "turbo run test -- --watch false",
     "format": "prettier --write .",
-    "postinstall": "tsx scripts/src/postinstall/index.ts"
+    "postinstall": "tsx scripts/src/postinstall/index.ts",
+    "android": "expo run:android",
+    "ios": "expo run:ios"
   },
   "devDependencies": {
     "@types/debug": "^4.1.12",
@@ -42,6 +44,9 @@
   },
   "dependencies": {
     "debug": "^4.4.3",
-    "lodash-es": "^4.17.23"
+    "lodash-es": "^4.17.23",
+    "expo": "~54.0.33",
+    "react": "19.1.0",
+    "react-native": "0.81.5"
   }
 }

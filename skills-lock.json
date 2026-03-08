@@ -1,0 +1,15 @@
+{
+  "version": 1,
+  "skills": {
+    "building-native-ui": {
+      "source": "expo/skills",
+      "sourceType": "github",
+      "computedHash": "342df93f481a0dba919f372d6c7b40d2b4bf5b51dd24363aea2e5d0bae27a6fa"
+    },
+    "ios-debugger-agent": {
+      "source": "dimillian/skills",
+      "sourceType": "github",
+      "computedHash": "ffaa86d5b055e161ec32acd535d5f7581825af0941c691a0c65e59380c04f11f"
+    }
+  }
+}

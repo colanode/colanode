@@ -81,7 +81,13 @@ class ExpoSqliteDriver implements Driver {
   }
 
   async destroy(): Promise<void> {
-    await this.connection.closeConnection();
+    // Acquire mutex to wait for any in-flight queries to finish
+    await this.connectionMutex.lock();
+    try {
+      await this.connection.closeConnection();
+    } finally {
+      this.connectionMutex.unlock();
+    }
   }
 }
 
@@ -89,6 +95,7 @@ class ExpoSqliteConnection implements DatabaseConnection {
   private readonly database: SQLiteDatabase;
   private readonly options: KyselyBuildOptions;
   private readonly paths: MobilePathService = new MobilePathService();
+  private destroyed = false;
 
   constructor(options: KyselyBuildOptions) {
     const databaseName = this.paths.filename(options.path);
@@ -103,10 +110,31 @@ class ExpoSqliteConnection implements DatabaseConnection {
   }
 
   async closeConnection(): Promise<void> {
+    this.destroyed = true;
+
+    // Drop FTS5 virtual tables before closing the database.
+    // expo-sqlite crashes (SIGSEGV in fts5DisconnectMethod) when
+    // closeAsync() tries to finalize FTS5 internal prepared statements.
+    try {
+      this.database.execSync('DROP TABLE IF EXISTS node_texts');
+      this.database.execSync('DROP TABLE IF EXISTS document_texts');
+    } catch {
+      // Ignore errors — we're shutting down
+    }
     return this.database.closeAsync();
   }
 
   async executeQuery<R>(compiledQuery: CompiledQuery): Promise<QueryResult<R>> {
+    // After destroy, bail out — the database is closed
+    if (this.destroyed) {
+      return {
+        rows: [],
+        insertId: BigInt(0),
+        numAffectedRows: BigInt(0),
+        numChangedRows: BigInt(0),
+      };
+    }
+
     const sql = compiledQuery.sql;
     const parameters = compiledQuery.parameters as SQLiteBindValue[];
     let statement: SQLiteStatement | undefined;

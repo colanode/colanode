@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "target": "ES2020",
-    "lib": ["ES2020", "DOM"],
+    "lib": ["ES2020"],
     "module": "esnext",
     "moduleResolution": "bundler",
     "esModuleInterop": true,
@@ -15,17 +15,15 @@
       "@colanode/mobile/*": ["./src/*"],
       "@colanode/core/*": ["../../packages/core/src/*"],
       "@colanode/crdt/*": ["../../packages/crdt/src/*"],
-      "@colanode/client/*": ["../../packages/client/src/*"],
-      "@colanode/ui/*": ["../../packages/ui/src/*"]
+      "@colanode/client/*": ["../../packages/client/src/*"]
     }
   },
   "exclude": ["node_modules"],
   "extends": "expo/tsconfig.base",
-  "include": ["**/*", "assets/ui/index.html"],
+  "include": ["**/*"],
   "references": [
     { "path": "../../packages/core/tsconfig.json" },
     { "path": "../../packages/crdt/tsconfig.json" },
-    { "path": "../../packages/client/tsconfig.json" },
-    { "path": "../../packages/ui/tsconfig.json" }
-  ],
+    { "path": "../../packages/client/tsconfig.json" }
+  ]
 }
