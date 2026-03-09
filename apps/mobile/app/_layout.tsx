@@ -3,6 +3,7 @@ import { modelName } from 'expo-device';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect, useRef, useState } from 'react';
+import { StatusBar } from 'react-native';
 
 import { AppMeta, AppService } from '@colanode/client/services';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
@@ -10,7 +11,7 @@ import {
   AppServiceContext,
   useAppService,
 } from '@colanode/mobile/contexts/app-service';
-import { ThemeProvider } from '@colanode/mobile/contexts/theme';
+import { ThemeProvider, useTheme } from '@colanode/mobile/contexts/theme';
 import { copyAssets } from '@colanode/mobile/lib/assets';
 import { buildQueryClient } from '@colanode/mobile/lib/query-client';
 import { MobileFileSystem } from '@colanode/mobile/services/file-system';
@@ -18,6 +19,15 @@ import { MobileKyselyService } from '@colanode/mobile/services/kysely-service';
 import { MobilePathService } from '@colanode/mobile/services/path-service';
 
 SplashScreen.preventAutoHideAsync();
+
+function ThemeStatusBar() {
+  const { scheme } = useTheme();
+  return (
+    <StatusBar
+      barStyle={scheme === 'dark' ? 'light-content' : 'dark-content'}
+    />
+  );
+}
 
 export default function RootLayout() {
   const [appService, setAppService] = useState<AppService | null>(null);
@@ -45,6 +55,10 @@ export default function RootLayout() {
         await service.migrate();
         await service.init();
 
+        // Add default Colanode servers (idempotent — skips if already present)
+        await service.createServer(new URL('https://eu.colanode.com/config'));
+        await service.createServer(new URL('https://us.colanode.com/config'));
+
         const client = buildQueryClient(service.mediator);
 
         setAppService(service);
@@ -61,6 +75,7 @@ export default function RootLayout() {
   if (!ready || !appService || !queryClient) {
     return (
       <ThemeProvider>
+        <ThemeStatusBar />
         <LoadingScreen />
       </ThemeProvider>
     );
@@ -68,6 +83,7 @@ export default function RootLayout() {
 
   return (
     <ThemeProvider>
+      <ThemeStatusBar />
       <AppServiceContext.Provider value={{ appService }}>
         <QueryClientProvider client={queryClient}>
           <RootNavigator />

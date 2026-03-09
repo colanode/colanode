@@ -5,6 +5,7 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-nati
 import { SvgUri } from 'react-native-svg';
 
 import { AnimatedLogo } from '@colanode/mobile/components/ui/animated-logo';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 
@@ -22,11 +23,7 @@ export default function AboutScreen() {
       contentContainerStyle={styles.container}
     >
       <View style={styles.header}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={[styles.backText, { color: colors.textSecondary }]}>
-            {'\u2039'} Back
-          </Text>
-        </Pressable>
+        <BackButton onPress={() => router.back()} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>About</Text>
         <View style={styles.headerSpacer} />
       </View>
@@ -42,7 +39,7 @@ export default function AboutScreen() {
       {server && (
         <View style={styles.serverSection}>
           <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>
-            SERVER
+            Server
           </Text>
           <View style={[styles.serverCard, { backgroundColor: colors.surface }]}>
             <View
@@ -138,10 +135,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 24,
   },
-  backText: {
-    fontSize: 16,
-    width: 60,
-  },
   headerTitle: {
     flex: 1,
     fontSize: 17,
@@ -149,7 +142,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSpacer: {
-    width: 60,
+    width: 44,
   },
   appSection: {
     alignItems: 'center',
@@ -169,10 +162,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    letterSpacing: 0.5,
-    marginBottom: 8,
+    fontSize: 12,
+    fontWeight: '500',
+    letterSpacing: 0.3,
+    marginBottom: 10,
   },
   serverCard: {
     borderRadius: 12,

@@ -1,3 +1,4 @@
+import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 
@@ -23,16 +24,6 @@ export default function SpacesScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Spaces</Text>
-        <Pressable
-          style={({ pressed }) => [
-            styles.addButton,
-            { backgroundColor: colors.primary },
-            pressed && styles.addButtonPressed,
-          ]}
-          onPress={() => router.push('/(app)/(spaces)/create-space')}
-        >
-          <Text style={[styles.addButtonText, { color: colors.text }]}>+</Text>
-        </Pressable>
       </View>
       <FlatList
         data={(spaces as LocalSpaceNode[] | undefined) ?? []}
@@ -48,6 +39,9 @@ export default function SpacesScreen() {
             }
           />
         )}
+        ItemSeparatorComponent={() => (
+          <View style={[styles.separator, { backgroundColor: colors.listSeparator }]} />
+        )}
         contentContainerStyle={styles.list}
         refreshControl={
           <RefreshControl
@@ -60,11 +54,28 @@ export default function SpacesScreen() {
           !isLoading ? (
             <EmptyState
               title="No spaces yet"
-              subtitle="Tap + to create your first space"
+              subtitle="Tap the button below to create your first space"
             />
           ) : null
         }
+        ListFooterComponent={
+          spaces && spaces.length > 0 && spaces.length <= 3 ? (
+            <Text style={[styles.hint, { color: colors.textMuted }]}>
+              Create spaces to organize channels, pages, and files
+            </Text>
+          ) : null
+        }
       />
+      <Pressable
+        style={({ pressed }) => [
+          styles.fab,
+          { backgroundColor: colors.surface },
+          pressed && styles.fabPressed,
+        ]}
+        onPress={() => router.push('/(app)/(spaces)/create-space')}
+      >
+        <Feather name="plus" size={22} color={colors.text} />
+      </Pressable>
     </View>
   );
 }
@@ -85,22 +96,36 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
   },
-  addButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 6,
   },
-  addButtonPressed: {
-    opacity: 0.7,
+  fabPressed: {
+    opacity: 0.8,
   },
-  addButtonText: {
-    fontSize: 22,
-    fontWeight: '400',
-    marginTop: -1,
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    marginLeft: 68,
   },
   list: {
     flexGrow: 1,
+  },
+  hint: {
+    fontSize: 13,
+    textAlign: 'center',
+    paddingHorizontal: 32,
+    paddingTop: 16,
+    paddingBottom: 8,
   },
 });

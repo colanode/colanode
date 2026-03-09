@@ -60,6 +60,10 @@ export default function AppLayout() {
 
   if (workspace) {
     lastWorkspaceRef.current = workspace;
+  } else if (!isLoading) {
+    // Data loaded but no workspace found (logged out) — clear the ref
+    // so children unmount and stop querying the destroyed DB
+    lastWorkspaceRef.current = null;
   }
 
   const activeWorkspace = workspace ?? lastWorkspaceRef.current;
@@ -138,8 +142,8 @@ export default function AppLayout() {
               options={{
                 title: 'Home',
                 tabBarLabel: 'Home',
-                tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-                  <Feather name="home" size={size} color={color} />
+                tabBarIcon: ({ color }: { color: string }) => (
+                  <Feather name="home" size={24} color={color} />
                 ),
               }}
             />
@@ -148,8 +152,8 @@ export default function AppLayout() {
               options={{
                 title: 'Spaces',
                 tabBarLabel: 'Spaces',
-                tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-                  <Feather name="layers" size={size} color={color} />
+                tabBarIcon: ({ color }: { color: string }) => (
+                  <Feather name="layers" size={24} color={color} />
                 ),
               }}
             />
@@ -166,8 +170,8 @@ export default function AppLayout() {
                   height: 18,
                   lineHeight: 18,
                 },
-                tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-                  <Feather name="message-circle" size={size} color={color} />
+                tabBarIcon: ({ color }: { color: string }) => (
+                  <Feather name="message-circle" size={24} color={color} />
                 ),
               }}
             />
@@ -176,8 +180,8 @@ export default function AppLayout() {
               options={{
                 title: 'Settings',
                 tabBarLabel: 'Settings',
-                tabBarIcon: ({ color, size }: { color: string; size: number }) => (
-                  <Feather name="settings" size={size} color={color} />
+                tabBarIcon: ({ color }: { color: string }) => (
+                  <Feather name="settings" size={24} color={color} />
                 ),
               }}
             />

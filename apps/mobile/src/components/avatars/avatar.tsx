@@ -11,18 +11,18 @@ interface UserAvatarProps {
 }
 
 const COLORS = [
-  '#6366f1',
-  '#8b5cf6',
-  '#a855f7',
-  '#ec4899',
-  '#f43f5e',
-  '#ef4444',
-  '#f97316',
-  '#eab308',
-  '#22c55e',
-  '#14b8a6',
-  '#06b6d4',
-  '#3b82f6',
+  '#7B8ABF',
+  '#9B8BB8',
+  '#B08DAF',
+  '#C48B9A',
+  '#C4887D',
+  '#BF9A7A',
+  '#C4A96E',
+  '#A8B07A',
+  '#6BC5A0',
+  '#5BA8A0',
+  '#6AA8BF',
+  '#7A9EC4',
 ];
 
 const getColor = (name: string): string => {

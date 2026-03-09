@@ -1,3 +1,4 @@
+import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 
@@ -46,16 +47,6 @@ export default function ChatsScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={styles.header}>
         <Text style={[styles.title, { color: colors.text }]}>Chats</Text>
-        <Pressable
-          style={({ pressed }) => [
-            styles.newButton,
-            { backgroundColor: colors.border },
-            pressed && styles.newButtonPressed,
-          ]}
-          onPress={() => router.push('/(app)/(chats)/new-chat')}
-        >
-          <Text style={[styles.newButtonText, { color: colors.text }]}>New</Text>
-        </Pressable>
       </View>
       <FlatList
         data={(chats as LocalChatNode[] | undefined) ?? []}
@@ -68,6 +59,9 @@ export default function ChatsScreen() {
             onPress={() => handleOpenChat(item)}
             unreadCount={getUnreadCount(item.id)}
           />
+        )}
+        ItemSeparatorComponent={() => (
+          <View style={[styles.separator, { backgroundColor: colors.listSeparator }]} />
         )}
         contentContainerStyle={styles.list}
         refreshControl={
@@ -85,7 +79,24 @@ export default function ChatsScreen() {
             />
           ) : null
         }
+        ListFooterComponent={
+          chats && chats.length > 0 && chats.length <= 3 ? (
+            <Text style={[styles.hint, { color: colors.textMuted }]}>
+              Start conversations with your workspace members
+            </Text>
+          ) : null
+        }
       />
+      <Pressable
+        style={({ pressed }) => [
+          styles.fab,
+          { backgroundColor: colors.surface },
+          pressed && styles.fabPressed,
+        ]}
+        onPress={() => router.push('/(app)/(chats)/new-chat')}
+      >
+        <Feather name="plus" size={22} color={colors.text} />
+      </Pressable>
     </View>
   );
 }
@@ -106,19 +117,36 @@ const styles = StyleSheet.create({
     fontSize: 28,
     fontWeight: 'bold',
   },
-  newButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 8,
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 6,
   },
-  newButtonPressed: {
-    opacity: 0.7,
+  fabPressed: {
+    opacity: 0.8,
   },
-  newButtonText: {
-    fontSize: 14,
-    fontWeight: '500',
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    marginLeft: 72,
   },
   list: {
     flexGrow: 1,
+  },
+  hint: {
+    fontSize: 13,
+    textAlign: 'center',
+    paddingHorizontal: 32,
+    paddingTop: 16,
+    paddingBottom: 8,
   },
 });

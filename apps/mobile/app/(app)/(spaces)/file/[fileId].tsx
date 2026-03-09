@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import { LocalFileNode } from '@colanode/client/types/nodes';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
@@ -116,9 +117,7 @@ export default function FileScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={[styles.backText, { color: colors.textSecondary }]}>{'\u2039'} Back</Text>
-        </Pressable>
+        <BackButton onPress={() => router.back()} />
         <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
           {file?.name ?? 'File'}
         </Text>
@@ -219,10 +218,6 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1,
   },
-  backText: {
-    fontSize: 16,
-    width: 60,
-  },
   headerTitle: {
     flex: 1,
     fontSize: 17,
@@ -230,7 +225,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSpacer: {
-    width: 60,
+    width: 44,
   },
   content: {
     flex: 1,

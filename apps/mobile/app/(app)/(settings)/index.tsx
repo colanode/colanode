@@ -26,17 +26,21 @@ export default function SettingsScreen() {
         onPress: async () => {
           setLoggingOut(true);
 
-          // 1. Cancel all in-flight queries and clear the cache
-          await queryClient.cancelQueries();
-          queryClient.clear();
+          // 1. Stop the Mediator from processing events during logout.
+          //    This prevents event-driven cache updates (setQueryData)
+          //    from re-rendering (app) components while the DB is being destroyed.
+          appService.mediator.clearSubscriptions();
 
-          // 2. Navigate away so components unmount
+          // 2. Cancel all in-flight queries so nothing hits the DB mid-destroy.
+          await queryClient.cancelQueries();
+
+          // 3. Navigate away so (app) components unmount.
           router.replace('/(auth)/');
 
-          // 3. Wait for navigation and unmount to complete
-          await new Promise((r) => setTimeout(r, 1000));
-
-          // 4. Execute logout (closes DB, deletes files)
+          // 4. Execute logout (closes DB, deletes files).
+          //    The (app) tree is unmounting in parallel, but we've already
+          //    neutered the Mediator and cancelled queries so no DB access
+          //    can be triggered by events or refetches.
           try {
             await appService.mediator.executeMutation({
               type: 'account.logout',
@@ -50,6 +54,8 @@ export default function SettingsScreen() {
     ]);
   };
 
+  const canEditWorkspace = role === 'owner' || role === 'admin';
+
   return (
     <ScrollView
       style={[styles.scroll, { backgroundColor: colors.background }]}
@@ -61,64 +67,70 @@ export default function SettingsScreen() {
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Account</Text>
-        <Pressable
-          style={({ pressed }) => [
-            styles.menuItem,
-            { backgroundColor: colors.surface },
-            pressed && { backgroundColor: colors.surfaceHover },
-          ]}
-          onPress={() => router.push('/(app)/(settings)/account')}
-        >
-          <Text style={[styles.menuItemText, { color: colors.text }]}>Edit Profile</Text>
-          <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
-        </Pressable>
+        <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.cardItem,
+              pressed && { backgroundColor: colors.surfaceHover },
+            ]}
+            onPress={() => router.push('/(app)/(settings)/account')}
+          >
+            <Text style={[styles.menuItemText, { color: colors.text }]}>Edit Profile</Text>
+            <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Workspace</Text>
-        <View style={[styles.infoRow, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Name</Text>
-          <Text style={[styles.infoValue, { color: colors.text }]}>{workspace.name}</Text>
-        </View>
-        <View style={[styles.infoRow, { backgroundColor: colors.surface }]}>
-          <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Role</Text>
-          <Text style={[styles.infoValue, { color: colors.text }]}>{role.charAt(0).toUpperCase() + role.slice(1)}</Text>
-        </View>
-        {(role === 'owner' || role === 'admin') && (
+        <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
+          <View style={styles.cardItem}>
+            <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Name</Text>
+            <Text style={[styles.infoValue, { color: colors.text }]}>{workspace.name}</Text>
+          </View>
+          <View style={[styles.cardSeparator, { backgroundColor: colors.cardSeparator }]} />
+          <View style={styles.cardItem}>
+            <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Role</Text>
+            <Text style={[styles.infoValue, { color: colors.text }]}>{role.charAt(0).toUpperCase() + role.slice(1)}</Text>
+          </View>
+          {canEditWorkspace && (
+            <>
+              <View style={[styles.cardSeparator, { backgroundColor: colors.cardSeparator }]} />
+              <Pressable
+                style={({ pressed }) => [
+                  styles.cardItem,
+                  pressed && { backgroundColor: colors.surfaceHover },
+                ]}
+                onPress={() => router.push('/(app)/(settings)/workspace')}
+              >
+                <Text style={[styles.menuItemText, { color: colors.text }]}>Edit Workspace</Text>
+                <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+              </Pressable>
+            </>
+          )}
+          <View style={[styles.cardSeparator, { backgroundColor: colors.cardSeparator }]} />
           <Pressable
             style={({ pressed }) => [
-              styles.menuItem,
-              { backgroundColor: colors.surface },
+              styles.cardItem,
               pressed && { backgroundColor: colors.surfaceHover },
             ]}
-            onPress={() => router.push('/(app)/(settings)/workspace')}
+            onPress={() => router.push('/(app)/(settings)/members')}
           >
-            <Text style={[styles.menuItemText, { color: colors.text }]}>Edit Workspace</Text>
+            <Text style={[styles.menuItemText, { color: colors.text }]}>Members</Text>
             <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
           </Pressable>
-        )}
-        <Pressable
-          style={({ pressed }) => [
-            styles.menuItem,
-            { backgroundColor: colors.surface, marginTop: 2 },
-            pressed && { backgroundColor: colors.surfaceHover },
-          ]}
-          onPress={() => router.push('/(app)/(settings)/members')}
-        >
-          <Text style={[styles.menuItemText, { color: colors.text }]}>Members</Text>
-          <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
-        </Pressable>
-        <Pressable
-          style={({ pressed }) => [
-            styles.menuItem,
-            { backgroundColor: colors.surface, marginTop: 2 },
-            pressed && { backgroundColor: colors.surfaceHover },
-          ]}
-          onPress={openSwitcher}
-        >
-          <Text style={[styles.menuItemText, { color: colors.text }]}>Switch Workspace</Text>
-          <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
-        </Pressable>
+          <View style={[styles.cardSeparator, { backgroundColor: colors.cardSeparator }]} />
+          <Pressable
+            style={({ pressed }) => [
+              styles.cardItem,
+              pressed && { backgroundColor: colors.surfaceHover },
+            ]}
+            onPress={openSwitcher}
+          >
+            <Text style={[styles.menuItemText, { color: colors.text }]}>Switch Workspace</Text>
+            <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.section}>
@@ -160,31 +172,31 @@ export default function SettingsScreen() {
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>App</Text>
-        <Pressable
-          style={({ pressed }) => [
-            styles.menuItem,
-            { backgroundColor: colors.surface },
-            pressed && { backgroundColor: colors.surfaceHover },
-          ]}
-          onPress={() => router.push('/(app)/(settings)/about')}
-        >
-          <Text style={[styles.menuItemText, { color: colors.text }]}>About</Text>
-          <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
-        </Pressable>
+        <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
+          <Pressable
+            style={({ pressed }) => [
+              styles.cardItem,
+              pressed && { backgroundColor: colors.surfaceHover },
+            ]}
+            onPress={() => router.push('/(app)/(settings)/about')}
+          >
+            <Text style={[styles.menuItemText, { color: colors.text }]}>About</Text>
+            <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+          </Pressable>
+        </View>
       </View>
 
       <View style={styles.section}>
         <Pressable
           style={({ pressed }) => [
             styles.logoutButton,
-            { backgroundColor: colors.surfaceHover, borderColor: colors.error },
-            pressed && { backgroundColor: colors.errorBackground },
+            pressed && { opacity: 0.7 },
           ]}
           onPress={handleLogout}
           disabled={loggingOut}
         >
           <Text style={[styles.logoutText, { color: colors.error }]}>
-            {loggingOut ? 'Logging out...' : 'Logout'}
+            {loggingOut ? 'Logging out...' : 'Log Out'}
           </Text>
         </Pressable>
       </View>
@@ -205,41 +217,39 @@ const styles = StyleSheet.create({
     paddingBottom: 24,
   },
   title: {
-    fontSize: 28,
+    fontSize: 30,
     fontWeight: 'bold',
   },
   section: {
-    marginBottom: 24,
+    marginBottom: 32,
     paddingHorizontal: 16,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 8,
+    fontSize: 12,
+    fontWeight: '500',
+    letterSpacing: 0.3,
+    marginBottom: 10,
   },
-  menuItem: {
+  card: {
+    borderRadius: 12,
+    overflow: 'hidden',
+  },
+  cardItem: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderRadius: 10,
     paddingHorizontal: 16,
     paddingVertical: 14,
+  },
+  cardSeparator: {
+    height: StyleSheet.hairlineWidth,
+    marginLeft: 16,
   },
   menuItemText: {
     fontSize: 16,
   },
   chevron: {
     fontSize: 20,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderRadius: 10,
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    marginBottom: 2,
   },
   infoLabel: {
     fontSize: 16,
@@ -248,10 +258,8 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   logoutButton: {
-    borderRadius: 10,
     paddingVertical: 14,
     alignItems: 'center',
-    borderWidth: 1,
   },
   logoutText: {
     fontSize: 16,

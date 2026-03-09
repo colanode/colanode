@@ -113,7 +113,7 @@ export const CreateNodeSheet = ({
                   >
                     <Feather
                       name={config.icon}
-                      size={22}
+                      size={28}
                       color={isSelected ? colors.text : colors.textSecondary}
                     />
                     <Text
@@ -198,8 +198,8 @@ const styles = StyleSheet.create({
   typeButton: {
     flex: 1,
     alignItems: 'center',
-    gap: 6,
-    paddingVertical: 14,
+    gap: 8,
+    paddingVertical: 18,
     borderRadius: 12,
     borderWidth: 1,
   },

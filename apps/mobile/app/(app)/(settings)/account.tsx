@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import { AvatarPicker } from '@colanode/mobile/components/avatars/avatar-picker';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
 import { useTheme } from '@colanode/mobile/contexts/theme';
@@ -67,11 +68,7 @@ export default function AccountSettingsScreen() {
         keyboardShouldPersistTaps="handled"
       >
         <View style={styles.header}>
-          <Pressable onPress={() => router.back()}>
-            <Text style={[styles.backText, { color: colors.textSecondary }]}>
-              {'\u2039'} Back
-            </Text>
-          </Pressable>
+          <BackButton onPress={() => router.back()} />
           <Text style={[styles.headerTitle, { color: colors.text }]}>
             Account
           </Text>
@@ -143,10 +140,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingBottom: 24,
   },
-  backText: {
-    fontSize: 16,
-    width: 60,
-  },
   headerTitle: {
     flex: 1,
     fontSize: 17,
@@ -154,7 +147,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSpacer: {
-    width: 60,
+    width: 44,
   },
   form: {
     paddingHorizontal: 16,

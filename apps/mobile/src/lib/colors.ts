@@ -38,6 +38,9 @@ export interface ThemeColors {
   tabBarBorder: string;
   tabBarActive: string;
   tabBarInactive: string;
+  cardBackground: string;
+  cardSeparator: string;
+  iconPillBackground: string;
   badgeBackground: string;
   badgeText: string;
   ownBubble: string;
@@ -46,90 +49,99 @@ export interface ThemeColors {
   inputBackground: string;
   sendButton: string;
   sendButtonDisabled: string;
+  listSeparator: string;
 }
 
 export const darkColors: ThemeColors = {
-  background: '#0a0a0a',
-  surface: '#111111',
-  surfaceHover: '#1a1a1a',
-  surfaceActive: '#1a1a1a',
+  background: '#131313',
+  surface: '#1e1e1e',
+  surfaceHover: '#242424',
+  surfaceActive: '#242424',
   surfaceAccent: '#1a2a3a',
-  surfaceAccentDeep: '#1a3a5c',
+  surfaceAccentDeep: '#203450',
 
-  border: '#222222',
+  border: '#2a2a2a',
   borderSubtle: '#333333',
 
-  text: '#ffffff',
-  textSecondary: '#a0a0a0',
-  textMuted: '#666666',
-  textPlaceholder: '#666666',
+  text: 'rgba(255,255,255,0.9)',
+  textSecondary: 'rgba(255,255,255,0.5)',
+  textMuted: 'rgba(255,255,255,0.35)',
+  textPlaceholder: 'rgba(255,255,255,0.3)',
 
-  primary: '#3b82f6',
-  primaryLight: '#60a5fa',
+  primary: '#4B7BE5',
+  primaryLight: '#6B9AEF',
   primaryText: '#ffffff',
 
-  error: '#ef4444',
-  errorBackground: '#2a1a1a',
-  success: '#34d399',
-  warning: '#fbbf24',
+  error: '#E5534B',
+  errorBackground: '#2d2020',
+  success: '#6BC5A0',
+  warning: '#D4A046',
   warningDark: '#b45309',
 
   overlay: 'rgba(0, 0, 0, 0.5)',
-  sheetHandle: '#444444',
+  sheetHandle: '#555555',
 
-  tabBarBackground: '#111111',
-  tabBarBorder: '#222222',
-  tabBarActive: '#ffffff',
-  tabBarInactive: '#666666',
-  badgeBackground: '#ef4444',
+  tabBarBackground: '#1a1a1a',
+  tabBarBorder: '#242424',
+  tabBarActive: 'rgba(255,255,255,0.9)',
+  tabBarInactive: 'rgba(255,255,255,0.35)',
+  cardBackground: 'rgba(255,255,255,0.04)',
+  cardSeparator: 'rgba(255,255,255,0.06)',
+  iconPillBackground: 'rgba(255,255,255,0.07)',
+  badgeBackground: '#4B7BE5',
   badgeText: '#ffffff',
-  ownBubble: '#1a3a5c',
-  otherBubble: '#1a1a1a',
-  replyAccent: '#60a5fa',
-  inputBackground: '#1a1a1a',
-  sendButton: '#3b82f6',
+  ownBubble: '#203450',
+  otherBubble: '#1e1e1e',
+  replyAccent: '#6B9AEF',
+  inputBackground: '#1e1e1e',
+  sendButton: '#4B7BE5',
   sendButtonDisabled: '#333333',
+  listSeparator: 'rgba(255,255,255,0.06)',
 };
 
 export const lightColors: ThemeColors = {
-  background: '#ffffff',
-  surface: '#f5f5f5',
-  surfaceHover: '#ebebeb',
-  surfaceActive: '#e0e0e0',
-  surfaceAccent: '#e8f0fe',
-  surfaceAccentDeep: '#d0e1fd',
+  background: '#f8f8f8',
+  surface: '#efefef',
+  surfaceHover: '#e5e5e5',
+  surfaceActive: '#dbdbdb',
+  surfaceAccent: '#e0eafa',
+  surfaceAccentDeep: '#c8d9f5',
 
-  border: '#e0e0e0',
-  borderSubtle: '#cccccc',
+  border: '#d4d4d4',
+  borderSubtle: '#c0c0c0',
 
-  text: '#111111',
-  textSecondary: '#555555',
+  text: '#1a1a1a',
+  textSecondary: '#5a5a5a',
   textMuted: '#888888',
   textPlaceholder: '#999999',
 
-  primary: '#2563eb',
-  primaryLight: '#3b82f6',
+  primary: '#4B7BE5',
+  primaryLight: '#6B9AEF',
   primaryText: '#ffffff',
 
-  error: '#dc2626',
+  error: '#D1453B',
   errorBackground: '#fef2f2',
   success: '#16a34a',
   warning: '#d97706',
   warningDark: '#92400e',
 
   overlay: 'rgba(0, 0, 0, 0.3)',
-  sheetHandle: '#cccccc',
+  sheetHandle: '#bbbbbb',
 
-  tabBarBackground: '#ffffff',
+  tabBarBackground: '#f8f8f8',
   tabBarBorder: '#e0e0e0',
-  tabBarActive: '#111111',
-  tabBarInactive: '#999999',
-  badgeBackground: '#dc2626',
+  tabBarActive: '#1a1a1a',
+  tabBarInactive: '#888888',
+  cardBackground: 'rgba(0,0,0,0.04)',
+  cardSeparator: 'rgba(0,0,0,0.08)',
+  iconPillBackground: 'rgba(0,0,0,0.06)',
+  badgeBackground: '#4B7BE5',
   badgeText: '#ffffff',
-  ownBubble: '#d0e1fd',
-  otherBubble: '#f0f0f0',
-  replyAccent: '#2563eb',
-  inputBackground: '#f0f0f0',
-  sendButton: '#2563eb',
-  sendButtonDisabled: '#cccccc',
+  ownBubble: '#c8d9f5',
+  otherBubble: '#e8e8e8',
+  replyAccent: '#4B7BE5',
+  inputBackground: '#efefef',
+  sendButton: '#4B7BE5',
+  sendButtonDisabled: '#c0c0c0',
+  listSeparator: 'rgba(0,0,0,0.08)',
 };

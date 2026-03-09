@@ -5,7 +5,7 @@ import { LocalChatNode, LocalMessageNode } from '@colanode/client/types/nodes';
 import { User } from '@colanode/client/types/users';
 import { UserAvatar } from '@colanode/mobile/components/avatars/avatar';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useQuery } from '@colanode/mobile/hooks/use-query';
+import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
 
 interface ChatListItemProps {
   chat: LocalChatNode;
@@ -45,16 +45,15 @@ export const ChatListItem = ({
   unreadCount,
 }: ChatListItemProps) => {
   const { colors } = useTheme();
-  const { data: messages } = useQuery({
-    type: 'node.list',
-    userId: currentUserId,
-    filters: [
+  const { data: messages } = useNodeListQuery(
+    currentUserId,
+    [
       { field: ['parentId'], operator: 'eq', value: chat.id },
       { field: ['type'], operator: 'eq', value: 'message' },
     ],
-    sorts: [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }],
-    limit: 1,
-  });
+    [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }],
+    1
+  );
 
   const lastMessage = (messages as LocalMessageNode[] | undefined)?.[0];
   const messagePreview = lastMessage ? getMessageText(lastMessage) : '';

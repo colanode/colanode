@@ -16,6 +16,27 @@ export abstract class AuthMutationHandlerBase {
     login: LoginSuccessOutput,
     server: ServerService
   ): Promise<void> {
+    // Clean up stale account data from a previously failed logout
+    const existingAccount = this.app.getAccount(login.account.id);
+    if (existingAccount) {
+      try {
+        await existingAccount.logout();
+      } catch {
+        // Best effort — fall through to direct DB cleanup below
+      }
+    }
+
+    // Delete any remaining stale DB records (in case logout didn't
+    // fully complete or there was no in-memory service)
+    await this.app.database
+      .deleteFrom('workspaces')
+      .where('account_id', '=', login.account.id)
+      .execute();
+    await this.app.database
+      .deleteFrom('accounts')
+      .where('id', '=', login.account.id)
+      .execute();
+
     const { createdAccount, createdWorkspaces } = await this.app.database
       .transaction()
       .execute(async (trx) => {

@@ -12,6 +12,7 @@ import {
 import {
   NodeInteractionSeenMutation,
   generateId,
+  getIdType,
   IdType,
 } from '@colanode/core';
 
@@ -39,12 +40,21 @@ export class NodeInteractionSeenMutationHandler
       .where('collaborator_id', '=', workspace.userId)
       .executeTakeFirst();
 
+    const nodeIdType = getIdType(input.nodeId);
+    const isChatOrChannel =
+      nodeIdType === IdType.Chat || nodeIdType === IdType.Channel;
+
     if (existingInteraction) {
       const lastSeenAt = existingInteraction.last_seen_at;
       if (
         lastSeenAt &&
         lastSeenAt > new Date(Date.now() - ms('5 minutes')).toISOString()
       ) {
+        // Even if rate-limited, clear counters for chat/channel nodes
+        // because new messages may have arrived since the last seen
+        if (isChatOrChannel) {
+          await workspace.nodeCounters.clearCountersForNode(input.nodeId);
+        }
         return {
           success: true,
         };
@@ -115,10 +125,14 @@ export class NodeInteractionSeenMutationHandler
       throw new Error('Failed to create node interaction');
     }
 
-    await workspace.nodeCounters.checkCountersForUpdatedNodeInteraction(
-      createdInteraction,
-      existingInteraction
-    );
+    if (isChatOrChannel) {
+      await workspace.nodeCounters.clearCountersForNode(input.nodeId);
+    } else {
+      await workspace.nodeCounters.checkCountersForUpdatedNodeInteraction(
+        createdInteraction,
+        existingInteraction
+      );
+    }
 
     workspace.mutations.scheduleSync();
 

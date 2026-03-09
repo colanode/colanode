@@ -1,4 +1,5 @@
 import Feather from '@expo/vector-icons/Feather';
+import { StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@colanode/mobile/contexts/theme';
 
@@ -15,14 +16,29 @@ interface NodeIconProps {
   size?: number;
 }
 
-export const NodeIcon = ({ type, size = 20 }: NodeIconProps) => {
+export const NodeIcon = ({ type, size = 22 }: NodeIconProps) => {
   const { colors } = useTheme();
   const config = NODE_ICONS[type];
 
-  if (!config) {
-    return <Feather name="circle" size={size} color={colors.textMuted} />;
-  }
+  const icon = config ? (
+    <Feather name={config.name} size={size} color={config.staticColor ?? colors[config.colorKey]} />
+  ) : (
+    <Feather name="circle" size={size} color={colors.textMuted} />
+  );
 
-  const color = config.staticColor ?? colors[config.colorKey];
-  return <Feather name={config.name} size={size} color={color} />;
+  return (
+    <View style={[styles.pill, { backgroundColor: colors.iconPillBackground }]}>
+      {icon}
+    </View>
+  );
 };
+
+const styles = StyleSheet.create({
+  pill: {
+    width: 28,
+    height: 28,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+});

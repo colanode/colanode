@@ -66,6 +66,7 @@ export default function NewChatScreen() {
           value={search}
           onChangeText={setSearch}
           autoFocus
+          style={styles.searchInput}
         />
       </View>
       <FlatList
@@ -134,6 +135,9 @@ const styles = StyleSheet.create({
   searchWrapper: {
     paddingHorizontal: 16,
     paddingBottom: 12,
+  },
+  searchInput: {
+    borderWidth: 0,
   },
   list: {
     flexGrow: 1,

@@ -13,6 +13,7 @@ import {
   View,
 } from 'react-native';
 
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
@@ -67,9 +68,7 @@ export default function CreateWorkspaceScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={[styles.backText, { color: colors.textSecondary }]}>{'\u2039'} Back</Text>
-        </Pressable>
+        <BackButton onPress={() => router.back()} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>Create Workspace</Text>
         <View style={styles.headerSpacer} />
       </View>
@@ -153,10 +152,6 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1,
   },
-  backText: {
-    fontSize: 16,
-    width: 60,
-  },
   headerTitle: {
     flex: 1,
     fontSize: 17,
@@ -164,7 +159,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSpacer: {
-    width: 60,
+    width: 44,
   },
   scroll: {
     flex: 1,

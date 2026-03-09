@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 
 import { LocalNode, LocalSpaceNode } from '@colanode/client/types/nodes';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { CreateNodeSheet } from '@colanode/mobile/components/nodes/create-node-sheet';
 import { NodeActionSheet } from '@colanode/mobile/components/nodes/node-action-sheet';
 import { NodeIcon } from '@colanode/mobile/components/nodes/node-icon';
@@ -86,9 +87,7 @@ export default function SpaceScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={[styles.backText, { color: colors.textSecondary }]}>{'\u2039'} Back</Text>
-        </Pressable>
+        <BackButton onPress={() => router.back()} />
         <Pressable
           onPress={() => space && setShowRename(true)}
           style={styles.headerTitleContainer}
@@ -97,12 +96,7 @@ export default function SpaceScreen() {
             {space?.name ?? 'Space'}
           </Text>
         </Pressable>
-        <Pressable
-          style={[styles.addButton, { backgroundColor: colors.primary }]}
-          onPress={() => setShowCreate(true)}
-        >
-          <Text style={[styles.addButtonText, { color: colors.text }]}>+</Text>
-        </Pressable>
+        <View style={{ width: 44 }} />
       </View>
       <FlatList
         data={(children as LocalNode[] | undefined) ?? []}
@@ -131,6 +125,9 @@ export default function SpaceScreen() {
             <Feather name="chevron-right" size={18} color={colors.sheetHandle} />
           </Pressable>
         )}
+        ItemSeparatorComponent={() => (
+          <View style={[styles.separator, { backgroundColor: colors.listSeparator }]} />
+        )}
         contentContainerStyle={styles.list}
         refreshControl={
           <RefreshControl
@@ -143,11 +140,21 @@ export default function SpaceScreen() {
           !isLoading ? (
             <EmptyState
               title="Empty space"
-              subtitle="Tap + to add content"
+              subtitle="Tap the button below to add content"
             />
           ) : null
         }
       />
+      <Pressable
+        style={({ pressed }) => [
+          styles.fab,
+          { backgroundColor: colors.surface },
+          pressed && styles.fabPressed,
+        ]}
+        onPress={() => setShowCreate(true)}
+      >
+        <Feather name="plus" size={22} color={colors.text} />
+      </Pressable>
       <CreateNodeSheet
         visible={showCreate}
         parentId={spaceId!}
@@ -184,10 +191,6 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1,
   },
-  backText: {
-    fontSize: 16,
-    width: 60,
-  },
   headerTitleContainer: {
     flex: 1,
   },
@@ -196,17 +199,27 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
-  addButton: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+  fab: {
+    position: 'absolute',
+    bottom: 24,
+    right: 20,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     alignItems: 'center',
     justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 6,
   },
-  addButtonText: {
-    fontSize: 20,
-    fontWeight: '400',
-    marginTop: -1,
+  fabPressed: {
+    opacity: 0.8,
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    marginLeft: 56,
   },
   list: {
     flexGrow: 1,

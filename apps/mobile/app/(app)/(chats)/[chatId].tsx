@@ -1,6 +1,6 @@
 import { setStringAsync } from 'expo-clipboard';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
+import { useEffect, useCallback, useRef, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import { LocalChatNode, LocalMessageNode } from '@colanode/client/types/nodes';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { EmojiPicker } from '@colanode/mobile/components/emojis/emoji-picker';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { MessageActionSheet } from '@colanode/mobile/components/messages/message-action-sheet';
@@ -40,7 +41,19 @@ export default function ChatScreen() {
   const [actionTarget, setActionTarget] = useState<MessageActionTarget | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const { mutate } = useMutation();
+  const navigation = useNavigation();
   const lastMarkedId = useRef<string | null>(null);
+
+  const handleGoBack = useCallback(() => {
+    // Check if the Stack has a screen below us (e.g. the chat list).
+    // When deep-linked from another tab the index may be missing.
+    const state = navigation.getState();
+    if (state && state.index > 0) {
+      router.back();
+    } else {
+      router.replace('/(app)/(chats)/');
+    }
+  }, [navigation, router]);
 
   // Mark chat as seen/opened on mount and when chatId changes
   useEffect(() => {
@@ -147,9 +160,7 @@ export default function ChatScreen() {
       keyboardVerticalOffset={0}
     >
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Text style={[styles.backText, { color: colors.textSecondary }]}>{'\u2039'} Back</Text>
-        </Pressable>
+        <BackButton onPress={handleGoBack} />
         <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
           {chatName}
         </Text>
@@ -206,12 +217,6 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1,
   },
-  backButton: {
-    width: 60,
-  },
-  backText: {
-    fontSize: 16,
-  },
   headerTitle: {
     flex: 1,
     fontSize: 17,
@@ -219,6 +224,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSpacer: {
-    width: 60,
+    width: 44,
   },
 });

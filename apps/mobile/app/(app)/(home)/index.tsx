@@ -1,6 +1,6 @@
 import Feather from '@expo/vector-icons/Feather';
 import { getIdType, IdType } from '@colanode/core';
-import { useRouter } from 'expo-router';
+import { Link, useRouter } from 'expo-router';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 import { LocalChatNode, LocalSpaceNode } from '@colanode/client/types/nodes';
@@ -88,9 +88,8 @@ export default function HomeScreen() {
       </Pressable>
 
       {totalUnread > 0 && (
-        <View style={[styles.unreadCard, { backgroundColor: colors.surface, borderColor: colors.surfaceAccent }]}>
-          <Feather name="bell" size={18} color={colors.primaryLight} />
-          <Text style={[styles.unreadText, { color: colors.primaryLight }]}>
+        <View style={[styles.unreadCard, { backgroundColor: colors.surface, borderLeftColor: colors.primary }]}>
+          <Text style={[styles.unreadText, { color: colors.textSecondary }]}>
             {totalUnread} unread message{totalUnread !== 1 ? 's' : ''}
             {unreadChats > 0
               ? ` in ${unreadChats} conversation${unreadChats !== 1 ? 's' : ''}`
@@ -103,8 +102,8 @@ export default function HomeScreen() {
         <Pressable
           style={({ pressed }) => [
             styles.quickAction,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-            pressed && { backgroundColor: colors.surfaceHover },
+            { backgroundColor: colors.surfaceAccent },
+            pressed && { backgroundColor: colors.surfaceAccentDeep },
           ]}
           onPress={() => router.push('/(app)/(chats)/new-chat')}
         >
@@ -114,8 +113,8 @@ export default function HomeScreen() {
         <Pressable
           style={({ pressed }) => [
             styles.quickAction,
-            { backgroundColor: colors.surface, borderColor: colors.border },
-            pressed && { backgroundColor: colors.surfaceHover },
+            { backgroundColor: colors.surfaceAccent },
+            pressed && { backgroundColor: colors.surfaceAccentDeep },
           ]}
           onPress={() => router.push('/(app)/(spaces)/create-space')}
         >
@@ -126,28 +125,29 @@ export default function HomeScreen() {
 
       {recentChats && recentChats.length > 0 && (
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Recent Conversations</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent conversations</Text>
           {(recentChats as LocalChatNode[]).map((chat) => (
-            <ChatListItem
+            <Link
               key={chat.id}
-              chat={chat}
-              currentUserId={userId}
-              users={users ?? []}
-              onPress={() =>
-                router.push({
-                  pathname: '/(app)/(chats)/[chatId]',
-                  params: { chatId: chat.id },
-                })
-              }
-              unreadCount={workspaceRadar?.nodeStates[chat.id]?.unreadCount ?? 0}
-            />
+              href={{ pathname: '/(app)/(chats)/[chatId]', params: { chatId: chat.id } }}
+              withAnchor
+              asChild
+            >
+              <ChatListItem
+                chat={chat}
+                currentUserId={userId}
+                users={users ?? []}
+                onPress={() => {}}
+                unreadCount={workspaceRadar?.nodeStates[chat.id]?.unreadCount ?? 0}
+              />
+            </Link>
           ))}
         </View>
       )}
 
       {recentSpaces && recentSpaces.length > 0 && (
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Recent Spaces</Text>
+          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent spaces</Text>
           {(recentSpaces as LocalSpaceNode[]).map((space) => (
             <Pressable
               key={space.id}
@@ -220,15 +220,15 @@ const styles = StyleSheet.create({
   unreadCard: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
     marginHorizontal: 16,
     marginBottom: 16,
-    borderRadius: 12,
-    padding: 14,
-    borderWidth: 1,
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 14,
+    borderLeftWidth: 3,
   },
   unreadText: {
-    fontSize: 14,
+    fontSize: 13,
     flex: 1,
   },
   quickActions: {
@@ -245,7 +245,6 @@ const styles = StyleSheet.create({
     gap: 8,
     borderRadius: 12,
     paddingVertical: 14,
-    borderWidth: 1,
   },
   quickActionText: {
     fontSize: 14,
@@ -255,11 +254,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   sectionTitle: {
-    fontSize: 13,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-    marginBottom: 8,
+    fontSize: 12,
+    fontWeight: '500',
+    letterSpacing: 0.3,
+    marginBottom: 10,
   },
   spaceRow: {
     flexDirection: 'row',

@@ -141,9 +141,13 @@ export class WorkspaceService {
 
   public async delete(): Promise<void> {
     try {
-      this.database.destroy();
+      // Stop services first so they don't trigger new DB queries
       this.synchronizer.destroy();
       this.radar.destroy();
+
+      // Now safely close the database — awaiting ensures the native
+      // SQLite close completes before we delete the file on disk.
+      await this.database.destroy();
 
       const databasePath = this.account.app.path.workspaceDatabase(
         this.workspace.userId

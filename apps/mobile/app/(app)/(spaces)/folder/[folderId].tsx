@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
 
 import { LocalFolderNode, LocalNode } from '@colanode/client/types/nodes';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useFolderFileUpload } from '@colanode/mobile/components/nodes/folder-add-sheet';
 import { NodeActionSheet } from '@colanode/mobile/components/nodes/node-action-sheet';
 import { NodeIcon } from '@colanode/mobile/components/nodes/node-icon';
@@ -86,9 +87,7 @@ export default function FolderScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={[styles.backText, { color: colors.textSecondary }]}>{'\u2039'} Back</Text>
-        </Pressable>
+        <BackButton onPress={() => router.back()} />
         <Pressable
           onPress={() => folder && setShowRename(true)}
           style={styles.headerTitleContainer}
@@ -130,6 +129,9 @@ export default function FolderScreen() {
             </View>
             <Feather name="chevron-right" size={18} color={colors.sheetHandle} />
           </Pressable>
+        )}
+        ItemSeparatorComponent={() => (
+          <View style={[styles.separator, { backgroundColor: colors.listSeparator }]} />
         )}
         contentContainerStyle={styles.list}
         refreshControl={
@@ -178,10 +180,6 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1,
   },
-  backText: {
-    fontSize: 16,
-    width: 60,
-  },
   headerTitleContainer: {
     flex: 1,
   },
@@ -196,6 +194,10 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  separator: {
+    height: StyleSheet.hairlineWidth,
+    marginLeft: 56,
   },
   list: {
     flexGrow: 1,

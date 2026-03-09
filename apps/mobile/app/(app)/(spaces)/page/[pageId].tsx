@@ -5,6 +5,7 @@ import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'r
 import { Block } from '@colanode/core';
 import { mapBlocksToContents } from '@colanode/client/lib';
 import { LocalPageNode } from '@colanode/client/types/nodes';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { BlockRenderer } from '@colanode/mobile/components/messages/block-renderer';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
@@ -57,9 +58,7 @@ export default function PageScreen() {
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Pressable onPress={() => router.back()}>
-          <Text style={[styles.backText, { color: colors.textSecondary }]}>{'\u2039'} Back</Text>
-        </Pressable>
+        <BackButton onPress={() => router.back()} />
         <Pressable
           onPress={() => page && setShowRename(true)}
           style={styles.headerTitleContainer}
@@ -110,10 +109,6 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1,
   },
-  backText: {
-    fontSize: 16,
-    width: 60,
-  },
   headerTitleContainer: {
     flex: 1,
   },
@@ -123,7 +118,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSpacer: {
-    width: 60,
+    width: 44,
   },
   content: {
     flex: 1,

@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import { LocalChannelNode, LocalMessageNode } from '@colanode/client/types/nodes';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { EmojiPicker } from '@colanode/mobile/components/emojis/emoji-picker';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { MessageActionSheet } from '@colanode/mobile/components/messages/message-action-sheet';
@@ -144,9 +145,7 @@ export default function ChannelScreen() {
       keyboardVerticalOffset={0}
     >
       <View style={[styles.header, { borderBottomColor: colors.border }]}>
-        <Pressable onPress={() => router.back()} style={styles.backButton}>
-          <Text style={[styles.backText, { color: colors.textSecondary }]}>{'\u2039'} Back</Text>
-        </Pressable>
+        <BackButton onPress={() => router.back()} />
         <Pressable
           onPress={() => channel && setShowRename(true)}
           style={styles.headerTitleContainer}
@@ -214,12 +213,6 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
     borderBottomWidth: 1,
   },
-  backButton: {
-    width: 60,
-  },
-  backText: {
-    fontSize: 16,
-  },
   headerTitleContainer: {
     flex: 1,
   },
@@ -229,6 +222,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   headerSpacer: {
-    width: 60,
+    width: 44,
   },
 });

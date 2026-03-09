@@ -52,6 +52,23 @@ export class NodeCountersService {
           return;
         }
 
+        // Check if the parent chat/channel was seen after this message
+        // was created. This handles re-login where interactions may sync
+        // before messages, so the parent already has last_seen_at.
+        const parentInteraction = await this.workspace.database
+          .selectFrom('node_interactions')
+          .selectAll()
+          .where('node_id', '=', node.parent_id)
+          .where('collaborator_id', '=', this.workspace.userId)
+          .executeTakeFirst();
+
+        if (
+          parentInteraction?.last_seen_at &&
+          parentInteraction.last_seen_at >= node.created_at
+        ) {
+          return;
+        }
+
         const collaboration = this.workspace.collaborations.getCollaboration(
           node.root_id
         );
@@ -143,7 +160,15 @@ export class NodeCountersService {
       return;
     }
 
-    // If the previous node interaction has already been seen, we don't need to check the counters
+    // When a chat/channel is marked as seen (locally or via sync),
+    // clear all its counters regardless of previous state.
+    const nodeIdType = getIdType(nodeInteraction.node_id);
+    if (nodeIdType === IdType.Chat || nodeIdType === IdType.Channel) {
+      await this.clearCountersForNode(nodeInteraction.node_id);
+      return;
+    }
+
+    // For message-level interactions, only decrement on first seen
     if (previousNodeInteraction?.last_seen_at) {
       return;
     }
@@ -201,6 +226,33 @@ export class NodeCountersService {
       for (const counter of counters) {
         eventBus.publish({
           type: 'node.counter.updated',
+          workspace: {
+            workspaceId: this.workspace.workspaceId,
+            userId: this.workspace.userId,
+            accountId: this.workspace.accountId,
+          },
+          counter: {
+            nodeId: counter.node_id,
+            type: counter.type,
+            count: counter.count,
+          },
+        });
+      }
+    }
+  }
+
+  public async clearCountersForNode(nodeId: string): Promise<void> {
+    const counters = await this.lock.acquire(
+      this.getLockKey(nodeId),
+      async () => {
+        return await this.deleteCounters(nodeId);
+      }
+    );
+
+    if (counters) {
+      for (const counter of counters) {
+        eventBus.publish({
+          type: 'node.counter.deleted',
           workspace: {
             workspaceId: this.workspace.workspaceId,
             userId: this.workspace.userId,
