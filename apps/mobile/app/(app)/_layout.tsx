@@ -1,5 +1,4 @@
 import Feather from '@expo/vector-icons/Feather';
-import { getIdType, IdType } from '@colanode/core';
 import { useQueryClient } from '@tanstack/react-query';
 import { Tabs, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -14,6 +13,7 @@ import { WorkspaceContext } from '@colanode/mobile/contexts/workspace';
 import { WorkspaceSwitcherContext } from '@colanode/mobile/contexts/workspace-switcher';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { getChatUnreadCount } from '@colanode/mobile/lib/radar-utils';
 
 export default function AppLayout() {
   const router = useRouter();
@@ -102,16 +102,7 @@ export default function AppLayout() {
     return <LoadingScreen />;
   }
 
-  // Compute unread chat count from radar data
-  const workspaceRadar = radarData?.[activeWorkspace.userId];
-  let chatUnreadCount = 0;
-  if (workspaceRadar) {
-    for (const [id, nodeState] of Object.entries(workspaceRadar.nodeStates)) {
-      if (getIdType(id) === IdType.Chat && nodeState.unreadCount > 0) {
-        chatUnreadCount += nodeState.unreadCount;
-      }
-    }
-  }
+  const chatUnreadCount = getChatUnreadCount(radarData, activeWorkspace.userId);
 
   return (
     <WorkspaceSwitcherContext.Provider value={{ openSwitcher }}>

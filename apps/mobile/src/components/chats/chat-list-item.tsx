@@ -23,7 +23,7 @@ export const ChatListItem = ({
   unreadCount,
 }: ChatListItemProps) => {
   const { colors } = useTheme();
-  const { data: messages } = useNodeListQuery(
+  const { data: messages } = useNodeListQuery<LocalMessageNode>(
     currentUserId,
     [
       { field: ['parentId'], operator: 'eq', value: chat.id },
@@ -33,7 +33,7 @@ export const ChatListItem = ({
     1
   );
 
-  const lastMessage = (messages as LocalMessageNode[] | undefined)?.[0];
+  const lastMessage = messages?.[0];
   const messagePreview = lastMessage ? getMessagePreview(lastMessage) : '';
 
   const otherUserId = Object.keys(chat.collaborators).find(

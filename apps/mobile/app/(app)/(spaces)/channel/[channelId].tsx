@@ -30,6 +30,7 @@ import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
+import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 
 export default function ChannelScreen() {
   const router = useRouter();
@@ -62,7 +63,9 @@ export default function ChannelScreen() {
     });
   }, [channelId, userId, appService]);
 
-  const { data: messages, isLoading } = useNodeListQuery(
+  const { data: channel } = useNodeQuery<LocalChannelNode>(userId, channelId, 'channel');
+
+  const { data: messages, isLoading } = useNodeListQuery<LocalMessageNode>(
     userId,
     [
       { field: ['parentId'], operator: 'eq', value: channelId },
@@ -76,18 +79,6 @@ export default function ChannelScreen() {
     type: 'user.list',
     userId,
   });
-
-  const { data: channelNodes } = useNodeListQuery(
-    userId,
-    [
-      { field: ['id'], operator: 'eq', value: channelId },
-      { field: ['type'], operator: 'eq', value: 'channel' },
-    ],
-    [],
-    1
-  );
-
-  const channel = channelNodes?.[0] as LocalChannelNode | undefined;
 
   const handleMessageAction = (target: MessageActionTarget) => {
     setActionTarget(target);
@@ -157,7 +148,7 @@ export default function ChannelScreen() {
         <View style={styles.headerSpacer} />
       </View>
       <MessageList
-        messages={(messages as LocalMessageNode[] | undefined) ?? []}
+        messages={messages ?? []}
         users={users ?? []}
         currentUserId={userId}
         onMessageAction={handleMessageAction}

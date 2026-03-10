@@ -1,5 +1,4 @@
 import Feather from '@expo/vector-icons/Feather';
-import { getIdType, IdType } from '@colanode/core';
 import { Link, useRouter } from 'expo-router';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 
@@ -11,6 +10,7 @@ import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useWorkspaceSwitcher } from '@colanode/mobile/contexts/workspace-switcher';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
+import { getNodeUnreadCount, getUnreadSummary } from '@colanode/mobile/lib/radar-utils';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -25,24 +25,10 @@ export default function HomeScreen() {
   const { data: users } = useLiveQuery({ type: 'user.list', userId });
 
   const { data: radarData } = useLiveQuery({ type: 'radar.data.get' });
-  const workspaceRadar = radarData?.[userId];
-
-  // Compute unread stats
-  let totalUnread = 0;
-  let unreadChats = 0;
-  if (workspaceRadar) {
-    for (const [id, nodeState] of Object.entries(workspaceRadar.nodeStates)) {
-      if (nodeState.unreadCount > 0) {
-        totalUnread += nodeState.unreadCount;
-        if (getIdType(id) === IdType.Chat) {
-          unreadChats++;
-        }
-      }
-    }
-  }
+  const { totalUnread, unreadChats } = getUnreadSummary(radarData, userId);
 
   // Recent chats (limit 3)
-  const { data: recentChats, refetch: refetchChats, isRefetching: isRefetchingChats } = useNodeListQuery(
+  const { data: recentChats, refetch: refetchChats, isRefetching: isRefetchingChats } = useNodeListQuery<LocalChatNode>(
     userId,
     [{ field: ['type'], operator: 'eq', value: 'chat' }],
     [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }],
@@ -50,7 +36,7 @@ export default function HomeScreen() {
   );
 
   // Recent spaces
-  const { data: recentSpaces, refetch: refetchSpaces, isRefetching: isRefetchingSpaces } = useNodeListQuery(
+  const { data: recentSpaces, refetch: refetchSpaces, isRefetching: isRefetchingSpaces } = useNodeListQuery<LocalSpaceNode>(
     userId,
     [{ field: ['type'], operator: 'eq', value: 'space' }],
     [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }],
@@ -126,7 +112,7 @@ export default function HomeScreen() {
       {recentChats && recentChats.length > 0 && (
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent conversations</Text>
-          {(recentChats as LocalChatNode[]).map((chat) => (
+          {recentChats.map((chat) => (
             <Link
               key={chat.id}
               href={{ pathname: '/(app)/(chats)/[chatId]', params: { chatId: chat.id } }}
@@ -138,7 +124,7 @@ export default function HomeScreen() {
                 currentUserId={userId}
                 users={users ?? []}
                 onPress={() => {}}
-                unreadCount={workspaceRadar?.nodeStates[chat.id]?.unreadCount ?? 0}
+                unreadCount={getNodeUnreadCount(radarData, userId, chat.id)}
               />
             </Link>
           ))}
@@ -148,7 +134,7 @@ export default function HomeScreen() {
       {recentSpaces && recentSpaces.length > 0 && (
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent spaces</Text>
-          {(recentSpaces as LocalSpaceNode[]).map((space) => (
+          {recentSpaces.map((space) => (
             <Pressable
               key={space.id}
               style={({ pressed }) => [

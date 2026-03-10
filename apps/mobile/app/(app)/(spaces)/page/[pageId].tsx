@@ -12,7 +12,7 @@ import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-s
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
-import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
+import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 
 export default function PageScreen() {
   const router = useRouter();
@@ -21,17 +21,7 @@ export default function PageScreen() {
   const { colors } = useTheme();
   const [showRename, setShowRename] = useState(false);
 
-  const { data: pageNodes } = useNodeListQuery(
-    userId,
-    [
-      { field: ['id'], operator: 'eq', value: pageId },
-      { field: ['type'], operator: 'eq', value: 'page' },
-    ],
-    [],
-    1
-  );
-
-  const page = pageNodes?.[0] as LocalPageNode | undefined;
+  const { data: page } = useNodeQuery<LocalPageNode>(userId, pageId, 'page');
 
   const { data: document, isLoading, refetch, isRefetching } = useLiveQuery({
     type: 'document.get',

@@ -2,9 +2,6 @@ import Feather from '@expo/vector-icons/Feather';
 import { useState } from 'react';
 import {
   Alert,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -13,6 +10,7 @@ import {
 } from 'react-native';
 
 import { generateId, IdType } from '@colanode/core';
+import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 
@@ -82,108 +80,75 @@ export const CreateNodeSheet = ({
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={handleClose}
-    >
-      <KeyboardAvoidingView
-        style={[styles.overlay, { backgroundColor: colors.overlay }]}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <Pressable style={[styles.overlay, { backgroundColor: colors.overlay }]} onPress={handleClose}>
-          <Pressable style={[styles.sheet, { backgroundColor: colors.surface }]} onPress={() => {}}>
-            <View style={[styles.handle, { backgroundColor: colors.sheetHandle }]} />
-            <Text style={[styles.title, { color: colors.text }]}>Create New</Text>
+    <BottomSheet visible={visible} onClose={handleClose} avoidKeyboard>
+      <Text style={[styles.title, { color: colors.text }]}>Create New</Text>
 
-            <View style={styles.typeRow}>
-              {allowedTypes.map((type) => {
-                const config = NODE_TYPE_CONFIG[type];
-                const isSelected = type === selectedType;
-                return (
-                  <Pressable
-                    key={type}
-                    style={[
-                      styles.typeButton,
-                      { backgroundColor: colors.surfaceHover, borderColor: colors.border },
-                      isSelected && { borderColor: colors.primary, backgroundColor: colors.surfaceAccent },
-                    ]}
-                    onPress={() => setSelectedType(type)}
-                  >
-                    <Feather
-                      name={config.icon}
-                      size={28}
-                      color={isSelected ? colors.text : colors.textSecondary}
-                    />
-                    <Text
-                      style={[
-                        styles.typeLabel,
-                        { color: colors.textSecondary },
-                        isSelected && { color: colors.text },
-                      ]}
-                    >
-                      {config.label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
-            </View>
-
-            <View style={styles.inputRow}>
-              <TextInput
-                style={[styles.input, { backgroundColor: colors.surfaceHover, borderColor: colors.border, color: colors.text }]}
-                placeholder={`${NODE_TYPE_CONFIG[selectedType].label} name`}
-                placeholderTextColor={colors.textMuted}
-                value={name}
-                onChangeText={setName}
-                autoFocus
-                maxLength={100}
-                returnKeyType="done"
-                onSubmitEditing={handleCreate}
-              />
-            </View>
-
+      <View style={styles.typeRow}>
+        {allowedTypes.map((type) => {
+          const config = NODE_TYPE_CONFIG[type];
+          const isSelected = type === selectedType;
+          return (
             <Pressable
-              style={({ pressed }) => [
-                styles.createButton,
-                { backgroundColor: colors.primary },
-                (!name.trim() || isPending) && { backgroundColor: colors.borderSubtle },
-                pressed && styles.createButtonPressed,
+              key={type}
+              style={[
+                styles.typeButton,
+                { backgroundColor: colors.surfaceHover, borderColor: colors.border },
+                isSelected && { borderColor: colors.primary, backgroundColor: colors.surfaceAccent },
               ]}
-              onPress={handleCreate}
-              disabled={!name.trim() || isPending}
+              onPress={() => setSelectedType(type)}
             >
-              <Text style={[styles.createButtonText, { color: colors.text }]}>
-                {isPending ? 'Creating...' : `Create ${NODE_TYPE_CONFIG[selectedType].label}`}
+              <Feather
+                name={config.icon}
+                size={28}
+                color={isSelected ? colors.text : colors.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.typeLabel,
+                  { color: colors.textSecondary },
+                  isSelected && { color: colors.text },
+                ]}
+              >
+                {config.label}
               </Text>
             </Pressable>
-          </Pressable>
-        </Pressable>
-      </KeyboardAvoidingView>
-    </Modal>
+          );
+        })}
+      </View>
+
+      <View style={styles.inputRow}>
+        <TextInput
+          style={[styles.input, { backgroundColor: colors.surfaceHover, borderColor: colors.border, color: colors.text }]}
+          placeholder={`${NODE_TYPE_CONFIG[selectedType].label} name`}
+          placeholderTextColor={colors.textMuted}
+          value={name}
+          onChangeText={setName}
+          autoFocus
+          maxLength={100}
+          returnKeyType="done"
+          onSubmitEditing={handleCreate}
+        />
+      </View>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.createButton,
+          { backgroundColor: colors.primary },
+          (!name.trim() || isPending) && { backgroundColor: colors.borderSubtle },
+          pressed && styles.createButtonPressed,
+        ]}
+        onPress={handleCreate}
+        disabled={!name.trim() || isPending}
+      >
+        <Text style={[styles.createButtonText, { color: colors.text }]}>
+          {isPending ? 'Creating...' : `Create ${NODE_TYPE_CONFIG[selectedType].label}`}
+        </Text>
+      </Pressable>
+    </BottomSheet>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    paddingBottom: 34,
-    paddingTop: 8,
-    paddingHorizontal: 20,
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 16,
-  },
   title: {
     fontSize: 18,
     fontWeight: '600',
@@ -194,6 +159,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
     marginBottom: 20,
+    paddingHorizontal: 20,
   },
   typeButton: {
     flex: 1,
@@ -209,6 +175,7 @@ const styles = StyleSheet.create({
   },
   inputRow: {
     marginBottom: 16,
+    paddingHorizontal: 20,
   },
   input: {
     borderRadius: 10,
@@ -221,6 +188,7 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     paddingVertical: 14,
     alignItems: 'center',
+    marginHorizontal: 20,
   },
   createButtonPressed: {
     opacity: 0.8,

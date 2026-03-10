@@ -5,7 +5,7 @@ import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'rea
 
 import { LocalFolderNode, LocalNode } from '@colanode/client/types/nodes';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
-import { useFolderFileUpload } from '@colanode/mobile/components/nodes/folder-add-sheet';
+import { useFolderFileUpload } from '@colanode/mobile/hooks/use-folder-file-upload';
 import { NodeActionSheet } from '@colanode/mobile/components/nodes/node-action-sheet';
 import { NodeIcon } from '@colanode/mobile/components/nodes/node-icon';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
@@ -13,6 +13,8 @@ import { EmptyState } from '@colanode/mobile/components/ui/empty-state';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
+import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
+import { getNodeDisplayName } from '@colanode/mobile/lib/node-utils';
 
 const NODE_TYPE_LABELS: Record<string, string> = {
   page: 'Page',
@@ -31,17 +33,7 @@ export default function FolderScreen() {
   const [actionNode, setActionNode] = useState<LocalNode | null>(null);
   const { pickAndUploadFile } = useFolderFileUpload({ parentId: folderId!, userId });
 
-  const { data: folderNodes } = useNodeListQuery(
-    userId,
-    [
-      { field: ['id'], operator: 'eq', value: folderId },
-      { field: ['type'], operator: 'eq', value: 'folder' },
-    ],
-    [],
-    1
-  );
-
-  const folder = folderNodes?.[0] as LocalFolderNode | undefined;
+  const { data: folder } = useNodeQuery<LocalFolderNode>(userId, folderId, 'folder');
 
   const { data: children, isLoading, refetch, isRefetching } = useNodeListQuery(
     userId,
@@ -78,10 +70,6 @@ export default function FolderScreen() {
     }
   };
 
-  const getNodeName = (node: LocalNode): string => {
-    return 'name' in node ? (node as any).name ?? node.type : node.type;
-  };
-
   const canDelete = role === 'owner' || role === 'admin';
 
   return (
@@ -104,7 +92,7 @@ export default function FolderScreen() {
         </Pressable>
       </View>
       <FlatList
-        data={(children as LocalNode[] | undefined) ?? []}
+        data={children ?? []}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <Pressable
@@ -121,7 +109,7 @@ export default function FolderScreen() {
             </View>
             <View style={styles.childInfo}>
               <Text style={[styles.childName, { color: colors.text }]} numberOfLines={1}>
-                {getNodeName(item)}
+                {getNodeDisplayName(item)}
               </Text>
               <Text style={[styles.childType, { color: colors.textMuted }]}>
                 {NODE_TYPE_LABELS[item.type] ?? item.type}
@@ -153,7 +141,7 @@ export default function FolderScreen() {
       <NodeActionSheet
         visible={actionNode !== null}
         nodeId={actionNode?.id ?? null}
-        nodeName={actionNode ? getNodeName(actionNode) : ''}
+        nodeName={actionNode ? getNodeDisplayName(actionNode) : ''}
         userId={userId}
         onClose={() => setActionNode(null)}
       />

@@ -3,7 +3,6 @@ import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
-  Modal,
   Pressable,
   StyleSheet,
   Text,
@@ -11,6 +10,7 @@ import {
   View,
 } from 'react-native';
 
+import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useQuery } from '@colanode/mobile/hooks/use-query';
 
@@ -90,140 +90,113 @@ export const EmojiPicker = ({ visible, onClose, onSelect }: EmojiPickerProps) =>
   );
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <Pressable style={[styles.overlay, { backgroundColor: colors.overlay }]} onPress={onClose}>
-        <Pressable style={[styles.sheet, { backgroundColor: colors.surface }]} onPress={() => {}}>
-          <View style={styles.header}>
-            <View style={[styles.handle, { backgroundColor: colors.sheetHandle }]} />
-            <View style={styles.quickRow}>
-              {QUICK_REACTIONS.map((r) => (
-                <Pressable
-                  key={r.code}
-                  style={({ pressed }) => [
-                    styles.quickEmoji,
-                    { backgroundColor: colors.surfaceHover },
-                    pressed && { backgroundColor: colors.border },
-                  ]}
-                  onPress={() => handleQuickReact(r.code)}
-                >
-                  <Text style={styles.quickEmojiText}>{codeToEmoji(r.code)}</Text>
-                </Pressable>
-              ))}
-            </View>
-            <View style={[styles.searchRow, { backgroundColor: colors.surfaceHover }]}>
-              <Feather name="search" size={16} color={colors.textMuted} />
-              <TextInput
-                style={[styles.searchInput, { color: colors.text }]}
-                placeholder="Search emojis..."
-                placeholderTextColor={colors.textMuted}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoCorrect={false}
-              />
-              {searchQuery.length > 0 && (
-                <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
-                  <Feather name="x" size={16} color={colors.textMuted} />
-                </Pressable>
-              )}
-            </View>
-          </View>
-
-          {!searchQuery && categories && categories.length > 0 && (
-            <FlatList
-              horizontal
-              data={categories}
-              keyExtractor={(c) => c.id}
-              showsHorizontalScrollIndicator={false}
-              style={styles.categoryBar}
-              contentContainerStyle={styles.categoryBarContent}
-              renderItem={({ item }) => (
-                <Pressable
-                  style={[
-                    styles.categoryTab,
-                    { backgroundColor: colors.surfaceHover },
-                    item.id === activeCategory && { backgroundColor: colors.primary },
-                  ]}
-                  onPress={() => setSelectedCategory(item.id)}
-                >
-                  <Text
-                    style={[
-                      styles.categoryTabText,
-                      { color: colors.textSecondary },
-                      item.id === activeCategory && { color: colors.text },
-                    ]}
-                    numberOfLines={1}
-                  >
-                    {item.name}
-                  </Text>
-                </Pressable>
-              )}
-            />
-          )}
-
-          <FlatList
-            data={emojis ?? []}
-            keyExtractor={(item) => item.id}
-            numColumns={8}
-            style={styles.grid}
-            contentContainerStyle={styles.gridContent}
-            renderItem={({ item }) => {
-              const unified = item.skins?.[0]?.unified;
-              if (!unified) return null;
-              return (
-                <Pressable
-                  style={({ pressed }) => [
-                    styles.emojiCell,
-                    pressed && { backgroundColor: colors.border },
-                  ]}
-                  onPress={() => handleSelect(unified)}
-                >
-                  <Text style={styles.emojiText}>{codeToEmoji(unified)}</Text>
-                </Pressable>
-              );
-            }}
-            ListEmptyComponent={
-              <View style={styles.emptyContainer}>
-                {searchQuery ? (
-                  <Text style={[styles.emptyText, { color: colors.textMuted }]}>
-                    No emojis found
-                  </Text>
-                ) : (
-                  <ActivityIndicator size="small" color={colors.textMuted} />
-                )}
-              </View>
-            }
+    <BottomSheet visible={visible} onClose={onClose} maxHeight="60%">
+      <View style={styles.header}>
+        <View style={styles.quickRow}>
+          {QUICK_REACTIONS.map((r) => (
+            <Pressable
+              key={r.code}
+              style={({ pressed }) => [
+                styles.quickEmoji,
+                { backgroundColor: colors.surfaceHover },
+                pressed && { backgroundColor: colors.border },
+              ]}
+              onPress={() => handleQuickReact(r.code)}
+            >
+              <Text style={styles.quickEmojiText}>{codeToEmoji(r.code)}</Text>
+            </Pressable>
+          ))}
+        </View>
+        <View style={[styles.searchRow, { backgroundColor: colors.surfaceHover }]}>
+          <Feather name="search" size={16} color={colors.textMuted} />
+          <TextInput
+            style={[styles.searchInput, { color: colors.text }]}
+            placeholder="Search emojis..."
+            placeholderTextColor={colors.textMuted}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            autoCorrect={false}
           />
-        </Pressable>
-      </Pressable>
-    </Modal>
+          {searchQuery.length > 0 && (
+            <Pressable onPress={() => setSearchQuery('')} hitSlop={8}>
+              <Feather name="x" size={16} color={colors.textMuted} />
+            </Pressable>
+          )}
+        </View>
+      </View>
+
+      {!searchQuery && categories && categories.length > 0 && (
+        <FlatList
+          horizontal
+          data={categories}
+          keyExtractor={(c) => c.id}
+          showsHorizontalScrollIndicator={false}
+          style={styles.categoryBar}
+          contentContainerStyle={styles.categoryBarContent}
+          renderItem={({ item }) => (
+            <Pressable
+              style={[
+                styles.categoryTab,
+                { backgroundColor: colors.surfaceHover },
+                item.id === activeCategory && { backgroundColor: colors.primary },
+              ]}
+              onPress={() => setSelectedCategory(item.id)}
+            >
+              <Text
+                style={[
+                  styles.categoryTabText,
+                  { color: colors.textSecondary },
+                  item.id === activeCategory && { color: colors.text },
+                ]}
+                numberOfLines={1}
+              >
+                {item.name}
+              </Text>
+            </Pressable>
+          )}
+        />
+      )}
+
+      <FlatList
+        data={emojis ?? []}
+        keyExtractor={(item) => item.id}
+        numColumns={8}
+        style={styles.grid}
+        contentContainerStyle={styles.gridContent}
+        renderItem={({ item }) => {
+          const unified = item.skins?.[0]?.unified;
+          if (!unified) return null;
+          return (
+            <Pressable
+              style={({ pressed }) => [
+                styles.emojiCell,
+                pressed && { backgroundColor: colors.border },
+              ]}
+              onPress={() => handleSelect(unified)}
+            >
+              <Text style={styles.emojiText}>{codeToEmoji(unified)}</Text>
+            </Pressable>
+          );
+        }}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            {searchQuery ? (
+              <Text style={[styles.emptyText, { color: colors.textMuted }]}>
+                No emojis found
+              </Text>
+            ) : (
+              <ActivityIndicator size="small" color={colors.textMuted} />
+            )}
+          </View>
+        }
+      />
+    </BottomSheet>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    height: '60%',
-    paddingBottom: 34,
-  },
   header: {
-    paddingTop: 8,
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 12,
+    paddingTop: 0,
   },
   quickRow: {
     flexDirection: 'row',

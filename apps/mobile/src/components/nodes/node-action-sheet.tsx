@@ -1,13 +1,12 @@
 import Feather from '@expo/vector-icons/Feather';
 import {
   Alert,
-  Modal,
   Pressable,
   StyleSheet,
   Text,
-  View,
 } from 'react-native';
 
+import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 
@@ -61,62 +60,34 @@ export const NodeActionSheet = ({
   };
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <Pressable style={[styles.overlay, { backgroundColor: colors.overlay }]} onPress={onClose}>
-        <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
-          <View style={[styles.handle, { backgroundColor: colors.sheetHandle }]} />
+    <BottomSheet visible={visible} onClose={onClose}>
+      <Text style={[styles.title, { color: colors.textSecondary }]} numberOfLines={1}>
+        {nodeName}
+      </Text>
 
-          <Text style={[styles.title, { color: colors.textSecondary }]} numberOfLines={1}>
-            {nodeName}
-          </Text>
-
-          <Pressable
-            style={({ pressed }) => [styles.action, pressed && { backgroundColor: colors.surfaceHover }]}
-            onPress={handleDelete}
-          >
-            <Feather name="trash-2" size={20} color={colors.error} />
-            <Text style={[styles.destructiveText, { color: colors.error }]}>Delete</Text>
-          </Pressable>
-
-          <Pressable
-            style={({ pressed }) => [
-              styles.cancelAction,
-              { borderTopColor: colors.border },
-              pressed && { backgroundColor: colors.surfaceHover },
-            ]}
-            onPress={onClose}
-          >
-            <Text style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
-          </Pressable>
-        </View>
+      <Pressable
+        style={({ pressed }) => [styles.action, pressed && { backgroundColor: colors.surfaceHover }]}
+        onPress={handleDelete}
+      >
+        <Feather name="trash-2" size={20} color={colors.error} />
+        <Text style={[styles.destructiveText, { color: colors.error }]}>Delete</Text>
       </Pressable>
-    </Modal>
+
+      <Pressable
+        style={({ pressed }) => [
+          styles.cancelAction,
+          { borderTopColor: colors.border },
+          pressed && { backgroundColor: colors.surfaceHover },
+        ]}
+        onPress={onClose}
+      >
+        <Text style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
+      </Pressable>
+    </BottomSheet>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  sheet: {
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    paddingBottom: 34,
-    paddingTop: 8,
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 12,
-  },
   title: {
     fontSize: 14,
     fontWeight: '500',
