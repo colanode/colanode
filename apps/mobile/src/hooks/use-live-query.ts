@@ -6,8 +6,7 @@ import {
 import { QueryInput, QueryMap, buildQueryKey } from '@colanode/client/queries';
 
 import { useAppService } from '@colanode/mobile/contexts/app-service';
-
-const MOBILE_WINDOW_ID = 'mobile-window';
+import { MOBILE_WINDOW_ID } from '@colanode/mobile/lib/constants';
 
 type UseLiveQueryOptions<T extends QueryInput> = Omit<
   TanstackUseQueryOptions<QueryMap[T['type']]['output']>,

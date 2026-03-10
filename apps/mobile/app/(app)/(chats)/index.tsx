@@ -9,13 +9,14 @@ import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
+import { getNodeUnreadCount } from '@colanode/mobile/lib/radar-utils';
 
 export default function ChatsScreen() {
   const router = useRouter();
   const { userId } = useWorkspace();
   const { colors } = useTheme();
 
-  const { data: chats, isLoading, refetch, isRefetching } = useNodeListQuery(
+  const { data: chats, isLoading, refetch, isRefetching } = useNodeListQuery<LocalChatNode>(
     userId,
     [{ field: ['type'], operator: 'eq', value: 'chat' }],
     [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }]
@@ -30,12 +31,6 @@ export default function ChatsScreen() {
     type: 'radar.data.get',
   });
 
-  const workspaceRadar = radarData?.[userId];
-
-  const getUnreadCount = (chatId: string): number => {
-    return workspaceRadar?.nodeStates[chatId]?.unreadCount ?? 0;
-  };
-
   const handleOpenChat = (chat: LocalChatNode) => {
     router.push({
       pathname: '/(app)/(chats)/[chatId]',
@@ -49,7 +44,7 @@ export default function ChatsScreen() {
         <Text style={[styles.title, { color: colors.text }]}>Chats</Text>
       </View>
       <FlatList
-        data={(chats as LocalChatNode[] | undefined) ?? []}
+        data={chats ?? []}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <ChatListItem
@@ -57,7 +52,7 @@ export default function ChatsScreen() {
             currentUserId={userId}
             users={users ?? []}
             onPress={() => handleOpenChat(item)}
-            unreadCount={getUnreadCount(item.id)}
+            unreadCount={getNodeUnreadCount(radarData, userId, item.id)}
           />
         )}
         ItemSeparatorComponent={() => (

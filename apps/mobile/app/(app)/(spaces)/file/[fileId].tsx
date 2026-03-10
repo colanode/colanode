@@ -18,7 +18,7 @@ import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
-import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
+import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 
 const formatFileSize = (bytes: number): string => {
   if (bytes === 0) return '0 B';
@@ -44,17 +44,7 @@ export default function FileScreen() {
   const [fileUri, setFileUri] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
 
-  const { data: fileNodes, isLoading } = useNodeListQuery(
-    userId,
-    [
-      { field: ['id'], operator: 'eq', value: fileId },
-      { field: ['type'], operator: 'eq', value: 'file' },
-    ],
-    [],
-    1
-  );
-
-  const file = fileNodes?.[0] as LocalFileNode | undefined;
+  const { data: file, isLoading } = useNodeQuery<LocalFileNode>(userId, fileId, 'file');
 
   const checkFileExists = async () => {
     if (!file) return;

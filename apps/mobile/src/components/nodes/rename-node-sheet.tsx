@@ -1,9 +1,6 @@
 import { useEffect, useState } from 'react';
 import {
   Alert,
-  KeyboardAvoidingView,
-  Modal,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -12,6 +9,7 @@ import {
 
 import { NodeAttributes } from '@colanode/core';
 import { LocalNode } from '@colanode/client/types/nodes';
+import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
 import { useTheme } from '@colanode/mobile/contexts/theme';
@@ -110,72 +108,38 @@ export const RenameNodeSheet = ({
   const typeLabel = node ? (NODE_TYPE_LABELS[node.type] ?? 'Item') : 'Item';
 
   return (
-    <Modal
-      visible={visible}
-      transparent
-      animationType="slide"
-      onRequestClose={onClose}
-    >
-      <KeyboardAvoidingView
-        style={styles.overlay}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <BottomSheet visible={visible} onClose={onClose} avoidKeyboard>
+      <Text style={[styles.title, { color: colors.text }]}>Rename {typeLabel}</Text>
+      <View style={styles.form}>
+        <TextInput
+          label="Name"
+          value={name}
+          onChangeText={setName}
+          autoFocus
+          returnKeyType="done"
+          onSubmitEditing={handleSave}
+        />
+        <Button
+          title="Save"
+          onPress={handleSave}
+          loading={isPending}
+        />
+      </View>
+      <Pressable
+        style={({ pressed }) => [
+          styles.cancelAction,
+          { borderTopColor: colors.border },
+          pressed && { backgroundColor: colors.surfaceHover },
+        ]}
+        onPress={onClose}
       >
-        <Pressable style={[styles.backdrop, { backgroundColor: colors.overlay }]} onPress={onClose} />
-        <View style={[styles.sheet, { backgroundColor: colors.surface }]}>
-          <View style={[styles.handle, { backgroundColor: colors.sheetHandle }]} />
-          <Text style={[styles.title, { color: colors.text }]}>Rename {typeLabel}</Text>
-          <View style={styles.form}>
-            <TextInput
-              label="Name"
-              value={name}
-              onChangeText={setName}
-              autoFocus
-              returnKeyType="done"
-              onSubmitEditing={handleSave}
-            />
-            <Button
-              title="Save"
-              onPress={handleSave}
-              loading={isPending}
-            />
-          </View>
-          <Pressable
-            style={({ pressed }) => [
-              styles.cancelAction,
-              { borderTopColor: colors.border },
-              pressed && { backgroundColor: colors.surfaceHover },
-            ]}
-            onPress={onClose}
-          >
-            <Text style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
-          </Pressable>
-        </View>
-      </KeyboardAvoidingView>
-    </Modal>
+        <Text style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
+      </Pressable>
+    </BottomSheet>
   );
 };
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    justifyContent: 'flex-end',
-  },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  sheet: {
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    paddingBottom: 34,
-    paddingTop: 8,
-  },
-  handle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 12,
-  },
   title: {
     fontSize: 17,
     fontWeight: '600',

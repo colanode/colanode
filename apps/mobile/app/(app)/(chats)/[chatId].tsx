@@ -29,6 +29,7 @@ import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
+import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -72,7 +73,7 @@ export default function ChatScreen() {
     });
   }, [chatId, userId, appService]);
 
-  const { data: messages, isLoading } = useNodeListQuery(
+  const { data: messages, isLoading } = useNodeListQuery<LocalMessageNode>(
     userId,
     [
       { field: ['parentId'], operator: 'eq', value: chatId },
@@ -87,17 +88,7 @@ export default function ChatScreen() {
     userId,
   });
 
-  const { data: chatNodes } = useNodeListQuery(
-    userId,
-    [
-      { field: ['id'], operator: 'eq', value: chatId },
-      { field: ['type'], operator: 'eq', value: 'chat' },
-    ],
-    [],
-    1
-  );
-
-  const chat = chatNodes?.[0] as LocalChatNode | undefined;
+  const { data: chat } = useNodeQuery<LocalChatNode>(userId, chatId, 'chat');
   const otherUserId = chat
     ? Object.keys(chat.collaborators).find((id) => id !== userId)
     : undefined;
@@ -167,7 +158,7 @@ export default function ChatScreen() {
         <View style={styles.headerSpacer} />
       </View>
       <MessageList
-        messages={(messages as LocalMessageNode[] | undefined) ?? []}
+        messages={messages ?? []}
         users={users ?? []}
         currentUserId={userId}
         onMessageAction={handleMessageAction}
