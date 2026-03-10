@@ -1,6 +1,7 @@
 import Feather from '@expo/vector-icons/Feather';
 import { useCallback, useState } from 'react';
 import {
+  ActivityIndicator,
   FlatList,
   Modal,
   Pressable,
@@ -186,9 +187,15 @@ export const EmojiPicker = ({ visible, onClose, onSelect }: EmojiPickerProps) =>
               );
             }}
             ListEmptyComponent={
-              <Text style={[styles.emptyText, { color: colors.textMuted }]}>
-                {searchQuery ? 'No emojis found' : 'Loading...'}
-              </Text>
+              <View style={styles.emptyContainer}>
+                {searchQuery ? (
+                  <Text style={[styles.emptyText, { color: colors.textMuted }]}>
+                    No emojis found
+                  </Text>
+                ) : (
+                  <ActivityIndicator size="small" color={colors.textMuted} />
+                )}
+              </View>
             }
           />
         </Pressable>
@@ -283,9 +290,12 @@ const styles = StyleSheet.create({
   emojiText: {
     fontSize: 28,
   },
+  emptyContainer: {
+    alignItems: 'center',
+    marginTop: 24,
+  },
   emptyText: {
     fontSize: 14,
     textAlign: 'center',
-    marginTop: 24,
   },
 });

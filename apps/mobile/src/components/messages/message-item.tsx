@@ -10,6 +10,7 @@ import { MessageReactions } from '@colanode/mobile/components/messages/message-r
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
+import { getMessagePreview } from '@colanode/mobile/lib/message-utils';
 
 export interface MessageActionTarget {
   message: LocalMessageNode;
@@ -33,47 +34,6 @@ interface MessageItemProps {
 const formatTime = (dateStr: string) => {
   const date = new Date(dateStr);
   return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-};
-
-export const getMessagePreview = (message: LocalMessageNode): string => {
-  const content = message.content;
-  if (content && typeof content === 'object') {
-    const blocks = Object.values(content) as Block[];
-    for (const block of blocks) {
-      if (block.content) {
-        const texts: string[] = [];
-        for (const child of block.content) {
-          if (child.type === 'text' && child.text) {
-            texts.push(child.text);
-          }
-        }
-        if (texts.length > 0) {
-          const preview = texts.join(' ');
-          return preview.length > 80 ? preview.slice(0, 80) + '...' : preview;
-        }
-      }
-    }
-  }
-  return '(message)';
-};
-
-export const getMessageText = (message: LocalMessageNode): string => {
-  const content = message.content;
-  if (content && typeof content === 'object') {
-    const blocks = Object.values(content) as Block[];
-    const allTexts: string[] = [];
-    for (const block of blocks) {
-      if (block.content) {
-        for (const child of block.content) {
-          if (child.type === 'text' && child.text) {
-            allTexts.push(child.text);
-          }
-        }
-      }
-    }
-    return allTexts.join('\n');
-  }
-  return '';
 };
 
 export const MessageItem = ({

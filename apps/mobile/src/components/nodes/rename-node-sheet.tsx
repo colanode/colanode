@@ -81,8 +81,8 @@ export const RenameNodeSheet = ({
   const { colors } = useTheme();
 
   useEffect(() => {
-    if (visible && node && 'name' in node) {
-      setName((node as any).name ?? '');
+    if (visible && node && (node.type === 'space' || node.type === 'channel' || node.type === 'page' || node.type === 'folder')) {
+      setName(node.name ?? '');
     }
   }, [visible, node]);
 

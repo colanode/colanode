@@ -20,8 +20,8 @@ import { EditTarget, MessageInput } from '@colanode/mobile/components/messages/m
 import {
   MessageActionTarget,
   ReplyTarget,
-  getMessageText,
 } from '@colanode/mobile/components/messages/message-item';
+import { getMessageText } from '@colanode/mobile/lib/message-utils';
 import { MessageList } from '@colanode/mobile/components/messages/message-list';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';

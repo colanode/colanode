@@ -198,5 +198,9 @@ expo-env.d.ts
 *.p12
 *.key
 *.mobileprovision
-/ios
-/android
+apps/mobile/ios/
+apps/mobile/android/
+
+# Stray Expo prebuild artifacts (native dirs belong in apps/mobile/, also gitignored)
+/ios/
+/android/

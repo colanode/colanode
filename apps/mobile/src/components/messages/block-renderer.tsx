@@ -1,5 +1,5 @@
 import { Fragment } from 'react';
-import { Linking, StyleSheet, Text, View } from 'react-native';
+import { Linking, StyleSheet, Text, TextStyle, View } from 'react-native';
 
 import { useTheme } from '@colanode/mobile/contexts/theme';
 
@@ -47,7 +47,7 @@ const InlineRenderer = ({ nodes }: InlineRendererProps) => {
 const StyledText = ({ node }: { node: JSONContent }) => {
   const { colors } = useTheme();
   const marks = node.marks ?? [];
-  let style: any = { color: colors.text, fontSize: 15, lineHeight: 22 };
+  let style: TextStyle = { color: colors.text, fontSize: 15, lineHeight: 22 };
 
   let isLink = false;
   let href = '';

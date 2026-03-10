@@ -1,11 +1,11 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Block } from '@colanode/core';
 import { LocalChatNode, LocalMessageNode } from '@colanode/client/types/nodes';
 import { User } from '@colanode/client/types/users';
 import { UserAvatar } from '@colanode/mobile/components/avatars/avatar';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
+import { getMessagePreview } from '@colanode/mobile/lib/message-utils';
 
 interface ChatListItemProps {
   chat: LocalChatNode;
@@ -14,28 +14,6 @@ interface ChatListItemProps {
   onPress: () => void;
   unreadCount?: number;
 }
-
-const getMessageText = (message: LocalMessageNode): string => {
-  const content = message.content;
-  if (content && typeof content === 'object') {
-    const blocks = Object.values(content) as Block[];
-    for (const block of blocks) {
-      if (block.content) {
-        const texts: string[] = [];
-        for (const child of block.content) {
-          if (child.type === 'text' && child.text) {
-            texts.push(child.text);
-          }
-        }
-        if (texts.length > 0) {
-          const preview = texts.join(' ');
-          return preview.length > 60 ? preview.slice(0, 60) + '...' : preview;
-        }
-      }
-    }
-  }
-  return '';
-};
 
 export const ChatListItem = ({
   chat,
@@ -56,7 +34,7 @@ export const ChatListItem = ({
   );
 
   const lastMessage = (messages as LocalMessageNode[] | undefined)?.[0];
-  const messagePreview = lastMessage ? getMessageText(lastMessage) : '';
+  const messagePreview = lastMessage ? getMessagePreview(lastMessage) : '';
 
   const otherUserId = Object.keys(chat.collaborators).find(
     (id) => id !== currentUserId

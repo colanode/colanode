@@ -1,4 +1,4 @@
-import { Paths } from 'expo-file-system';
+import { File as ExpoFile } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
 import { useState } from 'react';
 import {
@@ -92,8 +92,9 @@ export const AvatarPicker = ({
       const tempPath = appService.path.tempFile('avatar-upload.jpeg');
       await appService.fs.copy(asset.uri, tempPath);
 
-      const fileInfo = Paths.info(tempPath);
-      const fileSize = asset.fileSize ?? ('size' in fileInfo ? (fileInfo as any).size : 0) ?? 0;
+      const tempFile = new ExpoFile(tempPath);
+      const fileInfo = tempFile.info();
+      const fileSize = asset.fileSize ?? fileInfo.size ?? 0;
       const fileId = generateId(IdType.File);
 
       mutate({

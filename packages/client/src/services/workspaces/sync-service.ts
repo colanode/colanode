@@ -66,10 +66,10 @@ export class SyncService {
       ),
       nodeInteractions:
         this.workspace.nodeInteractions.syncServerNodeInteraction.bind(
-          this.workspace.nodes
+          this.workspace.nodeInteractions
         ),
       nodeReactions: this.workspace.nodeReactions.syncServerNodeReaction.bind(
-        this.workspace.nodes
+        this.workspace.nodeReactions
       ),
       nodeTombstones: this.workspace.nodes.syncServerNodeDelete.bind(
         this.workspace.nodes

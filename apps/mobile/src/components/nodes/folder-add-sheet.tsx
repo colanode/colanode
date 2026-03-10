@@ -66,8 +66,9 @@ export const useFolderFileUpload = ({ parentId, userId }: UseFolderFileUploadOpt
           Alert.alert('Error', error.message);
         },
       });
-    } catch (e: any) {
-      Alert.alert('Error', e?.message ?? 'Failed to pick file');
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Failed to pick file';
+      Alert.alert('Error', message);
     } finally {
       pickingRef.current = false;
     }

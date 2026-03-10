@@ -35,7 +35,7 @@ export class NodeCountersService {
 
     const isMentioned = this.isUserMentioned(references);
     const counters = await this.lock.acquire(
-      this.getLockKey(node.id),
+      this.getLockKey(node.parent_id),
       async () => {
         if (!node.parent_id) {
           return;
@@ -118,7 +118,7 @@ export class NodeCountersService {
     }
 
     const counters = await this.lock.acquire(
-      this.getLockKey(node.id),
+      this.getLockKey(node.parent_id),
       async () => {
         if (!node.parent_id) {
           return;

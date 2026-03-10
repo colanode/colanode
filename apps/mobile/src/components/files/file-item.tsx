@@ -17,7 +17,7 @@ const formatSize = (bytes: number | undefined | null): string => {
 export const FileItem = ({ file }: FileItemProps) => {
   const { colors } = useTheme();
   const name = file.name ?? 'Unnamed file';
-  const size = 'size' in file ? formatSize((file as any).size) : '';
+  const size = formatSize(file.size);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.border }]}>

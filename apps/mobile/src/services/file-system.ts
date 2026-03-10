@@ -38,7 +38,10 @@ export class MobileFileSystem implements FileSystem {
   public async exists(path: string): Promise<boolean> {
     try {
       return Paths.info(path).exists;
-    } catch {
+    } catch (error) {
+      if (__DEV__) {
+        console.warn('FileSystem.exists() error for path:', path, error);
+      }
       return false;
     }
   }

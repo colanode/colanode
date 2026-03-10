@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { FlatList, StyleSheet, Text, View } from 'react-native';
 
 import { LocalMessageNode } from '@colanode/client/types/nodes';
@@ -69,8 +70,8 @@ export const MessageList = ({
   onMessageAction,
 }: MessageListProps) => {
   const { colors } = useTheme();
-  const groups = buildGroups(messages);
-  const messageMap = new Map(messages.map((m) => [m.id, m]));
+  const groups = useMemo(() => buildGroups(messages), [messages]);
+  const messageMap = useMemo(() => new Map(messages.map((m) => [m.id, m])), [messages]);
 
   return (
     <FlatList
