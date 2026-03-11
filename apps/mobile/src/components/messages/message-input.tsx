@@ -20,6 +20,7 @@ import { LocalMessageNode } from '@colanode/client/types/nodes';
 import { ReplyTarget } from '@colanode/mobile/components/messages/message-item';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { getMessageText } from '@colanode/mobile/lib/message-utils';
 
 export interface EditTarget {
   message: LocalMessageNode;
@@ -33,23 +34,6 @@ interface MessageInputProps {
   editTarget?: EditTarget | null;
   onClearEdit?: () => void;
 }
-
-const extractTextFromBlocks = (
-  content: Record<string, Block> | null | undefined
-): string => {
-  if (!content) return '';
-  const allTexts: string[] = [];
-  for (const block of Object.values(content)) {
-    if (block.content) {
-      for (const child of block.content) {
-        if (child.type === 'text' && child.text) {
-          allTexts.push(child.text);
-        }
-      }
-    }
-  }
-  return allTexts.join('\n');
-};
 
 const buildContentBlocks = (
   messageId: string,
@@ -88,7 +72,7 @@ export const MessageInput = ({
   // When editTarget changes, pre-fill input
   useEffect(() => {
     if (editTarget) {
-      const existingText = extractTextFromBlocks(editTarget.message.content);
+      const existingText = getMessageText(editTarget.message);
       setText(existingText);
     }
   }, [editTarget]);

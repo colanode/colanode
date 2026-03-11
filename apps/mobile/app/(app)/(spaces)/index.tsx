@@ -16,7 +16,7 @@ export default function SpacesScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
 
-  const { data: spaces, isLoading, refetch, isRefetching } = useNodeListQuery(
+  const { data: spaces, isLoading, refetch, isRefetching } = useNodeListQuery<LocalSpaceNode>(
     userId,
     [{ field: ['type'], operator: 'eq', value: 'space' }],
     [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }]
@@ -28,7 +28,7 @@ export default function SpacesScreen() {
         <Text style={[styles.title, { color: colors.text }]}>Spaces</Text>
       </View>
       <FlatList
-        data={(spaces as LocalSpaceNode[] | undefined) ?? []}
+        data={spaces ?? []}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
           <SpaceListItem

@@ -5,7 +5,7 @@ import { LocalChatNode } from '@colanode/client/types/nodes';
 import { ConversationScreen } from '@colanode/mobile/components/conversation/conversation-screen';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
-import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
+import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 
 export default function ChatScreen() {
   const router = useRouter();
@@ -15,17 +15,7 @@ export default function ChatScreen() {
 
   const { data: users } = useLiveQuery({ type: 'user.list', userId });
 
-  const { data: chatNodes } = useNodeListQuery(
-    userId,
-    [
-      { field: ['id'], operator: 'eq', value: chatId },
-      { field: ['type'], operator: 'eq', value: 'chat' },
-    ],
-    [],
-    1
-  );
-
-  const chat = chatNodes?.[0] as LocalChatNode | undefined;
+  const { data: chat } = useNodeQuery<LocalChatNode>(userId, chatId, 'chat');
   const otherUserId = chat
     ? Object.keys(chat.collaborators).find((id) => id !== userId)
     : undefined;

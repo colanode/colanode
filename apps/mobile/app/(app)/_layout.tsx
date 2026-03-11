@@ -13,7 +13,7 @@ import { WorkspaceContext } from '@colanode/mobile/contexts/workspace';
 import { WorkspaceSwitcherContext } from '@colanode/mobile/contexts/workspace-switcher';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
-import { computeUnreadSummary } from '@colanode/mobile/lib/radar-utils';
+import { getChatUnreadCount } from '@colanode/mobile/lib/radar-utils';
 
 export default function AppLayout() {
   const router = useRouter();
@@ -102,10 +102,7 @@ export default function AppLayout() {
     return <LoadingScreen />;
   }
 
-  const workspaceRadar = radarData?.[activeWorkspace.userId];
-  const { chatUnreadCount } = computeUnreadSummary(
-    workspaceRadar?.nodeStates
-  );
+  const chatUnreadCount = getChatUnreadCount(radarData, activeWorkspace.userId);
 
   return (
     <WorkspaceSwitcherContext.Provider value={{ openSwitcher }}>

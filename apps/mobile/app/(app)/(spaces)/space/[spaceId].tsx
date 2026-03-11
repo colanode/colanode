@@ -13,7 +13,8 @@ import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-s
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
-import { getNodeName } from '@colanode/mobile/lib/node-utils';
+import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
+import { getNodeDisplayName } from '@colanode/mobile/lib/node-utils';
 import { navigateToNode } from '@colanode/mobile/lib/navigation-utils';
 
 export default function SpaceScreen() {
@@ -26,17 +27,7 @@ export default function SpaceScreen() {
   const [showRename, setShowRename] = useState(false);
   const [actionNode, setActionNode] = useState<LocalNode | null>(null);
 
-  const { data: spaceNodes } = useNodeListQuery(
-    userId,
-    [
-      { field: ['id'], operator: 'eq', value: spaceId },
-      { field: ['type'], operator: 'eq', value: 'space' },
-    ],
-    [],
-    1
-  );
-
-  const space = spaceNodes?.[0] as LocalSpaceNode | undefined;
+  const { data: space } = useNodeQuery<LocalSpaceNode>(userId, spaceId, 'space');
 
   const { data: children, isLoading, refetch, isRefetching } = useNodeListQuery(
     userId,
@@ -89,7 +80,7 @@ export default function SpaceScreen() {
       <NodeActionSheet
         visible={actionNode !== null}
         nodeId={actionNode?.id ?? null}
-        nodeName={actionNode ? getNodeName(actionNode) : ''}
+        nodeName={actionNode ? getNodeDisplayName(actionNode) : ''}
         userId={userId}
         onClose={() => setActionNode(null)}
       />

@@ -10,7 +10,7 @@ export const NODE_TYPE_LABELS: Record<string, string> = {
   record: 'Record',
 };
 
-export const getNodeName = (node: LocalNode): string => {
+export const getNodeDisplayName = (node: LocalNode): string => {
   switch (node.type) {
     case 'chat':
       return 'Chat';

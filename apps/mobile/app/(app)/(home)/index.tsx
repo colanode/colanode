@@ -11,7 +11,7 @@ import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useWorkspaceSwitcher } from '@colanode/mobile/contexts/workspace-switcher';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
-import { computeUnreadSummary } from '@colanode/mobile/lib/radar-utils';
+import { getNodeUnreadCount, getUnreadSummary } from '@colanode/mobile/lib/radar-utils';
 
 export default function HomeScreen() {
   const router = useRouter();
@@ -27,13 +27,10 @@ export default function HomeScreen() {
   const { data: users } = useLiveQuery({ type: 'user.list', userId });
 
   const { data: radarData } = useLiveQuery({ type: 'radar.data.get' });
-  const workspaceRadar = radarData?.[userId];
-  const { totalUnread, unreadChats } = computeUnreadSummary(
-    workspaceRadar?.nodeStates
-  );
+  const { totalUnread, unreadChats } = getUnreadSummary(radarData, userId);
 
   // Recent chats (limit 3)
-  const { data: recentChats, refetch: refetchChats, isRefetching: isRefetchingChats } = useNodeListQuery(
+  const { data: recentChats, refetch: refetchChats, isRefetching: isRefetchingChats } = useNodeListQuery<LocalChatNode>(
     userId,
     [{ field: ['type'], operator: 'eq', value: 'chat' }],
     [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }],
@@ -41,7 +38,7 @@ export default function HomeScreen() {
   );
 
   // Recent spaces
-  const { data: recentSpaces, refetch: refetchSpaces, isRefetching: isRefetchingSpaces } = useNodeListQuery(
+  const { data: recentSpaces, refetch: refetchSpaces, isRefetching: isRefetchingSpaces } = useNodeListQuery<LocalSpaceNode>(
     userId,
     [{ field: ['type'], operator: 'eq', value: 'space' }],
     [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }],
@@ -108,7 +105,7 @@ export default function HomeScreen() {
             pressed && { backgroundColor: colors.surfaceAccentDeep },
           ]}
           onPress={() => {
-            const firstSpace = recentSpaces?.[0] as LocalSpaceNode | undefined;
+            const firstSpace = recentSpaces?.[0];
             if (firstSpace) {
               router.push({
                 pathname: '/(app)/(spaces)/space/[spaceId]',
@@ -122,7 +119,7 @@ export default function HomeScreen() {
           <Feather name="layers" size={20} color={colors.primary} />
           <Text style={[styles.quickActionText, { color: colors.text }]} numberOfLines={1}>
             {(() => {
-              const name = (recentSpaces?.[0] as LocalSpaceNode | undefined)?.name;
+              const name = recentSpaces?.[0]?.name;
               if (!name) return 'Spaces';
               const words = name.trim().split(/\s+/);
               return words.length > 2 ? words.slice(0, 2).join(' ') + '...' : name;
@@ -134,7 +131,7 @@ export default function HomeScreen() {
       {recentChats && recentChats.length > 0 && (
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent conversations</Text>
-          {(recentChats as LocalChatNode[]).map((chat) => (
+          {recentChats.map((chat) => (
             <Link
               key={chat.id}
               href={{ pathname: '/(app)/(chats)/[chatId]', params: { chatId: chat.id } }}
@@ -146,7 +143,7 @@ export default function HomeScreen() {
                 currentUserId={userId}
                 users={users ?? []}
                 onPress={() => {}}
-                unreadCount={workspaceRadar?.nodeStates[chat.id]?.unreadCount ?? 0}
+                unreadCount={getNodeUnreadCount(radarData, userId, chat.id)}
               />
             </Link>
           ))}
@@ -156,7 +153,7 @@ export default function HomeScreen() {
       {recentSpaces && recentSpaces.length > 0 && (
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent spaces</Text>
-          {(recentSpaces as LocalSpaceNode[]).map((space) => (
+          {recentSpaces.map((space) => (
             <Pressable
               key={space.id}
               style={({ pressed }) => [

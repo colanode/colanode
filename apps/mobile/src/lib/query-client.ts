@@ -3,8 +3,7 @@ import { QueryClient } from '@tanstack/react-query';
 import { eventBus } from '@colanode/client/lib';
 import { Mediator } from '@colanode/client/handlers';
 import { Event } from '@colanode/client/types';
-
-const MOBILE_WINDOW_ID = 'mobile-window';
+import { MOBILE_WINDOW_ID } from '@colanode/mobile/lib/constants';
 
 export const buildQueryClient = (mediator: Mediator): QueryClient => {
   const queryClient = new QueryClient({

@@ -1,31 +1,47 @@
 import { getIdType, IdType } from '@colanode/core';
 
-interface UnreadSummary {
-  totalUnread: number;
-  unreadChats: number;
-  chatUnreadCount: number;
-}
+import { WorkspaceRadarData } from '@colanode/client/types/radars';
 
-export const computeUnreadSummary = (
-  nodeStates: Record<string, { unreadCount: number }> | undefined
-): UnreadSummary => {
+export const getChatUnreadCount = (
+  radarData: Record<string, WorkspaceRadarData> | undefined,
+  userId: string
+): number => {
+  const workspaceRadar = radarData?.[userId];
+  if (!workspaceRadar) return 0;
+
+  let count = 0;
+  for (const [id, nodeState] of Object.entries(workspaceRadar.nodeStates)) {
+    if (getIdType(id) === IdType.Chat && nodeState.unreadCount > 0) {
+      count += nodeState.unreadCount;
+    }
+  }
+  return count;
+};
+
+export const getUnreadSummary = (
+  radarData: Record<string, WorkspaceRadarData> | undefined,
+  userId: string
+): { totalUnread: number; unreadChats: number } => {
+  const workspaceRadar = radarData?.[userId];
+  if (!workspaceRadar) return { totalUnread: 0, unreadChats: 0 };
+
   let totalUnread = 0;
   let unreadChats = 0;
-  let chatUnreadCount = 0;
-
-  if (!nodeStates) {
-    return { totalUnread, unreadChats, chatUnreadCount };
-  }
-
-  for (const [id, nodeState] of Object.entries(nodeStates)) {
+  for (const [id, nodeState] of Object.entries(workspaceRadar.nodeStates)) {
     if (nodeState.unreadCount > 0) {
       totalUnread += nodeState.unreadCount;
       if (getIdType(id) === IdType.Chat) {
         unreadChats++;
-        chatUnreadCount += nodeState.unreadCount;
       }
     }
   }
+  return { totalUnread, unreadChats };
+};
 
-  return { totalUnread, unreadChats, chatUnreadCount };
+export const getNodeUnreadCount = (
+  radarData: Record<string, WorkspaceRadarData> | undefined,
+  userId: string,
+  nodeId: string
+): number => {
+  return radarData?.[userId]?.nodeStates[nodeId]?.unreadCount ?? 0;
 };

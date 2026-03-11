@@ -5,7 +5,7 @@ import { LocalNode } from '@colanode/client/types/nodes';
 import { NodeIcon } from '@colanode/mobile/components/nodes/node-icon';
 import { EmptyState } from '@colanode/mobile/components/ui/empty-state';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { getNodeName, NODE_TYPE_LABELS } from '@colanode/mobile/lib/node-utils';
+import { getNodeDisplayName, NODE_TYPE_LABELS } from '@colanode/mobile/lib/node-utils';
 
 interface NodeChildListProps {
   children: LocalNode[];
@@ -49,7 +49,7 @@ export const NodeChildList = ({
           </View>
           <View style={styles.childInfo}>
             <Text style={[styles.childName, { color: colors.text }]} numberOfLines={1}>
-              {getNodeName(item)}
+              {getNodeDisplayName(item)}
             </Text>
             <Text style={[styles.childType, { color: colors.textMuted }]}>
               {NODE_TYPE_LABELS[item.type] ?? item.type}

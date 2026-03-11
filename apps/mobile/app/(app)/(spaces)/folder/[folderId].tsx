@@ -13,7 +13,8 @@ import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useFolderFileUpload } from '@colanode/mobile/hooks/use-folder-file-upload';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
-import { getNodeName } from '@colanode/mobile/lib/node-utils';
+import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
+import { getNodeDisplayName } from '@colanode/mobile/lib/node-utils';
 import { navigateToNode } from '@colanode/mobile/lib/navigation-utils';
 
 export default function FolderScreen() {
@@ -26,17 +27,7 @@ export default function FolderScreen() {
   const [actionNode, setActionNode] = useState<LocalNode | null>(null);
   const { pickAndUploadFile } = useFolderFileUpload({ parentId: folderId!, userId });
 
-  const { data: folderNodes } = useNodeListQuery(
-    userId,
-    [
-      { field: ['id'], operator: 'eq', value: folderId },
-      { field: ['type'], operator: 'eq', value: 'folder' },
-    ],
-    [],
-    1
-  );
-
-  const folder = folderNodes?.[0] as LocalFolderNode | undefined;
+  const { data: folder } = useNodeQuery<LocalFolderNode>(userId, folderId, 'folder');
 
   const { data: children, isLoading, refetch, isRefetching } = useNodeListQuery(
     userId,
@@ -78,7 +69,7 @@ export default function FolderScreen() {
       <NodeActionSheet
         visible={actionNode !== null}
         nodeId={actionNode?.id ?? null}
-        nodeName={actionNode ? getNodeName(actionNode) : ''}
+        nodeName={actionNode ? getNodeDisplayName(actionNode) : ''}
         userId={userId}
         onClose={() => setActionNode(null)}
       />

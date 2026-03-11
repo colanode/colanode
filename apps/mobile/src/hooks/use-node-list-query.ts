@@ -13,7 +13,7 @@ const getFieldName = (field: Array<string | number>): string => {
   return field.length > 0 ? String(field[0]) : '';
 };
 
-export const useNodeListQuery = (
+export const useNodeListQuery = <T extends LocalNode = LocalNode>(
   userId: string,
   filters: NodeListQueryInput['filters'],
   sorts: NodeListQueryInput['sorts'],
@@ -72,7 +72,9 @@ export const useNodeListQuery = (
     return () => {
       eventBus.unsubscribe(subscriptionId);
     };
-  }, [key, queryClient, filters]);
+  }, [key, queryClient]);
 
-  return useQuery(input);
+  return useQuery(input) as ReturnType<typeof useQuery<NodeListQueryInput>> & {
+    data: T[] | undefined;
+  };
 };
