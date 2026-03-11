@@ -2,27 +2,33 @@ import Feather from '@expo/vector-icons/Feather';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { Image, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SvgUri } from 'react-native-svg';
 
 import { AnimatedLogo } from '@colanode/mobile/components/ui/animated-logo';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useTheme } from '@colanode/mobile/contexts/theme';
+import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 
 export default function AboutScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
+  const { accountId } = useWorkspace();
   const version = Constants.expoConfig?.version ?? '1.0.0';
 
+  const { data: accounts } = useLiveQuery({ type: 'account.list' });
+  const account = accounts?.find((a) => a.id === accountId);
   const { data: servers } = useLiveQuery({ type: 'server.list' });
-  const server = servers?.[0];
+  const server = servers?.find((s) => s.domain === account?.server) ?? servers?.[0];
 
   return (
     <ScrollView
       style={[styles.scroll, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.container}
     >
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <BackButton onPress={() => router.back()} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>About</Text>
         <View style={styles.headerSpacer} />
@@ -131,7 +137,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 56,
     paddingHorizontal: 16,
     paddingBottom: 24,
   },

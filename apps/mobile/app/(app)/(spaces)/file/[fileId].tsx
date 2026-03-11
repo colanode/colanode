@@ -10,6 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalFileNode } from '@colanode/client/types/nodes';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
@@ -40,6 +41,7 @@ export default function FileScreen() {
   const { userId } = useWorkspace();
   const { appService } = useAppService();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const { mutate, isPending } = useMutation();
   const [fileUri, setFileUri] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
@@ -56,19 +58,12 @@ export default function FileScreen() {
 
   const file = fileNodes?.[0] as LocalFileNode | undefined;
 
-  const checkFileExists = async () => {
+  useEffect(() => {
     if (!file) return;
     const path = appService.path.workspaceFile(userId, file.id, file.extension);
-    const exists = await appService.fs.exists(path);
-    if (exists) {
-      setFileUri(path);
-    } else {
-      setFileUri(null);
-    }
-  };
-
-  useEffect(() => {
-    checkFileExists();
+    appService.fs.exists(path).then((exists) => {
+      setFileUri(exists ? path : null);
+    });
   }, [file, userId, appService]);
 
   const handleDownload = () => {
@@ -116,7 +111,7 @@ export default function FileScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: insets.top + 8 }]}>
         <BackButton onPress={() => router.back()} />
         <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
           {file?.name ?? 'File'}
@@ -213,7 +208,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 56,
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,

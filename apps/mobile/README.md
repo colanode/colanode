@@ -112,9 +112,13 @@ The entry point (`index.js`) loads a `crypto.getRandomValues` polyfill before an
   - `MobilePathService` – path resolution using Expo's `Paths` API
   - `MobileKyselyService` – SQLite via `expo-sqlite` with a custom Kysely dialect
 
-### Metro bundler mocking
+### Metro bundler config
 
-Some packages pulled in transitively by `@colanode/client` are DOM-only and would crash the React Native bundler. The `metro.config.js` handles this by redirecting:
+The `metro.config.js` customizes the bundler in two ways:
+
+**Asset extensions** – `.db` files are registered as assets so the emoji and icon SQLite databases can be imported directly from `assets/`.
+
+**Module mocking** – Some packages pulled in transitively by `@colanode/client` are DOM-only and would crash the React Native bundler. The config redirects them:
 
 - `@tiptap/core` and `@tiptap/pm` → empty module (rich text editor, not used on mobile)
 - `isomorphic-webcrypto` → custom mock that delegates to `globalThis.crypto` (set up by the polyfill)

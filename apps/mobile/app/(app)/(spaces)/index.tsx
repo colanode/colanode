@@ -1,6 +1,7 @@
 import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalSpaceNode } from '@colanode/client/types/nodes';
 import { SpaceListItem } from '@colanode/mobile/components/spaces/space-list-item';
@@ -13,6 +14,7 @@ export default function SpacesScreen() {
   const router = useRouter();
   const { userId } = useWorkspace();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const { data: spaces, isLoading, refetch, isRefetching } = useNodeListQuery(
     userId,
@@ -22,7 +24,7 @@ export default function SpacesScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Text style={[styles.title, { color: colors.text }]}>Spaces</Text>
       </View>
       <FlatList
@@ -88,7 +90,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 60,
     paddingHorizontal: 16,
     paddingBottom: 12,
   },

@@ -1,29 +1,24 @@
 import Feather from '@expo/vector-icons/Feather';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalNode, LocalSpaceNode } from '@colanode/client/types/nodes';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { CreateNodeSheet } from '@colanode/mobile/components/nodes/create-node-sheet';
 import { NodeActionSheet } from '@colanode/mobile/components/nodes/node-action-sheet';
-import { NodeIcon } from '@colanode/mobile/components/nodes/node-icon';
+import { NodeChildList } from '@colanode/mobile/components/nodes/node-child-list';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
-import { EmptyState } from '@colanode/mobile/components/ui/empty-state';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
-
-const NODE_TYPE_LABELS: Record<string, string> = {
-  channel: 'Channel',
-  page: 'Page',
-  folder: 'Folder',
-  database: 'Database',
-  file: 'File',
-};
+import { getNodeName } from '@colanode/mobile/lib/node-utils';
+import { navigateToNode } from '@colanode/mobile/lib/navigation-utils';
 
 export default function SpaceScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { spaceId } = useLocalSearchParams<{ spaceId: string }>();
   const { userId, role } = useWorkspace();
   const { colors } = useTheme();
@@ -49,44 +44,11 @@ export default function SpaceScreen() {
     [{ field: ['createdAt'], direction: 'asc', nulls: 'last' }]
   );
 
-  const handleOpenChild = (node: LocalNode) => {
-    switch (node.type) {
-      case 'channel':
-        router.push({
-          pathname: '/(app)/(spaces)/channel/[channelId]',
-          params: { channelId: node.id },
-        });
-        break;
-      case 'page':
-        router.push({
-          pathname: '/(app)/(spaces)/page/[pageId]',
-          params: { pageId: node.id },
-        });
-        break;
-      case 'folder':
-        router.push({
-          pathname: '/(app)/(spaces)/folder/[folderId]',
-          params: { folderId: node.id },
-        });
-        break;
-      case 'file':
-        router.push({
-          pathname: '/(app)/(spaces)/file/[fileId]',
-          params: { fileId: node.id },
-        });
-        break;
-    }
-  };
-
-  const getNodeName = (node: LocalNode): string => {
-    return 'name' in node ? (node as any).name ?? node.type : node.type;
-  };
-
   const canDelete = role === 'owner' || role === 'admin';
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 8, borderBottomColor: colors.border }]}>
         <BackButton onPress={() => router.back()} />
         <Pressable
           onPress={() => space && setShowRename(true)}
@@ -96,54 +58,17 @@ export default function SpaceScreen() {
             {space?.name ?? 'Space'}
           </Text>
         </Pressable>
-        <View style={{ width: 44 }} />
+        <View style={styles.headerSpacer} />
       </View>
-      <FlatList
-        data={(children as LocalNode[] | undefined) ?? []}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Pressable
-            style={({ pressed }) => [
-              styles.childRow,
-              pressed && { backgroundColor: colors.surface },
-            ]}
-            onPress={() => handleOpenChild(item)}
-            onLongPress={canDelete ? () => setActionNode(item) : undefined}
-            delayLongPress={500}
-          >
-            <View style={styles.iconContainer}>
-              <NodeIcon type={item.type} size={20} />
-            </View>
-            <View style={styles.childInfo}>
-              <Text style={[styles.childName, { color: colors.text }]} numberOfLines={1}>
-                {getNodeName(item)}
-              </Text>
-              <Text style={[styles.childType, { color: colors.textMuted }]}>
-                {NODE_TYPE_LABELS[item.type] ?? item.type}
-              </Text>
-            </View>
-            <Feather name="chevron-right" size={18} color={colors.sheetHandle} />
-          </Pressable>
-        )}
-        ItemSeparatorComponent={() => (
-          <View style={[styles.separator, { backgroundColor: colors.listSeparator }]} />
-        )}
-        contentContainerStyle={styles.list}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefetching}
-            onRefresh={refetch}
-            tintColor={colors.textMuted}
-          />
-        }
-        ListEmptyComponent={
-          !isLoading ? (
-            <EmptyState
-              title="Empty space"
-              subtitle="Tap the button below to add content"
-            />
-          ) : null
-        }
+      <NodeChildList
+        children={(children as LocalNode[] | undefined) ?? []}
+        isLoading={isLoading}
+        isRefetching={isRefetching}
+        onRefresh={refetch}
+        onOpenChild={(node) => navigateToNode(router, node)}
+        onLongPressChild={canDelete ? (node) => setActionNode(node) : undefined}
+        emptyTitle="Empty space"
+        emptySubtitle="Tap the button below to add content"
       />
       <Pressable
         style={({ pressed }) => [
@@ -186,7 +111,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 56,
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
@@ -198,6 +122,9 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontWeight: '600',
     textAlign: 'center',
+  },
+  headerSpacer: {
+    width: 44,
   },
   fab: {
     position: 'absolute',
@@ -216,34 +143,5 @@ const styles = StyleSheet.create({
   },
   fabPressed: {
     opacity: 0.8,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    marginLeft: 56,
-  },
-  list: {
-    flexGrow: 1,
-  },
-  childRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  iconContainer: {
-    width: 28,
-    alignItems: 'center',
-  },
-  childInfo: {
-    flex: 1,
-    gap: 2,
-  },
-  childName: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  childType: {
-    fontSize: 12,
   },
 });

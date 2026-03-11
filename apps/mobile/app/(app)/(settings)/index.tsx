@@ -2,6 +2,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
@@ -15,6 +16,7 @@ export default function SettingsScreen() {
   const { accountId, workspace, role } = useWorkspace();
   const { openSwitcher } = useWorkspaceSwitcher();
   const { colors, preference, setScheme } = useTheme();
+  const insets = useSafeAreaInsets();
   const [loggingOut, setLoggingOut] = useState(false);
 
   const handleLogout = () => {
@@ -61,7 +63,7 @@ export default function SettingsScreen() {
       style={[styles.scroll, { backgroundColor: colors.background }]}
       contentContainerStyle={styles.container}
     >
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Text style={[styles.title, { color: colors.text }]}>Settings</Text>
       </View>
 
@@ -212,7 +214,6 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   header: {
-    paddingTop: 60,
     paddingHorizontal: 16,
     paddingBottom: 24,
   },

@@ -1,6 +1,6 @@
 import { File as ExpoFile } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -25,18 +25,18 @@ interface AvatarPickerProps {
 }
 
 const COLORS = [
-  '#6366f1',
-  '#8b5cf6',
-  '#a855f7',
-  '#ec4899',
-  '#f43f5e',
-  '#ef4444',
-  '#f97316',
-  '#eab308',
-  '#22c55e',
-  '#14b8a6',
-  '#06b6d4',
-  '#3b82f6',
+  '#7B8ABF',
+  '#9B8BB8',
+  '#B08DAF',
+  '#C48B9A',
+  '#C4887D',
+  '#BF9A7A',
+  '#C4A96E',
+  '#A8B07A',
+  '#6BC5A0',
+  '#5BA8A0',
+  '#6AA8BF',
+  '#7A9EC4',
 ];
 
 const getColor = (name: string): string => {
@@ -67,10 +67,19 @@ export const AvatarPicker = ({
   const { mutate } = useMutation();
   const [uploading, setUploading] = useState(false);
   const [localUri, setLocalUri] = useState<string | null>(null);
+  const [avatarUri, setAvatarUri] = useState<string | null>(null);
 
-  const avatarPath = currentAvatar
-    ? appService.path.avatar(currentAvatar)
-    : null;
+  useEffect(() => {
+    if (!currentAvatar) {
+      setAvatarUri(null);
+      return;
+    }
+
+    const path = appService.path.avatar(currentAvatar);
+    appService.fs.exists(path).then((exists) => {
+      setAvatarUri(exists ? path : null);
+    });
+  }, [currentAvatar, appService]);
 
   const handlePress = async () => {
     if (uploading) return;
@@ -130,7 +139,7 @@ export const AvatarPicker = ({
   };
 
   const borderRadius = size * 0.25;
-  const displayUri = localUri ?? avatarPath;
+  const displayUri = localUri ?? avatarUri;
 
   return (
     <Pressable onPress={handlePress} style={styles.wrapper}>
@@ -152,7 +161,7 @@ export const AvatarPicker = ({
               },
             ]}
           >
-            <Text style={[styles.initials, { fontSize: size * 0.4, color: colors.text }]}>
+            <Text style={[styles.initials, { fontSize: size * 0.4, color: '#ffffff' }]}>
               {getInitials(currentName)}
             </Text>
           </View>

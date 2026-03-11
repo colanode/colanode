@@ -1,7 +1,7 @@
 import Feather from '@expo/vector-icons/Feather';
-import { getIdType, IdType } from '@colanode/core';
 import { Link, useRouter } from 'expo-router';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalChatNode, LocalSpaceNode } from '@colanode/client/types/nodes';
 import { UserAvatar } from '@colanode/mobile/components/avatars/avatar';
@@ -11,12 +11,14 @@ import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useWorkspaceSwitcher } from '@colanode/mobile/contexts/workspace-switcher';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
+import { computeUnreadSummary } from '@colanode/mobile/lib/radar-utils';
 
 export default function HomeScreen() {
   const router = useRouter();
   const { accountId, userId, workspace } = useWorkspace();
   const { openSwitcher } = useWorkspaceSwitcher();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
 
   const { data: accounts } = useLiveQuery({ type: 'account.list' });
   const account = accounts?.find((a) => a.id === accountId);
@@ -26,20 +28,9 @@ export default function HomeScreen() {
 
   const { data: radarData } = useLiveQuery({ type: 'radar.data.get' });
   const workspaceRadar = radarData?.[userId];
-
-  // Compute unread stats
-  let totalUnread = 0;
-  let unreadChats = 0;
-  if (workspaceRadar) {
-    for (const [id, nodeState] of Object.entries(workspaceRadar.nodeStates)) {
-      if (nodeState.unreadCount > 0) {
-        totalUnread += nodeState.unreadCount;
-        if (getIdType(id) === IdType.Chat) {
-          unreadChats++;
-        }
-      }
-    }
-  }
+  const { totalUnread, unreadChats } = computeUnreadSummary(
+    workspaceRadar?.nodeStates
+  );
 
   // Recent chats (limit 3)
   const { data: recentChats, refetch: refetchChats, isRefetching: isRefetchingChats } = useNodeListQuery(
@@ -72,7 +63,7 @@ export default function HomeScreen() {
         />
       }
     >
-      <Pressable style={styles.header} onPress={openSwitcher}>
+      <Pressable style={[styles.header, { paddingTop: insets.top + 8 }]} onPress={openSwitcher}>
         <UserAvatar
           name={workspace.name}
           avatar={workspace.avatar ?? null}
@@ -116,10 +107,27 @@ export default function HomeScreen() {
             { backgroundColor: colors.surfaceAccent },
             pressed && { backgroundColor: colors.surfaceAccentDeep },
           ]}
-          onPress={() => router.push('/(app)/(spaces)/create-space')}
+          onPress={() => {
+            const firstSpace = recentSpaces?.[0] as LocalSpaceNode | undefined;
+            if (firstSpace) {
+              router.push({
+                pathname: '/(app)/(spaces)/space/[spaceId]',
+                params: { spaceId: firstSpace.id },
+              });
+            } else {
+              router.push('/(app)/(spaces)');
+            }
+          }}
         >
-          <Feather name="plus-circle" size={20} color={colors.primary} />
-          <Text style={[styles.quickActionText, { color: colors.text }]}>New Space</Text>
+          <Feather name="layers" size={20} color={colors.primary} />
+          <Text style={[styles.quickActionText, { color: colors.text }]} numberOfLines={1}>
+            {(() => {
+              const name = (recentSpaces?.[0] as LocalSpaceNode | undefined)?.name;
+              if (!name) return 'Spaces';
+              const words = name.trim().split(/\s+/);
+              return words.length > 2 ? words.slice(0, 2).join(' ') + '...' : name;
+            })()}
+          </Text>
         </Pressable>
       </View>
 
@@ -197,7 +205,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 14,
-    paddingTop: 60,
     paddingHorizontal: 16,
     paddingBottom: 24,
   },
