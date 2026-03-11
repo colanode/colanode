@@ -8,6 +8,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { UserAvatar } from '@colanode/mobile/components/avatars/avatar';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
@@ -20,6 +21,7 @@ export default function NewChatScreen() {
   const router = useRouter();
   const { userId } = useWorkspace();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const { mutate, isPending } = useMutation();
   const [search, setSearch] = useState('');
 
@@ -53,7 +55,7 @@ export default function NewChatScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={styles.header}>
+      <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
         <Pressable onPress={() => router.back()}>
           <Text style={[styles.backText, { color: colors.textSecondary }]}>Cancel</Text>
         </Pressable>
@@ -118,7 +120,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 60,
     paddingHorizontal: 16,
     paddingBottom: 12,
   },

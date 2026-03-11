@@ -1,5 +1,6 @@
 import { useRouter } from 'expo-router';
 import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { User } from '@colanode/client/types/users';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
@@ -18,6 +19,7 @@ const ROLE_LABELS: Record<string, string> = {
 export default function MembersScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const { userId, role } = useWorkspace();
   const canInvite = role === 'owner' || role === 'admin';
 
@@ -55,7 +57,7 @@ export default function MembersScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: insets.top + 8 }]}>
         <BackButton onPress={() => router.back()} />
         <Text style={[styles.headerTitle, { color: colors.text }]}>Members</Text>
         {canInvite ? (
@@ -103,7 +105,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 56,
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,

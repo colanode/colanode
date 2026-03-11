@@ -10,6 +10,7 @@ import {
   TextInput,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { generateId, IdType } from '@colanode/core';
 import { useTheme } from '@colanode/mobile/contexts/theme';
@@ -21,6 +22,7 @@ export default function CreateSpaceScreen() {
   const { userId } = useWorkspace();
   const { mutate, isPending } = useMutation();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
 
@@ -57,7 +59,7 @@ export default function CreateSpaceScreen() {
       style={[styles.container, { backgroundColor: colors.background }]}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: insets.top + 8 }]}>
         <Pressable onPress={() => router.back()}>
           <Text style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
         </Pressable>
@@ -117,7 +119,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 56,
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,

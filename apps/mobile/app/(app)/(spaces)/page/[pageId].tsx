@@ -1,6 +1,7 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { Block } from '@colanode/core';
 import { mapBlocksToContents } from '@colanode/client/lib';
@@ -19,6 +20,7 @@ export default function PageScreen() {
   const { pageId } = useLocalSearchParams<{ pageId: string }>();
   const { userId } = useWorkspace();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const [showRename, setShowRename] = useState(false);
 
   const { data: page } = useNodeQuery<LocalPageNode>(userId, pageId, 'page');
@@ -47,7 +49,7 @@ export default function PageScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: insets.top + 8 }]}>
         <BackButton onPress={() => router.back()} />
         <Pressable
           onPress={() => page && setShowRename(true)}
@@ -94,7 +96,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 56,
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,

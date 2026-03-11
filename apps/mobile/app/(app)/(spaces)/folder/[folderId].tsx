@@ -1,31 +1,25 @@
 import Feather from '@expo/vector-icons/Feather';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';
-import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalFolderNode, LocalNode } from '@colanode/client/types/nodes';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
-import { useFolderFileUpload } from '@colanode/mobile/hooks/use-folder-file-upload';
 import { NodeActionSheet } from '@colanode/mobile/components/nodes/node-action-sheet';
-import { NodeIcon } from '@colanode/mobile/components/nodes/node-icon';
+import { NodeChildList } from '@colanode/mobile/components/nodes/node-child-list';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
-import { EmptyState } from '@colanode/mobile/components/ui/empty-state';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
+import { useFolderFileUpload } from '@colanode/mobile/hooks/use-folder-file-upload';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 import { getNodeDisplayName } from '@colanode/mobile/lib/node-utils';
-
-const NODE_TYPE_LABELS: Record<string, string> = {
-  page: 'Page',
-  folder: 'Folder',
-  file: 'File',
-  database: 'Database',
-  channel: 'Channel',
-};
+import { navigateToNode } from '@colanode/mobile/lib/navigation-utils';
 
 export default function FolderScreen() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { folderId } = useLocalSearchParams<{ folderId: string }>();
   const { userId, role } = useWorkspace();
   const { colors } = useTheme();
@@ -41,40 +35,11 @@ export default function FolderScreen() {
     [{ field: ['createdAt'], direction: 'asc', nulls: 'last' }]
   );
 
-  const handleOpenChild = (node: LocalNode) => {
-    switch (node.type) {
-      case 'page':
-        router.push({
-          pathname: '/(app)/(spaces)/page/[pageId]',
-          params: { pageId: node.id },
-        });
-        break;
-      case 'folder':
-        router.push({
-          pathname: '/(app)/(spaces)/folder/[folderId]',
-          params: { folderId: node.id },
-        });
-        break;
-      case 'channel':
-        router.push({
-          pathname: '/(app)/(spaces)/channel/[channelId]',
-          params: { channelId: node.id },
-        });
-        break;
-      case 'file':
-        router.push({
-          pathname: '/(app)/(spaces)/file/[fileId]',
-          params: { fileId: node.id },
-        });
-        break;
-    }
-  };
-
   const canDelete = role === 'owner' || role === 'admin';
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
-      <View style={[styles.header, { borderBottomColor: colors.border }]}>
+      <View style={[styles.header, { paddingTop: insets.top + 8, borderBottomColor: colors.border }]}>
         <BackButton onPress={() => router.back()} />
         <Pressable
           onPress={() => folder && setShowRename(true)}
@@ -91,52 +56,15 @@ export default function FolderScreen() {
           <Feather name="upload" size={16} color={colors.text} />
         </Pressable>
       </View>
-      <FlatList
-        data={children ?? []}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Pressable
-            style={({ pressed }) => [
-              styles.childRow,
-              pressed && { backgroundColor: colors.surface },
-            ]}
-            onPress={() => handleOpenChild(item)}
-            onLongPress={canDelete ? () => setActionNode(item) : undefined}
-            delayLongPress={500}
-          >
-            <View style={styles.iconContainer}>
-              <NodeIcon type={item.type} size={20} />
-            </View>
-            <View style={styles.childInfo}>
-              <Text style={[styles.childName, { color: colors.text }]} numberOfLines={1}>
-                {getNodeDisplayName(item)}
-              </Text>
-              <Text style={[styles.childType, { color: colors.textMuted }]}>
-                {NODE_TYPE_LABELS[item.type] ?? item.type}
-              </Text>
-            </View>
-            <Feather name="chevron-right" size={18} color={colors.sheetHandle} />
-          </Pressable>
-        )}
-        ItemSeparatorComponent={() => (
-          <View style={[styles.separator, { backgroundColor: colors.listSeparator }]} />
-        )}
-        contentContainerStyle={styles.list}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefetching}
-            onRefresh={refetch}
-            tintColor={colors.textMuted}
-          />
-        }
-        ListEmptyComponent={
-          !isLoading ? (
-            <EmptyState
-              title="Empty folder"
-              subtitle="Tap + to add content"
-            />
-          ) : null
-        }
+      <NodeChildList
+        children={(children as LocalNode[] | undefined) ?? []}
+        isLoading={isLoading}
+        isRefetching={isRefetching}
+        onRefresh={refetch}
+        onOpenChild={(node) => navigateToNode(router, node)}
+        onLongPressChild={canDelete ? (node) => setActionNode(node) : undefined}
+        emptyTitle="Empty folder"
+        emptySubtitle="Tap + to add content"
       />
       <NodeActionSheet
         visible={actionNode !== null}
@@ -163,7 +91,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 56,
     paddingHorizontal: 16,
     paddingBottom: 12,
     borderBottomWidth: 1,
@@ -182,34 +109,5 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    marginLeft: 56,
-  },
-  list: {
-    flexGrow: 1,
-  },
-  childRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
-  },
-  iconContainer: {
-    width: 28,
-    alignItems: 'center',
-  },
-  childInfo: {
-    flex: 1,
-    gap: 2,
-  },
-  childName: {
-    fontSize: 16,
-    fontWeight: '500',
-  },
-  childType: {
-    fontSize: 12,
   },
 });

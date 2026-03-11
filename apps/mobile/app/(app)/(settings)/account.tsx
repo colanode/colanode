@@ -10,6 +10,7 @@ import {
   Text,
   View,
 } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { AvatarPicker } from '@colanode/mobile/components/avatars/avatar-picker';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
@@ -23,6 +24,7 @@ import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 export default function AccountSettingsScreen() {
   const router = useRouter();
   const { colors } = useTheme();
+  const insets = useSafeAreaInsets();
   const { accountId } = useWorkspace();
   const { mutate, isPending } = useMutation();
   const { mutate: mutateAvatar } = useMutation();
@@ -67,7 +69,7 @@ export default function AccountSettingsScreen() {
         contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <View style={styles.header}>
+        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
           <BackButton onPress={() => router.back()} />
           <Text style={[styles.headerTitle, { color: colors.text }]}>
             Account
@@ -136,7 +138,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingTop: 56,
     paddingHorizontal: 16,
     paddingBottom: 24,
   },

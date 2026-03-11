@@ -3,6 +3,9 @@ const path = require('path');
 
 const config = getDefaultConfig(__dirname);
 
+// Allow .db files to be imported as assets
+config.resolver.assetExts = [...config.resolver.assetExts, 'db'];
+
 // Modules that are never used at runtime on mobile — mock with empty export.
 const EMPTY_MOCK_MODULES = [
   '@tiptap/core',

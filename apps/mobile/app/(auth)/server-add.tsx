@@ -66,7 +66,7 @@ export default function ServerAddScreen() {
         <View style={styles.form}>
           <TextInput
             label="Server URL"
-            placeholder="https://your-server.com"
+            placeholder="http://your-server.com/config"
             value={url}
             onChangeText={setUrl}
             error={error}
