@@ -1,7 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -11,46 +9,13 @@ import {
 } from 'react-native';
 
 import { AnimatedLogo } from '@colanode/mobile/components/ui/animated-logo';
-import { Button } from '@colanode/mobile/components/ui/button';
-import { TextInput } from '@colanode/mobile/components/ui/text-input';
+import { CreateWorkspaceForm } from '@colanode/mobile/components/workspaces/create-workspace-form';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 
 export default function CreateWorkspaceScreen() {
   const { colors } = useTheme();
   const router = useRouter();
   const { accountId } = useLocalSearchParams<{ accountId: string }>();
-  const { mutate, isPending } = useMutation();
-
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [error, setError] = useState('');
-
-  const handleCreate = () => {
-    const trimmedName = name.trim();
-    if (!trimmedName) {
-      setError('Workspace name is required');
-      return;
-    }
-    if (!accountId) return;
-
-    setError('');
-    mutate({
-      input: {
-        type: 'workspace.create',
-        name: trimmedName,
-        description: description.trim(),
-        accountId,
-        avatar: null,
-      },
-      onSuccess() {
-        router.replace('/(app)/(home)');
-      },
-      onError(err) {
-        Alert.alert('Error', err.message);
-      },
-    });
-  };
 
   return (
     <KeyboardAvoidingView
@@ -71,31 +36,10 @@ export default function CreateWorkspaceScreen() {
             Create a workspace for your team to collaborate
           </Text>
         </View>
-        <View style={styles.form}>
-          <TextInput
-            label="Workspace Name"
-            placeholder="My Workspace"
-            value={name}
-            onChangeText={setName}
-            error={error}
-            autoCapitalize="words"
-            returnKeyType="next"
-          />
-          <TextInput
-            label="Description (optional)"
-            placeholder="What is this workspace for?"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-            numberOfLines={3}
-            style={styles.textarea}
-          />
-          <Button
-            title="Create Workspace"
-            onPress={handleCreate}
-            loading={isPending}
-          />
-        </View>
+        <CreateWorkspaceForm
+          accountId={accountId}
+          onCreated={() => router.replace('/(app)/(home)')}
+        />
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -123,12 +67,5 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 15,
     textAlign: 'center',
-  },
-  form: {
-    gap: 20,
-  },
-  textarea: {
-    minHeight: 80,
-    textAlignVertical: 'top',
   },
 });

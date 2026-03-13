@@ -1,6 +1,6 @@
 import { File as ExpoFile } from 'expo-file-system';
 import * as ImagePicker from 'expo-image-picker';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -14,6 +14,7 @@ import {
 import { generateId, IdType } from '@colanode/core';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
+import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 
 interface AvatarPickerProps {
@@ -67,19 +68,14 @@ export const AvatarPicker = ({
   const { mutate } = useMutation();
   const [uploading, setUploading] = useState(false);
   const [localUri, setLocalUri] = useState<string | null>(null);
-  const [avatarUri, setAvatarUri] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!currentAvatar) {
-      setAvatarUri(null);
-      return;
-    }
-
-    const path = appService.path.avatar(currentAvatar);
-    appService.fs.exists(path).then((exists) => {
-      setAvatarUri(exists ? path : null);
-    });
-  }, [currentAvatar, appService]);
+  const { data: storedAvatar } = useLiveQuery(
+    {
+      type: 'avatar.get',
+      accountId,
+      avatarId: currentAvatar ?? '',
+    },
+    { enabled: !!currentAvatar }
+  );
 
   const handlePress = async () => {
     if (uploading) return;
@@ -139,7 +135,7 @@ export const AvatarPicker = ({
   };
 
   const borderRadius = size * 0.25;
-  const displayUri = localUri ?? avatarUri;
+  const displayUri = localUri ?? storedAvatar?.url ?? null;
 
   return (
     <Pressable onPress={handlePress} style={styles.wrapper}>

@@ -3,8 +3,8 @@ import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { User } from '@colanode/client/types/users';
-import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { UserAvatar } from '@colanode/mobile/components/avatars/avatar';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
@@ -13,7 +13,7 @@ const ROLE_LABELS: Record<string, string> = {
   owner: 'Owner',
   admin: 'Admin',
   collaborator: 'Collaborator',
-  viewer: 'Viewer',
+  guest: 'Guest',
 };
 
 export default function MembersScreen() {

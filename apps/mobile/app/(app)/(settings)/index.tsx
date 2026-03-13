@@ -152,7 +152,9 @@ export default function SettingsScreen() {
                     borderColor: isActive ? colors.primary : colors.border,
                   },
                 ]}
-                onPress={() => setScheme(option)}
+                onPress={() => {
+                  void setScheme(option);
+                }}
               >
                 <Text
                   style={[

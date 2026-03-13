@@ -5,17 +5,18 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalNode, LocalSpaceNode } from '@colanode/client/types/nodes';
-import { BackButton } from '@colanode/mobile/components/ui/back-button';
+import { hasWorkspaceRole } from '@colanode/core';
 import { CreateNodeSheet } from '@colanode/mobile/components/nodes/create-node-sheet';
 import { NodeActionSheet } from '@colanode/mobile/components/nodes/node-action-sheet';
 import { NodeChildList } from '@colanode/mobile/components/nodes/node-child-list';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
-import { getNodeDisplayName } from '@colanode/mobile/lib/node-utils';
 import { navigateToNode } from '@colanode/mobile/lib/navigation-utils';
+import { getNodeDisplayName } from '@colanode/mobile/lib/node-utils';
 
 export default function SpaceScreen() {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function SpaceScreen() {
   );
 
   const canDelete = role === 'owner' || role === 'admin';
+  const canCreateChildren = hasWorkspaceRole(role, 'collaborator');
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -59,24 +61,32 @@ export default function SpaceScreen() {
         onOpenChild={(node) => navigateToNode(router, node)}
         onLongPressChild={canDelete ? (node) => setActionNode(node) : undefined}
         emptyTitle="Empty space"
-        emptySubtitle="Tap the button below to add content"
+        emptySubtitle={
+          canCreateChildren
+            ? 'Tap the button below to add content'
+            : 'Nothing has been added to this space yet'
+        }
       />
-      <Pressable
-        style={({ pressed }) => [
-          styles.fab,
-          { backgroundColor: colors.surface },
-          pressed && styles.fabPressed,
-        ]}
-        onPress={() => setShowCreate(true)}
-      >
-        <Feather name="plus" size={22} color={colors.text} />
-      </Pressable>
-      <CreateNodeSheet
-        visible={showCreate}
-        parentId={spaceId!}
-        userId={userId}
-        onClose={() => setShowCreate(false)}
-      />
+      {canCreateChildren && (
+        <>
+          <Pressable
+            style={({ pressed }) => [
+              styles.fab,
+              { backgroundColor: colors.surface },
+              pressed && styles.fabPressed,
+            ]}
+            onPress={() => setShowCreate(true)}
+          >
+            <Feather name="plus" size={22} color={colors.text} />
+          </Pressable>
+          <CreateNodeSheet
+            visible={showCreate}
+            parentId={spaceId!}
+            userId={userId}
+            onClose={() => setShowCreate(false)}
+          />
+        </>
+      )}
       <NodeActionSheet
         visible={actionNode !== null}
         nodeId={actionNode?.id ?? null}

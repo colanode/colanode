@@ -1,6 +1,6 @@
 import Feather from '@expo/vector-icons/Feather';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Image,
@@ -13,8 +13,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalFileNode } from '@colanode/client/types/nodes';
-import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
@@ -45,21 +45,52 @@ export default function FileScreen() {
   const { mutate, isPending } = useMutation();
   const [fileUri, setFileUri] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const downloadCheckTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null
+  );
+  const isMountedRef = useRef(true);
 
   const { data: file, isLoading } = useNodeQuery<LocalFileNode>(userId, fileId, 'file');
 
   useEffect(() => {
-    if (!file) return;
+    let cancelled = false;
+
+    if (!file) {
+      setFileUri(null);
+      return () => {
+        cancelled = true;
+      };
+    }
+
     const path = appService.path.workspaceFile(userId, file.id, file.extension);
-    appService.fs.exists(path).then((exists) => {
-      setFileUri(exists ? path : null);
+    appService.fs.exists(path).then((exists: boolean) => {
+      if (!cancelled && isMountedRef.current) {
+        setFileUri(exists ? path : null);
+      }
     });
+
+    return () => {
+      cancelled = true;
+    };
   }, [file, userId, appService]);
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (downloadCheckTimeoutRef.current) {
+        clearTimeout(downloadCheckTimeoutRef.current);
+      }
+    };
+  }, []);
 
   const handleDownload = () => {
     if (!file || downloading || isPending) return;
 
     const path = appService.path.workspaceFile(userId, file.id, file.extension);
+    if (downloadCheckTimeoutRef.current) {
+      clearTimeout(downloadCheckTimeoutRef.current);
+      downloadCheckTimeoutRef.current = null;
+    }
     setDownloading(true);
 
     mutate({
@@ -73,21 +104,40 @@ export default function FileScreen() {
         // Poll briefly for the file to appear (download happens async)
         let attempts = 0;
         const check = async () => {
+          if (!isMountedRef.current) {
+            return;
+          }
+
           const exists = await appService.fs.exists(path);
+          if (!isMountedRef.current) {
+            return;
+          }
+
           if (exists) {
             setFileUri(path);
             setDownloading(false);
+            downloadCheckTimeoutRef.current = null;
           } else if (attempts < 30) {
             attempts++;
-            setTimeout(check, 1000);
+            downloadCheckTimeoutRef.current = setTimeout(() => {
+              void check();
+            }, 1000);
           } else {
             setDownloading(false);
+            downloadCheckTimeoutRef.current = null;
           }
         };
         await check();
       },
       onError() {
-        setDownloading(false);
+        if (downloadCheckTimeoutRef.current) {
+          clearTimeout(downloadCheckTimeoutRef.current);
+          downloadCheckTimeoutRef.current = null;
+        }
+
+        if (isMountedRef.current) {
+          setDownloading(false);
+        }
       },
     });
   };

@@ -4,6 +4,7 @@ import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'rea
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalSpaceNode } from '@colanode/client/types/nodes';
+import { hasWorkspaceRole } from '@colanode/core';
 import { SpaceListItem } from '@colanode/mobile/components/spaces/space-list-item';
 import { EmptyState } from '@colanode/mobile/components/ui/empty-state';
 import { useTheme } from '@colanode/mobile/contexts/theme';
@@ -12,9 +13,10 @@ import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
 
 export default function SpacesScreen() {
   const router = useRouter();
-  const { userId } = useWorkspace();
+  const { userId, role } = useWorkspace();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const canCreateSpace = hasWorkspaceRole(role, 'collaborator');
 
   const { data: spaces, isLoading, refetch, isRefetching } = useNodeListQuery<LocalSpaceNode>(
     userId,
@@ -56,28 +58,34 @@ export default function SpacesScreen() {
           !isLoading ? (
             <EmptyState
               title="No spaces yet"
-              subtitle="Tap the button below to create your first space"
+              subtitle={
+                canCreateSpace
+                  ? 'Tap the button below to create your first space'
+                  : 'No spaces are available to you yet'
+              }
             />
           ) : null
         }
         ListFooterComponent={
-          spaces && spaces.length > 0 && spaces.length <= 3 ? (
+          canCreateSpace && spaces && spaces.length > 0 && spaces.length <= 3 ? (
             <Text style={[styles.hint, { color: colors.textMuted }]}>
               Create spaces to organize channels, pages, and files
             </Text>
           ) : null
         }
       />
-      <Pressable
-        style={({ pressed }) => [
-          styles.fab,
-          { backgroundColor: colors.surface },
-          pressed && styles.fabPressed,
-        ]}
-        onPress={() => router.push('/(app)/(spaces)/create-space')}
-      >
-        <Feather name="plus" size={22} color={colors.text} />
-      </Pressable>
+      {canCreateSpace && (
+        <Pressable
+          style={({ pressed }) => [
+            styles.fab,
+            { backgroundColor: colors.surface },
+            pressed && styles.fabPressed,
+          ]}
+          onPress={() => router.push('/(app)/(spaces)/create-space')}
+        >
+          <Feather name="plus" size={22} color={colors.text} />
+        </Pressable>
+      )}
     </View>
   );
 }

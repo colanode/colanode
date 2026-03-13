@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -30,10 +30,20 @@ export default function AccountSettingsScreen() {
   const { mutate: mutateAvatar } = useMutation();
 
   const { data: accounts } = useLiveQuery({ type: 'account.list' });
-  const account = accounts?.find((a) => a.id === accountId);
+  const account = (
+    accounts as
+      | Array<{ id: string; name: string; email: string; avatar: string | null }>
+      | undefined
+  )?.find(
+    (existingAccount) => existingAccount.id === accountId
+  );
 
   const [name, setName] = useState(account?.name ?? '');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    setName(account?.name ?? '');
+  }, [account?.id, account?.name]);
 
   const handleSave = () => {
     const trimmed = name.trim();
@@ -95,7 +105,12 @@ export default function AccountSettingsScreen() {
           <TextInput
             label="Name"
             value={name}
-            onChangeText={setName}
+            onChangeText={(text) => {
+              setName(text);
+              if (error) {
+                setError('');
+              }
+            }}
             error={error}
             autoCapitalize="words"
           />

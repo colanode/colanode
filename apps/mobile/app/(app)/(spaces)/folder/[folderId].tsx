@@ -5,17 +5,18 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalFolderNode, LocalNode } from '@colanode/client/types/nodes';
-import { BackButton } from '@colanode/mobile/components/ui/back-button';
+import { hasWorkspaceRole } from '@colanode/core';
 import { NodeActionSheet } from '@colanode/mobile/components/nodes/node-action-sheet';
 import { NodeChildList } from '@colanode/mobile/components/nodes/node-child-list';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useFolderFileUpload } from '@colanode/mobile/hooks/use-folder-file-upload';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
-import { getNodeDisplayName } from '@colanode/mobile/lib/node-utils';
 import { navigateToNode } from '@colanode/mobile/lib/navigation-utils';
+import { getNodeDisplayName } from '@colanode/mobile/lib/node-utils';
 
 export default function FolderScreen() {
   const router = useRouter();
@@ -36,6 +37,7 @@ export default function FolderScreen() {
   );
 
   const canDelete = role === 'owner' || role === 'admin';
+  const canUploadFiles = hasWorkspaceRole(role, 'collaborator');
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -49,12 +51,16 @@ export default function FolderScreen() {
             {folder?.name ?? 'Folder'}
           </Text>
         </Pressable>
-        <Pressable
-          style={[styles.addButton, { backgroundColor: colors.primary }]}
-          onPress={pickAndUploadFile}
-        >
-          <Feather name="upload" size={16} color={colors.text} />
-        </Pressable>
+        {canUploadFiles ? (
+          <Pressable
+            style={[styles.addButton, { backgroundColor: colors.primary }]}
+            onPress={pickAndUploadFile}
+          >
+            <Feather name="upload" size={16} color={colors.text} />
+          </Pressable>
+        ) : (
+          <View style={styles.headerSpacer} />
+        )}
       </View>
       <NodeChildList
         children={(children as LocalNode[] | undefined) ?? []}
@@ -64,7 +70,11 @@ export default function FolderScreen() {
         onOpenChild={(node) => navigateToNode(router, node)}
         onLongPressChild={canDelete ? (node) => setActionNode(node) : undefined}
         emptyTitle="Empty folder"
-        emptySubtitle="Tap + to add content"
+        emptySubtitle={
+          canUploadFiles
+            ? 'Tap upload to add content'
+            : 'Nothing has been added to this folder yet'
+        }
       />
       <NodeActionSheet
         visible={actionNode !== null}
@@ -109,5 +119,8 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  headerSpacer: {
+    width: 32,
   },
 });
