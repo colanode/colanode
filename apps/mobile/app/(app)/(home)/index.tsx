@@ -45,6 +45,14 @@ export default function HomeScreen() {
     3
   );
 
+  const recentChatItems = (recentChats ?? []).filter(
+    (node): node is LocalChatNode => node.type === 'chat'
+  );
+
+  const recentSpaceItems = (recentSpaces ?? []).filter(
+    (node): node is LocalSpaceNode => node.type === 'space'
+  );
+
   return (
     <ScrollView
       style={[styles.scroll, { backgroundColor: colors.background }]}
@@ -105,7 +113,7 @@ export default function HomeScreen() {
             pressed && { backgroundColor: colors.surfaceAccentDeep },
           ]}
           onPress={() => {
-            const firstSpace = recentSpaces?.[0];
+            const firstSpace = recentSpaceItems[0];
             if (firstSpace) {
               router.push({
                 pathname: '/(app)/(spaces)/space/[spaceId]',
@@ -119,7 +127,7 @@ export default function HomeScreen() {
           <Feather name="layers" size={20} color={colors.primary} />
           <Text style={[styles.quickActionText, { color: colors.text }]} numberOfLines={1}>
             {(() => {
-              const name = recentSpaces?.[0]?.name;
+              const name = recentSpaceItems[0]?.name;
               if (!name) return 'Spaces';
               const words = name.trim().split(/\s+/);
               return words.length > 2 ? words.slice(0, 2).join(' ') + '...' : name;
@@ -128,10 +136,10 @@ export default function HomeScreen() {
         </Pressable>
       </View>
 
-      {recentChats && recentChats.length > 0 && (
+      {recentChatItems.length > 0 && (
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent conversations</Text>
-          {recentChats.map((chat) => (
+          {recentChatItems.map((chat) => (
             <Link
               key={chat.id}
               href={{ pathname: '/(app)/(chats)/[chatId]', params: { chatId: chat.id } }}
@@ -150,10 +158,10 @@ export default function HomeScreen() {
         </View>
       )}
 
-      {recentSpaces && recentSpaces.length > 0 && (
+      {recentSpaceItems.length > 0 && (
         <View style={styles.section}>
           <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent spaces</Text>
-          {recentSpaces.map((space) => (
+          {recentSpaceItems.map((space) => (
             <Pressable
               key={space.id}
               style={({ pressed }) => [

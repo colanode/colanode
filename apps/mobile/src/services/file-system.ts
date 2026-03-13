@@ -17,7 +17,7 @@ export class MobileFileSystem implements FileSystem {
     const directory = new Directory(path);
 
     if (!directory.exists) {
-      directory.create({ intermediates: true, idempotent: true });
+      await directory.create({ intermediates: true, idempotent: true });
     }
   }
 
@@ -53,14 +53,14 @@ export class MobileFileSystem implements FileSystem {
     const destinationFile = new ExpoFile(destination);
 
     if (destinationFile.exists) {
-      destinationFile.delete();
+      await destinationFile.delete();
     }
 
     if (!sourceFile.exists) {
       throw new Error(`File not found: ${source}`);
     }
 
-    sourceFile.copy(destinationFile);
+    await sourceFile.copy(destinationFile);
   }
 
   public async readStream(path: string): Promise<FileReadStream> {
@@ -81,7 +81,7 @@ export class MobileFileSystem implements FileSystem {
     await this.ensureParentDirectory(path);
 
     const file = new ExpoFile(path);
-    file.create({ intermediates: true, overwrite: true });
+    await file.create({ intermediates: true, overwrite: true });
 
     return file.writableStream();
   }
@@ -111,8 +111,8 @@ export class MobileFileSystem implements FileSystem {
     await this.ensureParentDirectory(path);
 
     const file = new ExpoFile(path);
-    file.create({ intermediates: true, overwrite: true });
-    file.write(data);
+    await file.create({ intermediates: true, overwrite: true });
+    await file.write(data);
   }
 
   public async delete(path: string): Promise<void> {
@@ -124,12 +124,12 @@ export class MobileFileSystem implements FileSystem {
 
     if (pathInfo.isDirectory) {
       const directory = new Directory(path);
-      directory.delete();
+      await directory.delete();
       return;
     }
 
     const file = new ExpoFile(path);
-    file.delete();
+    await file.delete();
   }
 
   public async url(path: string): Promise<string> {

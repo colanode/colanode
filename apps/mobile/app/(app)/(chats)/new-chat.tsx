@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   FlatList,
@@ -24,12 +24,25 @@ export default function NewChatScreen() {
   const insets = useSafeAreaInsets();
   const { mutate, isPending } = useMutation();
   const [search, setSearch] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
+
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      setDebouncedSearch(search.trim());
+    }, 250);
+
+    return () => {
+      clearTimeout(timeoutId);
+    };
+  }, [search]);
 
   const { data: users } = useQuery({
     type: 'user.search',
-    searchQuery: search,
+    searchQuery: debouncedSearch,
     userId,
     exclude: [userId],
+  }, {
+    enabled: debouncedSearch.length > 1,
   });
 
   const handleSelectUser = (collaboratorId: string) => {
@@ -99,7 +112,7 @@ export default function NewChatScreen() {
         )}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
-          search.length > 0 ? (
+          search.trim().length > 1 ? (
             <Text style={[styles.emptyText, { color: colors.textMuted }]}>No users found</Text>
           ) : (
             <Text style={[styles.emptyText, { color: colors.textMuted }]}>

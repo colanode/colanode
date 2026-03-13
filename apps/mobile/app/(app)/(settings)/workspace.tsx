@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -35,6 +35,11 @@ export default function WorkspaceSettingsScreen() {
   const [error, setError] = useState('');
 
   const canEdit = role === 'owner' || role === 'admin';
+
+  useEffect(() => {
+    setName(workspace.name);
+    setDescription(workspace.description ?? '');
+  }, [workspace.workspaceId, workspace.name, workspace.description]);
 
   const handleSave = () => {
     const trimmed = name.trim();

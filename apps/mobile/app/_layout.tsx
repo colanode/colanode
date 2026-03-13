@@ -7,6 +7,8 @@ import { StatusBar } from 'react-native';
 
 import { AppMeta, AppService } from '@colanode/client/services';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
+import { ErrorBoundary } from '@colanode/mobile/components/ui/error-boundary';
+import { ErrorState } from '@colanode/mobile/components/ui/error-state';
 import {
   AppServiceContext,
   useAppService,
@@ -33,10 +35,19 @@ export default function RootLayout() {
   const [appService, setAppService] = useState<AppService | null>(null);
   const [queryClient, setQueryClient] = useState<QueryClient | null>(null);
   const [ready, setReady] = useState(false);
+  const [initError, setInitError] = useState<string | null>(null);
+  const [initAttempt, setInitAttempt] = useState(0);
 
   useEffect(() => {
+    let cancelled = false;
+
     (async () => {
       try {
+        setInitError(null);
+        setReady(false);
+        setAppService(null);
+        setQueryClient(null);
+
         const paths = new MobilePathService();
         await copyAssets(paths);
 
@@ -52,25 +63,55 @@ export default function RootLayout() {
           paths
         );
 
-        await service.migrate();
         await service.init();
 
-        // Add default Colanode servers (idempotent — skips if already present)
-        await service.createServer(new URL('https://eu.colanode.com/config'));
-        await service.createServer(new URL('https://us.colanode.com/config'));
-
         const client = buildQueryClient(service.mediator);
+
+        if (cancelled) {
+          return;
+        }
 
         setAppService(service);
         setQueryClient(client);
         setReady(true);
+
+        // Seed default public servers without blocking app startup.
+        void Promise.allSettled([
+          service.createServer(new URL('https://eu.colanode.com/config')),
+          service.createServer(new URL('https://us.colanode.com/config')),
+        ]).catch((error) => {
+          console.error('Failed to seed default servers:', error);
+        });
       } catch (error) {
         console.error('Failed to initialize AppService:', error);
+        if (!cancelled) {
+          setInitError(
+            error instanceof Error ? error.message : 'Failed to initialize app.'
+          );
+        }
       } finally {
-        await SplashScreen.hideAsync();
+        if (!cancelled) {
+          await SplashScreen.hideAsync();
+        }
       }
     })();
-  }, []);
+
+    return () => {
+      cancelled = true;
+    };
+  }, [initAttempt]);
+
+  if (initError) {
+    return (
+      <ThemeProvider>
+        <ThemeStatusBar />
+        <ErrorState
+          message={initError}
+          onRetry={() => setInitAttempt((current) => current + 1)}
+        />
+      </ThemeProvider>
+    );
+  }
 
   if (!ready || !appService || !queryClient) {
     return (
@@ -86,7 +127,9 @@ export default function RootLayout() {
       <ThemeStatusBar />
       <AppServiceContext.Provider value={{ appService }}>
         <QueryClientProvider client={queryClient}>
-          <RootNavigator />
+          <ErrorBoundary>
+            <RootNavigator />
+          </ErrorBoundary>
         </QueryClientProvider>
       </AppServiceContext.Provider>
     </ThemeProvider>

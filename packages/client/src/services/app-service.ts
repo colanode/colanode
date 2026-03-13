@@ -114,6 +114,19 @@ export class AppService {
     return this.workspaces.get(userId) ?? null;
   }
 
+  public getWorkspaceByReference(
+    accountId: string,
+    workspaceId: string
+  ): WorkspaceService | null {
+    return (
+      Array.from(this.workspaces.values()).find(
+        (workspace) =>
+          workspace.accountId === accountId &&
+          workspace.workspaceId === workspaceId
+      ) ?? null
+    );
+  }
+
   public getAccounts(): AccountService[] {
     return Array.from(this.accounts.values());
   }

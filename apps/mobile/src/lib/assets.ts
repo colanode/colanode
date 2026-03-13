@@ -11,10 +11,10 @@ export { emojisDatabaseAsset, iconsDatabaseAsset, antonioFontAsset };
 
 export const copyAssets = async (paths: PathService) => {
   const assetsDir = new Directory(paths.assets);
-  assetsDir.create({ intermediates: true, idempotent: true });
+  await assetsDir.create({ intermediates: true, idempotent: true });
 
   const fontsDir = new Directory(paths.fonts);
-  fontsDir.create({ intermediates: true, idempotent: true });
+  await fontsDir.create({ intermediates: true, idempotent: true });
 
   await copyAsset(
     Asset.fromModule(emojisDatabaseAsset),
@@ -37,5 +37,5 @@ export const copyAsset = async (asset: Asset, path: string) => {
   const localUri = asset.localUri ?? asset.uri;
 
   const assetFile = new File(localUri);
-  assetFile.copy(dest);
+  await assetFile.copy(dest);
 };
