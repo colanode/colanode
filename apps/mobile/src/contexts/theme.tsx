@@ -1,3 +1,4 @@
+import { File, Paths } from 'expo-file-system';
 import {
   createContext,
   useCallback,
@@ -11,15 +12,6 @@ import { ThemeColors, darkColors, lightColors } from '@colanode/mobile/lib/color
 
 export type ColorScheme = 'light' | 'dark';
 export type ThemePreference = 'light' | 'dark' | 'system';
-export const DEFAULT_THEME_PREFERENCE: ThemePreference = 'system';
-export const THEME_PREFERENCE_NAMESPACE = 'app';
-export const THEME_PREFERENCE_KEY = 'theme.preference';
-
-export const isThemePreference = (
-  value: unknown
-): value is ThemePreference => {
-  return value === 'light' || value === 'dark' || value === 'system';
-};
 
 interface ThemeContextValue {
   colors: ThemeColors;
@@ -32,23 +24,63 @@ const ThemeContext = createContext<ThemeContextValue | null>(null);
 
 interface ThemeProviderProps {
   children: React.ReactNode;
-  initialPreference?: ThemePreference;
-  onPreferenceChange?: (scheme: ThemePreference) => void | Promise<void>;
 }
 
-export const ThemeProvider = ({
-  children,
-  initialPreference = DEFAULT_THEME_PREFERENCE,
-  onPreferenceChange,
-}: ThemeProviderProps) => {
+const THEME_PREFERENCE_FILE = new File(Paths.document, 'theme-preference.json');
+
+const isThemePreference = (value: unknown): value is ThemePreference => {
+  return value === 'light' || value === 'dark' || value === 'system';
+};
+
+const readStoredPreference = async (): Promise<ThemePreference | null> => {
+  try {
+    if (!THEME_PREFERENCE_FILE.exists) {
+      return null;
+    }
+
+    const text = await THEME_PREFERENCE_FILE.text();
+    const parsed = JSON.parse(text) as { preference?: unknown };
+    return isThemePreference(parsed.preference) ? parsed.preference : null;
+  } catch (error) {
+    if (__DEV__) {
+      console.warn('Failed to read theme preference:', error);
+    }
+    return null;
+  }
+};
+
+const writeStoredPreference = async (
+  preference: ThemePreference
+): Promise<boolean> => {
+  try {
+    await THEME_PREFERENCE_FILE.write(JSON.stringify({ preference }));
+    return true;
+  } catch (error) {
+    if (__DEV__) {
+      console.warn('Failed to persist theme preference:', error);
+    }
+    return false;
+  }
+};
+
+export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const systemScheme = useColorScheme();
-  const [preference, setPreference] = useState<ThemePreference>(
-    initialPreference
-  );
+  const [preference, setPreference] = useState<ThemePreference>('system');
 
   useEffect(() => {
-    setPreference(initialPreference);
-  }, [initialPreference]);
+    let cancelled = false;
+
+    (async () => {
+      const storedPreference = await readStoredPreference();
+      if (!cancelled && storedPreference) {
+        setPreference(storedPreference);
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const resolvedScheme: ColorScheme =
     preference === 'system'
@@ -63,10 +95,14 @@ export const ThemeProvider = ({
         return;
       }
 
-      await onPreferenceChange?.(scheme);
+      const persisted = await writeStoredPreference(scheme);
+      if (!persisted) {
+        return;
+      }
+
       setPreference(scheme);
     },
-    [onPreferenceChange, preference]
+    [preference]
   );
 
   return (

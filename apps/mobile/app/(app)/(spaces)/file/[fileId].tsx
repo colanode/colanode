@@ -3,8 +3,11 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Image,
+  Linking,
   Pressable,
+  Share,
   ScrollView,
   StyleSheet,
   Text,
@@ -13,8 +16,8 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalFileNode } from '@colanode/client/types/nodes';
-import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
+import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
@@ -45,12 +48,19 @@ export default function FileScreen() {
   const { mutate, isPending } = useMutation();
   const [fileUri, setFileUri] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
-  const downloadCheckTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null
-  );
   const isMountedRef = useRef(true);
+  const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: file, isLoading } = useNodeQuery<LocalFileNode>(userId, fileId, 'file');
+
+  useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (downloadTimerRef.current) {
+        clearTimeout(downloadTimerRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     let cancelled = false;
@@ -68,30 +78,20 @@ export default function FileScreen() {
         setFileUri(exists ? path : null);
       }
     });
-
     return () => {
       cancelled = true;
     };
   }, [file, userId, appService]);
 
-  useEffect(() => {
-    return () => {
-      isMountedRef.current = false;
-      if (downloadCheckTimeoutRef.current) {
-        clearTimeout(downloadCheckTimeoutRef.current);
-      }
-    };
-  }, []);
-
   const handleDownload = () => {
     if (!file || downloading || isPending) return;
 
     const path = appService.path.workspaceFile(userId, file.id, file.extension);
-    if (downloadCheckTimeoutRef.current) {
-      clearTimeout(downloadCheckTimeoutRef.current);
-      downloadCheckTimeoutRef.current = null;
-    }
     setDownloading(true);
+    if (downloadTimerRef.current) {
+      clearTimeout(downloadTimerRef.current);
+      downloadTimerRef.current = null;
+    }
 
     mutate({
       input: {
@@ -101,14 +101,15 @@ export default function FileScreen() {
         path,
       },
       async onSuccess() {
-        // Poll briefly for the file to appear (download happens async)
         let attempts = 0;
+
         const check = async () => {
           if (!isMountedRef.current) {
             return;
           }
 
           const exists = await appService.fs.exists(path);
+
           if (!isMountedRef.current) {
             return;
           }
@@ -116,23 +117,27 @@ export default function FileScreen() {
           if (exists) {
             setFileUri(path);
             setDownloading(false);
-            downloadCheckTimeoutRef.current = null;
-          } else if (attempts < 30) {
+            downloadTimerRef.current = null;
+            return;
+          }
+
+          if (attempts < 30) {
             attempts++;
-            downloadCheckTimeoutRef.current = setTimeout(() => {
+            downloadTimerRef.current = setTimeout(() => {
               void check();
             }, 1000);
           } else {
             setDownloading(false);
-            downloadCheckTimeoutRef.current = null;
+            downloadTimerRef.current = null;
           }
         };
+
         await check();
       },
       onError() {
-        if (downloadCheckTimeoutRef.current) {
-          clearTimeout(downloadCheckTimeoutRef.current);
-          downloadCheckTimeoutRef.current = null;
+        if (downloadTimerRef.current) {
+          clearTimeout(downloadTimerRef.current);
+          downloadTimerRef.current = null;
         }
 
         if (isMountedRef.current) {
@@ -140,6 +145,43 @@ export default function FileScreen() {
         }
       },
     });
+  };
+
+  const handleOpen = async () => {
+    if (!fileUri) {
+      return;
+    }
+
+    try {
+      const canOpen = await Linking.canOpenURL(fileUri);
+      if (!canOpen) {
+        Alert.alert('Open Failed', 'This file cannot be opened on this device.');
+        return;
+      }
+
+      await Linking.openURL(fileUri);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to open file.';
+      Alert.alert('Open Failed', message);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!fileUri) {
+      return;
+    }
+
+    try {
+      await Share.share({
+        url: fileUri,
+        message: file?.originalName ?? file?.name ?? 'Colanode file',
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to share file.';
+      Alert.alert('Share Failed', message);
+    }
   };
 
   if (isLoading) {
@@ -205,6 +247,48 @@ export default function FileScreen() {
 
         {file && (
           <View style={styles.infoSection}>
+            {fileUri && (
+              <View style={styles.actionsRow}>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.actionButton,
+                    { backgroundColor: colors.primary },
+                    pressed && styles.actionButtonPressed,
+                  ]}
+                  onPress={handleOpen}
+                >
+                  <Feather name="external-link" size={18} color={colors.text} />
+                  <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                    Open
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.secondaryActionButton,
+                    {
+                      backgroundColor: colors.surface,
+                      borderColor: colors.border,
+                    },
+                    pressed && styles.actionButtonPressed,
+                  ]}
+                  onPress={handleShare}
+                >
+                  <Feather
+                    name="share"
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.actionButtonText,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
+                    Share
+                  </Text>
+                </Pressable>
+              </View>
+            )}
             <View style={[styles.infoRow, { backgroundColor: colors.surface }]}>
               <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Name</Text>
               <Text style={[styles.infoValue, { color: colors.text }]} numberOfLines={2}>
@@ -309,6 +393,37 @@ const styles = StyleSheet.create({
   },
   infoSection: {
     gap: 2,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 8,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 10,
+    paddingVertical: 12,
+  },
+  secondaryActionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 10,
+    paddingVertical: 12,
+    borderWidth: 1,
+  },
+  actionButtonPressed: {
+    opacity: 0.8,
+  },
+  actionButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
   },
   infoRow: {
     flexDirection: 'row',

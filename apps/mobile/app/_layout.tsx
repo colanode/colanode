@@ -2,7 +2,7 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { modelName } from 'expo-device';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'react-native';
 
 import { AppMeta, AppService } from '@colanode/client/services';
@@ -13,15 +13,7 @@ import {
   AppServiceContext,
   useAppService,
 } from '@colanode/mobile/contexts/app-service';
-import {
-  DEFAULT_THEME_PREFERENCE,
-  isThemePreference,
-  ThemePreference,
-  ThemeProvider,
-  THEME_PREFERENCE_KEY,
-  THEME_PREFERENCE_NAMESPACE,
-  useTheme,
-} from '@colanode/mobile/contexts/theme';
+import { ThemeProvider, useTheme } from '@colanode/mobile/contexts/theme';
 import { copyAssets } from '@colanode/mobile/lib/assets';
 import { buildQueryClient } from '@colanode/mobile/lib/query-client';
 import { MobileFileSystem } from '@colanode/mobile/services/file-system';
@@ -42,9 +34,6 @@ function ThemeStatusBar() {
 export default function RootLayout() {
   const [appService, setAppService] = useState<AppService | null>(null);
   const [queryClient, setQueryClient] = useState<QueryClient | null>(null);
-  const [themePreference, setThemePreference] = useState<ThemePreference>(
-    DEFAULT_THEME_PREFERENCE
-  );
   const [ready, setReady] = useState(false);
   const [initError, setInitError] = useState<string | null>(null);
   const [initAttempt, setInitAttempt] = useState(0);
@@ -52,11 +41,13 @@ export default function RootLayout() {
   useEffect(() => {
     let cancelled = false;
 
-    const initializeApp = async () => {
-      setReady(false);
-      setInitError(null);
-
+    (async () => {
       try {
+        setInitError(null);
+        setReady(false);
+        setAppService(null);
+        setQueryClient(null);
+
         const paths = new MobilePathService();
         await copyAssets(paths);
 
@@ -72,29 +63,7 @@ export default function RootLayout() {
           paths
         );
 
-        await service.migrate();
         await service.init();
-
-        const storedThemePreference = await service.metadata.get(
-          THEME_PREFERENCE_NAMESPACE,
-          THEME_PREFERENCE_KEY
-        );
-
-        let nextThemePreference = DEFAULT_THEME_PREFERENCE;
-        if (storedThemePreference) {
-          try {
-            const parsedPreference = JSON.parse(storedThemePreference.value);
-            if (isThemePreference(parsedPreference)) {
-              nextThemePreference = parsedPreference;
-            }
-          } catch {
-            // Ignore corrupted theme preference and fall back to default
-          }
-        }
-
-        // Add default Colanode servers (idempotent — skips if already present)
-        await service.createServer(new URL('https://eu.colanode.com/config'));
-        await service.createServer(new URL('https://us.colanode.com/config'));
 
         const client = buildQueryClient(service.mediator);
 
@@ -102,71 +71,51 @@ export default function RootLayout() {
           return;
         }
 
-        setThemePreference(nextThemePreference);
         setAppService(service);
         setQueryClient(client);
         setReady(true);
+
+        // Seed default public servers without blocking app startup.
+        void Promise.allSettled([
+          service.createServer(new URL('https://eu.colanode.com/config')),
+          service.createServer(new URL('https://us.colanode.com/config')),
+        ]).catch((error) => {
+          console.error('Failed to seed default servers:', error);
+        });
       } catch (error) {
         console.error('Failed to initialize AppService:', error);
-        if (cancelled) {
-          return;
+        if (!cancelled) {
+          setInitError(
+            error instanceof Error ? error.message : 'Failed to initialize app.'
+          );
         }
-
-        setAppService(null);
-        setQueryClient(null);
-        setInitError(
-          error instanceof Error
-            ? error.message
-            : 'Failed to initialize the mobile app.'
-        );
       } finally {
-        await SplashScreen.hideAsync();
+        if (!cancelled) {
+          await SplashScreen.hideAsync();
+        }
       }
-    };
-
-    void initializeApp();
+    })();
 
     return () => {
       cancelled = true;
     };
   }, [initAttempt]);
 
-  const handleRetry = useCallback(() => {
-    setInitAttempt((current) => current + 1);
-  }, []);
-
-  const handleThemePreferenceChange = useCallback(
-    async (preference: ThemePreference) => {
-      if (appService) {
-        try {
-          await appService.metadata.set(
-            THEME_PREFERENCE_NAMESPACE,
-            THEME_PREFERENCE_KEY,
-            preference
-          );
-        } catch (error: unknown) {
-          console.error('Failed to persist theme preference:', error);
-          return;
-        }
-      }
-
-      setThemePreference(preference);
-    },
-    [appService]
-  );
-
   if (initError) {
     return (
-      <ThemeProvider initialPreference={themePreference}>
+      <ThemeProvider>
         <ThemeStatusBar />
-        <ErrorState message={initError} onRetry={handleRetry} />
+        <ErrorState
+          message={initError}
+          onRetry={() => setInitAttempt((current) => current + 1)}
+        />
       </ThemeProvider>
     );
   }
 
   if (!ready || !appService || !queryClient) {
     return (
-      <ThemeProvider initialPreference={themePreference}>
+      <ThemeProvider>
         <ThemeStatusBar />
         <LoadingScreen />
       </ThemeProvider>
@@ -174,10 +123,7 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider
-      initialPreference={themePreference}
-      onPreferenceChange={handleThemePreferenceChange}
-    >
+    <ThemeProvider>
       <ThemeStatusBar />
       <AppServiceContext.Provider value={{ appService }}>
         <QueryClientProvider client={queryClient}>

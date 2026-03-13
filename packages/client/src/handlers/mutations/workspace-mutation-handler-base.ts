@@ -12,6 +12,20 @@ export abstract class WorkspaceMutationHandlerBase {
 
   protected getWorkspace(userId: string): WorkspaceService {
     const workspace = this.app.getWorkspace(userId);
+    return this.ensureWorkspaceIsWritable(workspace);
+  }
+
+  protected getWorkspaceByReference(
+    accountId: string,
+    workspaceId: string
+  ): WorkspaceService {
+    const workspace = this.app.getWorkspaceByReference(accountId, workspaceId);
+    return this.ensureWorkspaceIsWritable(workspace);
+  }
+
+  private ensureWorkspaceIsWritable(
+    workspace: WorkspaceService | null
+  ): WorkspaceService {
     if (!workspace) {
       throw new MutationError(
         MutationErrorCode.WorkspaceNotFound,
