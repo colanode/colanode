@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
 import { Image, ImageStyle, StyleSheet, Text, View, ViewStyle } from 'react-native';
 
-import { useAppService } from '@colanode/mobile/contexts/app-service';
+import { useWorkspace } from '@colanode/mobile/contexts/workspace';
+import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 
 interface UserAvatarProps {
   name: string;
@@ -47,29 +47,21 @@ export const UserAvatar = ({
   size = 40,
   style,
 }: UserAvatarProps) => {
-  const { appService } = useAppService();
-  const [avatarUri, setAvatarUri] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (!avatar) {
-      setAvatarUri(null);
-      return;
-    }
-
-    const path = appService.path.avatar(avatar);
-    appService.fs.exists(path).then((exists) => {
-      if (exists) {
-        setAvatarUri(path);
-      } else {
-        setAvatarUri(null);
-      }
-    });
-  }, [avatar, appService]);
+  const { accountId } = useWorkspace();
+  const { data: resolvedAvatar } = useLiveQuery(
+    {
+      type: 'avatar.get',
+      accountId,
+      avatarId: avatar ?? '',
+    },
+    { enabled: !!avatar }
+  );
 
   const color = getColor(name);
   const initials = getInitials(name);
   const fontSize = size * 0.4;
   const borderRadius = size * 0.25;
+  const avatarUri = resolvedAvatar?.url ?? null;
 
   if (avatarUri) {
     return (

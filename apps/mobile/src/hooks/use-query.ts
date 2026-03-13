@@ -2,9 +2,8 @@ import {
   useQuery as useTanstackQuery,
   UseQueryOptions as TanstackUseQueryOptions,
 } from '@tanstack/react-query';
-import { sha256 } from 'js-sha256';
 
-import { QueryInput, QueryMap } from '@colanode/client/queries';
+import { buildQueryKey, QueryInput, QueryMap } from '@colanode/client/queries';
 
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 
@@ -18,11 +17,10 @@ export const useQuery = <T extends QueryInput>(
   options?: UseQueryOptions<T>
 ) => {
   const { appService } = useAppService();
-  const inputJson = JSON.stringify(input);
-  const hash = sha256(inputJson);
+  const key = buildQueryKey(input);
 
   return useTanstackQuery({
-    queryKey: [hash],
+    queryKey: [key],
     queryFn: () => appService.mediator.executeQuery(input),
     ...options,
   });

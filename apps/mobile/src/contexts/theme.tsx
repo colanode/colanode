@@ -17,7 +17,7 @@ interface ThemeContextValue {
   colors: ThemeColors;
   scheme: ColorScheme;
   preference: ThemePreference;
-  setScheme: (scheme: ThemePreference) => void;
+  setScheme: (scheme: ThemePreference) => Promise<void>;
 }
 
 const ThemeContext = createContext<ThemeContextValue | null>(null);
@@ -51,13 +51,15 @@ const readStoredPreference = async (): Promise<ThemePreference | null> => {
 
 const writeStoredPreference = async (
   preference: ThemePreference
-): Promise<void> => {
+): Promise<boolean> => {
   try {
     await THEME_PREFERENCE_FILE.write(JSON.stringify({ preference }));
+    return true;
   } catch (error) {
     if (__DEV__) {
       console.warn('Failed to persist theme preference:', error);
     }
+    return false;
   }
 };
 
@@ -88,11 +90,19 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const colors = resolvedScheme === 'dark' ? darkColors : lightColors;
 
   const setScheme = useCallback(
-    (scheme: ThemePreference) => {
+    async (scheme: ThemePreference) => {
+      if (scheme === preference) {
+        return;
+      }
+
+      const persisted = await writeStoredPreference(scheme);
+      if (!persisted) {
+        return;
+      }
+
       setPreference(scheme);
-      void writeStoredPreference(scheme);
     },
-    []
+    [preference]
   );
 
   return (

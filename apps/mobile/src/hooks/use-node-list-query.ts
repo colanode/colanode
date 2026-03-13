@@ -1,9 +1,9 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
-import { sha256 } from 'js-sha256';
 
 import { eventBus } from '@colanode/client/lib';
 import { Event } from '@colanode/client/types';
+import { buildQueryKey } from '@colanode/client/queries';
 import { NodeListQueryInput } from '@colanode/client/queries/nodes/node-list';
 import { LocalNode } from '@colanode/client/types/nodes';
 
@@ -32,7 +32,7 @@ export const useNodeListQuery = <T extends LocalNode = LocalNode>(
     [userId, JSON.stringify(filters), JSON.stringify(sorts), limit]
   );
 
-  const key = useMemo(() => sha256(JSON.stringify(input)), [input]);
+  const key = useMemo(() => buildQueryKey(input), [input]);
 
   useEffect(() => {
     const subscriptionId = eventBus.subscribe((event: Event) => {
@@ -48,21 +48,23 @@ export const useNodeListQuery = <T extends LocalNode = LocalNode>(
 
       // Check if every filter matches the event node.
       // If no filters match a specific field, we consider it relevant.
-      const isRelevant = filters.every((filter) => {
-        const field = getFieldName(filter.field);
+      const isRelevant = filters.every(
+        (filter: NodeListQueryInput['filters'][number]) => {
+          const field = getFieldName(filter.field);
 
-        if (field === 'parentId' && filter.operator === 'eq') {
-          return node.parentId === filter.value;
+          if (field === 'parentId' && filter.operator === 'eq') {
+            return node.parentId === filter.value;
+          }
+          if (field === 'type' && filter.operator === 'eq') {
+            return node.type === filter.value;
+          }
+          if (field === 'rootId' && filter.operator === 'eq') {
+            return node.rootId === filter.value;
+          }
+          // For unrecognized fields, assume it could match
+          return true;
         }
-        if (field === 'type' && filter.operator === 'eq') {
-          return node.type === filter.value;
-        }
-        if (field === 'rootId' && filter.operator === 'eq') {
-          return node.rootId === filter.value;
-        }
-        // For unrecognized fields, assume it could match
-        return true;
-      });
+      );
 
       if (isRelevant) {
         queryClient.invalidateQueries({ queryKey: [key] });

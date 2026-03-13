@@ -65,7 +65,13 @@ export default function FileScreen() {
   useEffect(() => {
     let cancelled = false;
 
-    if (!file) return;
+    if (!file) {
+      setFileUri(null);
+      return () => {
+        cancelled = true;
+      };
+    }
+
     const path = appService.path.workspaceFile(userId, file.id, file.extension);
     appService.fs.exists(path).then((exists: boolean) => {
       if (!cancelled && isMountedRef.current) {
@@ -84,6 +90,7 @@ export default function FileScreen() {
     setDownloading(true);
     if (downloadTimerRef.current) {
       clearTimeout(downloadTimerRef.current);
+      downloadTimerRef.current = null;
     }
 
     mutate({
@@ -97,6 +104,10 @@ export default function FileScreen() {
         let attempts = 0;
 
         const check = async () => {
+          if (!isMountedRef.current) {
+            return;
+          }
+
           const exists = await appService.fs.exists(path);
 
           if (!isMountedRef.current) {
@@ -106,6 +117,7 @@ export default function FileScreen() {
           if (exists) {
             setFileUri(path);
             setDownloading(false);
+            downloadTimerRef.current = null;
             return;
           }
 
@@ -116,12 +128,18 @@ export default function FileScreen() {
             }, 1000);
           } else {
             setDownloading(false);
+            downloadTimerRef.current = null;
           }
         };
 
         await check();
       },
       onError() {
+        if (downloadTimerRef.current) {
+          clearTimeout(downloadTimerRef.current);
+          downloadTimerRef.current = null;
+        }
+
         if (isMountedRef.current) {
           setDownloading(false);
         }

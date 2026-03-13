@@ -12,23 +12,24 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { generateId, IdType } from '@colanode/core';
+import { generateId, hasWorkspaceRole, IdType } from '@colanode/core';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 
 export default function CreateSpaceScreen() {
   const router = useRouter();
-  const { userId } = useWorkspace();
+  const { userId, role } = useWorkspace();
   const { mutate, isPending } = useMutation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
+  const canCreateSpace = hasWorkspaceRole(role, 'collaborator');
 
   const handleCreate = () => {
     const trimmedName = name.trim();
-    if (!trimmedName) return;
+    if (!trimmedName || !canCreateSpace) return;
 
     const nodeId = generateId(IdType.Space);
 
@@ -66,13 +67,15 @@ export default function CreateSpaceScreen() {
         <Text style={[styles.headerTitle, { color: colors.text }]}>New Space</Text>
         <Pressable
           onPress={handleCreate}
-          disabled={!name.trim() || isPending}
+          disabled={!name.trim() || isPending || !canCreateSpace}
         >
           <Text
             style={[
               styles.createText,
               { color: colors.primary },
-              (!name.trim() || isPending) && { color: colors.borderSubtle },
+              (!name.trim() || isPending || !canCreateSpace) && {
+                color: colors.borderSubtle,
+              },
             ]}
           >
             {isPending ? 'Creating...' : 'Create'}
@@ -106,6 +109,11 @@ export default function CreateSpaceScreen() {
             maxLength={500}
           />
         </View>
+        {!canCreateSpace && (
+          <Text style={[styles.permissionNote, { color: colors.textMuted }]}>
+            You do not have permission to create spaces in this workspace.
+          </Text>
+        )}
       </View>
     </KeyboardAvoidingView>
   );
@@ -157,5 +165,9 @@ const styles = StyleSheet.create({
   textArea: {
     minHeight: 80,
     textAlignVertical: 'top',
+  },
+  permissionNote: {
+    fontSize: 14,
+    lineHeight: 20,
   },
 });
