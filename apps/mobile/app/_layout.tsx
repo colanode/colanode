@@ -115,9 +115,7 @@ function RootNavigator() {
       }
     } else if (workspaces.length > 0) {
       // Has account + workspace -> go to app
-      if (inAuthGroup || (segments as string[]).length === 0) {
-        router.replace('/(app)/(home)');
-      }
+      router.replace('/(app)/(home)');
     } else {
       // Has account but no workspace -> create workspace
       const firstAccount = accounts[0]!;
