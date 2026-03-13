@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -34,6 +34,10 @@ export default function AccountSettingsScreen() {
 
   const [name, setName] = useState(account?.name ?? '');
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    setName(account?.name ?? '');
+  }, [account?.id, account?.name]);
 
   const handleSave = () => {
     const trimmed = name.trim();

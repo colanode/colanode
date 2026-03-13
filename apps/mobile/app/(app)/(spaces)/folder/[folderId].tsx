@@ -64,7 +64,7 @@ export default function FolderScreen() {
         onOpenChild={(node) => navigateToNode(router, node)}
         onLongPressChild={canDelete ? (node) => setActionNode(node) : undefined}
         emptyTitle="Empty folder"
-        emptySubtitle="Tap + to add content"
+        emptySubtitle="Use the upload button to add content"
       />
       <NodeActionSheet
         visible={actionNode !== null}

@@ -1,10 +1,13 @@
 import Feather from '@expo/vector-icons/Feather';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Image,
+  Linking,
   Pressable,
+  Share,
   ScrollView,
   StyleSheet,
   Text,
@@ -45,15 +48,33 @@ export default function FileScreen() {
   const { mutate, isPending } = useMutation();
   const [fileUri, setFileUri] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const isMountedRef = useRef(true);
+  const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: file, isLoading } = useNodeQuery<LocalFileNode>(userId, fileId, 'file');
 
   useEffect(() => {
+    return () => {
+      isMountedRef.current = false;
+      if (downloadTimerRef.current) {
+        clearTimeout(downloadTimerRef.current);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
     if (!file) return;
     const path = appService.path.workspaceFile(userId, file.id, file.extension);
-    appService.fs.exists(path).then((exists) => {
-      setFileUri(exists ? path : null);
+    appService.fs.exists(path).then((exists: boolean) => {
+      if (!cancelled && isMountedRef.current) {
+        setFileUri(exists ? path : null);
+      }
     });
+    return () => {
+      cancelled = true;
+    };
   }, [file, userId, appService]);
 
   const handleDownload = () => {
@@ -61,6 +82,9 @@ export default function FileScreen() {
 
     const path = appService.path.workspaceFile(userId, file.id, file.extension);
     setDownloading(true);
+    if (downloadTimerRef.current) {
+      clearTimeout(downloadTimerRef.current);
+    }
 
     mutate({
       input: {
@@ -70,26 +94,76 @@ export default function FileScreen() {
         path,
       },
       async onSuccess() {
-        // Poll briefly for the file to appear (download happens async)
         let attempts = 0;
+
         const check = async () => {
           const exists = await appService.fs.exists(path);
+
+          if (!isMountedRef.current) {
+            return;
+          }
+
           if (exists) {
             setFileUri(path);
             setDownloading(false);
-          } else if (attempts < 30) {
+            return;
+          }
+
+          if (attempts < 30) {
             attempts++;
-            setTimeout(check, 1000);
+            downloadTimerRef.current = setTimeout(() => {
+              void check();
+            }, 1000);
           } else {
             setDownloading(false);
           }
         };
+
         await check();
       },
       onError() {
-        setDownloading(false);
+        if (isMountedRef.current) {
+          setDownloading(false);
+        }
       },
     });
+  };
+
+  const handleOpen = async () => {
+    if (!fileUri) {
+      return;
+    }
+
+    try {
+      const canOpen = await Linking.canOpenURL(fileUri);
+      if (!canOpen) {
+        Alert.alert('Open Failed', 'This file cannot be opened on this device.');
+        return;
+      }
+
+      await Linking.openURL(fileUri);
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to open file.';
+      Alert.alert('Open Failed', message);
+    }
+  };
+
+  const handleShare = async () => {
+    if (!fileUri) {
+      return;
+    }
+
+    try {
+      await Share.share({
+        url: fileUri,
+        message: file?.originalName ?? file?.name ?? 'Colanode file',
+      });
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to share file.';
+      Alert.alert('Share Failed', message);
+    }
   };
 
   if (isLoading) {
@@ -155,6 +229,48 @@ export default function FileScreen() {
 
         {file && (
           <View style={styles.infoSection}>
+            {fileUri && (
+              <View style={styles.actionsRow}>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.actionButton,
+                    { backgroundColor: colors.primary },
+                    pressed && styles.actionButtonPressed,
+                  ]}
+                  onPress={handleOpen}
+                >
+                  <Feather name="external-link" size={18} color={colors.text} />
+                  <Text style={[styles.actionButtonText, { color: colors.text }]}>
+                    Open
+                  </Text>
+                </Pressable>
+                <Pressable
+                  style={({ pressed }) => [
+                    styles.secondaryActionButton,
+                    {
+                      backgroundColor: colors.surface,
+                      borderColor: colors.border,
+                    },
+                    pressed && styles.actionButtonPressed,
+                  ]}
+                  onPress={handleShare}
+                >
+                  <Feather
+                    name="share"
+                    size={18}
+                    color={colors.textSecondary}
+                  />
+                  <Text
+                    style={[
+                      styles.actionButtonText,
+                      { color: colors.textSecondary },
+                    ]}
+                  >
+                    Share
+                  </Text>
+                </Pressable>
+              </View>
+            )}
             <View style={[styles.infoRow, { backgroundColor: colors.surface }]}>
               <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Name</Text>
               <Text style={[styles.infoValue, { color: colors.text }]} numberOfLines={2}>
@@ -259,6 +375,37 @@ const styles = StyleSheet.create({
   },
   infoSection: {
     gap: 2,
+  },
+  actionsRow: {
+    flexDirection: 'row',
+    gap: 12,
+    marginBottom: 8,
+  },
+  actionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 10,
+    paddingVertical: 12,
+  },
+  secondaryActionButton: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    borderRadius: 10,
+    paddingVertical: 12,
+    borderWidth: 1,
+  },
+  actionButtonPressed: {
+    opacity: 0.8,
+  },
+  actionButtonText: {
+    fontSize: 15,
+    fontWeight: '600',
   },
   infoRow: {
     flexDirection: 'row',

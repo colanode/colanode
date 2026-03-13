@@ -17,6 +17,12 @@ export class UserService {
       `Upserting user ${user.id} in workspace ${this.workspace.workspaceId}`
     );
 
+    const existingUser = await this.workspace.database
+      .selectFrom('users')
+      .select('id')
+      .where('id', '=', user.id)
+      .executeTakeFirst();
+
     const createdUser = await this.workspace.database
       .insertInto('users')
       .returningAll()
@@ -52,7 +58,7 @@ export class UserService {
 
     if (createdUser) {
       eventBus.publish({
-        type: 'user.created',
+        type: existingUser ? 'user.updated' : 'user.created',
         workspace: {
           workspaceId: this.workspace.workspaceId,
           userId: this.workspace.userId,
@@ -68,6 +74,12 @@ export class UserService {
       `Syncing server user ${user.id} in workspace ${this.workspace.workspaceId}`
     );
 
+    const existingUser = await this.workspace.database
+      .selectFrom('users')
+      .select('id')
+      .where('id', '=', user.id)
+      .executeTakeFirst();
+
     const createdUser = await this.workspace.database
       .insertInto('users')
       .returningAll()
@@ -103,7 +115,7 @@ export class UserService {
 
     if (createdUser) {
       eventBus.publish({
-        type: 'user.created',
+        type: existingUser ? 'user.updated' : 'user.created',
         workspace: {
           workspaceId: this.workspace.workspaceId,
           userId: this.workspace.userId,

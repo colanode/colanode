@@ -1,5 +1,5 @@
 import Feather from '@expo/vector-icons/Feather';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   FlatList,
@@ -45,8 +45,17 @@ export const EmojiPicker = ({ visible, onClose, onSelect }: EmojiPickerProps) =>
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (!visible) {
+      setSearchQuery('');
+      setSelectedCategory(null);
+    }
+  }, [visible]);
+
   const { data: categories } = useQuery({
     type: 'emoji.category.list',
+  }, {
+    enabled: visible,
   });
 
   const activeCategory = selectedCategory ?? categories?.[0]?.id ?? '';
@@ -58,7 +67,7 @@ export const EmojiPicker = ({ visible, onClose, onSelect }: EmojiPickerProps) =>
       page: 0,
       count: 200,
     },
-    { enabled: activeCategory.length > 0 }
+    { enabled: visible && activeCategory.length > 0 }
   );
 
   const { data: searchResults } = useQuery(
@@ -67,7 +76,7 @@ export const EmojiPicker = ({ visible, onClose, onSelect }: EmojiPickerProps) =>
       query: searchQuery,
       count: 50,
     },
-    { enabled: searchQuery.length > 1 }
+    { enabled: visible && searchQuery.length > 1 }
   );
 
   const emojis = searchQuery.length > 1 ? searchResults : categoryEmojis;

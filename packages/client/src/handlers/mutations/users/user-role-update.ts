@@ -15,7 +15,10 @@ export class UserRoleUpdateMutationHandler
   async handleMutation(
     input: UserRoleUpdateMutationInput
   ): Promise<UserRoleUpdateMutationOutput> {
-    const workspace = this.getWorkspace(input.userId);
+    const workspace = this.getWorkspaceByReference(
+      input.accountId,
+      input.workspaceId
+    );
 
     try {
       const body: UserRoleUpdateInput = {
