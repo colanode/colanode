@@ -48,5 +48,8 @@
     "expo": "~54.0.33",
     "react": "19.1.0",
     "react-native": "0.81.5"
+  },
+  "overrides": {
+    "react-dom": "19.1.0"
   }
 }
