@@ -1,7 +1,7 @@
 import { QueryClient } from '@tanstack/react-query';
 
-import { eventBus } from '@colanode/client/lib';
 import { Mediator } from '@colanode/client/handlers';
+import { eventBus } from '@colanode/client/lib';
 import { Event } from '@colanode/client/types';
 import { MOBILE_WINDOW_ID } from '@colanode/mobile/lib/constants';
 

@@ -37,9 +37,8 @@ export default function FolderScreen() {
     [{ field: ['createdAt'], direction: 'asc', nulls: 'last' }]
   );
 
-  const nodeRole = useNodeRole(userId, folder?.rootId);
+  const { role: nodeRole, canEdit: canRename } = useNodeRole(userId, folder);
   const canDelete = nodeRole !== null && hasNodeRole(nodeRole, 'admin');
-  const canRename = nodeRole !== null && hasNodeRole(nodeRole, 'editor');
   const canUploadFiles = canRename;
 
   return (

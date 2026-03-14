@@ -115,8 +115,8 @@ export class FileDownloadJobHandler implements JobHandler<FileDownloadInput> {
         }
       );
 
-      const writeStream = await this.app.fs.writeStream(download.path);
-      await response.body?.pipeTo(writeStream);
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      await this.app.fs.writeFile(download.path, bytes);
 
       await this.updateDownload(workspace, download.id, {
         status: DownloadStatus.Completed,

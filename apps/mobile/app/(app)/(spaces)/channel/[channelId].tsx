@@ -13,13 +13,13 @@ export default function ChannelScreen() {
   const { userId } = useWorkspace();
 
   const { data: channel } = useNodeQuery<LocalChannelNode>(userId, channelId, 'channel');
-  const nodeRole = useNodeRole(userId, channel?.rootId);
-  const canRename = nodeRole !== null && hasNodeRole(nodeRole, 'editor');
+  const { role: nodeRole, canEdit: canRename } = useNodeRole(userId, channel);
+  const isAdmin = nodeRole !== null && hasNodeRole(nodeRole, 'admin');
 
   return (
     <ConversationScreen
       nodeId={channelId!}
-      rootId={channel?.rootId}
+      isAdmin={isAdmin}
       title={`# ${channel?.name ?? 'Channel'}`}
       onGoBack={() => router.back()}
       renamableNode={canRename ? channel : undefined}

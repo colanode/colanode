@@ -4,7 +4,6 @@ import {
 } from '@tanstack/react-query';
 
 import { buildQueryKey, QueryInput, QueryMap } from '@colanode/client/queries';
-
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 
 type UseQueryOptions<T extends QueryInput> = Omit<

@@ -52,8 +52,9 @@ export class YDoc {
     schema: z.ZodSchema,
     object: z.infer<typeof schema>
   ): Uint8Array | null {
-    if (!schema.safeParse(object).success) {
-      throw new Error('Invalid object', schema.safeParse(object).error);
+    const objectParseResult = schema.safeParse(object);
+    if (!objectParseResult.success) {
+      throw new Error(`Invalid object: ${objectParseResult.error.message}`);
     }
 
     const objectSchema = this.extractType(schema, object);
@@ -74,7 +75,7 @@ export class YDoc {
 
       const parseResult = schema.safeParse(objectMap.toJSON());
       if (!parseResult.success) {
-        throw new Error('Invalid object', parseResult.error);
+        throw new Error(`Invalid object: ${parseResult.error.message}`);
       }
     }, ORIGIN);
 

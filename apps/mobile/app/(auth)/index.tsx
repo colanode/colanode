@@ -8,8 +8,8 @@ import {
   View,
 } from 'react-native';
 
-import { isColanodeDomain } from '@colanode/core';
 import { Server } from '@colanode/client/types';
+import { isColanodeDomain } from '@colanode/core';
 import { ServerCard } from '@colanode/mobile/components/auth/server-card';
 import { AnimatedLogo } from '@colanode/mobile/components/ui/animated-logo';
 import { EmptyState } from '@colanode/mobile/components/ui/empty-state';
