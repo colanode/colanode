@@ -50,38 +50,39 @@ export const PageBlockRow = forwardRef<BlockRowRef, PageBlockRowProps>(
       isFocused: () => inputRef.current?.isFocused() ?? false,
     }));
 
-    // Non-editable blocks: render with BlockRenderer using original block data
+    // Non-editable blocks: render with full BlockRenderer (rich previews for files, pages, etc.)
     if (!block.editable) {
       const originalBlock = originalBlocks[block.id];
-      if (originalBlock) {
-        const allBlocks = Object.values(originalBlocks);
-        const contents = mapBlocksToContents(block.id, allBlocks);
-        const jsonContent = {
-          type: originalBlock.type,
-          attrs: { id: originalBlock.id, ...(originalBlock.attrs ?? {}) },
-          content: contents.length > 0 ? contents : undefined,
-        };
-        // For leaf blocks, map content from the block's leafs
-        if (originalBlock.content && originalBlock.content.length > 0) {
-          jsonContent.content = originalBlock.content.map((leaf) => ({
-            type: leaf.type,
-            ...(leaf.text && { text: leaf.text }),
-            ...(leaf.attrs && { attrs: leaf.attrs }),
-            ...(leaf.marks?.length && {
-              marks: leaf.marks.map((m) => ({
-                type: m.type,
-                ...(m.attrs && { attrs: m.attrs }),
-              })),
-            }),
-          }));
-        }
-        return (
-          <View style={styles.readOnlyRow}>
-            <BlockRenderer content={jsonContent} />
-          </View>
-        );
+      if (!originalBlock) return null;
+
+      const allBlocks = Object.values(originalBlocks);
+      const childContents = mapBlocksToContents(block.id, allBlocks);
+
+      // Build JSONContent matching what BlockRenderer expects
+      const jsonContent: Record<string, any> = {
+        type: originalBlock.type,
+        attrs: { id: originalBlock.id, ...(originalBlock.attrs ?? {}) },
+      };
+
+      // Leaf blocks: convert block leafs to inline content
+      if (originalBlock.content && originalBlock.content.length > 0) {
+        jsonContent.content = originalBlock.content.map((leaf) => ({
+          type: leaf.type,
+          ...(leaf.text && { text: leaf.text }),
+          ...(leaf.attrs && { attrs: leaf.attrs }),
+          ...(leaf.marks?.length && {
+            marks: leaf.marks.map((m) => ({
+              type: m.type,
+              ...(m.attrs && { attrs: m.attrs }),
+            })),
+          }),
+        }));
+      } else if (childContents.length > 0) {
+        // Container blocks: use child contents
+        jsonContent.content = childContents;
       }
-      return null;
+
+      return <BlockRenderer content={jsonContent} />;
     }
 
     const handleKeyPress = (e: NativeSyntheticEvent<TextInputKeyPressEventData>) => {
@@ -207,9 +208,6 @@ const styles = StyleSheet.create({
   },
   blockquoteText: {
     fontStyle: 'italic',
-  },
-  readOnlyRow: {
-    marginVertical: 2,
   },
   hr: {
     height: 1,
