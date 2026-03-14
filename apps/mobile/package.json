@@ -10,10 +10,13 @@
     "lint": "eslint app src --ext .ts,.tsx --max-warnings 0",
     "start": "expo start",
     "android": "expo run:android",
-    "ios": "expo run:ios"
+    "ios": "expo run:ios",
+    "build:editor": "vite build --config vite.editor.config.js",
+    "dev:editor": "vite --config vite.editor.config.js"
   },
   "dependencies": {
     "@react-native-community/netinfo": "11.4.1",
+    "react-native-webview": "^13.12.5",
     "@tanstack/react-query": "^5.80.7",
     "expo": "~54.0.33",
     "expo-asset": "~12.0.12",
@@ -36,9 +39,14 @@
     "react-native-svg": "^15.12.1"
   },
   "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
     "@types/react": "~19.1.0",
+    "@vitejs/plugin-react": "^4.5.2",
     "babel-preset-expo": "~54.0.10",
-    "typescript": "~5.9.2"
+    "tailwindcss": "^4.1.18",
+    "typescript": "~5.9.2",
+    "vite": "^6.3.5",
+    "vite-plugin-singlefile": "^2.0.3"
   },
   "private": true
 }

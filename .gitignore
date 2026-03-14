@@ -179,6 +179,7 @@ apps/web/public/assets/colanode-logo-192.jpg
 apps/web/public/assets/colanode-logo-512.jpg
 
 # Ignore mobile assets
+apps/mobile/assets/editor-dist/
 apps/mobile/assets/ui/index.html
 apps/mobile/assets/emojis.db
 apps/mobile/assets/icons.db
