@@ -24,6 +24,12 @@ const emptyModule = path.resolve(__dirname, 'src/mocks/empty-module.js');
 
 const originalResolveRequest = config.resolver.resolveRequest;
 
+// Files containing syntax Hermes cannot compile (e.g. dynamic import with
+// webpack magic comments). Matched against the resolved file path.
+const BLOCKED_FILE_PATTERNS = [
+  /kysely[/\\]dist[/\\].*file-migration-provider/,
+];
+
 config.resolver.resolveRequest = (context, moduleName, platform) => {
   // Empty mocks for browser-only modules
   if (
@@ -47,11 +53,19 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
     }
   }
 
-  if (originalResolveRequest) {
-    return originalResolveRequest(context, moduleName, platform);
+  // Resolve normally first, then check if the result should be blocked
+  const resolution = originalResolveRequest
+    ? originalResolveRequest(context, moduleName, platform)
+    : context.resolveRequest(context, moduleName, platform);
+
+  if (
+    resolution?.type === 'sourceFile' &&
+    BLOCKED_FILE_PATTERNS.some((re) => re.test(resolution.filePath))
+  ) {
+    return { filePath: emptyModule, type: 'sourceFile' };
   }
 
-  return context.resolveRequest(context, moduleName, platform);
+  return resolution;
 };
 
 module.exports = config;
