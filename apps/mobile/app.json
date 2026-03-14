@@ -15,7 +15,10 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.colanode.mobile"
+      "bundleIdentifier": "com.colanode.mobile",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -25,6 +28,16 @@
       "edgeToEdgeEnabled": true,
       "package": "com.colanode.mobile"
     },
-    "plugins": ["expo-asset", "expo-sqlite", "expo-router"]
+    "plugins": [
+      "expo-asset",
+      "expo-sqlite",
+      "expo-router"
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "e96f3607-3c1c-4576-bb48-89ec3166db64"
+      }
+    }
   }
 }
