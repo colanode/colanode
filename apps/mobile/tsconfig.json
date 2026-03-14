@@ -20,10 +20,5 @@
   },
   "exclude": ["node_modules"],
   "extends": "expo/tsconfig.base",
-  "include": ["**/*"],
-  "references": [
-    { "path": "../../packages/core/tsconfig.json" },
-    { "path": "../../packages/crdt/tsconfig.json" },
-    { "path": "../../packages/client/tsconfig.json" }
-  ]
+  "include": ["**/*"]
 }

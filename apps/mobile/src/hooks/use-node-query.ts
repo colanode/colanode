@@ -1,5 +1,4 @@
 import { LocalNode } from '@colanode/client/types/nodes';
-
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
 
 export const useNodeQuery = <T extends LocalNode>(

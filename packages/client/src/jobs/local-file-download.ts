@@ -125,8 +125,8 @@ export class LocalFileDownloadJobHandler
         }
       );
 
-      const writeStream = await this.app.fs.writeStream(localFile.path);
-      await response.body?.pipeTo(writeStream);
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      await this.app.fs.writeFile(localFile.path, bytes);
 
       await this.updateLocalFile(workspace, localFile.id, {
         download_status: DownloadStatus.Completed,
@@ -200,7 +200,8 @@ export class LocalFileDownloadJobHandler
       return;
     }
 
-    const url = await this.app.fs.url(updatedLocalFile.path);
+    const fileExists = await this.app.fs.exists(updatedLocalFile.path);
+    const url = fileExists ? await this.app.fs.url(updatedLocalFile.path) : null;
     eventBus.publish({
       type: 'local.file.updated',
       workspace: {

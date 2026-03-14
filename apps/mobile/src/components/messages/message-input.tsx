@@ -10,13 +10,13 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { LocalMessageNode } from '@colanode/client/types/nodes';
 import {
   Block,
   generateFractionalIndex,
   generateId,
   IdType,
 } from '@colanode/core';
-import { LocalMessageNode } from '@colanode/client/types/nodes';
 import { ReplyTarget } from '@colanode/mobile/components/messages/message-item';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';

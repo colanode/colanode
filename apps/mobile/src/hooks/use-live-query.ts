@@ -4,7 +4,6 @@ import {
 } from '@tanstack/react-query';
 
 import { QueryInput, QueryMap, buildQueryKey } from '@colanode/client/queries';
-
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { MOBILE_WINDOW_ID } from '@colanode/mobile/lib/constants';
 

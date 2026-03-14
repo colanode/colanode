@@ -7,8 +7,8 @@ import {
   View,
 } from 'react-native';
 
-import { NodeAttributes } from '@colanode/core';
 import { LocalNode } from '@colanode/client/types/nodes';
+import { NodeAttributes } from '@colanode/core';
 import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';

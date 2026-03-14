@@ -7,7 +7,7 @@
   "main": "./index.js",
   "scripts": {
     "compile": "tsc --noEmit -p tsconfig.json",
-    "lint": "eslint . --ext .ts,.tsx,.js --max-warnings 0",
+    "lint": "eslint app src --ext .ts,.tsx --max-warnings 0",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios"

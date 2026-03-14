@@ -7,8 +7,8 @@ import {
   ViewStyle,
 } from 'react-native';
 
-import { ThemeColors } from '@colanode/mobile/lib/colors';
 import { useTheme } from '@colanode/mobile/contexts/theme';
+import { ThemeColors } from '@colanode/mobile/lib/colors';
 
 type ButtonVariant = 'primary' | 'secondary' | 'destructive' | 'link';
 
