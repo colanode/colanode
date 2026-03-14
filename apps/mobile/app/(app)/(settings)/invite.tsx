@@ -12,7 +12,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { WorkspaceRole } from '@colanode/core';
+import { hasWorkspaceRole, WorkspaceRole } from '@colanode/core';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
@@ -34,7 +34,8 @@ export default function InviteScreen() {
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const { userId } = useWorkspace();
+  const { userId, role: workspaceRole } = useWorkspace();
+  const canInvite = hasWorkspaceRole(workspaceRole, 'admin');
   const { mutate, isPending } = useMutation();
 
   const [email, setEmail] = useState('');
@@ -123,6 +124,25 @@ export default function InviteScreen() {
       },
     });
   };
+
+  if (!canInvite) {
+    return (
+      <View style={[styles.flex, { backgroundColor: colors.background }]}>
+        <View style={[styles.header, { paddingTop: insets.top + 8 }]}>
+          <BackButton onPress={() => router.back()} />
+          <Text style={[styles.headerTitle, { color: colors.text }]}>
+            Invite Members
+          </Text>
+          <View style={styles.headerSpacer} />
+        </View>
+        <View style={styles.permissionDenied}>
+          <Text style={[styles.permissionDeniedText, { color: colors.textMuted }]}>
+            You do not have permission to invite members.
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <KeyboardAvoidingView
@@ -340,5 +360,15 @@ const styles = StyleSheet.create({
   roleOptionText: {
     fontSize: 14,
     fontWeight: '500',
+  },
+  permissionDenied: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 32,
+  },
+  permissionDeniedText: {
+    fontSize: 15,
+    textAlign: 'center',
   },
 });

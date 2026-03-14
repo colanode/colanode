@@ -58,7 +58,6 @@ const ReadOnlyPageView = ({
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const [showRename, setShowRename] = useState(false);
 
   const { data: document, isLoading, refetch, isRefetching } = useLiveQuery({
     type: 'document.get',
@@ -86,14 +85,11 @@ const ReadOnlyPageView = ({
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: insets.top + 8 }]}>
         <BackButton onPress={() => router.back()} />
-        <Pressable
-          onPress={() => page && setShowRename(true)}
-          style={styles.headerTitleContainer}
-        >
+        <View style={styles.headerTitleContainer}>
           <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
             {page?.name ?? 'Page'}
           </Text>
-        </Pressable>
+        </View>
         <View style={styles.headerSpacer} />
       </View>
       <ScrollView
@@ -109,12 +105,6 @@ const ReadOnlyPageView = ({
           <Text style={[styles.emptyText, { color: colors.textMuted }]}>This page is empty</Text>
         )}
       </ScrollView>
-      <RenameNodeSheet
-        visible={showRename}
-        node={page ?? null}
-        userId={userId}
-        onClose={() => setShowRename(false)}
-      />
     </View>
   );
 };

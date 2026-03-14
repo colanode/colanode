@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalNode, LocalSpaceNode } from '@colanode/client/types/nodes';
-import { hasWorkspaceRole } from '@colanode/core';
+import { extractNodeRole, hasNodeRole } from '@colanode/core';
 import { CreateNodeSheet } from '@colanode/mobile/components/nodes/create-node-sheet';
 import { NodeActionSheet } from '@colanode/mobile/components/nodes/node-action-sheet';
 import { NodeChildList } from '@colanode/mobile/components/nodes/node-child-list';
@@ -22,7 +22,7 @@ export default function SpaceScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { spaceId } = useLocalSearchParams<{ spaceId: string }>();
-  const { userId, role } = useWorkspace();
+  const { userId } = useWorkspace();
   const { colors } = useTheme();
   const [showCreate, setShowCreate] = useState(false);
   const [showRename, setShowRename] = useState(false);
@@ -36,21 +36,31 @@ export default function SpaceScreen() {
     [{ field: ['createdAt'], direction: 'asc', nulls: 'last' }]
   );
 
-  const canDelete = role === 'owner' || role === 'admin';
-  const canCreateChildren = hasWorkspaceRole(role, 'collaborator');
+  const nodeRole = space ? extractNodeRole(space, userId) : null;
+  const canDelete = nodeRole !== null && hasNodeRole(nodeRole, 'admin');
+  const canRename = canDelete;
+  const canCreateChildren = nodeRole !== null && hasNodeRole(nodeRole, 'editor');
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { paddingTop: insets.top + 8, borderBottomColor: colors.border }]}>
         <BackButton onPress={() => router.back()} />
-        <Pressable
-          onPress={() => space && setShowRename(true)}
-          style={styles.headerTitleContainer}
-        >
-          <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
-            {space?.name ?? 'Space'}
-          </Text>
-        </Pressable>
+        {canRename ? (
+          <Pressable
+            onPress={() => space && setShowRename(true)}
+            style={styles.headerTitleContainer}
+          >
+            <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
+              {space?.name ?? 'Space'}
+            </Text>
+          </Pressable>
+        ) : (
+          <View style={styles.headerTitleContainer}>
+            <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
+              {space?.name ?? 'Space'}
+            </Text>
+          </View>
+        )}
         <View style={styles.headerSpacer} />
       </View>
       <NodeChildList

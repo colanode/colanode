@@ -33,6 +33,7 @@ import { getMessageText } from '@colanode/mobile/lib/message-utils';
 
 interface ConversationScreenProps {
   nodeId: string;
+  isAdmin?: boolean;
   title: string;
   onGoBack: () => void;
   renamableNode?: LocalNode | null;
@@ -40,6 +41,7 @@ interface ConversationScreenProps {
 
 export const ConversationScreen = ({
   nodeId,
+  isAdmin = false,
   title,
   onGoBack,
   renamableNode,
@@ -187,6 +189,7 @@ export const ConversationScreen = ({
         message={actionTarget?.message ?? null}
         authorName={actionTarget?.authorName ?? ''}
         isOwnMessage={actionTarget?.message.createdBy === userId}
+        canDelete={actionTarget?.message.createdBy === userId || isAdmin}
         userId={userId}
         onClose={() => setActionTarget(null)}
         onReply={handleReply}
