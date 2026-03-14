@@ -32,6 +32,7 @@ import {
 } from '@colanode/core';
 
 const debug = createDebugger('desktop:service:file');
+const MANUAL_DOWNLOAD_TYPE = 0;
 
 export class FileService {
   private readonly app: AppService;
@@ -233,6 +234,7 @@ export class FileService {
       return null;
     }
 
+    const file = mapNode(node) as LocalFileNode;
     const updatedLocalFile = await this.workspace.database
       .updateTable('local_files')
       .returningAll()
@@ -243,15 +245,61 @@ export class FileService {
       .executeTakeFirst();
 
     if (updatedLocalFile) {
-      const url = await this.app.fs.url(updatedLocalFile.path);
-      return mapLocalFile(updatedLocalFile, url);
+      const fileExists = await this.app.fs.exists(updatedLocalFile.path);
+      if (fileExists && updatedLocalFile.version === file.version) {
+        const url = await this.app.fs.url(updatedLocalFile.path);
+        return mapLocalFile(updatedLocalFile, url);
+      }
+
+      if (!autoDownload) {
+        return null;
+      }
+
+      const refreshedLocalFile = await this.workspace.database
+        .updateTable('local_files')
+        .returningAll()
+        .set({
+          version: file.version,
+          path: this.buildFilePath(fileId, file.extension),
+          opened_at: new Date().toISOString(),
+          download_status: DownloadStatus.Pending,
+          download_progress: 0,
+          download_completed_at: null,
+          download_error_code: null,
+          download_error_message: null,
+          download_retries: 0,
+        })
+        .where('id', '=', fileId)
+        .executeTakeFirst();
+
+      if (!refreshedLocalFile) {
+        return null;
+      }
+
+      await this.app.jobs.addJob({
+        type: 'local.file.download',
+        userId: this.workspace.userId,
+        fileId: fileId,
+      });
+
+      const localFile = mapLocalFile(refreshedLocalFile, null);
+      eventBus.publish({
+        type: 'local.file.updated',
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
+        localFile: localFile,
+      });
+
+      return localFile;
     }
 
     if (!autoDownload) {
       return null;
     }
 
-    const file = mapNode(node) as LocalFileNode;
     const now = new Date().toISOString();
     const createdLocalFile = await this.workspace.database
       .insertInto('local_files')
@@ -329,6 +377,7 @@ export class FileService {
         id: generateId(IdType.Download),
         file_id: fileId,
         version: file.version,
+        type: MANUAL_DOWNLOAD_TYPE,
         name: name,
         path: path,
         size: file.size,

@@ -7,7 +7,6 @@ import {
   MutationInput,
   MutationMap,
 } from '@colanode/client/mutations';
-
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 
 interface MutationOptions<T extends MutationInput> {

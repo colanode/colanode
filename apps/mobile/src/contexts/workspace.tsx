@@ -1,7 +1,7 @@
 import { createContext, useContext } from 'react';
 
-import { WorkspaceRole } from '@colanode/core';
 import { Workspace } from '@colanode/client/types/workspaces';
+import { WorkspaceRole } from '@colanode/core';
 
 interface WorkspaceContextValue {
   userId: string;

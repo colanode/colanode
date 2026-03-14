@@ -3,13 +3,13 @@ import { useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Block } from '@colanode/core';
 import { mapBlocksToContents } from '@colanode/client/lib';
 import { LocalPageNode } from '@colanode/client/types/nodes';
-import { BackButton } from '@colanode/mobile/components/ui/back-button';
+import { RichTextContent } from '@colanode/core';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { BlockRenderer } from '@colanode/mobile/components/messages/block-renderer';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
@@ -37,9 +37,9 @@ export default function PageScreen() {
 
   let jsonContent = null;
   if (document?.content) {
-    const richText = document.content as any;
+    const richText = document.content as RichTextContent;
     if (richText.blocks) {
-      const blocks = Object.values(richText.blocks) as Block[];
+      const blocks = Object.values(richText.blocks);
       const contents = mapBlocksToContents(pageId!, blocks);
       if (contents.length > 0) {
         jsonContent = { type: 'doc' as const, content: contents };
