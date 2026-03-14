@@ -16,6 +16,7 @@ interface MessageActionSheetProps {
   message: LocalMessageNode | null;
   authorName: string;
   isOwnMessage: boolean;
+  canDelete: boolean;
   userId: string;
   onClose: () => void;
   onReply: () => void;
@@ -28,6 +29,7 @@ export const MessageActionSheet = ({
   visible,
   message,
   isOwnMessage,
+  canDelete,
   userId,
   onClose,
   onReply,
@@ -101,7 +103,7 @@ export const MessageActionSheet = ({
         </Pressable>
       )}
 
-      {isOwnMessage && (
+      {canDelete && (
         <Pressable
           style={({ pressed }) => [styles.action, pressed && { backgroundColor: colors.surfaceHover }]}
           onPress={handleDelete}

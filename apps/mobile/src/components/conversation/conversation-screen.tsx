@@ -12,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalMessageNode, LocalNode } from '@colanode/client/types/nodes';
+import { hasNodeRole } from '@colanode/core';
 import { EmojiPicker } from '@colanode/mobile/components/emojis/emoji-picker';
 import { MessageActionSheet } from '@colanode/mobile/components/messages/message-action-sheet';
 import { EditTarget, MessageInput } from '@colanode/mobile/components/messages/message-input';
@@ -30,9 +31,11 @@ import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
+import { useNodeRole } from '@colanode/mobile/hooks/use-node-role';
 
 interface ConversationScreenProps {
   nodeId: string;
+  rootId?: string;
   title: string;
   onGoBack: () => void;
   renamableNode?: LocalNode | null;
@@ -40,6 +43,7 @@ interface ConversationScreenProps {
 
 export const ConversationScreen = ({
   nodeId,
+  rootId,
   title,
   onGoBack,
   renamableNode,
@@ -53,6 +57,8 @@ export const ConversationScreen = ({
   const [actionTarget, setActionTarget] = useState<MessageActionTarget | null>(null);
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showRename, setShowRename] = useState(false);
+  const nodeRole = useNodeRole(userId, rootId);
+  const isAdmin = nodeRole !== null && hasNodeRole(nodeRole, 'admin');
   const { mutate } = useMutation();
   const lastMarkedId = useRef<string | null>(null);
 
@@ -187,6 +193,7 @@ export const ConversationScreen = ({
         message={actionTarget?.message ?? null}
         authorName={actionTarget?.authorName ?? ''}
         isOwnMessage={actionTarget?.message.createdBy === userId}
+        canDelete={actionTarget?.message.createdBy === userId || isAdmin}
         userId={userId}
         onClose={() => setActionTarget(null)}
         onReply={handleReply}

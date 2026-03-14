@@ -5,7 +5,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalFolderNode, LocalNode } from '@colanode/client/types/nodes';
-import { hasWorkspaceRole } from '@colanode/core';
+import { hasNodeRole } from '@colanode/core';
 import { NodeActionSheet } from '@colanode/mobile/components/nodes/node-action-sheet';
 import { NodeChildList } from '@colanode/mobile/components/nodes/node-child-list';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
@@ -15,6 +15,7 @@ import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useFolderFileUpload } from '@colanode/mobile/hooks/use-folder-file-upload';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
+import { useNodeRole } from '@colanode/mobile/hooks/use-node-role';
 import { navigateToNode } from '@colanode/mobile/lib/navigation-utils';
 import { getNodeDisplayName } from '@colanode/mobile/lib/node-utils';
 
@@ -22,7 +23,7 @@ export default function FolderScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
   const { folderId } = useLocalSearchParams<{ folderId: string }>();
-  const { userId, role } = useWorkspace();
+  const { userId } = useWorkspace();
   const { colors } = useTheme();
   const [showRename, setShowRename] = useState(false);
   const [actionNode, setActionNode] = useState<LocalNode | null>(null);
@@ -36,21 +37,31 @@ export default function FolderScreen() {
     [{ field: ['createdAt'], direction: 'asc', nulls: 'last' }]
   );
 
-  const canDelete = role === 'owner' || role === 'admin';
-  const canUploadFiles = hasWorkspaceRole(role, 'collaborator');
+  const nodeRole = useNodeRole(userId, folder?.rootId);
+  const canDelete = nodeRole !== null && hasNodeRole(nodeRole, 'admin');
+  const canRename = nodeRole !== null && hasNodeRole(nodeRole, 'editor');
+  const canUploadFiles = canRename;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { paddingTop: insets.top + 8, borderBottomColor: colors.border }]}>
         <BackButton onPress={() => router.back()} />
-        <Pressable
-          onPress={() => folder && setShowRename(true)}
-          style={styles.headerTitleContainer}
-        >
-          <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
-            {folder?.name ?? 'Folder'}
-          </Text>
-        </Pressable>
+        {canRename ? (
+          <Pressable
+            onPress={() => folder && setShowRename(true)}
+            style={styles.headerTitleContainer}
+          >
+            <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
+              {folder?.name ?? 'Folder'}
+            </Text>
+          </Pressable>
+        ) : (
+          <View style={styles.headerTitleContainer}>
+            <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
+              {folder?.name ?? 'Folder'}
+            </Text>
+          </View>
+        )}
         {canUploadFiles ? (
           <Pressable
             style={[styles.addButton, { backgroundColor: colors.primary }]}

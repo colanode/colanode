@@ -3,9 +3,9 @@ import { useState } from 'react';
 import { Pressable, RefreshControl, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { Block } from '@colanode/core';
 import { mapBlocksToContents } from '@colanode/client/lib';
 import { LocalPageNode } from '@colanode/client/types/nodes';
+import { Block, hasNodeRole } from '@colanode/core';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { BlockRenderer } from '@colanode/mobile/components/messages/block-renderer';
@@ -14,6 +14,7 @@ import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
+import { useNodeRole } from '@colanode/mobile/hooks/use-node-role';
 
 export default function PageScreen() {
   const router = useRouter();
@@ -24,6 +25,8 @@ export default function PageScreen() {
   const [showRename, setShowRename] = useState(false);
 
   const { data: page } = useNodeQuery<LocalPageNode>(userId, pageId, 'page');
+  const nodeRole = useNodeRole(userId, page?.rootId);
+  const canRename = nodeRole !== null && hasNodeRole(nodeRole, 'editor');
 
   const { data: document, isLoading, refetch, isRefetching } = useLiveQuery({
     type: 'document.get',
@@ -51,14 +54,22 @@ export default function PageScreen() {
     <View style={[styles.container, { backgroundColor: colors.background }]}>
       <View style={[styles.header, { borderBottomColor: colors.border, paddingTop: insets.top + 8 }]}>
         <BackButton onPress={() => router.back()} />
-        <Pressable
-          onPress={() => page && setShowRename(true)}
-          style={styles.headerTitleContainer}
-        >
-          <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
-            {page?.name ?? 'Page'}
-          </Text>
-        </Pressable>
+        {canRename ? (
+          <Pressable
+            onPress={() => page && setShowRename(true)}
+            style={styles.headerTitleContainer}
+          >
+            <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
+              {page?.name ?? 'Page'}
+            </Text>
+          </Pressable>
+        ) : (
+          <View style={styles.headerTitleContainer}>
+            <Text style={[styles.headerTitle, { color: colors.text }]} numberOfLines={1}>
+              {page?.name ?? 'Page'}
+            </Text>
+          </View>
+        )}
         <View style={styles.headerSpacer} />
       </View>
       <ScrollView

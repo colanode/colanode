@@ -35,6 +35,7 @@ export default function ChatScreen() {
   return (
     <ConversationScreen
       nodeId={chatId!}
+      rootId={chat?.rootId}
       title={chatName}
       onGoBack={handleGoBack}
     />
