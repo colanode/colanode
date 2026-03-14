@@ -1,9 +1,9 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Block } from '@colanode/core';
 import { mapBlocksToContents } from '@colanode/client/lib';
 import { LocalMessageNode } from '@colanode/client/types/nodes';
 import { User } from '@colanode/client/types/users';
+import { Block } from '@colanode/core';
 import { UserAvatar } from '@colanode/mobile/components/avatars/avatar';
 import { BlockRenderer } from '@colanode/mobile/components/messages/block-renderer';
 import { MessageReactions } from '@colanode/mobile/components/messages/message-reactions';

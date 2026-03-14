@@ -1,6 +1,6 @@
+import { WorkspaceRadarData } from '@colanode/client/types/radars';
 import { getIdType, IdType } from '@colanode/core';
 
-import { WorkspaceRadarData } from '@colanode/client/types/radars';
 
 export const getChatUnreadCount = (
   radarData: Record<string, WorkspaceRadarData> | undefined,

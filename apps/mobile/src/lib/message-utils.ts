@@ -1,5 +1,5 @@
-import { Block } from '@colanode/core';
 import { LocalMessageNode } from '@colanode/client/types/nodes';
+import { Block } from '@colanode/core';
 
 export const getMessageText = (message: LocalMessageNode): string => {
   const content = message.content;

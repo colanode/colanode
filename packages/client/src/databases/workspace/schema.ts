@@ -268,6 +268,7 @@ interface DownloadTable {
   id: ColumnType<string, string, never>;
   file_id: ColumnType<string, string, never>;
   version: ColumnType<string, string, string>;
+  type: ColumnType<number, number, number>;
   name: ColumnType<string, string, string>;
   path: ColumnType<string, string, string>;
   size: ColumnType<number, number, number>;

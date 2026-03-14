@@ -13,6 +13,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalMessageNode, LocalNode } from '@colanode/client/types/nodes';
 import { EmojiPicker } from '@colanode/mobile/components/emojis/emoji-picker';
+import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { MessageActionSheet } from '@colanode/mobile/components/messages/message-action-sheet';
 import { EditTarget, MessageInput } from '@colanode/mobile/components/messages/message-input';
 import {
@@ -22,14 +23,13 @@ import {
 import { MessageList } from '@colanode/mobile/components/messages/message-list';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
-import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
-import { getMessageText } from '@colanode/mobile/lib/message-utils';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
+import { getMessageText } from '@colanode/mobile/lib/message-utils';
 
 interface ConversationScreenProps {
   nodeId: string;

@@ -2,11 +2,10 @@ import { useQueryClient } from '@tanstack/react-query';
 import { useEffect, useMemo } from 'react';
 
 import { eventBus } from '@colanode/client/lib';
-import { Event } from '@colanode/client/types';
 import { buildQueryKey } from '@colanode/client/queries';
 import { NodeListQueryInput } from '@colanode/client/queries/nodes/node-list';
+import { Event } from '@colanode/client/types';
 import { LocalNode } from '@colanode/client/types/nodes';
-
 import { useQuery } from '@colanode/mobile/hooks/use-query';
 
 const getFieldName = (field: Array<string | number>): string => {
