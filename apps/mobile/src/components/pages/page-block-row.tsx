@@ -29,6 +29,7 @@ interface PageBlockRowProps {
   onBackspaceEmpty: () => void;
   onToggleCheck?: () => void;
   onLongPress: () => void;
+  onFocus: () => void;
 }
 
 const HEADING_SIZES: Record<string, number> = {
@@ -39,7 +40,7 @@ const HEADING_SIZES: Record<string, number> = {
 
 export const PageBlockRow = forwardRef<BlockRowRef, PageBlockRowProps>(
   (
-    { block, originalBlocks, onChangeText, onSubmit, onBackspaceEmpty, onToggleCheck, onLongPress },
+    { block, originalBlocks, onChangeText, onSubmit, onBackspaceEmpty, onToggleCheck, onLongPress, onFocus },
     ref
   ) => {
     const { colors } = useTheme();
@@ -157,6 +158,7 @@ export const PageBlockRow = forwardRef<BlockRowRef, PageBlockRowProps>(
             ]}
             value={block.text}
             onChangeText={onChangeText}
+            onFocus={onFocus}
             onKeyPress={handleKeyPress}
             onSubmitEditing={handleSubmitEditing}
             placeholder={placeholder}

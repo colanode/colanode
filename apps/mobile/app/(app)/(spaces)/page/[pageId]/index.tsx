@@ -30,6 +30,7 @@ import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-s
 import { PageTitleInput } from '@colanode/mobile/components/pages/page-title-input';
 import { PageBlockRow, BlockRowRef } from '@colanode/mobile/components/pages/page-block-row';
 import { PageBlockTypeSheet } from '@colanode/mobile/components/pages/page-block-type-sheet';
+import { PageEditorToolbar } from '@colanode/mobile/components/pages/page-editor-toolbar';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
@@ -167,6 +168,7 @@ const EditablePageView = ({
     return blocksToEditModel(pageId, allBlocks);
   });
   const [typeSheetIndex, setTypeSheetIndex] = useState<number | null>(null);
+  const focusedBlockIndexRef = useRef<number | null>(null);
 
   const titleDirtyRef = useRef(false);
   const docDirtyRef = useRef(false);
@@ -424,7 +426,6 @@ const EditablePageView = ({
       <KeyboardAvoidingView
         style={styles.content}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        keyboardVerticalOffset={0}
       >
         <ScrollView
           style={styles.content}
@@ -451,9 +452,18 @@ const EditablePageView = ({
               onBackspaceEmpty={() => handleBackspaceEmpty(index)}
               onToggleCheck={() => handleToggleCheck(index)}
               onLongPress={() => block.editable && setTypeSheetIndex(index)}
+              onFocus={() => { focusedBlockIndexRef.current = index; }}
             />
           ))}
         </ScrollView>
+        <PageEditorToolbar
+          onAddBlock={() => {
+            const idx = focusedBlockIndexRef.current;
+            if (idx !== null && blocks[idx]?.editable) {
+              setTypeSheetIndex(idx);
+            }
+          }}
+        />
       </KeyboardAvoidingView>
       <PageBlockTypeSheet
         visible={typeSheetIndex !== null}
