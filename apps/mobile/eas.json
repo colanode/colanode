@@ -19,7 +19,10 @@
     },
     "production": {
       "autoIncrement": true,
-      "node": "22.16.0"
+      "node": "22.16.0",
+      "env": {
+        "EXPO_USE_METRO_WORKSPACE_ROOT": "1"
+      }
     }
   },
   "submit": {

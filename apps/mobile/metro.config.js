@@ -9,6 +9,10 @@ const config = getDefaultConfig(__dirname);
 // packages from the monorepo root node_modules.
 config.projectRoot = __dirname;
 config.watchFolders = [monorepoRoot];
+config.resolver.nodeModulesPaths = [
+  path.resolve(__dirname, 'node_modules'),
+  path.resolve(monorepoRoot, 'node_modules'),
+];
 
 // Allow .db and .html files to be imported as assets
 config.resolver.assetExts = [...config.resolver.assetExts, 'db', 'html'];
