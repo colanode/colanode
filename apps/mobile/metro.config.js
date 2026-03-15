@@ -1,7 +1,14 @@
 const { getDefaultConfig } = require('expo/metro-config');
 const path = require('path');
 
+const monorepoRoot = path.resolve(__dirname, '../..');
+
 const config = getDefaultConfig(__dirname);
+
+// Monorepo support: ensure Metro knows the app root and can resolve
+// packages from the monorepo root node_modules.
+config.projectRoot = __dirname;
+config.watchFolders = [monorepoRoot];
 
 // Allow .db and .html files to be imported as assets
 config.resolver.assetExts = [...config.resolver.assetExts, 'db', 'html'];
