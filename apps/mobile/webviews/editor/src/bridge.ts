@@ -34,7 +34,11 @@ export type NativeToWebViewMessage =
       type: 'mutation.response';
       payload: { requestId: string; result: unknown; error?: string };
     }
-  | { type: 'flush' };
+  | { type: 'flush' }
+  | { type: 'keyboard.show'; payload: { height: number } }
+  | { type: 'keyboard.hide' }
+  | { type: 'editor.blur' }
+  | { type: 'block.command'; payload: { command: string } };
 
 export type WebViewToNativeMessage =
   | { type: 'ready' }
@@ -51,6 +55,7 @@ export type WebViewToNativeMessage =
       payload: { nodeId: string; nodeType: string };
     }
   | { type: 'navigate.url'; payload: { url: string } }
+  | { type: 'editor.focus'; payload: { focused: boolean } }
   | { type: 'error'; payload: { message: string } };
 
 interface PendingRequest {
@@ -199,6 +204,10 @@ export function postReady() {
 
 export function postNavigateNode(nodeId: string, nodeType: string) {
   postToNative({ type: 'navigate.node', payload: { nodeId, nodeType } });
+}
+
+export function postEditorFocus(focused: boolean) {
+  postToNative({ type: 'editor.focus', payload: { focused } });
 }
 
 export function postError(message: string) {

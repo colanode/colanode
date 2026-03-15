@@ -136,6 +136,104 @@ export function MobileEditorApp() {
         }
         break;
       }
+
+      case 'keyboard.show': {
+        // After the WebView container resizes, scroll cursor into view
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            const selection = window.getSelection();
+            if (selection && selection.rangeCount > 0) {
+              const range = selection.getRangeAt(0);
+              const rect = range.getBoundingClientRect();
+              const container = document.getElementById('scroll-container');
+              if (container) {
+                const containerRect = container.getBoundingClientRect();
+                const cursorBottom =
+                  rect.bottom - containerRect.top + container.scrollTop;
+                const visibleBottom =
+                  container.scrollTop + container.clientHeight - 60;
+                if (cursorBottom > visibleBottom) {
+                  container.scrollTo({
+                    top: cursorBottom - container.clientHeight + 100,
+                    behavior: 'smooth',
+                  });
+                }
+              }
+            }
+          });
+        });
+        break;
+      }
+
+      case 'keyboard.hide': {
+        // No-op — container resizes back automatically
+        break;
+      }
+
+      case 'editor.blur': {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const ei = (window as any).__editorInstance;
+        if (ei) {
+          ei.commands.blur();
+        }
+        break;
+      }
+
+      case 'block.command': {
+        const { command } = msg.payload as { command: string };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const ei = (window as any).__editorInstance;
+        if (!ei) break;
+        try {
+          const chain = ei.chain().focus();
+          switch (command) {
+            case 'paragraph':
+              chain.toggleNode('paragraph', 'paragraph').run();
+              break;
+            case 'heading1':
+              chain.setNode('heading1').run();
+              break;
+            case 'heading2':
+              chain.setNode('heading2').run();
+              break;
+            case 'heading3':
+              chain.setNode('heading3').run();
+              break;
+            case 'bulletList':
+              chain.toggleBulletList().run();
+              break;
+            case 'orderedList':
+              chain.toggleOrderedList().run();
+              break;
+            case 'taskList':
+              chain.toggleTaskList().run();
+              break;
+            case 'blockquote':
+              chain.toggleBlockquote().run();
+              break;
+            case 'codeBlock':
+              chain.toggleCodeBlock().run();
+              break;
+            case 'divider':
+              chain.setHorizontalRule().run();
+              break;
+            case 'table':
+              chain.insertTable({ rows: 3, cols: 3, withHeaderRow: false }).run();
+              break;
+          }
+        } catch (e) {
+          // Post error to native for debugging
+          const errMsg = e instanceof Error ? e.message : String(e);
+          const rn = (window as any).ReactNativeWebView;
+          if (rn) {
+            rn.postMessage(JSON.stringify({
+              type: 'error',
+              payload: { message: 'block.command error: ' + errMsg },
+            }));
+          }
+        }
+        break;
+      }
     }
   }, []);
 
