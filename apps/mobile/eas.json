@@ -19,8 +19,7 @@
     },
     "production": {
       "autoIncrement": true,
-      "node": "22.16.0",
-      "prebuildCommand": "node scripts/copy-editor.js"
+      "node": "22.16.0"
     }
   },
   "submit": {
