@@ -24,6 +24,7 @@
     "lint": "turbo run lint --parallel",
     "test": "turbo run test -- --watch false",
     "format": "prettier --write .",
+    "eas-build-pre-install": "echo 'engine-strict=false' > .npmrc",
     "postinstall": "tsx scripts/src/postinstall/index.ts",
     "android": "expo run:android",
     "ios": "expo run:ios"
