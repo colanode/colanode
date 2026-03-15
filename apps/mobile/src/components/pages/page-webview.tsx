@@ -337,6 +337,25 @@ export const PageWebView = ({
               payload: { message: 'Unhandled rejection: ' + (e.reason && e.reason.message || e.reason || 'unknown') }
             }));
           });
+
+          // Prevent scroll-to-top on focus: save scroll container position and restore it
+          document.addEventListener('DOMContentLoaded', function() {
+            var sc = document.getElementById('scroll-container');
+            if (!sc) return;
+            var saved = 0;
+            sc.addEventListener('scroll', function() { saved = sc.scrollTop; }, { passive: true });
+            document.addEventListener('focusin', function() {
+              var s = saved;
+              // Restore after browser/ProseMirror auto-scroll
+              requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                  if (Math.abs(sc.scrollTop - s) > 50) {
+                    sc.scrollTop = s;
+                  }
+                });
+              });
+            }, true);
+          });
           true;
         `}
         style={[
@@ -346,9 +365,8 @@ export const PageWebView = ({
         ]}
         javaScriptEnabled
         domStorageEnabled
-        scrollEnabled
+        scrollEnabled={false}
         bounces={false}
-        keyboardDisplayRequiresUserAction={false}
         hideKeyboardAccessoryView
         automaticallyAdjustContentInsets={false}
         contentMode="mobile"

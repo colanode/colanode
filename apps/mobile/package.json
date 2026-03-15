@@ -8,6 +8,7 @@
   "scripts": {
     "compile": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint app src --ext .ts,.tsx --max-warnings 0",
+    "eas-build-post-install": "node scripts/copy-editor.js",
     "prestart": "node scripts/copy-editor.js",
     "preios": "node scripts/copy-editor.js",
     "preandroid": "node scripts/copy-editor.js",
