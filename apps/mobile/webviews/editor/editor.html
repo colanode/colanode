@@ -56,16 +56,24 @@
       html, body {
         margin: 0;
         padding: 0;
+        height: 100%;
+        overflow: hidden;
         background-color: var(--background);
         color: var(--foreground);
         font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
         -webkit-text-size-adjust: 100%;
+      }
+      #scroll-container {
+        height: 100%;
+        overflow-y: auto;
         -webkit-overflow-scrolling: touch;
       }
     </style>
   </head>
   <body>
-    <div id="editor-root"></div>
+    <div id="scroll-container">
+      <div id="editor-root"></div>
+    </div>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

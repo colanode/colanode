@@ -201,7 +201,7 @@ export function MobileEditorApp() {
         style={{
           padding: '0 16px',
           paddingBottom: 'env(safe-area-inset-bottom, 20px)',
-          minHeight: '100vh',
+          minHeight: '100%',
         }}
       >
         <DocumentEditor
