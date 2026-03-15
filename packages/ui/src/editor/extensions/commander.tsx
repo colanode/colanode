@@ -38,6 +38,15 @@ interface CommanderOptions {
 
 const navigationKeys = ['ArrowUp', 'ArrowDown', 'Enter'];
 
+// Flag to prevent ProseMirror from handling the mousedown that follows
+// after a slash command item is tapped (pointerdown destroys the popup,
+// then mousedown lands on the editor underneath).
+let slashCommandJustSelected = false;
+
+export function isSlashCommandActive() {
+  return slashCommandJustSelected;
+}
+
 const filterCommands = ({
   query,
   commands,
@@ -167,6 +176,8 @@ const CommandList = ({
                       // Added this event handler because the onClick handler was not working
                       e.preventDefault();
                       e.stopPropagation();
+                      slashCommandJustSelected = true;
+                      setTimeout(() => { slashCommandJustSelected = false; }, 300);
                       selectItem(index);
                     }}
                   >

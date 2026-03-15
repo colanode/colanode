@@ -24,11 +24,7 @@
   },
   "submit": {
     "production": {
-      "ios": {
-        "appleId": "colanode.com@gmail.com",
-        "appleTeamId": "95W33VRP9S",
-        "ascAppId": "6760587892"
-      }
+      "ios": {}
     }
   }
 }

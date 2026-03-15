@@ -3,8 +3,6 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   AppState,
   AppStateStatus,
-  KeyboardAvoidingView,
-  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -143,10 +141,7 @@ export default function PageScreen() {
         )}
         <View style={styles.headerSpacer} />
       </View>
-      <KeyboardAvoidingView
-        style={styles.content}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      >
+      <View style={styles.content}>
         <PageWebView
           nodeId={pageId!}
           userId={userId}
@@ -159,7 +154,7 @@ export default function PageScreen() {
           updates={docUpdates ?? []}
           onNavigateNode={handleNavigateNode}
         />
-      </KeyboardAvoidingView>
+      </View>
       {page && (
         <RenameNodeSheet
           visible={showRename}

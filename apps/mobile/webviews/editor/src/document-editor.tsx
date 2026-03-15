@@ -76,6 +76,7 @@ import {
   TableCommand,
   TodoCommand,
 } from '@colanode/ui/editor/commands';
+import { isSlashCommandActive } from '@colanode/ui/editor/extensions/commander';
 import { MobilePageNode } from './extensions/page';
 import { MobileFolderNode } from './extensions/folder';
 import { MobileFileNode } from './extensions/file';
@@ -234,6 +235,15 @@ export const DocumentEditor = ({
           class:
             'prose-lg prose-stone dark:prose-invert prose-headings:font-title font-default focus:outline-none max-w-full text-foreground',
           spellCheck: 'true',
+        },
+        handleDOMEvents: {
+          mousedown: (_view, event) => {
+            if (isSlashCommandActive()) {
+              event.preventDefault();
+              return true;
+            }
+            return false;
+          },
         },
       },
       content: buildEditorContent(
