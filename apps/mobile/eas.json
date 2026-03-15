@@ -19,12 +19,17 @@
     },
     "production": {
       "autoIncrement": true,
-      "node": "22.16.0"
+      "node": "22.16.0",
+      "prebuildCommand": "node scripts/copy-editor.js"
     }
   },
   "submit": {
     "production": {
-      "ios": {}
+      "ios": {
+        "appleId": "colanode.com@gmail.com",
+        "appleTeamId": "95W33VRP9S",
+        "ascAppId": "6760587892"
+      }
     }
   }
 }
