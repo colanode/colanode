@@ -8,12 +8,17 @@
   "scripts": {
     "compile": "tsc --noEmit -p tsconfig.json",
     "lint": "eslint app src --ext .ts,.tsx --max-warnings 0",
+    "prestart": "node scripts/copy-editor.js",
+    "preios": "node scripts/copy-editor.js",
+    "preandroid": "node scripts/copy-editor.js",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios"
   },
   "dependencies": {
+    "@colanode/mobile-editor": "*",
     "@react-native-community/netinfo": "11.4.1",
+    "react-native-webview": "^13.12.5",
     "@tanstack/react-query": "^5.80.7",
     "expo": "~54.0.33",
     "expo-asset": "~12.0.12",
@@ -36,7 +41,7 @@
     "react-native-svg": "^15.12.1"
   },
   "devDependencies": {
-    "@types/react": "~19.1.0",
+    "@types/react": "~19.2.0",
     "babel-preset-expo": "~54.0.10",
     "typescript": "~5.9.2"
   },

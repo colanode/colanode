@@ -1,0 +1,26 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "target": "ES2023",
+    "lib": ["ES2023", "DOM", "DOM.Iterable"],
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react-jsx",
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "typeRoots": ["../../../../node_modules/@types"],
+    "paths": {
+      "@colanode/core/*": ["../../../../packages/core/src/*"],
+      "@colanode/crdt/*": ["../../../../packages/crdt/src/*"],
+      "@colanode/client/*": ["../../../../packages/client/src/*"],
+      "@colanode/ui/*": ["../../../../packages/ui/src/*"],
+      "@tiptap/core": ["../../../../packages/ui/node_modules/@tiptap/core"],
+      "@tiptap/react": ["../../../../packages/ui/node_modules/@tiptap/react"],
+      "@tiptap/pm/*": ["../../../../packages/ui/node_modules/@tiptap/pm/*"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
