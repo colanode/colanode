@@ -19,7 +19,10 @@
     },
     "production": {
       "autoIncrement": true,
-      "node": "22.16.0"
+      "node": "22.16.0",
+      "env": {
+        "npm_config_engine_strict": "false"
+      }
     }
   },
   "submit": {
