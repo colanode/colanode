@@ -27,7 +27,9 @@ interface PageWebViewProps {
   title: string;
   state: DocumentState | null | undefined;
   updates: DocumentUpdate[];
+  keyboardHeight: number;
   onNavigateNode: (nodeId: string, nodeType: string) => void;
+  onEditorFocusChange?: (focused: boolean) => void;
 }
 
 export const PageWebView = ({
@@ -40,7 +42,9 @@ export const PageWebView = ({
   title,
   state,
   updates,
+  keyboardHeight,
   onNavigateNode,
+  onEditorFocusChange,
 }: PageWebViewProps) => {
   const { appService } = useAppService();
   const { scheme, colors } = useTheme();
@@ -143,6 +147,19 @@ export const PageWebView = ({
       payload: { canEdit },
     });
   }, [canEdit, sendMessage]);
+
+  // Send keyboard height changes to WebView
+  const prevKeyboardHeight = useRef(0);
+  useEffect(() => {
+    if (!isReadyRef.current) return;
+    if (prevKeyboardHeight.current === keyboardHeight) return;
+    prevKeyboardHeight.current = keyboardHeight;
+    if (keyboardHeight > 0) {
+      sendMessage({ type: 'keyboard.show', payload: { height: keyboardHeight } });
+    } else {
+      sendMessage({ type: 'keyboard.hide' });
+    }
+  }, [keyboardHeight, sendMessage]);
 
   const handleMessage = useCallback(
     async (event: WebViewMessageEvent) => {
@@ -251,6 +268,12 @@ export const PageWebView = ({
           break;
         }
 
+        case 'editor.focus': {
+          const { focused } = msg.payload as { focused: boolean };
+          onEditorFocusChange?.(focused);
+          break;
+        }
+
         case 'navigate.node': {
           const { nodeId: navNodeId, nodeType } = msg.payload as {
             nodeId: string;
@@ -273,7 +296,7 @@ export const PageWebView = ({
         }
       }
     },
-    [appService, userId, sendInit, sendMessage, onNavigateNode]
+    [appService, userId, sendInit, sendMessage, onNavigateNode, onEditorFocusChange]
   );
 
   const sendFlush = useCallback(() => {
@@ -281,16 +304,19 @@ export const PageWebView = ({
     sendMessage({ type: 'flush' });
   }, [sendMessage]);
 
-  // Expose flush for parent component
+  // Expose flush and sendMessage for parent component
   useEffect(() => {
-    // Store ref for external access
     (PageWebView as unknown as { flushRef: (() => void) | null }).flushRef =
       sendFlush;
+    (PageWebView as unknown as { sendMessageRef: ((msg: Record<string, unknown>) => void) | null }).sendMessageRef =
+      sendMessage;
     return () => {
       (PageWebView as unknown as { flushRef: (() => void) | null }).flushRef =
         null;
+      (PageWebView as unknown as { sendMessageRef: ((msg: Record<string, unknown>) => void) | null }).sendMessageRef =
+        null;
     };
-  }, [sendFlush]);
+  }, [sendFlush, sendMessage]);
 
   if (!editorHtml) {
     return (
@@ -338,24 +364,6 @@ export const PageWebView = ({
             }));
           });
 
-          // Prevent scroll-to-top on focus: save scroll container position and restore it
-          document.addEventListener('DOMContentLoaded', function() {
-            var sc = document.getElementById('scroll-container');
-            if (!sc) return;
-            var saved = 0;
-            sc.addEventListener('scroll', function() { saved = sc.scrollTop; }, { passive: true });
-            document.addEventListener('focusin', function() {
-              var s = saved;
-              // Restore after browser/ProseMirror auto-scroll
-              requestAnimationFrame(function() {
-                requestAnimationFrame(function() {
-                  if (Math.abs(sc.scrollTop - s) > 50) {
-                    sc.scrollTop = s;
-                  }
-                });
-              });
-            }, true);
-          });
           true;
         `}
         style={[
@@ -392,13 +400,26 @@ export const PageWebView = ({
   );
 };
 
-// Static ref for flush access from parent
+// Static refs for external access from parent
 (PageWebView as unknown as { flushRef: (() => void) | null }).flushRef = null;
+(PageWebView as unknown as { sendMessageRef: ((msg: Record<string, unknown>) => void) | null }).sendMessageRef = null;
 
 export const flushPageWebView = () => {
   const ref = (PageWebView as unknown as { flushRef: (() => void) | null })
     .flushRef;
   ref?.();
+};
+
+export const blurPageWebView = () => {
+  const ref = (PageWebView as unknown as { sendMessageRef: ((msg: Record<string, unknown>) => void) | null })
+    .sendMessageRef;
+  ref?.({ type: 'editor.blur' });
+};
+
+export const executeBlockCommand = (command: string) => {
+  const ref = (PageWebView as unknown as { sendMessageRef: ((msg: Record<string, unknown>) => void) | null })
+    .sendMessageRef;
+  ref?.({ type: 'block.command', payload: { command } });
 };
 
 const styles = StyleSheet.create({

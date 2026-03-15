@@ -81,6 +81,7 @@ import { MobilePageNode } from './extensions/page';
 import { MobileFolderNode } from './extensions/folder';
 import { MobileFileNode } from './extensions/file';
 import { MobileDatabaseNode } from './extensions/database';
+import { postEditorFocus } from './bridge';
 
 interface DocumentEditorProps {
   node: LocalNode;
@@ -259,6 +260,8 @@ export const DocumentEditor = ({
           debouncedSave(editor.getJSON());
         }
       },
+      onFocus: () => postEditorFocus(true),
+      onBlur: () => postEditorFocus(false),
     },
     [node.id]
   );
@@ -311,6 +314,14 @@ export const DocumentEditor = ({
         .__editorFlush;
     };
   }, [debouncedSave, editor]);
+
+  // Expose editor instance for bridge commands (blur, block commands)
+  useEffect(() => {
+    (window as unknown as { __editorInstance?: typeof editor }).__editorInstance = editor;
+    return () => {
+      delete (window as unknown as { __editorInstance?: typeof editor }).__editorInstance;
+    };
+  }, [editor]);
 
   return <EditorContent editor={editor} />;
 };

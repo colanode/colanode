@@ -3,6 +3,9 @@ import { useCallback, useEffect, useState } from 'react';
 import {
   AppState,
   AppStateStatus,
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -15,8 +18,11 @@ import { LocalPageNode } from '@colanode/client/types/nodes';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
+import { PageBlockTypeSheet } from '@colanode/mobile/components/pages/page-block-type-sheet';
+import { PageEditorToolbar } from '@colanode/mobile/components/pages/page-editor-toolbar';
 import {
   PageWebView,
+  executeBlockCommand,
   flushPageWebView,
 } from '@colanode/mobile/components/pages/page-webview';
 import { useTheme } from '@colanode/mobile/contexts/theme';
@@ -36,6 +42,9 @@ export default function PageScreen() {
     useNodeQuery<LocalPageNode>(userId, pageId, 'page');
   const { canEdit, isLoading: roleLoading } = useNodeRole(userId, page);
   const [showRename, setShowRename] = useState(false);
+  const [keyboardHeight, setKeyboardHeight] = useState(0);
+  const [editorFocused, setEditorFocused] = useState(false);
+  const [showBlockTypes, setShowBlockTypes] = useState(false);
 
   const { data: docState, isLoading: stateLoading } = useLiveQuery({
     type: 'document.state.get',
@@ -48,6 +57,24 @@ export default function PageScreen() {
     documentId: pageId!,
     userId,
   });
+
+  // Track keyboard height
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+    const showSub = Keyboard.addListener(showEvent, (e) =>
+      setKeyboardHeight(e.endCoordinates.height)
+    );
+    const hideSub = Keyboard.addListener(hideEvent, () =>
+      setKeyboardHeight(0)
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
 
   // Flush on app background
   useEffect(() => {
@@ -103,13 +130,18 @@ export default function PageScreen() {
   );
 
   const isLoading = pageLoading || roleLoading || stateLoading || updatesLoading;
+  const showToolbar = (keyboardHeight > 0 && editorFocused && canEdit) || showBlockTypes;
 
   if (isLoading) {
     return <LoadingScreen />;
   }
 
   return (
-    <View style={[styles.container, { backgroundColor: colors.background }]}>
+    <KeyboardAvoidingView
+      style={[styles.container, { backgroundColor: colors.background }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      keyboardVerticalOffset={0}
+    >
       <View
         style={[
           styles.header,
@@ -152,9 +184,19 @@ export default function PageScreen() {
           title={page?.name ?? ''}
           state={docState}
           updates={docUpdates ?? []}
+          keyboardHeight={keyboardHeight}
           onNavigateNode={handleNavigateNode}
+          onEditorFocusChange={setEditorFocused}
         />
       </View>
+      <PageBlockTypeSheet
+        visible={showBlockTypes}
+        onClose={() => setShowBlockTypes(false)}
+        onSelect={executeBlockCommand}
+      />
+      {showToolbar && (
+        <PageEditorToolbar onPlusPress={() => setShowBlockTypes(!showBlockTypes)} />
+      )}
       {page && (
         <RenameNodeSheet
           visible={showRename}
@@ -163,7 +205,7 @@ export default function PageScreen() {
           onClose={() => setShowRename(false)}
         />
       )}
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
