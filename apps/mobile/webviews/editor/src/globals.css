@@ -43,11 +43,3 @@
   min-height: 60vh;
   -webkit-tap-highlight-color: transparent;
 }
-
-/* Larger touch targets for interactive elements */
-.ProseMirror ul[data-type='taskList'] li > label input[type='checkbox'] {
-  width: 1.4em;
-  height: 1.4em;
-  min-width: 44px;
-  min-height: 44px;
-}

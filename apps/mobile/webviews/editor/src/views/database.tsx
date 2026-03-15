@@ -22,7 +22,8 @@ export const MobileDatabaseNodeView = ({ node }: NodeViewProps) => {
       })
       .then((nodes) => {
         if (nodes && nodes.length > 0) {
-          setName(nodes[0].name || 'Unnamed database');
+          const n = nodes[0] as { name?: string };
+          setName(n.name || 'Unnamed database');
         } else {
           setName('Unnamed database');
         }

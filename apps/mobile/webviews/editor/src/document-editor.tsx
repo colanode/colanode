@@ -7,7 +7,7 @@ import {
   useEditor,
 } from '@tiptap/react';
 import { debounce, isEqual } from 'lodash-es';
-import { Fragment, useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import {
   restoreRelativeSelection,
@@ -76,8 +76,6 @@ import {
   TableCommand,
   TodoCommand,
 } from '@colanode/ui/editor/commands';
-import { ToolbarMenu } from '@colanode/ui/editor/menus';
-
 import { MobilePageNode } from './extensions/page';
 import { MobileFolderNode } from './extensions/folder';
 import { MobileFileNode } from './extensions/file';
@@ -143,18 +141,21 @@ export const DocumentEditor = ({
           afterContent
         );
 
-        hasPendingChanges.current = false;
-
         if (!update) {
+          hasPendingChanges.current = false;
           return;
         }
 
-        await window.colanode.executeMutation({
-          type: 'document.update',
-          userId: workspace.userId,
-          documentId: node.id,
-          update: encodeState(update),
-        });
+        try {
+          await window.colanode.executeMutation({
+            type: 'document.update',
+            userId: workspace.userId,
+            documentId: node.id,
+            update: encodeState(update),
+          });
+        } finally {
+          hasPendingChanges.current = false;
+        }
       }, 500),
     [node.id, workspace.userId]
   );
@@ -252,10 +253,15 @@ export const DocumentEditor = ({
     [node.id]
   );
 
+  // Reconciliation: apply remote state updates to editor
+  // Uses a ref to track whether we have local pending changes
   useEffect(() => {
     if (!editor) return;
     if (!state) return;
+
+    // Always skip reconciliation if we have pending local changes
     if (hasPendingChanges.current) return;
+
     if (revisionRef.current === state?.revision) return;
 
     const beforeContent = ydocRef.current.getObject<RichTextContent>();
@@ -267,10 +273,12 @@ export const DocumentEditor = ({
 
     const afterContent = ydocRef.current.getObject<RichTextContent>();
 
+    // Update revision even if content is equal
+    revisionRef.current = state.revision;
+
     if (isEqual(afterContent, beforeContent)) return;
 
     const editorContent = buildEditorContent(node.id, afterContent);
-    revisionRef.current = state.revision;
 
     const relativeSelection = getRelativeSelection(editor);
     editor.chain().setContent(editorContent).run();
@@ -280,14 +288,19 @@ export const DocumentEditor = ({
     }
   }, [state, updates, editor, node.id]);
 
-  return (
-    <>
-      {editor && canEdit && (
-        <Fragment>
-          <ToolbarMenu editor={editor} />
-        </Fragment>
-      )}
-      <EditorContent editor={editor} />
-    </>
-  );
+  // Expose flush for the bridge so pending saves are not lost
+  useEffect(() => {
+    (window as unknown as { __editorFlush?: () => void }).__editorFlush =
+      () => {
+        if (hasPendingChanges.current && editor) {
+          debouncedSave.flush();
+        }
+      };
+    return () => {
+      delete (window as unknown as { __editorFlush?: () => void })
+        .__editorFlush;
+    };
+  }, [debouncedSave, editor]);
+
+  return <EditorContent editor={editor} />;
 };

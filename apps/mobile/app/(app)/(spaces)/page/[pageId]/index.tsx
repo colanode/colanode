@@ -1,10 +1,11 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   AppState,
   AppStateStatus,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
   View,
@@ -15,6 +16,7 @@ import { LocalPageNode } from '@colanode/client/types/nodes';
 
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
+import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
 import {
   PageWebView,
   flushPageWebView,
@@ -35,6 +37,7 @@ export default function PageScreen() {
   const { data: page, isLoading: pageLoading } =
     useNodeQuery<LocalPageNode>(userId, pageId, 'page');
   const { canEdit, isLoading: roleLoading } = useNodeRole(userId, page);
+  const [showRename, setShowRename] = useState(false);
 
   const { data: docState, isLoading: stateLoading } = useLiveQuery({
     type: 'document.state.get',
@@ -116,14 +119,28 @@ export default function PageScreen() {
         ]}
       >
         <BackButton onPress={() => router.back()} />
-        <View style={styles.headerTitleContainer}>
-          <Text
-            style={[styles.headerTitle, { color: colors.text }]}
-            numberOfLines={1}
+        {canEdit && page ? (
+          <Pressable
+            onPress={() => setShowRename(true)}
+            style={styles.headerTitleContainer}
           >
-            {page?.name ?? 'Page'}
-          </Text>
-        </View>
+            <Text
+              style={[styles.headerTitle, { color: colors.text }]}
+              numberOfLines={1}
+            >
+              {page.name || 'Page'}
+            </Text>
+          </Pressable>
+        ) : (
+          <View style={styles.headerTitleContainer}>
+            <Text
+              style={[styles.headerTitle, { color: colors.text }]}
+              numberOfLines={1}
+            >
+              {page?.name ?? 'Page'}
+            </Text>
+          </View>
+        )}
         <View style={styles.headerSpacer} />
       </View>
       <KeyboardAvoidingView
@@ -143,6 +160,14 @@ export default function PageScreen() {
           onNavigateNode={handleNavigateNode}
         />
       </KeyboardAvoidingView>
+      {page && (
+        <RenameNodeSheet
+          visible={showRename}
+          node={page}
+          userId={userId}
+          onClose={() => setShowRename(false)}
+        />
+      )}
     </View>
   );
 }

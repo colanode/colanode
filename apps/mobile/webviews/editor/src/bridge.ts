@@ -145,7 +145,7 @@ document.addEventListener('message', handleNativeMessage as EventListener);
 
 const bridgeApi: ColanodeWindowApi = {
   init: async () => {
-    return { accounts: [] };
+    return 'success';
   },
 
   reset: async () => {},

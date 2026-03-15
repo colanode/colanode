@@ -22,7 +22,8 @@ export const MobilePageNodeView = ({ node }: NodeViewProps) => {
       })
       .then((nodes) => {
         if (nodes && nodes.length > 0) {
-          setName(nodes[0].name || 'Unnamed');
+          const n = nodes[0] as { name?: string };
+          setName(n.name || 'Unnamed');
         } else {
           setName('Unnamed');
         }

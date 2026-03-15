@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/package.json",
+  "name": "@colanode/mobile-editor",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "WebView-based TipTap editor for the Colanode mobile app",
+  "scripts": {
+    "build": "vite build",
+    "dev": "vite",
+    "compile": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@colanode/core": "*",
+    "@colanode/crdt": "*",
+    "@colanode/client": "*",
+    "@colanode/ui": "*"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.18",
+    "@vitejs/plugin-react": "^4.5.2",
+    "tailwindcss": "^4.1.18",
+    "typescript": "~5.9.2",
+    "vite": "^6.3.5",
+    "vite-plugin-singlefile": "^2.0.3"
+  }
+}

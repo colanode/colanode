@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 import type { DocumentState, DocumentUpdate } from '@colanode/client/types';
+import type { LocalNode } from '@colanode/client/types/nodes';
 import type { WorkspaceRole } from '@colanode/core';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
 
@@ -127,11 +128,11 @@ export function MobileEditorApp() {
       }
 
       case 'flush': {
-        // The DocumentEditor uses a debounced save.
-        // We trigger a blur to force any pending changes to flush.
-        const activeEl = document.activeElement;
-        if (activeEl instanceof HTMLElement) {
-          activeEl.blur();
+        // Flush any pending debounced save immediately
+        const flush = (window as unknown as { __editorFlush?: () => void })
+          .__editorFlush;
+        if (flush) {
+          flush();
         }
         break;
       }
@@ -151,7 +152,7 @@ export function MobileEditorApp() {
   const node = {
     id: editorState.nodeId,
     rootId: editorState.rootId,
-    type: 'page' as const,
+    type: 'page',
     name: '',
     parentId: '',
     index: '',
@@ -159,8 +160,11 @@ export function MobileEditorApp() {
     createdAt: '',
     updatedAt: '',
     createdBy: editorState.userId,
+    updatedBy: null,
     transactionId: '',
-  };
+    localRevision: '0',
+    serverRevision: '0',
+  } as LocalNode;
 
   const workspaceCtx = {
     workspaceId: editorState.workspaceId,
