@@ -136,6 +136,27 @@ export function MobileEditorApp() {
         }
         break;
       }
+
+      case 'blur': {
+        const blur = (window as unknown as { __editorBlur?: () => void })
+          .__editorBlur;
+        if (blur) {
+          blur();
+        }
+        break;
+      }
+
+      case 'set.block.type': {
+        const setBlockType = (
+          window as unknown as {
+            __editorSetBlockType?: (type: string) => void;
+          }
+        ).__editorSetBlockType;
+        if (setBlockType) {
+          setBlockType(msg.payload.blockType);
+        }
+        break;
+      }
     }
   }, []);
 

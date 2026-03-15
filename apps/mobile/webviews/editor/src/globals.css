@@ -41,5 +41,6 @@
 /* Mobile-specific editor styles */
 .ProseMirror {
   min-height: 60vh;
+  padding-bottom: 50vh;
   -webkit-tap-highlight-color: transparent;
 }

@@ -34,7 +34,9 @@ export type NativeToWebViewMessage =
       type: 'mutation.response';
       payload: { requestId: string; result: unknown; error?: string };
     }
-  | { type: 'flush' };
+  | { type: 'flush' }
+  | { type: 'blur' }
+  | { type: 'set.block.type'; payload: { blockType: string } };
 
 export type WebViewToNativeMessage =
   | { type: 'ready' }

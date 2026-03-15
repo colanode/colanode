@@ -1,8 +1,9 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AppState,
   AppStateStatus,
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -17,9 +18,12 @@ import { LocalPageNode } from '@colanode/client/types/nodes';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
+import { PageBlockTypeSheet } from '@colanode/mobile/components/pages/page-block-type-sheet';
+import { PageKeyboardToolbar } from '@colanode/mobile/components/pages/page-keyboard-toolbar';
 import {
   PageWebView,
   flushPageWebView,
+  type PageWebViewHandle,
 } from '@colanode/mobile/components/pages/page-webview';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
@@ -38,6 +42,9 @@ export default function PageScreen() {
     useNodeQuery<LocalPageNode>(userId, pageId, 'page');
   const { canEdit, isLoading: roleLoading } = useNodeRole(userId, page);
   const [showRename, setShowRename] = useState(false);
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+  const [showBlockTypeSheet, setShowBlockTypeSheet] = useState(false);
+  const webViewHandleRef = useRef<PageWebViewHandle>(null);
 
   const { data: docState, isLoading: stateLoading } = useLiveQuery({
     type: 'document.state.get',
@@ -67,6 +74,33 @@ export default function PageScreen() {
     return () => {
       flushPageWebView();
     };
+  }, []);
+
+  // Track keyboard visibility
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
+
+    const showSub = Keyboard.addListener(showEvent, () =>
+      setKeyboardVisible(true)
+    );
+    const hideSub = Keyboard.addListener(hideEvent, () =>
+      setKeyboardVisible(false)
+    );
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  const handleDismissKeyboard = useCallback(() => {
+    webViewHandleRef.current?.blur();
+  }, []);
+
+  const handleSetBlockType = useCallback((blockType: string) => {
+    webViewHandleRef.current?.setBlockType(blockType);
   }, []);
 
   const handleNavigateNode = useCallback(
@@ -146,8 +180,10 @@ export default function PageScreen() {
       <KeyboardAvoidingView
         style={styles.content}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        keyboardVerticalOffset={insets.top + 8 + 24 + 12 + 1}
       >
         <PageWebView
+          ref={webViewHandleRef}
           nodeId={pageId!}
           userId={userId}
           accountId={accountId}
@@ -159,6 +195,12 @@ export default function PageScreen() {
           updates={docUpdates ?? []}
           onNavigateNode={handleNavigateNode}
         />
+        {keyboardVisible && canEdit && (
+          <PageKeyboardToolbar
+            onAddBlock={() => setShowBlockTypeSheet(true)}
+            onDismissKeyboard={handleDismissKeyboard}
+          />
+        )}
       </KeyboardAvoidingView>
       {page && (
         <RenameNodeSheet
@@ -168,6 +210,11 @@ export default function PageScreen() {
           onClose={() => setShowRename(false)}
         />
       )}
+      <PageBlockTypeSheet
+        visible={showBlockTypeSheet}
+        onClose={() => setShowBlockTypeSheet(false)}
+        onSelectBlockType={handleSetBlockType}
+      />
     </View>
   );
 }

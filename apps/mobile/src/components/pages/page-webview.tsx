@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   Linking,
@@ -17,6 +24,11 @@ import { useTheme } from '@colanode/mobile/contexts/theme';
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const editorHtmlAsset = require('../../../assets/editor-dist/editor.html');
 
+export interface PageWebViewHandle {
+  blur: () => void;
+  setBlockType: (blockType: string) => void;
+}
+
 interface PageWebViewProps {
   nodeId: string;
   userId: string;
@@ -30,7 +42,7 @@ interface PageWebViewProps {
   onNavigateNode: (nodeId: string, nodeType: string) => void;
 }
 
-export const PageWebView = ({
+export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(({
   nodeId,
   userId,
   accountId,
@@ -41,7 +53,7 @@ export const PageWebView = ({
   state,
   updates,
   onNavigateNode,
-}: PageWebViewProps) => {
+}, ref) => {
   const { appService } = useAppService();
   const { scheme, colors } = useTheme();
   const webViewRef = useRef<WebView>(null);
@@ -281,6 +293,24 @@ export const PageWebView = ({
     sendMessage({ type: 'flush' });
   }, [sendMessage]);
 
+  const sendBlur = useCallback(() => {
+    if (!isReadyRef.current) return;
+    sendMessage({ type: 'blur' });
+  }, [sendMessage]);
+
+  const sendSetBlockType = useCallback(
+    (blockType: string) => {
+      if (!isReadyRef.current) return;
+      sendMessage({ type: 'set.block.type', payload: { blockType } });
+    },
+    [sendMessage]
+  );
+
+  useImperativeHandle(ref, () => ({
+    blur: sendBlur,
+    setBlockType: sendSetBlockType,
+  }), [sendBlur, sendSetBlockType]);
+
   // Expose flush for parent component
   useEffect(() => {
     // Store ref for external access
@@ -372,7 +402,7 @@ export const PageWebView = ({
       />
     </View>
   );
-};
+});
 
 // Static ref for flush access from parent
 (PageWebView as unknown as { flushRef: (() => void) | null }).flushRef = null;

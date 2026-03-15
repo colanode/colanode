@@ -302,5 +302,93 @@ export const DocumentEditor = ({
     };
   }, [debouncedSave, editor]);
 
+  // Expose blur for keyboard dismiss from native toolbar
+  useEffect(() => {
+    (window as unknown as { __editorBlur?: () => void }).__editorBlur = () => {
+      if (editor) {
+        editor.commands.blur();
+      }
+    };
+    return () => {
+      delete (window as unknown as { __editorBlur?: () => void }).__editorBlur;
+    };
+  }, [editor]);
+
+  // Expose block type setter for native toolbar
+  useEffect(() => {
+    (
+      window as unknown as { __editorSetBlockType?: (type: string) => void }
+    ).__editorSetBlockType = (blockType: string) => {
+      if (!editor) return;
+      editor.commands.focus();
+      switch (blockType) {
+        case 'paragraph':
+          editor.chain().focus().setParagraph().run();
+          break;
+        case 'heading1':
+          editor.chain().focus().setHeading({ level: 1 }).run();
+          break;
+        case 'heading2':
+          editor.chain().focus().setHeading({ level: 2 }).run();
+          break;
+        case 'heading3':
+          editor.chain().focus().setHeading({ level: 3 }).run();
+          break;
+        case 'bulletList':
+          editor.chain().focus().toggleBulletList().run();
+          break;
+        case 'orderedList':
+          editor.chain().focus().toggleOrderedList().run();
+          break;
+        case 'taskList':
+          editor.chain().focus().toggleTaskList().run();
+          break;
+        case 'blockquote':
+          editor.chain().focus().toggleBlockquote().run();
+          break;
+        case 'codeBlock':
+          editor.chain().focus().toggleCodeBlock().run();
+          break;
+        case 'divider':
+          editor.chain().focus().setHorizontalRule().run();
+          break;
+        case 'table':
+          editor
+            .chain()
+            .focus()
+            .insertTable({ rows: 3, cols: 3, withHeaderRow: true })
+            .run();
+          break;
+      }
+    };
+    return () => {
+      delete (
+        window as unknown as { __editorSetBlockType?: (type: string) => void }
+      ).__editorSetBlockType;
+    };
+  }, [editor]);
+
+  // Scroll cursor into view when keyboard opens (visualViewport resize)
+  useEffect(() => {
+    if (!editor) return;
+    const vv = window.visualViewport;
+    if (!vv) return;
+
+    let prevHeight = vv.height;
+    const handleResize = () => {
+      const newHeight = vv.height;
+      // Viewport shrank — keyboard likely appeared
+      if (newHeight < prevHeight) {
+        requestAnimationFrame(() => {
+          editor.commands.scrollIntoView();
+        });
+      }
+      prevHeight = newHeight;
+    };
+
+    vv.addEventListener('resize', handleResize);
+    return () => vv.removeEventListener('resize', handleResize);
+  }, [editor]);
+
   return <EditorContent editor={editor} />;
 };
