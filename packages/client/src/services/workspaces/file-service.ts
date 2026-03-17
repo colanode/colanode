@@ -17,6 +17,7 @@ import { AppService } from '@colanode/client/services/app-service';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import {
   DownloadStatus,
+  DownloadType,
   LocalFile,
   UploadStatus,
 } from '@colanode/client/types/files';
@@ -333,6 +334,7 @@ export class FileService {
         path: path,
         size: file.size,
         mime_type: file.mimeType,
+        type: DownloadType.File,
         status: DownloadStatus.Pending,
         progress: 0,
         retries: 0,

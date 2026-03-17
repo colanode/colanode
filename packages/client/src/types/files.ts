@@ -46,6 +46,7 @@ export type Download = {
   id: string;
   fileId: string;
   version: string;
+  type: DownloadType;
   name: string;
   path: string;
   size: number;
@@ -58,6 +59,10 @@ export type Download = {
   errorCode: string | null;
   errorMessage: string | null;
 };
+
+export enum DownloadType {
+  File = 0,
+}
 
 export enum DownloadStatus {
   Pending = 0,
