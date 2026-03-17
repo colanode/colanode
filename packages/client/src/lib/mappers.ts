@@ -227,6 +227,7 @@ export const mapDownload = (row: SelectDownload): Download => {
     id: row.id,
     fileId: row.file_id,
     version: row.version,
+    type: row.type,
     name: row.name,
     path: row.path,
     size: row.size,

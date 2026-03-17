@@ -1,6 +1,6 @@
 import { ColumnType, Insertable, Selectable, Updateable } from 'kysely';
 
-import { DownloadStatus, UploadStatus } from '@colanode/client/types/files';
+import { DownloadStatus, UploadStatus, DownloadType } from '@colanode/client/types/files';
 import { NodeCounterType } from '@colanode/client/types/nodes';
 import {
   MutationType,
@@ -268,6 +268,7 @@ interface DownloadTable {
   id: ColumnType<string, string, never>;
   file_id: ColumnType<string, string, never>;
   version: ColumnType<string, string, string>;
+  type: ColumnType<DownloadType, DownloadType, DownloadType>;
   name: ColumnType<string, string, string>;
   path: ColumnType<string, string, string>;
   size: ColumnType<number, number, number>;
