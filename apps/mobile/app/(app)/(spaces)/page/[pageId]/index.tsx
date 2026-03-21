@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   AppState,
   AppStateStatus,
@@ -14,17 +14,15 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalPageNode } from '@colanode/client/types/nodes';
-
-import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
 import { PageBlockTypeSheet } from '@colanode/mobile/components/pages/page-block-type-sheet';
 import { PageEditorToolbar } from '@colanode/mobile/components/pages/page-editor-toolbar';
 import {
   PageWebView,
-  executeBlockCommand,
-  flushPageWebView,
+  type PageWebViewHandle,
 } from '@colanode/mobile/components/pages/page-webview';
+import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
@@ -37,6 +35,7 @@ export default function PageScreen() {
   const { userId, accountId, workspaceId } = useWorkspace();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const webViewRef = useRef<PageWebViewHandle>(null);
 
   const { data: page, isLoading: pageLoading } =
     useNodeQuery<LocalPageNode>(userId, pageId, 'page');
@@ -80,7 +79,7 @@ export default function PageScreen() {
   useEffect(() => {
     const handleAppState = (nextState: AppStateStatus) => {
       if (nextState === 'background' || nextState === 'inactive') {
-        flushPageWebView();
+        webViewRef.current?.flush();
       }
     };
     const sub = AppState.addEventListener('change', handleAppState);
@@ -90,7 +89,7 @@ export default function PageScreen() {
   // Flush on unmount
   useEffect(() => {
     return () => {
-      flushPageWebView();
+      webViewRef.current?.flush();
     };
   }, []);
 
@@ -175,6 +174,7 @@ export default function PageScreen() {
       </View>
       <View style={styles.content}>
         <PageWebView
+          ref={webViewRef}
           nodeId={pageId!}
           userId={userId}
           accountId={accountId}
@@ -192,10 +192,13 @@ export default function PageScreen() {
       <PageBlockTypeSheet
         visible={showBlockTypes}
         onClose={() => setShowBlockTypes(false)}
-        onSelect={executeBlockCommand}
+        onSelect={(command) => webViewRef.current?.executeBlockCommand(command)}
       />
       {showToolbar && (
-        <PageEditorToolbar onPlusPress={() => setShowBlockTypes(!showBlockTypes)} />
+        <PageEditorToolbar
+          onPlusPress={() => setShowBlockTypes(!showBlockTypes)}
+          onDismiss={() => webViewRef.current?.blur()}
+        />
       )}
       {page && (
         <RenameNodeSheet

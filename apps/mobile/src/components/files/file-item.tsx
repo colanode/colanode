@@ -1,23 +1,18 @@
+import { memo } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { LocalFileNode } from '@colanode/client/types/nodes';
 import { useTheme } from '@colanode/mobile/contexts/theme';
+import { formatFileSize } from '@colanode/mobile/lib/format-utils';
 
 interface FileItemProps {
   file: LocalFileNode;
 }
 
-const formatSize = (bytes: number | undefined | null): string => {
-  if (!bytes) return '';
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
-};
-
-export const FileItem = ({ file }: FileItemProps) => {
+export const FileItem = memo(({ file }: FileItemProps) => {
   const { colors } = useTheme();
   const name = file.name ?? 'Unnamed file';
-  const size = formatSize(file.size);
+  const size = formatFileSize(file.size);
 
   return (
     <View style={[styles.container, { backgroundColor: colors.surface, borderColor: colors.border }]}>
@@ -30,7 +25,8 @@ export const FileItem = ({ file }: FileItemProps) => {
       </View>
     </View>
   );
-};
+});
+FileItem.displayName = 'FileItem';
 
 const styles = StyleSheet.create({
   container: {

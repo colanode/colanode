@@ -45,8 +45,8 @@
   },
   "dependencies": {
     "debug": "^4.4.3",
-    "lodash-es": "^4.17.23",
     "expo": "~54.0.33",
+    "lodash-es": "^4.17.23",
     "react": "19.1.0",
     "react-native": "0.81.5"
   },

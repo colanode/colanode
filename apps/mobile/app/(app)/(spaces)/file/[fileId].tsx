@@ -23,13 +23,7 @@ import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
-
-const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return '0 B';
-  const units = ['B', 'KB', 'MB', 'GB'];
-  const i = Math.floor(Math.log(bytes) / Math.log(1024));
-  return `${(bytes / Math.pow(1024, i)).toFixed(i > 0 ? 1 : 0)} ${units[i]}`;
-};
+import { formatFileSize } from '@colanode/mobile/lib/format-utils';
 
 const FILE_TYPE_ICONS: Record<string, keyof typeof Feather.glyphMap> = {
   image: 'image',

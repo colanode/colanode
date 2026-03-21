@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { LocalChatNode, LocalMessageNode } from '@colanode/client/types/nodes';
@@ -15,7 +16,7 @@ interface ChatListItemProps {
   unreadCount?: number;
 }
 
-export const ChatListItem = ({
+export const ChatListItem = memo(({
   chat,
   currentUserId,
   users,
@@ -46,6 +47,8 @@ export const ChatListItem = ({
     <Pressable
       style={({ pressed }) => [styles.container, pressed && { backgroundColor: colors.surface }]}
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Chat with ${displayName}`}
     >
       <UserAvatar name={displayName} avatar={otherUser?.avatar ?? null} size={44} />
       <View style={styles.info}>
@@ -67,7 +70,8 @@ export const ChatListItem = ({
       )}
     </Pressable>
   );
-};
+});
+ChatListItem.displayName = 'ChatListItem';
 
 const styles = StyleSheet.create({
   container: {

@@ -94,6 +94,9 @@ export const Button = ({
         style,
       ]}
       disabled={isDisabled}
+      accessibilityRole="button"
+      accessibilityLabel={title}
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
       {...props}
     >
       {loading ? (

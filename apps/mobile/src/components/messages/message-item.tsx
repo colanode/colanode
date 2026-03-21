@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { mapBlocksToContents } from '@colanode/client/lib';
@@ -10,6 +11,7 @@ import { MessageReactions } from '@colanode/mobile/components/messages/message-r
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
+import { formatMessageTime } from '@colanode/mobile/lib/format-utils';
 import { getMessagePreview } from '@colanode/mobile/lib/message-utils';
 
 export interface MessageActionTarget {
@@ -31,12 +33,7 @@ interface MessageItemProps {
   currentUserId: string;
 }
 
-const formatTime = (dateStr: string) => {
-  const date = new Date(dateStr);
-  return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-};
-
-export const MessageItem = ({
+export const MessageItem = memo(({
   message,
   users,
   isOwnMessage,
@@ -120,7 +117,7 @@ export const MessageItem = ({
           ) : (
             <Text style={[styles.emptyMessage, { color: colors.textMuted }]}>(empty message)</Text>
           )}
-          <Text style={[styles.time, { color: colors.textMuted }]}>{formatTime(message.createdAt)}</Text>
+          <Text style={[styles.time, { color: colors.textMuted }]}>{formatMessageTime(message.createdAt)}</Text>
         </View>
         {isOwnMessage && <View style={styles.ownSpacer} />}
       </View>
@@ -140,7 +137,8 @@ export const MessageItem = ({
       )}
     </Pressable>
   );
-};
+});
+MessageItem.displayName = 'MessageItem';
 
 const styles = StyleSheet.create({
   container: {

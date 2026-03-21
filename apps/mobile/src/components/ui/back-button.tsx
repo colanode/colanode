@@ -11,7 +11,13 @@ export const BackButton = ({ onPress }: BackButtonProps) => {
   const { colors } = useTheme();
 
   return (
-    <Pressable style={styles.button} onPress={onPress} hitSlop={8}>
+    <Pressable
+      style={styles.button}
+      onPress={onPress}
+      hitSlop={8}
+      accessibilityRole="button"
+      accessibilityLabel="Go back"
+    >
       <Feather name="chevron-left" size={24} color={colors.textSecondary} />
     </Pressable>
   );

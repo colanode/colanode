@@ -2,19 +2,20 @@ import Feather from '@expo/vector-icons/Feather';
 import { Keyboard, Pressable, StyleSheet, View } from 'react-native';
 
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { blurPageWebView } from '@colanode/mobile/components/pages/page-webview';
 
 interface PageEditorToolbarProps {
   onPlusPress: () => void;
+  onDismiss: () => void;
 }
 
 export const PageEditorToolbar = ({
   onPlusPress,
+  onDismiss,
 }: PageEditorToolbarProps) => {
   const { colors } = useTheme();
 
   const handleDismiss = () => {
-    blurPageWebView();
+    onDismiss();
     Keyboard.dismiss();
   };
 
@@ -32,6 +33,8 @@ export const PageEditorToolbar = ({
         onPress={onPlusPress}
         style={({ pressed }) => [styles.button, pressed && styles.pressed]}
         hitSlop={8}
+        accessibilityRole="button"
+        accessibilityLabel="Insert block"
       >
         <Feather name="plus" size={22} color={colors.textSecondary} />
       </Pressable>
@@ -40,6 +43,8 @@ export const PageEditorToolbar = ({
         onPress={handleDismiss}
         style={({ pressed }) => [styles.button, pressed && styles.pressed]}
         hitSlop={8}
+        accessibilityRole="button"
+        accessibilityLabel="Dismiss keyboard"
       >
         <Feather name="chevron-down" size={22} color={colors.textSecondary} />
       </Pressable>

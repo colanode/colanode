@@ -1,16 +1,19 @@
 import { Stack } from 'expo-router';
 
+import { ErrorBoundary } from '@colanode/mobile/components/ui/error-boundary';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 
 export default function SettingsLayout() {
   const { colors } = useTheme();
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        contentStyle: { backgroundColor: colors.background },
-      }}
-    />
+    <ErrorBoundary>
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          contentStyle: { backgroundColor: colors.background },
+        }}
+      />
+    </ErrorBoundary>
   );
 }
