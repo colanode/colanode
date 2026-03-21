@@ -1,3 +1,4 @@
+import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { LocalSpaceNode } from '@colanode/client/types/nodes';
@@ -9,13 +10,15 @@ interface SpaceListItemProps {
   onPress: () => void;
 }
 
-export const SpaceListItem = ({ space, onPress }: SpaceListItemProps) => {
+export const SpaceListItem = memo(({ space, onPress }: SpaceListItemProps) => {
   const { colors } = useTheme();
 
   return (
     <Pressable
       style={({ pressed }) => [styles.container, pressed && { backgroundColor: colors.surface }]}
       onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={`Space: ${space.name}`}
     >
       <UserAvatar
         name={space.name}
@@ -35,7 +38,8 @@ export const SpaceListItem = ({ space, onPress }: SpaceListItemProps) => {
       <Text style={[styles.chevron, { color: colors.sheetHandle }]}>{'\u203A'}</Text>
     </Pressable>
   );
-};
+});
+SpaceListItem.displayName = 'SpaceListItem';
 
 const styles = StyleSheet.create({
   container: {

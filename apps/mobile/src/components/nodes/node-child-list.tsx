@@ -4,6 +4,7 @@ import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'rea
 import { LocalNode } from '@colanode/client/types/nodes';
 import { NodeIcon } from '@colanode/mobile/components/nodes/node-icon';
 import { EmptyState } from '@colanode/mobile/components/ui/empty-state';
+import { SkeletonList } from '@colanode/mobile/components/ui/skeleton';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { getNodeDisplayName, NODE_TYPE_LABELS } from '@colanode/mobile/lib/node-utils';
 
@@ -70,9 +71,11 @@ export const NodeChildList = ({
         />
       }
       ListEmptyComponent={
-        !isLoading ? (
+        isLoading ? (
+          <SkeletonList />
+        ) : (
           <EmptyState title={emptyTitle} subtitle={emptySubtitle} />
-        ) : null
+        )
       }
     />
   );

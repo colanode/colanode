@@ -31,7 +31,12 @@ export const BottomSheet = ({
   const insets = useSafeAreaInsets();
 
   const content = (
-    <Pressable style={[styles.overlay, { backgroundColor: colors.overlay }]} onPress={onClose}>
+    <Pressable
+      style={[styles.overlay, { backgroundColor: colors.overlay }]}
+      onPress={onClose}
+      accessibilityRole="button"
+      accessibilityLabel="Close"
+    >
       <Pressable
         style={[
           styles.sheet,

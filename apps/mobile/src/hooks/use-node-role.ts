@@ -1,6 +1,5 @@
-import { extractNodeRole, hasNodeRole, NodeRole } from '@colanode/core';
 import { LocalNode, LocalSpaceNode } from '@colanode/client/types/nodes';
-
+import { extractNodeRole, hasNodeRole, NodeRole } from '@colanode/core';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 
 export const useNodeRole = (

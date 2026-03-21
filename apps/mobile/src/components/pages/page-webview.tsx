@@ -1,4 +1,12 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { Asset } from 'expo-asset';
+import {
+  forwardRef,
+  useCallback,
+  useEffect,
+  useImperativeHandle,
+  useRef,
+  useState,
+} from 'react';
 import {
   ActivityIndicator,
   Linking,
@@ -7,15 +15,19 @@ import {
   View,
 } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
-import { Asset } from 'expo-asset';
 
 import type { DocumentState, DocumentUpdate } from '@colanode/client/types';
-
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// eslint-disable-next-line @typescript-eslint/no-require-imports
 const editorHtmlAsset = require('../../../assets/editor-dist/editor.html');
+
+export interface PageWebViewHandle {
+  flush: () => void;
+  blur: () => void;
+  executeBlockCommand: (command: string) => void;
+}
 
 interface PageWebViewProps {
   nodeId: string;
@@ -32,20 +44,24 @@ interface PageWebViewProps {
   onEditorFocusChange?: (focused: boolean) => void;
 }
 
-export const PageWebView = ({
-  nodeId,
-  userId,
-  accountId,
-  workspaceId,
-  rootId,
-  canEdit,
-  title,
-  state,
-  updates,
-  keyboardHeight,
-  onNavigateNode,
-  onEditorFocusChange,
-}: PageWebViewProps) => {
+export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
+  (
+    {
+      nodeId,
+      userId,
+      accountId,
+      workspaceId,
+      rootId,
+      canEdit,
+      title,
+      state,
+      updates,
+      keyboardHeight,
+      onNavigateNode,
+      onEditorFocusChange,
+    },
+    ref
+  ) => {
   const { appService } = useAppService();
   const { scheme, colors } = useTheme();
   const webViewRef = useRef<WebView>(null);
@@ -304,19 +320,16 @@ export const PageWebView = ({
     sendMessage({ type: 'flush' });
   }, [sendMessage]);
 
-  // Expose flush and sendMessage for parent component
-  useEffect(() => {
-    (PageWebView as unknown as { flushRef: (() => void) | null }).flushRef =
-      sendFlush;
-    (PageWebView as unknown as { sendMessageRef: ((msg: Record<string, unknown>) => void) | null }).sendMessageRef =
-      sendMessage;
-    return () => {
-      (PageWebView as unknown as { flushRef: (() => void) | null }).flushRef =
-        null;
-      (PageWebView as unknown as { sendMessageRef: ((msg: Record<string, unknown>) => void) | null }).sendMessageRef =
-        null;
-    };
-  }, [sendFlush, sendMessage]);
+  useImperativeHandle(
+    ref,
+    () => ({
+      flush: sendFlush,
+      blur: () => sendMessage({ type: 'editor.blur' }),
+      executeBlockCommand: (command: string) =>
+        sendMessage({ type: 'block.command', payload: { command } }),
+    }),
+    [sendFlush, sendMessage]
+  );
 
   if (!editorHtml) {
     return (
@@ -398,29 +411,9 @@ export const PageWebView = ({
       />
     </View>
   );
-};
-
-// Static refs for external access from parent
-(PageWebView as unknown as { flushRef: (() => void) | null }).flushRef = null;
-(PageWebView as unknown as { sendMessageRef: ((msg: Record<string, unknown>) => void) | null }).sendMessageRef = null;
-
-export const flushPageWebView = () => {
-  const ref = (PageWebView as unknown as { flushRef: (() => void) | null })
-    .flushRef;
-  ref?.();
-};
-
-export const blurPageWebView = () => {
-  const ref = (PageWebView as unknown as { sendMessageRef: ((msg: Record<string, unknown>) => void) | null })
-    .sendMessageRef;
-  ref?.({ type: 'editor.blur' });
-};
-
-export const executeBlockCommand = (command: string) => {
-  const ref = (PageWebView as unknown as { sendMessageRef: ((msg: Record<string, unknown>) => void) | null })
-    .sendMessageRef;
-  ref?.({ type: 'block.command', payload: { command } });
-};
+  }
+);
+PageWebView.displayName = 'PageWebView';
 
 const styles = StyleSheet.create({
   container: {

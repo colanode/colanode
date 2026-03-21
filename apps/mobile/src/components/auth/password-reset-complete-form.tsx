@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
 import { useTheme } from '@colanode/mobile/contexts/theme';
+import { formatCountdownTime } from '@colanode/mobile/lib/format-utils';
 
 interface PasswordResetCompleteFormProps {
   onSubmit: (values: {
@@ -72,11 +73,6 @@ export const PasswordResetCompleteForm = ({
     onSubmit({ otp: otp.trim(), password, confirmPassword });
   };
 
-  const formatTime = (seconds: number) => {
-    const m = Math.floor(seconds / 60);
-    const s = seconds % 60;
-    return `${m}:${s.toString().padStart(2, '0')}`;
-  };
 
   return (
     <View style={styles.container}>
@@ -113,7 +109,7 @@ export const PasswordResetCompleteForm = ({
       />
       {secondsLeft > 0 ? (
         <Text style={[styles.timer, { color: colors.textSecondary }]}>
-          Code expires in {formatTime(secondsLeft)}
+          Code expires in {formatCountdownTime(secondsLeft)}
         </Text>
       ) : (
         <Text style={[styles.expired, { color: colors.error }]}>

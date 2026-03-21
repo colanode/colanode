@@ -30,7 +30,7 @@ export default function HomeScreen() {
   const { totalUnread, unreadChats } = getUnreadSummary(radarData, userId);
 
   // Recent chats (limit 3)
-  const { data: recentChats, refetch: refetchChats, isRefetching: isRefetchingChats } = useNodeListQuery<LocalChatNode>(
+  const { data: recentChats, refetch: refetchChats, isRefetching: isRefetchingChats, isLoading: chatsLoading } = useNodeListQuery<LocalChatNode>(
     userId,
     [{ field: ['type'], operator: 'eq', value: 'chat' }],
     [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }],
@@ -38,7 +38,7 @@ export default function HomeScreen() {
   );
 
   // Recent spaces
-  const { data: recentSpaces, refetch: refetchSpaces, isRefetching: isRefetchingSpaces } = useNodeListQuery<LocalSpaceNode>(
+  const { data: recentSpaces, refetch: refetchSpaces, isRefetching: isRefetchingSpaces, isLoading: spacesLoading } = useNodeListQuery<LocalSpaceNode>(
     userId,
     [{ field: ['type'], operator: 'eq', value: 'space' }],
     [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }],
@@ -68,7 +68,12 @@ export default function HomeScreen() {
         />
       }
     >
-      <Pressable style={[styles.header, { paddingTop: insets.top + 8 }]} onPress={openSwitcher}>
+      <Pressable
+        style={[styles.header, { paddingTop: insets.top + 8 }]}
+        onPress={openSwitcher}
+        accessibilityRole="button"
+        accessibilityLabel={`Switch workspace. Current: ${workspace.name}`}
+      >
         <UserAvatar
           name={workspace.name}
           avatar={workspace.avatar ?? null}
@@ -102,6 +107,8 @@ export default function HomeScreen() {
             pressed && { backgroundColor: colors.surfaceAccentDeep },
           ]}
           onPress={() => router.push('/(app)/(chats)/new-chat')}
+          accessibilityRole="button"
+          accessibilityLabel="New chat"
         >
           <Feather name="message-circle" size={20} color={colors.primary} />
           <Text style={[styles.quickActionText, { color: colors.text }]}>New Chat</Text>
@@ -123,6 +130,8 @@ export default function HomeScreen() {
               router.push('/(app)/(spaces)');
             }
           }}
+          accessibilityRole="button"
+          accessibilityLabel="Open spaces"
         >
           <Feather name="layers" size={20} color={colors.primary} />
           <Text style={[styles.quickActionText, { color: colors.text }]} numberOfLines={1}>
@@ -135,6 +144,16 @@ export default function HomeScreen() {
           </Text>
         </Pressable>
       </View>
+
+      {!chatsLoading && !spacesLoading && recentChatItems.length === 0 && recentSpaceItems.length === 0 && (
+        <View style={styles.emptySection}>
+          <Feather name="compass" size={40} color={colors.textMuted} />
+          <Text style={[styles.emptyTitle, { color: colors.text }]}>No recent activity</Text>
+          <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
+            Create a space or start a conversation to get going
+          </Text>
+        </View>
+      )}
 
       {recentChatItems.length > 0 && (
         <View style={styles.section}>
@@ -289,5 +308,21 @@ const styles = StyleSheet.create({
   },
   spaceDesc: {
     fontSize: 13,
+  },
+  emptySection: {
+    alignItems: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 32,
+    gap: 8,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 8,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    textAlign: 'center',
+    lineHeight: 20,
   },
 });

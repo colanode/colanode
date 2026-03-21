@@ -8,6 +8,7 @@ import {
   MessageItem,
 } from '@colanode/mobile/components/messages/message-item';
 import { useTheme } from '@colanode/mobile/contexts/theme';
+import { formatRelativeDate } from '@colanode/mobile/lib/format-utils';
 
 interface MessageListProps {
   messages: LocalMessageNode[];
@@ -15,26 +16,6 @@ interface MessageListProps {
   currentUserId: string;
   onMessageAction?: (target: MessageActionTarget) => void;
 }
-
-const formatDate = (dateStr: string) => {
-  const date = new Date(dateStr);
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  if (date.toDateString() === today.toDateString()) {
-    return 'Today';
-  }
-  if (date.toDateString() === yesterday.toDateString()) {
-    return 'Yesterday';
-  }
-  return date.toLocaleDateString(undefined, {
-    month: 'short',
-    day: 'numeric',
-    year:
-      date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined,
-  });
-};
 
 interface MessageGroup {
   type: 'message' | 'date';
@@ -52,7 +33,7 @@ const buildGroups = (messages: LocalMessageNode[]): MessageGroup[] => {
   );
 
   for (const message of sorted) {
-    const date = formatDate(message.createdAt);
+    const date = formatRelativeDate(message.createdAt);
     if (date !== lastDate) {
       groups.push({ type: 'date', date, key: `date-${date}-${message.id}` });
       lastDate = date;
@@ -105,7 +86,20 @@ export const MessageList = ({
 
         return null;
       }}
-      contentContainerStyle={styles.list}
+      contentContainerStyle={[
+        styles.list,
+        groups.length === 0 && styles.emptyList,
+      ]}
+      ListEmptyComponent={
+        <View style={styles.emptyContainer}>
+          <Text style={[styles.emptyTitle, { color: colors.textMuted }]}>
+            No messages yet
+          </Text>
+          <Text style={[styles.emptySubtitle, { color: colors.textMuted }]}>
+            Start the conversation
+          </Text>
+        </View>
+      }
       showsVerticalScrollIndicator={false}
     />
   );
@@ -122,5 +116,21 @@ const styles = StyleSheet.create({
   dateText: {
     fontSize: 12,
     fontWeight: '500',
+  },
+  emptyList: {
+    flex: 1,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
+  },
+  emptyTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  emptySubtitle: {
+    fontSize: 14,
   },
 });

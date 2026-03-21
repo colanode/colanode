@@ -160,7 +160,12 @@ export const MessageInput = ({
             <Feather name="edit-2" size={14} color={colors.primaryLight} />
             <Text style={[styles.editBannerLabel, { color: colors.primaryLight }]}>Editing message</Text>
           </View>
-          <Pressable onPress={handleCancelEdit} hitSlop={8}>
+          <Pressable
+            onPress={handleCancelEdit}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Cancel editing"
+          >
             <Feather name="x" size={18} color={colors.textMuted} />
           </Pressable>
         </View>
@@ -173,7 +178,12 @@ export const MessageInput = ({
               <Text style={[styles.replyBannerName, { color: colors.primaryLight }]}>{replyTo.authorName}</Text>
             </Text>
           </View>
-          <Pressable onPress={onClearReply} hitSlop={8}>
+          <Pressable
+            onPress={onClearReply}
+            hitSlop={8}
+            accessibilityRole="button"
+            accessibilityLabel="Cancel reply"
+          >
             <Feather name="x" size={18} color={colors.textMuted} />
           </Pressable>
         </View>
@@ -188,6 +198,8 @@ export const MessageInput = ({
           multiline
           maxLength={10000}
           returnKeyType="default"
+          accessibilityLabel="Message input"
+          accessibilityHint="Type a message to send"
         />
         <Pressable
           style={({ pressed }) => [
@@ -198,6 +210,9 @@ export const MessageInput = ({
           ]}
           onPress={handleSend}
           disabled={!text.trim() || isPending}
+          accessibilityRole="button"
+          accessibilityLabel={isEditing ? 'Save edit' : 'Send message'}
+          accessibilityState={{ disabled: !text.trim() || isPending }}
         >
           <Feather
             name={isEditing ? 'check' : 'arrow-up'}

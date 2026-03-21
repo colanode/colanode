@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useMemo } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { eventBus } from '@colanode/client/lib';
 import { buildQueryKey } from '@colanode/client/queries';
@@ -12,6 +12,19 @@ const getFieldName = (field: Array<string | number>): string => {
   return field.length > 0 ? String(field[0]) : '';
 };
 
+const useStableValue = <T>(value: T): T => {
+  const ref = useRef(value);
+  const serialized = JSON.stringify(value);
+  const prevSerialized = useRef(serialized);
+
+  if (prevSerialized.current !== serialized) {
+    ref.current = value;
+    prevSerialized.current = serialized;
+  }
+
+  return ref.current;
+};
+
 export const useNodeListQuery = <T extends LocalNode = LocalNode>(
   userId: string,
   filters: NodeListQueryInput['filters'],
@@ -19,16 +32,18 @@ export const useNodeListQuery = <T extends LocalNode = LocalNode>(
   limit?: number
 ) => {
   const queryClient = useQueryClient();
+  const stableFilters = useStableValue(filters);
+  const stableSorts = useStableValue(sorts);
 
   const input: NodeListQueryInput = useMemo(
     () => ({
       type: 'node.list' as const,
       userId,
-      filters,
-      sorts,
+      filters: stableFilters,
+      sorts: stableSorts,
       limit,
     }),
-    [userId, JSON.stringify(filters), JSON.stringify(sorts), limit]
+    [userId, stableFilters, stableSorts, limit]
   );
 
   const key = useMemo(() => buildQueryKey(input), [input]);
@@ -47,7 +62,7 @@ export const useNodeListQuery = <T extends LocalNode = LocalNode>(
 
       // Check if every filter matches the event node.
       // If no filters match a specific field, we consider it relevant.
-      const isRelevant = filters.every(
+      const isRelevant = stableFilters.every(
         (filter: NodeListQueryInput['filters'][number]) => {
           const field = getFieldName(filter.field);
 
@@ -73,7 +88,7 @@ export const useNodeListQuery = <T extends LocalNode = LocalNode>(
     return () => {
       eventBus.unsubscribe(subscriptionId);
     };
-  }, [key, queryClient]);
+  }, [key, stableFilters, queryClient]);
 
   return useQuery(input) as ReturnType<typeof useQuery<NodeListQueryInput>> & {
     data: T[] | undefined;
