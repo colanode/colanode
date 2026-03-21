@@ -138,26 +138,34 @@ export function MobileEditorApp() {
       }
 
       case 'keyboard.show': {
-        // After the WebView container resizes, scroll cursor into view
+        const kbHeight = (msg.payload as { height: number }).height;
+        // Use the keyboard height to calculate the actual visible area,
+        // since the WebView container may not have resized yet.
         requestAnimationFrame(() => {
           requestAnimationFrame(() => {
+            const container = document.getElementById('scroll-container');
+            if (!container) return;
+
+            // Store keyboard height for CSS use
+            document.documentElement.style.setProperty(
+              '--keyboard-height',
+              `${kbHeight}px`
+            );
+
             const selection = window.getSelection();
             if (selection && selection.rangeCount > 0) {
               const range = selection.getRangeAt(0);
               const rect = range.getBoundingClientRect();
-              const container = document.getElementById('scroll-container');
-              if (container) {
-                const containerRect = container.getBoundingClientRect();
-                const cursorBottom =
-                  rect.bottom - containerRect.top + container.scrollTop;
-                const visibleBottom =
-                  container.scrollTop + container.clientHeight - 60;
-                if (cursorBottom > visibleBottom) {
-                  container.scrollTo({
-                    top: cursorBottom - container.clientHeight + 100,
-                    behavior: 'smooth',
-                  });
-                }
+              const viewportHeight = window.innerHeight;
+              // The visible area ends where the keyboard begins
+              const visibleBottom = viewportHeight - kbHeight - 60;
+              if (rect.bottom > visibleBottom) {
+                // Scroll so cursor is comfortably above the keyboard
+                const scrollBy = rect.bottom - visibleBottom + 40;
+                container.scrollBy({
+                  top: scrollBy,
+                  behavior: 'smooth',
+                });
               }
             }
           });
@@ -166,7 +174,10 @@ export function MobileEditorApp() {
       }
 
       case 'keyboard.hide': {
-        // No-op — container resizes back automatically
+        document.documentElement.style.setProperty(
+          '--keyboard-height',
+          '0px'
+        );
         break;
       }
 
