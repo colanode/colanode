@@ -26,18 +26,18 @@ interface AvatarPickerProps {
 }
 
 const COLORS = [
-  '#5B6EAA',
-  '#8B6BAA',
-  '#A06B96',
-  '#B5677A',
-  '#B56558',
-  '#AA7D55',
-  '#AA9245',
-  '#85A058',
-  '#45B585',
-  '#3FA08A',
-  '#4A8AAA',
-  '#5580AA',
+  '#7B8ABF',
+  '#9B8BB8',
+  '#B08DAF',
+  '#C48B9A',
+  '#C4887D',
+  '#BF9A7A',
+  '#C4A96E',
+  '#A8B07A',
+  '#6BC5A0',
+  '#5BA8A0',
+  '#6AA8BF',
+  '#7A9EC4',
 ];
 
 const getColor = (name: string): string => {
