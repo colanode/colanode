@@ -3,11 +3,14 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Alert, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import Feather from '@expo/vector-icons/Feather';
 
+import { UserAvatar } from '@colanode/mobile/components/avatars/avatar';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useWorkspaceSwitcher } from '@colanode/mobile/contexts/workspace-switcher';
+import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -18,6 +21,13 @@ export default function SettingsScreen() {
   const { colors, preference, setScheme } = useTheme();
   const insets = useSafeAreaInsets();
   const [loggingOut, setLoggingOut] = useState(false);
+
+  const { data: accounts } = useLiveQuery({ type: 'account.list' });
+  const account = (
+    accounts as
+      | Array<{ id: string; name: string; email: string; avatar: string | null }>
+      | undefined
+  )?.find((a) => a.id === accountId);
 
   const handleLogout = () => {
     Alert.alert('Logout', 'Are you sure you want to logout?', [
@@ -69,18 +79,30 @@ export default function SettingsScreen() {
 
       <View style={styles.section}>
         <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Account</Text>
-        <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
-          <Pressable
-            style={({ pressed }) => [
-              styles.cardItem,
-              pressed && { backgroundColor: colors.surfaceHover },
-            ]}
-            onPress={() => router.push('/(app)/(settings)/account')}
-          >
-            <Text style={[styles.menuItemText, { color: colors.text }]}>Edit Profile</Text>
-            <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
-          </Pressable>
-        </View>
+        <Pressable
+          style={({ pressed }) => [
+            styles.card,
+            styles.profileCard,
+            { backgroundColor: colors.cardBackground },
+            pressed && { backgroundColor: colors.surfaceHover },
+          ]}
+          onPress={() => router.push('/(app)/(settings)/account')}
+        >
+          <UserAvatar
+            name={account?.name ?? 'User'}
+            avatar={account?.avatar ?? null}
+            size={48}
+          />
+          <View style={styles.profileInfo}>
+            <Text style={[styles.profileName, { color: colors.text }]} numberOfLines={1}>
+              {account?.name ?? 'User'}
+            </Text>
+            <Text style={[styles.profileEmail, { color: colors.textMuted }]} numberOfLines={1}>
+              {account?.email ?? ''}
+            </Text>
+          </View>
+          <Feather name="chevron-right" size={16} color={colors.textMuted} />
+        </Pressable>
       </View>
 
       <View style={styles.section}>
@@ -105,8 +127,11 @@ export default function SettingsScreen() {
                 ]}
                 onPress={() => router.push('/(app)/(settings)/workspace')}
               >
-                <Text style={[styles.menuItemText, { color: colors.text }]}>Edit Workspace</Text>
-                <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+                <View style={styles.menuItemLeft}>
+                  <Feather name="edit-2" size={20} color={colors.textSecondary} />
+                  <Text style={[styles.menuItemText, { color: colors.text }]}>Edit Workspace</Text>
+                </View>
+                <Feather name="chevron-right" size={16} color={colors.textMuted} />
               </Pressable>
             </>
           )}
@@ -118,8 +143,11 @@ export default function SettingsScreen() {
             ]}
             onPress={() => router.push('/(app)/(settings)/members')}
           >
-            <Text style={[styles.menuItemText, { color: colors.text }]}>Members</Text>
-            <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+            <View style={styles.menuItemLeft}>
+              <Feather name="users" size={20} color={colors.textSecondary} />
+              <Text style={[styles.menuItemText, { color: colors.text }]}>Members</Text>
+            </View>
+            <Feather name="chevron-right" size={16} color={colors.textMuted} />
           </Pressable>
           <View style={[styles.cardSeparator, { backgroundColor: colors.cardSeparator }]} />
           <Pressable
@@ -129,8 +157,11 @@ export default function SettingsScreen() {
             ]}
             onPress={openSwitcher}
           >
-            <Text style={[styles.menuItemText, { color: colors.text }]}>Switch Workspace</Text>
-            <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+            <View style={styles.menuItemLeft}>
+              <Feather name="repeat" size={20} color={colors.textSecondary} />
+              <Text style={[styles.menuItemText, { color: colors.text }]}>Switch Workspace</Text>
+            </View>
+            <Feather name="chevron-right" size={16} color={colors.textMuted} />
           </Pressable>
         </View>
       </View>
@@ -184,8 +215,11 @@ export default function SettingsScreen() {
             ]}
             onPress={() => router.push('/(app)/(settings)/about')}
           >
-            <Text style={[styles.menuItemText, { color: colors.text }]}>About</Text>
-            <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+            <View style={styles.menuItemLeft}>
+              <Feather name="info" size={20} color={colors.textSecondary} />
+              <Text style={[styles.menuItemText, { color: colors.text }]}>About</Text>
+            </View>
+            <Feather name="chevron-right" size={16} color={colors.textMuted} />
           </Pressable>
         </View>
       </View>
@@ -199,9 +233,12 @@ export default function SettingsScreen() {
           onPress={handleLogout}
           disabled={loggingOut}
         >
-          <Text style={[styles.logoutText, { color: colors.error }]}>
-            {loggingOut ? 'Logging out...' : 'Log Out'}
-          </Text>
+          <View style={styles.menuItemLeft}>
+            <Feather name="log-out" size={20} color={colors.error} />
+            <Text style={[styles.logoutText, { color: colors.error }]}>
+              {loggingOut ? 'Logging out...' : 'Log Out'}
+            </Text>
+          </View>
         </Pressable>
       </View>
     </ScrollView>
@@ -237,6 +274,24 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     overflow: 'hidden',
   },
+  profileCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 14,
+    gap: 12,
+  },
+  profileInfo: {
+    flex: 1,
+    gap: 2,
+  },
+  profileName: {
+    fontSize: 17,
+    fontWeight: '600',
+  },
+  profileEmail: {
+    fontSize: 13,
+  },
   cardItem: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -248,11 +303,13 @@ const styles = StyleSheet.create({
     height: StyleSheet.hairlineWidth,
     marginLeft: 16,
   },
+  menuItemLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   menuItemText: {
     fontSize: 16,
-  },
-  chevron: {
-    fontSize: 20,
   },
   infoLabel: {
     fontSize: 16,
