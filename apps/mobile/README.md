@@ -14,15 +14,109 @@ Colanode Mobile is an Expo + React Native client for Colanode's local-first coll
 
 The app is mostly native React Native UI. The main exception is page editing: the rich-text editor runs as a small browser app inside a `WebView`, while the surrounding shell, routing, data access, and native integrations stay in React Native.
 
+## Architecture
+
+```mermaid
+graph TB
+    subgraph Clients
+        Web["Web App<br/>(Vite + React)"]
+        Desktop["Desktop App<br/>(Electron)"]
+        Mobile["Mobile App<br/>(Expo + React Native)"]
+    end
+
+    subgraph "Shared Packages"
+        Core["@colanode/core<br/>Types, schemas, permissions"]
+        Client["@colanode/client<br/>Queries, mutations, sync"]
+        CRDT["@colanode/crdt<br/>Yjs documents"]
+        UI["@colanode/ui<br/>Shared editor + components"]
+    end
+
+    subgraph Server
+        API["Fastify API Server"]
+        WS["WebSocket"]
+        Postgres[(Postgres)]
+        Redis[(Redis)]
+        Jobs["BullMQ Jobs"]
+    end
+
+    Web --> Core & Client & CRDT & UI
+    Desktop --> Core & Client & CRDT & UI
+    Mobile --> Core & Client & CRDT
+
+    Web -- "HTTP + WS" --> API
+    Desktop -- "HTTP + WS" --> API
+    Mobile -- "HTTP + WS" --> API
+
+    API --> Postgres & Redis
+    WS --> Redis
+    Jobs --> Postgres & Redis
+
+    style Mobile fill:#4B7BE5,color:#fff
+```
+
+### How data flows on mobile
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Screen as Native Screen
+    participant SQLite as Local SQLite
+    participant Sync as MutationService
+    participant Server as Colanode Server
+
+    User->>Screen: Tap / type / interact
+    Screen->>SQLite: Write locally (optimistic)
+    Screen-->>User: UI updates instantly
+    SQLite->>Sync: Queue mutation
+    Sync->>Server: POST /mutations (batched)
+    Server-->>Sync: ACK + revision
+    Server->>Screen: WebSocket push (other changes)
+    Screen->>SQLite: Apply remote updates
+    SQLite-->>Screen: Reactive query fires
+    Screen-->>User: UI refreshes
+```
+
+### How the embedded page editor works
+
+```mermaid
+sequenceDiagram
+    participant Page as Native Page Screen
+    participant WV as WebView (TipTap)
+    participant Bridge as Bridge Messages
+    participant App as AppService
+
+    Page->>WV: Load editor.html asset
+    WV->>Bridge: "ready"
+    Page->>WV: Send CRDT state + theme + permissions
+    WV->>WV: Render TipTap editor
+
+    loop User edits
+        WV->>Bridge: mutation.request
+        Bridge->>App: Execute via mediator
+        App-->>Bridge: Result
+        Bridge-->>WV: mutation.response
+    end
+
+    WV->>Bridge: query.request (e.g. node lookup)
+    Bridge->>App: Execute query
+    App-->>Bridge: Result
+    Bridge-->>WV: query.response
+
+    Note over Page,WV: CRDT updates debounced (500ms),<br/>flushed on background/navigate
+```
+
 ## What Exists Today
 
-- Authentication: server selection, OTP login, registration, password reset
-- Local-first chat and channel browsing
-- Spaces, folders, files, pages, and workspace navigation
-- Page viewing and editing
-- File picking and uploads from the device
-- Workspace switching and basic settings flows
-- Offline-aware reads from the local SQLite cache
+- **Authentication:** server selection, OTP login, registration, password reset
+- **Messaging:** chat and channel browsing, message sending, replies, reactions, editing, deletion
+- **Content:** spaces, folders, files, pages, and workspace navigation
+- **Page editing:** inline rich-text editing via embedded TipTap WebView (paragraph, headings, lists, tasks, blockquotes, horizontal rules)
+- **File management:** file picking, upload (resumable via tus-js-client), download, and preview
+- **Workspaces:** workspace switching, creation, and basic settings
+- **Members:** member list, invite flow with email chips and role picker
+- **Offline support:** reads from local SQLite cache, offline-aware UI with network banner
+- **Unread tracking:** unread dots on chat list items, unread summary on home screen
+- **Theming:** dark and light mode with system preference detection
 
 ## Getting Started
 
@@ -45,210 +139,169 @@ npm install
 
 ```bash
 cd apps/mobile
-npm run ios
+npm run ios       # iOS Simulator
+npm run android   # Android Emulator
+npm run start     # Expo dev server only
 ```
 
-```bash
-cd apps/mobile
-npm run android
-```
-
-```bash
-cd apps/mobile
-npm run start
-```
-
-The `prestart`, `preios`, and `preandroid` scripts prepare the embedded page editor asset before Expo starts.
-
-## High-Level Architecture
-
-There are three important layers:
-
-### 1. Native mobile shell
-
-This is the real Expo / React Native app:
-
-- file-based routes under `app/`
-- native screens and components under `src/`
-- Expo-backed services for filesystem, SQLite, paths, media picking, and platform integration
-
-This layer owns:
-
-- navigation
-- auth flow
-- workspace selection
-- chat UI
-- native sheets and action menus
-- loading data from the local client services
-- sending mutations and handling platform integrations
-
-### 2. Shared local-first data layer
-
-The mobile app follows the same local-first model as the desktop and web clients:
-
-1. Reads come from the local SQLite cache.
-2. Writes are applied locally first.
-3. Mutations sync to the server in the background.
-4. CRDT updates merge concurrent document edits.
-5. WebSocket-based synchronizers keep local state fresh.
-
-This is why mobile can reuse so much from `@colanode/client`, `@colanode/core`, and `@colanode/crdt` instead of reimplementing business logic in the app.
-
-### 3. Embedded page editor
-
-Rich-text page editing is implemented as an embedded browser app loaded into a React Native `WebView`.
-
-Why this exists:
-
-- the shared editor stack is browser-oriented
-- TipTap / ProseMirror depend on DOM APIs
-- React Native cannot run DOM-based editor code directly
-- a `WebView` gives the app a browser runtime inside the native screen
-
-So the page editor is effectively "a tiny website shipped inside the app".
-
-## How Page Editing Works
-
-The page screen is still a native screen, but the document body is rendered by the embedded editor.
-
-High-level flow:
-
-1. The native page screen loads the page node, current document state, and pending document updates using the shared mobile hooks.
-2. `PageWebView` loads a local HTML asset into `react-native-webview`.
-3. That HTML boots the embedded editor app, which uses `react-dom` and the shared editor stack.
-4. The editor sends a `ready` message to the native shell.
-5. The native shell sends initial state, theme, permissions, and document data into the WebView.
-6. When the editor needs queries or mutations, it sends bridge messages back to native.
-7. The native app executes those operations through the existing mediator and returns the results.
-
-In practice:
-
-- native owns the page screen, routing, theme, and app services
-- the embedded browser app owns the DOM-based editor UI
-- the bridge connects the two
-
-## Embedded Editor Setup
-
-The editor lives in its own browser-oriented mini-app:
-
-```text
-apps/mobile/webviews/editor/
-```
-
-That directory has its own:
-
-- `package.json`
-- `tsconfig.json`
-- `vite.config.ts`
-- `editor.html`
-- browser-side `src/`
-
-The editor is built into a single HTML file:
-
-```text
-apps/mobile/webviews/editor/dist/editor.html
-```
-
-Then the copy script:
-
-```text
-apps/mobile/scripts/copy-editor.js
-```
-
-copies the built file into:
-
-```text
-apps/mobile/assets/editor-dist/editor.html
-```
-
-Metro bundles that copied HTML asset with the native app, and `PageWebView` loads it at runtime.
-
-This split is intentional:
-
-- `apps/mobile/src/**` stays native-only
-- `apps/mobile/webviews/editor/**` stays browser-only
-
-Keeping those runtimes separate makes the build, TypeScript config, and mental model much clearer.
+The `prestart`, `preios`, and `preandroid` scripts build and copy the embedded page editor asset before Expo starts.
 
 ## Project Structure
 
 ```text
 apps/mobile/
-├── app/                       # Expo Router routes
-│   ├── (auth)/                # Authentication flows
-│   └── (app)/                 # Main application routes
+├── app/                               # Expo Router file-based routes
+│   ├── _layout.tsx                    # Root: AppService init, QueryClient, SplashScreen
+│   ├── (auth)/                        # Auth screens
+│   │   ├── index.tsx                  #   Server selection
+│   │   ├── login.tsx                  #   Email/password + OTP login
+│   │   ├── register.tsx               #   Registration
+│   │   ├── reset.tsx                  #   Password reset
+│   │   ├── server-add.tsx             #   Add custom server
+│   │   └── create-workspace.tsx       #   First workspace creation
+│   └── (app)/                         # Main app (tabs)
+│       ├── _layout.tsx                # Tab navigator + WorkspaceContext
+│       ├── (home)/index.tsx           # Unread summary, recent chats, quick actions
+│       ├── (chats)/                   # Chat tab
+│       │   ├── index.tsx              #   Chat list
+│       │   ├── [chatId].tsx           #   Conversation view
+│       │   └── new-chat.tsx           #   Create chat
+│       ├── (spaces)/                  # Spaces tab
+│       │   ├── index.tsx              #   Space list
+│       │   ├── create-space.tsx       #   Create space form
+│       │   ├── space/[spaceId].tsx    #   Space children browser
+│       │   ├── channel/[channelId].tsx#   Channel messages
+│       │   ├── page/[pageId]/         #   Page viewer/editor (WebView)
+│       │   ├── file/[fileId].tsx      #   File preview/download
+│       │   └── folder/[folderId].tsx  #   Folder contents
+│       └── (settings)/                # Settings tab
+│           ├── index.tsx              #   Settings home
+│           ├── account.tsx            #   Account + avatar upload
+│           ├── workspace.tsx          #   Workspace settings
+│           ├── members.tsx            #   Member list
+│           ├── invite.tsx             #   Invite members
+│           ├── create-workspace.tsx   #   Create workspace
+│           └── about.tsx              #   App info
 ├── src/
-│   ├── components/            # Native React Native UI
-│   ├── contexts/              # App, theme, workspace, and other providers
-│   ├── hooks/                 # Query, mutation, and platform hooks
-│   ├── lib/                   # Mobile-specific helpers
-│   ├── mocks/                 # Metro mocks for browser-only modules
-│   └── services/              # Expo-backed implementations for client services
-├── scripts/
-│   └── copy-editor.js         # Builds/copies the embedded editor asset
+│   ├── components/
+│   │   ├── ui/                        # Reusable: buttons, inputs, sheets, banners
+│   │   ├── messages/                  # Message list, items, input, reactions, actions
+│   │   ├── nodes/                     # Node icons, child lists, create/rename/action sheets
+│   │   ├── pages/                     # WebView wrapper, editor toolbar, block type sheet
+│   │   ├── auth/                      # Login, register, verify, reset forms
+│   │   ├── avatars/                   # Avatar display + picker
+│   │   ├── emojis/                    # Emoji picker (categories + search)
+│   │   ├── chats/                     # Chat list items with unread badges
+│   │   ├── spaces/                    # Space list items
+│   │   ├── files/                     # File list items
+│   │   ├── workspaces/                # Workspace switcher, create form
+│   │   └── conversation/              # Shared conversation screen
+│   ├── contexts/                      # App service, workspace, theme, switcher
+│   ├── hooks/                         # useLiveQuery, useQuery, useMutation, useNodeRole, etc.
+│   ├── services/                      # Expo implementations: filesystem, SQLite, paths
+│   ├── lib/                           # Crypto polyfill, colors, query client, utils
+│   └── mocks/                         # Metro mocks for browser-only modules
 ├── webviews/
-│   └── editor/                # Browser app used inside the page WebView
+│   └── editor/                        # Embedded TipTap editor (separate Vite build)
+│       ├── src/                       # Editor app: bridge, extensions, views
+│       ├── vite.config.ts             # Builds to single HTML file
+│       └── editor.html                # Entry HTML
 ├── assets/
-│   └── editor-dist/           # Generated HTML asset loaded by the WebView
-├── metro.config.js            # Metro asset + module resolution customization
-└── README.md
+│   └── editor-dist/editor.html        # Built editor asset (copied by pre-scripts)
+├── scripts/copy-editor.js             # Builds + copies editor before Expo starts
+├── index.js                           # Entry: crypto polyfill → expo-router
+├── app.json                           # Expo config (iOS + Android)
+├── eas.json                           # EAS Build profiles
+├── metro.config.js                    # Asset extensions, module mocks
+└── tsconfig.json                      # TypeScript config with package aliases
 ```
 
-## Key Mobile-Specific Pieces
+## Key Layers
 
-### Routing
+### 1. Native mobile shell
 
-Expo Router is used for file-based routing. The app is split into `(auth)` and `(app)` route groups, with nested stacks and tabs for the main experience.
+The Expo / React Native app handles everything except the rich-text editor DOM:
 
-### Contexts and services
+- File-based routing via Expo Router with `(auth)` and `(app)` route groups
+- Tab navigation: Home, Spaces, Chats, Settings
+- Native screens and components for all UI
+- Expo-backed services for filesystem, SQLite, camera/media, clipboard, and network detection
+- TanStack Query for data fetching with event bus integration
 
-The mobile app wires shared client abstractions to Expo APIs:
+### 2. Shared local-first data layer
 
-- filesystem access
-- local SQLite database access
-- path resolution
-- network state
-- theming and workspace state
+The mobile app follows the same local-first model as the desktop and web clients:
 
-### Queries and mutations
+1. **Reads** come from the local SQLite cache (instant).
+2. **Writes** are applied locally first (optimistic).
+3. **Mutations** sync to the server in batches via HTTP.
+4. **CRDT updates** merge concurrent document edits via Yjs.
+5. **WebSocket synchronizers** keep local state fresh with cursor-based streaming.
 
-The hooks in `src/hooks/` wrap the shared client mediator so screens and components can read from the local database and execute mutations without duplicating business logic.
+This is why mobile can reuse `@colanode/client`, `@colanode/core`, and `@colanode/crdt` instead of reimplementing business logic.
 
-### Metro configuration
+### 3. Embedded page editor
 
-`metro.config.js` is customized so the mobile app can:
+Rich-text page editing is implemented as an embedded browser app loaded into a React Native `WebView`.
 
-- bundle `.db` assets such as emoji/icon databases
-- bundle `.html` assets for the embedded editor
-- mock browser-only dependencies that should not execute in the native runtime
+Why:
+
+- The shared editor stack (TipTap / ProseMirror) depends on DOM APIs
+- React Native cannot run DOM-based editor code directly
+- A WebView gives the app a browser runtime inside the native screen
+- This lets mobile reuse the mature shared web editor instead of maintaining a second implementation
+
+The editor lives in `webviews/editor/`, has its own Vite build, and produces a single HTML file that Metro bundles as an asset. The native `PageWebView` component loads it and communicates via a bidirectional message bridge.
+
+## Metro Configuration
+
+`metro.config.js` is customized for mobile-specific needs:
+
+- **Asset extensions:** `.db` (emoji/icon databases) and `.html` (embedded editor)
+- **Empty mocks:** `@tiptap/core`, `@tiptap/pm` (DOM-dependent, pulled in via barrel exports but not used at runtime)
+- **Custom mocks:** `isomorphic-webcrypto` (delegates to native `globalThis.crypto`)
+- **Blocked patterns:** `kysely/dist/*file-migration-provider` (webpack-specific, incompatible with Hermes)
+
+The custom `index.js` entry point loads `crypto-polyfill.ts` before anything else, ensuring `crypto.getRandomValues` is available when `ulid` and Yjs modules initialize.
 
 ## Working On The Embedded Editor
 
-If you are changing the page editor itself:
-
-- browser-side editor code lives in `apps/mobile/webviews/editor/src/`
-- native hosting/bridge code lives in `apps/mobile/src/components/pages/page-webview.tsx`
-- the native page screen lives in `apps/mobile/app/(app)/(spaces)/page/[pageId]/index.tsx`
-
-Useful commands:
+Browser-side editor code lives in `webviews/editor/src/`. Native hosting and bridge code lives in `src/components/pages/page-webview.tsx`. The native page screen is at `app/(app)/(spaces)/page/[pageId]/index.tsx`.
 
 ```bash
+# Rebuild the editor after changes
 cd apps/mobile/webviews/editor
 npm run build
-```
 
-```bash
-cd apps/mobile/webviews/editor
-npm run compile
-```
-
-```bash
+# Run the app (pre-scripts rebuild automatically)
 cd apps/mobile
 npm run ios
 ```
+
+The bridge protocol supports:
+
+| Direction | Messages |
+|---|---|
+| Native → WebView | `init`, `state.update`, `theme.change`, `permission.change`, `flush`, `block.command`, keyboard events |
+| WebView → Native | `ready`, `mutation.request`, `query.request`, `navigate.node`, `navigate.url`, `editor.focus`, `error` |
+
+## Dependencies
+
+| Category | Key packages |
+|---|---|
+| Framework | `expo` ~54, `react` 19.1, `react-native` 0.81 |
+| Routing | `expo-router` ~6 |
+| State | `@tanstack/react-query` ^5 |
+| Platform APIs | `expo-file-system`, `expo-sqlite`, `expo-crypto`, `expo-image-picker`, `expo-document-picker`, `expo-clipboard` |
+| Network | `@react-native-community/netinfo` |
+| WebView | `react-native-webview` ^13 |
+| UI | `react-native-svg`, `react-native-screens`, `react-native-safe-area-context` |
 
 ## Notes And Tradeoffs
 
 - The app is still evolving quickly, so some flows are intentionally incomplete.
 - The page title is managed by the native screen header, while the document body is managed by the embedded editor.
-- Using a `WebView` for the editor is a tradeoff: it adds build/bridge complexity, but it allows the app to reuse the mature shared web editor stack instead of maintaining a second rich-text editor implementation in pure React Native.
+- Using a WebView for the editor adds build/bridge complexity, but lets the app reuse the mature shared web editor stack instead of maintaining a second rich-text editor in pure React Native.
+- No inline mark editing (bold/italic) in the editor yet — plain text formatting per block only.
+- No database views on mobile (complex, poor mobile UX).
+- No push notifications yet.
