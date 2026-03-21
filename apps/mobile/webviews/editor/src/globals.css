@@ -41,6 +41,13 @@
 /* Mobile-specific editor styles */
 .ProseMirror {
   min-height: 70vh;
-  padding-bottom: 60vh;
+  padding-bottom: max(60vh, 400px);
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Extra bottom spacer that's always visible, providing Notion-like scroll space */
+#editor-root::after {
+  content: '';
+  display: block;
+  min-height: 40vh;
 }

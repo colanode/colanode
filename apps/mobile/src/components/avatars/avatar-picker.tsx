@@ -173,7 +173,7 @@ export const AvatarPicker = ({
           </View>
         )}
         <View style={[styles.editBadge, { backgroundColor: colors.primary }]}>
-          <Text style={[styles.editBadgeText, { color: colors.text }]}>Edit</Text>
+          <Text style={[styles.editBadgeText, { color: colors.primaryText }]}>Edit</Text>
         </View>
       </View>
     </Pressable>
