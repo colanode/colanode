@@ -87,12 +87,12 @@ export default function ChatsScreen() {
       <Pressable
         style={({ pressed }) => [
           styles.fab,
-          { backgroundColor: colors.surface },
+          { backgroundColor: colors.primary },
           pressed && styles.fabPressed,
         ]}
         onPress={() => router.push('/(app)/(chats)/new-chat')}
       >
-        <Feather name="plus" size={22} color={colors.text} />
+        <Feather name="plus" size={22} color={colors.badgeText} />
       </Pressable>
     </View>
   );
@@ -117,15 +117,15 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 24,
     right: 20,
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 16,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
     elevation: 6,
   },
   fabPressed: {

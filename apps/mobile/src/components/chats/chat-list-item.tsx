@@ -56,7 +56,7 @@ export const ChatListItem = memo(({
           {displayName}
         </Text>
         {messagePreview ? (
-          <Text style={[styles.preview, { color: colors.textMuted }]} numberOfLines={1}>
+          <Text style={[styles.preview, { color: colors.textTertiary }]} numberOfLines={1}>
             {messagePreview}
           </Text>
         ) : null}
@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 16,
   },
   info: {

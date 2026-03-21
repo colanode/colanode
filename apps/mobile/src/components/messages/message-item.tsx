@@ -98,7 +98,7 @@ export const MessageItem = memo(({
           style={[
             styles.bubble,
             { backgroundColor: isOwnMessage ? colors.ownBubble : colors.otherBubble },
-            isOwnMessage && styles.ownBubble,
+            isOwnMessage ? styles.ownBubble : styles.otherBubbleTail,
           ]}
         >
           {referencedMessage && (
@@ -110,14 +110,14 @@ export const MessageItem = memo(({
             </View>
           )}
           {!isOwnMessage && (
-            <Text style={[styles.authorName, { color: colors.primaryLight }]}>{authorName}</Text>
+            <Text style={[styles.authorName, { color: colors.primary }]}>{authorName}</Text>
           )}
           {jsonContent ? (
             <BlockRenderer content={jsonContent} />
           ) : (
             <Text style={[styles.emptyMessage, { color: colors.textMuted }]}>(empty message)</Text>
           )}
-          <Text style={[styles.time, { color: colors.textMuted }]}>{formatMessageTime(message.createdAt)}</Text>
+          <Text style={[styles.time, { color: colors.textTertiary }]}>{formatMessageTime(message.createdAt)}</Text>
         </View>
         {isOwnMessage && <View style={styles.ownSpacer} />}
       </View>
@@ -149,19 +149,23 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   bubble: {
-    maxWidth: '80%',
-    borderRadius: 12,
-    paddingHorizontal: 12,
+    maxWidth: '78%',
+    borderRadius: 16,
+    paddingHorizontal: 14,
     paddingVertical: 8,
   },
   ownBubble: {
     marginLeft: 'auto',
+    borderBottomRightRadius: 4,
+  },
+  otherBubbleTail: {
+    borderBottomLeftRadius: 4,
   },
   ownSpacer: {
     width: 0,
   },
   replyPreview: {
-    borderLeftWidth: 2,
+    borderLeftWidth: 3,
     paddingLeft: 8,
     marginBottom: 6,
     gap: 1,

@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   readOnlyValue: {
-    borderRadius: 8,
+    borderRadius: 10,
     paddingHorizontal: 14,
     paddingVertical: 12,
     fontSize: 16,

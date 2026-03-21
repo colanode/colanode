@@ -1,3 +1,4 @@
+import Feather from '@expo/vector-icons/Feather';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
@@ -58,6 +59,8 @@ export default function SettingsScreen() {
 
   const canEditWorkspace = role === 'owner' || role === 'admin';
 
+  const themeIcons = { dark: 'moon', light: 'sun', system: 'smartphone' } as const;
+
   return (
     <ScrollView
       style={[styles.scroll, { backgroundColor: colors.background }]}
@@ -68,8 +71,8 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Account</Text>
-        <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
+        <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>Account</Text>
+        <View style={[styles.card, { backgroundColor: colors.surfaceGrouped }]}>
           <Pressable
             style={({ pressed }) => [
               styles.cardItem,
@@ -77,22 +80,25 @@ export default function SettingsScreen() {
             ]}
             onPress={() => router.push('/(app)/(settings)/account')}
           >
-            <Text style={[styles.menuItemText, { color: colors.text }]}>Edit Profile</Text>
-            <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+            <View style={styles.menuItemRow}>
+              <Feather name="user" size={18} color={colors.textSecondary} />
+              <Text style={[styles.menuItemText, { color: colors.text }]}>Edit Profile</Text>
+            </View>
+            <Feather name="chevron-right" size={18} color={colors.textMuted} />
           </Pressable>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Workspace</Text>
-        <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
+        <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>Workspace</Text>
+        <View style={[styles.card, { backgroundColor: colors.surfaceGrouped }]}>
           <View style={styles.cardItem}>
-            <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Name</Text>
+            <Text style={[styles.infoLabel, { color: colors.textTertiary }]}>Name</Text>
             <Text style={[styles.infoValue, { color: colors.text }]}>{workspace.name}</Text>
           </View>
           <View style={[styles.cardSeparator, { backgroundColor: colors.cardSeparator }]} />
           <View style={styles.cardItem}>
-            <Text style={[styles.infoLabel, { color: colors.textSecondary }]}>Role</Text>
+            <Text style={[styles.infoLabel, { color: colors.textTertiary }]}>Role</Text>
             <Text style={[styles.infoValue, { color: colors.text }]}>{role.charAt(0).toUpperCase() + role.slice(1)}</Text>
           </View>
           {canEditWorkspace && (
@@ -105,8 +111,11 @@ export default function SettingsScreen() {
                 ]}
                 onPress={() => router.push('/(app)/(settings)/workspace')}
               >
-                <Text style={[styles.menuItemText, { color: colors.text }]}>Edit Workspace</Text>
-                <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+                <View style={styles.menuItemRow}>
+                  <Feather name="briefcase" size={18} color={colors.textSecondary} />
+                  <Text style={[styles.menuItemText, { color: colors.text }]}>Edit Workspace</Text>
+                </View>
+                <Feather name="chevron-right" size={18} color={colors.textMuted} />
               </Pressable>
             </>
           )}
@@ -118,8 +127,11 @@ export default function SettingsScreen() {
             ]}
             onPress={() => router.push('/(app)/(settings)/members')}
           >
-            <Text style={[styles.menuItemText, { color: colors.text }]}>Members</Text>
-            <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+            <View style={styles.menuItemRow}>
+              <Feather name="users" size={18} color={colors.textSecondary} />
+              <Text style={[styles.menuItemText, { color: colors.text }]}>Members</Text>
+            </View>
+            <Feather name="chevron-right" size={18} color={colors.textMuted} />
           </Pressable>
           <View style={[styles.cardSeparator, { backgroundColor: colors.cardSeparator }]} />
           <Pressable
@@ -129,14 +141,17 @@ export default function SettingsScreen() {
             ]}
             onPress={openSwitcher}
           >
-            <Text style={[styles.menuItemText, { color: colors.text }]}>Switch Workspace</Text>
-            <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+            <View style={styles.menuItemRow}>
+              <Feather name="repeat" size={18} color={colors.textSecondary} />
+              <Text style={[styles.menuItemText, { color: colors.text }]}>Switch Workspace</Text>
+            </View>
+            <Feather name="chevron-right" size={18} color={colors.textMuted} />
           </Pressable>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>Appearance</Text>
+        <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>Appearance</Text>
         <View style={styles.themeRow}>
           {(['dark', 'light', 'system'] as const).map((option) => {
             const isActive = option === preference;
@@ -149,13 +164,18 @@ export default function SettingsScreen() {
                     backgroundColor: isActive
                       ? colors.surfaceAccent
                       : colors.surface,
-                    borderColor: isActive ? colors.primary : colors.border,
+                    borderColor: isActive ? colors.primary : colors.surfaceActive,
                   },
                 ]}
                 onPress={() => {
                   void setScheme(option);
                 }}
               >
+                <Feather
+                  name={themeIcons[option]}
+                  size={16}
+                  color={isActive ? colors.primary : colors.textSecondary}
+                />
                 <Text
                   style={[
                     styles.themeOptionText,
@@ -175,8 +195,8 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.section}>
-        <Text style={[styles.sectionTitle, { color: colors.textMuted }]}>App</Text>
-        <View style={[styles.card, { backgroundColor: colors.cardBackground }]}>
+        <Text style={[styles.sectionTitle, { color: colors.textTertiary }]}>App</Text>
+        <View style={[styles.card, { backgroundColor: colors.surfaceGrouped }]}>
           <Pressable
             style={({ pressed }) => [
               styles.cardItem,
@@ -184,8 +204,11 @@ export default function SettingsScreen() {
             ]}
             onPress={() => router.push('/(app)/(settings)/about')}
           >
-            <Text style={[styles.menuItemText, { color: colors.text }]}>About</Text>
-            <Text style={[styles.chevron, { color: colors.textMuted }]}>{'\u203A'}</Text>
+            <View style={styles.menuItemRow}>
+              <Feather name="info" size={18} color={colors.textSecondary} />
+              <Text style={[styles.menuItemText, { color: colors.text }]}>About</Text>
+            </View>
+            <Feather name="chevron-right" size={18} color={colors.textMuted} />
           </Pressable>
         </View>
       </View>
@@ -224,13 +247,14 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
   },
   section: {
-    marginBottom: 32,
+    marginBottom: 24,
     paddingHorizontal: 16,
   },
   sectionTitle: {
     fontSize: 12,
     fontWeight: '500',
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
+    textTransform: 'uppercase',
     marginBottom: 10,
   },
   card: {
@@ -248,14 +272,16 @@ const styles = StyleSheet.create({
     height: StyleSheet.hairlineWidth,
     marginLeft: 16,
   },
+  menuItemRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
+  },
   menuItemText: {
     fontSize: 16,
   },
-  chevron: {
-    fontSize: 20,
-  },
   infoLabel: {
-    fontSize: 16,
+    fontSize: 14,
   },
   infoValue: {
     fontSize: 16,
@@ -274,7 +300,10 @@ const styles = StyleSheet.create({
   },
   themeOption: {
     flex: 1,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    gap: 6,
     paddingVertical: 12,
     borderRadius: 10,
     borderWidth: 1,

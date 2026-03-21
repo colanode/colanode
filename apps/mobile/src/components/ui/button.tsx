@@ -25,7 +25,7 @@ const getVariantStyles = (
 ): ViewStyle => {
   switch (variant) {
     case 'primary':
-      return { backgroundColor: colors.text };
+      return { backgroundColor: colors.primary };
     case 'secondary':
       return {
         backgroundColor: colors.surfaceHover,
@@ -45,7 +45,7 @@ const getVariantTextColor = (
 ): string => {
   switch (variant) {
     case 'primary':
-      return colors.background;
+      return colors.primaryText;
     case 'secondary':
       return colors.text;
     case 'destructive':
@@ -102,7 +102,7 @@ export const Button = ({
       {loading ? (
         <ActivityIndicator
           size="small"
-          color={variant === 'primary' ? colors.background : colors.text}
+          color={variant === 'primary' ? colors.primaryText : colors.text}
         />
       ) : (
         <Text style={[styles.text, { color: textColor, fontWeight }]}>
@@ -115,7 +115,7 @@ export const Button = ({
 
 const styles = StyleSheet.create({
   base: {
-    borderRadius: 8,
+    borderRadius: 10,
     paddingVertical: 12,
     paddingHorizontal: 20,
     alignItems: 'center',

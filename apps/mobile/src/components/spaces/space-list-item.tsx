@@ -1,3 +1,4 @@
+import Feather from '@expo/vector-icons/Feather';
 import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
@@ -23,19 +24,19 @@ export const SpaceListItem = memo(({ space, onPress }: SpaceListItemProps) => {
       <UserAvatar
         name={space.name}
         avatar={space.avatar ?? null}
-        size={40}
+        size={44}
       />
       <View style={styles.info}>
         <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
           {space.name}
         </Text>
         {space.description && (
-          <Text style={[styles.description, { color: colors.textMuted }]} numberOfLines={1}>
+          <Text style={[styles.description, { color: colors.textTertiary }]} numberOfLines={1}>
             {space.description}
           </Text>
         )}
       </View>
-      <Text style={[styles.chevron, { color: colors.sheetHandle }]}>{'\u203A'}</Text>
+      <Feather name="chevron-right" size={18} color={colors.textMuted} />
     </Pressable>
   );
 });
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 12,
-    paddingVertical: 12,
+    paddingVertical: 14,
     paddingHorizontal: 16,
   },
   info: {
@@ -59,8 +60,5 @@ const styles = StyleSheet.create({
   },
   description: {
     fontSize: 13,
-  },
-  chevron: {
-    fontSize: 24,
   },
 });

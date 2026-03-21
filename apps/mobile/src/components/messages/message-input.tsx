@@ -155,7 +155,7 @@ export const MessageInput = ({
   return (
     <View style={[styles.container, { paddingBottom: Math.max(insets.bottom, 8), backgroundColor: colors.background, borderTopColor: colors.border }]}>
       {isEditing && (
-        <View style={[styles.editBanner, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <View style={[styles.editBanner, { backgroundColor: colors.surfaceGrouped, borderBottomColor: colors.border }]}>
           <View style={styles.editBannerContent}>
             <Feather name="edit-2" size={14} color={colors.primaryLight} />
             <Text style={[styles.editBannerLabel, { color: colors.primaryLight }]}>Editing message</Text>
@@ -171,7 +171,7 @@ export const MessageInput = ({
         </View>
       )}
       {replyTo && !isEditing && (
-        <View style={[styles.replyBanner, { backgroundColor: colors.surface, borderBottomColor: colors.border }]}>
+        <View style={[styles.replyBanner, { backgroundColor: colors.surfaceGrouped, borderBottomColor: colors.border }]}>
           <View style={styles.replyBannerContent}>
             <Text style={[styles.replyBannerLabel, { color: colors.textMuted }]}>
               Replying to{' '}
@@ -215,9 +215,9 @@ export const MessageInput = ({
           accessibilityState={{ disabled: !text.trim() || isPending }}
         >
           <Feather
-            name={isEditing ? 'check' : 'arrow-up'}
+            name={isEditing ? 'check' : 'send'}
             size={20}
-            color={colors.text}
+            color={colors.badgeText}
           />
         </Pressable>
       </View>
@@ -233,7 +233,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 6,
     borderBottomWidth: 1,
   },
   editBannerContent: {
@@ -250,7 +250,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 16,
-    paddingVertical: 8,
+    paddingVertical: 6,
     borderBottomWidth: 1,
   },
   replyBannerContent: {
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
   },
   input: {
     flex: 1,
-    borderRadius: 20,
+    borderRadius: 16,
     paddingHorizontal: 16,
     paddingTop: 10,
     paddingBottom: 10,

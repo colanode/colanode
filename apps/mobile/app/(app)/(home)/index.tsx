@@ -77,7 +77,7 @@ export default function HomeScreen() {
         <UserAvatar
           name={workspace.name}
           avatar={workspace.avatar ?? null}
-          size={56}
+          size={44}
         />
         <View style={styles.headerText}>
           <Text style={[styles.greeting, { color: colors.text }]}>{greeting}</Text>
@@ -89,7 +89,8 @@ export default function HomeScreen() {
       </Pressable>
 
       {totalUnread > 0 && (
-        <View style={[styles.unreadCard, { backgroundColor: colors.surface, borderLeftColor: colors.primary }]}>
+        <View style={[styles.unreadCard, { backgroundColor: colors.primaryMuted, borderLeftColor: colors.primary }]}>
+          <Feather name="message-circle" size={16} color={colors.primary} style={styles.unreadIcon} />
           <Text style={[styles.unreadText, { color: colors.textSecondary }]}>
             {totalUnread} unread message{totalUnread !== 1 ? 's' : ''}
             {unreadChats > 0
@@ -103,21 +104,21 @@ export default function HomeScreen() {
         <Pressable
           style={({ pressed }) => [
             styles.quickAction,
-            { backgroundColor: colors.surfaceAccent },
-            pressed && { backgroundColor: colors.surfaceAccentDeep },
+            { backgroundColor: colors.primary },
+            pressed && { opacity: 0.85 },
           ]}
           onPress={() => router.push('/(app)/(chats)/new-chat')}
           accessibilityRole="button"
           accessibilityLabel="New chat"
         >
-          <Feather name="message-circle" size={20} color={colors.primary} />
-          <Text style={[styles.quickActionText, { color: colors.text }]}>New Chat</Text>
+          <Feather name="message-circle" size={18} color={colors.badgeText} />
+          <Text style={[styles.quickActionText, { color: colors.badgeText }]}>New Chat</Text>
         </Pressable>
         <Pressable
           style={({ pressed }) => [
             styles.quickAction,
-            { backgroundColor: colors.surfaceAccent },
-            pressed && { backgroundColor: colors.surfaceAccentDeep },
+            { backgroundColor: colors.surfaceGrouped },
+            pressed && { backgroundColor: colors.surfaceHover },
           ]}
           onPress={() => {
             const firstSpace = recentSpaceItems[0];
@@ -133,7 +134,7 @@ export default function HomeScreen() {
           accessibilityRole="button"
           accessibilityLabel="Open spaces"
         >
-          <Feather name="layers" size={20} color={colors.primary} />
+          <Feather name="layers" size={18} color={colors.textSecondary} />
           <Text style={[styles.quickActionText, { color: colors.text }]} numberOfLines={1}>
             {(() => {
               const name = recentSpaceItems[0]?.name;
@@ -147,17 +148,28 @@ export default function HomeScreen() {
 
       {!chatsLoading && !spacesLoading && recentChatItems.length === 0 && recentSpaceItems.length === 0 && (
         <View style={styles.emptySection}>
-          <Feather name="compass" size={40} color={colors.textMuted} />
+          <Feather name="compass" size={48} color={colors.textMuted} />
           <Text style={[styles.emptyTitle, { color: colors.text }]}>No recent activity</Text>
           <Text style={[styles.emptySubtitle, { color: colors.textSecondary }]}>
             Create a space or start a conversation to get going
           </Text>
+          <Pressable
+            style={[styles.emptyCta, { backgroundColor: colors.primary }]}
+            onPress={() => router.push('/(app)/(spaces)/create-space')}
+          >
+            <Text style={[styles.emptyCtaText, { color: colors.badgeText }]}>Create a Space</Text>
+          </Pressable>
         </View>
       )}
 
       {recentChatItems.length > 0 && (
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent conversations</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent conversations</Text>
+            <Pressable onPress={() => router.push('/(app)/(chats)')}>
+              <Text style={[styles.seeAll, { color: colors.textTertiary }]}>See all</Text>
+            </Pressable>
+          </View>
           {recentChatItems.map((chat) => (
             <Link
               key={chat.id}
@@ -179,7 +191,12 @@ export default function HomeScreen() {
 
       {recentSpaceItems.length > 0 && (
         <View style={styles.section}>
-          <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent spaces</Text>
+          <View style={styles.sectionHeader}>
+            <Text style={[styles.sectionTitle, { color: colors.textSecondary }]}>Recent spaces</Text>
+            <Pressable onPress={() => router.push('/(app)/(spaces)')}>
+              <Text style={[styles.seeAll, { color: colors.textTertiary }]}>See all</Text>
+            </Pressable>
+          </View>
           {recentSpaceItems.map((space) => (
             <Pressable
               key={space.id}
@@ -204,7 +221,7 @@ export default function HomeScreen() {
                   {space.name ?? 'Untitled Space'}
                 </Text>
                 {space.description ? (
-                  <Text style={[styles.spaceDesc, { color: colors.textMuted }]} numberOfLines={1}>
+                  <Text style={[styles.spaceDesc, { color: colors.textTertiary }]} numberOfLines={1}>
                     {space.description}
                   </Text>
                 ) : null}
@@ -237,8 +254,8 @@ const styles = StyleSheet.create({
     gap: 2,
   },
   greeting: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '600',
   },
   workspaceRow: {
     flexDirection: 'row',
@@ -246,7 +263,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   workspace: {
-    fontSize: 14,
+    fontSize: 15,
   },
   unreadCard: {
     flexDirection: 'row',
@@ -258,8 +275,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
     borderLeftWidth: 3,
   },
+  unreadIcon: {
+    marginRight: 8,
+  },
   unreadText: {
-    fontSize: 13,
+    fontSize: 14,
     flex: 1,
   },
   quickActions: {
@@ -279,16 +299,26 @@ const styles = StyleSheet.create({
   },
   quickActionText: {
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   section: {
     paddingHorizontal: 16,
+  },
+  sectionHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 10,
   },
   sectionTitle: {
     fontSize: 12,
     fontWeight: '500',
     letterSpacing: 0.3,
-    marginBottom: 10,
+    textTransform: 'uppercase',
+  },
+  seeAll: {
+    fontSize: 13,
+    fontWeight: '500',
   },
   spaceRow: {
     flexDirection: 'row',
@@ -323,6 +353,16 @@ const styles = StyleSheet.create({
   emptySubtitle: {
     fontSize: 14,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: 22,
+  },
+  emptyCta: {
+    marginTop: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 20,
+    borderRadius: 10,
+  },
+  emptyCtaText: {
+    fontSize: 14,
+    fontWeight: '600',
   },
 });
