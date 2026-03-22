@@ -41,8 +41,6 @@ export default function NewChatScreen() {
     searchQuery: debouncedSearch,
     userId,
     exclude: [userId],
-  }, {
-    enabled: debouncedSearch.length > 1,
   });
 
   const handleSelectUser = (collaboratorId: string) => {
@@ -112,13 +110,7 @@ export default function NewChatScreen() {
         )}
         contentContainerStyle={styles.list}
         ListEmptyComponent={
-          search.trim().length > 1 ? (
-            <Text style={[styles.emptyText, { color: colors.textMuted }]}>No users found</Text>
-          ) : (
-            <Text style={[styles.emptyText, { color: colors.textMuted }]}>
-              Type to search for users
-            </Text>
-          )
+          <Text style={[styles.emptyText, { color: colors.textMuted }]}>No users found</Text>
         }
       />
     </View>
