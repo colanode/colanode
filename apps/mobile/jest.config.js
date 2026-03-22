@@ -1,7 +1,7 @@
 /** @type {import('jest').Config} */
 module.exports = {
   preset: 'jest-expo',
-  testMatch: ['**/__tests__/**/*.test.ts', '**/__tests__/**/*.test.tsx'],
+  testMatch: ['<rootDir>/test/**/*.test.ts', '<rootDir>/test/**/*.test.tsx'],
   moduleNameMapper: {
     '^@colanode/mobile/(.*)$': '<rootDir>/src/$1',
     '^@colanode/core/(.*)$': '<rootDir>/../../packages/core/src/$1',

@@ -74,7 +74,7 @@ export class MobileFileSystem implements FileSystem {
     // Use fetch on the local file URI to get a proper RN Blob.
     const response = await fetch(file.uri);
     const blob = await response.blob();
-    return blob as unknown as FileReadStream;
+    return blob;
   }
 
   public async writeStream(path: string): Promise<WritableStream<Uint8Array>> {

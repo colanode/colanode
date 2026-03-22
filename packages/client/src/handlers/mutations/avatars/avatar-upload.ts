@@ -45,7 +45,7 @@ export class AvatarUploadMutationHandler
       const fileStream = await this.app.fs.readStream(filePath);
       const response = await account.client
         .post('v1/avatars', {
-          body: fileStream,
+          body: fileStream as BodyInit,
           headers: {
             'Content-Type': input.file.mimeType,
             'Content-Length': input.file.size.toString(),
