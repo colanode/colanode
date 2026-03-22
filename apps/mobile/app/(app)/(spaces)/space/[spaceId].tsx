@@ -61,7 +61,21 @@ export default function SpaceScreen() {
             </Text>
           </View>
         )}
-        <View style={styles.headerSpacer} />
+        {canDelete ? (
+          <Pressable
+            onPress={() =>
+              router.push({
+                pathname: '/(app)/(spaces)/space-settings/[spaceId]',
+                params: { spaceId: spaceId! },
+              })
+            }
+            style={styles.headerAction}
+          >
+            <Feather name="settings" size={20} color={colors.textSecondary} />
+          </Pressable>
+        ) : (
+          <View style={styles.headerSpacer} />
+        )}
       </View>
       <NodeChildList
         children={(children as LocalNode[] | undefined) ?? []}
@@ -136,6 +150,10 @@ const styles = StyleSheet.create({
   },
   headerSpacer: {
     width: 44,
+  },
+  headerAction: {
+    width: 44,
+    alignItems: 'flex-end',
   },
   fab: {
     position: 'absolute',
