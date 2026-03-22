@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -15,6 +14,7 @@ import { AvatarPicker } from '@colanode/mobile/components/avatars/avatar-picker'
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
+import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
@@ -26,6 +26,7 @@ export default function WorkspaceSettingsScreen() {
   const { userId, accountId, workspace, role } = useWorkspace();
   const { mutate, isPending } = useMutation();
   const { mutate: mutateAvatar } = useMutation();
+  const toast = useToast();
 
   const [name, setName] = useState(workspace.name);
   const [description, setDescription] = useState(
@@ -57,10 +58,10 @@ export default function WorkspaceSettingsScreen() {
         avatar: workspace.avatar ?? null,
       },
       onSuccess() {
-        Alert.alert('Success', 'Workspace updated');
+        toast.show('Workspace updated', 'success');
       },
       onError(err) {
-        Alert.alert('Error', err.message);
+        toast.show(err.message);
       },
     });
   };

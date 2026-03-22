@@ -16,7 +16,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalFileNode } from '@colanode/client/types/nodes';
-import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
+import { SkeletonFilePreview } from '@colanode/mobile/components/ui/skeleton';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
@@ -179,7 +179,7 @@ export default function FileScreen() {
   };
 
   if (isLoading) {
-    return <LoadingScreen />;
+    return <SkeletonFilePreview />;
   }
 
   const isImage = file?.subtype === 'image';

@@ -1,4 +1,5 @@
 import Feather from '@expo/vector-icons/Feather';
+import { useEffect } from 'react';
 import {
   Alert,
   Pressable,
@@ -9,6 +10,7 @@ import {
 import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { impactMedium } from '@colanode/mobile/lib/haptics';
 
 interface NodeActionSheetProps {
   visible: boolean;
@@ -27,6 +29,12 @@ export const NodeActionSheet = ({
 }: NodeActionSheetProps) => {
   const { mutate } = useMutation();
   const { colors } = useTheme();
+
+  useEffect(() => {
+    if (visible) {
+      impactMedium();
+    }
+  }, [visible]);
 
   const handleDelete = () => {
     if (!nodeId) return;

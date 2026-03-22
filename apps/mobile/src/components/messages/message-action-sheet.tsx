@@ -1,4 +1,5 @@
 import Feather from '@expo/vector-icons/Feather';
+import { useEffect } from 'react';
 import {
   Alert,
   Pressable,
@@ -10,6 +11,7 @@ import { LocalMessageNode } from '@colanode/client/types/nodes';
 import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { impactMedium } from '@colanode/mobile/lib/haptics';
 
 interface MessageActionSheetProps {
   visible: boolean;
@@ -39,6 +41,12 @@ export const MessageActionSheet = ({
 }: MessageActionSheetProps) => {
   const { mutate } = useMutation();
   const { colors } = useTheme();
+
+  useEffect(() => {
+    if (visible) {
+      impactMedium();
+    }
+  }, [visible]);
 
   const handleDelete = () => {
     if (!message) return;

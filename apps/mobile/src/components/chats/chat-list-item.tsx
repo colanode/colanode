@@ -52,11 +52,11 @@ export const ChatListItem = memo(({
     >
       <UserAvatar name={displayName} avatar={otherUser?.avatar ?? null} size={44} />
       <View style={styles.info}>
-        <Text style={[styles.name, { color: colors.text }]} numberOfLines={1}>
+        <Text style={[styles.name, { color: colors.text, fontWeight: unreadCount && unreadCount > 0 ? '700' : '500' }]} numberOfLines={1}>
           {displayName}
         </Text>
         {messagePreview ? (
-          <Text style={[styles.preview, { color: colors.textMuted }]} numberOfLines={1}>
+          <Text style={[styles.preview, { color: unreadCount && unreadCount > 0 ? colors.textSecondary : colors.textMuted }]} numberOfLines={1}>
             {messagePreview}
           </Text>
         ) : null}

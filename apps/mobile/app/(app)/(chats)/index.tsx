@@ -6,6 +6,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { LocalChatNode } from '@colanode/client/types/nodes';
 import { ChatListItem } from '@colanode/mobile/components/chats/chat-list-item';
 import { EmptyState } from '@colanode/mobile/components/ui/empty-state';
+import { ListSeparator } from '@colanode/mobile/components/ui/list-separator';
+import { SkeletonList } from '@colanode/mobile/components/ui/skeleton';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
@@ -21,7 +23,7 @@ export default function ChatsScreen() {
   const { data: chats, isLoading, refetch, isRefetching } = useNodeListQuery<LocalChatNode>(
     userId,
     [{ field: ['type'], operator: 'eq', value: 'chat' }],
-    [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }]
+    [{ field: ['updatedAt'], direction: 'desc', nulls: 'last' }]
   );
 
   const { data: users } = useLiveQuery({
@@ -57,9 +59,7 @@ export default function ChatsScreen() {
             unreadCount={getNodeUnreadCount(radarData, userId, item.id)}
           />
         )}
-        ItemSeparatorComponent={() => (
-          <View style={[styles.separator, { backgroundColor: colors.listSeparator }]} />
-        )}
+        ItemSeparatorComponent={() => <ListSeparator marginLeft={72} />}
         contentContainerStyle={styles.list}
         refreshControl={
           <RefreshControl
@@ -69,12 +69,14 @@ export default function ChatsScreen() {
           />
         }
         ListEmptyComponent={
-          !isLoading ? (
+          isLoading ? (
+            <SkeletonList />
+          ) : (
             <EmptyState
               title="No chats yet"
               subtitle="Start a new conversation"
             />
-          ) : null
+          )
         }
         ListFooterComponent={
           chats && chats.length > 0 && chats.length <= 3 ? (
@@ -130,10 +132,6 @@ const styles = StyleSheet.create({
   },
   fabPressed: {
     opacity: 0.8,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    marginLeft: 72,
   },
   list: {
     flexGrow: 1,

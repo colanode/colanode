@@ -7,6 +7,8 @@ import { LocalSpaceNode } from '@colanode/client/types/nodes';
 import { hasWorkspaceRole } from '@colanode/core';
 import { SpaceListItem } from '@colanode/mobile/components/spaces/space-list-item';
 import { EmptyState } from '@colanode/mobile/components/ui/empty-state';
+import { ListSeparator } from '@colanode/mobile/components/ui/list-separator';
+import { SkeletonList } from '@colanode/mobile/components/ui/skeleton';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
@@ -43,9 +45,7 @@ export default function SpacesScreen() {
             }
           />
         )}
-        ItemSeparatorComponent={() => (
-          <View style={[styles.separator, { backgroundColor: colors.listSeparator }]} />
-        )}
+        ItemSeparatorComponent={() => <ListSeparator marginLeft={68} />}
         contentContainerStyle={styles.list}
         refreshControl={
           <RefreshControl
@@ -55,7 +55,9 @@ export default function SpacesScreen() {
           />
         }
         ListEmptyComponent={
-          !isLoading ? (
+          isLoading ? (
+            <SkeletonList />
+          ) : (
             <EmptyState
               title="No spaces yet"
               subtitle={
@@ -64,7 +66,7 @@ export default function SpacesScreen() {
                   : 'No spaces are available to you yet'
               }
             />
-          ) : null
+          )
         }
         ListFooterComponent={
           canCreateSpace && spaces && spaces.length > 0 && spaces.length <= 3 ? (
@@ -122,10 +124,6 @@ const styles = StyleSheet.create({
   },
   fabPressed: {
     opacity: 0.8,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    marginLeft: 68,
   },
   list: {
     flexGrow: 1,

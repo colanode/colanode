@@ -149,7 +149,11 @@ class ExpoSqliteConnection implements DatabaseConnection {
         numChangedRows: BigInt(result.changes),
       };
     } catch (error) {
-      console.error('SQLite query failed:', sql, parameters, error);
+      if (__DEV__) {
+        console.error('SQLite query failed:', sql, parameters, error);
+      } else {
+        console.error('SQLite query failed:', error);
+      }
       throw error;
     } finally {
       await statement?.finalizeAsync();

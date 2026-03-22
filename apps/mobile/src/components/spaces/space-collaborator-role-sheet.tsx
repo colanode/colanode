@@ -11,6 +11,7 @@ import {
 
 import { NodeRole } from '@colanode/core';
 import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
+import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 
@@ -54,6 +55,7 @@ export const SpaceCollaboratorRoleSheet = ({
 }: SpaceCollaboratorRoleSheetProps) => {
   const { colors } = useTheme();
   const { mutate, isPending } = useMutation();
+  const toast = useToast();
 
   const handleRoleChange = (role: NodeRole) => {
     if (!collaborator || isPending || !canEdit) return;
@@ -74,7 +76,7 @@ export const SpaceCollaboratorRoleSheet = ({
         onClose();
       },
       onError(error) {
-        Alert.alert('Error', error.message);
+        toast.show(error.message);
       },
     });
   };
@@ -102,7 +104,7 @@ export const SpaceCollaboratorRoleSheet = ({
                 onClose();
               },
               onError(error) {
-                Alert.alert('Error', error.message);
+                toast.show(error.message);
               },
             });
           },

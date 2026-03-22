@@ -1,7 +1,6 @@
 import Feather from '@expo/vector-icons/Feather';
 import { useEffect, useState } from 'react';
 import {
-  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -18,8 +17,10 @@ import {
   IdType,
 } from '@colanode/core';
 import { ReplyTarget } from '@colanode/mobile/components/messages/message-item';
+import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { impactLight, notificationSuccess } from '@colanode/mobile/lib/haptics';
 import { getMessageText } from '@colanode/mobile/lib/message-utils';
 
 export interface EditTarget {
@@ -67,6 +68,7 @@ export const MessageInput = ({
   const [text, setText] = useState('');
   const { mutate, isPending } = useMutation();
   const { colors } = useTheme();
+  const toast = useToast();
   const insets = useSafeAreaInsets();
 
   // When editTarget changes, pre-fill input
@@ -101,11 +103,12 @@ export const MessageInput = ({
           },
         },
         onSuccess() {
+          impactLight();
           setText('');
           onClearEdit?.();
         },
         onError(error) {
-          Alert.alert('Error', error.message);
+          toast.show(error.message);
         },
       });
       return;
@@ -136,11 +139,12 @@ export const MessageInput = ({
         referenceId: replyTo?.message.id,
       },
       onSuccess() {
+        notificationSuccess();
         setText('');
         onClearReply?.();
       },
       onError(error) {
-        Alert.alert('Error', error.message);
+        toast.show(error.message);
       },
     });
   };

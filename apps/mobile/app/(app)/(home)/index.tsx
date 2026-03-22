@@ -33,7 +33,7 @@ export default function HomeScreen() {
   const { data: recentChats, refetch: refetchChats, isRefetching: isRefetchingChats, isLoading: chatsLoading } = useNodeListQuery<LocalChatNode>(
     userId,
     [{ field: ['type'], operator: 'eq', value: 'chat' }],
-    [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }],
+    [{ field: ['updatedAt'], direction: 'desc', nulls: 'last' }],
     3
   );
 
@@ -135,12 +135,7 @@ export default function HomeScreen() {
         >
           <Feather name="layers" size={20} color={colors.primary} />
           <Text style={[styles.quickActionText, { color: colors.text }]} numberOfLines={1}>
-            {(() => {
-              const name = recentSpaceItems[0]?.name;
-              if (!name) return 'Spaces';
-              const words = name.trim().split(/\s+/);
-              return words.length > 2 ? words.slice(0, 2).join(' ') + '...' : name;
-            })()}
+            Spaces
           </Text>
         </Pressable>
       </View>
@@ -196,7 +191,7 @@ export default function HomeScreen() {
             >
               <UserAvatar
                 name={space.name ?? 'Space'}
-                avatar={null}
+                avatar={space.avatar ?? null}
                 size={40}
               />
               <View style={styles.spaceInfo}>
