@@ -2,8 +2,8 @@ import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { modelName } from 'expo-device';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { useEffect, useRef, useState } from 'react';
 import { StatusBar } from 'expo-status-bar';
+import { useEffect, useRef, useState } from 'react';
 
 import { AppMeta, AppService } from '@colanode/client/services';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';

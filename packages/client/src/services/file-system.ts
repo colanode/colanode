@@ -1,4 +1,4 @@
-export type FileReadStream = Buffer | File;
+export type FileReadStream = Buffer | File | Blob;
 
 export interface FileSystem {
   makeDirectory(path: string): Promise<void>;
