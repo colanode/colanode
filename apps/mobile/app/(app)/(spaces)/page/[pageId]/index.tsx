@@ -14,7 +14,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalPageNode } from '@colanode/client/types/nodes';
-import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
+import { SkeletonPage } from '@colanode/mobile/components/ui/skeleton';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
 import { PageBlockTypeSheet } from '@colanode/mobile/components/pages/page-block-type-sheet';
 import { PageEditorToolbar } from '@colanode/mobile/components/pages/page-editor-toolbar';
@@ -132,7 +132,7 @@ export default function PageScreen() {
   const showToolbar = (keyboardHeight > 0 && editorFocused && canEdit) || showBlockTypes;
 
   if (isLoading) {
-    return <LoadingScreen />;
+    return <SkeletonPage />;
   }
 
   return (

@@ -14,6 +14,7 @@ import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useQuery } from '@colanode/mobile/hooks/use-query';
 import { codeToEmoji } from '@colanode/mobile/lib/emoji-utils';
+import { selectionChanged } from '@colanode/mobile/lib/haptics';
 
 const QUICK_REACTIONS = [
   { code: '1f44d', label: 'thumbs up' },
@@ -74,6 +75,7 @@ export const EmojiPicker = ({ visible, onClose, onSelect }: EmojiPickerProps) =>
 
   const handleSelect = useCallback(
     (unified: string) => {
+      selectionChanged();
       onSelect(codeToEmoji(unified));
       onClose();
       setSearchQuery('');
@@ -83,6 +85,7 @@ export const EmojiPicker = ({ visible, onClose, onSelect }: EmojiPickerProps) =>
 
   const handleQuickReact = useCallback(
     (code: string) => {
+      selectionChanged();
       onSelect(codeToEmoji(code));
       onClose();
     },

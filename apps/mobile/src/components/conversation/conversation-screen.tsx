@@ -1,7 +1,6 @@
 import { setStringAsync } from 'expo-clipboard';
 import { useEffect, useRef, useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -13,7 +12,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { LocalMessageNode, LocalNode } from '@colanode/client/types/nodes';
 import { EmojiPicker } from '@colanode/mobile/components/emojis/emoji-picker';
-import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
+import { SkeletonMessageList } from '@colanode/mobile/components/ui/skeleton';
+import { useToast } from '@colanode/mobile/components/ui/toast';
 import { MessageActionSheet } from '@colanode/mobile/components/messages/message-action-sheet';
 import { EditTarget, MessageInput } from '@colanode/mobile/components/messages/message-input';
 import {
@@ -56,6 +56,7 @@ export const ConversationScreen = ({
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showRename, setShowRename] = useState(false);
   const { mutate } = useMutation();
+  const toast = useToast();
   const lastMarkedId = useRef<string | null>(null);
 
   useEffect(() => {
@@ -136,14 +137,14 @@ export const ConversationScreen = ({
         reaction: emoji,
       },
       onError(error) {
-        Alert.alert('Error', error.message);
+        toast.show(error.message);
       },
     });
     setActionTarget(null);
   };
 
   if (isLoading) {
-    return <LoadingScreen />;
+    return <SkeletonMessageList />;
   }
 
   return (

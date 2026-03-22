@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   ScrollView,
@@ -15,6 +14,7 @@ import { AvatarPicker } from '@colanode/mobile/components/avatars/avatar-picker'
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
+import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
@@ -27,6 +27,7 @@ export default function AccountSettingsScreen() {
   const { accountId } = useWorkspace();
   const { mutate, isPending } = useMutation();
   const { mutate: mutateAvatar } = useMutation();
+  const toast = useToast();
 
   const { data: accounts } = useLiveQuery({ type: 'account.list' });
   const account = (
@@ -60,10 +61,10 @@ export default function AccountSettingsScreen() {
         avatar: undefined,
       },
       onSuccess() {
-        Alert.alert('Success', 'Profile updated');
+        toast.show('Profile updated', 'success');
       },
       onError(err) {
-        Alert.alert('Error', err.message);
+        toast.show(err.message);
       },
     });
   };

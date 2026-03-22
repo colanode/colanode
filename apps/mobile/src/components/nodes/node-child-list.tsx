@@ -3,6 +3,7 @@ import { FlatList, Pressable, RefreshControl, StyleSheet, Text, View } from 'rea
 
 import { LocalNode } from '@colanode/client/types/nodes';
 import { NodeIcon } from '@colanode/mobile/components/nodes/node-icon';
+import { ListSeparator } from '@colanode/mobile/components/ui/list-separator';
 import { EmptyState } from '@colanode/mobile/components/ui/empty-state';
 import { SkeletonList } from '@colanode/mobile/components/ui/skeleton';
 import { useTheme } from '@colanode/mobile/contexts/theme';
@@ -59,9 +60,7 @@ export const NodeChildList = ({
           <Feather name="chevron-right" size={18} color={colors.sheetHandle} />
         </Pressable>
       )}
-      ItemSeparatorComponent={() => (
-        <View style={[styles.separator, { backgroundColor: colors.listSeparator }]} />
-      )}
+      ItemSeparatorComponent={() => <ListSeparator marginLeft={56} />}
       contentContainerStyle={styles.list}
       refreshControl={
         <RefreshControl
@@ -106,9 +105,5 @@ const styles = StyleSheet.create({
   },
   childType: {
     fontSize: 12,
-  },
-  separator: {
-    height: StyleSheet.hairlineWidth,
-    marginLeft: 56,
   },
 });

@@ -1,7 +1,6 @@
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import {
-  Alert,
   KeyboardAvoidingView,
   Platform,
   Pressable,
@@ -13,6 +12,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { generateId, hasWorkspaceRole, IdType } from '@colanode/core';
+import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
@@ -23,6 +23,7 @@ export default function CreateSpaceScreen() {
   const { mutate, isPending } = useMutation();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const toast = useToast();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const canCreateSpace = hasWorkspaceRole(role, 'collaborator');
@@ -50,7 +51,7 @@ export default function CreateSpaceScreen() {
         router.back();
       },
       onError(error) {
-        Alert.alert('Error', error.message);
+        toast.show(error.message);
       },
     });
   };

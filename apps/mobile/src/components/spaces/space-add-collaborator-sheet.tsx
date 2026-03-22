@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import {
-  Alert,
   FlatList,
   Pressable,
   StyleSheet,
@@ -12,6 +11,7 @@ import { NodeRole } from '@colanode/core';
 import { UserAvatar } from '@colanode/mobile/components/avatars/avatar';
 import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
+import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 import { useQuery } from '@colanode/mobile/hooks/use-query';
@@ -40,6 +40,7 @@ export const SpaceAddCollaboratorSheet = ({
 }: SpaceAddCollaboratorSheetProps) => {
   const { colors } = useTheme();
   const { mutate, isPending } = useMutation();
+  const toast = useToast();
   const [search, setSearch] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
   const [role, setRole] = useState<NodeRole>('editor');
@@ -89,7 +90,7 @@ export const SpaceAddCollaboratorSheet = ({
         onClose();
       },
       onError(error) {
-        Alert.alert('Error', error.message);
+        toast.show(error.message);
       },
     });
   };

@@ -1,7 +1,6 @@
 import Feather from '@expo/vector-icons/Feather';
 import { useEffect, useState } from 'react';
 import {
-  Alert,
   Dimensions,
   Pressable,
   StyleSheet,
@@ -16,6 +15,7 @@ import { NodeIcon } from '@colanode/mobile/components/nodes/node-icon';
 import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
+import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 
@@ -96,6 +96,7 @@ export const RenameNodeSheet = ({
   const [showAvatarPicker, setShowAvatarPicker] = useState(false);
   const { mutate, isPending } = useMutation();
   const { colors } = useTheme();
+  const toast = useToast();
 
   useEffect(() => {
     if (visible && node && (node.type === 'space' || node.type === 'channel' || node.type === 'page' || node.type === 'folder')) {
@@ -121,7 +122,7 @@ export const RenameNodeSheet = ({
         onRenamed?.();
       },
       onError(error) {
-        Alert.alert('Error', error.message);
+        toast.show(error.message);
       },
     });
   };

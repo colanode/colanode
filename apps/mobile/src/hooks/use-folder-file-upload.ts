@@ -1,8 +1,8 @@
 import * as DocumentPicker from 'expo-document-picker';
 import { useRef } from 'react';
-import { Alert } from 'react-native';
 
 import { extractFileSubtype, generateId, IdType } from '@colanode/core';
+import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 
@@ -14,6 +14,7 @@ interface UseFolderFileUploadOptions {
 export const useFolderFileUpload = ({ parentId, userId }: UseFolderFileUploadOptions) => {
   const { appService } = useAppService();
   const { mutate } = useMutation();
+  const toast = useToast();
   const pickingRef = useRef(false);
 
   const pickAndUploadFile = async () => {
@@ -58,17 +59,17 @@ export const useFolderFileUpload = ({ parentId, userId }: UseFolderFileUploadOpt
               tempFileId: tempId,
             },
             onError(error) {
-              Alert.alert('Error', error.message);
+              toast.show(error.message);
             },
           });
         },
         onError(error) {
-          Alert.alert('Error', error.message);
+          toast.show(error.message);
         },
       });
     } catch (e: unknown) {
       const message = e instanceof Error ? e.message : 'Failed to pick file';
-      Alert.alert('Error', message);
+      toast.show(message);
     } finally {
       pickingRef.current = false;
     }

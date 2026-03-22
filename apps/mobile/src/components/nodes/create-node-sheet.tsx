@@ -1,7 +1,6 @@
 import Feather from '@expo/vector-icons/Feather';
 import { useState } from 'react';
 import {
-  Alert,
   Pressable,
   StyleSheet,
   Text,
@@ -11,6 +10,7 @@ import {
 
 import { generateId, IdType } from '@colanode/core';
 import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
+import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 
@@ -44,6 +44,7 @@ export const CreateNodeSheet = ({
   const [name, setName] = useState('');
   const { mutate, isPending } = useMutation();
   const { colors } = useTheme();
+  const toast = useToast();
 
   const handleCreate = () => {
     const trimmedName = name.trim();
@@ -68,7 +69,7 @@ export const CreateNodeSheet = ({
         onClose();
       },
       onError(error) {
-        Alert.alert('Error', error.message);
+        toast.show(error.message);
       },
     });
   };

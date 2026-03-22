@@ -1,5 +1,15 @@
-import { useMemo } from 'react';
-import { FlatList, StyleSheet, Text, View } from 'react-native';
+import Feather from '@expo/vector-icons/Feather';
+import { useCallback, useMemo, useRef, useState } from 'react';
+import {
+  Animated,
+  FlatList,
+  NativeScrollEvent,
+  NativeSyntheticEvent,
+  Pressable,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 import { LocalMessageNode } from '@colanode/client/types/nodes';
 import { User } from '@colanode/client/types/users';
@@ -44,6 +54,8 @@ const buildGroups = (messages: LocalMessageNode[]): MessageGroup[] => {
   return groups.reverse();
 };
 
+const SCROLL_THRESHOLD = 300;
+
 export const MessageList = ({
   messages,
   users,
@@ -53,59 +65,106 @@ export const MessageList = ({
   const { colors } = useTheme();
   const groups = useMemo(() => buildGroups(messages), [messages]);
   const messageMap = useMemo(() => new Map(messages.map((m) => [m.id, m])), [messages]);
+  const flatListRef = useRef<FlatList>(null);
+  const [showScrollButton, setShowScrollButton] = useState(false);
+  const scrollButtonOpacity = useRef(new Animated.Value(0)).current;
+
+  const handleScroll = useCallback(
+    (event: NativeSyntheticEvent<NativeScrollEvent>) => {
+      const offset = event.nativeEvent.contentOffset.y;
+      const shouldShow = offset > SCROLL_THRESHOLD;
+
+      if (shouldShow !== showScrollButton) {
+        setShowScrollButton(shouldShow);
+        Animated.timing(scrollButtonOpacity, {
+          toValue: shouldShow ? 1 : 0,
+          duration: 200,
+          useNativeDriver: true,
+        }).start();
+      }
+    },
+    [showScrollButton, scrollButtonOpacity]
+  );
+
+  const scrollToBottom = useCallback(() => {
+    flatListRef.current?.scrollToOffset({ offset: 0, animated: true });
+  }, []);
 
   return (
-    <FlatList
-      data={groups}
-      keyExtractor={(item) => item.key}
-      inverted
-      renderItem={({ item }) => {
-        if (item.type === 'date') {
-          return (
-            <View style={styles.dateContainer}>
-              <Text style={[styles.dateText, { color: colors.textMuted }]}>{item.date}</Text>
-            </View>
-          );
+    <View style={styles.wrapper}>
+      <FlatList
+        ref={flatListRef}
+        data={groups}
+        keyExtractor={(item) => item.key}
+        inverted
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        removeClippedSubviews={true}
+        maxToRenderPerBatch={15}
+        windowSize={10}
+        renderItem={({ item }) => {
+          if (item.type === 'date') {
+            return (
+              <View style={styles.dateContainer}>
+                <Text style={[styles.dateText, { color: colors.textMuted }]}>{item.date}</Text>
+              </View>
+            );
+          }
+
+          if (item.message) {
+            const refId = item.message.referenceId;
+            const referencedMessage = refId ? messageMap.get(refId) : undefined;
+
+            return (
+              <MessageItem
+                message={item.message}
+                users={users}
+                isOwnMessage={item.message.createdBy === currentUserId}
+                onLongPress={onMessageAction}
+                referencedMessage={referencedMessage}
+                currentUserId={currentUserId}
+              />
+            );
+          }
+
+          return null;
+        }}
+        contentContainerStyle={[
+          styles.list,
+          groups.length === 0 && styles.emptyList,
+        ]}
+        ListEmptyComponent={
+          <View style={styles.emptyContainer}>
+            <Text style={[styles.emptyTitle, { color: colors.textMuted }]}>
+              No messages yet
+            </Text>
+            <Text style={[styles.emptySubtitle, { color: colors.textMuted }]}>
+              Start the conversation
+            </Text>
+          </View>
         }
-
-        if (item.message) {
-          const refId = item.message.referenceId;
-          const referencedMessage = refId ? messageMap.get(refId) : undefined;
-
-          return (
-            <MessageItem
-              message={item.message}
-              users={users}
-              isOwnMessage={item.message.createdBy === currentUserId}
-              onLongPress={onMessageAction}
-              referencedMessage={referencedMessage}
-              currentUserId={currentUserId}
-            />
-          );
-        }
-
-        return null;
-      }}
-      contentContainerStyle={[
-        styles.list,
-        groups.length === 0 && styles.emptyList,
-      ]}
-      ListEmptyComponent={
-        <View style={styles.emptyContainer}>
-          <Text style={[styles.emptyTitle, { color: colors.textMuted }]}>
-            No messages yet
-          </Text>
-          <Text style={[styles.emptySubtitle, { color: colors.textMuted }]}>
-            Start the conversation
-          </Text>
-        </View>
-      }
-      showsVerticalScrollIndicator={false}
-    />
+        showsVerticalScrollIndicator={false}
+      />
+      {showScrollButton && (
+        <Animated.View style={[styles.scrollButton, { opacity: scrollButtonOpacity }]}>
+          <Pressable
+            style={[styles.scrollButtonInner, { backgroundColor: colors.surface }]}
+            onPress={scrollToBottom}
+            accessibilityRole="button"
+            accessibilityLabel="Scroll to bottom"
+          >
+            <Feather name="chevron-down" size={20} color={colors.text} />
+          </Pressable>
+        </Animated.View>
+      )}
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
+  wrapper: {
+    flex: 1,
+  },
   list: {
     paddingVertical: 8,
   },
@@ -132,5 +191,22 @@ const styles = StyleSheet.create({
   },
   emptySubtitle: {
     fontSize: 14,
+  },
+  scrollButton: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+  },
+  scrollButtonInner: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 6,
   },
 });

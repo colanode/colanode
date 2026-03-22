@@ -16,6 +16,7 @@ import { hasWorkspaceRole, WorkspaceRole } from '@colanode/core';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
+import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
@@ -37,6 +38,7 @@ export default function InviteScreen() {
   const { userId, role: workspaceRole } = useWorkspace();
   const canInvite = hasWorkspaceRole(workspaceRole, 'admin');
   const { mutate, isPending } = useMutation();
+  const toast = useToast();
 
   const [email, setEmail] = useState('');
   const [emails, setEmails] = useState<string[]>([]);
@@ -120,7 +122,7 @@ export default function InviteScreen() {
         }
       },
       onError(err) {
-        Alert.alert('Error', err.message);
+        toast.show(err.message);
       },
     });
   };

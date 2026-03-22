@@ -14,6 +14,7 @@ import {
   useAppService,
 } from '@colanode/mobile/contexts/app-service';
 import { ThemeProvider, useTheme } from '@colanode/mobile/contexts/theme';
+import { ToastProvider } from '@colanode/mobile/components/ui/toast';
 import { copyAssets } from '@colanode/mobile/lib/assets';
 import { buildQueryClient } from '@colanode/mobile/lib/query-client';
 import { MobileFileSystem } from '@colanode/mobile/services/file-system';
@@ -121,13 +122,15 @@ export default function RootLayout() {
   return (
     <ThemeProvider>
       <ThemeStatusBar />
-      <AppServiceContext.Provider value={{ appService }}>
-        <QueryClientProvider client={queryClient}>
-          <ErrorBoundary>
-            <RootNavigator />
-          </ErrorBoundary>
-        </QueryClientProvider>
-      </AppServiceContext.Provider>
+      <ToastProvider>
+        <AppServiceContext.Provider value={{ appService }}>
+          <QueryClientProvider client={queryClient}>
+            <ErrorBoundary>
+              <RootNavigator />
+            </ErrorBoundary>
+          </QueryClientProvider>
+        </AppServiceContext.Provider>
+      </ToastProvider>
     </ThemeProvider>
   );
 }

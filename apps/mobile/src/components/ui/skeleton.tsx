@@ -89,6 +89,33 @@ export const SkeletonMessageList = ({ count = 4 }: SkeletonListProps) => {
   );
 };
 
+export const SkeletonPage = () => {
+  return (
+    <View style={styles.page}>
+      <Skeleton width="50%" height={22} borderRadius={6} />
+      <View style={styles.pageLines}>
+        <Skeleton width="90%" height={14} />
+        <Skeleton width="75%" height={14} />
+        <Skeleton width="85%" height={14} />
+        <Skeleton width="60%" height={14} />
+        <Skeleton width="70%" height={14} />
+      </View>
+    </View>
+  );
+};
+
+export const SkeletonFilePreview = () => {
+  return (
+    <View style={styles.filePreview}>
+      <Skeleton width="100%" height={200} borderRadius={12} />
+      <View style={styles.fileMeta}>
+        <Skeleton width="60%" height={14} />
+        <Skeleton width="40%" height={12} />
+      </View>
+    </View>
+  );
+};
+
 const styles = StyleSheet.create({
   row: {
     flexDirection: 'row',
@@ -124,5 +151,19 @@ const styles = StyleSheet.create({
     gap: 6,
     maxWidth: '70%',
     padding: 12,
+  },
+  page: {
+    padding: 16,
+    gap: 20,
+  },
+  pageLines: {
+    gap: 10,
+  },
+  filePreview: {
+    padding: 16,
+    gap: 16,
+  },
+  fileMeta: {
+    gap: 8,
   },
 });

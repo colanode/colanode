@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { NodeReaction } from '@colanode/client/types/nodes';
 import { useTheme } from '@colanode/mobile/contexts/theme';
+import { impactLight } from '@colanode/mobile/lib/haptics';
 
 interface MessageReactionsProps {
   reactions: NodeReaction[];
@@ -52,7 +53,10 @@ export const MessageReactions = ({
             { backgroundColor: colors.surfaceHover, borderColor: colors.border },
             g.hasOwnReaction && { borderColor: colors.primary, backgroundColor: colors.surfaceAccent },
           ]}
-          onPress={() => onToggleReaction(g.reaction)}
+          onPress={() => {
+            impactLight();
+            onToggleReaction(g.reaction);
+          }}
         >
           <Text style={styles.emoji}>{g.reaction}</Text>
           <Text
