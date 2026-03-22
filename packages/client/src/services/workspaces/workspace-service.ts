@@ -139,7 +139,7 @@ export class WorkspaceService {
     await migrator.migrateToLatest();
   }
 
-  public async delete(): Promise<void> {
+  public async cleanup(): Promise<void> {
     try {
       // Stop services first so they don't trigger new DB queries
       this.synchronizer.destroy();
@@ -161,11 +161,6 @@ export class WorkspaceService {
 
       await this.account.app.fs.delete(workspacePath);
 
-      await this.account.app.database
-        .deleteFrom('workspaces')
-        .where('user_id', '=', this.workspace.userId)
-        .execute();
-
       const deletedMetadata = await this.account.app.database
         .deleteFrom('metadata')
         .returningAll()
@@ -184,6 +179,21 @@ export class WorkspaceService {
       await this.account.app.jobs.removeJobSchedule(
         this.workspaceFilesCleanJobScheduleId
       );
+    } catch (error) {
+      debug(
+        `Error cleaning up workspace ${this.workspace.workspaceId}: ${error}`
+      );
+    }
+  }
+
+  public async delete(): Promise<void> {
+    try {
+      await this.cleanup();
+
+      await this.account.app.database
+        .deleteFrom('workspaces')
+        .where('user_id', '=', this.workspace.userId)
+        .execute();
 
       eventBus.publish({
         type: 'workspace.deleted',

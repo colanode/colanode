@@ -82,11 +82,33 @@ export class AppService {
 
     this.metadata = new MetadataService(this);
 
-    this.eventSubscriptionId = eventBus.subscribe((event) => {
+    this.eventSubscriptionId = eventBus.subscribe(async (event) => {
       if (event.type === 'account.deleted') {
         this.accounts.delete(event.account.id);
       } else if (event.type === 'workspace.deleted') {
-        this.workspaces.delete(event.workspace.userId);
+        const workspace = this.workspaces.get(event.workspace.userId);
+        if (workspace) {
+          this.workspaces.delete(event.workspace.userId);
+          await workspace.cleanup();
+        }
+      } else if (event.type === 'workspace.created') {
+        if (this.workspaces.has(event.workspace.userId)) {
+          return;
+        }
+
+        const workspaceRow = await this.database
+          .selectFrom('workspaces')
+          .selectAll()
+          .where('user_id', '=', event.workspace.userId)
+          .executeTakeFirst();
+
+        if (workspaceRow) {
+          try {
+            await this.initWorkspace(workspaceRow);
+          } catch (error) {
+            debug(`Failed to init synced workspace: ${error}`);
+          }
+        }
       }
     });
   }
