@@ -46,7 +46,7 @@ export const NodeChildList = ({
           delayLongPress={500}
         >
           <View style={styles.iconContainer}>
-            <NodeIcon type={item.type} size={20} />
+            <NodeIcon type={item.type} avatar={'avatar' in item ? (item.avatar as string | null) : null} size={20} />
           </View>
           <View style={styles.childInfo}>
             <Text style={[styles.childName, { color: colors.text }]} numberOfLines={1}>
