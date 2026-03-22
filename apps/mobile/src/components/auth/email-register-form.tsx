@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 
+import { newPasswordSchema } from '@colanode/core';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
 
@@ -37,16 +38,10 @@ export const EmailRegisterForm = ({
       newErrors.email = 'Invalid email address';
     }
 
-    if (!password) {
-      newErrors.password = 'Password is required';
-    } else if (password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-    } else if (!/[A-Z]/.test(password)) {
-      newErrors.password = 'Must contain an uppercase letter';
-    } else if (!/[a-z]/.test(password)) {
-      newErrors.password = 'Must contain a lowercase letter';
-    } else if (!/[^A-Za-z0-9]/.test(password)) {
-      newErrors.password = 'Must contain a special character';
+    const passwordResult = newPasswordSchema.safeParse(password);
+    if (!passwordResult.success) {
+      newErrors.password =
+        passwordResult.error.issues[0]?.message ?? 'Invalid password';
     }
 
     if (confirmPassword !== password) {

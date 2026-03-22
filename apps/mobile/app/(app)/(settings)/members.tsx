@@ -97,6 +97,11 @@ export default function MembersScreen() {
       return;
     }
 
+    // Non-owners cannot modify owner roles
+    if (member.role === 'owner' && role !== 'owner') {
+      return;
+    }
+
     setSelectedUser(member);
     setPendingRole(null);
   };
@@ -287,7 +292,10 @@ export default function MembersScreen() {
               style={styles.sheetList}
               contentContainerStyle={styles.sheetListContent}
             >
-              {ROLE_OPTIONS.map((roleOption) => {
+              {ROLE_OPTIONS.filter(
+                (roleOption) =>
+                  roleOption.value !== 'owner' || role === 'owner'
+              ).map((roleOption) => {
                 const isSelected = selectedUser.role === roleOption.value;
                 const isUpdatingRole =
                   isPending && pendingRole === roleOption.value;

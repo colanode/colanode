@@ -15,12 +15,14 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { DownloadStatus } from '@colanode/client/types/files';
 import { LocalFileNode } from '@colanode/client/types/nodes';
 import { SkeletonFilePreview } from '@colanode/mobile/components/ui/skeleton';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
+import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 import { formatFileSize } from '@colanode/mobile/lib/format-utils';
@@ -42,10 +44,18 @@ export default function FileScreen() {
   const { mutate, isPending } = useMutation();
   const [fileUri, setFileUri] = useState<string | null>(null);
   const [downloading, setDownloading] = useState(false);
+  const downloadingRef = useRef(false);
   const isMountedRef = useRef(true);
   const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: file, isLoading } = useNodeQuery<LocalFileNode>(userId, fileId, 'file');
+
+  // Reactively track download status via local.file.get
+  const { data: localFile } = useLiveQuery({
+    type: 'local.file.get',
+    fileId: fileId!,
+    userId,
+  });
 
   useEffect(() => {
     return () => {
@@ -56,36 +66,67 @@ export default function FileScreen() {
     };
   }, []);
 
+  // Update fileUri reactively when download completes
   useEffect(() => {
-    let cancelled = false;
-
     if (!file) {
       setFileUri(null);
+      return;
+    }
+
+    if (localFile?.downloadStatus === DownloadStatus.Completed) {
+      const path = appService.path.workspaceFile(userId, file.id, file.extension);
+      let cancelled = false;
+      appService.fs.exists(path).then((exists: boolean) => {
+        if (!cancelled && isMountedRef.current) {
+          setFileUri(exists ? path : null);
+          setDownloading(false);
+          downloadingRef.current = false;
+          if (downloadTimerRef.current) {
+            clearTimeout(downloadTimerRef.current);
+            downloadTimerRef.current = null;
+          }
+        }
+      });
       return () => {
         cancelled = true;
       };
     }
 
-    const path = appService.path.workspaceFile(userId, file.id, file.extension);
-    appService.fs.exists(path).then((exists: boolean) => {
-      if (!cancelled && isMountedRef.current) {
-        setFileUri(exists ? path : null);
+    if (localFile?.downloadStatus === DownloadStatus.Failed) {
+      setDownloading(false);
+      downloadingRef.current = false;
+      if (downloadTimerRef.current) {
+        clearTimeout(downloadTimerRef.current);
+        downloadTimerRef.current = null;
       }
-    });
-    return () => {
-      cancelled = true;
-    };
-  }, [file, userId, appService]);
+      Alert.alert(
+        'Download Failed',
+        localFile.downloadErrorMessage ?? 'An error occurred while downloading the file.'
+      );
+      return;
+    }
+
+    // No local file record yet — check filesystem directly
+    if (!localFile) {
+      const path = appService.path.workspaceFile(userId, file.id, file.extension);
+      let cancelled = false;
+      appService.fs.exists(path).then((exists: boolean) => {
+        if (!cancelled && isMountedRef.current) {
+          setFileUri(exists ? path : null);
+        }
+      });
+      return () => {
+        cancelled = true;
+      };
+    }
+  }, [file, localFile, userId, appService]);
 
   const handleDownload = () => {
     if (!file || downloading || isPending) return;
 
     const path = appService.path.workspaceFile(userId, file.id, file.extension);
     setDownloading(true);
-    if (downloadTimerRef.current) {
-      clearTimeout(downloadTimerRef.current);
-      downloadTimerRef.current = null;
-    }
+    downloadingRef.current = true;
 
     mutate({
       input: {
@@ -94,48 +135,25 @@ export default function FileScreen() {
         fileId: file.id,
         path,
       },
-      async onSuccess() {
-        let attempts = 0;
-
-        const check = async () => {
-          if (!isMountedRef.current) {
-            return;
-          }
-
-          const exists = await appService.fs.exists(path);
-
-          if (!isMountedRef.current) {
-            return;
-          }
-
-          if (exists) {
-            setFileUri(path);
+      onSuccess() {
+        // Download initiated — useLiveQuery on local.file.get will
+        // reactively update when download_status changes.
+        // Set a fallback timeout in case events are missed.
+        downloadTimerRef.current = setTimeout(() => {
+          if (isMountedRef.current && downloadingRef.current) {
             setDownloading(false);
-            downloadTimerRef.current = null;
-            return;
+            downloadingRef.current = false;
+            Alert.alert(
+              'Download Timeout',
+              'The download is taking longer than expected. Please try again.'
+            );
           }
-
-          if (attempts < 30) {
-            attempts++;
-            downloadTimerRef.current = setTimeout(() => {
-              void check();
-            }, 1000);
-          } else {
-            setDownloading(false);
-            downloadTimerRef.current = null;
-          }
-        };
-
-        await check();
+        }, 60000);
       },
       onError() {
-        if (downloadTimerRef.current) {
-          clearTimeout(downloadTimerRef.current);
-          downloadTimerRef.current = null;
-        }
-
         if (isMountedRef.current) {
           setDownloading(false);
+          downloadingRef.current = false;
         }
       },
     });

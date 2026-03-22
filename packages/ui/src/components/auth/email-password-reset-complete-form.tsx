@@ -2,6 +2,7 @@ import { useForm } from '@tanstack/react-form';
 import { Lock } from 'lucide-react';
 import { z } from 'zod/v4';
 
+import { newPasswordSchema } from '@colanode/core/types/auth';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   Field,
@@ -15,15 +16,7 @@ import { useCountdown } from '@colanode/ui/hooks/use-countdown';
 const formSchema = z
   .object({
     otp: z.string().min(6, 'OTP must be 6 characters long'),
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters long')
-      .regex(/[A-Z]/, 'Password must contain at least one uppercase letter')
-      .regex(/[a-z]/, 'Password must contain at least one lowercase letter')
-      .regex(
-        /[^A-Za-z0-9]/,
-        'Password must contain at least one special character'
-      ),
+    password: newPasswordSchema,
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {

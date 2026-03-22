@@ -67,6 +67,7 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
   const webViewRef = useRef<WebView>(null);
   const isReadyRef = useRef(false);
   const revisionRef = useRef(state?.revision ?? '0');
+  const sentUpdateIdsRef = useRef<Set<string>>(new Set());
   const [editorHtml, setEditorHtml] = useState<string | null>(null);
   const [webViewReady, setWebViewReady] = useState(false);
 
@@ -115,6 +116,8 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
         title,
       },
     });
+    // Track which updates have been sent to avoid re-sending
+    sentUpdateIdsRef.current = new Set(updates.map((u) => u.id));
   }, [
     nodeId,
     userId,
@@ -129,18 +132,26 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
     sendMessage,
   ]);
 
-  // Send state updates when revision changes
+  // Send state updates when revision changes or new updates arrive
   useEffect(() => {
     if (!isReadyRef.current) return;
     if (!state) return;
-    if (revisionRef.current === state.revision) return;
+
+    const newUpdates = updates.filter((u) => !sentUpdateIdsRef.current.has(u.id));
+    const revisionChanged = revisionRef.current !== state.revision;
+
+    if (!revisionChanged && newUpdates.length === 0) return;
 
     revisionRef.current = state.revision;
+    for (const u of newUpdates) {
+      sentUpdateIdsRef.current.add(u.id);
+    }
+
     sendMessage({
       type: 'state.update',
       payload: {
         state: state.state,
-        updates: updates.map((u) => u.data),
+        updates: newUpdates.map((u) => u.data),
         revision: state.revision,
       },
     });

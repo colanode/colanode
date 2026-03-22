@@ -34,7 +34,7 @@ export default function WorkspaceSettingsScreen() {
   );
   const [error, setError] = useState('');
 
-  const canEdit = role === 'owner' || role === 'admin';
+  const canEdit = role === 'owner';
 
   useEffect(() => {
     setName(workspace.name);
@@ -94,8 +94,8 @@ export default function WorkspaceSettingsScreen() {
                   input: {
                     type: 'workspace.update',
                     userId,
-                    name: workspace.name,
-                    description: workspace.description ?? '',
+                    name: name.trim() || workspace.name,
+                    description: description.trim(),
                     avatar: avatarId,
                   },
                 });
