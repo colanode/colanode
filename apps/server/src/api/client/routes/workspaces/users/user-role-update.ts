@@ -64,6 +64,45 @@ export const userRoleUpdateRoute: FastifyPluginCallbackZod = (
         });
       }
 
+      // Only owners can modify another owner's role
+      if (
+        userToUpdate.role === 'owner' &&
+        workspace.user.role !== 'owner'
+      ) {
+        return reply.code(403).send({
+          code: ApiErrorCode.UserUpdateNoAccess,
+          message:
+            'Only owners can change the role of another owner.',
+        });
+      }
+
+      // Only owners can promote someone to owner
+      if (input.role === 'owner' && workspace.user.role !== 'owner') {
+        return reply.code(403).send({
+          code: ApiErrorCode.UserUpdateNoAccess,
+          message: 'Only owners can promote users to owner.',
+        });
+      }
+
+      // Prevent removing the last owner
+      if (userToUpdate.role === 'owner' && input.role !== 'owner') {
+        const ownerCount = await database
+          .selectFrom('users')
+          .select(database.fn.countAll<number>().as('count'))
+          .where('workspace_id', '=', workspace.id)
+          .where('role', '=', 'owner')
+          .where('status', '=', UserStatus.Active)
+          .executeTakeFirstOrThrow();
+
+        if (ownerCount.count <= 1) {
+          return reply.code(400).send({
+            code: ApiErrorCode.BadRequest,
+            message:
+              'Cannot remove the last owner. Promote another user to owner first.',
+          });
+        }
+      }
+
       const status =
         input.role === 'none' ? UserStatus.Removed : UserStatus.Active;
 

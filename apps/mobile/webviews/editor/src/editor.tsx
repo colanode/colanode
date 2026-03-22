@@ -48,9 +48,13 @@ function buildDocState(
   };
 }
 
-function buildDocUpdates(nodeId: string, updates: string[]): DocumentUpdate[] {
+function buildDocUpdates(
+  nodeId: string,
+  updates: string[],
+  startIndex = 0
+): DocumentUpdate[] {
   return updates.map((data, i) => ({
-    id: `${nodeId}-update-${i}`,
+    id: `${nodeId}-update-${startIndex + i}`,
     documentId: nodeId,
     data,
   }));
@@ -90,6 +94,11 @@ export function MobileEditorApp() {
       case 'state.update': {
         const current = editorStateRef.current;
         if (!current) return;
+        const nextUpdates = buildDocUpdates(
+          current.nodeId,
+          msg.payload.updates,
+          current.docUpdates.length
+        );
 
         const updated: EditorState = {
           ...current,
@@ -98,10 +107,8 @@ export function MobileEditorApp() {
             revision: msg.payload.revision,
             state: msg.payload.state,
           },
-          docUpdates: buildDocUpdates(
-            current.nodeId,
-            msg.payload.updates
-          ),
+          // Keep a stable local sequence so incremental batches are distinct.
+          docUpdates: [...current.docUpdates, ...nextUpdates],
         };
         editorStateRef.current = updated;
         setEditorState(updated);

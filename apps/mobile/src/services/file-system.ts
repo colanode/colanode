@@ -132,11 +132,11 @@ export class MobileFileSystem implements FileSystem {
     await file.delete();
   }
 
-  public async url(path: string): Promise<string> {
+  public async url(path: string): Promise<string | null> {
     const file = new ExpoFile(path);
 
     if (!file.exists) {
-      throw new Error(`File not found: ${path}`);
+      return null;
     }
 
     return file.uri;

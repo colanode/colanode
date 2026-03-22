@@ -3,12 +3,19 @@ import { z } from 'zod/v4';
 import { accountOutputSchema } from '@colanode/core/types/accounts';
 import { workspaceOutputSchema } from '@colanode/core/types/workspaces';
 
+export const newPasswordSchema = z
+  .string({ error: 'Password is required' })
+  .min(8, 'Password must be at least 8 characters')
+  .regex(/[A-Z]/, 'Must contain an uppercase letter')
+  .regex(/[a-z]/, 'Must contain a lowercase letter')
+  .regex(/[^A-Za-z0-9]/, 'Must contain a special character');
+
 export const emailRegisterInputSchema = z.object({
   name: z.string({ error: 'Name is required' }),
   email: z.string({ error: 'Email is required' }).email({
     message: 'Invalid email address',
   }),
-  password: z.string({ error: 'Password is required' }),
+  password: newPasswordSchema,
 });
 
 export type EmailRegisterInput = z.infer<typeof emailRegisterInputSchema>;
@@ -73,7 +80,7 @@ export type EmailPasswordResetInitInput = z.infer<
 export const emailPasswordResetCompleteInputSchema = z.object({
   id: z.string(),
   otp: z.string(),
-  password: z.string(),
+  password: newPasswordSchema,
 });
 
 export type EmailPasswordResetCompleteInput = z.infer<

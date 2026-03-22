@@ -114,6 +114,45 @@ export const DocumentEditor = ({
   const hasPendingChanges = useRef(false);
   const revisionRef = useRef(state?.revision ?? 0);
   const ydocRef = useRef<YDoc>(buildYDoc(state, updates));
+  const pendingRemoteRef = useRef<{
+    state: DocumentState;
+    updates: DocumentUpdate[];
+  } | null>(null);
+  const editorRef = useRef<ReturnType<typeof useEditor>>(null);
+  const appliedUpdateIdsRef = useRef<Set<string>>(
+    new Set(updates.map((u) => u.id))
+  );
+
+  const reconcileRef = useRef(
+    (
+      ed: NonNullable<ReturnType<typeof useEditor>>,
+      remoteState: DocumentState,
+      remoteUpdates: DocumentUpdate[],
+      nodeId: string
+    ) => {
+      const beforeContent = ydocRef.current.getObject<RichTextContent>();
+
+      ydocRef.current.applyUpdate(remoteState.state);
+      for (const update of remoteUpdates) {
+        ydocRef.current.applyUpdate(update.data);
+      }
+
+      const afterContent = ydocRef.current.getObject<RichTextContent>();
+
+      revisionRef.current = remoteState.revision;
+
+      if (isEqual(afterContent, beforeContent)) return;
+
+      const editorContent = buildEditorContent(nodeId, afterContent);
+
+      const relativeSelection = getRelativeSelection(ed);
+      ed.chain().setContent(editorContent).run();
+
+      if (relativeSelection != null) {
+        restoreRelativeSelection(ed, relativeSelection);
+      }
+    }
+  );
 
   const debouncedSave = useMemo(
     () =>
@@ -157,10 +196,26 @@ export const DocumentEditor = ({
           });
         } finally {
           hasPendingChanges.current = false;
+
+          // Replay stashed remote updates that arrived during local editing
+          const stashed = pendingRemoteRef.current;
+          if (stashed && editorRef.current) {
+            pendingRemoteRef.current = null;
+            for (const u of stashed.updates) {
+              appliedUpdateIdsRef.current.add(u.id);
+            }
+            reconcileRef.current(
+              editorRef.current,
+              stashed.state,
+              stashed.updates,
+              node.id
+            );
+          }
         }
       }, 500),
     [node.id, workspace.userId]
   );
+
 
   const editor = useEditor(
     {
@@ -266,39 +321,32 @@ export const DocumentEditor = ({
     [node.id]
   );
 
+  // Keep editorRef in sync for use in debouncedSave replay
+  editorRef.current = editor;
+
   // Reconciliation: apply remote state updates to editor
   // Uses a ref to track whether we have local pending changes
   useEffect(() => {
     if (!editor) return;
     if (!state) return;
 
-    // Always skip reconciliation if we have pending local changes
-    if (hasPendingChanges.current) return;
+    const revisionChanged = revisionRef.current !== state.revision;
+    const hasNewUpdates = updates.some(
+      (u) => !appliedUpdateIdsRef.current.has(u.id)
+    );
 
-    if (revisionRef.current === state?.revision) return;
+    if (!revisionChanged && !hasNewUpdates) return;
 
-    const beforeContent = ydocRef.current.getObject<RichTextContent>();
-
-    ydocRef.current.applyUpdate(state.state);
-    for (const update of updates) {
-      ydocRef.current.applyUpdate(update.data);
+    // Stash remote updates when local edits are pending — replayed after save
+    if (hasPendingChanges.current) {
+      pendingRemoteRef.current = { state, updates };
+      return;
     }
 
-    const afterContent = ydocRef.current.getObject<RichTextContent>();
-
-    // Update revision even if content is equal
-    revisionRef.current = state.revision;
-
-    if (isEqual(afterContent, beforeContent)) return;
-
-    const editorContent = buildEditorContent(node.id, afterContent);
-
-    const relativeSelection = getRelativeSelection(editor);
-    editor.chain().setContent(editorContent).run();
-
-    if (relativeSelection != null) {
-      restoreRelativeSelection(editor, relativeSelection);
+    for (const u of updates) {
+      appliedUpdateIdsRef.current.add(u.id);
     }
+    reconcileRef.current(editor, state, updates, node.id);
   }, [state, updates, editor, node.id]);
 
   // Expose flush for the bridge so pending saves are not lost
