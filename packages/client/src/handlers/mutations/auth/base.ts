@@ -1,5 +1,9 @@
 import { eventBus } from '@colanode/client/lib/event-bus';
-import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
+import {
+  mapAccount,
+  mapMetadata,
+  mapWorkspace,
+} from '@colanode/client/lib/mappers';
 import { MutationError, MutationErrorCode } from '@colanode/client/mutations';
 import { AppService } from '@colanode/client/services/app-service';
 import { ServerService } from '@colanode/client/services/server-service';
@@ -105,6 +109,33 @@ export abstract class AuthMutationHandlerBase {
         type: 'workspace.created',
         workspace: mapWorkspace(createdWorkspace),
       });
+    }
+
+    if (createdWorkspaces.length > 0) {
+      const firstWorkspace = createdWorkspaces[0]!;
+      const updatedMetadata = await this.app.database
+        .insertInto('metadata')
+        .returningAll()
+        .values({
+          namespace: 'app',
+          key: 'workspace',
+          value: JSON.stringify(firstWorkspace.user_id),
+          created_at: new Date().toISOString(),
+        })
+        .onConflict((cb) =>
+          cb.columns(['namespace', 'key']).doUpdateSet({
+            value: JSON.stringify(firstWorkspace.user_id),
+            updated_at: new Date().toISOString(),
+          })
+        )
+        .executeTakeFirst();
+
+      if (updatedMetadata) {
+        eventBus.publish({
+          type: 'metadata.updated',
+          metadata: mapMetadata(updatedMetadata),
+        });
+      }
     }
   }
 }
