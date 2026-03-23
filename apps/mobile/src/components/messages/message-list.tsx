@@ -1,6 +1,7 @@
 import Feather from '@expo/vector-icons/Feather';
 import { useCallback, useMemo, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   Animated,
   FlatList,
   NativeScrollEvent,
@@ -11,7 +12,7 @@ import {
   View,
 } from 'react-native';
 
-import { LocalMessageNode } from '@colanode/client/types/nodes';
+import { LocalMessageNode, NodeReaction } from '@colanode/client/types/nodes';
 import { User } from '@colanode/client/types/users';
 import {
   MessageActionTarget,
@@ -25,6 +26,9 @@ interface MessageListProps {
   users: User[];
   currentUserId: string;
   onMessageAction?: (target: MessageActionTarget) => void;
+  reactionsMap?: Record<string, NodeReaction[]>;
+  onLoadMore?: () => void;
+  loadingMore?: boolean;
 }
 
 interface MessageGroup {
@@ -61,6 +65,9 @@ export const MessageList = ({
   users,
   currentUserId,
   onMessageAction,
+  reactionsMap,
+  onLoadMore,
+  loadingMore,
 }: MessageListProps) => {
   const { colors } = useTheme();
   const groups = useMemo(() => buildGroups(messages), [messages]);
@@ -123,6 +130,7 @@ export const MessageList = ({
                 onLongPress={onMessageAction}
                 referencedMessage={referencedMessage}
                 currentUserId={currentUserId}
+                reactions={reactionsMap?.[item.message.id]}
               />
             );
           }
@@ -142,6 +150,15 @@ export const MessageList = ({
               Start the conversation
             </Text>
           </View>
+        }
+        onEndReached={onLoadMore}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={
+          loadingMore ? (
+            <View style={styles.loadingMore}>
+              <ActivityIndicator size="small" color={colors.textMuted} />
+            </View>
+          ) : null
         }
         showsVerticalScrollIndicator={false}
       />
@@ -196,6 +213,10 @@ const styles = StyleSheet.create({
     position: 'absolute',
     bottom: 16,
     right: 16,
+  },
+  loadingMore: {
+    paddingVertical: 16,
+    alignItems: 'center',
   },
   scrollButtonInner: {
     width: 40,

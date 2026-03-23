@@ -44,6 +44,10 @@ export class NodeListQueryHandler
       queryString += ` LIMIT ${input.limit}`;
     }
 
+    if (input.offset !== undefined && input.offset > 0) {
+      queryString += ` OFFSET ${input.offset}`;
+    }
+
     const query = sql<SelectNode>`${sql.raw(queryString)}`.compile(
       workspace.database
     );

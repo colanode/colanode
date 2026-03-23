@@ -57,6 +57,8 @@ export const MessageReactions = ({
             impactLight();
             onToggleReaction(g.reaction);
           }}
+          accessibilityRole="button"
+          accessibilityLabel={`${g.reaction}, ${g.count} ${g.count === 1 ? 'reaction' : 'reactions'}${g.hasOwnReaction ? ', you reacted' : ''}`}
         >
           <Text style={styles.emoji}>{g.reaction}</Text>
           <Text

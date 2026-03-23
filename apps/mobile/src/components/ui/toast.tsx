@@ -7,6 +7,7 @@ import {
   useState,
 } from 'react';
 import {
+  AccessibilityInfo,
   Animated,
   Pressable,
   StyleSheet,
@@ -83,6 +84,8 @@ const ToastBanner = ({ text, variant, onDismiss }: ToastBannerProps) => {
   const translateY = useRef(new Animated.Value(-100)).current;
 
   useEffect(() => {
+    AccessibilityInfo.announceForAccessibility(text);
+
     Animated.spring(translateY, {
       toValue: 0,
       useNativeDriver: true,
@@ -99,7 +102,7 @@ const ToastBanner = ({ text, variant, onDismiss }: ToastBannerProps) => {
     }, 3000);
 
     return () => clearTimeout(timer);
-  }, [translateY, onDismiss]);
+  }, [translateY, onDismiss, text]);
 
   const backgroundColor =
     variant === 'error'
@@ -114,6 +117,7 @@ const ToastBanner = ({ text, variant, onDismiss }: ToastBannerProps) => {
         styles.container,
         { top: insets.top + 8, transform: [{ translateY }] },
       ]}
+      accessibilityRole="alert"
     >
       <Pressable
         style={[styles.banner, { backgroundColor }]}

@@ -1,8 +1,10 @@
+import Feather from '@expo/vector-icons/Feather';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   ScrollView,
   StyleSheet,
   Text,
@@ -15,6 +17,7 @@ import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
 import { useToast } from '@colanode/mobile/components/ui/toast';
+import { WorkspaceDeleteSheet } from '@colanode/mobile/components/workspaces/workspace-delete-sheet';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
@@ -33,6 +36,7 @@ export default function WorkspaceSettingsScreen() {
     workspace.description ?? ''
   );
   const [error, setError] = useState('');
+  const [showDelete, setShowDelete] = useState(false);
 
   const canEdit = role === 'owner';
 
@@ -125,8 +129,42 @@ export default function WorkspaceSettingsScreen() {
               loading={isPending}
             />
           )}
+          {canEdit && (
+            <View style={styles.deleteSection}>
+              <View style={[styles.deleteSeparator, { backgroundColor: colors.border }]} />
+              <Pressable
+                style={({ pressed }) => [
+                  styles.deleteButton,
+                  pressed && { opacity: 0.7 },
+                ]}
+                onPress={() => setShowDelete(true)}
+              >
+                <Feather name="trash-2" size={20} color={colors.error} />
+                <Text style={[styles.deleteButtonText, { color: colors.error }]}>
+                  Delete Workspace
+                </Text>
+              </Pressable>
+              <Text style={[styles.deleteHint, { color: colors.textMuted }]}>
+                Once you delete a workspace, there is no going back.
+              </Text>
+            </View>
+          )}
         </View>
       </ScrollView>
+      {canEdit && (
+        <WorkspaceDeleteSheet
+          visible={showDelete}
+          userId={userId}
+          workspaceName={workspace.name}
+          onClose={() => setShowDelete(false)}
+          onDeleted={() => {
+            toast.show('Workspace deleted', 'success');
+          }}
+          onError={(message) => {
+            toast.show(message);
+          }}
+        />
+      )}
     </KeyboardAvoidingView>
   );
 }
@@ -162,5 +200,28 @@ const styles = StyleSheet.create({
   textarea: {
     minHeight: 80,
     textAlignVertical: 'top',
+  },
+  deleteSection: {
+    marginTop: 20,
+    gap: 12,
+  },
+  deleteSeparator: {
+    height: StyleSheet.hairlineWidth,
+  },
+  deleteButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    paddingVertical: 14,
+    borderRadius: 10,
+  },
+  deleteButtonText: {
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  deleteHint: {
+    fontSize: 12,
+    textAlign: 'center',
   },
 });
