@@ -66,7 +66,7 @@ export default function SettingsScreen() {
     ]);
   };
 
-  const canEditWorkspace = role === 'owner' || role === 'admin';
+  const canEditWorkspace = role === 'owner';
 
   return (
     <ScrollView

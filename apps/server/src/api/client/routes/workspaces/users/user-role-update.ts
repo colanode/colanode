@@ -55,6 +55,7 @@ export const userRoleUpdateRoute: FastifyPluginCallbackZod = (
         .selectFrom('users')
         .selectAll()
         .where('id', '=', userId)
+        .where('workspace_id', '=', workspace.id)
         .executeTakeFirst();
 
       if (!userToUpdate) {

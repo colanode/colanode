@@ -71,6 +71,25 @@ export const usersCreateRoute: FastifyPluginCallbackZod = (
       };
 
       for (const user of input.users) {
+        if (user.role === 'none') {
+          output.errors.push({
+            email: user.email,
+            error: 'Cannot invite users with role none.',
+          });
+          continue;
+        }
+
+        if (
+          (user.role === 'owner' || user.role === 'admin') &&
+          workspace.user.role !== 'owner'
+        ) {
+          output.errors.push({
+            email: user.email,
+            error: 'Only owners can invite users with this role.',
+          });
+          continue;
+        }
+
         const account = await getOrCreateAccount(user.email);
         if (!account) {
           output.errors.push({

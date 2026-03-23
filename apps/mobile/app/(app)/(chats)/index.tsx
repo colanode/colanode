@@ -93,6 +93,8 @@ export default function ChatsScreen() {
           pressed && styles.fabPressed,
         ]}
         onPress={() => router.push('/(app)/(chats)/new-chat')}
+        accessibilityRole="button"
+        accessibilityLabel="Start new chat"
       >
         <Feather name="plus" size={22} color={colors.text} />
       </Pressable>

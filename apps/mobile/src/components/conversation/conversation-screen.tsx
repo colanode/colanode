@@ -1,5 +1,5 @@
 import { setStringAsync } from 'expo-clipboard';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -10,7 +10,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { LocalMessageNode, LocalNode } from '@colanode/client/types/nodes';
+import { LocalMessageNode, LocalNode, NodeReaction } from '@colanode/client/types/nodes';
 import { EmojiPicker } from '@colanode/mobile/components/emojis/emoji-picker';
 import { SkeletonMessageList } from '@colanode/mobile/components/ui/skeleton';
 import { useToast } from '@colanode/mobile/components/ui/toast';
@@ -30,6 +30,8 @@ import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useMutation } from '@colanode/mobile/hooks/use-mutation';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
 import { getMessageText } from '@colanode/mobile/lib/message-utils';
+
+const PAGE_SIZE = 50;
 
 interface ConversationScreenProps {
   nodeId: string;
@@ -58,6 +60,15 @@ export const ConversationScreen = ({
   const { mutate } = useMutation();
   const toast = useToast();
   const lastMarkedId = useRef<string | null>(null);
+  const [olderMessages, setOlderMessages] = useState<LocalMessageNode[]>([]);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
+  // Reset pagination when conversation changes
+  useEffect(() => {
+    setOlderMessages([]);
+    setHasMore(true);
+  }, [nodeId]);
 
   useEffect(() => {
     if (!nodeId || lastMarkedId.current === nodeId) return;
@@ -83,18 +94,79 @@ export const ConversationScreen = ({
     markInteractions();
   }, [nodeId, userId, appService]);
 
-  const { data: messages, isLoading } = useNodeListQuery(
+  const { data: recentMessages, isLoading } = useNodeListQuery(
     userId,
     [
       { field: ['parentId'], operator: 'eq', value: nodeId },
       { field: ['type'], operator: 'eq', value: 'message' },
     ],
     [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }],
-    100
+    PAGE_SIZE
   );
+
+  // Merge recent (reactive) messages with older (paginated) messages
+  const allMessages = useMemo(() => {
+    const recent = (recentMessages as LocalMessageNode[] | undefined) ?? [];
+    if (olderMessages.length === 0) return recent;
+
+    // Deduplicate by id — recent messages take priority
+    const recentIds = new Set(recent.map((m) => m.id));
+    const uniqueOlder = olderMessages.filter((m) => !recentIds.has(m.id));
+    return [...recent, ...uniqueOlder];
+  }, [recentMessages, olderMessages]);
+
+  const handleLoadMore = useCallback(async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+
+    try {
+      const offset = allMessages.length;
+      const older = await appService.mediator.executeQuery({
+        type: 'node.list',
+        userId,
+        filters: [
+          { field: ['parentId'], operator: 'eq', value: nodeId },
+          { field: ['type'], operator: 'eq', value: 'message' },
+        ],
+        sorts: [{ field: ['createdAt'], direction: 'desc', nulls: 'last' }],
+        limit: PAGE_SIZE,
+        offset,
+      });
+
+      if (older.length < PAGE_SIZE) {
+        setHasMore(false);
+      }
+
+      if (older.length > 0) {
+        setOlderMessages((prev) => {
+          const existingIds = new Set(prev.map((m) => m.id));
+          const newMessages = (older as LocalMessageNode[]).filter(
+            (m) => !existingIds.has(m.id)
+          );
+          return [...prev, ...newMessages];
+        });
+      }
+    } catch {
+      // Silently fail — user can try again
+    } finally {
+      setLoadingMore(false);
+    }
+  }, [loadingMore, hasMore, allMessages.length, appService, userId, nodeId]);
 
   const { data: users } = useLiveQuery({
     type: 'user.list',
+    userId,
+  });
+
+  // Batch reaction query for all visible messages
+  const messageIds = useMemo(
+    () => allMessages.map((m) => m.id),
+    [allMessages]
+  );
+
+  const { data: reactionsMap } = useLiveQuery({
+    type: 'node.reaction.batch-list',
+    nodeIds: messageIds,
     userId,
   });
 
@@ -172,10 +244,13 @@ export const ConversationScreen = ({
         <View style={styles.headerSpacer} />
       </View>
       <MessageList
-        messages={(messages as LocalMessageNode[] | undefined) ?? []}
+        messages={allMessages}
         users={users ?? []}
         currentUserId={userId}
         onMessageAction={handleMessageAction}
+        reactionsMap={reactionsMap ?? undefined}
+        onLoadMore={hasMore ? handleLoadMore : undefined}
+        loadingMore={loadingMore}
       />
       <MessageInput
         userId={userId}

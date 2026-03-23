@@ -68,11 +68,21 @@ export default function AppLayout() {
 
   const activeWorkspace = workspace ?? lastWorkspaceRef.current;
 
+  const { data: accounts } = useLiveQuery({ type: 'account.list' });
+
   useEffect(() => {
     if (!isLoading && !workspace) {
-      router.replace('/(auth)/');
+      if (accounts && accounts.length > 0) {
+        const firstAccount = accounts[0] as { id: string };
+        router.replace({
+          pathname: '/(auth)/create-workspace',
+          params: { accountId: firstAccount.id },
+        });
+      } else {
+        router.replace('/(auth)/');
+      }
     }
-  }, [isLoading, workspace, router]);
+  }, [isLoading, workspace, accounts, router]);
 
   const handleSelectWorkspace = useCallback(
     async (userId: string) => {

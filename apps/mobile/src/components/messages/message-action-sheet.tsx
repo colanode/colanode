@@ -80,6 +80,8 @@ export const MessageActionSheet = ({
       <Pressable
         style={({ pressed }) => [styles.action, pressed && { backgroundColor: colors.surfaceHover }]}
         onPress={() => { onReply(); onClose(); }}
+        accessibilityRole="menuitem"
+        accessibilityLabel="Reply"
       >
         <Feather name="corner-up-left" size={20} color={colors.text} />
         <Text style={[styles.actionText, { color: colors.text }]}>Reply</Text>
@@ -88,6 +90,8 @@ export const MessageActionSheet = ({
       <Pressable
         style={({ pressed }) => [styles.action, pressed && { backgroundColor: colors.surfaceHover }]}
         onPress={() => { onReact(); }}
+        accessibilityRole="menuitem"
+        accessibilityLabel="Add Reaction"
       >
         <Feather name="smile" size={20} color={colors.text} />
         <Text style={[styles.actionText, { color: colors.text }]}>Add Reaction</Text>
@@ -96,6 +100,8 @@ export const MessageActionSheet = ({
       <Pressable
         style={({ pressed }) => [styles.action, pressed && { backgroundColor: colors.surfaceHover }]}
         onPress={() => { onCopy(); onClose(); }}
+        accessibilityRole="menuitem"
+        accessibilityLabel="Copy Text"
       >
         <Feather name="copy" size={20} color={colors.text} />
         <Text style={[styles.actionText, { color: colors.text }]}>Copy Text</Text>
@@ -105,6 +111,8 @@ export const MessageActionSheet = ({
         <Pressable
           style={({ pressed }) => [styles.action, pressed && { backgroundColor: colors.surfaceHover }]}
           onPress={() => { onEdit(); onClose(); }}
+          accessibilityRole="menuitem"
+          accessibilityLabel="Edit"
         >
           <Feather name="edit-2" size={20} color={colors.text} />
           <Text style={[styles.actionText, { color: colors.text }]}>Edit</Text>
@@ -115,6 +123,8 @@ export const MessageActionSheet = ({
         <Pressable
           style={({ pressed }) => [styles.action, pressed && { backgroundColor: colors.surfaceHover }]}
           onPress={handleDelete}
+          accessibilityRole="menuitem"
+          accessibilityLabel="Delete message"
         >
           <Feather name="trash-2" size={20} color={colors.error} />
           <Text style={[styles.actionText, { color: colors.error }]}>
@@ -126,6 +136,8 @@ export const MessageActionSheet = ({
       <Pressable
         style={({ pressed }) => [styles.cancelAction, { borderTopColor: colors.border }, pressed && { backgroundColor: colors.surfaceHover }]}
         onPress={onClose}
+        accessibilityRole="button"
+        accessibilityLabel="Cancel"
       >
         <Text style={[styles.cancelText, { color: colors.textSecondary }]}>Cancel</Text>
       </Pressable>

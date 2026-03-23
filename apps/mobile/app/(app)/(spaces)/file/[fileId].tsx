@@ -19,6 +19,7 @@ import { DownloadStatus } from '@colanode/client/types/files';
 import { LocalFileNode } from '@colanode/client/types/nodes';
 import { SkeletonFilePreview } from '@colanode/mobile/components/ui/skeleton';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
+import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
@@ -41,32 +42,28 @@ export default function FileScreen() {
   const { appService } = useAppService();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
-  const { mutate, isPending } = useMutation();
+  const toast = useToast();
+  const { mutate } = useMutation();
   const [fileUri, setFileUri] = useState<string | null>(null);
-  const [downloading, setDownloading] = useState(false);
-  const downloadingRef = useRef(false);
   const isMountedRef = useRef(true);
-  const downloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { data: file, isLoading } = useNodeQuery<LocalFileNode>(userId, fileId, 'file');
 
-  // Reactively track download status via local.file.get
+  // Reactively track download status via local.file.get with autoDownload
   const { data: localFile } = useLiveQuery({
     type: 'local.file.get',
     fileId: fileId!,
     userId,
+    autoDownload: true,
   });
 
   useEffect(() => {
     return () => {
       isMountedRef.current = false;
-      if (downloadTimerRef.current) {
-        clearTimeout(downloadTimerRef.current);
-      }
     };
   }, []);
 
-  // Update fileUri reactively when download completes
+  // Derive fileUri from download status
   useEffect(() => {
     if (!file) {
       setFileUri(null);
@@ -79,12 +76,6 @@ export default function FileScreen() {
       appService.fs.exists(path).then((exists: boolean) => {
         if (!cancelled && isMountedRef.current) {
           setFileUri(exists ? path : null);
-          setDownloading(false);
-          downloadingRef.current = false;
-          if (downloadTimerRef.current) {
-            clearTimeout(downloadTimerRef.current);
-            downloadTimerRef.current = null;
-          }
         }
       });
       return () => {
@@ -92,42 +83,26 @@ export default function FileScreen() {
       };
     }
 
-    if (localFile?.downloadStatus === DownloadStatus.Failed) {
-      setDownloading(false);
-      downloadingRef.current = false;
-      if (downloadTimerRef.current) {
-        clearTimeout(downloadTimerRef.current);
-        downloadTimerRef.current = null;
-      }
-      Alert.alert(
-        'Download Failed',
-        localFile.downloadErrorMessage ?? 'An error occurred while downloading the file.'
-      );
-      return;
-    }
-
-    // No local file record yet — check filesystem directly
-    if (!localFile) {
-      const path = appService.path.workspaceFile(userId, file.id, file.extension);
-      let cancelled = false;
-      appService.fs.exists(path).then((exists: boolean) => {
-        if (!cancelled && isMountedRef.current) {
-          setFileUri(exists ? path : null);
-        }
-      });
-      return () => {
-        cancelled = true;
-      };
-    }
+    setFileUri(null);
   }, [file, localFile, userId, appService]);
 
-  const handleDownload = () => {
-    if (!file || downloading || isPending) return;
+  // Show toast when download fails
+  const prevStatusRef = useRef<string | undefined>();
+  useEffect(() => {
+    if (
+      localFile?.downloadStatus === DownloadStatus.Failed &&
+      prevStatusRef.current !== DownloadStatus.Failed
+    ) {
+      toast.show(
+        localFile.downloadErrorMessage ?? 'Download failed'
+      );
+    }
+    prevStatusRef.current = localFile?.downloadStatus;
+  }, [localFile?.downloadStatus, localFile?.downloadErrorMessage, toast]);
 
+  const handleRetry = () => {
+    if (!file) return;
     const path = appService.path.workspaceFile(userId, file.id, file.extension);
-    setDownloading(true);
-    downloadingRef.current = true;
-
     mutate({
       input: {
         type: 'file.download',
@@ -135,34 +110,11 @@ export default function FileScreen() {
         fileId: file.id,
         path,
       },
-      onSuccess() {
-        // Download initiated — useLiveQuery on local.file.get will
-        // reactively update when download_status changes.
-        // Set a fallback timeout in case events are missed.
-        downloadTimerRef.current = setTimeout(() => {
-          if (isMountedRef.current && downloadingRef.current) {
-            setDownloading(false);
-            downloadingRef.current = false;
-            Alert.alert(
-              'Download Timeout',
-              'The download is taking longer than expected. Please try again.'
-            );
-          }
-        }, 60000);
-      },
-      onError() {
-        if (isMountedRef.current) {
-          setDownloading(false);
-          downloadingRef.current = false;
-        }
-      },
     });
   };
 
   const handleOpen = async () => {
-    if (!fileUri) {
-      return;
-    }
+    if (!fileUri) return;
 
     try {
       const canOpen = await Linking.canOpenURL(fileUri);
@@ -170,7 +122,6 @@ export default function FileScreen() {
         Alert.alert('Open Failed', 'This file cannot be opened on this device.');
         return;
       }
-
       await Linking.openURL(fileUri);
     } catch (error) {
       const message =
@@ -180,9 +131,7 @@ export default function FileScreen() {
   };
 
   const handleShare = async () => {
-    if (!fileUri) {
-      return;
-    }
+    if (!fileUri) return;
 
     try {
       await Share.share({
@@ -202,6 +151,14 @@ export default function FileScreen() {
 
   const isImage = file?.subtype === 'image';
   const iconName = FILE_TYPE_ICONS[file?.subtype ?? ''] ?? 'file';
+  const isDownloading =
+    !fileUri &&
+    file &&
+    (!localFile ||
+      localFile.downloadStatus === DownloadStatus.Pending ||
+      localFile.downloadStatus === DownloadStatus.Downloading);
+  const isFailed =
+    !fileUri && file && localFile?.downloadStatus === DownloadStatus.Failed;
 
   return (
     <View style={[styles.container, { backgroundColor: colors.background }]}>
@@ -225,10 +182,10 @@ export default function FileScreen() {
         ) : (
           <View style={[styles.filePlaceholder, { backgroundColor: colors.surface }]}>
             <Feather name={iconName} size={48} color={colors.sheetHandle} />
-            {!fileUri && file && !downloading && (
+            {isFailed && (
               <>
-                <Text style={[styles.placeholderNote, { color: colors.textMuted }]}>
-                  File not downloaded yet
+                <Text style={[styles.placeholderNote, { color: colors.error }]}>
+                  {localFile?.downloadErrorMessage ?? 'Download failed'}
                 </Text>
                 <Pressable
                   style={({ pressed }) => [
@@ -236,17 +193,21 @@ export default function FileScreen() {
                     { backgroundColor: colors.primary },
                     pressed && styles.downloadButtonPressed,
                   ]}
-                  onPress={handleDownload}
+                  onPress={handleRetry}
                 >
-                  <Feather name="download" size={18} color={colors.text} />
-                  <Text style={[styles.downloadButtonText, { color: colors.text }]}>Download</Text>
+                  <Feather name="refresh-cw" size={18} color={colors.text} />
+                  <Text style={[styles.downloadButtonText, { color: colors.text }]}>Retry</Text>
                 </Pressable>
               </>
             )}
-            {downloading && (
+            {isDownloading && (
               <View style={styles.downloadingRow}>
                 <ActivityIndicator size="small" color={colors.primary} />
-                <Text style={[styles.downloadingText, { color: colors.primary }]}>Downloading...</Text>
+                <Text style={[styles.downloadingText, { color: colors.primary }]}>
+                  {localFile?.downloadProgress != null && localFile.downloadProgress > 0
+                    ? `Downloading... ${Math.round(localFile.downloadProgress)}%`
+                    : 'Downloading...'}
+                </Text>
               </View>
             )}
             {fileUri && !isImage && (

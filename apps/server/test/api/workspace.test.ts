@@ -241,3 +241,163 @@ describe('workspace role updates', () => {
     expect(updatedUser?.role).toBe('none');
   });
 });
+
+describe('workspace role update security', () => {
+  it('rejects cross-workspace role update', async () => {
+    const adminAccount = await createAccount({
+      email: 'cross-ws-admin@example.com',
+    });
+    const workspaceA = await createWorkspace({ createdBy: adminAccount.id });
+    await createUser({
+      workspaceId: workspaceA.id,
+      account: adminAccount,
+      role: 'admin',
+    });
+    const { token: adminToken } = await createDevice({
+      accountId: adminAccount.id,
+    });
+
+    const ownerBAccount = await createAccount({
+      email: 'cross-ws-owner-b@example.com',
+    });
+    const workspaceB = await createWorkspace({ createdBy: ownerBAccount.id });
+    const targetUser = await createUser({
+      workspaceId: workspaceB.id,
+      account: ownerBAccount,
+      role: 'collaborator',
+    });
+
+    const response = await app.inject({
+      method: 'PATCH',
+      url: `/client/v1/workspaces/${workspaceA.id}/users/${targetUser.id}/role`,
+      headers: buildAuthHeader(adminToken),
+      payload: { role: 'guest' },
+    });
+
+    expect(response.statusCode).toBe(404);
+    expect(response.json()).toMatchObject({
+      code: ApiErrorCode.UserNotFound,
+    });
+  });
+});
+
+describe('workspace invite role restrictions', () => {
+  it('rejects invite with none role', async () => {
+    const ownerAccount = await createAccount({
+      email: 'invite-none-owner@example.com',
+    });
+    const workspace = await createWorkspace({ createdBy: ownerAccount.id });
+    await createUser({
+      workspaceId: workspace.id,
+      account: ownerAccount,
+      role: 'owner',
+    });
+    const { token } = await createDevice({ accountId: ownerAccount.id });
+
+    const response = await app.inject({
+      method: 'POST',
+      url: `/client/v1/workspaces/${workspace.id}/users`,
+      headers: buildAuthHeader(token),
+      payload: {
+        users: [{ email: 'none-role@example.com', role: 'none' }],
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(body.errors).toHaveLength(1);
+    expect(body.errors[0].error).toContain('none');
+  });
+
+  it('rejects admin inviting as owner', async () => {
+    const adminAccount = await createAccount({
+      email: 'invite-admin-owner@example.com',
+    });
+    const workspace = await createWorkspace({ createdBy: adminAccount.id });
+    await createUser({
+      workspaceId: workspace.id,
+      account: adminAccount,
+      role: 'admin',
+    });
+    const { token } = await createDevice({ accountId: adminAccount.id });
+
+    const response = await app.inject({
+      method: 'POST',
+      url: `/client/v1/workspaces/${workspace.id}/users`,
+      headers: buildAuthHeader(token),
+      payload: {
+        users: [{ email: 'new-owner@example.com', role: 'owner' }],
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(body.errors).toHaveLength(1);
+    expect(body.errors[0].error).toContain('Only owners');
+  });
+
+  it('rejects admin inviting as admin', async () => {
+    const adminAccount = await createAccount({
+      email: 'invite-admin-admin@example.com',
+    });
+    const workspace = await createWorkspace({ createdBy: adminAccount.id });
+    await createUser({
+      workspaceId: workspace.id,
+      account: adminAccount,
+      role: 'admin',
+    });
+    const { token } = await createDevice({ accountId: adminAccount.id });
+
+    const response = await app.inject({
+      method: 'POST',
+      url: `/client/v1/workspaces/${workspace.id}/users`,
+      headers: buildAuthHeader(token),
+      payload: {
+        users: [{ email: 'new-admin@example.com', role: 'admin' }],
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(body.errors).toHaveLength(1);
+    expect(body.errors[0].error).toContain('Only owners');
+  });
+
+  it('allows owner to invite as collaborator', async () => {
+    const ownerAccount = await createAccount({
+      email: 'invite-owner-collab@example.com',
+    });
+    const workspace = await createWorkspace({ createdBy: ownerAccount.id });
+    await createUser({
+      workspaceId: workspace.id,
+      account: ownerAccount,
+      role: 'owner',
+    });
+    const { token } = await createDevice({ accountId: ownerAccount.id });
+
+    // Pre-create the target account and user so the invite returns
+    // the existing user without trying to send an invitation email.
+    const targetAccount = await createAccount({
+      email: 'new-collab-ok@example.com',
+    });
+    await createUser({
+      workspaceId: workspace.id,
+      account: targetAccount,
+      role: 'collaborator',
+    });
+
+    const response = await app.inject({
+      method: 'POST',
+      url: `/client/v1/workspaces/${workspace.id}/users`,
+      headers: buildAuthHeader(token),
+      payload: {
+        users: [{ email: 'new-collab-ok@example.com', role: 'collaborator' }],
+      },
+    });
+
+    expect(response.statusCode).toBe(200);
+    const body = response.json();
+    expect(body.errors).toHaveLength(0);
+    expect(body.users).toHaveLength(1);
+  });
+});

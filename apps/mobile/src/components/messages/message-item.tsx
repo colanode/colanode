@@ -2,7 +2,7 @@ import { memo } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { mapBlocksToContents } from '@colanode/client/lib';
-import { LocalMessageNode } from '@colanode/client/types/nodes';
+import { LocalMessageNode, NodeReaction } from '@colanode/client/types/nodes';
 import { User } from '@colanode/client/types/users';
 import { Block } from '@colanode/core';
 import { UserAvatar } from '@colanode/mobile/components/avatars/avatar';
@@ -10,7 +10,6 @@ import { BlockRenderer } from '@colanode/mobile/components/messages/block-render
 import { MessageReactions } from '@colanode/mobile/components/messages/message-reactions';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { formatMessageTime } from '@colanode/mobile/lib/format-utils';
 import { getMessagePreview } from '@colanode/mobile/lib/message-utils';
 
@@ -31,6 +30,7 @@ interface MessageItemProps {
   onLongPress?: (target: MessageActionTarget) => void;
   referencedMessage?: LocalMessageNode;
   currentUserId: string;
+  reactions?: NodeReaction[];
 }
 
 export const MessageItem = memo(({
@@ -40,6 +40,7 @@ export const MessageItem = memo(({
   onLongPress,
   referencedMessage,
   currentUserId,
+  reactions,
 }: MessageItemProps) => {
   const { appService } = useAppService();
   const { colors } = useTheme();
@@ -50,12 +51,6 @@ export const MessageItem = memo(({
     ? users.find((u) => u.id === referencedMessage.createdBy)
     : undefined;
   const refAuthorName = refAuthor?.name ?? 'Unknown';
-
-  const { data: reactions } = useLiveQuery({
-    type: 'node.reaction.list',
-    nodeId: message.id,
-    userId: currentUserId,
-  });
 
   const handleToggleReaction = (reaction: string) => {
     const hasOwn = reactions?.some(
@@ -85,6 +80,9 @@ export const MessageItem = memo(({
     <Pressable
       onLongPress={() => onLongPress?.({ message, authorName })}
       delayLongPress={400}
+      accessibilityRole="button"
+      accessibilityLabel={`Message from ${authorName} at ${formatMessageTime(message.createdAt)}`}
+      accessibilityHint="Long press for message actions"
     >
       <View style={styles.container}>
         {!isOwnMessage && (

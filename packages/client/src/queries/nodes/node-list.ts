@@ -8,6 +8,7 @@ export type NodeListQueryInput = {
   filters: Array<SimpleComparison>;
   sorts: Array<ParsedOrderBy>;
   limit?: number;
+  offset?: number;
 };
 
 declare module '@colanode/client/queries' {
