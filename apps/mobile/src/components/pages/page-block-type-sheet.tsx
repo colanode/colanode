@@ -21,6 +21,8 @@ const BLOCK_TYPES: BlockType[] = [
   { command: 'codeBlock', label: 'Code', icon: 'code' },
   { command: 'divider', label: 'Divider', icon: 'minus' },
   { command: 'table', label: 'Table', icon: 'grid' },
+  { command: 'databaseInline', label: 'Database', icon: 'grid' },
+  { command: 'database', label: 'Database Page', icon: 'grid' },
 ];
 
 interface PageBlockTypeSheetProps {

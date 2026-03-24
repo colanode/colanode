@@ -67,6 +67,8 @@ import {
   BlockquoteCommand,
   BulletListCommand,
   CodeBlockCommand,
+  DatabaseCommand,
+  DatabaseInlineCommand,
   DividerCommand,
   Heading1Command,
   Heading2Command,
@@ -263,6 +265,8 @@ export const DocumentEditor = ({
             Heading1Command,
             Heading2Command,
             Heading3Command,
+            DatabaseInlineCommand,
+            DatabaseCommand,
             BulletListCommand,
             CodeBlockCommand,
             OrderedListCommand,
@@ -349,17 +353,25 @@ export const DocumentEditor = ({
     reconcileRef.current(editor, state, updates, node.id);
   }, [state, updates, editor, node.id]);
 
-  // Expose flush for the bridge so pending saves are not lost
+  // Register flush callback so pending saves are not lost on navigation/background
   useEffect(() => {
-    (window as unknown as { __editorFlush?: () => void }).__editorFlush =
-      () => {
-        if (hasPendingChanges.current && editor) {
-          debouncedSave.flush();
-        }
-      };
+    type FlushWindow = Window & typeof globalThis & {
+      __flushCallbacks?: Array<() => void>;
+    };
+    const win = window as FlushWindow;
+    if (!win.__flushCallbacks) {
+      win.__flushCallbacks = [];
+    }
+    const flushCb = () => {
+      if (hasPendingChanges.current && editor) {
+        debouncedSave.flush();
+      }
+    };
+    win.__flushCallbacks.push(flushCb);
     return () => {
-      delete (window as unknown as { __editorFlush?: () => void })
-        .__editorFlush;
+      win.__flushCallbacks = win.__flushCallbacks?.filter(
+        (cb) => cb !== flushCb
+      );
     };
   }, [debouncedSave, editor]);
 

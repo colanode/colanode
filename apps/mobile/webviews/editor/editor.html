@@ -74,6 +74,57 @@
     <div id="scroll-container">
       <div id="editor-root"></div>
     </div>
+    <script>
+      (function () {
+        function stringifyError(error) {
+          if (!error) {
+            return 'Unknown error';
+          }
+
+          if (error.stack) {
+            return String(error.stack);
+          }
+
+          if (error.message) {
+            return String(error.message);
+          }
+
+          return String(error);
+        }
+
+        function report(message) {
+          try {
+            const rn = window.ReactNativeWebView;
+            if (rn && typeof rn.postMessage === 'function') {
+              rn.postMessage(
+                JSON.stringify({
+                  type: 'error',
+                  payload: { message },
+                })
+              );
+            }
+          } catch {
+            // Ignore reporting failures inside the reporter itself.
+          }
+        }
+
+        window.__colanodeReportFatal = report;
+
+        window.addEventListener('error', function (event) {
+          const location = [event.filename, event.lineno, event.colno]
+            .filter(Boolean)
+            .join(':');
+          const message = event.error
+            ? stringifyError(event.error)
+            : [event.message, location].filter(Boolean).join(' at ');
+          report('Window error: ' + message);
+        });
+
+        window.addEventListener('unhandledrejection', function (event) {
+          report('Unhandled rejection: ' + stringifyError(event.reason));
+        });
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

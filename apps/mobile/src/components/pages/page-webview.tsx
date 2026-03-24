@@ -16,7 +16,9 @@ import {
 } from 'react-native';
 import { WebView, type WebViewMessageEvent } from 'react-native-webview';
 
-import type { DocumentState, DocumentUpdate } from '@colanode/client/types';
+import { eventBus } from '@colanode/client/lib';
+import type { Event, DocumentState, DocumentUpdate } from '@colanode/client/types';
+import type { WorkspaceRole } from '@colanode/core';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 
@@ -30,10 +32,12 @@ export interface PageWebViewHandle {
 }
 
 interface PageWebViewProps {
+  mode?: 'page' | 'database' | 'record';
   nodeId: string;
   userId: string;
   accountId: string;
   workspaceId: string;
+  workspaceRole: WorkspaceRole;
   rootId: string;
   canEdit: boolean;
   title: string;
@@ -44,13 +48,18 @@ interface PageWebViewProps {
   onEditorFocusChange?: (focused: boolean) => void;
 }
 
+const buildPendingSubscriptionKey = (windowId: string, key: string) =>
+  `${windowId}:${key}`;
+
 export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
   (
     {
+      mode = 'page',
       nodeId,
       userId,
       accountId,
       workspaceId,
+      workspaceRole,
       rootId,
       canEdit,
       title,
@@ -66,10 +75,34 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
   const { scheme, colors } = useTheme();
   const webViewRef = useRef<WebView>(null);
   const isReadyRef = useRef(false);
+  const editorFocusedRef = useRef(false);
+  const webViewWindowIdRef = useRef(
+    `mobile-webview:${mode}:${nodeId}:${Math.random().toString(36).slice(2)}`
+  );
+  const subscribedQueryKeysRef = useRef<Set<string>>(new Set());
+  const pendingUnsubscribeKeysRef = useRef<Set<string>>(new Set());
   const revisionRef = useRef(state?.revision ?? '0');
   const sentUpdateIdsRef = useRef<Set<string>>(new Set());
-  const [editorHtml, setEditorHtml] = useState<string | null>(null);
+  const [editorAsset, setEditorAsset] = useState<{ html: string; baseUrl: string } | null>(null);
   const [webViewReady, setWebViewReady] = useState(false);
+
+  useEffect(() => {
+    const previousWindowId = webViewWindowIdRef.current;
+    for (const key of subscribedQueryKeysRef.current) {
+      pendingUnsubscribeKeysRef.current.add(
+        buildPendingSubscriptionKey(previousWindowId, key)
+      );
+      appService.mediator.unsubscribeQuery(key, previousWindowId);
+    }
+
+    subscribedQueryKeysRef.current.clear();
+    webViewWindowIdRef.current = `mobile-webview:${mode}:${nodeId}:${Math.random().toString(36).slice(2)}`;
+    isReadyRef.current = false;
+    editorFocusedRef.current = false;
+    setWebViewReady(false);
+    revisionRef.current = '0';
+    sentUpdateIdsRef.current.clear();
+  }, [appService, mode, nodeId]);
 
   // Load the HTML content from the asset
   useEffect(() => {
@@ -80,13 +113,16 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
         const resp = await fetch(asset.localUri);
         let html = await resp.text();
         // Polyfill crypto.randomUUID — iOS WebView doesn't provide it
-        const polyfill = `<script>if(!crypto.randomUUID){crypto.randomUUID=function(){var d=new Uint8Array(16);crypto.getRandomValues(d);d[6]=(d[6]&0x0f)|0x40;d[8]=(d[8]&0x3f)|0x80;var h='';for(var i=0;i<16;i++){h+=d[i].toString(16).padStart(2,'0');if(i===3||i===5||i===7||i===9)h+='-';}return h;};}</script>`;
+        const polyfill = `<script>(function(){if(typeof window.crypto==='undefined'){window.crypto={};}if(typeof window.crypto.getRandomValues!=='function'){window.crypto.getRandomValues=function(arr){for(var i=0;i<arr.length;i++){arr[i]=Math.floor(Math.random()*256);}return arr;};}if(typeof window.crypto.randomUUID!=='function'){window.crypto.randomUUID=function(){var d=new Uint8Array(16);window.crypto.getRandomValues(d);d[6]=(d[6]&0x0f)|0x40;d[8]=(d[8]&0x3f)|0x80;var h='';for(var i=0;i<16;i++){h+=d[i].toString(16).padStart(2,'0');if(i===3||i===5||i===7||i===9)h+='-';}return h;};}})();</script>`;
         html = html.replace('<head>', '<head>' + polyfill);
         // Apply dark class before first paint to avoid white flash
         if (scheme === 'dark') {
           html = html.replace('<html lang="en">', '<html lang="en" class="dark">');
         }
-        setEditorHtml(html);
+        // Derive base URL from the asset path so the page gets a file:// origin.
+        // Without a real origin, WKWebView masks all error details as "Script error".
+        const baseUrl = asset.localUri.replace(/\/[^/]*$/, '/');
+        setEditorAsset({ html, baseUrl });
       }
     };
     loadAsset();
@@ -96,7 +132,7 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
     if (!webViewRef.current) return;
     const json = JSON.stringify(msg);
     webViewRef.current.injectJavaScript(
-      `(function(){try{window.dispatchEvent(new MessageEvent('message',{data:${JSON.stringify(json)}}));}catch(e){}})();true;`
+      `(function(){try{window.dispatchEvent(new MessageEvent('message',{data:${JSON.stringify(json)}}));}catch(e){window.__colanodeBridgeReportError&&window.__colanodeBridgeReportError('Bridge dispatch error',e);}})();true;`
     );
   }, []);
 
@@ -104,10 +140,12 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
     sendMessage({
       type: 'init',
       payload: {
+        mode,
         nodeId,
         userId,
         accountId,
         workspaceId,
+        workspaceRole,
         rootId,
         canEdit,
         theme: scheme,
@@ -120,9 +158,11 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
     sentUpdateIdsRef.current = new Set(updates.map((u) => u.id));
   }, [
     nodeId,
+    mode,
     userId,
     accountId,
     workspaceId,
+    workspaceRole,
     rootId,
     canEdit,
     scheme,
@@ -131,6 +171,23 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
     title,
     sendMessage,
   ]);
+
+  useEffect(() => {
+    const subscriptionId = eventBus.subscribe((event: Event) => {
+      if (!isReadyRef.current) {
+        return;
+      }
+
+      sendMessage({
+        type: 'event.publish',
+        payload: { event },
+      });
+    });
+
+    return () => {
+      eventBus.unsubscribe(subscriptionId);
+    };
+  }, [sendMessage]);
 
   // Send state updates when revision changes or new updates arrive
   useEffect(() => {
@@ -181,6 +238,7 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
     if (!isReadyRef.current) return;
     if (prevKeyboardHeight.current === keyboardHeight) return;
     prevKeyboardHeight.current = keyboardHeight;
+    if (!editorFocusedRef.current) return;
     if (keyboardHeight > 0) {
       sendMessage({ type: 'keyboard.show', payload: { height: keyboardHeight } });
     } else {
@@ -295,8 +353,74 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
           break;
         }
 
+        case 'query.subscribe.request': {
+          const { requestId, key, input } = msg.payload as {
+            requestId: string;
+            key: string;
+            input: Record<string, unknown>;
+          };
+
+          const queryInput = { ...input };
+          if (!queryInput.userId) {
+            queryInput.userId = userId;
+          }
+
+          try {
+            const windowId = webViewWindowIdRef.current;
+            const pendingKey = buildPendingSubscriptionKey(windowId, key);
+
+            pendingUnsubscribeKeysRef.current.delete(pendingKey);
+            subscribedQueryKeysRef.current.add(key);
+            const data = await appService.mediator.executeQueryAndSubscribe(
+              key,
+              windowId,
+              queryInput as never
+            );
+
+            if (pendingUnsubscribeKeysRef.current.has(pendingKey)) {
+              pendingUnsubscribeKeysRef.current.delete(pendingKey);
+              subscribedQueryKeysRef.current.delete(key);
+              appService.mediator.unsubscribeQuery(key, windowId);
+            }
+
+            sendMessage({
+              type: 'query.response',
+              payload: { requestId, data },
+            });
+          } catch (err) {
+            sendMessage({
+              type: 'query.response',
+              payload: {
+                requestId,
+                data: null,
+                error: err instanceof Error ? err.message : 'Query failed',
+              },
+            });
+          }
+          break;
+        }
+
+        case 'query.unsubscribe.request': {
+          const { key } = msg.payload as { key: string };
+          pendingUnsubscribeKeysRef.current.add(
+            buildPendingSubscriptionKey(webViewWindowIdRef.current, key)
+          );
+          subscribedQueryKeysRef.current.delete(key);
+          appService.mediator.unsubscribeQuery(key, webViewWindowIdRef.current);
+          break;
+        }
+
         case 'editor.focus': {
           const { focused } = msg.payload as { focused: boolean };
+          editorFocusedRef.current = focused;
+          if (focused && keyboardHeight > 0) {
+            sendMessage({
+              type: 'keyboard.show',
+              payload: { height: keyboardHeight },
+            });
+          } else if (!focused) {
+            sendMessage({ type: 'keyboard.hide' });
+          }
           onEditorFocusChange?.(focused);
           break;
         }
@@ -323,8 +447,29 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
         }
       }
     },
-    [appService, userId, sendInit, sendMessage, onNavigateNode, onEditorFocusChange]
+    [
+      appService,
+      keyboardHeight,
+      onEditorFocusChange,
+      onNavigateNode,
+      sendInit,
+      sendMessage,
+      userId,
+    ]
   );
+
+  useEffect(() => {
+    return () => {
+      const windowId = webViewWindowIdRef.current;
+      for (const key of subscribedQueryKeysRef.current) {
+        pendingUnsubscribeKeysRef.current.add(
+          buildPendingSubscriptionKey(windowId, key)
+        );
+        appService.mediator.unsubscribeQuery(key, windowId);
+      }
+      subscribedQueryKeysRef.current.clear();
+    };
+  }, [appService]);
 
   const sendFlush = useCallback(() => {
     if (!isReadyRef.current) return;
@@ -342,7 +487,7 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
     [sendFlush, sendMessage]
   );
 
-  if (!editorHtml) {
+  if (!editorAsset) {
     return (
       <View style={[styles.container, styles.loading, { backgroundColor: colors.background }]}>
         <ActivityIndicator color={colors.textMuted} />
@@ -358,35 +503,62 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
         </View>
       )}
       <WebView
+        key={`${mode}:${nodeId}`}
         ref={webViewRef}
-        source={{ html: editorHtml, baseUrl: '' }}
+        source={{ html: editorAsset.html, baseUrl: editorAsset.baseUrl }}
         injectedJavaScriptBeforeContentLoaded={`
-          if (!crypto.randomUUID) {
-            crypto.randomUUID = function() {
-              var d = new Uint8Array(16);
-              crypto.getRandomValues(d);
-              d[6] = (d[6] & 0x0f) | 0x40;
-              d[8] = (d[8] & 0x3f) | 0x80;
-              var h = '';
-              for (var i = 0; i < 16; i++) {
-                h += d[i].toString(16).padStart(2, '0');
-                if (i === 3 || i === 5 || i === 7 || i === 9) h += '-';
+          (function() {
+            if (typeof window.crypto === 'undefined') {
+              window.crypto = {};
+            }
+            if (typeof window.crypto.getRandomValues !== 'function') {
+              window.crypto.getRandomValues = function(arr) {
+                for (var i = 0; i < arr.length; i++) {
+                  arr[i] = Math.floor(Math.random() * 256);
+                }
+                return arr;
+              };
+            }
+            if (typeof window.crypto.randomUUID !== 'function') {
+              window.crypto.randomUUID = function() {
+                var d = new Uint8Array(16);
+                window.crypto.getRandomValues(d);
+                d[6] = (d[6] & 0x0f) | 0x40;
+                d[8] = (d[8] & 0x3f) | 0x80;
+                var h = '';
+                for (var i = 0; i < 16; i++) {
+                  h += d[i].toString(16).padStart(2, '0');
+                  if (i === 3 || i === 5 || i === 7 || i === 9) h += '-';
+                }
+                return h;
+              };
+            }
+          })();
+          window.__colanodeBridgeReportError = function(prefix, value) {
+            var message = prefix;
+            if (value) {
+              if (value.stack) {
+                message += ': ' + value.stack;
+              } else if (value.message) {
+                message += ': ' + value.message;
+              } else {
+                message += ': ' + String(value);
               }
-              return h;
-            };
-          }
-          window.onerror = function(msg, url, line, col, err) {
+            }
             window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
               type: 'error',
-              payload: { message: 'JS Error: ' + msg + ' at ' + url + ':' + line + ':' + col }
+              payload: { message: message }
             }));
           };
-          window.addEventListener('unhandledrejection', function(e) {
-            window.ReactNativeWebView && window.ReactNativeWebView.postMessage(JSON.stringify({
-              type: 'error',
-              payload: { message: 'Unhandled rejection: ' + (e.reason && e.reason.message || e.reason || 'unknown') }
-            }));
+          window.addEventListener('error', function(event) {
+            window.__colanodeBridgeReportError('JS Error', event.error || (event.message + ' at ' + event.filename + ':' + event.lineno + ':' + event.colno));
           });
+          window.addEventListener('unhandledrejection', function(e) {
+            window.__colanodeBridgeReportError('Unhandled rejection', e.reason);
+          });
+          window.onerror = function(msg, url, line, col, err) {
+            window.__colanodeBridgeReportError('JS Error', err || (msg + ' at ' + url + ':' + line + ':' + col));
+          };
 
           true;
         `}

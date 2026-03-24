@@ -10,9 +10,9 @@ Colanode Mobile is an Expo + React Native client for Colanode's local-first coll
 - `@colanode/client` for local database access, queries, mutations, and sync
 - `@colanode/core` for schemas, types, permissions, and business rules
 - `@colanode/crdt` for Yjs-backed collaborative documents
-- `@colanode/ui` for shared editor behavior and UI building blocks where it makes sense
+- `@colanode/ui` for shared editor behavior, database components, and UI building blocks where it makes sense
 
-The app is mostly native React Native UI. The main exception is page editing: the rich-text editor runs as a small browser app inside a `WebView`, while the surrounding shell, routing, data access, and native integrations stay in React Native.
+The app is mostly native React Native UI. The main exception is content editing: the rich-text editor, database views, and record detail screens run as a browser app inside a `WebView`, while the surrounding shell, routing, data access, and native integrations stay in React Native.
 
 ## Architecture
 
@@ -41,7 +41,7 @@ graph TB
 
     Web --> Core & Client & CRDT & UI
     Desktop --> Core & Client & CRDT & UI
-    Mobile --> Core & Client & CRDT
+    Mobile --> Core & Client & CRDT & UI
 
     Web -- "HTTP + WS" --> API
     Desktop -- "HTTP + WS" --> API
@@ -76,19 +76,21 @@ sequenceDiagram
     Screen-->>User: UI refreshes
 ```
 
-### How the embedded page editor works
+### How the embedded editor WebView works
+
+The WebView hosts three rendering modes — page editing, database views, and record detail — all sharing the same bridge and communication protocol.
 
 ```mermaid
 sequenceDiagram
-    participant Page as Native Page Screen
-    participant WV as WebView (TipTap)
+    participant Screen as Native Screen
+    participant WV as WebView
     participant Bridge as Bridge Messages
     participant App as AppService
 
-    Page->>WV: Load editor.html asset
+    Screen->>WV: Load editor.html asset
     WV->>Bridge: "ready"
-    Page->>WV: Send CRDT state + theme + permissions
-    WV->>WV: Render TipTap editor
+    Screen->>WV: init (mode, CRDT state, theme, permissions)
+    WV->>WV: Render based on mode:<br/>page → TipTap editor<br/>database → database table view<br/>record → record attributes + editor
 
     loop User edits
         WV->>Bridge: mutation.request
@@ -97,20 +99,25 @@ sequenceDiagram
         Bridge-->>WV: mutation.response
     end
 
-    WV->>Bridge: query.request (e.g. node lookup)
-    Bridge->>App: Execute query
-    App-->>Bridge: Result
-    Bridge-->>WV: query.response
+    loop Data subscriptions
+        WV->>Bridge: query.subscribe.request
+        Bridge->>App: Subscribe via mediator
+        App-->>Bridge: Initial data
+        App->>Bridge: event.publish (live updates)
+        Bridge-->>WV: Collection updates
+    end
 
-    Note over Page,WV: CRDT updates debounced (500ms),<br/>flushed on background/navigate
+    Note over Screen,WV: CRDT updates debounced (500ms),<br/>flushed on background/navigate
 ```
 
 ## What Exists Today
 
 - **Authentication:** server selection, OTP login, registration, password reset
 - **Messaging:** chat and channel browsing, message sending, replies, reactions, editing, deletion
-- **Content:** spaces, folders, files, pages, and workspace navigation
-- **Page editing:** inline rich-text editing via embedded TipTap WebView (paragraph, headings, lists, tasks, blockquotes, horizontal rules)
+- **Content:** spaces, folders, files, pages, databases, records, and workspace navigation
+- **Page editing:** inline rich-text editing via embedded TipTap WebView (paragraph, headings, lists, tasks, blockquotes, code blocks, tables, horizontal rules, inline databases)
+- **Database views:** table view with inline field editing, record creation, view tabs, filters, sorts, and settings — rendered inside the WebView using shared `@colanode/ui` database components
+- **Record editing:** record attributes (name, fields) and rich-text body editing, also rendered in the WebView
 - **File management:** file picking, upload (resumable via tus-js-client), download, and preview
 - **Workspaces:** workspace switching, creation, and basic settings
 - **Members:** member list, invite flow with email chips and role picker
@@ -144,7 +151,7 @@ npm run android   # Android Emulator
 npm run start     # Expo dev server only
 ```
 
-The `prestart`, `preios`, and `preandroid` scripts build and copy the embedded page editor asset before Expo starts.
+The `prestart`, `preios`, and `preandroid` scripts build and copy the embedded editor asset before Expo starts.
 
 ## Project Structure
 
@@ -172,6 +179,8 @@ apps/mobile/
 │       │   ├── space/[spaceId].tsx    #   Space children browser
 │       │   ├── channel/[channelId].tsx#   Channel messages
 │       │   ├── page/[pageId]/         #   Page viewer/editor (WebView)
+│       │   ├── database/[databaseId].tsx # Database view (WebView)
+│       │   ├── record/[recordId].tsx  #   Record detail + editor (WebView)
 │       │   ├── file/[fileId].tsx      #   File preview/download
 │       │   └── folder/[folderId].tsx  #   Folder contents
 │       └── (settings)/                # Settings tab
@@ -202,8 +211,16 @@ apps/mobile/
 │   ├── lib/                           # Crypto polyfill, colors, query client, utils
 │   └── mocks/                         # Metro mocks for browser-only modules
 ├── webviews/
-│   └── editor/                        # Embedded TipTap editor (separate Vite build)
-│       ├── src/                       # Editor app: bridge, extensions, views
+│   └── editor/                        # Embedded editor (separate Vite build)
+│       ├── src/
+│       │   ├── main.tsx               # Bootstrap: lazy-loads bridge + editor
+│       │   ├── bridge.ts             # Native ↔ WebView message protocol
+│       │   ├── editor.tsx            # Root component: mode routing, contexts, keyboard
+│       │   ├── document-editor.tsx   # TipTap rich-text editor (page/record body)
+│       │   ├── database-runtime.tsx  # Database table view (mobile-specific layout)
+│       │   ├── record-runtime.tsx    # Record attributes + document editor
+│       │   ├── extensions/           # TipTap node extensions (database, page, file, folder)
+│       │   └── views/               # TipTap node views (database, page, file, folder, mention)
 │       ├── vite.config.ts             # Builds to single HTML file
 │       └── editor.html                # Entry HTML
 ├── assets/
@@ -220,7 +237,7 @@ apps/mobile/
 
 ### 1. Native mobile shell
 
-The Expo / React Native app handles everything except the rich-text editor DOM:
+The Expo / React Native app handles everything except the rich-text and database editor DOM:
 
 - File-based routing via Expo Router with `(auth)` and `(app)` route groups
 - Tab navigation: Home, Spaces, Chats, Settings
@@ -240,18 +257,33 @@ The mobile app follows the same local-first model as the desktop and web clients
 
 This is why mobile can reuse `@colanode/client`, `@colanode/core`, and `@colanode/crdt` instead of reimplementing business logic.
 
-### 3. Embedded page editor
+### 3. Embedded editor WebView
 
-Rich-text page editing is implemented as an embedded browser app loaded into a React Native `WebView`.
+Rich-text editing, database views, and record detail screens are implemented as an embedded browser app loaded into a React Native `WebView`.
 
 Why:
 
 - The shared editor stack (TipTap / ProseMirror) depends on DOM APIs
-- React Native cannot run DOM-based editor code directly
+- Database and record UIs use `@colanode/ui` components built with Radix UI, TanStack DB, and Tailwind CSS — all browser-only
+- React Native cannot run DOM-based editor or UI code directly
 - A WebView gives the app a browser runtime inside the native screen
-- This lets mobile reuse the mature shared web editor instead of maintaining a second implementation
+- This lets mobile reuse the shared web components instead of maintaining parallel implementations
 
 The editor lives in `webviews/editor/`, has its own Vite build, and produces a single HTML file that Metro bundles as an asset. The native `PageWebView` component loads it and communicates via a bidirectional message bridge.
+
+The WebView operates in three modes:
+
+| Mode | Renders | Used by |
+|---|---|---|
+| `page` | TipTap rich-text editor with inline database blocks | `page/[pageId]` |
+| `database` | Database table view with view tabs, filters, sorts | `database/[databaseId]` |
+| `record` | Record attributes (name, fields) + TipTap body editor | `record/[recordId]` |
+
+### 4. Database and record rendering
+
+Database views and record editing run inside the WebView and use shared `@colanode/ui` components (database table, record attributes, field value editors, view settings, etc.) via TanStack DB collections that communicate with native through the bridge.
+
+The WebView's `database-runtime.tsx` intentionally reimplements some of the surrounding table/view/header layout rather than reusing the full shared `DatabaseViews` component from `packages/ui`. This is because the shared components include desktop-specific features (drag-and-drop column reordering, column resizing, board/calendar layouts) that don't work well on mobile. The mobile-specific layout provides a touch-friendly table view while still reusing the shared data layer, field value components, and database context providers. Consolidating these into a single responsive implementation in `packages/ui` is a future goal.
 
 ## Metro Configuration
 
@@ -266,7 +298,7 @@ The custom `index.js` entry point loads `crypto-polyfill.ts` before anything els
 
 ## Working On The Embedded Editor
 
-Browser-side editor code lives in `webviews/editor/src/`. Native hosting and bridge code lives in `src/components/pages/page-webview.tsx`. The native page screen is at `app/(app)/(spaces)/page/[pageId]/index.tsx`.
+Browser-side editor code lives in `webviews/editor/src/`. Native hosting and bridge code lives in `src/components/pages/page-webview.tsx`. The native screens are at `app/(app)/(spaces)/page/[pageId]/index.tsx`, `database/[databaseId].tsx`, and `record/[recordId].tsx`.
 
 ```bash
 # Rebuild the editor after changes
@@ -282,8 +314,10 @@ The bridge protocol supports:
 
 | Direction | Messages |
 |---|---|
-| Native → WebView | `init`, `state.update`, `theme.change`, `permission.change`, `flush`, `block.command`, keyboard events |
-| WebView → Native | `ready`, `mutation.request`, `query.request`, `navigate.node`, `navigate.url`, `editor.focus`, `error` |
+| Native → WebView | `init`, `state.update`, `theme.change`, `permission.change`, `flush`, `block.command`, `keyboard.show`, `keyboard.hide`, `editor.blur`, `event.publish` |
+| WebView → Native | `ready`, `mutation.request`, `query.request`, `query.subscribe.request`, `query.unsubscribe.request`, `navigate.node`, `navigate.url`, `editor.focus`, `error` |
+
+The WebView uses TanStack DB collections for reactive data access. Collections subscribe to queries via the bridge (`query.subscribe.request`) and receive live updates through forwarded events (`event.publish`). This gives database and record views the same reactive behavior as the web/desktop apps.
 
 ## Dependencies
 
@@ -301,7 +335,8 @@ The bridge protocol supports:
 
 - The app is still evolving quickly, so some flows are intentionally incomplete.
 - The page title is managed by the native screen header, while the document body is managed by the embedded editor.
-- Using a WebView for the editor adds build/bridge complexity, but lets the app reuse the mature shared web editor stack instead of maintaining a second rich-text editor in pure React Native.
+- Using a WebView for the editor and database views adds build/bridge complexity, but lets the app reuse the shared web component stack instead of maintaining parallel implementations in pure React Native.
+- Database views on mobile currently support the table layout only. Board and calendar layouts are not available on mobile and the view shows a message directing users to switch to a table view.
+- The mobile `database-runtime.tsx` reimplements some table/view layout that exists in shared `packages/ui` because the shared version includes desktop-specific drag-and-drop and resize features. Consolidating into a responsive shared implementation is planned for the future.
 - No inline mark editing (bold/italic) in the editor yet — plain text formatting per block only.
-- No database views on mobile (complex, poor mobile UX).
 - No push notifications yet.
