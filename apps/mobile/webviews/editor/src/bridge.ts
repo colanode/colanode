@@ -1,6 +1,8 @@
 import { EventBusService } from '@colanode/client/lib';
 import type { MutationInput, MutationResult } from '@colanode/client/mutations';
 import type { QueryInput, QueryMap } from '@colanode/client/queries';
+import type { Event } from '@colanode/client/types';
+import type { WorkspaceRole } from '@colanode/core';
 import type { ColanodeWindowApi } from '@colanode/ui/window';
 
 // Types for messages between WebView and Native
@@ -8,10 +10,12 @@ export type NativeToWebViewMessage =
   | {
       type: 'init';
       payload: {
+        mode: 'page' | 'database' | 'record';
         nodeId: string;
         userId: string;
         accountId: string;
         workspaceId: string;
+        workspaceRole: WorkspaceRole;
         rootId: string;
         canEdit: boolean;
         theme: 'light' | 'dark';
@@ -38,7 +42,8 @@ export type NativeToWebViewMessage =
   | { type: 'keyboard.show'; payload: { height: number } }
   | { type: 'keyboard.hide' }
   | { type: 'editor.blur' }
-  | { type: 'block.command'; payload: { command: string } };
+  | { type: 'block.command'; payload: { command: string } }
+  | { type: 'event.publish'; payload: { event: Event } };
 
 export type WebViewToNativeMessage =
   | { type: 'ready' }
@@ -49,6 +54,14 @@ export type WebViewToNativeMessage =
   | {
       type: 'query.request';
       payload: { requestId: string; input: QueryInput };
+    }
+  | {
+      type: 'query.subscribe.request';
+      payload: { requestId: string; key: string; input: QueryInput };
+    }
+  | {
+      type: 'query.unsubscribe.request';
+      payload: { key: string };
     }
   | {
       type: 'navigate.node';
@@ -91,20 +104,34 @@ function generateRequestId(): string {
 }
 
 function sendRequest(
-  type: 'mutation.request' | 'query.request',
-  input: unknown
+  message:
+    | {
+        type: 'mutation.request';
+        payload: { input: MutationInput };
+      }
+    | {
+        type: 'query.request';
+        payload: { input: QueryInput };
+      }
+    | {
+        type: 'query.subscribe.request';
+        payload: { key: string; input: QueryInput };
+      }
 ): Promise<unknown> {
   return new Promise((resolve, reject) => {
     const requestId = generateRequestId();
     const timer = setTimeout(() => {
       pendingRequests.delete(requestId);
-      reject(new Error(`Bridge request timed out: ${type}`));
+      reject(new Error(`Bridge request timed out: ${message.type}`));
     }, REQUEST_TIMEOUT);
 
     pendingRequests.set(requestId, { resolve, reject, timer });
     postToNative({
-      type,
-      payload: { requestId, input: input as MutationInput & QueryInput },
+      ...message,
+      payload: {
+        ...message.payload,
+        requestId,
+      },
     } as WebViewToNativeMessage);
   });
 }
@@ -120,27 +147,38 @@ function handleNativeMessage(event: MessageEvent) {
 
   if (!msg || !msg.type) return;
 
-  // Handle request responses
-  if (msg.type === 'mutation.response' || msg.type === 'query.response') {
-    const { requestId, error } = msg.payload;
-    const pending = pendingRequests.get(requestId);
-    if (pending) {
-      clearTimeout(pending.timer);
-      pendingRequests.delete(requestId);
-      if (error) {
-        pending.reject(new Error(error));
-      } else {
-        const data =
-          msg.type === 'mutation.response' ? msg.payload.result : msg.payload.data;
-        pending.resolve(data);
+  try {
+    // Handle request responses
+    if (msg.type === 'mutation.response' || msg.type === 'query.response') {
+      const { requestId, error } = msg.payload;
+      const pending = pendingRequests.get(requestId);
+      if (pending) {
+        clearTimeout(pending.timer);
+        pendingRequests.delete(requestId);
+        if (error) {
+          pending.reject(new Error(error));
+        } else {
+          const data =
+            msg.type === 'mutation.response' ? msg.payload.result : msg.payload.data;
+          pending.resolve(data);
+        }
       }
+      return;
     }
-    return;
-  }
 
-  // Forward all other messages to listeners
-  for (const listener of messageListeners) {
-    listener(msg);
+    if (msg.type === 'event.publish') {
+      window.eventBus.publish(msg.payload.event);
+      return;
+    }
+
+    // Forward all other messages to listeners
+    for (const listener of messageListeners) {
+      listener(msg);
+    }
+  } catch (err) {
+    postError(
+      `Bridge message handler error (${msg.type}): ${err instanceof Error ? err.stack ?? err.message : String(err)}`
+    );
   }
 }
 
@@ -158,26 +196,40 @@ const bridgeApi: ColanodeWindowApi = {
   executeMutation: async <T extends MutationInput>(
     input: T
   ): Promise<MutationResult<T>> => {
-    const result = await sendRequest('mutation.request', input);
+    const result = await sendRequest({
+      type: 'mutation.request',
+      payload: { input },
+    });
     return result as MutationResult<T>;
   },
 
   executeQuery: async <T extends QueryInput>(
     input: T
   ): Promise<QueryMap[T['type']]['output']> => {
-    const result = await sendRequest('query.request', input);
+    const result = await sendRequest({
+      type: 'query.request',
+      payload: { input },
+    });
     return result as QueryMap[T['type']]['output'];
   },
 
   executeQueryAndSubscribe: async <T extends QueryInput>(
-    _key: string,
+    key: string,
     input: T
   ): Promise<QueryMap[T['type']]['output']> => {
-    const result = await sendRequest('query.request', input);
+    const result = await sendRequest({
+      type: 'query.subscribe.request',
+      payload: { key, input },
+    });
     return result as QueryMap[T['type']]['output'];
   },
 
-  unsubscribeQuery: async () => {},
+  unsubscribeQuery: async (key: string) => {
+    postToNative({
+      type: 'query.unsubscribe.request',
+      payload: { key },
+    });
+  },
 
   saveTempFile: async () => {
     throw new Error('saveTempFile is not supported in mobile editor');

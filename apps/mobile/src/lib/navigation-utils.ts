@@ -4,31 +4,51 @@ import { LocalNode } from '@colanode/client/types/nodes';
 
 type AppRouter = ReturnType<typeof useRouter>;
 
-export const navigateToNode = (router: AppRouter, node: LocalNode) => {
-  switch (node.type) {
+export const navigateToNodeByType = (
+  router: AppRouter,
+  nodeId: string,
+  nodeType: LocalNode['type']
+) => {
+  switch (nodeType) {
     case 'channel':
       router.push({
         pathname: '/(app)/(spaces)/channel/[channelId]',
-        params: { channelId: node.id },
+        params: { channelId: nodeId },
       });
       break;
     case 'page':
       router.push({
         pathname: '/(app)/(spaces)/page/[pageId]',
-        params: { pageId: node.id },
+        params: { pageId: nodeId },
       });
       break;
     case 'folder':
       router.push({
         pathname: '/(app)/(spaces)/folder/[folderId]',
-        params: { folderId: node.id },
+        params: { folderId: nodeId },
       });
       break;
     case 'file':
       router.push({
         pathname: '/(app)/(spaces)/file/[fileId]',
-        params: { fileId: node.id },
+        params: { fileId: nodeId },
+      });
+      break;
+    case 'database':
+      router.push({
+        pathname: '/(app)/(spaces)/database/[databaseId]',
+        params: { databaseId: nodeId },
+      });
+      break;
+    case 'record':
+      router.push({
+        pathname: '/(app)/(spaces)/record/[recordId]',
+        params: { recordId: nodeId },
       });
       break;
   }
+};
+
+export const navigateToNode = (router: AppRouter, node: LocalNode) => {
+  navigateToNodeByType(router, node.id, node.type);
 };

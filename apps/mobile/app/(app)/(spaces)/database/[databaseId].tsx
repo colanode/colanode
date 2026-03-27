@@ -1,8 +1,6 @@
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
-  AppState,
-  AppStateStatus,
   Keyboard,
   KeyboardAvoidingView,
   Platform,
@@ -13,86 +11,33 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { LocalPageNode } from '@colanode/client/types/nodes';
-import { SkeletonPage } from '@colanode/mobile/components/ui/skeleton';
+import { LocalDatabaseNode } from '@colanode/client/types/nodes';
 import { RenameNodeSheet } from '@colanode/mobile/components/nodes/rename-node-sheet';
-import { PageBlockTypeSheet } from '@colanode/mobile/components/pages/page-block-type-sheet';
-import { PageEditorToolbar } from '@colanode/mobile/components/pages/page-editor-toolbar';
 import {
   PageWebView,
   type PageWebViewHandle,
 } from '@colanode/mobile/components/pages/page-webview';
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
+import { SkeletonPage } from '@colanode/mobile/components/ui/skeleton';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
-import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 import { useNodeRole } from '@colanode/mobile/hooks/use-node-role';
 import { navigateToNodeByType } from '@colanode/mobile/lib/navigation-utils';
 
-export default function PageScreen() {
-  const { pageId } = useLocalSearchParams<{ pageId: string }>();
+export default function DatabaseScreen() {
+  const { databaseId } = useLocalSearchParams<{ databaseId: string }>();
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const { userId, accountId, workspaceId, role } = useWorkspace();
   const { colors } = useTheme();
-  const insets = useSafeAreaInsets();
-  const webViewRef = useRef<PageWebViewHandle>(null);
-
-  const { data: page, isLoading: pageLoading } =
-    useNodeQuery<LocalPageNode>(userId, pageId, 'page');
-  const { canEdit, isLoading: roleLoading } = useNodeRole(userId, page);
   const [showRename, setShowRename] = useState(false);
   const [keyboardHeight, setKeyboardHeight] = useState(0);
-  const [editorFocused, setEditorFocused] = useState(false);
-  const [showBlockTypes, setShowBlockTypes] = useState(false);
+  const webViewRef = useRef<PageWebViewHandle>(null);
 
-  const { data: docState, isLoading: stateLoading } = useLiveQuery({
-    type: 'document.state.get',
-    documentId: pageId!,
-    userId,
-  });
-
-  const { data: docUpdates, isLoading: updatesLoading } = useLiveQuery({
-    type: 'document.updates.list',
-    documentId: pageId!,
-    userId,
-  });
-
-  // Track keyboard height
-  useEffect(() => {
-    const showEvent =
-      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
-    const hideEvent =
-      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
-    const showSub = Keyboard.addListener(showEvent, (e) =>
-      setKeyboardHeight(e.endCoordinates.height)
-    );
-    const hideSub = Keyboard.addListener(hideEvent, () =>
-      setKeyboardHeight(0)
-    );
-    return () => {
-      showSub.remove();
-      hideSub.remove();
-    };
-  }, []);
-
-  // Flush on app background
-  useEffect(() => {
-    const handleAppState = (nextState: AppStateStatus) => {
-      if (nextState === 'background' || nextState === 'inactive') {
-        webViewRef.current?.flush();
-      }
-    };
-    const sub = AppState.addEventListener('change', handleAppState);
-    return () => sub.remove();
-  }, []);
-
-  // Flush on unmount
-  useEffect(() => {
-    return () => {
-      webViewRef.current?.flush();
-    };
-  }, []);
+  const { data: database, isLoading: databaseLoading } =
+    useNodeQuery<LocalDatabaseNode>(userId, databaseId, 'database');
+  const { canEdit, isLoading: roleLoading } = useNodeRole(userId, database);
 
   const handleNavigateNode = useCallback(
     (nodeId: string, nodeType: string) => {
@@ -101,10 +46,24 @@ export default function PageScreen() {
     [router]
   );
 
-  const isLoading = pageLoading || roleLoading || stateLoading || updatesLoading;
-  const showToolbar = (keyboardHeight > 0 && editorFocused && canEdit) || showBlockTypes;
+  useEffect(() => {
+    const showEvent =
+      Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow';
+    const hideEvent =
+      Platform.OS === 'ios' ? 'keyboardWillHide' : 'keyboardDidHide';
 
-  if (isLoading) {
+    const showSub = Keyboard.addListener(showEvent, (event) =>
+      setKeyboardHeight(event.endCoordinates.height)
+    );
+    const hideSub = Keyboard.addListener(hideEvent, () => setKeyboardHeight(0));
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, []);
+
+  if (databaseLoading || roleLoading) {
     return <SkeletonPage />;
   }
 
@@ -121,7 +80,7 @@ export default function PageScreen() {
         ]}
       >
         <BackButton onPress={() => router.back()} />
-        {canEdit && page ? (
+        {canEdit && database ? (
           <Pressable
             onPress={() => setShowRename(true)}
             style={styles.headerTitleContainer}
@@ -130,7 +89,7 @@ export default function PageScreen() {
               style={[styles.headerTitle, { color: colors.text }]}
               numberOfLines={1}
             >
-              {page.name || 'Page'}
+              {database.name || 'Database'}
             </Text>
           </Pressable>
         ) : (
@@ -139,7 +98,7 @@ export default function PageScreen() {
               style={[styles.headerTitle, { color: colors.text }]}
               numberOfLines={1}
             >
-              {page?.name ?? 'Page'}
+              {database?.name ?? 'Database'}
             </Text>
           </View>
         )}
@@ -148,36 +107,25 @@ export default function PageScreen() {
       <View style={styles.content}>
         <PageWebView
           ref={webViewRef}
-          nodeId={pageId!}
+          mode="database"
+          nodeId={databaseId!}
           userId={userId}
           accountId={accountId}
           workspaceId={workspaceId}
           workspaceRole={role}
-          rootId={page?.rootId ?? ''}
+          rootId={database?.rootId ?? ''}
           canEdit={canEdit}
-          title={page?.name ?? ''}
-          state={docState}
-          updates={docUpdates ?? []}
+          title={database?.name ?? ''}
+          state={null}
+          updates={[]}
           keyboardHeight={keyboardHeight}
           onNavigateNode={handleNavigateNode}
-          onEditorFocusChange={setEditorFocused}
         />
       </View>
-      <PageBlockTypeSheet
-        visible={showBlockTypes}
-        onClose={() => setShowBlockTypes(false)}
-        onSelect={(command) => webViewRef.current?.executeBlockCommand(command)}
-      />
-      {showToolbar && (
-        <PageEditorToolbar
-          onPlusPress={() => setShowBlockTypes(!showBlockTypes)}
-          onDismiss={() => webViewRef.current?.blur()}
-        />
-      )}
-      {page && (
+      {database && (
         <RenameNodeSheet
           visible={showRename}
-          node={page}
+          node={database}
           userId={userId}
           onClose={() => setShowRename(false)}
         />

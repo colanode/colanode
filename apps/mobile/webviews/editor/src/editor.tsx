@@ -1,22 +1,63 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { Component, useCallback, useEffect, useRef, useState } from 'react';
+import type { ErrorInfo, ReactNode } from 'react';
 
 import type { DocumentState, DocumentUpdate } from '@colanode/client/types';
 import type { LocalNode } from '@colanode/client/types/nodes';
-import type { WorkspaceRole } from '@colanode/core';
+import { WorkspaceStatus, type WorkspaceRole } from '@colanode/core';
+import { AppContext } from '@colanode/ui/contexts/app';
+import { collections } from '@colanode/ui/collections';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
+import { buildQueryClient } from '@colanode/ui/lib/query';
+import { DatabaseCommand, DatabaseInlineCommand } from '@colanode/ui/editor/commands';
 
+import { MobileDatabaseRuntime } from './database-runtime';
 import { DocumentEditor } from './document-editor';
 import {
   onNativeMessage,
+  postEditorFocus,
+  postError,
   postReady,
   type NativeToWebViewMessage,
 } from './bridge';
+import { MobileRecordRuntime } from './record-runtime';
+
+class EditorErrorBoundary extends Component<
+  { children: ReactNode },
+  { error: Error | null }
+> {
+  state: { error: Error | null } = { error: null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  componentDidCatch(error: Error, info: ErrorInfo) {
+    const details = `React error: ${error.stack ?? error.message}${info.componentStack ? `\nComponent stack: ${info.componentStack}` : ''}`;
+    postError(details);
+  }
+
+  render() {
+    if (this.state.error) {
+      return (
+        <div style={{ padding: 16, color: 'red', fontSize: 12 }}>
+          <p>
+            <strong>Editor error:</strong> {this.state.error.message}
+          </p>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 interface InitPayload {
+  mode: 'page' | 'database' | 'record';
   nodeId: string;
   userId: string;
   accountId: string;
   workspaceId: string;
+  workspaceRole: WorkspaceRole;
   rootId: string;
   canEdit: boolean;
   theme: 'light' | 'dark';
@@ -26,10 +67,12 @@ interface InitPayload {
 }
 
 interface EditorState {
+  mode: 'page' | 'database' | 'record';
   nodeId: string;
   userId: string;
   accountId: string;
   workspaceId: string;
+  workspaceRole: WorkspaceRole;
   rootId: string;
   canEdit: boolean;
   docState: DocumentState | null;
@@ -62,12 +105,30 @@ function buildDocUpdates(
 
 export function MobileEditorApp() {
   const [editorState, setEditorState] = useState<EditorState | null>(null);
+  const [runtimeReady, setRuntimeReady] = useState(false);
   const editorStateRef = useRef<EditorState | null>(null);
+  const preloadPromiseRef = useRef<Promise<void> | null>(null);
+  const queryClientRef = useRef<ReturnType<typeof buildQueryClient> | null>(
+    null
+  );
+
+  if (queryClientRef.current === null) {
+    queryClientRef.current = buildQueryClient();
+  }
+
+  const ensureCollectionsReady = useCallback(async () => {
+    if (!preloadPromiseRef.current) {
+      preloadPromiseRef.current = collections.preload();
+    }
+
+    await preloadPromiseRef.current;
+  }, []);
 
   const handleMessage = useCallback((msg: NativeToWebViewMessage) => {
     switch (msg.type) {
       case 'init': {
         const p = msg.payload as InitPayload;
+        setRuntimeReady(false);
 
         // Set theme
         if (p.theme === 'dark') {
@@ -77,17 +138,36 @@ export function MobileEditorApp() {
         }
 
         const state: EditorState = {
+          mode: p.mode,
           nodeId: p.nodeId,
           userId: p.userId,
           accountId: p.accountId,
           workspaceId: p.workspaceId,
+          workspaceRole: p.workspaceRole,
           rootId: p.rootId,
           canEdit: p.canEdit,
           docState: buildDocState(p.nodeId, p.state),
           docUpdates: buildDocUpdates(p.nodeId, p.updates),
         };
-        editorStateRef.current = state;
-        setEditorState(state);
+        void ensureCollectionsReady().then(() => {
+          if (!collections.workspaces.has(p.userId)) {
+            collections.workspaces.insert({
+              userId: p.userId,
+              workspaceId: p.workspaceId,
+              accountId: p.accountId,
+              role: p.workspaceRole,
+              name: '',
+              description: null,
+              avatar: null,
+              status: WorkspaceStatus.Active,
+              maxFileSize: undefined,
+            });
+          }
+
+          editorStateRef.current = state;
+          setEditorState(state);
+          setRuntimeReady(true);
+        });
         break;
       }
 
@@ -135,11 +215,29 @@ export function MobileEditorApp() {
       }
 
       case 'flush': {
-        // Flush any pending debounced save immediately
-        const flush = (window as unknown as { __editorFlush?: () => void })
-          .__editorFlush;
-        if (flush) {
-          flush();
+        // Flush any pending debounced save immediately.
+        // 1. Call all registered flush callbacks (TipTap editor, etc.)
+        const callbacks = (
+          window as unknown as { __flushCallbacks?: Array<() => void> }
+        ).__flushCallbacks;
+        if (callbacks) {
+          for (const cb of callbacks) {
+            try {
+              cb();
+            } catch {
+              // ignore flush errors
+            }
+          }
+        }
+        // 2. Blur the active element so input-based components (record name,
+        //    field values) commit their pending debounced mutations via their
+        //    own blur/change handlers before the WebView is torn down.
+        if (
+          document.activeElement instanceof HTMLInputElement ||
+          document.activeElement instanceof HTMLTextAreaElement ||
+          document.activeElement instanceof HTMLSelectElement
+        ) {
+          document.activeElement.blur();
         }
         break;
       }
@@ -159,21 +257,42 @@ export function MobileEditorApp() {
               `${kbHeight}px`
             );
 
-            const selection = window.getSelection();
-            if (selection && selection.rangeCount > 0) {
-              const range = selection.getRangeAt(0);
-              const rect = range.getBoundingClientRect();
-              const viewportHeight = window.innerHeight;
-              // The visible area ends where the keyboard begins
-              const visibleBottom = viewportHeight - kbHeight - 60;
-              if (rect.bottom > visibleBottom) {
-                // Scroll so cursor is comfortably above the keyboard
-                const scrollBy = rect.bottom - visibleBottom + 40;
-                container.scrollBy({
-                  top: scrollBy,
-                  behavior: 'smooth',
-                });
+            const activeElement = document.activeElement;
+            let focusBottom: number | null = null;
+
+            if (
+              activeElement instanceof HTMLInputElement ||
+              activeElement instanceof HTMLTextAreaElement ||
+              activeElement instanceof HTMLSelectElement
+            ) {
+              focusBottom = activeElement.getBoundingClientRect().bottom;
+            } else {
+              const selection = window.getSelection();
+              if (selection && selection.rangeCount > 0) {
+                try {
+                  focusBottom = selection
+                    .getRangeAt(0)
+                    .getBoundingClientRect().bottom;
+                } catch {
+                  focusBottom = null;
+                }
               }
+            }
+
+            if (focusBottom == null) {
+              return;
+            }
+
+            const viewportHeight = window.innerHeight;
+            // The visible area ends where the keyboard begins
+            const visibleBottom = viewportHeight - kbHeight - 60;
+            if (focusBottom > visibleBottom) {
+              // Scroll so the focused control stays comfortably above the keyboard
+              const scrollBy = focusBottom - visibleBottom + 40;
+              container.scrollBy({
+                top: scrollBy,
+                behavior: 'smooth',
+              });
             }
           });
         });
@@ -202,6 +321,7 @@ export function MobileEditorApp() {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const ei = (window as any).__editorInstance;
         if (!ei) break;
+        const current = editorStateRef.current;
         try {
           const chain = ei.chain().focus();
           switch (command) {
@@ -238,6 +358,44 @@ export function MobileEditorApp() {
             case 'table':
               chain.insertTable({ rows: 3, cols: 3, withHeaderRow: false }).run();
               break;
+            case 'databaseInline':
+              if (!current) {
+                break;
+              }
+              void DatabaseInlineCommand.handler({
+                editor: ei,
+                range: {
+                  from: ei.state.selection.from,
+                  to: ei.state.selection.to,
+                },
+                context: {
+                  userId: current.userId,
+                  documentId: current.nodeId,
+                  accountId: current.accountId,
+                  workspaceId: current.workspaceId,
+                  rootId: current.rootId,
+                },
+              });
+              break;
+            case 'database':
+              if (!current) {
+                break;
+              }
+              void DatabaseCommand.handler({
+                editor: ei,
+                range: {
+                  from: ei.state.selection.from,
+                  to: ei.state.selection.to,
+                },
+                context: {
+                  userId: current.userId,
+                  documentId: current.nodeId,
+                  accountId: current.accountId,
+                  workspaceId: current.workspaceId,
+                  rootId: current.rootId,
+                },
+              });
+              break;
           }
         } catch (e) {
           // Post error to native for debugging
@@ -253,7 +411,7 @@ export function MobileEditorApp() {
         break;
       }
     }
-  }, []);
+  }, [ensureCollectionsReady]);
 
   useEffect(() => {
     const unsub = onNativeMessage(handleMessage);
@@ -261,14 +419,50 @@ export function MobileEditorApp() {
     return unsub;
   }, [handleMessage]);
 
-  if (!editorState) {
+  // Global focus tracking: report focus/blur for ALL interactive elements
+  // (inputs, textareas, selects, contentEditable) to native so keyboard
+  // avoidance works for database/record inputs, not just the TipTap editor.
+  useEffect(() => {
+    const isInteractive = (el: Element): boolean =>
+      el instanceof HTMLInputElement ||
+      el instanceof HTMLTextAreaElement ||
+      el instanceof HTMLSelectElement ||
+      (el as HTMLElement).isContentEditable;
+
+    const handleFocusIn = (e: FocusEvent) => {
+      if (e.target instanceof Element && isInteractive(e.target)) {
+        postEditorFocus(true);
+      }
+    };
+    const handleFocusOut = (e: FocusEvent) => {
+      if (e.target instanceof Element && isInteractive(e.target)) {
+        // Defer so we can check if focus moved to another interactive element
+        requestAnimationFrame(() => {
+          const next = document.activeElement;
+          if (!next || !isInteractive(next)) {
+            postEditorFocus(false);
+          }
+        });
+      }
+    };
+
+    document.addEventListener('focusin', handleFocusIn);
+    document.addEventListener('focusout', handleFocusOut);
+    return () => {
+      document.removeEventListener('focusin', handleFocusIn);
+      document.removeEventListener('focusout', handleFocusOut);
+    };
+  }, []);
+
+  if (!editorState || !runtimeReady) {
     return null;
   }
 
+  const nodeType = editorState.mode === 'record' ? 'record' : 'page';
   const node = {
     id: editorState.nodeId,
     rootId: editorState.rootId,
-    type: 'page',
+    type: nodeType,
     name: '',
     parentId: '',
     index: '',
@@ -282,30 +476,46 @@ export function MobileEditorApp() {
     serverRevision: '0',
   } as LocalNode;
 
-  const workspaceCtx = {
-    workspaceId: editorState.workspaceId,
-    accountId: editorState.accountId,
-    userId: editorState.userId,
-    role: 'owner' as WorkspaceRole,
-    collections: {} as never,
-  };
-
   return (
-    <WorkspaceContext.Provider value={workspaceCtx}>
-      <div
-        style={{
-          padding: '0 16px',
-          paddingBottom: 'env(safe-area-inset-bottom, 20px)',
-          minHeight: '100%',
-        }}
-      >
-        <DocumentEditor
-          node={node}
-          state={editorState.docState}
-          updates={editorState.docUpdates}
-          canEdit={editorState.canEdit}
-        />
-      </div>
-    </WorkspaceContext.Provider>
+    <QueryClientProvider client={queryClientRef.current}>
+      <AppContext.Provider value={{ type: 'mobile' }}>
+        <WorkspaceContext.Provider
+          value={{
+            workspaceId: editorState.workspaceId,
+            accountId: editorState.accountId,
+            userId: editorState.userId,
+            role: editorState.workspaceRole,
+            collections: collections.workspace(editorState.userId),
+          }}
+        >
+          <EditorErrorBoundary>
+            <div
+              style={{
+                padding: '0 16px',
+                paddingBottom: 'env(safe-area-inset-bottom, 20px)',
+                minHeight: '100%',
+              }}
+            >
+              {editorState.mode === 'database' ? (
+                <MobileDatabaseRuntime databaseId={editorState.nodeId} />
+              ) : editorState.mode === 'record' ? (
+                <MobileRecordRuntime
+                  recordId={editorState.nodeId}
+                  state={editorState.docState}
+                  updates={editorState.docUpdates}
+                />
+              ) : (
+                <DocumentEditor
+                  node={node}
+                  state={editorState.docState}
+                  updates={editorState.docUpdates}
+                  canEdit={editorState.canEdit}
+                />
+              )}
+            </div>
+          </EditorErrorBoundary>
+        </WorkspaceContext.Provider>
+      </AppContext.Provider>
+    </QueryClientProvider>
   );
 }
