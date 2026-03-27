@@ -7,6 +7,7 @@ import type { LocalNode } from '@colanode/client/types/nodes';
 import { WorkspaceStatus, type WorkspaceRole } from '@colanode/core';
 import { AppContext } from '@colanode/ui/contexts/app';
 import { collections } from '@colanode/ui/collections';
+import { NavigationContext } from '@colanode/ui/contexts/navigation';
 import { WorkspaceContext } from '@colanode/ui/contexts/workspace';
 import { buildQueryClient } from '@colanode/ui/lib/query';
 import { DatabaseCommand, DatabaseInlineCommand } from '@colanode/ui/editor/commands';
@@ -17,6 +18,7 @@ import {
   onNativeMessage,
   postEditorFocus,
   postError,
+  postNavigateNode,
   postReady,
   type NativeToWebViewMessage,
 } from './bridge';
@@ -488,6 +490,9 @@ export function MobileEditorApp() {
             collections: collections.workspace(editorState.userId),
           }}
         >
+          <NavigationContext.Provider
+            value={{ openNode: postNavigateNode }}
+          >
           <EditorErrorBoundary>
             <div
               style={{
@@ -514,6 +519,7 @@ export function MobileEditorApp() {
               )}
             </div>
           </EditorErrorBoundary>
+          </NavigationContext.Provider>
         </WorkspaceContext.Provider>
       </AppContext.Provider>
     </QueryClientProvider>

@@ -8,7 +8,7 @@ export const ViewTabs = () => {
   const databaseViews = useDatabaseViews();
 
   return (
-    <div className="flex flex-row items-center gap-3">
+    <div className="flex flex-row items-center gap-3 overflow-x-auto">
       {databaseViews.views.map((view) => (
         <ViewTab
           key={view.id}

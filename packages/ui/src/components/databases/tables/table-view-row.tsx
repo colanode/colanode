@@ -22,14 +22,14 @@ export const TableViewRow = ({ index, record }: TableViewRowProps) => {
     <RecordProvider record={record} role={role}>
       <div className="animate-fade-in flex flex-row items-center gap-0.5 border-b">
         <span
-          className="flex cursor-pointer items-center justify-center text-sm text-muted-foreground"
+          className="flex items-center justify-center text-sm text-muted-foreground"
           style={{ width: '30px', minWidth: '30px' }}
         >
           {index + 1}
         </span>
         <div
           className="h-8 border-r overflow-hidden"
-          style={{ width: `${view.nameWidth}px`, minWidth: '300px' }}
+          style={{ width: `${view.nameWidth}px`, minWidth: '240px' }}
         >
           <TableViewNameCell record={record} />
         </div>
@@ -38,13 +38,16 @@ export const TableViewRow = ({ index, record }: TableViewRowProps) => {
             <div
               key={`row-${record.id}-${field.field.id}`}
               className="h-8 border-r p-1 overflow-hidden"
-              style={{ width: `${field.width}px` }}
+              style={{ width: `${field.width}px`, minWidth: '120px' }}
             >
-              <RecordFieldValue field={field.field} />
+              <RecordFieldValue
+                field={field.field}
+                readOnly={database.isLocked}
+              />
             </div>
           );
         })}
-        <div className="w-8" />
+        <div className="w-2" />
       </div>
     </RecordProvider>
   );

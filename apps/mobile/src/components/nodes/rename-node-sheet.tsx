@@ -34,6 +34,7 @@ const NODE_TYPE_LABELS: Record<string, string> = {
   channel: 'Channel',
   page: 'Page',
   folder: 'Folder',
+  database: 'Database',
 };
 
 const buildAttributes = (
@@ -72,6 +73,16 @@ const buildAttributes = (
         avatar: newAvatar ?? null,
         parentId: node.parentId!,
       };
+    case 'database':
+      return {
+        type: 'database',
+        name: newName,
+        avatar: newAvatar ?? null,
+        parentId: node.parentId!,
+        fields: node.fields ?? {},
+        nameField: node.nameField ?? null,
+        locked: node.locked ?? null,
+      };
     default:
       throw new Error(`Unsupported node type for rename: ${node.type}`);
   }
@@ -99,7 +110,7 @@ export const RenameNodeSheet = ({
   const toast = useToast();
 
   useEffect(() => {
-    if (visible && node && (node.type === 'space' || node.type === 'channel' || node.type === 'page' || node.type === 'folder')) {
+    if (visible && node && (node.type === 'space' || node.type === 'channel' || node.type === 'page' || node.type === 'folder' || node.type === 'database')) {
       setName(node.name ?? '');
       setAvatar(getNodeAvatar(node));
       setShowAvatarPicker(false);
