@@ -5,7 +5,16 @@ import { ViewAvatarInput } from '@colanode/ui/components/databases/view-avatar-i
 import { ViewFieldSettings } from '@colanode/ui/components/databases/view-field-settings';
 import { ViewRenameInput } from '@colanode/ui/components/databases/view-rename-input';
 import { ViewSettingsButton } from '@colanode/ui/components/databases/view-settings-button';
-import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@colanode/ui/components/ui/alert-dialog';
+import { Button } from '@colanode/ui/components/ui/button';
 import {
   Popover,
   PopoverContent,
@@ -14,13 +23,30 @@ import {
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
+import { useDatabaseViews } from '@colanode/ui/contexts/database-views';
+import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 export const TableViewSettings = () => {
+  const workspace = useWorkspace();
   const database = useDatabase();
   const view = useDatabaseView();
+  const databaseViews = useDatabaseViews();
 
   const [open, setOpen] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
+
+  const canDeleteView = databaseViews.views.length > 1;
+
+  const handleDeleteView = () => {
+    const nextViewId =
+      databaseViews.views.find((candidate) => candidate.id !== view.id)?.id ??
+      '';
+
+    workspace.collections.nodes.delete(view.id);
+    databaseViews.onActiveViewChange(nextViewId);
+    setOpenDelete(false);
+    setOpen(false);
+  };
 
   return (
     <Fragment>
@@ -65,7 +91,7 @@ export const TableViewSettings = () => {
                     {database.isLocked ? 'Unlock database' : 'Lock database'}
                   </span>
                 </div>
-                {!database.isLocked && (
+                {canDeleteView && !database.isLocked && (
                   <div
                     className="flex cursor-pointer flex-row items-center gap-1 rounded-md p-0.5 hover:bg-accent"
                     onClick={() => {
@@ -82,15 +108,25 @@ export const TableViewSettings = () => {
           )}
         </PopoverContent>
       </Popover>
-      {openDelete && (
-        <NodeDeleteDialog
-          title="Are you sure you want delete this view?"
-          description="This action cannot be undone. This view will no longer be accessible and all data in the view will be lost."
-          id={view.id}
-          open={openDelete}
-          onOpenChange={setOpenDelete}
-        />
-      )}
+      <AlertDialog open={openDelete} onOpenChange={setOpenDelete}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Are you sure you want delete this view?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This view will no longer be
+              accessible and all data in the view will be lost.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <Button variant="destructive" onClick={handleDeleteView}>
+              Delete
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Fragment>
   );
 };

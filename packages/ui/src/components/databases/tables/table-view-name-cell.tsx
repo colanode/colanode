@@ -3,7 +3,10 @@ import { SquareArrowOutUpRight } from 'lucide-react';
 import React, { Fragment } from 'react';
 
 import { RecordNode } from '@colanode/core';
-import { Link } from '@colanode/ui/components/ui/link';
+import { useApp } from '@colanode/ui/contexts/app';
+import { useDatabase } from '@colanode/ui/contexts/database';
+import { useNavigation } from '@colanode/ui/contexts/navigation';
+import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 interface NameEditorProps {
@@ -55,10 +58,15 @@ interface TableViewNameCellProps {
 }
 
 export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
+  const app = useApp();
   const workspace = useWorkspace();
+  const database = useDatabase();
+  const currentRecord = useRecord();
+  const navigation = useNavigation();
   const [isEditing, setIsEditing] = React.useState(false);
 
-  const canEdit = true;
+  const isMobile = app.type === 'mobile';
+  const canEdit = currentRecord.canEdit && !database.isLocked;
   const hasName = record.name && record.name.length > 0;
 
   const handleSave = (newName: string) => {
@@ -95,14 +103,13 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
               <span className="text-muted-foreground">Unnamed</span>
             )}
           </div>
-          <Link
-            from="/workspace/$userId/$nodeId"
-            to="modal/$modalNodeId"
-            params={{ modalNodeId: record.id }}
-            className="absolute right-2 flex h-6 cursor-pointer flex-row items-center gap-1 rounded-md border p-1 text-sm text-muted-foreground opacity-0 hover:bg-accent group-hover:opacity-100"
+          <button
+            type="button"
+            className={`absolute right-2 flex h-6 cursor-pointer flex-row items-center gap-1 rounded-md border p-1 text-sm text-muted-foreground hover:bg-accent ${isMobile ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'}`}
+            onClick={() => navigation.openNode(record.id, 'record')}
           >
-            <SquareArrowOutUpRight className="mr-1 size-4" /> <p>Open</p>
-          </Link>
+            <SquareArrowOutUpRight className="size-4" />
+          </button>
         </Fragment>
       )}
     </div>

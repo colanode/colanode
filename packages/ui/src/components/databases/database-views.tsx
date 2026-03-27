@@ -1,4 +1,5 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
+import type { ReactNode } from 'react';
 
 import { LocalDatabaseViewNode } from '@colanode/client/types';
 import { View } from '@colanode/ui/components/databases/view';
@@ -9,9 +10,16 @@ import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 
 interface DatabaseViewsProps {
   inline?: boolean;
+  renderLayout?: (props: {
+    view: LocalDatabaseViewNode;
+    inline: boolean;
+  }) => ReactNode;
 }
 
-export const DatabaseViews = ({ inline = false }: DatabaseViewsProps) => {
+export const DatabaseViews = ({
+  inline = false,
+  renderLayout,
+}: DatabaseViewsProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
 
@@ -47,7 +55,10 @@ export const DatabaseViews = ({ inline = false }: DatabaseViewsProps) => {
         inline,
       }}
     >
-      {activeView && <View view={activeView} />}
+      {activeView &&
+        (renderLayout
+          ? renderLayout({ view: activeView, inline })
+          : <View view={activeView} />)}
     </DatabaseViewsContext.Provider>
   );
 };

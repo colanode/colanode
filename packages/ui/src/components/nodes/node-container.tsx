@@ -1,4 +1,5 @@
-import { Outlet } from '@tanstack/react-router';
+import { Outlet, useNavigate } from '@tanstack/react-router';
+import { useCallback } from 'react';
 
 import { ChannelContainer } from '@colanode/ui/components/channels/channel-container';
 import { ChatContainer } from '@colanode/ui/components/chats/chat-container';
@@ -14,6 +15,7 @@ import { PageContainer } from '@colanode/ui/components/pages/page-container';
 import { RecordContainer } from '@colanode/ui/components/records/record-container';
 import { SpaceContainer } from '@colanode/ui/components/spaces/space-container';
 import { ContainerType } from '@colanode/ui/contexts/container';
+import { NavigationContext } from '@colanode/ui/contexts/navigation';
 import { useNode } from '@colanode/ui/contexts/node';
 import { useNodeRadar } from '@colanode/ui/hooks/use-node-radar';
 
@@ -72,11 +74,34 @@ export const NodeContainer = ({
   nodeId,
   onFullscreen,
 }: NodeContainerProps) => {
+  const navigate = useNavigate();
+
+  const openNode = useCallback(
+    (targetNodeId: string, nodeType: string) => {
+      if (nodeType === 'record') {
+        navigate({
+          from: '/workspace/$userId/$nodeId',
+          to: 'modal/$modalNodeId',
+          params: { modalNodeId: targetNodeId },
+        });
+      } else {
+        navigate({
+          from: '/workspace/$userId',
+          to: '$nodeId',
+          params: { nodeId: targetNodeId },
+        });
+      }
+    },
+    [navigate]
+  );
+
   return (
     <>
-      <NodeProvider nodeId={nodeId}>
-        <NodeContent type={type} onFullscreen={onFullscreen} />
-      </NodeProvider>
+      <NavigationContext.Provider value={{ openNode }}>
+        <NodeProvider nodeId={nodeId}>
+          <NodeContent type={type} onFullscreen={onFullscreen} />
+        </NodeProvider>
+      </NavigationContext.Provider>
       <Outlet />
     </>
   );
