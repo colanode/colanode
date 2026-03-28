@@ -12,7 +12,7 @@ import { generateId, IdType } from '@colanode/core';
 import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export type CreatableNodeType = 'channel' | 'page' | 'folder';
 

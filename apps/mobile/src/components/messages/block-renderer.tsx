@@ -17,7 +17,7 @@ import { FileItem } from '@colanode/mobile/components/files/file-item';
 import { NodeIcon } from '@colanode/mobile/components/nodes/node-icon';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
-import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 import { getNodeDisplayName, NODE_TYPE_LABELS } from '@colanode/mobile/lib/node-utils';
 

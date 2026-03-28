@@ -7,6 +7,7 @@ import {
   MutationInput,
   MutationMap,
 } from '@colanode/client/mutations';
+import { getColanode } from '@colanode/ui/lib/core-api';
 
 interface MutationOptions<T extends MutationInput> {
   input: T;
@@ -21,7 +22,7 @@ export const useMutation = () => {
     async <T extends MutationInput>(options: MutationOptions<T>) => {
       setIsPending(true);
       try {
-        const result = await window.colanode.executeMutation(options.input);
+        const result = await getColanode().executeMutation(options.input);
         if (result.success) {
           options.onSuccess?.(result.output);
           return;
@@ -46,6 +47,6 @@ export const useMutation = () => {
 
   return {
     isPending,
-    mutate: mutate,
+    mutate,
   };
 };

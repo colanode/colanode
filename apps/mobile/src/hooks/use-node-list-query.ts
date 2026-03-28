@@ -6,7 +6,7 @@ import { buildQueryKey } from '@colanode/client/queries';
 import { NodeListQueryInput } from '@colanode/client/queries/nodes/node-list';
 import { Event } from '@colanode/client/types';
 import { LocalNode } from '@colanode/client/types/nodes';
-import { useQuery } from '@colanode/mobile/hooks/use-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 const getFieldName = (field: Array<string | number>): string => {
   return field.length > 0 ? String(field[0]) : '';

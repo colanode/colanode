@@ -31,6 +31,15 @@ const BLOCKED_FILE_PATTERNS = [
 ];
 
 config.resolver.resolveRequest = (context, moduleName, platform) => {
+  // packages/ui ships its own web-only React (different version). Force react
+  // and react-native to always resolve from the mobile app's node_modules so
+  // there is exactly one React instance in the bundle.
+  if (moduleName === 'react' || moduleName.startsWith('react/') ||
+      moduleName === 'react-native' || moduleName.startsWith('react-native/')) {
+    const resolved = require.resolve(moduleName, { paths: [__dirname] });
+    return { filePath: resolved, type: 'sourceFile' };
+  }
+
   // Empty mocks for browser-only modules
   if (
     EMPTY_MOCK_MODULES.some(

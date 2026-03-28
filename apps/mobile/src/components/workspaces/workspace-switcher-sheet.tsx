@@ -11,7 +11,7 @@ import { Workspace } from '@colanode/client/types/workspaces';
 import { UserAvatar } from '@colanode/mobile/components/avatars/avatar';
 import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { getChatUnreadCount } from '@colanode/mobile/lib/radar-utils';
 
 interface WorkspaceSwitcherSheetProps {

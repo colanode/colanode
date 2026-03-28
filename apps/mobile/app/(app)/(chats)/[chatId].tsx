@@ -4,7 +4,7 @@ import { useCallback } from 'react';
 import { LocalChatNode } from '@colanode/client/types/nodes';
 import { ConversationScreen } from '@colanode/mobile/components/conversation/conversation-screen';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
-import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 
 export default function ChatScreen() {

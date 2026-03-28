@@ -12,7 +12,7 @@ import {
 import { SvgXml } from 'react-native-svg';
 
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useQuery } from '@colanode/mobile/hooks/use-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 interface IconPickerProps {
   onSelect: (iconId: string) => void;

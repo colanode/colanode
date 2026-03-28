@@ -12,7 +12,7 @@ import {
 
 import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useQuery } from '@colanode/mobile/hooks/use-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 import { codeToEmoji } from '@colanode/mobile/lib/emoji-utils';
 import { selectionChanged } from '@colanode/mobile/lib/haptics';
 
