@@ -5,6 +5,7 @@ import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect, useRef, useState } from 'react';
 
+import { eventBus } from '@colanode/client/lib';
 import { AppMeta, AppService } from '@colanode/client/services';
 import { LoadingScreen } from '@colanode/mobile/components/loading-screen';
 import { ErrorBoundary } from '@colanode/mobile/components/ui/error-boundary';
@@ -16,10 +17,11 @@ import {
 import { ThemeProvider, useTheme } from '@colanode/mobile/contexts/theme';
 import { ToastProvider } from '@colanode/mobile/components/ui/toast';
 import { copyAssets } from '@colanode/mobile/lib/assets';
-import { buildQueryClient } from '@colanode/mobile/lib/query-client';
+import { MOBILE_WINDOW_ID } from '@colanode/mobile/lib/constants';
 import { MobileFileSystem } from '@colanode/mobile/services/file-system';
 import { MobileKyselyService } from '@colanode/mobile/services/kysely-service';
 import { MobilePathService } from '@colanode/mobile/services/path-service';
+import { buildQueryClient } from '@colanode/ui/lib/query';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -62,7 +64,22 @@ export default function RootLayout() {
 
         await service.init();
 
-        const client = buildQueryClient(service.mediator);
+        (globalThis as any).colanode = {
+          executeMutation: (input: any) =>
+            service.mediator.executeMutation(input),
+          executeQuery: (input: any) => service.mediator.executeQuery(input),
+          executeQueryAndSubscribe: (key: string, input: any) =>
+            service.mediator.executeQueryAndSubscribe(
+              key,
+              MOBILE_WINDOW_ID,
+              input
+            ),
+          unsubscribeQuery: (key: string) =>
+            service.mediator.unsubscribeQuery(key, MOBILE_WINDOW_ID),
+        };
+        (globalThis as any).eventBus = eventBus;
+
+        const client = buildQueryClient();
 
         if (cancelled) {
           return;

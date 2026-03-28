@@ -19,7 +19,7 @@ import {
 import { ReplyTarget } from '@colanode/mobile/components/messages/message-item';
 import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { impactLight, notificationSuccess } from '@colanode/mobile/lib/haptics';
 import { getMessageText } from '@colanode/mobile/lib/message-utils';
 

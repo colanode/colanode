@@ -13,8 +13,8 @@ import { BottomSheet } from '@colanode/mobile/components/ui/bottom-sheet';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
 import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
-import { useQuery } from '@colanode/mobile/hooks/use-query';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 const ROLE_OPTIONS: Array<{ value: NodeRole; label: string }> = [
   { value: 'admin', label: 'Admin' },

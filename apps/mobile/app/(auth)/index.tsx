@@ -14,8 +14,8 @@ import { ServerCard } from '@colanode/mobile/components/auth/server-card';
 import { AnimatedLogo } from '@colanode/mobile/components/ui/animated-logo';
 import { EmptyState } from '@colanode/mobile/components/ui/empty-state';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export default function ServerSelectScreen() {
   const { colors } = useTheme();

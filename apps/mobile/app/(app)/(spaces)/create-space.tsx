@@ -15,7 +15,7 @@ import { generateId, hasWorkspaceRole, IdType } from '@colanode/core';
 import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export default function CreateSpaceScreen() {
   const router = useRouter();

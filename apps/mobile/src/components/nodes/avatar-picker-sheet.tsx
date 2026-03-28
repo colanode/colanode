@@ -12,7 +12,7 @@ import {
 
 import { IconPicker } from '@colanode/mobile/components/icons/icon-picker';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useQuery } from '@colanode/mobile/hooks/use-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 import { codeToEmoji } from '@colanode/mobile/lib/emoji-utils';
 
 type Tab = 'emojis' | 'icons';

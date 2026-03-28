@@ -11,8 +11,8 @@ import { WorkspaceSwitcherSheet } from '@colanode/mobile/components/workspaces/w
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { WorkspaceContext } from '@colanode/mobile/contexts/workspace';
 import { WorkspaceSwitcherContext } from '@colanode/mobile/contexts/workspace-switcher';
-import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { getChatUnreadCount } from '@colanode/mobile/lib/radar-utils';
 
 export default function AppLayout() {

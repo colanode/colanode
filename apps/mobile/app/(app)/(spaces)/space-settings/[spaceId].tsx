@@ -20,8 +20,8 @@ import { SpaceCollaboratorRoleSheet } from '@colanode/mobile/components/spaces/s
 import { BackButton } from '@colanode/mobile/components/ui/back-button';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
-import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 
 const ROLE_LABELS: Record<NodeRole, string> = {

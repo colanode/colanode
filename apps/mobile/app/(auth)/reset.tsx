@@ -15,7 +15,7 @@ import { PasswordResetCompleteForm } from '@colanode/mobile/components/auth/pass
 import { PasswordResetInitForm } from '@colanode/mobile/components/auth/password-reset-init-form';
 import { AnimatedLogo } from '@colanode/mobile/components/ui/animated-logo';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 type ResetState =
   | { type: 'init' }

@@ -10,7 +10,7 @@ import { ListSeparator } from '@colanode/mobile/components/ui/list-separator';
 import { SkeletonList } from '@colanode/mobile/components/ui/skeleton';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
-import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useNodeListQuery } from '@colanode/mobile/hooks/use-node-list-query';
 import { getNodeUnreadCount } from '@colanode/mobile/lib/radar-utils';
 

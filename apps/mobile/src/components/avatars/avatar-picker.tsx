@@ -14,8 +14,8 @@ import {
 import { generateId, IdType } from '@colanode/core';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface AvatarPickerProps {
   currentName: string;

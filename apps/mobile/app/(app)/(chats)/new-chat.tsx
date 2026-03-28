@@ -14,8 +14,8 @@ import { UserAvatar } from '@colanode/mobile/components/avatars/avatar';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
-import { useQuery } from '@colanode/mobile/hooks/use-query';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 export default function NewChatScreen() {
   const router = useRouter();

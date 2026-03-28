@@ -4,7 +4,7 @@ import { Alert, StyleSheet, View } from 'react-native';
 import { WorkspaceCreateMutationOutput } from '@colanode/client/mutations';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface CreateWorkspaceFormProps {
   accountId?: string;

@@ -16,7 +16,7 @@ import { EmailRegisterForm } from '@colanode/mobile/components/auth/email-regist
 import { EmailVerifyForm } from '@colanode/mobile/components/auth/email-verify-form';
 import { AnimatedLogo } from '@colanode/mobile/components/ui/animated-logo';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 type RegisterState =
   | { type: 'register' }

@@ -19,7 +19,7 @@ import { TextInput } from '@colanode/mobile/components/ui/text-input';
 import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 const ROLES: { value: WorkspaceRole; label: string }[] = [
   { value: 'collaborator', label: 'Collaborator' },

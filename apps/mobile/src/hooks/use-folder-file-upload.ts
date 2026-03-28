@@ -4,7 +4,7 @@ import { useRef } from 'react';
 import { extractFileSubtype, generateId, IdType } from '@colanode/core';
 import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 interface UseFolderFileUploadOptions {
   parentId: string;

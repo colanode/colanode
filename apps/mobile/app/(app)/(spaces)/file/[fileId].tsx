@@ -23,8 +23,8 @@ import { useToast } from '@colanode/mobile/components/ui/toast';
 import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
-import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { useNodeQuery } from '@colanode/mobile/hooks/use-node-query';
 import { formatFileSize } from '@colanode/mobile/lib/format-utils';
 

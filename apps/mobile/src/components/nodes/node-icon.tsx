@@ -4,7 +4,7 @@ import { SvgXml } from 'react-native-svg';
 
 import { getIdType, IdType } from '@colanode/core';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useQuery } from '@colanode/mobile/hooks/use-query';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 import { codeToEmoji } from '@colanode/mobile/lib/emoji-utils';
 
 const NODE_ICONS: Record<string, { name: keyof typeof Feather.glyphMap; colorKey: 'primaryLight' | 'textSecondary' | 'textMuted'; staticColor?: string }> = {

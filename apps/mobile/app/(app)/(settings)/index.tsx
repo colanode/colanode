@@ -10,7 +10,7 @@ import { useAppService } from '@colanode/mobile/contexts/app-service';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
 import { useWorkspaceSwitcher } from '@colanode/mobile/contexts/workspace-switcher';
-import { useLiveQuery } from '@colanode/mobile/hooks/use-live-query';
+import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 
 export default function SettingsScreen() {
   const router = useRouter();

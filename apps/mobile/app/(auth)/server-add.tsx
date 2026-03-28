@@ -15,7 +15,7 @@ import { AnimatedLogo } from '@colanode/mobile/components/ui/animated-logo';
 import { Button } from '@colanode/mobile/components/ui/button';
 import { TextInput } from '@colanode/mobile/components/ui/text-input';
 import { useTheme } from '@colanode/mobile/contexts/theme';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export default function ServerAddScreen() {
   const { colors } = useTheme();

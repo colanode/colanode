@@ -20,7 +20,7 @@ import { useToast } from '@colanode/mobile/components/ui/toast';
 import { WorkspaceDeleteSheet } from '@colanode/mobile/components/workspaces/workspace-delete-sheet';
 import { useTheme } from '@colanode/mobile/contexts/theme';
 import { useWorkspace } from '@colanode/mobile/contexts/workspace';
-import { useMutation } from '@colanode/mobile/hooks/use-mutation';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 
 export default function WorkspaceSettingsScreen() {
   const router = useRouter();
