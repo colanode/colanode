@@ -1,29 +1,10 @@
-import { mergeAttributes, Node } from '@tiptap/core';
-import { ReactNodeViewRenderer } from '@tiptap/react';
-
 import { PageNodeView } from '@colanode/ui/editor/views';
+import { createNodeExtension } from '@colanode/ui/editor/extensions/create-node-extension';
 
-const PageNode = Node.create({
+const PageNode = createNodeExtension({
   name: 'page',
-  group: 'block',
-  atom: true,
-  defining: true,
   draggable: true,
-  addAttributes() {
-    return {
-      id: {
-        default: null,
-      },
-    };
-  },
-  renderHTML({ HTMLAttributes }) {
-    return ['page', mergeAttributes(HTMLAttributes)];
-  },
-  addNodeView() {
-    return ReactNodeViewRenderer(PageNodeView, {
-      as: 'page',
-    });
-  },
+  view: PageNodeView,
 });
 
 export { PageNode };

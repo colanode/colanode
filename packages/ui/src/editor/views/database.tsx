@@ -6,7 +6,7 @@ import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Database } from '@colanode/ui/components/databases/database';
 import { DatabaseViews } from '@colanode/ui/components/databases/database-views';
 import { NodeProvider } from '@colanode/ui/components/nodes/node-provider';
-import { Link } from '@colanode/ui/components/ui/link';
+import { NodeLink } from '@colanode/ui/editor/views/node-link';
 import { useNode } from '@colanode/ui/contexts/node';
 
 const DatabaseNodeViewContent = ({
@@ -45,14 +45,14 @@ const DatabaseNodeViewContent = ({
 
   return (
     <NodeViewWrapper data-id={id}>
-      <Link from="/workspace/$userId" to="$nodeId" params={{ nodeId: id }}>
+      <NodeLink nodeId={id} nodeType="database">
         <div className="my-0.5 flex h-10 w-full cursor-pointer flex-row items-center gap-1 rounded-md p-1 hover:bg-accent">
           <Avatar size="small" id={id} name={name} avatar={avatar} />
           <div role="presentation" className="grow">
             {name}
           </div>
         </div>
-      </Link>
+      </NodeLink>
     </NodeViewWrapper>
   );
 };

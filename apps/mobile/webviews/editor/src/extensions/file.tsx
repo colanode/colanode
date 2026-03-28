@@ -1,27 +1,9 @@
-import { mergeAttributes, Node } from '@tiptap/core';
-import { ReactNodeViewRenderer } from '@tiptap/react';
+import { createNodeExtension } from '@colanode/ui/editor/extensions/create-node-extension';
 
 import { MobileFileNodeView } from '../views/file';
 
-export const MobileFileNode = Node.create({
+export const MobileFileNode = createNodeExtension({
   name: 'file',
-  group: 'block',
-  atom: true,
-  defining: true,
   draggable: false,
-  addAttributes() {
-    return {
-      id: {
-        default: null,
-      },
-    };
-  },
-  renderHTML({ HTMLAttributes }) {
-    return ['file', mergeAttributes(HTMLAttributes)];
-  },
-  addNodeView() {
-    return ReactNodeViewRenderer(MobileFileNodeView, {
-      as: 'file',
-    });
-  },
+  view: MobileFileNodeView,
 });
