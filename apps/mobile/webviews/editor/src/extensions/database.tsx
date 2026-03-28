@@ -1,30 +1,13 @@
-import { mergeAttributes, Node } from '@tiptap/core';
-import { ReactNodeViewRenderer } from '@tiptap/react';
+import { createNodeExtension } from '@colanode/ui/editor/extensions/create-node-extension';
 
 import { MobileDatabaseNodeView } from '../views/database';
 
-export const MobileDatabaseNode = Node.create({
+export const MobileDatabaseNode = createNodeExtension({
   name: 'database',
-  group: 'block',
-  atom: true,
-  defining: true,
   draggable: false,
-  addAttributes() {
-    return {
-      id: {
-        default: null,
-      },
-      inline: {
-        default: false,
-      },
-    };
-  },
-  renderHTML({ HTMLAttributes }) {
-    return ['database', mergeAttributes(HTMLAttributes)];
-  },
-  addNodeView() {
-    return ReactNodeViewRenderer(MobileDatabaseNodeView, {
-      as: 'database',
-    });
+  view: MobileDatabaseNodeView,
+  attributes: {
+    id: { default: null },
+    inline: { default: false },
   },
 });

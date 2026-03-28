@@ -1,9 +1,7 @@
 import type { DocumentState, DocumentUpdate, LocalRecordNode } from '@colanode/client/types';
 import { hasNodeRole } from '@colanode/core';
-import { RecordDatabase } from '@colanode/ui/components/records/record-database';
-import { RecordProvider } from '@colanode/ui/components/records/record-provider';
-import { RecordAttributes } from '@colanode/ui/components/records/record-attributes';
 import { NodeProvider } from '@colanode/ui/components/nodes/node-provider';
+import { RecordDetailLayout } from '@colanode/ui/components/records/record-detail-layout';
 import { useNode } from '@colanode/ui/contexts/node';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
@@ -45,19 +43,13 @@ const MobileRecordRuntimeContent = ({
     node.createdBy === workspace.userId || hasNodeRole(role, 'editor');
 
   return (
-    <RecordDatabase id={node.databaseId} role={role}>
-      <RecordProvider record={node} role={role}>
-        <div className="flex flex-col gap-3 pt-4">
-          <RecordAttributes />
-        </div>
-      </RecordProvider>
-      <div className="my-4 h-px w-full bg-border" />
+    <RecordDetailLayout record={node} role={role}>
       <DocumentEditor
         node={node}
         state={state}
         updates={updates}
         canEdit={canEdit}
       />
-    </RecordDatabase>
+    </RecordDetailLayout>
   );
 };

@@ -1,27 +1,17 @@
 import '@colanode/ui/styles/editor.css';
 
-import {
-  EditorContent,
-  FocusPosition,
-  JSONContent,
-  useEditor,
-} from '@tiptap/react';
-import { debounce, isEqual } from 'lodash-es';
-import { Fragment, useEffect, useMemo, useRef } from 'react';
+import { EditorContent, type FocusPosition, useEditor } from '@tiptap/react';
+import { isEqual } from 'lodash-es';
+import { Fragment, useRef } from 'react';
 import { toast } from 'sonner';
 
-import {
-  restoreRelativeSelection,
-  getRelativeSelection,
-  mapContentsToBlocks,
-  buildEditorContent,
-} from '@colanode/client/lib';
-import {
+import { buildEditorContent } from '@colanode/client/lib';
+import type {
   LocalNode,
   DocumentState,
   DocumentUpdate,
 } from '@colanode/client/types';
-import { RichTextContent, richTextContentSchema } from '@colanode/core';
+import { type RichTextContent } from '@colanode/core';
 import { encodeState, YDoc } from '@colanode/crdt';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import {
@@ -43,50 +33,15 @@ import {
   DatabaseInlineCommand,
 } from '@colanode/ui/editor/commands';
 import {
-  BlockquoteNode,
-  BoldMark,
-  BulletListNode,
-  CodeBlockNode,
-  CodeMark,
-  ColorMark,
   CommanderExtension,
-  DeleteControlExtension,
-  DividerNode,
-  DocumentNode,
-  DropcursorExtension,
   FileNode,
   FolderNode,
-  Heading1Node,
-  Heading2Node,
-  Heading3Node,
-  HighlightMark,
-  IdExtension,
-  ItalicMark,
-  LinkMark,
-  ListItemNode,
-  ListKeymapExtension,
-  OrderedListNode,
   PageNode,
-  ParagraphNode,
-  PlaceholderExtension,
-  StrikethroughMark,
-  TabKeymapExtension,
-  TableNode,
-  TableRowNode,
-  TableHeaderNode,
-  TableCellNode,
-  TaskItemNode,
-  TaskListNode,
-  TextNode,
-  TrailingNode,
-  UnderlineMark,
   DatabaseNode,
-  AutoJoiner,
-  HardBreakNode,
-  ParserExtension,
-  Markdown,
 } from '@colanode/ui/editor/extensions';
 import { ToolbarMenu, ActionMenu } from '@colanode/ui/editor/menus';
+
+import { useDocumentEditor } from './use-document-editor';
 
 interface DocumentEditorProps {
   node: LocalNode;
@@ -95,17 +50,6 @@ interface DocumentEditorProps {
   canEdit: boolean;
   autoFocus?: FocusPosition;
 }
-
-const buildYDoc = (
-  state: DocumentState | null | undefined,
-  updates: DocumentUpdate[]
-) => {
-  const ydoc = new YDoc(state?.state);
-  for (const update of updates) {
-    ydoc.applyUpdate(update.data);
-  }
-  return ydoc;
-};
 
 interface UndoRedoParams {
   editor: ReturnType<typeof useEditor>;
@@ -155,10 +99,7 @@ const performRedo = async ({
   userId,
 }: UndoRedoParams) => {
   const beforeContent = ydoc.getObject<RichTextContent>();
-  console.log('beforeContent', beforeContent);
   const update = ydoc.redo();
-  console.log('afterContent', ydoc.getObject<RichTextContent>());
-  console.log('update', update);
 
   if (!update) {
     return;
@@ -193,245 +134,97 @@ export const DocumentEditor = ({
   autoFocus,
 }: DocumentEditorProps) => {
   const workspace = useWorkspace();
+  const editorLocalRef = useRef<ReturnType<typeof useEditor>>(null);
 
-  const hasPendingChanges = useRef(false);
-  const revisionRef = useRef(state?.revision ?? 0);
-  const ydocRef = useRef<YDoc>(buildYDoc(state, updates));
-  const editorRef = useRef<ReturnType<typeof useEditor>>(null);
-
-  const debouncedSave = useMemo(
-    () =>
-      debounce(async (content: JSONContent) => {
-        const beforeContent = ydocRef.current.getObject<RichTextContent>();
-        const beforeBlocks = beforeContent?.blocks;
-        const indexMap = new Map<string, string>();
-        if (beforeBlocks) {
-          for (const [key, value] of Object.entries(beforeBlocks)) {
-            indexMap.set(key, value.index);
-          }
-        }
-
-        const afterBlocks = mapContentsToBlocks(
-          node.id,
-          content.content ?? [],
-          indexMap
-        );
-
-        const afterContent: RichTextContent = {
-          type: 'rich_text',
-          blocks: afterBlocks,
-        };
-
-        const update = ydocRef.current.update(
-          richTextContentSchema,
-          afterContent
-        );
-
-        hasPendingChanges.current = false;
-
-        if (!update) {
-          return;
-        }
-
-        const result = await window.colanode.executeMutation({
-          type: 'document.update',
+  const { editor, ydocRef } = useDocumentEditor({
+    node,
+    state,
+    updates,
+    canEdit,
+    autoFocus,
+    platformExtensions: [
+      PageNode,
+      FolderNode,
+      FileNode.configure({
+        context: {
+          userId: workspace.userId,
+          accountId: workspace.accountId,
+          workspaceId: workspace.workspaceId,
+          documentId: node.id,
+          rootId: node.rootId,
+        },
+      }),
+      DatabaseNode,
+      CommanderExtension.configure({
+        commands: [
+          ParagraphCommand,
+          PageCommand,
+          BlockquoteCommand,
+          Heading1Command,
+          Heading2Command,
+          Heading3Command,
+          BulletListCommand,
+          CodeBlockCommand,
+          OrderedListCommand,
+          TableCommand,
+          DatabaseInlineCommand,
+          DatabaseCommand,
+          DividerCommand,
+          TodoCommand,
+          FileCommand,
+          FolderCommand,
+        ],
+        context: {
           userId: workspace.userId,
           documentId: node.id,
-          update: encodeState(update),
-        });
-
-        if (!result.success) {
-          toast.error(result.error.message);
+          accountId: workspace.accountId,
+          workspaceId: workspace.workspaceId,
+          rootId: node.rootId,
+        },
+      }),
+    ],
+    editorProps: {
+      handleKeyDown: (_, event) => {
+        if (!editorLocalRef.current) {
+          return false;
         }
-      }, 500),
-    [node.id]
-  );
 
-  const editor = useEditor(
-    {
-      extensions: [
-        IdExtension,
-        ParserExtension,
-        Markdown,
-        DocumentNode,
-        PageNode,
-        FolderNode,
-        FileNode.configure({
-          context: {
+        if (event.key === 'z' && event.metaKey && !event.shiftKey) {
+          event.preventDefault();
+          performUndo({
+            editor: editorLocalRef.current,
+            ydoc: ydocRef.current,
+            nodeId: node.id,
             userId: workspace.userId,
-            accountId: workspace.accountId,
-            workspaceId: workspace.workspaceId,
-            documentId: node.id,
-            rootId: node.rootId,
-          },
-        }),
-        TextNode,
-        ParagraphNode,
-        HardBreakNode,
-        Heading1Node,
-        Heading2Node,
-        Heading3Node,
-        BlockquoteNode,
-        BulletListNode,
-        CodeBlockNode,
-        TabKeymapExtension,
-        ListItemNode,
-        ListKeymapExtension,
-        OrderedListNode,
-        PlaceholderExtension.configure({
-          message: "Write something or '/' for commands",
-        }),
-        TaskListNode,
-        TaskItemNode,
-        TableNode,
-        TableRowNode,
-        TableCellNode,
-        TableHeaderNode,
-        DividerNode,
-        TrailingNode,
-        LinkMark,
-        DeleteControlExtension,
-        DropcursorExtension,
-        DatabaseNode,
-        AutoJoiner,
-        CommanderExtension.configure({
-          commands: [
-            ParagraphCommand,
-            PageCommand,
-            BlockquoteCommand,
-            Heading1Command,
-            Heading2Command,
-            Heading3Command,
-            BulletListCommand,
-            CodeBlockCommand,
-            OrderedListCommand,
-            TableCommand,
-            DatabaseInlineCommand,
-            DatabaseCommand,
-            DividerCommand,
-            TodoCommand,
-            FileCommand,
-            FolderCommand,
-          ],
-          context: {
+          });
+          return true;
+        }
+        if (event.key === 'z' && event.metaKey && event.shiftKey) {
+          event.preventDefault();
+          performRedo({
+            editor: editorLocalRef.current,
+            ydoc: ydocRef.current,
+            nodeId: node.id,
             userId: workspace.userId,
-            documentId: node.id,
-            accountId: workspace.accountId,
-            workspaceId: workspace.workspaceId,
-            rootId: node.rootId,
-          },
-        }),
-        BoldMark,
-        ItalicMark,
-        UnderlineMark,
-        StrikethroughMark,
-        CodeMark,
-        ColorMark,
-        HighlightMark,
-      ],
-      editorProps: {
-        attributes: {
-          class:
-            'prose-lg prose-stone dark:prose-invert prose-headings:font-title font-default focus:outline-none max-w-full text-foreground',
-          spellCheck: 'false',
-        },
-        handleKeyDown: (_, event) => {
-          if (!editorRef.current) {
-            return false;
-          }
-
-          if (event.key === 'z' && event.metaKey && !event.shiftKey) {
-            event.preventDefault();
-            performUndo({
-              editor: editorRef.current,
-              ydoc: ydocRef.current,
-              nodeId: node.id,
-              userId: workspace.userId,
-            });
-            return true;
-          }
-          if (event.key === 'z' && event.metaKey && event.shiftKey) {
-            event.preventDefault();
-            performRedo({
-              editor: editorRef.current,
-              ydoc: ydocRef.current,
-              nodeId: node.id,
-              userId: workspace.userId,
-            });
-            return true;
-          }
-          if (event.key === 'y' && event.metaKey) {
-            event.preventDefault();
-            performRedo({
-              editor: editorRef.current,
-              ydoc: ydocRef.current,
-              nodeId: node.id,
-              userId: workspace.userId,
-            });
-            return true;
-          }
-        },
-      },
-      content: buildEditorContent(
-        node.id,
-        ydocRef.current.getObject<RichTextContent>()
-      ),
-      editable: canEdit,
-      shouldRerenderOnTransaction: false,
-      autofocus: autoFocus,
-      onUpdate: async ({ editor, transaction }) => {
-        if (transaction.docChanged) {
-          hasPendingChanges.current = true;
-          debouncedSave(editor.getJSON());
+          });
+          return true;
+        }
+        if (event.key === 'y' && event.metaKey) {
+          event.preventDefault();
+          performRedo({
+            editor: editorLocalRef.current,
+            ydoc: ydocRef.current,
+            nodeId: node.id,
+            userId: workspace.userId,
+          });
+          return true;
         }
       },
     },
-    [node.id]
-  );
+  });
 
-  useEffect(() => {
-    if (!editor) {
-      return;
-    }
-
-    if (!state) {
-      return;
-    }
-
-    if (hasPendingChanges.current) {
-      return;
-    }
-
-    if (revisionRef.current === state?.revision) {
-      return;
-    }
-
-    const beforeContent = ydocRef.current.getObject<RichTextContent>();
-
-    ydocRef.current.applyUpdate(state.state);
-    for (const update of updates) {
-      ydocRef.current.applyUpdate(update.data);
-    }
-
-    const afterContent = ydocRef.current.getObject<RichTextContent>();
-
-    if (isEqual(afterContent, beforeContent)) {
-      return;
-    }
-
-    const editorContent = buildEditorContent(node.id, afterContent);
-    revisionRef.current = state.revision;
-
-    const relativeSelection = getRelativeSelection(editor);
-    editor.chain().setContent(editorContent).run();
-
-    if (relativeSelection != null) {
-      restoreRelativeSelection(editor, relativeSelection);
-    }
-  }, [state, updates, editor]);
-
-  // Keep editorRef updated so handleKeyDown can access the current editor
-  editorRef.current = editor;
+  // Keep local ref in sync for undo/redo handleKeyDown
+  editorLocalRef.current = editor;
 
   return (
     <>
