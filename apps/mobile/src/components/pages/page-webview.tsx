@@ -537,9 +537,7 @@ export const PageWebView = forwardRef<PageWebViewHandle, PageWebViewProps>(
           window.__colanodeBridgeReportError = function(prefix, value) {
             var message = prefix;
             if (value) {
-              if (value.stack) {
-                message += ': ' + value.stack;
-              } else if (value.message) {
+              if (value.message) {
                 message += ': ' + value.message;
               } else {
                 message += ': ' + String(value);
