@@ -24,6 +24,8 @@
     "coverage": "vitest run --coverage "
   },
   "dependencies": {
+    "@colanode/core": "*",
+    "@colanode/crdt": "*",
     "@tanstack/db": "^0.5.33",
     "@tiptap/core": "^3.22.1",
     "@tiptap/pm": "^3.22.1",
