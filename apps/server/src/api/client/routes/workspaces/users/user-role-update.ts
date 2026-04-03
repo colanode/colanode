@@ -55,12 +55,44 @@ export const userRoleUpdateRoute: FastifyPluginCallbackZod = (
         .selectFrom('users')
         .selectAll()
         .where('id', '=', userId)
+        .where('workspace_id', '=', workspace.id)
         .executeTakeFirst();
 
       if (!userToUpdate) {
         return reply.code(404).send({
           code: ApiErrorCode.UserNotFound,
           message: 'User not found.',
+        });
+      }
+
+      if (userToUpdate.id === workspace.user.id) {
+        return reply.code(403).send({
+          code: ApiErrorCode.UserUpdateNoAccess,
+          message: 'You cannot modify your own role.',
+        });
+      }
+
+      if (userToUpdate.role === 'owner') {
+        return reply.code(403).send({
+          code: ApiErrorCode.UserUpdateNoAccess,
+          message: 'The workspace owner role cannot be modified.',
+        });
+      }
+
+      if (input.role === 'owner') {
+        return reply.code(403).send({
+          code: ApiErrorCode.UserUpdateNoAccess,
+          message: 'The owner role cannot be assigned through this endpoint.',
+        });
+      }
+
+      if (
+        workspace.user.role !== 'owner' &&
+        (userToUpdate.role === 'admin' || input.role === 'admin')
+      ) {
+        return reply.code(403).send({
+          code: ApiErrorCode.UserUpdateNoAccess,
+          message: 'Only the workspace owner can manage admins.',
         });
       }
 
@@ -77,6 +109,7 @@ export const userRoleUpdateRoute: FastifyPluginCallbackZod = (
           updated_by: request.account.id,
         })
         .where('id', '=', userToUpdate.id)
+        .where('workspace_id', '=', workspace.id)
         .executeTakeFirst();
 
       if (!updatedUser) {
