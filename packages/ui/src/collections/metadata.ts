@@ -1,4 +1,4 @@
-import { createCollection } from '@tanstack/react-db';
+import { BasicIndex, createCollection } from '@tanstack/react-db';
 
 import { Metadata } from '@colanode/client/types';
 
@@ -11,6 +11,8 @@ export const createMetadataCollection = () => {
     getKey(item) {
       return buildMetadataKey(item.namespace, item.key);
     },
+    defaultIndexType: BasicIndex,
+    autoIndex: 'eager',
     sync: {
       sync({ begin, write, commit, markReady, collection }) {
         window.colanode

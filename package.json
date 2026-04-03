@@ -26,22 +26,22 @@
     "postinstall": "tsx scripts/src/postinstall/index.ts"
   },
   "devDependencies": {
-    "@types/debug": "^4.1.12",
+    "@types/debug": "^4.1.13",
     "@types/lodash-es": "^4.17.12",
-    "@typescript-eslint/eslint-plugin": "^8.54.0",
-    "@typescript-eslint/parser": "^8.54.0",
+    "@typescript-eslint/eslint-plugin": "^8.58.0",
+    "@typescript-eslint/parser": "^8.58.0",
     "eslint": "^8.57.1",
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-react": "^7.37.5",
     "prettier": "^3.8.1",
     "tsx": "^4.21.0",
-    "turbo": "^2.8.3",
+    "turbo": "^2.9.3",
     "typescript": "^5.9.3",
-    "vitest": "^4.0.18"
+    "vitest": "^4.1.2"
   },
   "dependencies": {
     "debug": "^4.4.3",
-    "lodash-es": "^4.17.23"
+    "lodash-es": "^4.18.1"
   }
 }

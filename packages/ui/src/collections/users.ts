@@ -1,4 +1,4 @@
-import { createCollection } from '@tanstack/react-db';
+import { BasicIndex, createCollection } from '@tanstack/react-db';
 
 import { User } from '@colanode/client/types';
 
@@ -7,6 +7,8 @@ export const createUsersCollection = (userId: string) => {
     getKey(item) {
       return item.id;
     },
+    defaultIndexType: BasicIndex,
+    autoIndex: 'eager',
     sync: {
       sync({ begin, write, commit, markReady }) {
         window.colanode

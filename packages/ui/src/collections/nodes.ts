@@ -1,4 +1,8 @@
-import { createCollection, parseLoadSubsetOptions } from '@tanstack/react-db';
+import {
+  BasicIndex,
+  createCollection,
+  parseLoadSubsetOptions,
+} from '@tanstack/react-db';
 
 import { LocalNode } from '@colanode/client/types';
 import { applyNodeTransaction } from '@colanode/ui/lib/nodes';
@@ -8,6 +12,8 @@ export const createNodesCollection = (userId: string) => {
     getKey(item) {
       return item.id;
     },
+    defaultIndexType: BasicIndex,
+    autoIndex: 'eager',
     syncMode: 'on-demand',
 
     sync: {
