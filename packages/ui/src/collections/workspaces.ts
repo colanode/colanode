@@ -1,4 +1,4 @@
-import { createCollection } from '@tanstack/react-db';
+import { BasicIndex, createCollection } from '@tanstack/react-db';
 
 import { Workspace } from '@colanode/client/types';
 
@@ -7,6 +7,8 @@ export const createWorkspacesCollection = () => {
     getKey(item) {
       return item.userId;
     },
+    defaultIndexType: BasicIndex,
+    autoIndex: 'eager',
     sync: {
       sync({ begin, write, commit, markReady }) {
         window.colanode

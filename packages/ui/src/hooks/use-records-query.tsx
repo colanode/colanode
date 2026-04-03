@@ -683,7 +683,7 @@ const combineWithOr = (
 };
 
 const isValueMissing = (value: unknown): BooleanExpression => {
-  return or(isNull(value), isUndefined(value));
+  return or(isNull(value as never), isUndefined(value as never));
 };
 
 const isValuePresent = (value: unknown): BooleanExpression => {

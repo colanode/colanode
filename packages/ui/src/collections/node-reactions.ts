@@ -1,4 +1,8 @@
-import { createCollection, parseLoadSubsetOptions } from '@tanstack/react-db';
+import {
+  BasicIndex,
+  createCollection,
+  parseLoadSubsetOptions,
+} from '@tanstack/react-db';
 
 import { NodeReaction } from '@colanode/client/types';
 import {
@@ -10,6 +14,8 @@ export const createNodeReactionsCollection = (userId: string) => {
   const loadedNodeIds = new Set<string>();
   return createCollection<NodeReaction, string>({
     syncMode: 'on-demand',
+    defaultIndexType: BasicIndex,
+    autoIndex: 'eager',
     getKey(item) {
       return buildNodeReactionKey(
         item.nodeId,

@@ -1,4 +1,4 @@
-import { createCollection } from '@tanstack/react-db';
+import { BasicIndex, createCollection } from '@tanstack/react-db';
 
 import { Server } from '@colanode/client/types';
 
@@ -7,6 +7,8 @@ export const createServersCollection = () => {
     getKey(item) {
       return item.domain;
     },
+    defaultIndexType: BasicIndex,
+    autoIndex: 'eager',
     sync: {
       sync({ begin, write, commit, markReady }) {
         window.colanode
