@@ -24,7 +24,7 @@ export class UserRoleUpdateMutationHandler
 
       const output = await workspace.account.client
         .patch(
-          `v1/workspaces/${workspace.workspaceId}/users/${input.userId}/role`,
+          `v1/workspaces/${workspace.workspaceId}/users/${input.targetUserId}/role`,
           {
             json: body,
           }

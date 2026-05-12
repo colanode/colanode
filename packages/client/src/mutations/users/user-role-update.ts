@@ -3,6 +3,7 @@ import { WorkspaceRole } from '@colanode/core';
 export type UserRoleUpdateMutationInput = {
   type: 'user.role.update';
   userId: string;
+  targetUserId: string;
   role: WorkspaceRole;
 };
 
