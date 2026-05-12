@@ -71,7 +71,7 @@ export const WorkspaceUsersContainer = () => {
                     <p className="text-sm text-muted-foreground">{email}</p>
                   </div>
                   <WorkspaceUserRoleDropdown
-                    userId={user.id}
+                    targetUserId={user.id}
                     value={role}
                     canEdit={canEditUsers}
                   />
