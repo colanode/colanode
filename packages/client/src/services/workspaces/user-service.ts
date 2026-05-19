@@ -17,7 +17,13 @@ export class UserService {
       `Upserting user ${user.id} in workspace ${this.workspace.workspaceId}`
     );
 
-    const createdUser = await this.workspace.database
+    const existingUser = await this.workspace.database
+      .selectFrom('users')
+      .selectAll()
+      .where('id', '=', user.id)
+      .executeTakeFirst();
+
+    const upsertedUser = await this.workspace.database
       .insertInto('users')
       .returningAll()
       .values({
@@ -50,15 +56,16 @@ export class UserService {
       )
       .executeTakeFirst();
 
-    if (createdUser) {
+    if (upsertedUser) {
+      const eventType = existingUser ? 'user.updated' : 'user.created';
       eventBus.publish({
-        type: 'user.created',
+        type: eventType,
         workspace: {
           workspaceId: this.workspace.workspaceId,
           userId: this.workspace.userId,
           accountId: this.workspace.accountId,
         },
-        user: mapUser(createdUser),
+        user: mapUser(upsertedUser),
       });
     }
   }
@@ -68,7 +75,13 @@ export class UserService {
       `Syncing server user ${user.id} in workspace ${this.workspace.workspaceId}`
     );
 
-    const createdUser = await this.workspace.database
+    const existingUser = await this.workspace.database
+      .selectFrom('users')
+      .selectAll()
+      .where('id', '=', user.id)
+      .executeTakeFirst();
+
+    const syncedUser = await this.workspace.database
       .insertInto('users')
       .returningAll()
       .values({
@@ -101,15 +114,16 @@ export class UserService {
       )
       .executeTakeFirst();
 
-    if (createdUser) {
+    if (syncedUser) {
+      const eventType = existingUser ? 'user.updated' : 'user.created';
       eventBus.publish({
-        type: 'user.created',
+        type: eventType,
         workspace: {
           workspaceId: this.workspace.workspaceId,
           userId: this.workspace.userId,
           accountId: this.workspace.accountId,
         },
-        user: mapUser(createdUser),
+        user: mapUser(syncedUser),
       });
     }
   }
