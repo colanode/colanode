@@ -23,10 +23,10 @@ const releaseRepo = githubRepo || 'colanode';
 
 const config: ForgeConfig = {
   packagerConfig: {
-    name: 'Colanode',
-    executableName: process.platform === 'linux' ? 'colanode' : 'Colanode',
-    icon: 'assets/colanode-logo',
-    appBundleId: 'com.colanode.desktop',
+    name: 'Colapp',
+    executableName: process.platform === 'linux' ? 'colapp' : 'Colapp',
+    icon: 'assets/colapp-logo',
+    appBundleId: 'com.colapp.desktop',
     ...(process.platform === 'win32' && hasWindowsSigningEnv && {
       certificateFile: process.env.CERTIFICATE_PATH,
       certificatePassword: process.env.CERTIFICATE_PASSWORD,
@@ -85,15 +85,15 @@ const config: ForgeConfig = {
   rebuildConfig: {},
   makers: [
     new MakerSquirrel({
-      name: 'Colanode',
+      name: 'Colapp',
       ...(process.platform === 'win32' && hasWindowsSigningEnv && {
         certificateFile: process.env.CERTIFICATE_PATH,
         certificatePassword: process.env.CERTIFICATE_PASSWORD,
       }),
     }),
     new MakerDMG({
-      icon: 'assets/colanode-logo.png',
-      title: 'Colanode',
+      icon: 'assets/colapp-logo.png',
+      title: 'Colapp',
     }),
     {
       name: '@electron-forge/maker-zip',

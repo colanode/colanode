@@ -59,7 +59,7 @@ const LOCAL_ACCOUNT_NAME = 'Local User';
 const LOCAL_WORKSPACE_NAME = 'My Workspace';
 const STORAGE_DIR_ARG_PREFIX = '--colanode-storage-dir=';
 const STORAGE_CONFIG_FILE = 'storage-config.json';
-const STORAGE_ROOT_DIR_NAME = 'Colanode-Local';
+const STORAGE_ROOT_DIR_NAME = 'Colapp-Local';
 const STORAGE_DIR_ENV_KEYS = [
   'COLANODE_STORAGE_DIR',
   'COLANODE_REPO_DIR',
@@ -284,8 +284,8 @@ const bootstrap = new BootstrapService(pathService);
 let app: AppService | null = null;
 let appBadge: AppBadge | null = null;
 
-electronApp.setName('Colanode');
-electronApp.setAppUserModelId('com.colanode.desktop');
+electronApp.setName('Colapp');
+electronApp.setAppUserModelId('com.colapp.desktop');
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
@@ -315,7 +315,7 @@ const createWindow = async () => {
     fullscreenable: true,
     minWidth: 800,
     minHeight: 600,
-    icon: path.join(pathService.assets, 'colanode-logo.png'),
+    icon: path.join(pathService.assets, 'colapp-logo.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
