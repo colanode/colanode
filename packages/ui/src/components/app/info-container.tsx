@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { build } from '@colanode/core';
+import { BackupPanel } from '@colanode/ui/components/app/backup-panel';
 import { InfoBreadcrumb } from '@colanode/ui/components/app/info-breadcrumb';
 import { Container } from '@colanode/ui/components/layouts/containers/container';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -98,6 +99,8 @@ export const InfoContainer = () => {
               </div>
             </div>
           )}
+
+          {app.type === 'desktop' && localOnly && <BackupPanel />}
 
         </div>
       </div>

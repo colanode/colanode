@@ -1,6 +1,11 @@
 export interface StorageProviderConfig {
-    type: 'github' | 's3';
+    type: 'github' | 's3' | 'local';
     [key: string]: unknown;
+}
+
+export interface LocalProviderConfig extends StorageProviderConfig {
+    type: 'local';
+    path: string;
 }
 
 export interface GitHubProviderConfig extends StorageProviderConfig {

@@ -21,11 +21,13 @@ import { AppMeta, AppService } from '@colanode/client/services';
 import {
   BackupService,
   GitHubStorageProvider,
+  LocalStorageProvider,
   S3StorageProvider,
 } from '@colanode/client/services/backup';
 import type {
   StorageProvider,
   GitHubProviderConfig,
+  LocalProviderConfig,
   S3ProviderConfig,
 } from '@colanode/client/services/backup';
 import { AppInitOutput, TempFile, ThemeMode } from '@colanode/client/types';
@@ -650,20 +652,22 @@ ipcMain.handle(
 // ---- Backup / Restore IPC ----
 
 function createStorageProvider(
-  config: GitHubProviderConfig | S3ProviderConfig
+  config: GitHubProviderConfig | S3ProviderConfig | LocalProviderConfig
 ): StorageProvider {
   switch (config.type) {
     case 'github':
       return new GitHubStorageProvider(config);
     case 's3':
       return new S3StorageProvider(config);
+    case 'local':
+      return new LocalStorageProvider(config);
     default:
       throw new Error(`Unknown storage provider type: ${(config as { type: string }).type}`);
   }
 }
 
 function createBackupService(
-  config: GitHubProviderConfig | S3ProviderConfig
+  config: GitHubProviderConfig | S3ProviderConfig | LocalProviderConfig
 ): BackupService {
   const provider = createStorageProvider(config);
   return new BackupService(pathService.app, provider, '1.0.0');
@@ -673,7 +677,7 @@ ipcMain.handle(
   'backup-create',
   async (
     _,
-    config: GitHubProviderConfig | S3ProviderConfig
+    config: GitHubProviderConfig | S3ProviderConfig | LocalProviderConfig
   ): Promise<{ backupId: string }> => {
     const service = createBackupService(config);
     const backupId = await service.backup((progress) => {
@@ -685,7 +689,7 @@ ipcMain.handle(
 
 ipcMain.handle(
   'backup-list',
-  async (_, config: GitHubProviderConfig | S3ProviderConfig) => {
+  async (_, config: GitHubProviderConfig | S3ProviderConfig | LocalProviderConfig) => {
     const service = createBackupService(config);
     return service.listBackups();
   }
@@ -700,7 +704,7 @@ ipcMain.handle(
       backupId,
       targetPath,
     }: {
-      config: GitHubProviderConfig | S3ProviderConfig;
+      config: GitHubProviderConfig | S3ProviderConfig | LocalProviderConfig;
       backupId: string;
       targetPath?: string;
     }

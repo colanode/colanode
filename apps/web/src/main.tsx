@@ -62,6 +62,14 @@ const initializeApp = async () => {
     setStorageDirectory: async () => {
       // No-op on web
     },
+    backupCreate: async () => ({ backupId: '' }),
+    backupList: async () => [],
+    backupRestore: async () => {
+      // No-op on web
+    },
+    onBackupProgress: () => () => {
+      // No-op on web
+    },
   };
 
   window.eventBus = eventBus;

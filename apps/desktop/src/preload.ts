@@ -76,6 +76,31 @@ contextBridge.exposeInMainWorld('colanode', {
   setStorageDirectory: async (path: string) => {
     return ipcRenderer.invoke('set-storage-directory', path);
   },
+
+  backupCreate: async (config: Record<string, unknown>) => {
+    return ipcRenderer.invoke('backup-create', config);
+  },
+
+  backupList: async (config: Record<string, unknown>) => {
+    return ipcRenderer.invoke('backup-list', config);
+  },
+
+  backupRestore: async (params: {
+    config: Record<string, unknown>;
+    backupId: string;
+    targetPath?: string;
+  }) => {
+    return ipcRenderer.invoke('backup-restore', params);
+  },
+
+  onBackupProgress: (callback: (progress: Record<string, unknown>) => void) => {
+    const handler = (_: unknown, progress: Record<string, unknown>) =>
+      callback(progress);
+    ipcRenderer.on('backup-progress', handler);
+    return () => {
+      ipcRenderer.removeListener('backup-progress', handler);
+    };
+  },
 });
 
 contextBridge.exposeInMainWorld('eventBus', {

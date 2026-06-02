@@ -23,19 +23,39 @@ const EXCLUDE_PATTERNS = [
     /.*-shm$/,
     // Temp files are ephemeral
     /^temp\//,
-    // Electron internal
+    // macOS metadata
+    /\.DS_Store$/,
+    // Electron / Chromium internal caches and state
     /^\.vite\//,
     /^GPUCache\//,
     /^Cache\//,
     /^Code Cache\//,
+    /^DawnGraphiteCache\//,
+    /^DawnWebGPUCache\//,
     /^Local Storage\//,
     /^Session Storage\//,
     /^Network\//,
+    /^Network Persistent State$/,
+    /^Shared Dictionary\//,
+    /^SharedStorage$/,
+    /^Trust Tokens/,
+    /^DIPS$/,
     /^blob_storage\//,
     /^Crashpad\//,
     /^Preferences$/,
     /^TransportSecurity$/,
     /^databases$/,
+    /^IndexedDB\//,
+    /^WebStorage\//,
+    /^Service Worker\//,
+    /^File System\//,
+    /^LOG$/,
+    /^LOG\.old$/,
+    /^LOCK$/,
+    /^MANIFEST-/,
+    /^\.org\.chromium\./,
+    // journal files (non-WAL SQLite temp)
+    /.*-journal$/,
 ];
 
 function shouldExclude(relativePath: string): boolean {
