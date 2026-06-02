@@ -292,15 +292,17 @@ if (started) {
   electronApp.quit();
 }
 
-updateElectronApp({
-  updateSource: {
-    type: UpdateSourceType.ElectronPublicUpdateService,
-    repo: 'colanode/colanode',
-    host: 'https://update.electronjs.org',
-  },
-  updateInterval: '5 minutes',
-  notifyUser: true,
-});
+if (!localOnlyMode) {
+  updateElectronApp({
+    updateSource: {
+      type: UpdateSourceType.ElectronPublicUpdateService,
+      repo: 'colanode/colanode',
+      host: 'https://update.electronjs.org',
+    },
+    updateInterval: '5 minutes',
+    notifyUser: true,
+  });
+}
 
 const createWindow = async () => {
   nativeTheme.themeSource = bootstrap.theme ?? 'system';
