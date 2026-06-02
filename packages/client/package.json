@@ -9,6 +9,7 @@
     "./handlers": "./src/handlers/index.ts",
     "./databases": "./src/databases/index.ts",
     "./services": "./src/services/index.ts",
+    "./services/backup": "./src/services/backup/index.ts",
     "./queries": "./src/queries/index.ts",
     "./mutations": "./src/mutations/index.ts",
     "./commands": "./src/commands/index.ts"

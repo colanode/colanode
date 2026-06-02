@@ -2,12 +2,12 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { build } from '@colanode/core';
-import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import { InfoBreadcrumb } from '@colanode/ui/components/app/info-breadcrumb';
 import { Container } from '@colanode/ui/components/layouts/containers/container';
 import { Button } from '@colanode/ui/components/ui/button';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { useApp } from '@colanode/ui/contexts/app';
+import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import { isLocalOnlyMode } from '@colanode/ui/routes/utils';
 
 export const InfoContainer = () => {

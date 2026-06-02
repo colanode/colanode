@@ -18,6 +18,16 @@ import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationMap } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
 import { AppMeta, AppService } from '@colanode/client/services';
+import {
+  BackupService,
+  GitHubStorageProvider,
+  S3StorageProvider,
+} from '@colanode/client/services/backup';
+import type {
+  StorageProvider,
+  GitHubProviderConfig,
+  S3ProviderConfig,
+} from '@colanode/client/services/backup';
 import { AppInitOutput, TempFile, ThemeMode } from '@colanode/client/types';
 import {
   build,
@@ -634,5 +644,73 @@ ipcMain.handle(
     }
 
     return result.filePath;
+  }
+);
+
+// ---- Backup / Restore IPC ----
+
+function createStorageProvider(
+  config: GitHubProviderConfig | S3ProviderConfig
+): StorageProvider {
+  switch (config.type) {
+    case 'github':
+      return new GitHubStorageProvider(config);
+    case 's3':
+      return new S3StorageProvider(config);
+    default:
+      throw new Error(`Unknown storage provider type: ${(config as { type: string }).type}`);
+  }
+}
+
+function createBackupService(
+  config: GitHubProviderConfig | S3ProviderConfig
+): BackupService {
+  const provider = createStorageProvider(config);
+  return new BackupService(pathService.app, provider, '1.0.0');
+}
+
+ipcMain.handle(
+  'backup-create',
+  async (
+    _,
+    config: GitHubProviderConfig | S3ProviderConfig
+  ): Promise<{ backupId: string }> => {
+    const service = createBackupService(config);
+    const backupId = await service.backup((progress) => {
+      BrowserWindow.getAllWindows()[0]?.webContents.send('backup-progress', progress);
+    });
+    return { backupId };
+  }
+);
+
+ipcMain.handle(
+  'backup-list',
+  async (_, config: GitHubProviderConfig | S3ProviderConfig) => {
+    const service = createBackupService(config);
+    return service.listBackups();
+  }
+);
+
+ipcMain.handle(
+  'backup-restore',
+  async (
+    _,
+    {
+      config,
+      backupId,
+      targetPath,
+    }: {
+      config: GitHubProviderConfig | S3ProviderConfig;
+      backupId: string;
+      targetPath?: string;
+    }
+  ) => {
+    const service = createBackupService(config);
+    await service.restore(backupId, targetPath, (progress) => {
+      BrowserWindow.getAllWindows()[0]?.webContents.send('backup-progress', progress);
+    });
+    // Relaunch after restore
+    electronApp.relaunch();
+    electronApp.exit(0);
   }
 );

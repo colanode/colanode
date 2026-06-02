@@ -5,3 +5,4 @@ export * from './kysely-service';
 export * from './asset-service';
 export * from './app-meta';
 export * from './path-service';
+export * from './backup';
