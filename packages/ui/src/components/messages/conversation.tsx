@@ -20,6 +20,10 @@ interface ConversationProps {
   role: NodeRole;
 }
 
+const toDateInputValue = (date: Date): string => {
+  return date.toISOString().slice(0, 10);
+};
+
 export const Conversation = ({
   conversationId,
   rootId,
@@ -172,6 +176,30 @@ export const Conversation = ({
                 onChange={(event) => setToDate(event.target.value)}
                 className="h-8 w-40"
               />
+              <button
+                type="button"
+                className="h-8 rounded border border-border px-2 text-xs text-muted-foreground hover:bg-accent"
+                onClick={() => {
+                  const today = toDateInputValue(new Date());
+                  setFromDate(today);
+                  setToDate(today);
+                }}
+              >
+                Today
+              </button>
+              <button
+                type="button"
+                className="h-8 rounded border border-border px-2 text-xs text-muted-foreground hover:bg-accent"
+                onClick={() => {
+                  const today = new Date();
+                  const start = new Date(today);
+                  start.setDate(today.getDate() - 6);
+                  setFromDate(toDateInputValue(start));
+                  setToDate(toDateInputValue(today));
+                }}
+              >
+                Last 7 days
+              </button>
               {(searchQuery.length > 0 ||
                 fromDate.length > 0 ||
                 toDate.length > 0) && (
