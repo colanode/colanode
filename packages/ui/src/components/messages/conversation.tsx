@@ -1,4 +1,5 @@
-import { useEffect, useRef } from 'react';
+import { ArrowDown } from 'lucide-react';
+import { useEffect, useRef, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { NodeRole, hasNodeRole } from '@colanode/core';
@@ -33,6 +34,7 @@ export const Conversation = ({
   const bottomVisibleRef = useRef<boolean>(false);
   const shouldScrollToBottomRef = useRef<boolean>(true);
   const messageCreateRef = useRef<MessageCreateRefProps>(null);
+  const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
 
   useEffect(() => {
     if (bottomRef.current && scrollPositionRef.current == 0) {
@@ -66,7 +68,7 @@ export const Conversation = ({
       };
     }
 
-    return () => {};
+    return () => { };
   }, [conversationId]);
 
   const handleScroll = () => {
@@ -103,7 +105,7 @@ export const Conversation = ({
         },
       }}
     >
-      <div className="flex flex-col h-full">
+      <div className="relative flex flex-col h-full">
         <div className="flex-1 min-h-0" ref={messageListRef}>
           <MessageList />
         </div>
@@ -112,10 +114,24 @@ export const Conversation = ({
           rootMargin="20px"
           onChange={(inView) => {
             bottomVisibleRef.current = inView;
+            setIsAtBottom(inView);
           }}
         >
           <div ref={bottomRef} className="h-4"></div>
         </InView>
+        {!isAtBottom && (
+          <button
+            type="button"
+            onClick={() => {
+              bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
+            }}
+            className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 rounded-full bg-background border border-border shadow-md px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+            aria-label="Jump to latest"
+          >
+            <ArrowDown size={14} />
+            <span>Jump to latest</span>
+          </button>
+        )}
         <div className="sticky bottom-0 bg-background pb-4 pt-2">
           <MessageCreate ref={messageCreateRef} />
         </div>

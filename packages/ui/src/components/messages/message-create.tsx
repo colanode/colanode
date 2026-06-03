@@ -200,11 +200,10 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
           ) : (
             <button
               type="submit"
-              className={`${
-                conversation.canCreateMessage && hasContent
+              className={`${conversation.canCreateMessage && hasContent
                   ? 'cursor-pointer text-blue-600'
                   : 'cursor-default text-muted-foreground'
-              }`}
+                }`}
               onClick={handleSubmit}
             >
               <Send size={20} />
