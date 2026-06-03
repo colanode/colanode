@@ -11,12 +11,12 @@ import { MessageMenuMobile } from '@colanode/ui/components/messages/message-menu
 import { MessageReactionCounts } from '@colanode/ui/components/messages/message-reaction-counts';
 import { MessageReference } from '@colanode/ui/components/messages/message-reference';
 import { MessageTime } from '@colanode/ui/components/messages/message-time';
+import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from '@colanode/ui/components/ui/tooltip';
-import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { MessageContext } from '@colanode/ui/contexts/message';
 import { useRadar } from '@colanode/ui/contexts/radar';
