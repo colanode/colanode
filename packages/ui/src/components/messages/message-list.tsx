@@ -11,6 +11,44 @@ import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 const MESSAGES_PER_PAGE = 50;
 
+const isSameDay = (a: Date, b: Date): boolean =>
+  a.getFullYear() === b.getFullYear() &&
+  a.getMonth() === b.getMonth() &&
+  a.getDate() === b.getDate();
+
+const formatDateDivider = (date: Date): string => {
+  const now = new Date();
+  if (isSameDay(date, now)) {
+    return 'Today';
+  }
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (isSameDay(date, yesterday)) {
+    return 'Yesterday';
+  }
+
+  const diffDays = Math.floor(
+    (now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24)
+  );
+  if (diffDays < 7 && diffDays >= 0) {
+    return date.toLocaleDateString(undefined, { weekday: 'long' });
+  }
+
+  if (date.getFullYear() === now.getFullYear()) {
+    return date.toLocaleDateString(undefined, {
+      month: 'short',
+      day: 'numeric',
+    });
+  }
+
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
+
 export const MessageList = () => {
   const workspace = useWorkspace();
   const conversation = useConversation();
@@ -95,7 +133,7 @@ export const MessageList = () => {
               <div className="relative flex items-center py-1">
                 <div className="grow border-t border-muted" />
                 <span className="mx-4 shrink text-xs text-muted-foreground">
-                  {currentMessageDate.toDateString()}
+                  {formatDateDivider(currentMessageDate)}
                 </span>
                 <div className="grow border-t border-muted" />
               </div>
