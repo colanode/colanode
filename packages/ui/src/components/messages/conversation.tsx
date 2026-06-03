@@ -175,18 +175,18 @@ export const Conversation = ({
               {(searchQuery.length > 0 ||
                 fromDate.length > 0 ||
                 toDate.length > 0) && (
-                <button
-                  type="button"
-                  className="h-8 rounded border border-border px-2 text-xs text-muted-foreground hover:bg-accent"
-                  onClick={() => {
-                    setSearchQuery('');
-                    setFromDate('');
-                    setToDate('');
-                  }}
-                >
-                  Clear
-                </button>
-              )}
+                  <button
+                    type="button"
+                    className="h-8 rounded border border-border px-2 text-xs text-muted-foreground hover:bg-accent"
+                    onClick={() => {
+                      setSearchQuery('');
+                      setFromDate('');
+                      setToDate('');
+                    }}
+                  >
+                    Clear
+                  </button>
+                )}
             </div>
           </div>
         )}

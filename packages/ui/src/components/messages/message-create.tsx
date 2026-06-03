@@ -45,181 +45,181 @@ interface MessageCreateProps {
 
 export const MessageCreate = forwardRef<MessageCreateRefProps, MessageCreateProps>(
   ({ threadRootMessageId }, ref) => {
-  const workspace = useWorkspace();
-  const conversation = useConversation();
+    const workspace = useWorkspace();
+    const conversation = useConversation();
 
-  const { mutate, isPending } = useMutation();
+    const { mutate, isPending } = useMutation();
 
-  const messageEditorRef = useRef<MessageEditorRefProps>(null);
-  const initialDraft = useMemo(
-    () => loadDraft(workspace.workspaceId, conversation.id),
-    [workspace.workspaceId, conversation.id]
-  );
-  const [content, setContent] = useState<JSONContent | null>(initialDraft);
-  const [replyTo, setReplyTo] = useState<LocalMessageNode | null>(null);
+    const messageEditorRef = useRef<MessageEditorRefProps>(null);
+    const initialDraft = useMemo(
+      () => loadDraft(workspace.workspaceId, conversation.id),
+      [workspace.workspaceId, conversation.id]
+    );
+    const [content, setContent] = useState<JSONContent | null>(initialDraft);
+    const [replyTo, setReplyTo] = useState<LocalMessageNode | null>(null);
 
-  const hasContent = content != null && editorHasContent(content);
+    const hasContent = content != null && editorHasContent(content);
 
-  useEffect(() => {
-    if (content != null && editorHasContent(content)) {
-      saveDraft(workspace.workspaceId, conversation.id, content);
-    } else {
-      clearDraft(workspace.workspaceId, conversation.id);
-    }
-  }, [content, workspace.workspaceId, conversation.id]);
+    useEffect(() => {
+      if (content != null && editorHasContent(content)) {
+        saveDraft(workspace.workspaceId, conversation.id, content);
+      } else {
+        clearDraft(workspace.workspaceId, conversation.id);
+      }
+    }, [content, workspace.workspaceId, conversation.id]);
 
-  useImperativeHandle(ref, () => ({
-    setReplyTo: (replyTo) => {
+    useImperativeHandle(ref, () => ({
+      setReplyTo: (replyTo) => {
+        if (!conversation.canCreateMessage) {
+          return;
+        }
+
+        setReplyTo(replyTo);
+        if (messageEditorRef.current) {
+          messageEditorRef.current.focus();
+        }
+      },
+    }));
+
+    const handleSubmit = useCallback(() => {
       if (!conversation.canCreateMessage) {
         return;
       }
 
-      setReplyTo(replyTo);
-      if (messageEditorRef.current) {
-        messageEditorRef.current.focus();
+      if (content == null || !editorHasContent(content)) {
+        return;
       }
-    },
-  }));
 
-  const handleSubmit = useCallback(() => {
-    if (!conversation.canCreateMessage) {
-      return;
-    }
+      if (!content || !content.content) {
+        return;
+      }
 
-    if (content == null || !editorHasContent(content)) {
-      return;
-    }
-
-    if (!content || !content.content) {
-      return;
-    }
-
-    mutate({
-      input: {
-        type: 'message.create',
-        parentId: conversation.id,
-        content: content,
-        userId: workspace.userId,
-        referenceId: threadRootMessageId ?? replyTo?.id,
-        rootId: conversation.rootId,
-      },
-      onSuccess: () => {
-        setReplyTo(null);
-        setContent(null);
-        clearDraft(workspace.workspaceId, conversation.id);
-        if (messageEditorRef.current) {
-          messageEditorRef.current.clear();
-          messageEditorRef.current.focus();
-        }
-      },
-      onError(error) {
-        toast.error(error.message);
-      },
-    });
-  }, [
-    conversation.id,
-    conversation.canCreateMessage,
-    conversation.rootId,
-    content,
-    replyTo,
-    workspace.userId,
-    workspace.workspaceId,
-    threadRootMessageId,
-    mutate,
-  ]);
-
-  const handleUploadClick = useCallback(async () => {
-    if (messageEditorRef.current == null) {
-      return;
-    }
-
-    const result = await openFileDialog();
-
-    if (result.type === 'success') {
-      result.files.forEach((file) => {
-        messageEditorRef.current?.addTempFile(file);
+      mutate({
+        input: {
+          type: 'message.create',
+          parentId: conversation.id,
+          content: content,
+          userId: workspace.userId,
+          referenceId: threadRootMessageId ?? replyTo?.id,
+          rootId: conversation.rootId,
+        },
+        onSuccess: () => {
+          setReplyTo(null);
+          setContent(null);
+          clearDraft(workspace.workspaceId, conversation.id);
+          if (messageEditorRef.current) {
+            messageEditorRef.current.clear();
+            messageEditorRef.current.focus();
+          }
+        },
+        onError(error) {
+          toast.error(error.message);
+        },
       });
-    } else if (result.type === 'error') {
-      toast.error(result.error);
-    }
-  }, [messageEditorRef]);
+    }, [
+      conversation.id,
+      conversation.canCreateMessage,
+      conversation.rootId,
+      content,
+      replyTo,
+      workspace.userId,
+      workspace.workspaceId,
+      threadRootMessageId,
+      mutate,
+    ]);
 
-  return (
-    <div className="flex flex-col">
-      {conversation.canCreateMessage && replyTo && (
-        <MessageReplyBanner
-          message={replyTo}
-          onCancel={() => setReplyTo(null)}
-        />
-      )}
-      <div className="flex min-h-0 flex-row items-center rounded bg-muted p-2 pl-0">
-        <div className="flex w-10 items-center justify-center">
-          <DropdownMenu>
-            <DropdownMenuTrigger
-              disabled={isPending || !conversation.canCreateMessage}
-              className="cursor-pointer hover:bg-accent"
-            >
-              <span>
-                <Plus size={20} />
-              </span>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
-              <DropdownMenuItem disabled={true}>
-                <div className="flex flex-row items-center gap-2 text-sm">
-                  <Search className="size-4" />
-                  <span>Browse</span>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={handleUploadClick}>
-                <div className="flex cursor-pointer flex-row items-center gap-2 text-sm">
-                  <Upload className="size-4" />
-                  <span>Upload</span>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-        <div className="max-h-72 grow overflow-y-auto">
-          {conversation.canCreateMessage ? (
-            <MessageEditor
-              key={conversation.id}
-              ref={messageEditorRef}
-              userId={workspace.userId}
-              accountId={workspace.accountId}
-              workspaceId={workspace.workspaceId}
-              conversationId={conversation.id}
-              rootId={conversation.rootId}
-              initialContent={initialDraft}
-              onChange={setContent}
-              onSubmit={handleSubmit}
-            />
-          ) : (
-            <p className="m-0 px-0 py-1 text-muted-foreground">
-              You don&apos;t have permission to create messages in this
-              conversation
-            </p>
-          )}
-        </div>
-        <div className="flex flex-row gap-2">
-          {isPending ? (
-            <Spinner size={20} />
-          ) : (
-            <button
-              type="submit"
-              className={`${conversation.canCreateMessage && hasContent
+    const handleUploadClick = useCallback(async () => {
+      if (messageEditorRef.current == null) {
+        return;
+      }
+
+      const result = await openFileDialog();
+
+      if (result.type === 'success') {
+        result.files.forEach((file) => {
+          messageEditorRef.current?.addTempFile(file);
+        });
+      } else if (result.type === 'error') {
+        toast.error(result.error);
+      }
+    }, [messageEditorRef]);
+
+    return (
+      <div className="flex flex-col">
+        {conversation.canCreateMessage && replyTo && (
+          <MessageReplyBanner
+            message={replyTo}
+            onCancel={() => setReplyTo(null)}
+          />
+        )}
+        <div className="flex min-h-0 flex-row items-center rounded bg-muted p-2 pl-0">
+          <div className="flex w-10 items-center justify-center">
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                disabled={isPending || !conversation.canCreateMessage}
+                className="cursor-pointer hover:bg-accent"
+              >
+                <span>
+                  <Plus size={20} />
+                </span>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuItem disabled={true}>
+                  <div className="flex flex-row items-center gap-2 text-sm">
+                    <Search className="size-4" />
+                    <span>Browse</span>
+                  </div>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleUploadClick}>
+                  <div className="flex cursor-pointer flex-row items-center gap-2 text-sm">
+                    <Upload className="size-4" />
+                    <span>Upload</span>
+                  </div>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+          <div className="max-h-72 grow overflow-y-auto">
+            {conversation.canCreateMessage ? (
+              <MessageEditor
+                key={conversation.id}
+                ref={messageEditorRef}
+                userId={workspace.userId}
+                accountId={workspace.accountId}
+                workspaceId={workspace.workspaceId}
+                conversationId={conversation.id}
+                rootId={conversation.rootId}
+                initialContent={initialDraft}
+                onChange={setContent}
+                onSubmit={handleSubmit}
+              />
+            ) : (
+              <p className="m-0 px-0 py-1 text-muted-foreground">
+                You don&apos;t have permission to create messages in this
+                conversation
+              </p>
+            )}
+          </div>
+          <div className="flex flex-row gap-2">
+            {isPending ? (
+              <Spinner size={20} />
+            ) : (
+              <button
+                type="submit"
+                className={`${conversation.canCreateMessage && hasContent
                   ? 'cursor-pointer text-blue-600'
                   : 'cursor-default text-muted-foreground'
-                }`}
-              onClick={handleSubmit}
-            >
-              <Send size={20} />
-            </button>
-          )}
+                  }`}
+                onClick={handleSubmit}
+              >
+                <Send size={20} />
+              </button>
+            )}
+          </div>
         </div>
       </div>
-    </div>
-  );
-}
+    );
+  }
 );
 
 MessageCreate.displayName = 'MessageCreate';

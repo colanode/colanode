@@ -143,8 +143,8 @@ export const MessageList = ({
     : hasSearchFilters
       ? (messageSearchQuery.data ?? [])
       : messageListQuery.data
-          .map((node) => node as LocalMessageNode)
-          .toSorted((a, b) => compareString(a.id, b.id));
+        .map((node) => node as LocalMessageNode)
+        .toSorted((a, b) => compareString(a.id, b.id));
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -191,9 +191,8 @@ export const MessageList = ({
         <div className="px-2 py-1 text-xs text-muted-foreground">
           {threadMessageQuery.isPending
             ? 'Loading thread...'
-            : `${Math.max(messages.length - 1, 0)} repl${
-              messages.length - 1 === 1 ? 'y' : 'ies'
-          } in thread`}
+            : `${Math.max(messages.length - 1, 0)} repl${messages.length - 1 === 1 ? 'y' : 'ies'
+            } in thread`}
         </div>
       )}
       {messages.map((message, index) => {
