@@ -277,7 +277,10 @@ export class JobService {
           .executeTakeFirst();
 
         if (nextScheduledJob) {
-          const timestamp = new Date(nextScheduledJob.scheduled_at).getTime();
+          const rawTimestamp = new Date(
+            nextScheduledJob.scheduled_at
+          ).getTime();
+          const timestamp = Math.max(rawTimestamp, Date.now() + 1000);
           await this.sleepScheduler.sleepUntil(JOB_LOOP_ID, timestamp);
         } else {
           const timestamp = new Date(
@@ -326,8 +329,15 @@ export class JobService {
       for (const schedule of schedules) {
         try {
           await this.addJobFromSchedule(schedule);
+        } catch (error) {
+          console.error(`Error processing schedule ${schedule.id}:`, error);
+        }
 
-          const nextRunAt = new Date(now.getTime() + schedule.interval);
+        // Always advance next_run_at, even if addJobFromSchedule threw,
+        // otherwise scheduleLoop will spin at 100% CPU on a past-due schedule.
+        try {
+          const interval = Math.max(schedule.interval ?? 0, 1000);
+          const nextRunAt = new Date(now.getTime() + interval);
           await this.app.database
             .updateTable('job_schedules')
             .set({
@@ -338,7 +348,10 @@ export class JobService {
             .where('id', '=', schedule.id)
             .execute();
         } catch (error) {
-          console.error(`Error processing schedule ${schedule.id}:`, error);
+          console.error(
+            `Error advancing schedule ${schedule.id} next_run_at:`,
+            error
+          );
         }
       }
 
@@ -351,7 +364,9 @@ export class JobService {
         .executeTakeFirst();
 
       if (nextSchedule) {
-        const timestamp = new Date(nextSchedule.next_run_at).getTime();
+        const rawTimestamp = new Date(nextSchedule.next_run_at).getTime();
+        // Floor at now+1s so a past-due next_run_at can never spin the loop.
+        const timestamp = Math.max(rawTimestamp, Date.now() + 1000);
         await this.sleepScheduler.sleepUntil(SCHEDULE_LOOP_ID, timestamp);
       } else {
         const timestamp = new Date(

@@ -1,11 +1,8 @@
-import {
-  BasicIndex,
-  createCollection,
-  parseLoadSubsetOptions,
-} from '@tanstack/react-db';
+import { BasicIndex, createCollection } from '@tanstack/react-db';
 
 import { LocalNode } from '@colanode/client/types';
 import { applyNodeTransaction } from '@colanode/ui/lib/nodes';
+import { parseLoadSubsetOptionsLenient } from '@colanode/ui/lib/parse-load-subset';
 
 export const createNodesCollection = (userId: string) => {
   return createCollection<LocalNode, string>({
@@ -69,7 +66,7 @@ export const createNodesCollection = (userId: string) => {
         return {
           cleanup: () => window.eventBus.unsubscribe(subscriptionId),
           loadSubset: async (options) => {
-            const parsedOptions = parseLoadSubsetOptions(options);
+            const parsedOptions = parseLoadSubsetOptionsLenient(options);
 
             const nodes = await window.colanode.executeQuery({
               type: 'node.list',

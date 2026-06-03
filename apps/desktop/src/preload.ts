@@ -109,6 +109,28 @@ contextBridge.exposeInMainWorld('eventBus', {
   publish: (event: Event) => eventBus.publish(event),
 });
 
+// Renderer-process event-loop lag monitor: reports >200ms stalls to main
+(() => {
+  const SAMPLE_MS = 100;
+  const THRESHOLD_MS = 200;
+  let last = Date.now();
+  ipcRenderer.send('freeze-log-renderer', `=== renderer start ===`);
+  setInterval(() => {
+    const now = Date.now();
+    const lag = now - last - SAMPLE_MS;
+    last = now;
+    if (lag >= THRESHOLD_MS) {
+      const mem = (performance as unknown as {
+        memory?: { usedJSHeapSize: number; totalJSHeapSize: number };
+      }).memory;
+      const memStr = mem
+        ? ` heap=${Math.round(mem.usedJSHeapSize / 1048576)}/${Math.round(mem.totalJSHeapSize / 1048576)}MB`
+        : '';
+      ipcRenderer.send('freeze-log-renderer', `lag=${lag}ms${memStr}`);
+    }
+  }, SAMPLE_MS);
+})();
+
 ipcRenderer.on('event', (_, event) => {
   eventBus.publish(event);
 });

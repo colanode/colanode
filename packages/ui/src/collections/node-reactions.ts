@@ -1,14 +1,11 @@
-import {
-  BasicIndex,
-  createCollection,
-  parseLoadSubsetOptions,
-} from '@tanstack/react-db';
+import { BasicIndex, createCollection } from '@tanstack/react-db';
 
 import { NodeReaction } from '@colanode/client/types';
 import {
   applyNodeReactionTransaction,
   buildNodeReactionKey,
 } from '@colanode/ui/lib/nodes';
+import { parseLoadSubsetOptionsLenient } from '@colanode/ui/lib/parse-load-subset';
 
 export const createNodeReactionsCollection = (userId: string) => {
   const loadedNodeIds = new Set<string>();
@@ -48,7 +45,7 @@ export const createNodeReactionsCollection = (userId: string) => {
         return {
           cleanup: () => window.eventBus.unsubscribe(subscriptionId),
           loadSubset: (options) => {
-            const parsedOptions = parseLoadSubsetOptions(options);
+            const parsedOptions = parseLoadSubsetOptionsLenient(options);
             const nodeId = parsedOptions.filters.find(
               (filter) => filter.field.join('.') === 'nodeId'
             )?.value;
