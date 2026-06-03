@@ -106,13 +106,17 @@ export class WorkspaceService {
     await this.radar.init();
     await this.files.init();
 
+    const workspaceFilesCleanInterval = this.account.app.meta.localOnly
+      ? ms('30 minutes')
+      : ms('1 minute');
+
     await this.account.app.jobs.upsertJobSchedule(
       this.workspaceFilesCleanJobScheduleId,
       {
         type: 'workspace.files.clean',
         userId: this.workspace.userId,
       },
-      ms('1 minute'),
+      workspaceFilesCleanInterval,
       {
         deduplication: {
           key: this.workspaceFilesCleanJobScheduleId,
