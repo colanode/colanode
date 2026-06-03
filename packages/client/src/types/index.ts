@@ -8,6 +8,7 @@ export * from './events';
 export * from './files';
 export * from './folders';
 export * from './icons';
+export * from './mentions';
 export * from './nodes';
 export * from './radars';
 export * from './themes';

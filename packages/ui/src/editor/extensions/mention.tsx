@@ -23,7 +23,7 @@ import {
   useState,
 } from 'react';
 
-import { EditorContext, User } from '@colanode/client/types';
+import { EditorContext, MentionSearchItem } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import {
@@ -54,10 +54,10 @@ const CommandList = ({
   range,
   props,
 }: {
-  items: User[];
-  command: (item: User, range: Range) => void;
+  items: MentionSearchItem[];
+  command: (item: MentionSearchItem, range: Range) => void;
   range: Range;
-  props: SuggestionProps<User>;
+  props: SuggestionProps<MentionSearchItem>;
 }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
 
@@ -143,14 +143,13 @@ const CommandList = ({
           <ScrollArea className="h-80">
             <ScrollViewport ref={scrollContainer}>
               <div ref={listContainer}>
-                {items.map((item: User, index: number) => (
+                {items.map((item: MentionSearchItem, index: number) => (
                   <button
                     type="button"
-                    className={`relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-left outline-hidden select-none focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground ${
-                      index === selectedIndex
+                    className={`relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-left outline-hidden select-none focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground ${index === selectedIndex
                         ? 'bg-accent text-accent-foreground'
                         : ''
-                    }`}
+                      }`}
                     key={item.id}
                     onClick={() => selectItem(index)}
                     onPointerDownCapture={(e) => {
@@ -164,14 +163,14 @@ const CommandList = ({
                       <Avatar
                         id={item.id}
                         name={item.name}
-                        avatar={item.avatar}
+                        avatar={item.avatar ?? undefined}
                         className="size-8"
                       />
                     </div>
                     <div className="flex-1">
                       <p className="font-medium">{item.name}</p>
                       <p className="text-sm text-muted-foreground">
-                        {item.email}
+                        {item.subtitle ?? item.type}
                       </p>
                     </div>
                   </button>
@@ -191,7 +190,7 @@ const renderItems = () => {
   let editor: Editor | null = null;
 
   return {
-    onStart: (props: SuggestionProps<User>) => {
+    onStart: (props: SuggestionProps<MentionSearchItem>) => {
       editor = props.editor;
       props.editor.storage.mention.isOpen = true;
 
@@ -203,7 +202,7 @@ const renderItems = () => {
         editor: props.editor,
       });
     },
-    onUpdate: (props: SuggestionProps<User>) => {
+    onUpdate: (props: SuggestionProps<MentionSearchItem>) => {
       props.editor.storage.mention.isOpen = true;
       component?.updateProps({
         ...props,
@@ -279,7 +278,7 @@ export const MentionExtension = Node.create<MentionOptions>({
         }: {
           editor: Editor;
           range: Range;
-          props: User;
+          props: MentionSearchItem;
         }) => {
           // increase range.to by one when the next node is of type "text"
           // and starts with a space character
@@ -299,6 +298,7 @@ export const MentionExtension = Node.create<MentionOptions>({
                 attrs: {
                   id: generateId(IdType.Mention),
                   target: props.id,
+                  targetType: props.type,
                 },
               },
               {
@@ -317,22 +317,21 @@ export const MentionExtension = Node.create<MentionOptions>({
           return !!$from.parent.type.contentMatch.matchType(type);
         },
         items: async ({ query }: { query: string }) => {
-          return new Promise<User[]>((resolve) => {
+          return new Promise<MentionSearchItem[]>((resolve) => {
             if (!this.options.context) {
-              resolve([] as User[]);
+              resolve([] as MentionSearchItem[]);
               return;
             }
 
             const { userId } = this.options.context;
             window.colanode
               .executeQuery({
-                type: 'user.search',
+                type: 'mention.search',
                 userId,
                 searchQuery: query,
-                exclude: [userId],
               })
-              .then((users) => {
-                resolve(users);
+              .then((mentions) => {
+                resolve(mentions);
               });
           });
         },

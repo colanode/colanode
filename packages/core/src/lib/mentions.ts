@@ -27,6 +27,7 @@ const collectBlockMentions = (
           mentions.push({
             id: leaf.attrs.id,
             target: leaf.attrs.target,
+            targetType: leaf.attrs.targetType,
           });
         }
       }

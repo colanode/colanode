@@ -24,6 +24,7 @@ import { IconListQueryHandler } from './icons/icon-list';
 import { IconSearchQueryHandler } from './icons/icon-search';
 import { IconSvgGetQueryHandler } from './icons/icon-svg-get';
 import { RadarDataGetQueryHandler } from './interactions/radar-data-get';
+import { MentionSearchQueryHandler } from './mentions/mention-search';
 import { MessageSearchQueryHandler } from './messages/message-search';
 import { NodeListQueryHandler } from './nodes/node-list';
 import { NodeReactionsListQueryHandler } from './nodes/node-reaction-list';
@@ -57,6 +58,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'icon.search': new IconSearchQueryHandler(app),
     'icon.category.list': new IconCategoryListQueryHandler(app),
     'radar.data.get': new RadarDataGetQueryHandler(app),
+    'mention.search': new MentionSearchQueryHandler(app),
     'message.search': new MessageSearchQueryHandler(app),
     'record.search': new RecordSearchQueryHandler(app),
     'local.file.get': new LocalFileGetQueryHandler(app),

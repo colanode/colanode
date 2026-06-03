@@ -14,6 +14,8 @@ export const MentionRenderer = ({ node }: MentionRendererProps) => {
   const workspace = useWorkspace();
 
   const target = node.attrs?.target;
+  const targetType = node.attrs?.targetType as string | undefined;
+
   const userQuery = useLiveQuery(
     (q) =>
       q
@@ -25,11 +27,21 @@ export const MentionRenderer = ({ node }: MentionRendererProps) => {
           avatar: users.avatar,
         }))
         .findOne(),
-    [workspace.userId, target]
+    [workspace.userId, target, targetType]
   );
 
-  const user = userQuery.data;
-  const name = user?.name ?? 'Unknown';
+  const nodeQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.id, target ?? ''))
+        .findOne(),
+    [workspace.userId, target, targetType]
+  );
+
+  const user = targetType === 'user' || !targetType ? userQuery.data : null;
+  const resource = targetType && targetType !== 'user' ? nodeQuery.data : null;
+  const name = user?.name ?? ((resource as { name?: string } | null)?.name ?? 'Unknown');
   const avatar = user?.avatar;
 
   return (
