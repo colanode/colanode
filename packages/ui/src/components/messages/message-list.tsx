@@ -1,11 +1,12 @@
 import { eq, useLiveInfiniteQuery } from '@tanstack/react-db';
-import { Fragment, useEffect, useRef } from 'react';
+import { Fragment, useEffect, useMemo, useRef } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { LocalMessageNode } from '@colanode/client/types';
 import { compareString } from '@colanode/core';
 import { Message } from '@colanode/ui/components/messages/message';
 import { useConversation } from '@colanode/ui/contexts/conversation';
+import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 const MESSAGES_PER_PAGE = 50;
@@ -13,8 +14,18 @@ const MESSAGES_PER_PAGE = 50;
 export const MessageList = () => {
   const workspace = useWorkspace();
   const conversation = useConversation();
+  const radar = useRadar();
 
   const lastMessageId = useRef<string | null>(null);
+
+  // 快照进入该会话时的未读数，新消息不会移动分隔线位置
+  const unreadSnapshot = useMemo(
+    () =>
+      radar.getNodeState(workspace.userId, conversation.id).unreadCount,
+    // 仅在切换会话时重新快照
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [conversation.id, workspace.userId]
+  );
   const messageListQuery = useLiveInfiniteQuery(
     (q) =>
       q
@@ -73,6 +84,11 @@ export const MessageList = () => {
           !previousMessageDate ||
           currentMessageDate.getDate() !== previousMessageDate.getDate();
 
+        const showUnreadDivider =
+          unreadSnapshot > 0 &&
+          messages.length >= unreadSnapshot &&
+          index === messages.length - unreadSnapshot;
+
         return (
           <Fragment key={message.id}>
             {showDate && (
@@ -82,6 +98,15 @@ export const MessageList = () => {
                   {currentMessageDate.toDateString()}
                 </span>
                 <div className="grow border-t border-muted" />
+              </div>
+            )}
+            {showUnreadDivider && (
+              <div className="relative flex items-center py-1">
+                <div className="grow border-t border-red-500/60" />
+                <span className="mx-3 shrink rounded bg-red-500/10 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-red-500">
+                  New
+                </span>
+                <div className="grow border-t border-red-500/60" />
               </div>
             )}
             <Message message={message} previousMessage={previousMessage} />
