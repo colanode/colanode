@@ -34,7 +34,16 @@ export const Conversation = ({
   const bottomVisibleRef = useRef<boolean>(false);
   const shouldScrollToBottomRef = useRef<boolean>(true);
   const messageCreateRef = useRef<MessageCreateRefProps>(null);
+  const isAtBottomRef = useRef<boolean>(true);
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+
+  const updateAtBottom = (atBottom: boolean) => {
+    if (isAtBottomRef.current === atBottom) {
+      return;
+    }
+    isAtBottomRef.current = atBottom;
+    setIsAtBottom(atBottom);
+  };
 
   useEffect(() => {
     if (bottomRef.current && scrollPositionRef.current == 0) {
@@ -77,6 +86,12 @@ export const Conversation = ({
         scrollAreaRef.current.scrollHeight - scrollAreaRef.current.scrollTop;
 
       shouldScrollToBottomRef.current = bottomVisibleRef.current;
+
+      const distanceFromBottom =
+        scrollAreaRef.current.scrollHeight -
+        scrollAreaRef.current.scrollTop -
+        scrollAreaRef.current.clientHeight;
+      updateAtBottom(distanceFromBottom < 80);
     }
   };
 
@@ -114,7 +129,6 @@ export const Conversation = ({
           rootMargin="20px"
           onChange={(inView) => {
             bottomVisibleRef.current = inView;
-            setIsAtBottom(inView);
           }}
         >
           <div ref={bottomRef} className="h-4"></div>
