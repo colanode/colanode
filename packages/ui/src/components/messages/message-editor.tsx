@@ -37,6 +37,7 @@ interface MessageEditorProps {
   workspaceId: string;
   conversationId: string;
   rootId: string;
+  initialContent?: JSONContent | null;
   onChange?: (content: JSONContent) => void;
   onSubmit: () => void;
 }
@@ -96,7 +97,7 @@ export const MessageEditor = forwardRef<
           return isHotkey('enter', event);
         },
       },
-      content: {
+      content: props.initialContent ?? {
         type: 'message',
         content: [
           {

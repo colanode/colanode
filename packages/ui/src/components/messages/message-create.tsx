@@ -3,7 +3,9 @@ import { Plus, Search, Send, Upload } from 'lucide-react';
 import {
   forwardRef,
   useCallback,
+  useEffect,
   useImperativeHandle,
+  useMemo,
   useRef,
   useState,
 } from 'react';
@@ -27,6 +29,11 @@ import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { openFileDialog } from '@colanode/ui/lib/files';
+import {
+  clearDraft,
+  loadDraft,
+  saveDraft,
+} from '@colanode/ui/lib/message-drafts';
 
 export interface MessageCreateRefProps {
   setReplyTo: (replyTo: LocalMessageNode) => void;
@@ -39,10 +46,22 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
   const { mutate, isPending } = useMutation();
 
   const messageEditorRef = useRef<MessageEditorRefProps>(null);
-  const [content, setContent] = useState<JSONContent | null>(null);
+  const initialDraft = useMemo(
+    () => loadDraft(workspace.workspaceId, conversation.id),
+    [workspace.workspaceId, conversation.id]
+  );
+  const [content, setContent] = useState<JSONContent | null>(initialDraft);
   const [replyTo, setReplyTo] = useState<LocalMessageNode | null>(null);
 
   const hasContent = content != null && editorHasContent(content);
+
+  useEffect(() => {
+    if (content != null && editorHasContent(content)) {
+      saveDraft(workspace.workspaceId, conversation.id, content);
+    } else {
+      clearDraft(workspace.workspaceId, conversation.id);
+    }
+  }, [content, workspace.workspaceId, conversation.id]);
 
   useImperativeHandle(ref, () => ({
     setReplyTo: (replyTo) => {
@@ -81,6 +100,8 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
       },
       onSuccess: () => {
         setReplyTo(null);
+        setContent(null);
+        clearDraft(workspace.workspaceId, conversation.id);
         if (messageEditorRef.current) {
           messageEditorRef.current.clear();
           messageEditorRef.current.focus();
@@ -93,9 +114,12 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
   }, [
     conversation.id,
     conversation.canCreateMessage,
+    conversation.rootId,
     content,
     replyTo,
     workspace.userId,
+    workspace.workspaceId,
+    mutate,
   ]);
 
   const handleUploadClick = useCallback(async () => {
@@ -159,6 +183,7 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
               workspaceId={workspace.workspaceId}
               conversationId={conversation.id}
               rootId={conversation.rootId}
+              initialContent={initialDraft}
               onChange={setContent}
               onSubmit={handleSubmit}
             />
