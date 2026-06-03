@@ -31,6 +31,10 @@ export const WorkspaceSettingsContainer = () => {
   const currentWorkspace = currentWorkspaceQuery.data?.[0];
   const canEdit = workspace.role === 'owner';
 
+  if (currentWorkspaceQuery.isLoading || !currentWorkspaceQuery.isReady) {
+    return null;
+  }
+
   if (!currentWorkspace) {
     return <WorkspaceNotFound />;
   }

@@ -30,6 +30,10 @@ export const Workspace = ({ userId }: WorkspaceProps) => {
   const workspaceId = workspaceQuery.data?.workspaceId;
   const accountId = workspaceQuery.data?.accountId;
 
+  if (workspaceQuery.isLoading || !workspaceQuery.isReady) {
+    return null;
+  }
+
   if (!workspaceId || !accountId) {
     return <WorkspaceNotFound />;
   }
