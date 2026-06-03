@@ -16,6 +16,7 @@ interface MessageListProps {
   searchQuery?: string;
   fromDate?: string;
   toDate?: string;
+  threadRootMessageId?: string;
 }
 
 const isSameDay = (a: Date, b: Date): boolean =>
@@ -68,6 +69,7 @@ export const MessageList = ({
   searchQuery = '',
   fromDate = '',
   toDate = '',
+  threadRootMessageId,
 }: MessageListProps) => {
   const workspace = useWorkspace();
   const conversation = useConversation();
@@ -85,8 +87,23 @@ export const MessageList = ({
   );
 
   const trimmedSearchQuery = searchQuery.trim();
+  const inThreadView = threadRootMessageId != null;
   const hasSearchFilters =
-    trimmedSearchQuery.length > 0 || fromDate.length > 0 || toDate.length > 0;
+    !inThreadView &&
+    (trimmedSearchQuery.length > 0 || fromDate.length > 0 || toDate.length > 0);
+
+  const threadMessageQuery = useQuery(
+    {
+      type: 'message.search',
+      userId: workspace.userId,
+      conversationId: conversation.id,
+      threadRootMessageId,
+      limit: 500,
+    },
+    {
+      enabled: inThreadView,
+    }
+  );
 
   const fromCreatedAt = fromDate.length > 0 ? toStartOfDayIso(fromDate) : undefined;
   const toCreatedAt = toDate.length > 0 ? toEndOfDayIso(toDate) : undefined;
@@ -121,11 +138,13 @@ export const MessageList = ({
     [workspace.userId, conversation.id]
   );
 
-  const messages: LocalMessageNode[] = hasSearchFilters
-    ? (messageSearchQuery.data ?? [])
-    : messageListQuery.data
-        .map((node) => node as LocalMessageNode)
-        .toSorted((a, b) => compareString(a.id, b.id));
+  const messages: LocalMessageNode[] = inThreadView
+    ? (threadMessageQuery.data ?? [])
+    : hasSearchFilters
+      ? (messageSearchQuery.data ?? [])
+      : messageListQuery.data
+          .map((node) => node as LocalMessageNode)
+          .toSorted((a, b) => compareString(a.id, b.id));
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -134,12 +153,16 @@ export const MessageList = ({
         return;
       }
 
-      if (!hasSearchFilters && lastMessage.id !== lastMessageId.current) {
+      if (
+        !hasSearchFilters &&
+        !inThreadView &&
+        lastMessage.id !== lastMessageId.current
+      ) {
         lastMessageId.current = lastMessage.id;
         conversation.onLastMessageIdChange(lastMessage.id);
       }
     }
-  }, [messages, hasSearchFilters]);
+  }, [messages, hasSearchFilters, inThreadView]);
 
   return (
     <Fragment>
@@ -147,6 +170,7 @@ export const MessageList = ({
         rootMargin="200px"
         onChange={(inView) => {
           if (
+            !inThreadView &&
             !hasSearchFilters &&
             inView &&
             messageListQuery.hasNextPage &&
@@ -161,6 +185,15 @@ export const MessageList = ({
           {messageSearchQuery.isPending
             ? 'Searching...'
             : `${messages.length} result${messages.length === 1 ? '' : 's'}`}
+        </div>
+      )}
+      {inThreadView && (
+        <div className="px-2 py-1 text-xs text-muted-foreground">
+          {threadMessageQuery.isPending
+            ? 'Loading thread...'
+            : `${Math.max(messages.length - 1, 0)} repl${
+              messages.length - 1 === 1 ? 'y' : 'ies'
+          } in thread`}
         </div>
       )}
       {messages.map((message, index) => {

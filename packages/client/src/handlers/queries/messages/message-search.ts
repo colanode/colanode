@@ -4,6 +4,7 @@ import { mapNode } from '@colanode/client/lib/mappers';
 import { MessageSearchQueryInput } from '@colanode/client/queries/messages/message-search';
 import { Event } from '@colanode/client/types/events';
 import { LocalMessageNode } from '@colanode/client/types/nodes';
+import { sql } from 'kysely';
 
 const DEFAULT_LIMIT = 300;
 
@@ -26,6 +27,35 @@ export class MessageSearchQueryHandler
     const workspace = this.getWorkspace(input.userId);
     const searchQuery = input.searchQuery?.trim() ?? '';
     const limit = input.limit ?? DEFAULT_LIMIT;
+
+    if (input.threadRootMessageId) {
+      const threadRoot = await workspace.database
+        .selectFrom('nodes')
+        .where('nodes.id', '=', input.threadRootMessageId)
+        .where('nodes.type', '=', 'message')
+        .where('nodes.parent_id', '=', input.conversationId)
+        .selectAll('nodes')
+        .executeTakeFirst();
+
+      const threadReplies = await workspace.database
+        .selectFrom('nodes')
+        .where('nodes.type', '=', 'message')
+        .where('nodes.parent_id', '=', input.conversationId)
+        .where(
+          sql<boolean>`json_extract(nodes.attributes, '$.referenceId') = ${input.threadRootMessageId}`
+        )
+        .orderBy('nodes.created_at', 'asc')
+        .limit(limit)
+        .selectAll('nodes')
+        .execute();
+
+      const rows = [
+        ...(threadRoot ? [threadRoot] : []),
+        ...threadReplies.filter((row) => row.id !== input.threadRootMessageId),
+      ];
+
+      return rows.map((row) => mapNode(row) as LocalMessageNode);
+    }
 
     let queryBuilder = workspace.database
       .selectFrom('nodes')

@@ -101,7 +101,7 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
       value={{
         ...message,
         canDelete: conversation.canDeleteMessage(message),
-        canReplyInThread: false,
+        canReplyInThread: conversation.canCreateMessage,
         openDelete: () => {
           setOpenDeleteDialog(true);
         },

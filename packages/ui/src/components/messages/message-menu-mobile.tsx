@@ -54,7 +54,7 @@ export const MessageMenuMobile = ({
   const conversation = useConversation();
   const message = useMessage();
 
-  const canReplyInThread = false;
+  const canReplyInThread = message.canReplyInThread;
 
   const handleReactionClick = useCallback(
     (reaction: string) => {
@@ -82,6 +82,11 @@ export const MessageMenuMobile = ({
 
   const handleReply = () => {
     conversation.onReply(message);
+    onOpenChange(false);
+  };
+
+  const handleReplyInThread = () => {
+    conversation.onReplyInThread(message);
     onOpenChange(false);
   };
 
@@ -131,7 +136,7 @@ export const MessageMenuMobile = ({
           {/* Actions Section */}
           <div className="space-y-1">
             {canReplyInThread && (
-              <MenuAction onClick={handleReply}>
+              <MenuAction onClick={handleReplyInThread}>
                 <MessagesSquare className="size-5 text-muted-foreground" />
                 <span>Reply in thread</span>
               </MenuAction>

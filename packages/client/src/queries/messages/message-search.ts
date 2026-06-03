@@ -4,6 +4,7 @@ export type MessageSearchQueryInput = {
   type: 'message.search';
   userId: string;
   conversationId: string;
+  threadRootMessageId?: string;
   searchQuery?: string;
   fromCreatedAt?: string;
   toCreatedAt?: string;

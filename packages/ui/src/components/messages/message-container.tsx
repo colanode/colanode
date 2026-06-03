@@ -17,6 +17,7 @@ export const MessageContainer = ({ message, role }: MessageContainerProps) => {
         rootId: message.rootId,
         canCreateMessage: true,
         onReply: () => {},
+        onReplyInThread: () => {},
         onLastMessageIdChange: () => {},
         canDeleteMessage: () => false,
       }}

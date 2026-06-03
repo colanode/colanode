@@ -39,7 +39,12 @@ export interface MessageCreateRefProps {
   setReplyTo: (replyTo: LocalMessageNode) => void;
 }
 
-export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
+interface MessageCreateProps {
+  threadRootMessageId?: string;
+}
+
+export const MessageCreate = forwardRef<MessageCreateRefProps, MessageCreateProps>(
+  ({ threadRootMessageId }, ref) => {
   const workspace = useWorkspace();
   const conversation = useConversation();
 
@@ -95,7 +100,7 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
         parentId: conversation.id,
         content: content,
         userId: workspace.userId,
-        referenceId: replyTo?.id,
+        referenceId: threadRootMessageId ?? replyTo?.id,
         rootId: conversation.rootId,
       },
       onSuccess: () => {
@@ -119,6 +124,7 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
     replyTo,
     workspace.userId,
     workspace.workspaceId,
+    threadRootMessageId,
     mutate,
   ]);
 
@@ -213,6 +219,7 @@ export const MessageCreate = forwardRef<MessageCreateRefProps>((_, ref) => {
       </div>
     </div>
   );
-});
+}
+);
 
 MessageCreate.displayName = 'MessageCreate';

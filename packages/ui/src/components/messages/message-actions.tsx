@@ -67,7 +67,12 @@ export const MessageActions = () => {
       <div className="mx-1 h-6 w-px bg-border" />
       {message.canReplyInThread && (
         <MessageAction>
-          <MessagesSquare className="size-4 cursor-pointer" />
+          <MessagesSquare
+            className="size-4 cursor-pointer"
+            onClick={() => {
+              conversation.onReplyInThread(message);
+            }}
+          />
         </MessageAction>
       )}
       <MessageAction>
