@@ -37,6 +37,8 @@ const formatShortTime = (value: string): string => {
   return `${hour}:${minute}`;
 };
 
+const GROUP_THRESHOLD_MS = 5 * 60 * 1000;
+
 const shouldDisplayAuthor = (
   message: LocalMessageNode,
   previousMessage?: LocalMessageNode | null
@@ -52,7 +54,14 @@ const shouldDisplayAuthor = (
     return true;
   }
 
-  return previousMessage.createdBy !== message.createdBy;
+  if (previousMessage.createdBy !== message.createdBy) {
+    return true;
+  }
+
+  return (
+    currentMessageDate.getTime() - previousMessageDate.getTime() >
+    GROUP_THRESHOLD_MS
+  );
 };
 
 export const Message = ({ message, previousMessage }: MessageProps) => {
