@@ -1,0 +1,99 @@
+import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
+import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib';
+import { mapNode } from '@colanode/client/lib/mappers';
+import { MessageSearchQueryInput } from '@colanode/client/queries/messages/message-search';
+import { Event } from '@colanode/client/types/events';
+import { LocalMessageNode } from '@colanode/client/types/nodes';
+
+const DEFAULT_LIMIT = 300;
+
+const buildFtsQuery = (query: string): string => {
+  return query
+    .trim()
+    .split(/\s+/)
+    .filter((term) => term.length > 0)
+    .map((term) => `${term.replace(/"/g, '')}*`)
+    .join(' ');
+};
+
+export class MessageSearchQueryHandler
+  extends WorkspaceQueryHandlerBase
+  implements QueryHandler<MessageSearchQueryInput>
+{
+  public async handleQuery(
+    input: MessageSearchQueryInput
+  ): Promise<LocalMessageNode[]> {
+    const workspace = this.getWorkspace(input.userId);
+    const searchQuery = input.searchQuery?.trim() ?? '';
+    const limit = input.limit ?? DEFAULT_LIMIT;
+
+    let queryBuilder = workspace.database
+      .selectFrom('nodes')
+      .where('nodes.type', '=', 'message')
+      .where('nodes.parent_id', '=', input.conversationId)
+      .selectAll('nodes');
+
+    if (searchQuery.length > 0) {
+      queryBuilder = queryBuilder
+        .innerJoin('node_texts', 'nodes.id', 'node_texts.id')
+        .where('node_texts.attributes', 'match', buildFtsQuery(searchQuery));
+    }
+
+    if (input.fromCreatedAt) {
+      queryBuilder = queryBuilder.where(
+        'nodes.created_at',
+        '>=',
+        input.fromCreatedAt
+      );
+    }
+
+    if (input.toCreatedAt) {
+      queryBuilder = queryBuilder.where(
+        'nodes.created_at',
+        '<=',
+        input.toCreatedAt
+      );
+    }
+
+    const rows = await queryBuilder
+      .orderBy('nodes.created_at', 'asc')
+      .limit(limit)
+      .execute();
+
+    return rows.map((row) => mapNode(row) as LocalMessageNode);
+  }
+
+  public async checkForChanges(
+    event: Event,
+    input: MessageSearchQueryInput,
+    _: LocalMessageNode[]
+  ): Promise<ChangeCheckResult<MessageSearchQueryInput>> {
+    if (
+      event.type === 'workspace.deleted' &&
+      event.workspace.userId === input.userId
+    ) {
+      return {
+        hasChanges: true,
+        result: [],
+      };
+    }
+
+    if (
+      (event.type === 'node.created' ||
+        event.type === 'node.updated' ||
+        event.type === 'node.deleted') &&
+      event.workspace.userId === input.userId &&
+      event.node.type === 'message' &&
+      event.node.parentId === input.conversationId
+    ) {
+      return {
+        hasChanges: true,
+        result: await this.handleQuery(input),
+      };
+    }
+
+    return {
+      hasChanges: false,
+    };
+  }
+}

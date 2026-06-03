@@ -17,6 +17,7 @@ export * from './icons/icon-list';
 export * from './icons/icon-search';
 export * from './interactions/radar-data-get';
 export * from './nodes/node-reaction-list';
+export * from './messages/message-search';
 export * from './records/record-search';
 export * from './users/user-list';
 export * from './users/user-search';

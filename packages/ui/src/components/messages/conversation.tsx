@@ -8,6 +8,7 @@ import {
   MessageCreateRefProps,
 } from '@colanode/ui/components/messages/message-create';
 import { MessageList } from '@colanode/ui/components/messages/message-list';
+import { Input } from '@colanode/ui/components/ui/input';
 import { useContainer } from '@colanode/ui/contexts/container';
 import { ConversationContext } from '@colanode/ui/contexts/conversation';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -36,6 +37,9 @@ export const Conversation = ({
   const messageCreateRef = useRef<MessageCreateRefProps>(null);
   const isAtBottomRef = useRef<boolean>(true);
   const [isAtBottom, setIsAtBottom] = useState<boolean>(true);
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [fromDate, setFromDate] = useState<string>('');
+  const [toDate, setToDate] = useState<string>('');
 
   const updateAtBottom = (atBottom: boolean) => {
     if (isAtBottomRef.current === atBottom) {
@@ -121,8 +125,47 @@ export const Conversation = ({
       }}
     >
       <div className="relative flex flex-col h-full">
+        <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-2 py-2 backdrop-blur">
+          <div className="flex flex-wrap items-center gap-2">
+            <Input
+              value={searchQuery}
+              onChange={(event) => setSearchQuery(event.target.value)}
+              placeholder="Search messages"
+              className="h-8 min-w-52 flex-1"
+            />
+            <Input
+              type="date"
+              value={fromDate}
+              onChange={(event) => setFromDate(event.target.value)}
+              className="h-8 w-40"
+            />
+            <Input
+              type="date"
+              value={toDate}
+              onChange={(event) => setToDate(event.target.value)}
+              className="h-8 w-40"
+            />
+            {(searchQuery.length > 0 || fromDate.length > 0 || toDate.length > 0) && (
+              <button
+                type="button"
+                className="h-8 rounded border border-border px-2 text-xs text-muted-foreground hover:bg-accent"
+                onClick={() => {
+                  setSearchQuery('');
+                  setFromDate('');
+                  setToDate('');
+                }}
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
         <div className="flex-1 min-h-0" ref={messageListRef}>
-          <MessageList />
+          <MessageList
+            searchQuery={searchQuery}
+            fromDate={fromDate}
+            toDate={toDate}
+          />
         </div>
         <InView
           className="h-4"

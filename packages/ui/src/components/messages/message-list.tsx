@@ -8,8 +8,15 @@ import { Message } from '@colanode/ui/components/messages/message';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useQuery } from '@colanode/ui/hooks/use-query';
 
 const MESSAGES_PER_PAGE = 50;
+
+interface MessageListProps {
+  searchQuery?: string;
+  fromDate?: string;
+  toDate?: string;
+}
 
 const isSameDay = (a: Date, b: Date): boolean =>
   a.getFullYear() === b.getFullYear() &&
@@ -49,7 +56,19 @@ const formatDateDivider = (date: Date): string => {
   });
 };
 
-export const MessageList = () => {
+const toStartOfDayIso = (date: string): string => {
+  return new Date(`${date}T00:00:00`).toISOString();
+};
+
+const toEndOfDayIso = (date: string): string => {
+  return new Date(`${date}T23:59:59.999`).toISOString();
+};
+
+export const MessageList = ({
+  searchQuery = '',
+  fromDate = '',
+  toDate = '',
+}: MessageListProps) => {
   const workspace = useWorkspace();
   const conversation = useConversation();
   const radar = useRadar();
@@ -64,6 +83,29 @@ export const MessageList = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [conversation.id, workspace.userId]
   );
+
+  const trimmedSearchQuery = searchQuery.trim();
+  const hasSearchFilters =
+    trimmedSearchQuery.length > 0 || fromDate.length > 0 || toDate.length > 0;
+
+  const fromCreatedAt = fromDate.length > 0 ? toStartOfDayIso(fromDate) : undefined;
+  const toCreatedAt = toDate.length > 0 ? toEndOfDayIso(toDate) : undefined;
+
+  const messageSearchQuery = useQuery(
+    {
+      type: 'message.search',
+      userId: workspace.userId,
+      conversationId: conversation.id,
+      searchQuery: trimmedSearchQuery,
+      fromCreatedAt,
+      toCreatedAt,
+      limit: 500,
+    },
+    {
+      enabled: hasSearchFilters,
+    }
+  );
+
   const messageListQuery = useLiveInfiniteQuery(
     (q) =>
       q
@@ -79,9 +121,11 @@ export const MessageList = () => {
     [workspace.userId, conversation.id]
   );
 
-  const messages: LocalMessageNode[] = messageListQuery.data
-    .map((node) => node as LocalMessageNode)
-    .toSorted((a, b) => compareString(a.id, b.id));
+  const messages: LocalMessageNode[] = hasSearchFilters
+    ? (messageSearchQuery.data ?? [])
+    : messageListQuery.data
+        .map((node) => node as LocalMessageNode)
+        .toSorted((a, b) => compareString(a.id, b.id));
 
   useEffect(() => {
     if (messages.length > 0) {
@@ -90,12 +134,12 @@ export const MessageList = () => {
         return;
       }
 
-      if (lastMessage.id !== lastMessageId.current) {
+      if (!hasSearchFilters && lastMessage.id !== lastMessageId.current) {
         lastMessageId.current = lastMessage.id;
         conversation.onLastMessageIdChange(lastMessage.id);
       }
     }
-  }, [messages]);
+  }, [messages, hasSearchFilters]);
 
   return (
     <Fragment>
@@ -103,6 +147,7 @@ export const MessageList = () => {
         rootMargin="200px"
         onChange={(inView) => {
           if (
+            !hasSearchFilters &&
             inView &&
             messageListQuery.hasNextPage &&
             !messageListQuery.isFetchingNextPage
@@ -111,6 +156,13 @@ export const MessageList = () => {
           }
         }}
       />
+      {hasSearchFilters && (
+        <div className="px-2 py-1 text-xs text-muted-foreground">
+          {messageSearchQuery.isPending
+            ? 'Searching...'
+            : `${messages.length} result${messages.length === 1 ? '' : 's'}`}
+        </div>
+      )}
       {messages.map((message, index) => {
         const previousMessage = index > 0 ? messages[index - 1] : null;
 
@@ -123,6 +175,7 @@ export const MessageList = () => {
           currentMessageDate.getDate() !== previousMessageDate.getDate();
 
         const showUnreadDivider =
+          !hasSearchFilters &&
           unreadSnapshot > 0 &&
           messages.length >= unreadSnapshot &&
           index === messages.length - unreadSnapshot;
