@@ -116,7 +116,7 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
           ) : (
             <Tooltip>
               <TooltipTrigger asChild>
-                <span className="block text-right pr-1 text-[10px] leading-5 text-muted-foreground/70 opacity-0 group-hover:opacity-100 transition-opacity select-none">
+                <span className="block text-right pr-1 text-[10px] leading-5 text-muted-foreground/70 select-none">
                   {formatShortTime(message.createdAt)}
                 </span>
               </TooltipTrigger>
