@@ -1,4 +1,4 @@
-import { createRoute, notFound } from '@tanstack/react-router';
+import { createRoute, redirect } from '@tanstack/react-router';
 
 import { collections } from '@colanode/ui/collections';
 import { Workspace } from '@colanode/ui/components/workspaces/workspace';
@@ -20,10 +20,11 @@ export const workspaceRoute = createRoute({
       tab: <WorkspaceTab userId={ctx.params.userId} />,
     };
   },
-  loader: (ctx) => {
+  loader: async (ctx) => {
+    await collections.workspaces.preload();
     const workspace = collections.workspaces.get(ctx.params.userId);
     if (!workspace) {
-      throw notFound();
+      throw redirect({ to: '/', replace: true });
     }
   },
 });
@@ -32,10 +33,11 @@ export const workspaceMaskRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/$workspaceId',
   notFoundComponent: WorkspaceNotFound,
-  loader: (ctx) => {
+  loader: async (ctx) => {
+    await collections.workspaces.preload();
     const userId = getWorkspaceUserId(ctx.params.workspaceId);
     if (!userId) {
-      throw notFound();
+      throw redirect({ to: '/', replace: true });
     }
   },
 });
