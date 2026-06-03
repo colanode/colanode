@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { LocalMessageNode } from '@colanode/client/types';
+import { formatDate } from '@colanode/core';
 import { MessageActions } from '@colanode/ui/components/messages/message-actions';
 import { MessageAuthorAvatar } from '@colanode/ui/components/messages/message-author-avatar';
 import { MessageAuthorName } from '@colanode/ui/components/messages/message-author-name';
@@ -10,6 +11,11 @@ import { MessageMenuMobile } from '@colanode/ui/components/messages/message-menu
 import { MessageReactionCounts } from '@colanode/ui/components/messages/message-reaction-counts';
 import { MessageReference } from '@colanode/ui/components/messages/message-reference';
 import { MessageTime } from '@colanode/ui/components/messages/message-time';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@colanode/ui/components/ui/tooltip';
 import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
 import { useConversation } from '@colanode/ui/contexts/conversation';
 import { MessageContext } from '@colanode/ui/contexts/message';
@@ -23,6 +29,13 @@ interface MessageProps {
   message: LocalMessageNode;
   previousMessage?: LocalMessageNode | null;
 }
+
+const formatShortTime = (value: string): string => {
+  const date = new Date(value);
+  const hour = date.getHours().toString().padStart(2, '0');
+  const minute = date.getMinutes().toString().padStart(2, '0');
+  return `${hour}:${minute}`;
+};
 
 const shouldDisplayAuthor = (
   message: LocalMessageNode,
@@ -57,21 +70,21 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
 
   const longPressHandlers = isMobile
     ? useLongPress(
-        () => {
-          setIsMobileMenuOpen(true);
+      () => {
+        setIsMobileMenuOpen(true);
+      },
+      {
+        onStart: () => {
+          setIsLongPressing(true);
         },
-        {
-          onStart: () => {
-            setIsLongPressing(true);
-          },
-          onFinish: () => {
-            setIsLongPressing(false);
-          },
-          onCancel: () => {
-            setIsLongPressing(false);
-          },
-        }
-      )
+        onFinish: () => {
+          setIsLongPressing(false);
+        },
+        onCancel: () => {
+          setIsLongPressing(false);
+        },
+      }
+    )
     : {};
 
   return (
@@ -98,7 +111,22 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
         {...longPressHandlers}
       >
         <div className="mr-2 w-10 pt-1">
-          {displayAuthor && <MessageAuthorAvatar message={message} />}
+          {displayAuthor ? (
+            <MessageAuthorAvatar message={message} />
+          ) : (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <span className="block text-right pr-1 text-[10px] leading-5 text-muted-foreground/70 opacity-0 group-hover:opacity-100 transition-opacity select-none">
+                  {formatShortTime(message.createdAt)}
+                </span>
+              </TooltipTrigger>
+              <TooltipContent>
+                <span className="text-sm shadow-md">
+                  {formatDate(message.createdAt)}
+                </span>
+              </TooltipContent>
+            </Tooltip>
+          )}
         </div>
 
         <div className="relative w-full">
