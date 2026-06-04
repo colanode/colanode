@@ -13,6 +13,7 @@ import { collections } from '@colanode/ui/collections';
 import { GlobalCommandPalette } from '@colanode/ui/components/layouts/global-command-palette';
 import { TabsContent } from '@colanode/ui/components/layouts/tabs/tabs-content';
 import { TabsHeader } from '@colanode/ui/components/layouts/tabs/tabs-header';
+import { LayoutContext } from '@colanode/ui/contexts/layout';
 import { TabManagerContext } from '@colanode/ui/contexts/tab-manager';
 import { router, routeTree } from '@colanode/ui/routes';
 
@@ -142,14 +143,16 @@ export const LayoutDesktop = () => {
         getRouter: handleTabGetRouter,
       }}
     >
-      <div className="flex flex-col h-full">
-        <TabsHeader />
-        <TabsContent />
-        <GlobalCommandPalette
-          openInCurrentTab={handleOpenInCurrentTab}
-          openInNewTab={handleOpenInNewTab}
-        />
-      </div>
+      <LayoutContext.Provider value={{ openInNewTab: handleOpenInNewTab }}>
+        <div className="flex flex-col h-full">
+          <TabsHeader />
+          <TabsContent />
+          <GlobalCommandPalette
+            openInCurrentTab={handleOpenInCurrentTab}
+            openInNewTab={handleOpenInNewTab}
+          />
+        </div>
+      </LayoutContext.Provider>
     </TabManagerContext.Provider>
   );
 };

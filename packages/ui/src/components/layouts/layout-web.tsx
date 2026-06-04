@@ -6,6 +6,7 @@ import {
 import { useCallback, useMemo } from 'react';
 
 import { GlobalCommandPalette } from '@colanode/ui/components/layouts/global-command-palette';
+import { LayoutContext } from '@colanode/ui/contexts/layout';
 import { routeTree } from '@colanode/ui/routes';
 import { routeMasks } from '@colanode/ui/routes/masks';
 
@@ -35,12 +36,12 @@ export const LayoutWeb = () => {
   }, []);
 
   return (
-    <>
+    <LayoutContext.Provider value={{ openInNewTab: handleOpenInNewTab }}>
       <RouterProvider router={router} />
       <GlobalCommandPalette
         openInCurrentTab={handleOpenInCurrentTab}
         openInNewTab={handleOpenInNewTab}
       />
-    </>
+    </LayoutContext.Provider>
   );
 };
