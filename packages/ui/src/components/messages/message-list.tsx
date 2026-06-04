@@ -233,6 +233,19 @@ export const MessageList = ({
               </div>
             )}
             <Message message={message} previousMessage={previousMessage} />
+            {hasSearchFilters && (
+              <div className="px-2 pb-1 pl-12 text-xs">
+                <button
+                  type="button"
+                  className="cursor-pointer text-blue-600 hover:underline"
+                  onClick={() => {
+                    conversation.onLocateMessage(message.id);
+                  }}
+                >
+                  Jump to message →
+                </button>
+              </div>
+            )}
           </Fragment>
         );
       })}

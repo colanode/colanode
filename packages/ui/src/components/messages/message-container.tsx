@@ -16,9 +16,12 @@ export const MessageContainer = ({ message, role }: MessageContainerProps) => {
         role: role,
         rootId: message.rootId,
         canCreateMessage: true,
+        searchTerms: [],
+        flashMessageId: null,
         onReply: () => { },
         onReplyInThread: () => { },
         onLastMessageIdChange: () => { },
+        onLocateMessage: () => { },
         canDeleteMessage: () => false,
       }}
     >

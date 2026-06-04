@@ -9,6 +9,7 @@ export type MessageSearchQueryInput = {
     fromCreatedAt?: string;
     toCreatedAt?: string;
     limit?: number;
+    pinnedOnly?: boolean;
 };
 
 declare module '@colanode/client/queries' {

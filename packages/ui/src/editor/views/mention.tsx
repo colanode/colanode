@@ -14,6 +14,7 @@ export const MentionNodeView = ({ node }: NodeViewProps) => {
 
   const target = node.attrs.target;
   const targetType = node.attrs.targetType as string | undefined;
+  const isGroup = targetType === 'group' || target === 'everyone';
 
   const userQuery = useLiveQuery(
     (q) =>
@@ -37,6 +38,18 @@ export const MentionNodeView = ({ node }: NodeViewProps) => {
         .findOne(),
     [workspace.userId, target, targetType]
   );
+
+  if (isGroup) {
+    return (
+      <NodeViewWrapper
+        data-id={node.attrs.id}
+        className={defaultClasses.mention}
+        style={{ backgroundColor: 'rgba(250, 204, 21, 0.25)' }}
+      >
+        <span role="presentation">@everyone</span>
+      </NodeViewWrapper>
+    );
+  }
 
   const user = userQuery.data;
   const resource = nodeQuery.data;

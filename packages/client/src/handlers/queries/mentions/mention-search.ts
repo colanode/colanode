@@ -3,6 +3,7 @@ import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib';
 import { MentionSearchQueryInput } from '@colanode/client/queries/mentions/mention-search';
 import { Event } from '@colanode/client/types/events';
 import { MentionSearchItem, MentionTargetType } from '@colanode/client/types/mentions';
+import { MentionConstants } from '@colanode/core';
 
 const DEFAULT_LIMIT = 20;
 
@@ -19,6 +20,7 @@ const RESOURCE_TYPES = [
 
 const TYPE_LABELS: Record<MentionTargetType, string> = {
     user: 'User',
+    group: 'Group',
     channel: 'Channel',
     page: 'Page',
     record: 'Record',
@@ -28,6 +30,27 @@ const TYPE_LABELS: Record<MentionTargetType, string> = {
     folder: 'Folder',
     file: 'File',
 };
+
+const GROUP_MENTIONS: MentionSearchItem[] = [
+    {
+        id: MentionConstants.Everyone,
+        type: 'group',
+        name: 'everyone',
+        subtitle: 'Notify everyone in this conversation',
+    },
+    {
+        id: MentionConstants.Everyone,
+        type: 'group',
+        name: 'here',
+        subtitle: 'Notify everyone in this conversation',
+    },
+    {
+        id: MentionConstants.Everyone,
+        type: 'group',
+        name: 'channel',
+        subtitle: 'Notify everyone in this conversation',
+    },
+];
 
 export class MentionSearchQueryHandler
     extends WorkspaceQueryHandlerBase
@@ -85,7 +108,14 @@ export class MentionSearchQueryHandler
                 };
             });
 
-        return [...userItems, ...nodeItems].slice(0, limit);
+        const lowerQuery = searchQuery.toLowerCase();
+        const groupItems = GROUP_MENTIONS.filter((item) =>
+            lowerQuery.length === 0
+                ? true
+                : item.name.toLowerCase().startsWith(lowerQuery)
+        );
+
+        return [...groupItems, ...userItems, ...nodeItems].slice(0, limit);
     }
 
     public async checkForChanges(

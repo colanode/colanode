@@ -1,5 +1,6 @@
 export type MentionTargetType =
     | 'user'
+    | 'group'
     | 'channel'
     | 'page'
     | 'record'

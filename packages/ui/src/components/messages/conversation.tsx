@@ -1,5 +1,5 @@
-import { ArrowDown } from 'lucide-react';
-import { useEffect, useRef, useState } from 'react';
+import { ArrowDown, X } from 'lucide-react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { InView } from 'react-intersection-observer';
 
 import { LocalMessageNode } from '@colanode/client/types';
@@ -9,9 +9,11 @@ import {
   MessageCreateRefProps,
 } from '@colanode/ui/components/messages/message-create';
 import { MessageList } from '@colanode/ui/components/messages/message-list';
+import { PinnedMessagesPopover } from '@colanode/ui/components/messages/pinned-messages-popover';
 import { Input } from '@colanode/ui/components/ui/input';
 import { useContainer } from '@colanode/ui/contexts/container';
 import { ConversationContext } from '@colanode/ui/contexts/conversation';
+import { SearchHighlightContext } from '@colanode/ui/contexts/search-highlight';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
 interface ConversationProps {
@@ -45,8 +47,20 @@ export const Conversation = ({
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [fromDate, setFromDate] = useState<string>('');
   const [toDate, setToDate] = useState<string>('');
+  const [flashMessageId, setFlashMessageId] = useState<string | null>(null);
   const [threadRootMessage, setThreadRootMessage] =
     useState<LocalMessageNode | null>(null);
+
+  const searchTerms = useMemo(() => {
+    const trimmed = searchQuery.trim();
+    if (trimmed.length === 0) {
+      return [];
+    }
+    return trimmed
+      .split(/\s+/)
+      .map((token) => token.replace(/^["']+|["']+$/g, ''))
+      .filter((token) => token.length > 0);
+  }, [searchQuery]);
 
   const updateAtBottom = (atBottom: boolean) => {
     if (isAtBottomRef.current === atBottom) {
@@ -116,6 +130,8 @@ export const Conversation = ({
         role,
         rootId,
         canCreateMessage,
+        searchTerms,
+        flashMessageId,
         onReply: (message) => {
           if (messageCreateRef.current) {
             messageCreateRef.current.setReplyTo(message);
@@ -123,138 +139,157 @@ export const Conversation = ({
         },
         onReplyInThread: (message) => {
           setThreadRootMessage(message);
-          if (messageCreateRef.current) {
-            messageCreateRef.current.setReplyTo(message);
-          }
         },
         onLastMessageIdChange: () => {
           if (shouldScrollToBottomRef.current && bottomRef.current) {
             bottomRef.current.scrollIntoView();
           }
         },
+        onLocateMessage: (messageId) => {
+          setSearchQuery('');
+          setFromDate('');
+          setToDate('');
+          setFlashMessageId(messageId);
+          shouldScrollToBottomRef.current = false;
+          requestAnimationFrame(() => {
+            const el = document.getElementById(`message-${messageId}`);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+          });
+          window.setTimeout(() => {
+            setFlashMessageId((current) =>
+              current === messageId ? null : current
+            );
+          }, 2000);
+        },
         canDeleteMessage: (message) => {
           return isAdmin || message.createdBy === workspace.userId;
         },
       }}
     >
-      <div className="relative flex flex-col h-full">
-        {threadRootMessage ? (
-          <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-2 py-2 backdrop-blur">
-            <div className="flex items-center gap-2">
+      <SearchHighlightContext.Provider value={{ terms: searchTerms }}>
+        <div className="relative flex h-full flex-row">
+          <div className="relative flex min-w-0 flex-1 flex-col">
+            <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-2 py-2 backdrop-blur">
+              <div className="flex flex-wrap items-center gap-2">
+                <Input
+                  value={searchQuery}
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                  placeholder="Search messages"
+                  className="h-8 min-w-52 flex-1"
+                />
+                <Input
+                  type="date"
+                  value={fromDate}
+                  onChange={(event) => setFromDate(event.target.value)}
+                  className="h-8 w-40"
+                />
+                <Input
+                  type="date"
+                  value={toDate}
+                  onChange={(event) => setToDate(event.target.value)}
+                  className="h-8 w-40"
+                />
+                <button
+                  type="button"
+                  className="h-8 rounded border border-border px-2 text-xs text-muted-foreground hover:bg-accent"
+                  onClick={() => {
+                    const today = toDateInputValue(new Date());
+                    setFromDate(today);
+                    setToDate(today);
+                  }}
+                >
+                  Today
+                </button>
+                <button
+                  type="button"
+                  className="h-8 rounded border border-border px-2 text-xs text-muted-foreground hover:bg-accent"
+                  onClick={() => {
+                    const today = new Date();
+                    const start = new Date(today);
+                    start.setDate(today.getDate() - 6);
+                    setFromDate(toDateInputValue(start));
+                    setToDate(toDateInputValue(today));
+                  }}
+                >
+                  Last 7 days
+                </button>
+                {(searchQuery.length > 0 ||
+                  fromDate.length > 0 ||
+                  toDate.length > 0) && (
+                    <button
+                      type="button"
+                      className="h-8 rounded border border-border px-2 text-xs text-muted-foreground hover:bg-accent"
+                      onClick={() => {
+                        setSearchQuery('');
+                        setFromDate('');
+                        setToDate('');
+                      }}
+                    >
+                      Clear
+                    </button>
+                  )}                <PinnedMessagesPopover />              </div>
+            </div>
+            <div className="flex-1 min-h-0" ref={messageListRef}>
+              <MessageList
+                searchQuery={searchQuery}
+                fromDate={fromDate}
+                toDate={toDate}
+              />
+            </div>
+            <InView
+              className="h-4"
+              rootMargin="20px"
+              onChange={(inView) => {
+                bottomVisibleRef.current = inView;
+              }}
+            >
+              <div ref={bottomRef} className="h-4"></div>
+            </InView>
+            {!isAtBottom && (
               <button
                 type="button"
-                className="h-8 rounded border border-border px-2 text-xs text-muted-foreground hover:bg-accent"
                 onClick={() => {
-                  setThreadRootMessage(null);
+                  bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
                 }}
+                className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 rounded-full bg-background border border-border shadow-md px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
+                aria-label="Jump to latest"
               >
-                Back to channel
+                <ArrowDown size={14} />
+                <span>Jump to latest</span>
               </button>
-              <span className="text-xs text-muted-foreground">
-                Thread view
-              </span>
+            )}
+            <div className="sticky bottom-0 bg-background pb-4 pt-2">
+              <MessageCreate ref={messageCreateRef} />
             </div>
           </div>
-        ) : (
-          <div className="sticky top-0 z-10 border-b border-border bg-background/95 px-2 py-2 backdrop-blur">
-            <div className="flex flex-wrap items-center gap-2">
-              <Input
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-                placeholder="Search messages"
-                className="h-8 min-w-52 flex-1"
-              />
-              <Input
-                type="date"
-                value={fromDate}
-                onChange={(event) => setFromDate(event.target.value)}
-                className="h-8 w-40"
-              />
-              <Input
-                type="date"
-                value={toDate}
-                onChange={(event) => setToDate(event.target.value)}
-                className="h-8 w-40"
-              />
-              <button
-                type="button"
-                className="h-8 rounded border border-border px-2 text-xs text-muted-foreground hover:bg-accent"
-                onClick={() => {
-                  const today = toDateInputValue(new Date());
-                  setFromDate(today);
-                  setToDate(today);
-                }}
-              >
-                Today
-              </button>
-              <button
-                type="button"
-                className="h-8 rounded border border-border px-2 text-xs text-muted-foreground hover:bg-accent"
-                onClick={() => {
-                  const today = new Date();
-                  const start = new Date(today);
-                  start.setDate(today.getDate() - 6);
-                  setFromDate(toDateInputValue(start));
-                  setToDate(toDateInputValue(today));
-                }}
-              >
-                Last 7 days
-              </button>
-              {(searchQuery.length > 0 ||
-                fromDate.length > 0 ||
-                toDate.length > 0) && (
-                  <button
-                    type="button"
-                    className="h-8 rounded border border-border px-2 text-xs text-muted-foreground hover:bg-accent"
-                    onClick={() => {
-                      setSearchQuery('');
-                      setFromDate('');
-                      setToDate('');
-                    }}
-                  >
-                    Clear
-                  </button>
-                )}
-            </div>
-          </div>
-        )}
-        <div className="flex-1 min-h-0" ref={messageListRef}>
-          <MessageList
-            searchQuery={searchQuery}
-            fromDate={fromDate}
-            toDate={toDate}
-            threadRootMessageId={threadRootMessage?.id}
-          />
+          {threadRootMessage && (
+            <aside className="sticky top-0 h-screen w-[400px] shrink-0 border-l border-border bg-background flex flex-col">
+              <div className="flex items-center justify-between border-b border-border px-3 py-2">
+                <span className="text-sm font-medium">Thread</span>
+                <button
+                  type="button"
+                  className="cursor-pointer rounded p-1 text-muted-foreground hover:bg-accent"
+                  onClick={() => setThreadRootMessage(null)}
+                  aria-label="Close thread"
+                >
+                  <X size={16} />
+                </button>
+              </div>
+              <div className="flex-1 min-h-0 overflow-y-auto px-2 py-2">
+                <MessageList threadRootMessageId={threadRootMessage.id} />
+              </div>
+              <div className="border-t border-border bg-background px-2 pb-3 pt-2">
+                <MessageCreate
+                  key={`thread-${threadRootMessage.id}`}
+                  threadRootMessageId={threadRootMessage.id}
+                />
+              </div>
+            </aside>
+          )}
         </div>
-        <InView
-          className="h-4"
-          rootMargin="20px"
-          onChange={(inView) => {
-            bottomVisibleRef.current = inView;
-          }}
-        >
-          <div ref={bottomRef} className="h-4"></div>
-        </InView>
-        {!isAtBottom && (
-          <button
-            type="button"
-            onClick={() => {
-              bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-            }}
-            className="absolute bottom-24 left-1/2 -translate-x-1/2 z-10 flex items-center gap-1 rounded-full bg-background border border-border shadow-md px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground hover:bg-accent transition-colors"
-            aria-label="Jump to latest"
-          >
-            <ArrowDown size={14} />
-            <span>Jump to latest</span>
-          </button>
-        )}
-        <div className="sticky bottom-0 bg-background pb-4 pt-2">
-          <MessageCreate
-            ref={messageCreateRef}
-            threadRootMessageId={threadRootMessage?.id}
-          />
-        </div>
-      </div>
+      </SearchHighlightContext.Provider>
     </ConversationContext.Provider>
   );
 };

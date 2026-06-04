@@ -15,6 +15,8 @@ export const messageAttributesSchema = z.object({
   referenceId: z.string().nullable().optional(),
   content: z.record(z.string(), blockSchema).optional().nullable(),
   selectedContextNodeIds: z.array(z.string()).optional().nullable(),
+  pinnedAt: z.string().nullable().optional(),
+  pinnedBy: z.string().nullable().optional(),
 });
 
 export type MessageAttributes = z.infer<typeof messageAttributesSchema>;

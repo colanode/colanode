@@ -8,9 +8,12 @@ interface ConversationContext {
   rootId: string;
   role: NodeRole;
   canCreateMessage: boolean;
+  searchTerms: string[];
+  flashMessageId: string | null;
   onReply: (message: LocalMessageNode) => void;
   onReplyInThread: (message: LocalMessageNode) => void;
   onLastMessageIdChange: (id: string) => void;
+  onLocateMessage: (messageId: string) => void;
   canDeleteMessage: (message: LocalMessageNode) => boolean;
 }
 

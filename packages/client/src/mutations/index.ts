@@ -6,6 +6,9 @@ export * from './documents/document-update';
 export * from './files/file-create';
 export * from './files/file-download';
 export * from './messages/message-create';
+export * from './messages/message-update';
+export * from './messages/message-pin';
+export * from './messages/message-forward';
 export * from './nodes/node-collaborator-create';
 export * from './nodes/node-collaborator-delete';
 export * from './nodes/node-collaborator-update';
@@ -133,6 +136,11 @@ export enum MutationErrorCode {
   FolderUpdateFailed = 'folder_update_failed',
   MessageCreateForbidden = 'message_create_forbidden',
   MessageCreateFailed = 'message_create_failed',
+  MessageUpdateForbidden = 'message_update_forbidden',
+  MessageUpdateFailed = 'message_update_failed',
+  MessagePinForbidden = 'message_pin_forbidden',
+  MessagePinFailed = 'message_pin_failed',
+  MessageForwardFailed = 'message_forward_failed',
   MessageDeleteForbidden = 'message_delete_forbidden',
   MessageDeleteFailed = 'message_delete_failed',
   MessageNotFound = 'message_not_found',

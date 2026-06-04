@@ -78,6 +78,11 @@ export class MessageSearchQueryHandler
             .$if(toCreatedAt != null, (qb) =>
                 qb.where('nodes.created_at', '<=', toCreatedAt!)
             )
+            .$if(input.pinnedOnly === true, (qb) =>
+                qb.where(
+                    sql<boolean>`json_extract(nodes.attributes, '$.pinnedAt') IS NOT NULL`
+                )
+            )
             .selectAll('nodes')
             .orderBy('nodes.created_at', 'asc')
             .limit(limit)

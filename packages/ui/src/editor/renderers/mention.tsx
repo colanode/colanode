@@ -18,6 +18,7 @@ export const MentionRenderer = ({ node }: MentionRendererProps) => {
 
   const target = node.attrs?.target;
   const targetType = node.attrs?.targetType as string | undefined;
+  const isGroup = targetType === 'group' || target === 'everyone';
 
   const userQuery = useLiveQuery(
     (q) =>
@@ -41,6 +42,17 @@ export const MentionRenderer = ({ node }: MentionRendererProps) => {
         .findOne(),
     [workspace.userId, target, targetType]
   );
+
+  if (isGroup) {
+    return (
+      <span
+        className={defaultClasses.mention}
+        style={{ backgroundColor: 'rgba(250, 204, 21, 0.25)' }}
+      >
+        <span role="presentation">@everyone</span>
+      </span>
+    );
+  }
 
   const user = targetType === 'user' || !targetType ? userQuery.data : null;
   const resource = targetType && targetType !== 'user' ? nodeQuery.data : null;

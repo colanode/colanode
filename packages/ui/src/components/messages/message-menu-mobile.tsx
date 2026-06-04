@@ -1,5 +1,5 @@
 import { VisuallyHidden } from '@radix-ui/react-visually-hidden';
-import { MessagesSquare, Reply, Trash2 } from 'lucide-react';
+import { MessagesSquare, Pencil, Pin, PinOff, Reply, Send, Trash2 } from 'lucide-react';
 import { useCallback } from 'react';
 
 import { LocalMessageNode } from '@colanode/client/types';
@@ -158,6 +158,48 @@ export const MessageMenuMobile = ({
               >
                 <Trash2 className="size-5" />
                 <span>Delete message</span>
+              </MenuAction>
+            )}
+
+            {message.canEdit && (
+              <MenuAction
+                onClick={() => {
+                  message.openEdit();
+                  onOpenChange(false);
+                }}
+              >
+                <Pencil className="size-5 text-muted-foreground" />
+                <span>Edit message</span>
+              </MenuAction>
+            )}
+
+            {message.canPin && (
+              <MenuAction
+                onClick={() => {
+                  message.togglePin();
+                  onOpenChange(false);
+                }}
+              >
+                {message.isPinned ? (
+                  <PinOff className="size-5 text-muted-foreground" />
+                ) : (
+                  <Pin className="size-5 text-muted-foreground" />
+                )}
+                <span>
+                  {message.isPinned ? 'Unpin from channel' : 'Pin to channel'}
+                </span>
+              </MenuAction>
+            )}
+
+            {message.canForward && (
+              <MenuAction
+                onClick={() => {
+                  message.openForward();
+                  onOpenChange(false);
+                }}
+              >
+                <Send className="size-5 text-muted-foreground" />
+                <span>Forward message</span>
               </MenuAction>
             )}
           </div>

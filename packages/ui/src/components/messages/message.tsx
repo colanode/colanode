@@ -1,5 +1,7 @@
 import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
+import { toast } from 'sonner';
+import { Pin } from 'lucide-react';
 
 import { LocalMessageNode } from '@colanode/client/types';
 import { formatDate } from '@colanode/core';
@@ -7,6 +9,8 @@ import { MessageActions } from '@colanode/ui/components/messages/message-actions
 import { MessageAuthorAvatar } from '@colanode/ui/components/messages/message-author-avatar';
 import { MessageAuthorName } from '@colanode/ui/components/messages/message-author-name';
 import { MessageContent } from '@colanode/ui/components/messages/message-content';
+import { MessageEditInline } from '@colanode/ui/components/messages/message-edit-inline';
+import { MessageForwardDialog } from '@colanode/ui/components/messages/message-forward-dialog';
 import { MessageMenuMobile } from '@colanode/ui/components/messages/message-menu-mobile';
 import { MessageReactionCounts } from '@colanode/ui/components/messages/message-reaction-counts';
 import { MessageReference } from '@colanode/ui/components/messages/message-reference';
@@ -23,6 +27,7 @@ import { useRadar } from '@colanode/ui/contexts/radar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useIsMobile } from '@colanode/ui/hooks/use-is-mobile';
 import { useLongPress } from '@colanode/ui/hooks/use-long-press';
+import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface MessageProps {
@@ -74,6 +79,27 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
   const [isLongPressing, setIsLongPressing] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [openForwardDialog, setOpenForwardDialog] = useState(false);
+
+  const canEdit = message.createdBy === workspace.userId;
+  const canPin = canEdit;
+  const canForward = conversation.canCreateMessage;
+  const isPinned = Boolean(message.pinnedAt);
+
+  const { mutate: mutatePin } = useMutation();
+
+  const togglePin = () => {
+    mutatePin({
+      input: {
+        type: 'message.pin',
+        userId: workspace.userId,
+        messageId: message.id,
+        pinned: !isPinned,
+      },
+      onError: (error) => toast.error(error.message),
+    });
+  };
 
   const displayAuthor = shouldDisplayAuthor(message, previousMessage);
 
@@ -101,10 +127,27 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
       value={{
         ...message,
         canDelete: conversation.canDeleteMessage(message),
+        canEdit,
+        canForward,
+        canPin,
         canReplyInThread: conversation.canCreateMessage,
+        isEditing,
+        isPinned,
         openDelete: () => {
           setOpenDeleteDialog(true);
         },
+        openEdit: () => {
+          if (canEdit) {
+            setIsEditing(true);
+          }
+        },
+        closeEdit: () => {
+          setIsEditing(false);
+        },
+        openForward: () => {
+          setOpenForwardDialog(true);
+        },
+        togglePin,
       }}
     >
       <div
@@ -115,7 +158,9 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
           isLongPressing
             ? 'bg-accent-foreground/10 scale-[0.98]'
             : 'hover:bg-accent',
-          displayAuthor && 'mt-2 first:mt-0'
+          displayAuthor && 'mt-2 first:mt-0',
+          conversation.flashMessageId === message.id &&
+          'bg-yellow-200/60 dark:bg-yellow-500/20 ring-2 ring-yellow-400/70 animate-pulse'
         )}
         {...longPressHandlers}
       >
@@ -153,11 +198,24 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
               }
             }}
           >
-            {!isMobile && <MessageActions />}
+            {!isMobile && !isEditing && <MessageActions />}
+            {isPinned && (
+              <div className="mb-1 inline-flex items-center gap-1 rounded bg-yellow-200/60 px-1.5 py-0.5 text-[10px] font-medium text-yellow-900 dark:bg-yellow-500/20 dark:text-yellow-200">
+                <Pin className="size-3" />
+                <span>Pinned</span>
+              </div>
+            )}
             {message.referenceId && (
               <MessageReference messageId={message.referenceId} />
             )}
-            <MessageContent message={message} />
+            {isEditing ? (
+              <MessageEditInline
+                message={message}
+                onClose={() => setIsEditing(false)}
+              />
+            ) : (
+              <MessageContent message={message} />
+            )}
             <MessageReactionCounts message={message} />
           </InView>
         </div>
@@ -176,6 +234,13 @@ export const Message = ({ message, previousMessage }: MessageProps) => {
             description="This action cannot be undone. This message will no longer be accessible by you or others you've shared it with."
             open={openDeleteDialog}
             onOpenChange={setOpenDeleteDialog}
+          />
+        )}
+        {openForwardDialog && (
+          <MessageForwardDialog
+            message={message}
+            open={openForwardDialog}
+            onOpenChange={setOpenForwardDialog}
           />
         )}
       </div>

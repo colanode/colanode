@@ -14,6 +14,9 @@ import { FileCreateMutationHandler } from './files/file-create';
 import { FileDownloadMutationHandler } from './files/file-download';
 import { TempFileCreateMutationHandler } from './files/temp-file-create';
 import { MessageCreateMutationHandler } from './messages/message-create';
+import { MessageForwardMutationHandler } from './messages/message-forward';
+import { MessagePinMutationHandler } from './messages/message-pin';
+import { MessageUpdateMutationHandler } from './messages/message-update';
 import { NodeCollaboratorCreateMutationHandler } from './nodes/node-collaborator-create';
 import { NodeCollaboratorDeleteMutationHandler } from './nodes/node-collaborator-delete';
 import { NodeCollaboratorUpdateMutationHandler } from './nodes/node-collaborator-update';
@@ -42,6 +45,9 @@ export const buildMutationHandlerMap = (
     'node.update': new NodeUpdateMutationHandler(app),
     'chat.create': new ChatCreateMutationHandler(app),
     'message.create': new MessageCreateMutationHandler(app),
+    'message.update': new MessageUpdateMutationHandler(app),
+    'message.pin': new MessagePinMutationHandler(app),
+    'message.forward': new MessageForwardMutationHandler(app),
     'node.collaborator.create': new NodeCollaboratorCreateMutationHandler(app),
     'node.collaborator.delete': new NodeCollaboratorDeleteMutationHandler(app),
     'node.collaborator.update': new NodeCollaboratorUpdateMutationHandler(app),

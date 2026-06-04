@@ -1,4 +1,4 @@
-import { MessagesSquare, Reply, Trash2 } from 'lucide-react';
+import { MessagesSquare, Pencil, Pin, PinOff, Reply, Send, Trash2 } from 'lucide-react';
 import { useCallback } from 'react';
 
 import { MessageQuickReaction } from '@colanode/ui/components/messages/message-quick-reaction';
@@ -85,6 +85,39 @@ export const MessageActions = () => {
             onClick={() => {
               conversation.onReply(message);
             }}
+          />
+        </MessageAction>
+      )}
+      {message.canEdit && (
+        <MessageAction>
+          <Pencil
+            className="size-4 cursor-pointer"
+            onClick={() => {
+              message.openEdit();
+            }}
+          />
+        </MessageAction>
+      )}
+      {message.canPin && (
+        <MessageAction>
+          {message.isPinned ? (
+            <PinOff
+              className="size-4 cursor-pointer"
+              onClick={() => message.togglePin()}
+            />
+          ) : (
+            <Pin
+              className="size-4 cursor-pointer"
+              onClick={() => message.togglePin()}
+            />
+          )}
+        </MessageAction>
+      )}
+      {message.canForward && (
+        <MessageAction>
+          <Send
+            className="size-4 cursor-pointer"
+            onClick={() => message.openForward()}
           />
         </MessageAction>
       )}
