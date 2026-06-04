@@ -7,6 +7,7 @@ import { StringArrayFieldValue } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { NodeReferenceSearch } from '@colanode/ui/components/records/node-reference-search';
 import { Badge } from '@colanode/ui/components/ui/badge';
+import { Link } from '@colanode/ui/components/ui/link';
 import {
     Popover,
     PopoverContent,
@@ -104,7 +105,15 @@ export const RecordNodeReferenceValue = ({
                                     key={reference.id}
                                     className="flex w-full flex-row items-center gap-2"
                                 >
-                                    <NodeReferenceBadge node={reference} />
+                                    <Link
+                                        from="/workspace/$userId"
+                                        to="$nodeId"
+                                        params={{ nodeId: reference.id }}
+                                        className="flex-1 min-w-0"
+                                        onClick={() => setOpen(false)}
+                                    >
+                                        <NodeReferenceBadge node={reference} />
+                                    </Link>
                                     {record.canEdit && !readOnly && (
                                         <X
                                             className="size-4 cursor-pointer ml-auto"
