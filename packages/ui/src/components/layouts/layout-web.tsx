@@ -3,8 +3,9 @@ import {
   createRouter,
   RouterProvider,
 } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 
+import { GlobalCommandPalette } from '@colanode/ui/components/layouts/global-command-palette';
 import { routeTree } from '@colanode/ui/routes';
 import { routeMasks } from '@colanode/ui/routes/masks';
 
@@ -22,5 +23,24 @@ export const LayoutWeb = () => {
     });
   }, []);
 
-  return <RouterProvider router={router} />;
+  const handleOpenInCurrentTab = useCallback(
+    (location: string) => {
+      router.history.push(location);
+    },
+    [router]
+  );
+
+  const handleOpenInNewTab = useCallback((location: string) => {
+    window.open(location, '_blank', 'noopener,noreferrer');
+  }, []);
+
+  return (
+    <>
+      <RouterProvider router={router} />
+      <GlobalCommandPalette
+        openInCurrentTab={handleOpenInCurrentTab}
+        openInNewTab={handleOpenInNewTab}
+      />
+    </>
+  );
 };

@@ -1,5 +1,6 @@
+import { useLiveQuery } from '@tanstack/react-db';
 import { createMemoryHistory, createRouter } from '@tanstack/react-router';
-import { useCallback, useRef } from 'react';
+import { useCallback, useMemo, useRef } from 'react';
 
 import { Tab } from '@colanode/client/types';
 import {
@@ -9,6 +10,7 @@ import {
   IdType,
 } from '@colanode/core';
 import { collections } from '@colanode/ui/collections';
+import { GlobalCommandPalette } from '@colanode/ui/components/layouts/global-command-palette';
 import { TabsContent } from '@colanode/ui/components/layouts/tabs/tabs-content';
 import { TabsHeader } from '@colanode/ui/components/layouts/tabs/tabs-header';
 import { TabManagerContext } from '@colanode/ui/contexts/tab-manager';
@@ -16,6 +18,27 @@ import { router, routeTree } from '@colanode/ui/routes';
 
 export const LayoutDesktop = () => {
   const routersRef = useRef<Map<string, typeof router>>(new Map());
+
+  const tabsQuery = useLiveQuery(
+    (q) =>
+      q
+        .from({ tabs: collections.tabs })
+        .select(({ tabs }) => ({
+          id: tabs.id,
+          lastActiveAt: tabs.lastActiveAt,
+        })),
+    []
+  );
+
+  const activeTabId = useMemo(() => {
+    const tabs = tabsQuery.data;
+    if (!tabs || tabs.length === 0) {
+      return null;
+    }
+
+    return tabs.toSorted((a, b) => b.lastActiveAt.localeCompare(a.lastActiveAt))[0]
+      ?.id;
+  }, [tabsQuery.data]);
 
   const handleTabAdd = useCallback((location: string) => {
     const tabs = collections.tabs.map((tab) => tab);
@@ -89,6 +112,27 @@ export const LayoutDesktop = () => {
     return router;
   }, []);
 
+  const handleOpenInCurrentTab = useCallback(
+    (location: string) => {
+      if (!activeTabId) {
+        handleTabAdd(location);
+        return;
+      }
+
+      const tabRouter = handleTabGetRouter(activeTabId);
+      tabRouter.history.push(location);
+      handleTabSwitch(activeTabId);
+    },
+    [activeTabId, handleTabAdd, handleTabGetRouter, handleTabSwitch]
+  );
+
+  const handleOpenInNewTab = useCallback(
+    (location: string) => {
+      handleTabAdd(location);
+    },
+    [handleTabAdd]
+  );
+
   return (
     <TabManagerContext.Provider
       value={{
@@ -101,6 +145,10 @@ export const LayoutDesktop = () => {
       <div className="flex flex-col h-full">
         <TabsHeader />
         <TabsContent />
+        <GlobalCommandPalette
+          openInCurrentTab={handleOpenInCurrentTab}
+          openInNewTab={handleOpenInNewTab}
+        />
       </div>
     </TabManagerContext.Provider>
   );
