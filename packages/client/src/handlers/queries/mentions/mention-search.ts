@@ -38,19 +38,9 @@ const GROUP_MENTIONS: MentionSearchItem[] = [
         name: 'everyone',
         subtitle: 'Notify everyone in this conversation',
     },
-    {
-        id: MentionConstants.Everyone,
-        type: 'group',
-        name: 'here',
-        subtitle: 'Notify everyone in this conversation',
-    },
-    {
-        id: MentionConstants.Everyone,
-        type: 'group',
-        name: 'channel',
-        subtitle: 'Notify everyone in this conversation',
-    },
 ];
+
+const GROUP_ALIASES = ['everyone', 'here', 'channel'];
 
 export class MentionSearchQueryHandler
     extends WorkspaceQueryHandlerBase
@@ -109,10 +99,10 @@ export class MentionSearchQueryHandler
             });
 
         const lowerQuery = searchQuery.toLowerCase();
-        const groupItems = GROUP_MENTIONS.filter((item) =>
+        const groupItems = GROUP_MENTIONS.filter(() =>
             lowerQuery.length === 0
                 ? true
-                : item.name.toLowerCase().startsWith(lowerQuery)
+                : GROUP_ALIASES.some((alias) => alias.startsWith(lowerQuery))
         );
 
         return [...groupItems, ...userItems, ...nodeItems].slice(0, limit);

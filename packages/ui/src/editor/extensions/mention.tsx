@@ -150,7 +150,7 @@ const CommandList = ({
                       ? 'bg-accent text-accent-foreground'
                       : ''
                       }`}
-                    key={item.id}
+                    key={`${item.type}:${item.id}:${item.name}`}
                     onClick={() => selectItem(index)}
                     onPointerDownCapture={(e) => {
                       // Added this event handler because the onClick handler was not working
