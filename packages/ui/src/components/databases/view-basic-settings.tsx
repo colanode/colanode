@@ -1,6 +1,7 @@
 import { Lock, LockOpen, Trash2 } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
+import { ListViewGroupSettings } from '@colanode/ui/components/databases/list/list-view-group-settings';
 import { ViewAvatarInput } from '@colanode/ui/components/databases/view-avatar-input';
 import { ViewFieldSettings } from '@colanode/ui/components/databases/view-field-settings';
 import { ViewRenameInput } from '@colanode/ui/components/databases/view-rename-input';
@@ -45,6 +46,12 @@ export const ViewBasicSettings = () => {
                     </div>
                     <Separator />
                     <ViewFieldSettings />
+                    {view.layout === 'list' && database.canEdit && (
+                        <Fragment>
+                            <Separator />
+                            <ListViewGroupSettings />
+                        </Fragment>
+                    )}
                     {database.canEdit && (
                         <Fragment>
                             <Separator />
