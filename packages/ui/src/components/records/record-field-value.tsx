@@ -5,6 +5,7 @@ import { RecordCreatedAtValue } from '@colanode/ui/components/records/values/rec
 import { RecordCreatedByValue } from '@colanode/ui/components/records/values/record-created-by-value';
 import { RecordDateValue } from '@colanode/ui/components/records/values/record-date-value';
 import { RecordEmailValue } from '@colanode/ui/components/records/values/record-email-value';
+import { RecordFileValue } from '@colanode/ui/components/records/values/record-file-value';
 import { RecordMultiSelectValue } from '@colanode/ui/components/records/values/record-multi-select-value';
 import { RecordNumberValue } from '@colanode/ui/components/records/values/record-number-value';
 import { RecordPhoneValue } from '@colanode/ui/components/records/values/record-phone-value';
@@ -37,6 +38,8 @@ export const RecordFieldValue = ({
       return <RecordDateValue field={field} readOnly={readOnly} />;
     case 'email':
       return <RecordEmailValue field={field} readOnly={readOnly} />;
+    case 'file':
+      return <RecordFileValue field={field} readOnly={readOnly} />;
     case 'multi_select':
       return <RecordMultiSelectValue field={field} readOnly={readOnly} />;
     case 'number':
