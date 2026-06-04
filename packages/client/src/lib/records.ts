@@ -21,7 +21,6 @@ import {
   UpdatedByFieldAttributes,
   RelationFieldAttributes,
   ResourceFieldAttributes,
-  ChannelFieldAttributes,
 } from '@colanode/core';
 
 type SqliteOperator =
@@ -101,8 +100,6 @@ const buildFilterQuery = (
       return buildRelationFilterQuery(filter, field);
     case 'resource':
       return buildResourceFilterQuery(filter, field);
-    case 'channel':
-      return buildChannelFilterQuery(filter, field);
     case 'select':
       return buildSelectFilterQuery(filter, field);
     case 'text':
@@ -396,13 +393,6 @@ const buildRelationFilterQuery = (
 const buildResourceFilterQuery = (
   filter: DatabaseViewFieldFilterAttributes,
   field: ResourceFieldAttributes
-): string | null => {
-  return buildNodeIdArrayFilterQuery(filter, field.id);
-};
-
-const buildChannelFilterQuery = (
-  filter: DatabaseViewFieldFilterAttributes,
-  field: ChannelFieldAttributes
 ): string | null => {
   return buildNodeIdArrayFilterQuery(filter, field.id);
 };

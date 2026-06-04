@@ -83,10 +83,6 @@ const fieldTypes: FieldTypeOption[] = [
     type: 'resource',
   },
   {
-    name: 'Channel',
-    type: 'channel',
-  },
-  {
     name: 'Rollup',
     type: 'rollup',
   },

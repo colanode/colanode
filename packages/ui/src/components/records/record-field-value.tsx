@@ -1,6 +1,5 @@
 import { FieldAttributes } from '@colanode/core';
 import { RecordBooleanValue } from '@colanode/ui/components/records/values/record-boolean-value';
-import { RecordChannelValue } from '@colanode/ui/components/records/values/record-channel-value';
 import { RecordCollaboratorValue } from '@colanode/ui/components/records/values/record-collaborator-value';
 import { RecordCreatedAtValue } from '@colanode/ui/components/records/values/record-created-at-value';
 import { RecordCreatedByValue } from '@colanode/ui/components/records/values/record-created-by-value';
@@ -55,8 +54,6 @@ export const RecordFieldValue = ({
       return <RecordRelationValue field={field} readOnly={readOnly} />;
     case 'resource':
       return <RecordResourceValue field={field} readOnly={readOnly} />;
-    case 'channel':
-      return <RecordChannelValue field={field} readOnly={readOnly} />;
     case 'rollup':
       return <RecordRollupValue field={field} />;
     case 'text':

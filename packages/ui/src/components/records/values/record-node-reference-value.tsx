@@ -36,7 +36,7 @@ const NodeReferenceBadge = ({ node }: NodeReferenceBadgeProps) => {
 interface RecordNodeReferenceValueProps {
     field: {
         id: string;
-        type: 'resource' | 'channel';
+        type: 'resource';
         name: string;
         index: string;
     };

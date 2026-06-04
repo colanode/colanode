@@ -136,17 +136,6 @@ export type ResourceFieldAttributes = z.infer<
   typeof resourceFieldAttributesSchema
 >;
 
-export const channelFieldAttributesSchema = z.object({
-  id: z.string(),
-  type: z.literal('channel'),
-  name: z.string(),
-  index: z.string(),
-});
-
-export type ChannelFieldAttributes = z.infer<
-  typeof channelFieldAttributesSchema
->;
-
 export const rollupAggregationSchema = z.enum([
   'count',
   'sum',
@@ -232,7 +221,6 @@ export const fieldAttributesSchema = z.discriminatedUnion('type', [
   phoneFieldAttributesSchema,
   relationFieldAttributesSchema,
   resourceFieldAttributesSchema,
-  channelFieldAttributesSchema,
   rollupFieldAttributesSchema,
   selectFieldAttributesSchema,
   textFieldAttributesSchema,

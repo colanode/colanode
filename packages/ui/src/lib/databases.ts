@@ -50,8 +50,6 @@ export const getDefaultFieldWidth = (type: FieldType): number => {
       return 200;
     case 'resource':
       return 200;
-    case 'channel':
-      return 200;
     case 'rollup':
       return 200;
     case 'select':
@@ -664,8 +662,6 @@ export const getFieldFilterOperators = (
     case 'relation':
       return relationFieldFilterOperators;
     case 'resource':
-      return relationFieldFilterOperators;
-    case 'channel':
       return relationFieldFilterOperators;
     case 'select':
       return selectFieldFilterOperators;

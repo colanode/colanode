@@ -15,6 +15,7 @@ import {
 } from '@colanode/core';
 import { DatabaseSelect } from '@colanode/ui/components/databases/database-select';
 import { FieldTypeSelect } from '@colanode/ui/components/databases/fields/field-type-select';
+import { ResourceTypesSelect } from '@colanode/ui/components/databases/fields/resource-types-select';
 import { RollupConfig } from '@colanode/ui/components/databases/fields/rollup-config';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
@@ -50,7 +51,6 @@ const formSchema = z.object({
     z.literal('text'),
     z.literal('relation'),
     z.literal('resource'),
-    z.literal('channel'),
     z.literal('rollup'),
     z.literal('updated_at'),
     z.literal('updated_by'),
@@ -59,6 +59,7 @@ const formSchema = z.object({
   relationDatabaseId: z.string().optional().nullable(),
   relationFieldId: z.string().optional().nullable(),
   rolledUpFieldId: z.string().optional().nullable(),
+  resourceAllowedTypes: z.array(z.string()).optional().nullable(),
   aggregation: z
     .enum(['count', 'sum', 'average', 'min', 'max'])
     .optional()
@@ -71,6 +72,7 @@ const defaultValues: FieldCreateFormValues = {
   relationDatabaseId: null,
   relationFieldId: null,
   rolledUpFieldId: null,
+  resourceAllowedTypes: null,
   aggregation: null,
 };
 
@@ -168,6 +170,13 @@ export const FieldCreatePopover = ({
           newField.databaseId = values.relationDatabaseId;
         }
 
+        if (newField.type === 'resource') {
+          newField.allowedTypes =
+            values.resourceAllowedTypes && values.resourceAllowedTypes.length
+              ? values.resourceAllowedTypes
+              : null;
+        }
+
         if (newField.type === 'rollup') {
           newField.relationFieldId = values.relationFieldId;
           newField.rolledUpFieldId = values.rolledUpFieldId;
@@ -258,6 +267,22 @@ export const FieldCreatePopover = ({
                       <FieldLabel htmlFor={field.name}>Database</FieldLabel>
                       <DatabaseSelect
                         id={field.state.value}
+                        onChange={(value) => field.handleChange(value)}
+                      />
+                    </Field>
+                  )}
+                />
+              )}
+              {type === 'resource' && (
+                <form.Field
+                  name="resourceAllowedTypes"
+                  children={(field) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>
+                        Allowed resource types
+                      </FieldLabel>
+                      <ResourceTypesSelect
+                        value={field.state.value ?? null}
                         onChange={(value) => field.handleChange(value)}
                       />
                     </Field>
