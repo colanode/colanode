@@ -39,6 +39,7 @@ export const NodeReferenceSearch = ({
         searchQuery: query,
         userId: workspace.userId,
         limit: 30,
+        allowedTypes,
     });
 
     const items = (mentionQuery.data ?? []) as MentionSearchItem[];

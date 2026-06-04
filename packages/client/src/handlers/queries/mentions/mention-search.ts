@@ -52,31 +52,55 @@ export class MentionSearchQueryHandler
         const searchQuery = input.searchQuery.trim();
         const limit = input.limit ?? DEFAULT_LIMIT;
         const wildcard = `%${searchQuery}%`;
+        const allowedTypes = input.allowedTypes;
+        const allowedSet = allowedTypes ? new Set(allowedTypes) : null;
+        const includeUsers = !allowedSet || allowedSet.has('user');
+        const includeGroups = !allowedSet || allowedSet.has('group');
+        const nodeTypes = (allowedSet
+            ? RESOURCE_TYPES.filter((t) => allowedSet.has(t))
+            : [...RESOURCE_TYPES]) as readonly (typeof RESOURCE_TYPES)[number][];
 
-        const users = await workspace.database
-            .selectFrom('users')
-            .select(['id', 'name', 'email', 'avatar'])
-            .where('id', '!=', input.userId)
-            .$if(searchQuery.length > 0, (qb) =>
-                qb.where('name', 'like', wildcard)
+        const users = includeUsers
+            ? await workspace.database
+                .selectFrom('users')
+                .select(['id', 'name', 'email', 'avatar'])
+                .where('id', '!=', input.userId)
+                .$if(searchQuery.length > 0, (qb) =>
+                    qb.where('name', 'like', wildcard)
+                )
+                .orderBy('name', 'asc')
+                .limit(limit)
+                .execute()
+            : [];
+
+        const nodes = nodeTypes.length
+            ? (
+                await Promise.all(
+                    nodeTypes.map((nodeType) =>
+                        workspace.database
+                            .selectFrom('nodes')
+                            .leftJoin('node_texts', 'nodes.id', 'node_texts.id')
+                            .select([
+                                'nodes.id as id',
+                                'nodes.type as type',
+                                'node_texts.name as name',
+                                'nodes.updated_at as updated_at',
+                            ])
+                            .where('nodes.type', '=', nodeType)
+                            .$if(searchQuery.length > 0, (qb) =>
+                                qb.where('node_texts.name', 'like', wildcard)
+                            )
+                            .orderBy('nodes.updated_at', 'desc')
+                            .limit(limit)
+                            .execute()
+                    )
+                )
             )
-            .orderBy('name', 'asc')
-            .limit(limit)
-            .execute();
-
-        const nodes = await workspace.database
-            .selectFrom('nodes')
-            .leftJoin('node_texts', 'nodes.id', 'node_texts.id')
-            .select([
-                'nodes.id as id',
-                'nodes.type as type',
-                'node_texts.name as name',
-            ])
-            .where('nodes.type', 'in', RESOURCE_TYPES)
-            .$if(searchQuery.length > 0, (qb) => qb.where('node_texts.name', 'like', wildcard))
-            .orderBy('nodes.updated_at', 'desc')
-            .limit(limit)
-            .execute();
+                .flat()
+                .sort((a, b) =>
+                    (b.updated_at ?? '').localeCompare(a.updated_at ?? '')
+                )
+            : [];
 
         const userItems: MentionSearchItem[] = users.map((user) => ({
             id: user.id,
@@ -99,11 +123,15 @@ export class MentionSearchQueryHandler
             });
 
         const lowerQuery = searchQuery.toLowerCase();
-        const groupItems = GROUP_MENTIONS.filter(() =>
-            lowerQuery.length === 0
-                ? true
-                : GROUP_ALIASES.some((alias) => alias.startsWith(lowerQuery))
-        );
+        const groupItems = includeGroups
+            ? GROUP_MENTIONS.filter(() =>
+                lowerQuery.length === 0
+                    ? true
+                    : GROUP_ALIASES.some((alias) =>
+                        alias.startsWith(lowerQuery)
+                    )
+            )
+            : [];
 
         return [...groupItems, ...userItems, ...nodeItems].slice(0, limit);
     }
