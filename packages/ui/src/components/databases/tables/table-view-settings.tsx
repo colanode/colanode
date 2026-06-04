@@ -3,6 +3,7 @@ import { Fragment, useState } from 'react';
 
 import { ViewAvatarInput } from '@colanode/ui/components/databases/view-avatar-input';
 import { ViewFieldSettings } from '@colanode/ui/components/databases/view-field-settings';
+import { ViewGroupSettings } from '@colanode/ui/components/databases/view-group-settings';
 import { ViewRenameInput } from '@colanode/ui/components/databases/view-rename-input';
 import { ViewSettingsButton } from '@colanode/ui/components/databases/view-settings-button';
 import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
@@ -45,6 +46,12 @@ export const TableViewSettings = () => {
           </div>
           <Separator />
           <ViewFieldSettings />
+          {database.canEdit && (
+            <Fragment>
+              <Separator />
+              <ViewGroupSettings />
+            </Fragment>
+          )}
           {database.canEdit && (
             <Fragment>
               <Separator />

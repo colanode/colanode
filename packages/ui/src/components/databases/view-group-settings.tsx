@@ -5,12 +5,12 @@ import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
-export const ListViewGroupSettings = () => {
+export const ViewGroupSettings = () => {
     const workspace = useWorkspace();
     const database = useDatabase();
     const view = useDatabaseView();
 
-    const selectFields = database.fields.filter(
+    const groupableFields = database.fields.filter(
         (field) => field.type === 'select' || field.type === 'multi_select'
     );
 
@@ -27,11 +27,11 @@ export const ListViewGroupSettings = () => {
     return (
         <div className="flex flex-col gap-2 text-sm">
             <p className="my-1 font-semibold">Group by</p>
-            {selectFields.length > 0 ? (
+            {groupableFields.length > 0 ? (
                 <div className="flex flex-row items-center gap-1">
                     <div className="flex-1">
                         <FieldSelect
-                            fields={selectFields}
+                            fields={groupableFields}
                             value={view.groupBy ?? null}
                             onChange={(fieldId) => updateGroupBy(fieldId)}
                         />

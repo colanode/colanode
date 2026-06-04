@@ -1,9 +1,9 @@
 import { Lock, LockOpen, Trash2 } from 'lucide-react';
 import { Fragment, useState } from 'react';
 
-import { ListViewGroupSettings } from '@colanode/ui/components/databases/list/list-view-group-settings';
 import { ViewAvatarInput } from '@colanode/ui/components/databases/view-avatar-input';
 import { ViewFieldSettings } from '@colanode/ui/components/databases/view-field-settings';
+import { ViewGroupSettings } from '@colanode/ui/components/databases/view-group-settings';
 import { ViewRenameInput } from '@colanode/ui/components/databases/view-rename-input';
 import { ViewSettingsButton } from '@colanode/ui/components/databases/view-settings-button';
 import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
@@ -49,7 +49,7 @@ export const ViewBasicSettings = () => {
                     {view.layout === 'list' && database.canEdit && (
                         <Fragment>
                             <Separator />
-                            <ListViewGroupSettings />
+                            <ViewGroupSettings />
                         </Fragment>
                     )}
                     {database.canEdit && (

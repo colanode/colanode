@@ -10,7 +10,7 @@ import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
-import { getSelectOptionColorClass } from '@colanode/ui/lib/databases';
+import { getSelectOptionStrongColorClass } from '@colanode/ui/lib/databases';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface ListViewGroupedProps {
@@ -60,8 +60,8 @@ export const ListViewGrouped = ({ field }: ListViewGroupedProps) => {
                             <div className="flex flex-row items-center gap-2">
                                 <span
                                     className={cn(
-                                        'inline-flex items-center rounded-md border px-2 py-0.5 text-sm font-semibold',
-                                        getSelectOptionColorClass(option.color)
+                                        'inline-flex items-center rounded-md border px-2.5 py-1 text-sm font-semibold shadow-sm',
+                                        getSelectOptionStrongColorClass(option.color)
                                     )}
                                 >
                                     {option.name}
@@ -82,7 +82,7 @@ export const ListViewGrouped = ({ field }: ListViewGroupedProps) => {
                 }}
                 header={
                     <div className="flex flex-row items-center gap-2">
-                        <span className="inline-flex items-center gap-1 rounded-md border px-2 py-0.5 text-sm font-semibold text-muted-foreground">
+                        <span className="inline-flex items-center gap-1 rounded-md border border-dashed px-2.5 py-1 text-sm font-semibold text-muted-foreground">
                             <CircleDashed className="size-3.5" />
                             No {field.name}
                         </span>

@@ -80,6 +80,7 @@ interface SelectOptionColor {
   value: string;
   class: string;
   lightClass: string;
+  strongClass: string;
 }
 
 export const selectOptionColors: SelectOptionColor[] = [
@@ -88,48 +89,64 @@ export const selectOptionColors: SelectOptionColor[] = [
     value: 'gray',
     class: 'bg-gray-200 dark:bg-gray-800',
     lightClass: 'bg-gray-50 dark:bg-gray-900',
+    strongClass:
+      'bg-gray-600 text-white border-gray-700 dark:bg-gray-500 dark:border-gray-400',
   },
   {
     label: 'Orange',
     value: 'orange',
     class: 'bg-orange-200 dark:bg-orange-800',
     lightClass: 'bg-orange-50 dark:bg-orange-900',
+    strongClass:
+      'bg-orange-500 text-white border-orange-600 dark:bg-orange-500 dark:border-orange-400',
   },
   {
     label: 'Yellow',
     value: 'yellow',
     class: 'bg-yellow-200 dark:bg-yellow-800',
     lightClass: 'bg-yellow-50 dark:bg-yellow-900',
+    strongClass:
+      'bg-yellow-400 text-gray-900 border-yellow-500 dark:bg-yellow-400 dark:text-gray-900 dark:border-yellow-300',
   },
   {
     label: 'Green',
     value: 'green',
     class: 'bg-green-200 dark:bg-green-800',
     lightClass: 'bg-green-50 dark:bg-green-900',
+    strongClass:
+      'bg-green-600 text-white border-green-700 dark:bg-green-500 dark:border-green-400',
   },
   {
     label: 'Blue',
     value: 'blue',
     class: 'bg-blue-200 dark:bg-blue-800',
     lightClass: 'bg-blue-50 dark:bg-blue-900',
+    strongClass:
+      'bg-blue-600 text-white border-blue-700 dark:bg-blue-500 dark:border-blue-400',
   },
   {
     label: 'Purple',
     value: 'purple',
     class: 'bg-purple-200 dark:bg-purple-800',
     lightClass: 'bg-purple-50 dark:bg-purple-900',
+    strongClass:
+      'bg-purple-600 text-white border-purple-700 dark:bg-purple-500 dark:border-purple-400',
   },
   {
     label: 'Pink',
     value: 'pink',
     class: 'bg-pink-200 dark:bg-pink-800',
     lightClass: 'bg-pink-50 dark:bg-pink-900',
+    strongClass:
+      'bg-pink-500 text-white border-pink-600 dark:bg-pink-500 dark:border-pink-400',
   },
   {
     label: 'Red',
     value: 'red',
     class: 'bg-red-200 dark:bg-red-800',
     lightClass: 'bg-red-50 dark:bg-red-900',
+    strongClass:
+      'bg-red-600 text-white border-red-700 dark:bg-red-500 dark:border-red-400',
   },
 ];
 
@@ -139,6 +156,10 @@ export const getSelectOptionColorClass = (color: string): string => {
 
 export const getSelectOptionLightColorClass = (color: string): string => {
   return selectOptionColors.find((c) => c.value === color)?.lightClass || '';
+};
+
+export const getSelectOptionStrongColorClass = (color: string): string => {
+  return selectOptionColors.find((c) => c.value === color)?.strongClass || '';
 };
 
 export const getRandomSelectOptionColor = (): string => {
