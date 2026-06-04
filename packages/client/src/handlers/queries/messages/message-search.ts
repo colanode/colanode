@@ -56,35 +56,29 @@ export class MessageSearchQueryHandler
             return rows.map((row) => mapNode(row) as LocalMessageNode);
         }
 
-        let queryBuilder = workspace.database
+        const fromCreatedAt = input.fromCreatedAt;
+        const toCreatedAt = input.toCreatedAt;
+
+        const rows = await workspace.database
             .selectFrom('nodes')
             .where('nodes.type', '=', 'message')
             .where('nodes.parent_id', '=', input.conversationId)
-            .selectAll('nodes');
-
-        if (searchQuery.length > 0) {
-            queryBuilder = queryBuilder
-                .innerJoin('node_texts', 'nodes.id', 'node_texts.id')
-                .where('node_texts.attributes', 'match', buildFtsQuery(searchQuery));
-        }
-
-        if (input.fromCreatedAt) {
-            queryBuilder = queryBuilder.where(
-                'nodes.created_at',
-                '>=',
-                input.fromCreatedAt
-            );
-        }
-
-        if (input.toCreatedAt) {
-            queryBuilder = queryBuilder.where(
-                'nodes.created_at',
-                '<=',
-                input.toCreatedAt
-            );
-        }
-
-        const rows = await queryBuilder
+            .$if(searchQuery.length > 0, (qb) =>
+                qb
+                    .innerJoin('node_texts', 'nodes.id', 'node_texts.id')
+                    .where(
+                        'node_texts.attributes',
+                        'match',
+                        buildFtsQuery(searchQuery)
+                    )
+            )
+            .$if(fromCreatedAt != null, (qb) =>
+                qb.where('nodes.created_at', '>=', fromCreatedAt!)
+            )
+            .$if(toCreatedAt != null, (qb) =>
+                qb.where('nodes.created_at', '<=', toCreatedAt!)
+            )
+            .selectAll('nodes')
             .orderBy('nodes.created_at', 'asc')
             .limit(limit)
             .execute();
