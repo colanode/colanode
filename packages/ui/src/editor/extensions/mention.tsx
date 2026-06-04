@@ -147,8 +147,8 @@ const CommandList = ({
                   <button
                     type="button"
                     className={`relative flex w-full cursor-default items-center gap-2 rounded-sm px-2 py-1.5 text-sm text-left outline-hidden select-none focus:bg-accent focus:text-accent-foreground hover:bg-accent hover:text-accent-foreground ${index === selectedIndex
-                        ? 'bg-accent text-accent-foreground'
-                        : ''
+                      ? 'bg-accent text-accent-foreground'
+                      : ''
                       }`}
                     key={item.id}
                     onClick={() => selectItem(index)}
@@ -246,6 +246,9 @@ export const MentionExtension = Node.create<MentionOptions>({
         default: null,
       },
       target: {
+        default: null,
+      },
+      targetType: {
         default: null,
       },
     };

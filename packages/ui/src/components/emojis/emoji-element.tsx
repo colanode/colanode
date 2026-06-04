@@ -12,11 +12,17 @@ interface EmojiElementProps {
 
 const EmojiElementWeb = ({ id, className, onClick }: EmojiElementProps) => {
   return (
-    <div className={cn('emoji-element', className)} onClick={onClick}>
+    <span
+      className={cn(
+        'emoji-element inline-flex items-center justify-center',
+        className
+      )}
+      onClick={onClick}
+    >
       <svg>
         <use href={`/assets/emojis.svg#${id}`} />
       </svg>
-    </div>
+    </span>
   );
 };
 
@@ -33,15 +39,24 @@ const EmojiElementDesktop = ({ id, className, onClick }: EmojiElementProps) => {
   const svg = svgQuery.data;
   if (!svg) {
     return (
-      <div className={cn('emoji-element', className)} onClick={onClick}>
+      <span
+        className={cn(
+          'emoji-element inline-flex items-center justify-center',
+          className
+        )}
+        onClick={onClick}
+      >
         <ShieldQuestionMark />
-      </div>
+      </span>
     );
   }
 
   return (
-    <div
-      className={cn('emoji-element', className)}
+    <span
+      className={cn(
+        'emoji-element inline-flex items-center justify-center',
+        className
+      )}
       onClick={onClick}
       dangerouslySetInnerHTML={{ __html: svg }}
     />

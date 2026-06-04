@@ -1,5 +1,7 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
+import { useNavigate } from '@tanstack/react-router';
 import { JSONContent } from '@tiptap/core';
+import { type MouseEvent } from 'react';
 
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -12,6 +14,7 @@ interface MentionRendererProps {
 
 export const MentionRenderer = ({ node }: MentionRendererProps) => {
   const workspace = useWorkspace();
+  const navigate = useNavigate();
 
   const target = node.attrs?.target;
   const targetType = node.attrs?.targetType as string | undefined;
@@ -44,8 +47,27 @@ export const MentionRenderer = ({ node }: MentionRendererProps) => {
   const name = user?.name ?? ((resource as { name?: string } | null)?.name ?? 'Unknown');
   const avatar = user?.avatar;
 
+  const canNavigate = !!resource && !!target;
+
+  const handleClick = (event: MouseEvent) => {
+    if (!canNavigate || !target) {
+      return;
+    }
+
+    event.preventDefault();
+    event.stopPropagation();
+    navigate({
+      to: '/workspace/$userId/$nodeId',
+      params: { userId: workspace.userId, nodeId: target },
+    });
+  };
+
   return (
-    <span className={defaultClasses.mention}>
+    <span
+      className={defaultClasses.mention}
+      onClick={handleClick}
+      style={canNavigate ? { cursor: 'pointer' } : undefined}
+    >
       <Avatar size="small" id={target ?? '?'} name={name} avatar={avatar} />
       <span role="presentation">{name}</span>
     </span>

@@ -11,11 +11,16 @@ interface IconElementProps {
 
 const IconElementWeb = ({ id, className }: IconElementProps) => {
   return (
-    <div className={cn('icon-element', className)}>
+    <span
+      className={cn(
+        'icon-element inline-flex items-center justify-center',
+        className
+      )}
+    >
       <svg fill="currentColor" viewBox="0 0 24 24">
         <use href={`/assets/icons.svg#${id}`} />
       </svg>
-    </div>
+    </span>
   );
 };
 
@@ -37,15 +42,23 @@ const IconElementDesktop = ({ id, className }: IconElementProps) => {
   const svg = svgQuery.data;
   if (!svg) {
     return (
-      <div className={cn('icon-element', className)}>
+      <span
+        className={cn(
+          'icon-element inline-flex items-center justify-center',
+          className
+        )}
+      >
         <ShieldQuestionMark />
-      </div>
+      </span>
     );
   }
 
   return (
-    <div
-      className={cn('icon-element', className)}
+    <span
+      className={cn(
+        'icon-element inline-flex items-center justify-center',
+        className
+      )}
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   );

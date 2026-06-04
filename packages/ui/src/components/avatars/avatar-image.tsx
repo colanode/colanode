@@ -18,10 +18,10 @@ export const AvatarImage = (props: AvatarProps) => {
 
   if (avatarQuery.isPending) {
     return (
-      <div
+      <span
         className={cn(
           getAvatarSizeClasses(props.size),
-          'object-cover rounded bg-muted',
+          'inline-block object-cover rounded bg-muted',
           props.className
         )}
       />
