@@ -162,6 +162,35 @@ export const getSelectOptionStrongColorClass = (color: string): string => {
   return selectOptionColors.find((c) => c.value === color)?.strongClass || '';
 };
 
+interface SelectOptionStrongStyle {
+  backgroundColor: string;
+  color: string;
+  borderColor: string;
+}
+
+const selectOptionStrongStyles: Record<string, SelectOptionStrongStyle> = {
+  gray: { backgroundColor: '#4b5563', color: '#ffffff', borderColor: '#374151' },
+  orange: { backgroundColor: '#ea580c', color: '#ffffff', borderColor: '#c2410c' },
+  yellow: { backgroundColor: '#facc15', color: '#1f2937', borderColor: '#eab308' },
+  green: { backgroundColor: '#16a34a', color: '#ffffff', borderColor: '#15803d' },
+  blue: { backgroundColor: '#2563eb', color: '#ffffff', borderColor: '#1d4ed8' },
+  purple: { backgroundColor: '#7c3aed', color: '#ffffff', borderColor: '#6d28d9' },
+  pink: { backgroundColor: '#db2777', color: '#ffffff', borderColor: '#be185d' },
+  red: { backgroundColor: '#dc2626', color: '#ffffff', borderColor: '#b91c1c' },
+};
+
+export const getSelectOptionStrongStyle = (
+  color: string
+): SelectOptionStrongStyle => {
+  return (
+    selectOptionStrongStyles[color] ?? {
+      backgroundColor: '#4b5563',
+      color: '#ffffff',
+      borderColor: '#374151',
+    }
+  );
+};
+
 export const getRandomSelectOptionColor = (): string => {
   const randomIndex = Math.floor(Math.random() * selectOptionColors.length);
   const randomColor = selectOptionColors[randomIndex] ?? selectOptionColors[0]!;

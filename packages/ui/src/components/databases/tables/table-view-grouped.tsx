@@ -10,8 +10,7 @@ import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
-import { getSelectOptionStrongColorClass } from '@colanode/ui/lib/databases';
-import { cn } from '@colanode/ui/lib/utils';
+import { getSelectOptionStrongStyle } from '@colanode/ui/lib/databases';
 
 interface TableViewGroupedProps {
     field: SelectFieldAttributes | MultiSelectFieldAttributes;
@@ -60,10 +59,8 @@ export const TableViewGrouped = ({ field }: TableViewGroupedProps) => {
                         header={
                             <div className="flex flex-row items-center gap-2">
                                 <span
-                                    className={cn(
-                                        'inline-flex items-center rounded-md border px-2.5 py-1 text-sm font-semibold shadow-sm',
-                                        getSelectOptionStrongColorClass(option.color)
-                                    )}
+                                    className="inline-flex items-center rounded-md border px-2.5 py-1 text-sm font-semibold shadow-sm"
+                                    style={getSelectOptionStrongStyle(option.color)}
                                 >
                                     {option.name}
                                 </span>
