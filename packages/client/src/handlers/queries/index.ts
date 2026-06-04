@@ -26,6 +26,7 @@ import { IconSvgGetQueryHandler } from './icons/icon-svg-get';
 import { RadarDataGetQueryHandler } from './interactions/radar-data-get';
 import { MentionSearchQueryHandler } from './mentions/mention-search';
 import { MessageSearchQueryHandler } from './messages/message-search';
+import { MessageActivityDatesQueryHandler } from './messages/message-activity-dates';
 import { NodeListQueryHandler } from './nodes/node-list';
 import { NodeReactionsListQueryHandler } from './nodes/node-reaction-list';
 import { RecordFieldValueCountQueryHandler } from './records/record-field-value-count';
@@ -60,6 +61,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'radar.data.get': new RadarDataGetQueryHandler(app),
     'mention.search': new MentionSearchQueryHandler(app),
     'message.search': new MessageSearchQueryHandler(app),
+    'message.activity-dates': new MessageActivityDatesQueryHandler(app),
     'record.search': new RecordSearchQueryHandler(app),
     'local.file.get': new LocalFileGetQueryHandler(app),
     'file.download.request.get': new FileDownloadRequestGetQueryHandler(app),

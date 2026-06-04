@@ -19,6 +19,7 @@ export * from './interactions/radar-data-get';
 export * from './mentions/mention-search';
 export * from './nodes/node-reaction-list';
 export * from './messages/message-search';
+export * from './messages/message-activity-dates';
 export * from './records/record-search';
 export * from './users/user-list';
 export * from './users/user-search';
