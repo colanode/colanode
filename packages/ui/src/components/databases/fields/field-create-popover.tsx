@@ -15,6 +15,7 @@ import {
 } from '@colanode/core';
 import { DatabaseSelect } from '@colanode/ui/components/databases/database-select';
 import { FieldTypeSelect } from '@colanode/ui/components/databases/fields/field-type-select';
+import { RollupConfig } from '@colanode/ui/components/databases/fields/rollup-config';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   Field,
@@ -48,17 +49,27 @@ const formSchema = z.object({
     z.literal('select'),
     z.literal('text'),
     z.literal('relation'),
+    z.literal('rollup'),
     z.literal('updated_at'),
     z.literal('updated_by'),
     z.literal('url'),
   ]),
   relationDatabaseId: z.string().optional().nullable(),
+  relationFieldId: z.string().optional().nullable(),
+  rolledUpFieldId: z.string().optional().nullable(),
+  aggregation: z
+    .enum(['count', 'sum', 'average', 'min', 'max'])
+    .optional()
+    .nullable(),
 });
 
 const defaultValues: FieldCreateFormValues = {
   name: '',
   type: 'text',
   relationDatabaseId: null,
+  relationFieldId: null,
+  rolledUpFieldId: null,
+  aggregation: null,
 };
 
 type FieldCreateFormValues = z.infer<typeof formSchema>;
@@ -89,6 +100,18 @@ export const FieldCreatePopover = ({
   });
 
   const type = useStore(form.store, (state) => state.values.type);
+  const relationFieldId = useStore(
+    form.store,
+    (state) => state.values.relationFieldId
+  );
+  const rolledUpFieldId = useStore(
+    form.store,
+    (state) => state.values.rolledUpFieldId
+  );
+  const aggregation = useStore(
+    form.store,
+    (state) => state.values.aggregation
+  );
 
   const handleCancelClick = () => {
     setOpen(false);
@@ -141,6 +164,12 @@ export const FieldCreatePopover = ({
 
         if (newField.type === 'relation') {
           newField.databaseId = values.relationDatabaseId;
+        }
+
+        if (newField.type === 'rollup') {
+          newField.relationFieldId = values.relationFieldId;
+          newField.rolledUpFieldId = values.rolledUpFieldId;
+          newField.aggregation = values.aggregation;
         }
 
         draft.fields[fieldId] = newField;
@@ -231,6 +260,23 @@ export const FieldCreatePopover = ({
                       />
                     </Field>
                   )}
+                />
+              )}
+              {type === 'rollup' && (
+                <RollupConfig
+                  relationFieldId={relationFieldId}
+                  rolledUpFieldId={rolledUpFieldId}
+                  aggregation={aggregation}
+                  onChangeRelationField={(value) => {
+                    form.setFieldValue('relationFieldId', value);
+                    form.setFieldValue('rolledUpFieldId', null);
+                  }}
+                  onChangeRolledUpField={(value) =>
+                    form.setFieldValue('rolledUpFieldId', value)
+                  }
+                  onChangeAggregation={(value) =>
+                    form.setFieldValue('aggregation', value)
+                  }
                 />
               )}
             </FieldGroup>

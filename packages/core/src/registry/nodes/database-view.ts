@@ -63,7 +63,7 @@ export type DatabaseViewFilterAttributes = z.infer<
 export const databaseViewAttributesSchema = z.object({
   type: z.literal('database_view'),
   parentId: z.string(),
-  layout: z.enum(['table', 'board', 'calendar']),
+  layout: z.enum(['table', 'board', 'calendar', 'gallery', 'list']),
   name: z.string(),
   avatar: z.string().nullable().optional(),
   index: z.string(),
@@ -86,7 +86,12 @@ export const databaseViewAttributesSchema = z.object({
 export type DatabaseViewAttributes = z.infer<
   typeof databaseViewAttributesSchema
 >;
-export type DatabaseViewLayout = 'table' | 'board' | 'calendar';
+export type DatabaseViewLayout =
+  | 'table'
+  | 'board'
+  | 'calendar'
+  | 'gallery'
+  | 'list';
 
 export const databaseViewModel: NodeModel = {
   type: 'database_view',

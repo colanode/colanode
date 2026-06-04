@@ -72,7 +72,7 @@ export const getDefaultNameWidth = (): number => {
 export const getDefaultViewFieldDisplay = (
   layout: DatabaseViewLayout
 ): boolean => {
-  return layout === 'table';
+  return layout === 'table' || layout === 'gallery' || layout === 'list';
 };
 
 interface SelectOptionColor {

@@ -18,6 +18,8 @@ import {
 } from '@colanode/core';
 import { BoardView } from '@colanode/ui/components/databases/boards/board-view';
 import { CalendarView } from '@colanode/ui/components/databases/calendars/calendar-view';
+import { GalleryView } from '@colanode/ui/components/databases/gallery/gallery-view';
+import { ListView } from '@colanode/ui/components/databases/list/list-view';
 import { TableView } from '@colanode/ui/components/databases/tables/table-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { DatabaseViewContext } from '@colanode/ui/contexts/database-view';
@@ -206,6 +208,8 @@ export const View = ({ view }: ViewProps) => {
           .with('table', () => <TableView />)
           .with('board', () => <BoardView />)
           .with('calendar', () => <CalendarView />)
+          .with('gallery', () => <GalleryView />)
+          .with('list', () => <ListView />)
           .exhaustive()}
       </div>
     </DatabaseViewContext.Provider>

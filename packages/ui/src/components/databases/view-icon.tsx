@@ -1,12 +1,20 @@
-import { Calendar, Database, SquareKanban, Table } from 'lucide-react';
+import {
+  Calendar,
+  Database,
+  LayoutGrid,
+  List,
+  SquareKanban,
+  Table,
+} from 'lucide-react';
 
+import { DatabaseViewLayout } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 
 interface ViewIconProps {
   id: string;
   name: string;
   avatar: string | null | undefined;
-  layout: 'table' | 'board' | 'calendar';
+  layout: DatabaseViewLayout;
   className?: string;
 }
 
@@ -31,6 +39,14 @@ export const ViewIcon = ({
 
   if (layout === 'board') {
     return <SquareKanban className={className} />;
+  }
+
+  if (layout === 'gallery') {
+    return <LayoutGrid className={className} />;
+  }
+
+  if (layout === 'list') {
+    return <List className={className} />;
   }
 
   return <Database className={className} />;

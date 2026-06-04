@@ -10,6 +10,7 @@ import { RecordMultiSelectValue } from '@colanode/ui/components/records/values/r
 import { RecordNumberValue } from '@colanode/ui/components/records/values/record-number-value';
 import { RecordPhoneValue } from '@colanode/ui/components/records/values/record-phone-value';
 import { RecordRelationValue } from '@colanode/ui/components/records/values/record-relation-value';
+import { RecordRollupValue } from '@colanode/ui/components/records/values/record-rollup-value';
 import { RecordSelectValue } from '@colanode/ui/components/records/values/record-select-value';
 import { RecordTextValue } from '@colanode/ui/components/records/values/record-text-value';
 import { RecordUpdatedAtValue } from '@colanode/ui/components/records/values/record-updated-at-value';
@@ -50,6 +51,8 @@ export const RecordFieldValue = ({
       return <RecordSelectValue field={field} readOnly={readOnly} />;
     case 'relation':
       return <RecordRelationValue field={field} readOnly={readOnly} />;
+    case 'rollup':
+      return <RecordRollupValue field={field} />;
     case 'text':
       return <RecordTextValue field={field} readOnly={readOnly} />;
     case 'url':

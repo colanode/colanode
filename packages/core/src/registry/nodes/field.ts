@@ -124,11 +124,24 @@ export type RelationFieldAttributes = z.infer<
   typeof relationFieldAttributesSchema
 >;
 
+export const rollupAggregationSchema = z.enum([
+  'count',
+  'sum',
+  'average',
+  'min',
+  'max',
+]);
+
+export type RollupAggregation = z.infer<typeof rollupAggregationSchema>;
+
 export const rollupFieldAttributesSchema = z.object({
   id: z.string(),
   type: z.literal('rollup'),
   name: z.string(),
   index: z.string(),
+  relationFieldId: z.string().optional().nullable(),
+  rolledUpFieldId: z.string().optional().nullable(),
+  aggregation: rollupAggregationSchema.optional().nullable(),
 });
 
 export type RollupFieldAttributes = z.infer<typeof rollupFieldAttributesSchema>;
