@@ -51,6 +51,38 @@ export const NodeReferenceSearch = ({
         return true;
     });
 
+    const TYPE_HEADINGS: Record<MentionTargetType, string> = {
+        user: 'Users',
+        group: 'Groups',
+        channel: 'Channels',
+        page: 'Pages',
+        record: 'Records',
+        database: 'Databases',
+        chat: 'Chats',
+        space: 'Spaces',
+        folder: 'Folders',
+        file: 'Files',
+    };
+    const TYPE_ORDER: MentionTargetType[] = [
+        'channel',
+        'database',
+        'page',
+        'folder',
+        'file',
+        'record',
+        'chat',
+        'user',
+        'group',
+        'space',
+    ];
+    const grouped = new Map<MentionTargetType, MentionSearchItem[]>();
+    for (const item of filtered) {
+        const arr = grouped.get(item.type) ?? [];
+        arr.push(item);
+        grouped.set(item.type, arr);
+    }
+    const groupKeys = TYPE_ORDER.filter((t) => grouped.has(t));
+
     return (
         <Command className="min-h-min" shouldFilter={false}>
             <CommandInput
@@ -63,33 +95,41 @@ export const NodeReferenceSearch = ({
             <ScrollArea className="h-80">
                 <ScrollViewport>
                     <CommandList className="max-h-none overflow-hidden">
-                        <CommandGroup className="h-min">
-                            {filtered.map((item) => (
-                                <CommandItem
-                                    key={`${item.type}:${item.id}`}
-                                    value={`${item.type}:${item.id}:${item.name}`}
-                                    onSelect={() => {
-                                        onSelect(item);
-                                        setQuery('');
-                                    }}
-                                >
-                                    <div className="flex w-full flex-row items-center gap-2">
-                                        <Avatar
-                                            id={item.id}
-                                            name={item.name}
-                                            avatar={item.avatar ?? null}
-                                            className="size-4"
-                                        />
-                                        <p className="text-sm grow truncate">
-                                            {item.name || 'Untitled'}
-                                        </p>
-                                        <span className="text-xs text-muted-foreground capitalize">
-                                            {item.type}
-                                        </span>
-                                    </div>
-                                </CommandItem>
-                            ))}
-                        </CommandGroup>
+                        {groupKeys.map((typeKey) => (
+                            <CommandGroup
+                                key={typeKey}
+                                heading={TYPE_HEADINGS[typeKey]}
+                                className="h-min"
+                            >
+                                {grouped.get(typeKey)!.map((item) => (
+                                    <CommandItem
+                                        key={`${item.type}:${item.id}`}
+                                        value={`${item.type}:${item.id}:${item.name}`}
+                                        onSelect={() => {
+                                            onSelect(item);
+                                            setQuery('');
+                                        }}
+                                    >
+                                        <div className="flex w-full flex-row items-center gap-2">
+                                            <Avatar
+                                                id={item.id}
+                                                name={item.name}
+                                                avatar={item.avatar ?? null}
+                                                className="size-4"
+                                            />
+                                            <p className="text-sm grow truncate">
+                                                {item.name || 'Untitled'}
+                                            </p>
+                                            {item.subtitle && (
+                                                <span className="text-xs text-muted-foreground truncate max-w-[50%]">
+                                                    {item.subtitle}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </CommandItem>
+                                ))}
+                            </CommandGroup>
+                        ))}
                     </CommandList>
                 </ScrollViewport>
                 <ScrollBar orientation="vertical" />

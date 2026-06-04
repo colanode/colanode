@@ -73,7 +73,7 @@ export class MentionSearchQueryHandler
                 .execute()
             : [];
 
-        const nodes = nodeTypes.length
+        const rawNodes = nodeTypes.length
             ? (
                 await Promise.all(
                     nodeTypes.map((nodeType) =>
@@ -83,6 +83,7 @@ export class MentionSearchQueryHandler
                             .select([
                                 'nodes.id as id',
                                 'nodes.type as type',
+                                'nodes.parent_id as parent_id',
                                 'node_texts.name as name',
                                 'nodes.updated_at as updated_at',
                             ])
@@ -102,6 +103,41 @@ export class MentionSearchQueryHandler
                 )
             : [];
 
+        const seenNodeIds = new Set<string>();
+        const nodes: typeof rawNodes = [];
+        for (const n of rawNodes) {
+            if (seenNodeIds.has(n.id)) continue;
+            seenNodeIds.add(n.id);
+            nodes.push(n);
+        }
+
+        const parentIds = Array.from(
+            new Set(
+                nodes
+                    .map((n) => n.parent_id)
+                    .filter((id): id is string => !!id)
+            )
+        );
+        const parents = parentIds.length
+            ? await workspace.database
+                .selectFrom('nodes')
+                .leftJoin('node_texts', 'nodes.id', 'node_texts.id')
+                .select([
+                    'nodes.id as id',
+                    'nodes.type as type',
+                    'node_texts.name as name',
+                ])
+                .where('nodes.id', 'in', parentIds)
+                .execute()
+            : [];
+        const parentMap = new Map<
+            string,
+            { name: string | null; type: string }
+        >();
+        for (const p of parents) {
+            parentMap.set(p.id, { name: p.name ?? null, type: p.type });
+        }
+
         const userItems: MentionSearchItem[] = users.map((user) => ({
             id: user.id,
             type: 'user',
@@ -114,11 +150,17 @@ export class MentionSearchQueryHandler
             .filter((node) => !!node.name)
             .map((node) => {
                 const type = node.type as MentionTargetType;
+                const parent = node.parent_id
+                    ? parentMap.get(node.parent_id)
+                    : undefined;
+                const subtitle = parent?.name
+                    ? `in ${parent.name}`
+                    : (TYPE_LABELS[type] ?? 'Resource');
                 return {
                     id: node.id,
                     type,
                     name: node.name ?? 'Unknown',
-                    subtitle: TYPE_LABELS[type] ?? 'Resource',
+                    subtitle,
                 };
             });
 
