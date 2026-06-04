@@ -83,7 +83,18 @@ export const RecordNodeReferenceValue = ({
             <PopoverTrigger asChild>
                 <div className="flex h-full w-full cursor-pointer flex-wrap gap-1 p-0 overflow-hidden">
                     {references.slice(0, 1).map((reference) => (
-                        <NodeReferenceBadge key={reference.id} node={reference} />
+                        <Link
+                            key={reference.id}
+                            from="/workspace/$userId"
+                            to="$nodeId"
+                            params={{ nodeId: reference.id }}
+                            className="min-w-0"
+                            onClick={(e) => {
+                                e.stopPropagation();
+                            }}
+                        >
+                            <NodeReferenceBadge node={reference} />
+                        </Link>
                     ))}
                     {references.length === 0 && ' '}
                     {references.length > 1 && (
