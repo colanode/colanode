@@ -1,4 +1,5 @@
 import {
+  AtSign,
   Cable,
   Calendar,
   File,
@@ -7,6 +8,7 @@ import {
   ListCheck,
   ListChecks,
   Mail,
+  MessagesSquare,
   ShieldQuestion,
   Sigma,
   Smartphone,
@@ -48,6 +50,10 @@ export const FieldIcon = ({ type, className }: FieldIconProps) => {
       return <ListCheck className={className} />;
     case 'relation':
       return <Cable className={className} />;
+    case 'resource':
+      return <AtSign className={className} />;
+    case 'channel':
+      return <MessagesSquare className={className} />;
     case 'rollup':
       return <Sigma className={className} />;
     case 'text':

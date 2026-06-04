@@ -1,5 +1,6 @@
 import { FieldAttributes } from '@colanode/core';
 import { RecordBooleanValue } from '@colanode/ui/components/records/values/record-boolean-value';
+import { RecordChannelValue } from '@colanode/ui/components/records/values/record-channel-value';
 import { RecordCollaboratorValue } from '@colanode/ui/components/records/values/record-collaborator-value';
 import { RecordCreatedAtValue } from '@colanode/ui/components/records/values/record-created-at-value';
 import { RecordCreatedByValue } from '@colanode/ui/components/records/values/record-created-by-value';
@@ -10,6 +11,7 @@ import { RecordMultiSelectValue } from '@colanode/ui/components/records/values/r
 import { RecordNumberValue } from '@colanode/ui/components/records/values/record-number-value';
 import { RecordPhoneValue } from '@colanode/ui/components/records/values/record-phone-value';
 import { RecordRelationValue } from '@colanode/ui/components/records/values/record-relation-value';
+import { RecordResourceValue } from '@colanode/ui/components/records/values/record-resource-value';
 import { RecordRollupValue } from '@colanode/ui/components/records/values/record-rollup-value';
 import { RecordSelectValue } from '@colanode/ui/components/records/values/record-select-value';
 import { RecordTextValue } from '@colanode/ui/components/records/values/record-text-value';
@@ -51,6 +53,10 @@ export const RecordFieldValue = ({
       return <RecordSelectValue field={field} readOnly={readOnly} />;
     case 'relation':
       return <RecordRelationValue field={field} readOnly={readOnly} />;
+    case 'resource':
+      return <RecordResourceValue field={field} readOnly={readOnly} />;
+    case 'channel':
+      return <RecordChannelValue field={field} readOnly={readOnly} />;
     case 'rollup':
       return <RecordRollupValue field={field} />;
     case 'text':

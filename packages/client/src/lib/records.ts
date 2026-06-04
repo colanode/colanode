@@ -20,6 +20,8 @@ import {
   UpdatedAtFieldAttributes,
   UpdatedByFieldAttributes,
   RelationFieldAttributes,
+  ResourceFieldAttributes,
+  ChannelFieldAttributes,
 } from '@colanode/core';
 
 type SqliteOperator =
@@ -97,6 +99,10 @@ const buildFilterQuery = (
       return buildPhoneFilterQuery(filter, field);
     case 'relation':
       return buildRelationFilterQuery(filter, field);
+    case 'resource':
+      return buildResourceFilterQuery(filter, field);
+    case 'channel':
+      return buildChannelFilterQuery(filter, field);
     case 'select':
       return buildSelectFilterQuery(filter, field);
     case 'text':
@@ -384,12 +390,33 @@ const buildRelationFilterQuery = (
   filter: DatabaseViewFieldFilterAttributes,
   field: RelationFieldAttributes
 ): string | null => {
+  return buildNodeIdArrayFilterQuery(filter, field.id);
+};
+
+const buildResourceFilterQuery = (
+  filter: DatabaseViewFieldFilterAttributes,
+  field: ResourceFieldAttributes
+): string | null => {
+  return buildNodeIdArrayFilterQuery(filter, field.id);
+};
+
+const buildChannelFilterQuery = (
+  filter: DatabaseViewFieldFilterAttributes,
+  field: ChannelFieldAttributes
+): string | null => {
+  return buildNodeIdArrayFilterQuery(filter, field.id);
+};
+
+const buildNodeIdArrayFilterQuery = (
+  filter: DatabaseViewFieldFilterAttributes,
+  fieldId: string
+): string | null => {
   if (filter.operator === 'is_empty') {
-    return buildFieldArrayIsEmptyFilterQuery(field.id);
+    return buildFieldArrayIsEmptyFilterQuery(fieldId);
   }
 
   if (filter.operator === 'is_not_empty') {
-    return buildFieldArrayIsNotEmptyFilterQuery(field.id);
+    return buildFieldArrayIsNotEmptyFilterQuery(fieldId);
   }
 
   if (!isStringArray(filter.value)) {
@@ -402,9 +429,9 @@ const buildRelationFilterQuery = (
 
   switch (filter.operator) {
     case 'is_in':
-      return buildArrayFieldContainsFilterQuery(field.id, filter.value);
+      return buildArrayFieldContainsFilterQuery(fieldId, filter.value);
     case 'is_not_in':
-      return buildArrayFieldDoesNotContainFilterQuery(field.id, filter.value);
+      return buildArrayFieldDoesNotContainFilterQuery(fieldId, filter.value);
     default:
       return null;
   }

@@ -18,8 +18,7 @@ import { useRecord } from '@colanode/ui/contexts/record';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { useMutation } from '@colanode/ui/hooks/use-mutation';
 import { useRecordField } from '@colanode/ui/hooks/use-record-field';
-import { canPreviewFile } from '@colanode/ui/lib/files';
-import { openFileDialog } from '@colanode/ui/lib/files';
+import { canPreviewFile , openFileDialog } from '@colanode/ui/lib/files';
 
 interface RecordFileValueProps {
     field: FileFieldAttributes;

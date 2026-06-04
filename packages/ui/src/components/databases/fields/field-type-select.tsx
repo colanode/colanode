@@ -79,6 +79,14 @@ const fieldTypes: FieldTypeOption[] = [
     type: 'relation',
   },
   {
+    name: 'Resource',
+    type: 'resource',
+  },
+  {
+    name: 'Channel',
+    type: 'channel',
+  },
+  {
     name: 'Rollup',
     type: 'rollup',
   },

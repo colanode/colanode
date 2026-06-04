@@ -49,6 +49,8 @@ const formSchema = z.object({
     z.literal('select'),
     z.literal('text'),
     z.literal('relation'),
+    z.literal('resource'),
+    z.literal('channel'),
     z.literal('rollup'),
     z.literal('updated_at'),
     z.literal('updated_by'),

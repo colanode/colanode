@@ -124,6 +124,29 @@ export type RelationFieldAttributes = z.infer<
   typeof relationFieldAttributesSchema
 >;
 
+export const resourceFieldAttributesSchema = z.object({
+  id: z.string(),
+  type: z.literal('resource'),
+  name: z.string(),
+  index: z.string(),
+  allowedTypes: z.array(z.string()).optional().nullable(),
+});
+
+export type ResourceFieldAttributes = z.infer<
+  typeof resourceFieldAttributesSchema
+>;
+
+export const channelFieldAttributesSchema = z.object({
+  id: z.string(),
+  type: z.literal('channel'),
+  name: z.string(),
+  index: z.string(),
+});
+
+export type ChannelFieldAttributes = z.infer<
+  typeof channelFieldAttributesSchema
+>;
+
 export const rollupAggregationSchema = z.enum([
   'count',
   'sum',
@@ -208,6 +231,8 @@ export const fieldAttributesSchema = z.discriminatedUnion('type', [
   numberFieldAttributesSchema,
   phoneFieldAttributesSchema,
   relationFieldAttributesSchema,
+  resourceFieldAttributesSchema,
+  channelFieldAttributesSchema,
   rollupFieldAttributesSchema,
   selectFieldAttributesSchema,
   textFieldAttributesSchema,
