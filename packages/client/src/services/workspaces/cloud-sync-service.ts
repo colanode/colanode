@@ -5,6 +5,10 @@ import {
     createStorageProvider,
     StorageProvider,
 } from '@colanode/client/services/backup';
+import {
+    readWorkspaceManifest,
+    writeWorkspaceManifest,
+} from '@colanode/client/services/workspaces/workspace-manifest';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import { DownloadStatus } from '@colanode/client/types/files';
 import type { LocalSyncStatus } from '@colanode/client/types/workspaces';
@@ -64,6 +68,7 @@ export class CloudSyncService {
             lastExportError: null,
             lastImportAt: null,
             lastImportError: null,
+            identityDrift: null,
         };
     }
 
@@ -135,18 +140,61 @@ export class CloudSyncService {
     // Lazily initializes the storage provider. Idempotent and safe to call from
     // any public entry point (init/sync/exportLocal/importRemote).
     private async ensureInitialized(): Promise<boolean> {
+        if (!this.status.enabled) {
+            return false;
+        }
         if (this.initialized) {
             return true;
         }
 
         try {
             await this.provider.init();
-            this.initialized = true;
-            return true;
         } catch (error) {
             debug(`Failed to initialize cloud sync provider: ${error}`);
             return false;
         }
+
+        // Verify the local workspace identity matches the shared manifest. If
+        // the manifest is absent, claim authorship by writing our identity
+        // (first-write-wins). If it disagrees with the local workspace, refuse
+        // to sync to avoid corrupting the op-log under a foreign identity.
+        try {
+            const manifest = await readWorkspaceManifest(this.provider);
+            if (!manifest) {
+                await writeWorkspaceManifest(this.provider, {
+                    workspaceId: this.workspace.workspaceId,
+                    userId: this.workspace.userId,
+                    name: this.workspace.workspace.name ?? this.workspace.workspaceId,
+                    createdAt: new Date().toISOString(),
+                    createdByDeviceId: this.deviceId,
+                });
+            } else if (
+                manifest.workspaceId !== this.workspace.workspaceId ||
+                manifest.userId !== this.workspace.userId
+            ) {
+                this.updateStatus({
+                    enabled: false,
+                    identityDrift: {
+                        localWorkspaceId: this.workspace.workspaceId,
+                        localUserId: this.workspace.userId,
+                        manifestWorkspaceId: manifest.workspaceId,
+                        manifestUserId: manifest.userId,
+                        manifestCreatedByDeviceId: manifest.createdByDeviceId,
+                    },
+                    lastImportError:
+                        'Local workspace identity does not match the shared manifest; sync disabled.',
+                });
+                debug(
+                    `Identity drift detected: local ${this.workspace.workspaceId}/${this.workspace.userId} vs manifest ${manifest.workspaceId}/${manifest.userId}`
+                );
+                return false;
+            }
+        } catch (error) {
+            debug(`Manifest check failed (continuing best-effort): ${error}`);
+        }
+
+        this.initialized = true;
+        return true;
     }
 
     public async init(): Promise<void> {

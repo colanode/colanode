@@ -4,11 +4,11 @@ import { InView } from 'react-intersection-observer';
 
 import { LocalMessageNode } from '@colanode/client/types';
 import { NodeRole, hasNodeRole } from '@colanode/core';
+import { MessageActivityCalendar } from '@colanode/ui/components/messages/message-activity-calendar';
 import {
   MessageCreate,
   MessageCreateRefProps,
 } from '@colanode/ui/components/messages/message-create';
-import { MessageActivityCalendar } from '@colanode/ui/components/messages/message-activity-calendar';
 import { MessageList } from '@colanode/ui/components/messages/message-list';
 import { PinnedMessagesPopover } from '@colanode/ui/components/messages/pinned-messages-popover';
 import { Input } from '@colanode/ui/components/ui/input';

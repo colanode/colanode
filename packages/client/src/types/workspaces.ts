@@ -14,6 +14,14 @@ export type Workspace = {
 
 export type SidebarMenuType = 'chats' | 'spaces' | 'settings';
 
+export type LocalSyncIdentityDrift = {
+  localWorkspaceId: string;
+  localUserId: string;
+  manifestWorkspaceId: string;
+  manifestUserId: string;
+  manifestCreatedByDeviceId: string;
+};
+
 export type LocalSyncStatus = {
   enabled: boolean;
   deviceId: string;
@@ -22,4 +30,5 @@ export type LocalSyncStatus = {
   lastExportError: string | null;
   lastImportAt: string | null;
   lastImportError: string | null;
+  identityDrift: LocalSyncIdentityDrift | null;
 };

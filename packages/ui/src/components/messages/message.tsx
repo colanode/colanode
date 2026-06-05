@@ -1,7 +1,7 @@
+import { Pin } from 'lucide-react';
 import { useState } from 'react';
 import { InView } from 'react-intersection-observer';
 import { toast } from 'sonner';
-import { Pin } from 'lucide-react';
 
 import { LocalMessageNode } from '@colanode/client/types';
 import { formatDate } from '@colanode/core';

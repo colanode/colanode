@@ -14,7 +14,7 @@ import { DocumentService } from '@colanode/client/services/workspaces/document-s
 import { NodeCountersService } from '@colanode/client/services/workspaces/node-counters-service';
 import { NodeReactionService } from '@colanode/client/services/workspaces/node-reaction-service';
 import { NodeService } from '@colanode/client/services/workspaces/node-service';
-import { acquireWorkspaceIdentity } from '@colanode/client/services/workspaces/workspace-manifest';
+import { acquireWorkspaceIdentity, readWorkspaceManifest, writeWorkspaceManifest } from '@colanode/client/services/workspaces/workspace-manifest';
 import type { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import {
     generateId,
@@ -59,6 +59,9 @@ const createDeviceWithIds = async (
         database,
         account: { app: { meta: { localOnly: true } } },
         files: { deleteFile: async () => { } },
+        // The cloud-sync service reads workspace.workspace.name when seeding
+        // the shared manifest for the first time; provide a placeholder.
+        workspace: { name: 'Test Workspace' },
     };
 
     workspace.nodeCounters = new NodeCountersService(workspace);
@@ -697,6 +700,136 @@ describe('CloudSyncService (manifest-based join flow)', () => {
             deviceB.cloudSync.destroy();
             await deviceA.database.destroy();
             await deviceB.database.destroy();
+        }
+    });
+});
+
+// Stage 3.4: a device whose local workspace identity disagrees with the shared
+// manifest must refuse to sync, surfacing the drift through the published
+// status so the UI can warn the user instead of corrupting peer data.
+describe('CloudSyncService (identity drift)', () => {
+    let tempDir: string;
+    let storagePath: string;
+
+    beforeEach(async () => {
+        tempDir = await fs.promises.mkdtemp(
+            path.join(os.tmpdir(), 'cloud-sync-drift-')
+        );
+        storagePath = path.join(tempDir, 'storage');
+    });
+
+    afterEach(async () => {
+        await fs.promises.rm(tempDir, { recursive: true, force: true });
+    });
+
+    it('seeds the manifest with the local identity on first connect', async () => {
+        const deviceId = generateId(IdType.Device);
+        const device = await createDeviceWithIds(deviceId, storagePath, {
+            workspaceId: generateId(IdType.Workspace),
+            userId: generateId(IdType.User),
+            accountId: generateId(IdType.Account),
+        });
+
+        try {
+            await device.cloudSync.exportLocal();
+
+            const provider = new LocalStorageProvider({
+                type: 'local',
+                path: storagePath,
+            });
+            await provider.init();
+
+            const manifest = await readWorkspaceManifest(provider);
+            expect(manifest).toBeTruthy();
+            expect(manifest!.workspaceId).toBe(device.workspaceId);
+            expect(manifest!.userId).toBe(device.userId);
+            expect(manifest!.createdByDeviceId).toBe(deviceId);
+
+            const status = device.cloudSync.getStatus();
+            expect(status.enabled).toBe(true);
+            expect(status.identityDrift).toBeNull();
+        } finally {
+            device.cloudSync.destroy();
+            await device.database.destroy();
+        }
+    });
+
+    it('disables sync and reports drift when the manifest already belongs to a different workspace', async () => {
+        // Pre-seed the shared manifest with someone else's identity.
+        const provider = new LocalStorageProvider({
+            type: 'local',
+            path: storagePath,
+        });
+        await provider.init();
+        const foreignWorkspaceId = generateId(IdType.Workspace);
+        const foreignUserId = generateId(IdType.User);
+        const foreignDeviceId = generateId(IdType.Device);
+        await writeWorkspaceManifest(provider, {
+            workspaceId: foreignWorkspaceId,
+            userId: foreignUserId,
+            name: 'Foreign Workspace',
+            createdAt: new Date().toISOString(),
+            createdByDeviceId: foreignDeviceId,
+        });
+
+        const localWorkspaceId = generateId(IdType.Workspace);
+        const localUserId = generateId(IdType.User);
+        const device = await createDeviceWithIds(
+            generateId(IdType.Device),
+            storagePath,
+            {
+                workspaceId: localWorkspaceId,
+                userId: localUserId,
+                accountId: generateId(IdType.Account),
+            }
+        );
+
+        try {
+            // Seed something exportable so an attempted sync would otherwise
+            // produce a log file under the foreign manifest's namespace.
+            const spaceId = generateId(IdType.Space);
+            await seedNode(
+                device,
+                { type: 'page', name: 'Should not ship', parentId: spaceId },
+                spaceId
+            );
+
+            await device.cloudSync.exportLocal();
+
+            const status = device.cloudSync.getStatus();
+            expect(status.enabled).toBe(false);
+            expect(status.identityDrift).not.toBeNull();
+            expect(status.identityDrift!.localWorkspaceId).toBe(localWorkspaceId);
+            expect(status.identityDrift!.localUserId).toBe(localUserId);
+            expect(status.identityDrift!.manifestWorkspaceId).toBe(
+                foreignWorkspaceId
+            );
+            expect(status.identityDrift!.manifestUserId).toBe(foreignUserId);
+            expect(status.identityDrift!.manifestCreatedByDeviceId).toBe(
+                foreignDeviceId
+            );
+
+            // No device-specific log directory may have been created.
+            const deviceLogs = await fs.promises
+                .readdir(
+                    path.join(
+                        storagePath,
+                        'workspaces',
+                        localWorkspaceId,
+                        'devices'
+                    )
+                )
+                .catch(() => [] as string[]);
+            expect(deviceLogs).toHaveLength(0);
+
+            // Subsequent calls remain a no-op while drift persists.
+            await device.cloudSync.importRemote();
+            const statusAfter = device.cloudSync.getStatus();
+            expect(statusAfter.enabled).toBe(false);
+            expect(statusAfter.identityDrift).not.toBeNull();
+        } finally {
+            device.cloudSync.destroy();
+            await device.database.destroy();
         }
     });
 });
