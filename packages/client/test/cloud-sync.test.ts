@@ -8,11 +8,13 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 import type { WorkspaceDatabaseSchema } from '@colanode/client/databases';
 import type { LocalSyncConfig } from '@colanode/client/services/app-meta';
+import { LocalStorageProvider } from '@colanode/client/services/backup';
 import { CloudSyncService } from '@colanode/client/services/workspaces/cloud-sync-service';
 import { DocumentService } from '@colanode/client/services/workspaces/document-service';
 import { NodeCountersService } from '@colanode/client/services/workspaces/node-counters-service';
 import { NodeReactionService } from '@colanode/client/services/workspaces/node-reaction-service';
 import { NodeService } from '@colanode/client/services/workspaces/node-service';
+import { acquireWorkspaceIdentity } from '@colanode/client/services/workspaces/workspace-manifest';
 import type { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import {
     generateId,
@@ -34,23 +36,26 @@ interface Device {
     database: Kysely<WorkspaceDatabaseSchema>;
     workspace: WorkspaceService;
     cloudSync: CloudSyncService;
+    workspaceId: string;
+    userId: string;
 }
 
 const workspaceId = generateId(IdType.Workspace);
 const userId = generateId(IdType.User);
 const accountId = generateId(IdType.Account);
 
-const createDevice = async (
+const createDeviceWithIds = async (
     deviceId: string,
-    storagePath: string
+    storagePath: string,
+    ids: { workspaceId: string; userId: string; accountId: string }
 ): Promise<Device> => {
     const database = await createWorkspaceDatabase();
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const workspace: any = {
-        workspaceId,
-        userId,
-        accountId,
+        workspaceId: ids.workspaceId,
+        userId: ids.userId,
+        accountId: ids.accountId,
         database,
         account: { app: { meta: { localOnly: true } } },
         files: { deleteFile: async () => { } },
@@ -68,8 +73,24 @@ const createDevice = async (
 
     const cloudSync = new CloudSyncService(workspace as WorkspaceService, config);
 
-    return { database, workspace: workspace as WorkspaceService, cloudSync };
+    return {
+        database,
+        workspace: workspace as WorkspaceService,
+        cloudSync,
+        workspaceId: ids.workspaceId,
+        userId: ids.userId,
+    };
 };
+
+const createDevice = (
+    deviceId: string,
+    storagePath: string
+): Promise<Device> =>
+    createDeviceWithIds(deviceId, storagePath, {
+        workspaceId,
+        userId,
+        accountId,
+    });
 
 const seedNode = async (
     device: Device,
@@ -93,7 +114,7 @@ const seedNode = async (
             root_id: rootId,
             attributes: JSON.stringify(attributes),
             created_at: now,
-            created_by: userId,
+            created_by: device.userId,
             local_revision: '0',
             server_revision: '0',
         })
@@ -306,5 +327,91 @@ describe('CloudSyncService (local-folder peer sync)', () => {
             .where('id', '=', nodeId)
             .executeTakeFirst();
         expect(tombstone).toBeTruthy();
+    });
+});
+
+// End-to-end Stage-2 join flow: device A boots into an empty storage and
+// publishes its identity through the manifest; device B starts with no local
+// workspace, reads the manifest, adopts the same workspaceId/userId, and
+// replays the full op-log to materialize the same data.
+describe('CloudSyncService (manifest-based join flow)', () => {
+    let tempDir: string;
+    let storagePath: string;
+
+    beforeEach(async () => {
+        tempDir = await fs.promises.mkdtemp(
+            path.join(os.tmpdir(), 'cloud-sync-join-')
+        );
+        storagePath = path.join(tempDir, 'storage');
+    });
+
+    afterEach(async () => {
+        await fs.promises.rm(tempDir, { recursive: true, force: true });
+    });
+
+    const bootDevice = async (deviceId: string): Promise<Device> => {
+        const provider = new LocalStorageProvider({
+            type: 'local',
+            path: storagePath,
+        });
+        await provider.init();
+        const manifest = await acquireWorkspaceIdentity(provider, deviceId, () => ({
+            workspaceId: generateId(IdType.Workspace),
+            userId: generateId(IdType.User),
+            name: 'My Workspace',
+        }));
+        return createDeviceWithIds(deviceId, storagePath, {
+            workspaceId: manifest.workspaceId,
+            userId: manifest.userId,
+            accountId: generateId(IdType.Account),
+        });
+    };
+
+    it('device B adopts device A\u2019s identity and replays the full op-log', async () => {
+        const deviceA = await bootDevice(generateId(IdType.Device));
+
+        const spaceId = generateId(IdType.Space);
+        const { nodeId: pageA } = await seedNode(
+            deviceA,
+            { type: 'page', name: 'Roadmap', parentId: spaceId },
+            spaceId
+        );
+        const { nodeId: pageB } = await seedNode(
+            deviceA,
+            { type: 'page', name: 'Backlog', parentId: spaceId },
+            spaceId
+        );
+
+        await deviceA.cloudSync.exportLocal();
+
+        const deviceB = await bootDevice(generateId(IdType.Device));
+
+        try {
+            expect(deviceB.workspaceId).toBe(deviceA.workspaceId);
+            expect(deviceB.userId).toBe(deviceA.userId);
+
+            await deviceB.cloudSync.importRemote();
+
+            for (const nodeId of [pageA, pageB]) {
+                const node = await deviceB.database
+                    .selectFrom('nodes')
+                    .selectAll()
+                    .where('id', '=', nodeId)
+                    .executeTakeFirst();
+                expect(node).toBeTruthy();
+                expect(node!.created_by).toBe(deviceA.userId);
+            }
+
+            const allNodes = await deviceB.database
+                .selectFrom('nodes')
+                .selectAll()
+                .execute();
+            expect(allNodes).toHaveLength(2);
+        } finally {
+            deviceA.cloudSync.destroy();
+            deviceB.cloudSync.destroy();
+            await deviceA.database.destroy();
+            await deviceB.database.destroy();
+        }
     });
 });

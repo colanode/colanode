@@ -2,6 +2,8 @@ export { BackupService } from './backup-service';
 export { GitHubStorageProvider } from './github-provider';
 export { LocalStorageProvider } from './local-provider';
 export { S3StorageProvider } from './s3-provider';
+export { createStorageProvider } from './storage-factory';
+export type { StorageProviderInput } from './storage-factory';
 export type {
     StorageProvider,
     StorageProviderConfig,

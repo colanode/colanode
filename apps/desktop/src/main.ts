@@ -20,16 +20,14 @@ import { QueryInput, QueryMap } from '@colanode/client/queries';
 import { AppMeta, AppService, LocalSyncConfig } from '@colanode/client/services';
 import {
   BackupService,
-  GitHubStorageProvider,
-  LocalStorageProvider,
-  S3StorageProvider,
+  createStorageProvider,
 } from '@colanode/client/services/backup';
 import type {
-  StorageProvider,
   GitHubProviderConfig,
   LocalProviderConfig,
   S3ProviderConfig,
 } from '@colanode/client/services/backup';
+import { acquireWorkspaceIdentity } from '@colanode/client/services/workspaces/workspace-manifest';
 import { AppInitOutput, TempFile, ThemeMode } from '@colanode/client/types';
 import {
   build,
@@ -238,14 +236,43 @@ const ensureLocalOnlyBootstrap = async (app: AppService): Promise<void> => {
     .execute();
 
   if (workspaces.length === 0) {
+    // When peer-to-peer sync is enabled, consult the shared storage manifest
+    // first so every device adopts the same workspace_id/user_id and the
+    // replayed op-log materializes consistently. Otherwise fall back to a
+    // freshly generated identity for a standalone local-only install.
+    let workspaceId = generateId(IdType.Workspace);
+    let userId = generateId(IdType.User);
+    let workspaceName = LOCAL_WORKSPACE_NAME;
+
+    if (appMeta.localSync) {
+      try {
+        const provider = createStorageProvider(appMeta.localSync.storage);
+        await provider.init();
+        const manifest = await acquireWorkspaceIdentity(
+          provider,
+          appMeta.localSync.deviceId,
+          () => ({
+            workspaceId,
+            userId,
+            name: workspaceName,
+          })
+        );
+        workspaceId = manifest.workspaceId;
+        userId = manifest.userId;
+        workspaceName = manifest.name;
+      } catch (error) {
+        debug(`Failed to read workspace manifest: ${error}`);
+      }
+    }
+
     const createdWorkspace = await app.database
       .insertInto('workspaces')
       .returningAll()
       .values({
-        user_id: generateId(IdType.User),
-        workspace_id: generateId(IdType.Workspace),
+        user_id: userId,
+        workspace_id: workspaceId,
         account_id: accountRow.id,
-        name: LOCAL_WORKSPACE_NAME,
+        name: workspaceName,
         description: 'Local-only workspace',
         avatar: null,
         role: 'owner',
@@ -725,21 +752,6 @@ ipcMain.handle(
 );
 
 // ---- Backup / Restore IPC ----
-
-function createStorageProvider(
-  config: GitHubProviderConfig | S3ProviderConfig | LocalProviderConfig
-): StorageProvider {
-  switch (config.type) {
-    case 'github':
-      return new GitHubStorageProvider(config);
-    case 's3':
-      return new S3StorageProvider(config);
-    case 'local':
-      return new LocalStorageProvider(config);
-    default:
-      throw new Error(`Unknown storage provider type: ${(config as { type: string }).type}`);
-  }
-}
 
 function createBackupService(
   config: GitHubProviderConfig | S3ProviderConfig | LocalProviderConfig

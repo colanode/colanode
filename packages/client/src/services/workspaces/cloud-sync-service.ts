@@ -1,9 +1,7 @@
 
 import type { LocalSyncConfig } from '@colanode/client/services/app-meta';
 import {
-    GitHubStorageProvider,
-    LocalStorageProvider,
-    S3StorageProvider,
+    createStorageProvider,
     StorageProvider,
 } from '@colanode/client/services/backup';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
@@ -51,7 +49,7 @@ export class CloudSyncService {
         this.workspace = workspace;
         this.config = config;
         this.deviceId = config.deviceId;
-        this.provider = this.createProvider(config);
+        this.provider = createStorageProvider(config.storage);
     }
 
     private get logPrefix(): string {
@@ -422,18 +420,4 @@ export class CloudSyncService {
         return applied;
     }
 
-    private createProvider(config: LocalSyncConfig): StorageProvider {
-        switch (config.storage.type) {
-            case 'github':
-                return new GitHubStorageProvider(config.storage);
-            case 's3':
-                return new S3StorageProvider(config.storage);
-            case 'local':
-                return new LocalStorageProvider(config.storage);
-            default:
-                throw new Error(
-                    `Unknown storage provider type: ${(config.storage as { type: string }).type}`
-                );
-        }
-    }
 }

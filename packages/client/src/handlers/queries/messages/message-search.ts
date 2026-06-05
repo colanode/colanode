@@ -1,10 +1,11 @@
+import { sql } from 'kysely';
+
 import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib';
 import { mapNode } from '@colanode/client/lib/mappers';
 import { MessageSearchQueryInput } from '@colanode/client/queries/messages/message-search';
 import { Event } from '@colanode/client/types/events';
 import { LocalMessageNode } from '@colanode/client/types/nodes';
-import { sql } from 'kysely';
 
 const DEFAULT_LIMIT = 300;
 

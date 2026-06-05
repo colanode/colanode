@@ -1,8 +1,9 @@
+import { sql } from 'kysely';
+
 import { WorkspaceQueryHandlerBase } from '@colanode/client/handlers/queries/workspace-query-handler-base';
 import { ChangeCheckResult, QueryHandler } from '@colanode/client/lib';
 import { MessageActivityDatesQueryInput } from '@colanode/client/queries/messages/message-activity-dates';
 import { Event } from '@colanode/client/types/events';
-import { sql } from 'kysely';
 
 export class MessageActivityDatesQueryHandler
     extends WorkspaceQueryHandlerBase
