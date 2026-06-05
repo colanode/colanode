@@ -22,12 +22,22 @@ export type LocalSyncIdentityDrift = {
   manifestCreatedByDeviceId: string;
 };
 
-export type LocalSyncSummary = {
+export type LocalSyncExportSummary = {
   nodeUpdates: number;
   documentUpdates: number;
   reactions: number;
   deletes: number;
   files: number;
+};
+
+// importRemote replays the op-log only; file blobs are downloaded lazily by
+// FileService on demand, so an import summary cannot meaningfully carry a
+// `files` count.
+export type LocalSyncImportSummary = {
+  nodeUpdates: number;
+  documentUpdates: number;
+  reactions: number;
+  deletes: number;
 };
 
 export type LocalSyncStatus = {
@@ -38,9 +48,9 @@ export type LocalSyncStatus = {
   paused: boolean;
   lastExportAt: string | null;
   lastExportError: string | null;
-  lastExportSummary: LocalSyncSummary | null;
+  lastExportSummary: LocalSyncExportSummary | null;
   lastImportAt: string | null;
   lastImportError: string | null;
-  lastImportSummary: LocalSyncSummary | null;
+  lastImportSummary: LocalSyncImportSummary | null;
   identityDrift: LocalSyncIdentityDrift | null;
 };

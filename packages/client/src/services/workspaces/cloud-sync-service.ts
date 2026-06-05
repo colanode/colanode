@@ -11,7 +11,10 @@ import {
 } from '@colanode/client/services/workspaces/workspace-manifest';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import { DownloadStatus } from '@colanode/client/types/files';
-import type { LocalSyncStatus, LocalSyncSummary } from '@colanode/client/types/workspaces';
+import type {
+    LocalSyncExportSummary,
+    LocalSyncStatus,
+} from '@colanode/client/types/workspaces';
 import {
     createDebugger,
     generateId,
@@ -51,8 +54,12 @@ const describeStorage = (config: LocalSyncConfig['storage']): string => {
         }
         case 'github':
             return `github: ${config.owner}/${config.repo}`;
-        default:
-            return (config as { type: string }).type;
+        default: {
+            // Exhaustiveness guard: adding a new provider variant without
+            // extending this switch will surface as a compile error here.
+            const exhaustive: never = config;
+            return (exhaustive as { type: string }).type;
+        }
     }
 };
 
@@ -325,7 +332,7 @@ export class CloudSyncService {
             return;
         }
 
-        const summary: LocalSyncSummary = {
+        const summary: LocalSyncExportSummary = {
             nodeUpdates: 0,
             documentUpdates: 0,
             reactions: 0,
@@ -692,7 +699,6 @@ export class CloudSyncService {
                         documentUpdates: 0,
                         reactions: 0,
                         deletes: 0,
-                        files: 0,
                     },
                 });
                 return;
@@ -780,7 +786,6 @@ export class CloudSyncService {
                     documentUpdates: documentUpdates.length,
                     reactions: nodeReactions.length,
                     deletes: nodeDeletes.length,
-                    files: 0,
                 },
             });
 

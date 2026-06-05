@@ -1,6 +1,10 @@
 import { toast } from 'sonner';
 
-import { LocalSyncStatus, LocalSyncSummary } from '@colanode/client/types';
+import {
+    LocalSyncExportSummary,
+    LocalSyncImportSummary,
+    LocalSyncStatus,
+} from '@colanode/client/types';
 import { Badge } from '@colanode/ui/components/ui/badge';
 import { Button } from '@colanode/ui/components/ui/button';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -18,17 +22,49 @@ const formatTimestamp = (value: string | null): string => {
     }
 };
 
-const formatSummary = (summary: LocalSyncSummary | null): string => {
+const formatExportSummary = (
+    summary: LocalSyncExportSummary | null
+): string => {
     if (!summary) {
         return '';
     }
-    const parts = [
-        `${summary.nodeUpdates} update${summary.nodeUpdates === 1 ? '' : 's'}`,
-        `${summary.documentUpdates} doc${summary.documentUpdates === 1 ? '' : 's'}`,
-        `${summary.reactions} reaction${summary.reactions === 1 ? '' : 's'}`,
-        `${summary.deletes} delete${summary.deletes === 1 ? '' : 's'}`,
-        `${summary.files} file${summary.files === 1 ? '' : 's'}`,
-    ];
+    const total =
+        summary.nodeUpdates +
+        summary.documentUpdates +
+        summary.reactions +
+        summary.deletes +
+        summary.files;
+    if (total === 0) {
+        return 'no changes';
+    }
+    const parts: string[] = [];
+    if (summary.nodeUpdates) parts.push(`${summary.nodeUpdates} updates`);
+    if (summary.documentUpdates) parts.push(`${summary.documentUpdates} docs`);
+    if (summary.reactions) parts.push(`${summary.reactions} reactions`);
+    if (summary.deletes) parts.push(`${summary.deletes} deletes`);
+    if (summary.files) parts.push(`${summary.files} files`);
+    return parts.join(' · ');
+};
+
+const formatImportSummary = (
+    summary: LocalSyncImportSummary | null
+): string => {
+    if (!summary) {
+        return '';
+    }
+    const total =
+        summary.nodeUpdates +
+        summary.documentUpdates +
+        summary.reactions +
+        summary.deletes;
+    if (total === 0) {
+        return 'no changes';
+    }
+    const parts: string[] = [];
+    if (summary.nodeUpdates) parts.push(`${summary.nodeUpdates} updates`);
+    if (summary.documentUpdates) parts.push(`${summary.documentUpdates} docs`);
+    if (summary.reactions) parts.push(`${summary.reactions} reactions`);
+    if (summary.deletes) parts.push(`${summary.deletes} deletes`);
     return parts.join(' · ');
 };
 
@@ -72,6 +108,11 @@ export const WorkspaceLocalSync = () => {
                 type: 'local.sync.trigger',
                 userId: workspace.userId,
             },
+            onSuccess(output) {
+                if (output.success) {
+                    toast.success('Sync triggered');
+                }
+            },
             onError(error) {
                 toast.error(error.message);
             },
@@ -91,8 +132,8 @@ export const WorkspaceLocalSync = () => {
         });
     };
 
-    const importSummary = formatSummary(status.lastImportSummary);
-    const exportSummary = formatSummary(status.lastExportSummary);
+    const importSummary = formatImportSummary(status.lastImportSummary);
+    const exportSummary = formatExportSummary(status.lastExportSummary);
 
     return (
         <div className="space-y-4 text-sm">
