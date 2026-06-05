@@ -1406,6 +1406,10 @@ export class NodeService {
           .where('node_id', '=', tombstone.id)
           .execute();
 
+        // deleteNodeRelations also clears any existing tombstone for this id, so
+        // it must run before we record the tombstone below.
+        await deleteNodeRelations(trx, tombstone.id);
+
         await trx
           .insertInto('tombstones')
           .values({
@@ -1415,8 +1419,6 @@ export class NodeService {
           })
           .onConflict((cb) => cb.doNothing())
           .execute();
-
-        await deleteNodeRelations(trx, tombstone.id);
 
         return { deletedNode };
       });

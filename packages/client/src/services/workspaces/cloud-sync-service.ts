@@ -1,12 +1,3 @@
-import { encodeState } from '@colanode/crdt';
-import {
-    createDebugger,
-    generateId,
-    IdType,
-    SyncDocumentUpdateData,
-    SyncNodeTombstoneData,
-    SyncNodeUpdateData,
-} from '@colanode/core';
 
 import type { LocalSyncConfig } from '@colanode/client/services/app-meta';
 import {
@@ -16,6 +7,15 @@ import {
     StorageProvider,
 } from '@colanode/client/services/backup';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
+import {
+    createDebugger,
+    generateId,
+    IdType,
+    SyncDocumentUpdateData,
+    SyncNodeTombstoneData,
+    SyncNodeUpdateData,
+} from '@colanode/core';
+import { encodeState } from '@colanode/crdt';
 
 const debug = createDebugger('desktop:service:cloud-sync');
 
@@ -62,16 +62,29 @@ export class CloudSyncService {
         return `${this.logPrefix}${this.deviceId}/`;
     }
 
-    public async init(): Promise<void> {
+    // Lazily initializes the storage provider. Idempotent and safe to call from
+    // any public entry point (init/sync/exportLocal/importRemote).
+    private async ensureInitialized(): Promise<boolean> {
         if (this.initialized) {
-            return;
+            return true;
         }
 
         try {
             await this.provider.init();
             this.initialized = true;
+            return true;
         } catch (error) {
             debug(`Failed to initialize cloud sync provider: ${error}`);
+            return false;
+        }
+    }
+
+    public async init(): Promise<void> {
+        if (!(await this.ensureInitialized())) {
+            return;
+        }
+
+        if (this.timer) {
             return;
         }
 
@@ -110,7 +123,11 @@ export class CloudSyncService {
 
     // ---- Export (local -> storage) ----
 
-    private async exportLocal(): Promise<void> {
+    public async exportLocal(): Promise<void> {
+        if (!(await this.ensureInitialized())) {
+            return;
+        }
+
         const records: SyncRecord[] = [];
 
         const nodeUpdateCursor = await this.exportNodeUpdates(records);
@@ -291,7 +308,11 @@ export class CloudSyncService {
 
     // ---- Import (storage -> local) ----
 
-    private async importRemote(): Promise<void> {
+    public async importRemote(): Promise<void> {
+        if (!(await this.ensureInitialized())) {
+            return;
+        }
+
         const keys = await this.provider.list(this.logPrefix);
 
         const applied = await this.getAppliedKeys();
