@@ -129,6 +129,31 @@ export class NodeReactionService {
           .where('id', '=', tombstoneId)
           .execute();
 
+        // Append an op-log entry so peer devices can replay the reaction.
+        const updateId = generateId(IdType.Update);
+        const reactionData: SyncNodeReactionData = {
+          nodeId,
+          collaboratorId: this.workspace.userId,
+          reaction,
+          rootId: node.rootId,
+          workspaceId: this.workspace.workspaceId,
+          revision: updateId,
+          createdAt: createdNodeReaction.created_at,
+          deletedAt: null,
+        };
+        await trx
+          .insertInto('node_reaction_updates')
+          .values({
+            id: updateId,
+            node_id: nodeId,
+            collaborator_id: this.workspace.userId,
+            reaction,
+            root_id: node.rootId,
+            data: JSON.stringify(reactionData),
+            created_at: createdNodeReaction.created_at,
+          })
+          .execute();
+
         return {
           createdNodeReaction,
           createdMutation,
@@ -223,6 +248,32 @@ export class NodeReactionService {
             deleted_at: new Date().toISOString(),
           })
           .executeTakeFirst();
+
+        // Append an op-log entry so peer devices can replay the deletion.
+        const updateId = generateId(IdType.Update);
+        const deletedAt = new Date().toISOString();
+        const reactionData: SyncNodeReactionData = {
+          nodeId,
+          collaboratorId: this.workspace.userId,
+          reaction,
+          rootId: existingNodeReaction.root_id,
+          workspaceId: this.workspace.workspaceId,
+          revision: updateId,
+          createdAt: deletedNodeReaction.created_at,
+          deletedAt,
+        };
+        await trx
+          .insertInto('node_reaction_updates')
+          .values({
+            id: updateId,
+            node_id: nodeId,
+            collaborator_id: this.workspace.userId,
+            reaction,
+            root_id: existingNodeReaction.root_id,
+            data: JSON.stringify(reactionData),
+            created_at: deletedAt,
+          })
+          .execute();
 
         return {
           deletedNodeReaction,

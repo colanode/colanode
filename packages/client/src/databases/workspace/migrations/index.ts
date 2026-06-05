@@ -23,6 +23,7 @@ import { createDownloadsTable } from './00020-create-downloads-table';
 import { recreateNodeTextsTable } from './00021-recreate-node-texts-table';
 import { recreateDocumentTextsTable } from './00022-recreate-document-texts-table';
 import { createSyncStateTable } from './00023-create-sync-state-table';
+import { createNodeReactionUpdatesTable } from './00024-create-node-reaction-updates-table';
 
 export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00001-create-users-table': createUsersTable,
@@ -48,4 +49,5 @@ export const workspaceDatabaseMigrations: Record<string, Migration> = {
   '00021-recreate-node-texts-table': recreateNodeTextsTable,
   '00022-recreate-document-texts-table': recreateDocumentTextsTable,
   '00023-create-sync-state-table': createSyncStateTable,
+  '00024-create-node-reaction-updates-table': createNodeReactionUpdatesTable,
 };

@@ -356,6 +356,167 @@ describe('CloudSyncService (local-folder peer sync)', () => {
         expect(afterB.isRunning).toBe(false);
     });
 
+    it('replays a reaction create from device A to device B', async () => {
+        const spaceId = generateId(IdType.Space);
+        const { nodeId } = await seedNode(
+            deviceA,
+            { type: 'page', name: 'Reactable', parentId: spaceId },
+            spaceId
+        );
+
+        const updateId = generateId(IdType.Update);
+        const now = new Date().toISOString();
+        const reactionData = {
+            nodeId,
+            collaboratorId: deviceA.userId,
+            reaction: ':+1:',
+            rootId: spaceId,
+            workspaceId: deviceA.workspaceId,
+            revision: updateId,
+            createdAt: now,
+            deletedAt: null,
+        };
+
+        await deviceA.database
+            .insertInto('node_reactions')
+            .values({
+                node_id: nodeId,
+                collaborator_id: deviceA.userId,
+                reaction: ':+1:',
+                root_id: spaceId,
+                revision: '0',
+                created_at: now,
+            })
+            .execute();
+
+        await deviceA.database
+            .insertInto('node_reaction_updates')
+            .values({
+                id: updateId,
+                node_id: nodeId,
+                collaborator_id: deviceA.userId,
+                reaction: ':+1:',
+                root_id: spaceId,
+                data: JSON.stringify(reactionData),
+                created_at: now,
+            })
+            .execute();
+
+        await deviceA.cloudSync.exportLocal();
+        await deviceB.cloudSync.importRemote();
+
+        const reaction = await deviceB.database
+            .selectFrom('node_reactions')
+            .selectAll()
+            .where('node_id', '=', nodeId)
+            .where('collaborator_id', '=', deviceA.userId)
+            .where('reaction', '=', ':+1:')
+            .executeTakeFirst();
+
+        expect(reaction).toBeTruthy();
+        expect(reaction!.revision).toBe(updateId);
+
+        const cursor = await deviceA.database
+            .selectFrom('sync_state')
+            .selectAll()
+            .where('key', '=', 'export.node_reactions')
+            .executeTakeFirst();
+        expect(cursor?.value).toBe(updateId);
+    });
+
+    it('replays a reaction delete with last-writer-wins ordering', async () => {
+        const spaceId = generateId(IdType.Space);
+        const { nodeId } = await seedNode(
+            deviceA,
+            { type: 'page', name: 'Unreactable', parentId: spaceId },
+            spaceId
+        );
+
+        const createId = generateId(IdType.Update);
+        const createdAt = new Date().toISOString();
+        await deviceA.database
+            .insertInto('node_reactions')
+            .values({
+                node_id: nodeId,
+                collaborator_id: deviceA.userId,
+                reaction: ':tada:',
+                root_id: spaceId,
+                revision: '0',
+                created_at: createdAt,
+            })
+            .execute();
+        await deviceA.database
+            .insertInto('node_reaction_updates')
+            .values({
+                id: createId,
+                node_id: nodeId,
+                collaborator_id: deviceA.userId,
+                reaction: ':tada:',
+                root_id: spaceId,
+                data: JSON.stringify({
+                    nodeId,
+                    collaboratorId: deviceA.userId,
+                    reaction: ':tada:',
+                    rootId: spaceId,
+                    workspaceId: deviceA.workspaceId,
+                    revision: createId,
+                    createdAt,
+                    deletedAt: null,
+                }),
+                created_at: createdAt,
+            })
+            .execute();
+
+        // Delete after a short delay so the ULID is strictly later than create.
+        const deleteId = generateId(IdType.Update);
+        const deletedAt = new Date().toISOString();
+        await deviceA.database
+            .deleteFrom('node_reactions')
+            .where('node_id', '=', nodeId)
+            .where('collaborator_id', '=', deviceA.userId)
+            .where('reaction', '=', ':tada:')
+            .execute();
+        await deviceA.database
+            .insertInto('node_reaction_updates')
+            .values({
+                id: deleteId,
+                node_id: nodeId,
+                collaborator_id: deviceA.userId,
+                reaction: ':tada:',
+                root_id: spaceId,
+                data: JSON.stringify({
+                    nodeId,
+                    collaboratorId: deviceA.userId,
+                    reaction: ':tada:',
+                    rootId: spaceId,
+                    workspaceId: deviceA.workspaceId,
+                    revision: deleteId,
+                    createdAt,
+                    deletedAt,
+                }),
+                created_at: deletedAt,
+            })
+            .execute();
+
+        await deviceA.cloudSync.exportLocal();
+        await deviceB.cloudSync.importRemote();
+
+        const reaction = await deviceB.database
+            .selectFrom('node_reactions')
+            .selectAll()
+            .where('node_id', '=', nodeId)
+            .where('reaction', '=', ':tada:')
+            .executeTakeFirst();
+        expect(reaction).toBeUndefined();
+
+        const cursor = await deviceA.database
+            .selectFrom('sync_state')
+            .selectAll()
+            .where('key', '=', 'export.node_reactions')
+            .executeTakeFirst();
+        expect(cursor?.value).toBe(deleteId);
+    });
+
     it('uploads and downloads file bytes between devices', async () => {
         const fileId = generateId(IdType.File);
         const bytes = new Uint8Array([1, 2, 3, 4, 5]);

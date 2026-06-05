@@ -95,6 +95,20 @@ export type SelectNodeReaction = Selectable<NodeReactionTable>;
 export type CreateNodeReaction = Insertable<NodeReactionTable>;
 export type UpdateNodeReaction = Updateable<NodeReactionTable>;
 
+interface NodeReactionUpdateTable {
+  id: ColumnType<string, string, never>;
+  node_id: ColumnType<string, string, never>;
+  collaborator_id: ColumnType<string, string, never>;
+  reaction: ColumnType<string, string, never>;
+  root_id: ColumnType<string, string, never>;
+  data: ColumnType<string, string, never>;
+  created_at: ColumnType<string, string, never>;
+}
+
+export type SelectNodeReactionUpdate = Selectable<NodeReactionUpdateTable>;
+export type CreateNodeReactionUpdate = Insertable<NodeReactionUpdateTable>;
+export type UpdateNodeReactionUpdate = Updateable<NodeReactionUpdateTable>;
+
 interface NodeReferenceTable {
   node_id: ColumnType<string, string, never>;
   reference_id: ColumnType<string, string, never>;
@@ -304,6 +318,7 @@ export interface WorkspaceDatabaseSchema {
   node_interactions: NodeInteractionTable;
   node_updates: NodeUpdateTable;
   node_reactions: NodeReactionTable;
+  node_reaction_updates: NodeReactionUpdateTable;
   node_references: NodeReferenceTable;
   node_counters: NodeCounterTable;
   node_texts: NodeTextTable;

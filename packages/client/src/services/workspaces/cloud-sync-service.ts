@@ -13,6 +13,7 @@ import {
     generateId,
     IdType,
     SyncDocumentUpdateData,
+    SyncNodeReactionData,
     SyncNodeTombstoneData,
     SyncNodeUpdateData,
 } from '@colanode/core';
@@ -30,7 +31,8 @@ const EXPORT_BATCH_SIZE = 500;
 type SyncRecord =
     | { kind: 'node.update'; data: SyncNodeUpdateData }
     | { kind: 'node.delete'; data: SyncNodeTombstoneData }
-    | { kind: 'document.update'; data: SyncDocumentUpdateData };
+    | { kind: 'document.update'; data: SyncDocumentUpdateData }
+    | { kind: 'node.reaction'; data: SyncNodeReactionData };
 
 // CloudSyncService implements peer-to-peer synchronization for local-only
 // workspaces. Instead of syncing the SQLite database (which cannot be merged),
@@ -221,6 +223,7 @@ export class CloudSyncService {
         const nodeUpdateCursor = await this.exportNodeUpdates(records);
         const documentUpdateCursor = await this.exportDocumentUpdates(records);
         const tombstoneCursor = await this.exportTombstones(records);
+        const reactionCursor = await this.exportNodeReactions(records);
 
         if (records.length === 0) {
             return;
@@ -242,6 +245,9 @@ export class CloudSyncService {
         }
         if (tombstoneCursor) {
             await this.setSyncState('export.tombstones', tombstoneCursor);
+        }
+        if (reactionCursor) {
+            await this.setSyncState('export.node_reactions', reactionCursor);
         }
 
         debug(`Exported ${records.length} record(s) to ${key}`);
@@ -446,6 +452,41 @@ export class CloudSyncService {
         return lastCursor;
     }
 
+    // Ships locally-authored reactions (creates and deletions) through the same
+    // op-log. Each entry's id is a monotonic ULID so the cursor is total-order
+    // and resilient to clock skew across devices.
+    private async exportNodeReactions(
+        records: SyncRecord[]
+    ): Promise<string | null> {
+        const cursor = (await this.getSyncState('export.node_reactions')) ?? '';
+
+        const rows = await this.workspace.database
+            .selectFrom('node_reaction_updates')
+            .selectAll()
+            .where('id', '>', cursor)
+            .orderBy('id', 'asc')
+            .limit(EXPORT_BATCH_SIZE)
+            .execute();
+
+        let lastId: string | null = null;
+        for (const row of rows) {
+            let data: SyncNodeReactionData | null = null;
+            try {
+                data = JSON.parse(row.data) as SyncNodeReactionData;
+            } catch {
+                // Skip malformed payloads but still advance the cursor so the bad
+                // row does not block the rest of the queue.
+                lastId = row.id;
+                continue;
+            }
+
+            records.push({ kind: 'node.reaction', data });
+            lastId = row.id;
+        }
+
+        return lastId;
+    }
+
     // ---- Import (storage -> local) ----
 
     public async importRemote(): Promise<void> {
@@ -475,6 +516,7 @@ export class CloudSyncService {
             const nodeUpdates: SyncNodeUpdateData[] = [];
             const documentUpdates: SyncDocumentUpdateData[] = [];
             const nodeDeletes: SyncNodeTombstoneData[] = [];
+            const nodeReactions: SyncNodeReactionData[] = [];
 
             for (const key of pending) {
                 try {
@@ -492,6 +534,8 @@ export class CloudSyncService {
                             documentUpdates.push(record.data);
                         } else if (record.kind === 'node.delete') {
                             nodeDeletes.push(record.data);
+                        } else if (record.kind === 'node.reaction') {
+                            nodeReactions.push(record.data);
                         }
                     }
                 } catch (error) {
@@ -505,9 +549,13 @@ export class CloudSyncService {
             }
 
             // Apply in a dependency-friendly order: node updates (so nodes exist), then
-            // document updates (which reference their node), then deletions last.
+            // document updates (which reference their node), reactions after the
+            // target nodes exist, and deletions last.
             nodeUpdates.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
             documentUpdates.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+            nodeReactions.sort((a, b) =>
+                a.revision < b.revision ? -1 : a.revision > b.revision ? 1 : 0
+            );
             nodeDeletes.sort((a, b) =>
                 a.deletedAt < b.deletedAt ? -1 : a.deletedAt > b.deletedAt ? 1 : 0
             );
@@ -517,6 +565,9 @@ export class CloudSyncService {
             }
             for (const data of documentUpdates) {
                 await this.workspace.documents.applyRemoteDocumentUpdate(data);
+            }
+            for (const data of nodeReactions) {
+                await this.workspace.nodeReactions.applyRemoteNodeReaction(data);
             }
             for (const data of nodeDeletes) {
                 await this.workspace.nodes.applyRemoteNodeDelete(data);
@@ -535,6 +586,7 @@ export class CloudSyncService {
             debug(
                 `Imported ${nodeUpdates.length} node update(s), ` +
                 `${documentUpdates.length} document update(s), ` +
+                `${nodeReactions.length} reaction(s), ` +
                 `${nodeDeletes.length} deletion(s) from ${pending.length} file(s)`
             );
         } catch (error) {
