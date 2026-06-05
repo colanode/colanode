@@ -11,7 +11,7 @@ import {
 } from '@colanode/client/services/workspaces/workspace-manifest';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import { DownloadStatus } from '@colanode/client/types/files';
-import type { LocalSyncStatus } from '@colanode/client/types/workspaces';
+import type { LocalSyncStatus, LocalSyncSummary } from '@colanode/client/types/workspaces';
 import {
     createDebugger,
     generateId,
@@ -38,6 +38,24 @@ type SyncRecord =
     | { kind: 'document.update'; data: SyncDocumentUpdateData }
     | { kind: 'node.reaction'; data: SyncNodeReactionData };
 
+// Short human-readable label of where a device is shipping its op-log; surfaced
+// in the workspace settings card so the user can confirm they connected the
+// right bucket / folder.
+const describeStorage = (config: LocalSyncConfig['storage']): string => {
+    switch (config.type) {
+        case 'local':
+            return `local: ${config.path}`;
+        case 's3': {
+            const endpoint = config.endpoint ? ` @ ${config.endpoint}` : '';
+            return `s3: ${config.bucket}${endpoint}`;
+        }
+        case 'github':
+            return `github: ${config.owner}/${config.repo}`;
+        default:
+            return (config as { type: string }).type;
+    }
+};
+
 // CloudSyncService implements peer-to-peer synchronization for local-only
 // workspaces. Instead of syncing the SQLite database (which cannot be merged),
 // it ships the CRDT op-log (node/document updates + tombstones) through an
@@ -63,11 +81,15 @@ export class CloudSyncService {
         this.status = {
             enabled: true,
             deviceId: this.deviceId,
+            storageDescription: describeStorage(config.storage),
             isRunning: false,
+            paused: false,
             lastExportAt: null,
             lastExportError: null,
+            lastExportSummary: null,
             lastImportAt: null,
             lastImportError: null,
+            lastImportSummary: null,
             identityDrift: null,
         };
     }
@@ -242,10 +264,44 @@ export class CloudSyncService {
         this.updateStatus({ enabled: false, isRunning: false });
     }
 
+    // Manually triggers an immediate sync cycle from outside (UI button or
+    // tests). Bypasses the paused flag so the user can always force a one-off
+    // exchange even while periodic syncing is paused.
+    public async triggerSyncNow(): Promise<void> {
+        await this.sync(true);
+    }
+
+    // Pauses or resumes the periodic timer. While paused, sync() short-circuits
+    // unless invoked with force=true (triggerSyncNow). Resuming kicks off an
+    // immediate cycle so the user sees activity right away.
+    public setPaused(paused: boolean): void {
+        if (this.status.paused === paused) {
+            return;
+        }
+        this.updateStatus({ paused });
+        if (paused) {
+            if (this.timer) {
+                clearInterval(this.timer);
+                this.timer = null;
+            }
+            return;
+        }
+        // Resuming: schedule again (if init succeeded) and run immediately.
+        if (!this.timer && this.initialized) {
+            this.timer = setInterval(() => {
+                void this.sync();
+            }, SYNC_INTERVAL_MS);
+        }
+        void this.sync();
+    }
+
     // Runs one full sync cycle: pull remote logs first (so local state is fresh),
     // then push any new local changes. Overlapping cycles are skipped.
-    public async sync(): Promise<void> {
+    public async sync(force = false): Promise<void> {
         if (!this.initialized || this.running) {
+            return;
+        }
+        if (!force && this.status.paused) {
             return;
         }
 
@@ -269,23 +325,41 @@ export class CloudSyncService {
             return;
         }
 
+        const summary: LocalSyncSummary = {
+            nodeUpdates: 0,
+            documentUpdates: 0,
+            reactions: 0,
+            deletes: 0,
+            files: 0,
+        };
         try {
-            await this.exportRecords();
-            await this.exportFiles();
+            const recordCounts = await this.exportRecords();
+            summary.nodeUpdates = recordCounts.nodeUpdates;
+            summary.documentUpdates = recordCounts.documentUpdates;
+            summary.reactions = recordCounts.reactions;
+            summary.deletes = recordCounts.deletes;
+            summary.files = await this.exportFiles();
             this.updateStatus({
                 lastExportAt: new Date().toISOString(),
                 lastExportError: null,
+                lastExportSummary: summary,
             });
         } catch (error) {
             this.updateStatus({
                 lastExportAt: new Date().toISOString(),
                 lastExportError: error instanceof Error ? error.message : String(error),
+                lastExportSummary: summary,
             });
             throw error;
         }
     }
 
-    private async exportRecords(): Promise<void> {
+    private async exportRecords(): Promise<{
+        nodeUpdates: number;
+        documentUpdates: number;
+        reactions: number;
+        deletes: number;
+    }> {
         const records: SyncRecord[] = [];
 
         const nodeUpdateCursor = await this.exportNodeUpdates(records);
@@ -294,7 +368,7 @@ export class CloudSyncService {
         const reactionCursor = await this.exportNodeReactions(records);
 
         if (records.length === 0) {
-            return;
+            return { nodeUpdates: 0, documentUpdates: 0, reactions: 0, deletes: 0 };
         }
 
         const seq = generateId(IdType.Update);
@@ -319,13 +393,25 @@ export class CloudSyncService {
         }
 
         debug(`Exported ${records.length} record(s) to ${key}`);
+
+        let nodeUpdates = 0;
+        let documentUpdates = 0;
+        let reactions = 0;
+        let deletes = 0;
+        for (const record of records) {
+            if (record.kind === 'node.update') nodeUpdates++;
+            else if (record.kind === 'document.update') documentUpdates++;
+            else if (record.kind === 'node.reaction') reactions++;
+            else if (record.kind === 'node.delete') deletes++;
+        }
+        return { nodeUpdates, documentUpdates, reactions, deletes };
     }
 
     // Uploads locally-cached file bytes for any file nodes whose ULID is past
     // the last advanced cursor. Bytes are content-addressed at
     // workspaces/<wsId>/files/<fileId><ext>, so concurrent uploads from other
     // devices simply overwrite the same key with identical contents.
-    private async exportFiles(): Promise<void> {
+    private async exportFiles(): Promise<number> {
         const cursor = (await this.getSyncState('export.files')) ?? '';
 
         const rows = await this.workspace.database
@@ -344,10 +430,11 @@ export class CloudSyncService {
             .execute();
 
         if (rows.length === 0) {
-            return;
+            return 0;
         }
 
         let lastUploadedId: string | null = null;
+        let uploaded = 0;
         for (const row of rows) {
             let extension = '';
             try {
@@ -361,6 +448,7 @@ export class CloudSyncService {
                 const data = await this.workspace.account.app.fs.readFile(row.path);
                 await this.uploadFile(row.id, extension, data);
                 lastUploadedId = row.id;
+                uploaded++;
             } catch (error) {
                 debug(`Failed to upload file ${row.id}: ${error}`);
                 break;
@@ -369,8 +457,9 @@ export class CloudSyncService {
 
         if (lastUploadedId) {
             await this.setSyncState('export.files', lastUploadedId);
-            debug(`Uploaded ${rows.length} file(s) up to ${lastUploadedId}`);
+            debug(`Uploaded ${uploaded} file(s) up to ${lastUploadedId}`);
         }
+        return uploaded;
     }
 
     private async exportNodeUpdates(
@@ -598,6 +687,13 @@ export class CloudSyncService {
                 this.updateStatus({
                     lastImportAt: new Date().toISOString(),
                     lastImportError: null,
+                    lastImportSummary: {
+                        nodeUpdates: 0,
+                        documentUpdates: 0,
+                        reactions: 0,
+                        deletes: 0,
+                        files: 0,
+                    },
                 });
                 return;
             }
@@ -679,6 +775,13 @@ export class CloudSyncService {
             this.updateStatus({
                 lastImportAt: new Date().toISOString(),
                 lastImportError: null,
+                lastImportSummary: {
+                    nodeUpdates: nodeUpdates.length,
+                    documentUpdates: documentUpdates.length,
+                    reactions: nodeReactions.length,
+                    deletes: nodeDeletes.length,
+                    files: 0,
+                },
             });
 
             debug(

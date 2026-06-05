@@ -28,6 +28,8 @@ import { NodeReactionCreateMutationHandler } from './nodes/node-reaction-create'
 import { NodeReactionDeleteMutationHandler } from './nodes/node-reaction-delete';
 import { NodeUpdateMutationHandler } from './nodes/node-update';
 import { SpaceChildReorderMutationHandler } from './spaces/space-child-reorder';
+import { LocalSyncSetPausedMutationHandler } from './workspaces/local-sync-set-paused';
+import { LocalSyncTriggerMutationHandler } from './workspaces/local-sync-trigger';
 import { WorkspaceCreateMutationHandler } from './workspaces/workspace-create';
 import { WorkspaceDeleteMutationHandler } from './workspaces/workspace-delete';
 import { WorkspaceUpdateMutationHandler } from './workspaces/workspace-update';
@@ -69,5 +71,7 @@ export const buildMutationHandlerMap = (
     'tab.create': new TabCreateMutationHandler(app),
     'tab.update': new TabUpdateMutationHandler(app),
     'tab.delete': new TabDeleteMutationHandler(app),
+    'local.sync.trigger': new LocalSyncTriggerMutationHandler(app),
+    'local.sync.set-paused': new LocalSyncSetPausedMutationHandler(app),
   };
 };
