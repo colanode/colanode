@@ -17,6 +17,10 @@ const debug = createDebugger('desktop:service:backup');
 
 const MANIFEST_KEY = 'manifest.json';
 const BACKUP_PREFIX = 'backups/';
+// Content-addressed blob store. Every file uploaded by backup() is keyed by
+// its sha256 so identical bytes are stored once across all backupIds and any
+// single backup can be fully restored from its manifest alone.
+const BLOBS_PREFIX = 'backups/blobs/';
 
 const EXCLUDE_PATTERNS = [
     // .db files are snapshotted via VACUUM INTO; the live -wal/-shm sidecars
@@ -245,28 +249,9 @@ export class BackupService {
                 totalSize += sourceStat.size;
             }
 
-            // Phase 3: Check existing backup for incremental
-            let existingManifest: BackupManifest | null = null;
-            try {
-                const latestManifestKey = await this.findLatestManifestKey();
-                if (latestManifestKey) {
-                    const data = await this.provider.download(latestManifestKey);
-                    existingManifest = JSON.parse(data.toString()) as BackupManifest;
-                }
-            } catch {
-                debug('No existing backup found, doing full backup');
-            }
-
-            // Phase 4: Upload files (incremental if possible)
+            // Phase 3: Upload file blobs (content-addressed, deduped)
             const backupId = new Date().toISOString().replace(/[:.]/g, '-');
             const backupPrefix = `${BACKUP_PREFIX}${backupId}/`;
-
-            const existingFileMap = new Map<string, BackupManifestFile>();
-            if (existingManifest) {
-                for (const f of existingManifest.files) {
-                    existingFileMap.set(f.path, f);
-                }
-            }
 
             let uploaded = 0;
             let skipped = 0;
@@ -280,9 +265,10 @@ export class BackupService {
                     currentFile: file.path,
                 });
 
-                // Skip if file unchanged since last backup
-                const existing = existingFileMap.get(file.path);
-                if (existing && existing.sha256 === file.sha256) {
+                // Dedup via content addressing: if a blob with this sha256 is
+                // already present (from any prior backupId), skip the upload.
+                const blobKey = `${BLOBS_PREFIX}${file.sha256}`;
+                if (await this.provider.exists(blobKey)) {
                     skipped++;
                     continue;
                 }
@@ -291,13 +277,13 @@ export class BackupService {
                 const sourceAbs =
                     snapshotAbs ?? path.join(this.storagePath, file.path);
                 const fileData = await fs.promises.readFile(sourceAbs);
-                await this.provider.upload(`${backupPrefix}${file.path}`, fileData);
+                await this.provider.upload(blobKey, fileData);
                 uploaded++;
             }
 
-            debug(`Uploaded ${uploaded} files, skipped ${skipped} unchanged`);
+            debug(`Uploaded ${uploaded} blobs, skipped ${skipped} already present`);
 
-            // Phase 5: Upload manifest
+            // Phase 4: Upload manifest
             const manifest: BackupManifest = {
                 version: 1,
                 createdAt: new Date().toISOString(),
@@ -390,8 +376,17 @@ export class BackupService {
                 currentFile: file.path,
             });
 
-            const fileKey = `${BACKUP_PREFIX}${backupId}/${file.path}`;
-            const data = await this.provider.download(fileKey);
+            // Prefer the content-addressed blob store. Fall back to the
+            // legacy per-backupId layout so backups produced by earlier
+            // versions of this code can still be restored.
+            const blobKey = `${BLOBS_PREFIX}${file.sha256}`;
+            let data: Buffer;
+            if (await this.provider.exists(blobKey)) {
+                data = await this.provider.download(blobKey);
+            } else {
+                const legacyKey = `${BACKUP_PREFIX}${backupId}/${file.path}`;
+                data = await this.provider.download(legacyKey);
+            }
 
             // Verify checksum
             const actualHash = createHash('sha256').update(data).digest('hex');
@@ -417,15 +412,5 @@ export class BackupService {
         });
 
         debug(`Restore complete: ${restored} files`);
-    }
-
-    private async findLatestManifestKey(): Promise<string | null> {
-        const keys = await this.provider.list(BACKUP_PREFIX);
-        const manifestKeys = keys
-            .filter((k) => k.endsWith(`/${MANIFEST_KEY}`))
-            .sort()
-            .reverse();
-
-        return manifestKeys[0] ?? null;
     }
 }
