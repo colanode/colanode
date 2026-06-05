@@ -137,6 +137,26 @@ export class CloudSyncService {
         }
     }
 
+    // Deletes a previously uploaded file blob from shared storage. Idempotent:
+    // missing objects do not throw. Called both from the originating device's
+    // local deletion path (file-service.deleteFile) and from importRemote as a
+    // fallback when receiving a file tombstone, so any device that processes
+    // the deletion contributes to garbage collection.
+    public async deleteRemoteFile(
+        fileId: string,
+        extension: string
+    ): Promise<void> {
+        if (!(await this.ensureInitialized())) {
+            return;
+        }
+        const key = this.fileKey(fileId, extension);
+        try {
+            await this.provider.delete(key);
+        } catch (error) {
+            debug(`Failed to delete remote file ${key}: ${error}`);
+        }
+    }
+
     // Lazily initializes the storage provider. Idempotent and safe to call from
     // any public entry point (init/sync/exportLocal/importRemote).
     private async ensureInitialized(): Promise<boolean> {
@@ -469,10 +489,30 @@ export class CloudSyncService {
             }
 
             let rootId = row.id;
+            let fileExtension: string | undefined;
             try {
-                const parsed = JSON.parse(row.data) as { root_id?: string };
+                const parsed = JSON.parse(row.data) as {
+                    root_id?: string;
+                    type?: string;
+                    attributes?: string | { extension?: string };
+                };
                 if (parsed && parsed.root_id) {
                     rootId = parsed.root_id;
+                }
+                if (parsed && parsed.type === 'file') {
+                    // tombstones.data stores the full deleted node row, where
+                    // attributes is the same JSON-encoded string that lives on
+                    // the nodes table. Parse it lazily so non-file tombstones
+                    // pay nothing.
+                    const attrs =
+                        typeof parsed.attributes === 'string'
+                            ? (JSON.parse(parsed.attributes) as {
+                                extension?: string;
+                            })
+                            : parsed.attributes;
+                    if (attrs && typeof attrs.extension === 'string') {
+                        fileExtension = attrs.extension;
+                    }
                 }
             } catch {
                 // Older tombstone payloads may not be parseable; fall back to the id.
@@ -487,6 +527,7 @@ export class CloudSyncService {
                     deletedBy: this.workspace.userId,
                     deletedAt: row.deleted_at,
                     revision: '0',
+                    fileExtension,
                 },
             });
 
@@ -619,6 +660,15 @@ export class CloudSyncService {
             }
             for (const data of nodeDeletes) {
                 await this.workspace.nodes.applyRemoteNodeDelete(data);
+                // Fallback GC for the corresponding file blob in shared storage.
+                // applyRemoteNodeDelete already triggers files.deleteFile (which
+                // calls deleteRemoteFile via the local path) when the receiving
+                // device has the node row, but a device that never received the
+                // original create won't take that path; this ensures the blob
+                // is collected either way. Idempotent at the provider level.
+                if (data.fileExtension) {
+                    await this.deleteRemoteFile(data.id, data.fileExtension);
+                }
             }
 
             // Mark every processed log file as applied so it is not replayed again.

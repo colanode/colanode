@@ -616,6 +616,61 @@ describe('CloudSyncService (local-folder peer sync)', () => {
             .executeTakeFirst();
         expect(cursorAfter?.value).toBe(fileId);
     });
+
+    it('garbage collects the remote file blob when a file tombstone is replayed', async () => {
+        const fileId = generateId(IdType.File);
+        const spaceId = generateId(IdType.Space);
+        const extension = '.bin';
+        const bytes = new Uint8Array([7, 8, 9, 10]);
+
+        // Seed device A with a remote blob plus a matching tombstone, which is
+        // the exact state left behind by node-service.deleteNode() after the
+        // user removes a file node locally.
+        await deviceA.cloudSync.uploadFile(fileId, extension, bytes);
+
+        const now = new Date().toISOString();
+        const deletedNodeRow = {
+            id: fileId,
+            type: 'file',
+            root_id: spaceId,
+            attributes: JSON.stringify({
+                type: 'file',
+                subtype: 'other',
+                parentId: spaceId,
+                name: 'gc.bin',
+                originalName: 'gc.bin',
+                mimeType: 'application/octet-stream',
+                extension,
+                size: bytes.length,
+                version: generateId(IdType.Version),
+                status: 0,
+            }),
+            created_at: now,
+            created_by: deviceA.userId,
+            local_revision: '0',
+            server_revision: '0',
+        };
+
+        await deviceA.database
+            .insertInto('tombstones')
+            .values({
+                id: fileId,
+                data: JSON.stringify(deletedNodeRow),
+                deleted_at: now,
+            })
+            .execute();
+
+        // Sanity: device B can still see the blob before the tombstone ships.
+        const before = await deviceB.cloudSync.downloadFile(fileId, extension);
+        expect(before).not.toBeNull();
+
+        await deviceA.cloudSync.exportLocal();
+        await deviceB.cloudSync.importRemote();
+
+        // The import-side fallback should have evicted the blob from storage.
+        const after = await deviceB.cloudSync.downloadFile(fileId, extension);
+        expect(after).toBeNull();
+    });
 });
 
 // End-to-end Stage-2 join flow: device A boots into an empty storage and

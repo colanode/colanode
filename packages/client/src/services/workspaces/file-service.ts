@@ -176,6 +176,12 @@ export class FileService {
 
     const filePath = this.buildFilePath(file.id, file.extension);
     await this.app.fs.delete(filePath);
+
+    // Best-effort GC of the corresponding blob in shared storage.
+    // Safe whether or not local-only sync is configured; deleteRemoteFile is
+    // a no-op when no cloudSync is wired up, and idempotent at the provider
+    // level so concurrent deletes from multiple devices do not race.
+    await this.workspace.cloudSync?.deleteRemoteFile(file.id, file.extension);
   }
 
   public async getLocalFile(
