@@ -359,6 +359,113 @@ describe('CloudSyncService (local-folder peer sync)', () => {
         expect(afterB.isRunning).toBe(false);
     });
 
+    it('describes the configured local storage in the status payload', () => {
+        const status = deviceA.cloudSync.getStatus();
+        expect(status.storageDescription).toBe(`local: ${storagePath}`);
+        expect(status.paused).toBe(false);
+        expect(status.lastExportSummary).toBeNull();
+        expect(status.lastImportSummary).toBeNull();
+    });
+
+    it('populates export and import summaries with per-kind counts', async () => {
+        const spaceId = generateId(IdType.Space);
+        const { nodeId } = await seedNode(
+            deviceA,
+            { type: 'page', name: 'Summary Probe', parentId: spaceId },
+            spaceId
+        );
+        const updateId = generateId(IdType.Update);
+        const now = new Date().toISOString();
+        const reactionData = {
+            nodeId,
+            collaboratorId: deviceA.userId,
+            reaction: ':+1:',
+            rootId: spaceId,
+            workspaceId: deviceA.workspaceId,
+            revision: updateId,
+            createdAt: now,
+            deletedAt: null,
+        };
+        await deviceA.database
+            .insertInto('node_reactions')
+            .values({
+                node_id: nodeId,
+                collaborator_id: deviceA.userId,
+                reaction: ':+1:',
+                root_id: spaceId,
+                revision: '0',
+                created_at: now,
+            })
+            .execute();
+        await deviceA.database
+            .insertInto('node_reaction_updates')
+            .values({
+                id: updateId,
+                node_id: nodeId,
+                collaborator_id: deviceA.userId,
+                reaction: ':+1:',
+                root_id: spaceId,
+                data: JSON.stringify(reactionData),
+                created_at: now,
+            })
+            .execute();
+
+        await deviceA.cloudSync.exportLocal();
+        const exportSummary = deviceA.cloudSync.getStatus().lastExportSummary;
+        expect(exportSummary).not.toBeNull();
+        expect(exportSummary!.nodeUpdates).toBe(1);
+        expect(exportSummary!.reactions).toBe(1);
+        expect(exportSummary!.deletes).toBe(0);
+
+        await deviceB.cloudSync.importRemote();
+        const importSummary = deviceB.cloudSync.getStatus().lastImportSummary;
+        expect(importSummary).not.toBeNull();
+        expect(importSummary!.nodeUpdates).toBe(1);
+        expect(importSummary!.reactions).toBe(1);
+        expect(importSummary!.deletes).toBe(0);
+    });
+
+    it('pauses periodic sync but still allows a forced trigger', async () => {
+        // Prime initialization without starting the periodic timer: a single
+        // exportLocal() runs ensureInitialized() internally and flips the
+        // private `initialized` flag so subsequent sync() calls advance past
+        // the `!this.initialized` short-circuit. We avoid init() because its
+        // immediate fire-and-forget sync() would race with the assertions.
+        await deviceA.cloudSync.exportLocal();
+        const baselineExportAt =
+            deviceA.cloudSync.getStatus().lastExportAt;
+        expect(baselineExportAt).not.toBeNull();
+
+        deviceA.cloudSync.setPaused(true);
+        expect(deviceA.cloudSync.getStatus().paused).toBe(true);
+
+        const spaceId = generateId(IdType.Space);
+        await seedNode(
+            deviceA,
+            { type: 'page', name: 'Paused', parentId: spaceId },
+            spaceId
+        );
+
+        // sync() respects the paused flag and does NOT advance the timestamp.
+        await deviceA.cloudSync.sync();
+        expect(deviceA.cloudSync.getStatus().lastExportAt).toBe(
+            baselineExportAt
+        );
+
+        // triggerSyncNow forces a cycle even while paused; a new timestamp is
+        // recorded (always at least one ms later than baseline).
+        await new Promise((resolve) => setTimeout(resolve, 5));
+        await deviceA.cloudSync.triggerSyncNow();
+        const afterTrigger = deviceA.cloudSync.getStatus();
+        expect(afterTrigger.lastExportAt).not.toBeNull();
+        expect(afterTrigger.lastExportAt).not.toBe(baselineExportAt);
+        expect(afterTrigger.paused).toBe(true);
+
+        // Resume clears the paused flag.
+        deviceA.cloudSync.setPaused(false);
+        expect(deviceA.cloudSync.getStatus().paused).toBe(false);
+    });
+
     it('replays a reaction create from device A to device B', async () => {
         const spaceId = generateId(IdType.Space);
         const { nodeId } = await seedNode(
