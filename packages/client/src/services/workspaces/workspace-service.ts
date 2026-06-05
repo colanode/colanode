@@ -9,6 +9,7 @@ import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapMetadata } from '@colanode/client/lib/mappers';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { CollaborationService } from '@colanode/client/services/workspaces/collaboration-service';
+import { CloudSyncService } from '@colanode/client/services/workspaces/cloud-sync-service';
 import { DocumentService } from '@colanode/client/services/workspaces/document-service';
 import { FileService } from '@colanode/client/services/workspaces/file-service';
 import { MutationService } from '@colanode/client/services/workspaces/mutation-service';
@@ -39,6 +40,7 @@ export class WorkspaceService {
   public readonly synchronizer: SyncService;
   public readonly radar: RadarService;
   public readonly nodeCounters: NodeCountersService;
+  public cloudSync: CloudSyncService | null = null;
 
   private readonly workspaceFilesCleanJobScheduleId: string;
 
@@ -101,10 +103,21 @@ export class WorkspaceService {
 
   public async init() {
     await this.migrate();
+
+    if (this.account.app.meta.localOnly) {
+      await this.users.ensureLocalUser();
+    }
+
     await this.collaborations.init();
     await this.synchronizer.init();
     await this.radar.init();
     await this.files.init();
+
+    const localSync = this.account.app.meta.localSync;
+    if (this.account.app.meta.localOnly && localSync) {
+      this.cloudSync = new CloudSyncService(this, localSync);
+      await this.cloudSync.init();
+    }
 
     const workspaceFilesCleanInterval = this.account.app.meta.localOnly
       ? ms('30 minutes')
@@ -148,6 +161,7 @@ export class WorkspaceService {
       this.database.destroy();
       this.synchronizer.destroy();
       this.radar.destroy();
+      this.cloudSync?.destroy();
 
       const databasePath = this.account.app.path.workspaceDatabase(
         this.workspace.userId

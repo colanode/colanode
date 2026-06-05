@@ -17,7 +17,7 @@ import { updateElectronApp, UpdateSourceType } from 'update-electron-app';
 import { eventBus } from '@colanode/client/lib';
 import { MutationInput, MutationMap } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
-import { AppMeta, AppService } from '@colanode/client/services';
+import { AppMeta, AppService, LocalSyncConfig } from '@colanode/client/services';
 import {
   BackupService,
   GitHubStorageProvider,
@@ -59,6 +59,7 @@ const LOCAL_ACCOUNT_NAME = 'Local User';
 const LOCAL_WORKSPACE_NAME = 'My Workspace';
 const STORAGE_DIR_ARG_PREFIX = '--colanode-storage-dir=';
 const STORAGE_CONFIG_FILE = 'storage-config.json';
+const SYNC_CONFIG_FILE = 'sync-config.json';
 const STORAGE_ROOT_DIR_NAME = 'Colapp-Local';
 const STORAGE_DIR_ENV_KEYS = [
   'COLANODE_STORAGE_DIR',
@@ -275,6 +276,78 @@ const ensureLocalOnlyBootstrap = async (app: AppService): Promise<void> => {
 };
 
 configureStoragePath();
+
+// Resolves the peer-to-peer local sync configuration. The device id is
+// generated once and persisted; the storage credentials come from the same
+// JSON file or, as a convenience for testing, from environment variables.
+const resolveLocalSyncConfig = (): LocalSyncConfig | undefined => {
+  const finalStoragePath =
+    resolveConfiguredStoragePath() ?? resolveDefaultStoragePath();
+  const configPath = path.join(finalStoragePath, SYNC_CONFIG_FILE);
+
+  let fileConfig: {
+    deviceId?: string;
+    storage?: LocalSyncConfig['storage'];
+  } = {};
+
+  try {
+    if (fs.existsSync(configPath)) {
+      fileConfig = JSON.parse(fs.readFileSync(configPath, 'utf-8')) as {
+        deviceId?: string;
+        storage?: LocalSyncConfig['storage'];
+      };
+    }
+  } catch (error) {
+    debug(`Failed to read sync config: ${error}`);
+  }
+
+  // Storage from the config file takes precedence; otherwise fall back to S3
+  // environment variables (handy for quickly testing two devices).
+  let storage = fileConfig.storage;
+  if (!storage) {
+    const accessKeyId = process.env.COLANODE_SYNC_S3_ACCESS_KEY_ID?.trim();
+    const secretAccessKey =
+      process.env.COLANODE_SYNC_S3_SECRET_ACCESS_KEY?.trim();
+    const bucket = process.env.COLANODE_SYNC_S3_BUCKET?.trim();
+
+    if (accessKeyId && secretAccessKey && bucket) {
+      storage = {
+        type: 's3',
+        accessKeyId,
+        secretAccessKey,
+        bucket,
+        region: process.env.COLANODE_SYNC_S3_REGION?.trim() || undefined,
+        endpoint: process.env.COLANODE_SYNC_S3_ENDPOINT?.trim() || undefined,
+      };
+    }
+  }
+
+  if (!storage) {
+    return undefined;
+  }
+
+  let deviceId = fileConfig.deviceId?.trim();
+  if (!deviceId) {
+    deviceId = generateId(IdType.Device);
+  }
+
+  // Persist the (possibly newly generated) device id so this machine keeps a
+  // stable identity across restarts.
+  try {
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    fs.writeFileSync(
+      configPath,
+      JSON.stringify({ deviceId, storage }, null, 2),
+      'utf-8'
+    );
+  } catch (error) {
+    debug(`Failed to persist sync config: ${error}`);
+  }
+
+  return { deviceId, storage };
+};
+
+appMeta.localSync = resolveLocalSyncConfig();
 
 const fileSystem = new DesktopFileSystem();
 const pathService = new DesktopPathService();

@@ -249,6 +249,68 @@ export class NodeReactionService {
     });
   }
 
+  // Applies a node reaction from another local device (peer-to-peer sync).
+  // Reactions use a last-writer-wins strategy keyed by (node, collaborator,
+  // reaction). The remote record's revision (a monotonic ULID) acts as the
+  // version for conflict resolution.
+  public async applyRemoteNodeReaction(
+    nodeReaction: SyncNodeReactionData
+  ): Promise<void> {
+    const workspaceRef = {
+      workspaceId: this.workspace.workspaceId,
+      userId: this.workspace.userId,
+      accountId: this.workspace.accountId,
+    };
+
+    if (nodeReaction.deletedAt) {
+      const deletedNodeReaction = await this.workspace.database
+        .deleteFrom('node_reactions')
+        .returningAll()
+        .where('node_id', '=', nodeReaction.nodeId)
+        .where('collaborator_id', '=', nodeReaction.collaboratorId)
+        .where('reaction', '=', nodeReaction.reaction)
+        .executeTakeFirst();
+
+      if (deletedNodeReaction) {
+        eventBus.publish({
+          type: 'node.reaction.deleted',
+          workspace: workspaceRef,
+          nodeReaction: mapNodeReaction(deletedNodeReaction),
+        });
+      }
+
+      return;
+    }
+
+    const createdNodeReaction = await this.workspace.database
+      .insertInto('node_reactions')
+      .returningAll()
+      .values({
+        node_id: nodeReaction.nodeId,
+        collaborator_id: nodeReaction.collaboratorId,
+        reaction: nodeReaction.reaction,
+        root_id: nodeReaction.rootId,
+        created_at: nodeReaction.createdAt,
+        revision: nodeReaction.revision,
+      })
+      .onConflict((b) =>
+        b.columns(['node_id', 'collaborator_id', 'reaction']).doUpdateSet({
+          revision: nodeReaction.revision,
+        })
+      )
+      .executeTakeFirst();
+
+    if (!createdNodeReaction) {
+      return;
+    }
+
+    eventBus.publish({
+      type: 'node.reaction.created',
+      workspace: workspaceRef,
+      nodeReaction: mapNodeReaction(createdNodeReaction),
+    });
+  }
+
   public async syncServerNodeReaction(nodeReaction: SyncNodeReactionData) {
     if (this.workspace.account.app.meta.localOnly) {
       return;

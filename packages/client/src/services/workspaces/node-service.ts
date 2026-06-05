@@ -1151,6 +1151,297 @@ export class NodeService {
     }
   }
 
+  // Applies a node update originating from another local device (peer-to-peer
+  // sync over a shared storage provider). Unlike syncServerNodeUpdate, there is
+  // no authoritative server revision: we simply store the raw update and rebuild
+  // the node from the full local update log. This is order-independent and
+  // idempotent, matching the LOCAL_ONLY invariant where node_updates is never
+  // pruned and node_states is never written.
+  public async applyRemoteNodeUpdate(data: SyncNodeUpdateData): Promise<void> {
+    const existingUpdate = await this.workspace.database
+      .selectFrom('node_updates')
+      .select('id')
+      .where('id', '=', data.id)
+      .executeTakeFirst();
+
+    if (existingUpdate) {
+      return;
+    }
+
+    const updateBytes = decodeState(data.data);
+
+    await this.workspace.database
+      .insertInto('node_updates')
+      .values({
+        id: data.id,
+        node_id: data.nodeId,
+        data: updateBytes,
+        created_at: data.createdAt,
+      })
+      .onConflict((cb) => cb.doNothing())
+      .execute();
+
+    const nodeUpdates = await this.workspace.database
+      .selectFrom('node_updates')
+      .selectAll()
+      .where('node_id', '=', data.nodeId)
+      .orderBy('id', 'asc')
+      .execute();
+
+    const ydoc = new YDoc();
+    for (const nodeUpdate of nodeUpdates) {
+      ydoc.applyUpdate(nodeUpdate.data);
+    }
+
+    const attributes = ydoc.getObject<NodeAttributes>();
+    if (!attributes || !attributes.type) {
+      // Not enough updates have arrived yet to materialize this node; the raw
+      // update is kept and the node will materialize once more updates arrive.
+      return;
+    }
+
+    const model = getNodeModel(attributes.type);
+    const nodeText = model.extractText(data.nodeId, attributes);
+    const afterMentions = model.extractMentions(data.nodeId, attributes);
+
+    const existingNode = await this.workspace.database
+      .selectFrom('nodes')
+      .selectAll()
+      .where('id', '=', data.nodeId)
+      .executeTakeFirst();
+
+    const workspaceRef = {
+      workspaceId: this.workspace.workspaceId,
+      userId: this.workspace.userId,
+      accountId: this.workspace.accountId,
+    };
+
+    if (!existingNode) {
+      const nodeReferencesToCreate: CreateNodeReference[] = afterMentions.map(
+        (mention) => ({
+          node_id: data.nodeId,
+          reference_id: mention.target,
+          inner_id: mention.id,
+          type: 'mention',
+          created_at: data.createdAt,
+          created_by: data.createdBy,
+        })
+      );
+
+      const { createdNode, createdNodeReferences } =
+        await this.workspace.database.transaction().execute(async (trx) => {
+          const createdNode = await trx
+            .insertInto('nodes')
+            .returningAll()
+            .values({
+              id: data.nodeId,
+              root_id: data.rootId,
+              attributes: JSON.stringify(attributes),
+              created_at: data.createdAt,
+              created_by: data.createdBy,
+              local_revision: '0',
+              server_revision: '0',
+            })
+            .onConflict((cb) => cb.doNothing())
+            .executeTakeFirst();
+
+          if (!createdNode) {
+            return {
+              createdNode: undefined,
+              createdNodeReferences: [] as SelectNodeReference[],
+            };
+          }
+
+          await trx
+            .deleteFrom('node_texts')
+            .where('id', '=', data.nodeId)
+            .execute();
+
+          if (nodeText) {
+            await trx
+              .insertInto('node_texts')
+              .values({
+                id: data.nodeId,
+                name: nodeText.name,
+                attributes: nodeText.attributes,
+              })
+              .execute();
+          }
+
+          let createdNodeReferences: SelectNodeReference[] = [];
+          if (nodeReferencesToCreate.length > 0) {
+            createdNodeReferences = await trx
+              .insertInto('node_references')
+              .values(nodeReferencesToCreate)
+              .returningAll()
+              .execute();
+          }
+
+          return { createdNode, createdNodeReferences };
+        });
+
+      if (!createdNode) {
+        return;
+      }
+
+      eventBus.publish({
+        type: 'node.created',
+        workspace: workspaceRef,
+        node: mapNode(createdNode),
+      });
+
+      for (const createdNodeReference of createdNodeReferences) {
+        eventBus.publish({
+          type: 'node.reference.created',
+          workspace: workspaceRef,
+          nodeReference: mapNodeReference(createdNodeReference),
+        });
+      }
+
+      await this.workspace.nodeCounters.checkCountersForCreatedNode(
+        createdNode,
+        createdNodeReferences
+      );
+
+      return;
+    }
+
+    const localRevision = BigInt(existingNode.local_revision) + BigInt(1);
+    const beforeAttributes = JSON.parse(existingNode.attributes);
+    const beforeModel = getNodeModel(beforeAttributes.type ?? attributes.type);
+    const beforeMentions = beforeModel.extractMentions(
+      data.nodeId,
+      beforeAttributes
+    );
+    const mentionChanges = checkMentionChanges(beforeMentions, afterMentions);
+
+    const { updatedNode, createdNodeReferences, deletedNodeReferences } =
+      await this.workspace.database.transaction().execute(async (trx) => {
+        const updatedNode = await trx
+          .updateTable('nodes')
+          .returningAll()
+          .set({
+            attributes: JSON.stringify(attributes),
+            updated_at: data.createdAt,
+            updated_by: data.createdBy,
+            local_revision: localRevision.toString(),
+          })
+          .where('id', '=', data.nodeId)
+          .executeTakeFirst();
+
+        if (!updatedNode) {
+          throw new Error('Failed to apply remote node update');
+        }
+
+        await trx
+          .deleteFrom('node_texts')
+          .where('id', '=', data.nodeId)
+          .execute();
+
+        if (nodeText) {
+          await trx
+            .insertInto('node_texts')
+            .values({
+              id: data.nodeId,
+              name: nodeText.name,
+              attributes: nodeText.attributes,
+            })
+            .execute();
+        }
+
+        const { createdNodeReferences, deletedNodeReferences } =
+          await applyMentionUpdates(
+            trx,
+            data.nodeId,
+            data.createdBy,
+            data.createdAt,
+            mentionChanges
+          );
+
+        return { updatedNode, createdNodeReferences, deletedNodeReferences };
+      });
+
+    if (!updatedNode) {
+      return;
+    }
+
+    eventBus.publish({
+      type: 'node.updated',
+      workspace: workspaceRef,
+      node: mapNode(updatedNode),
+    });
+
+    for (const createdNodeReference of createdNodeReferences) {
+      eventBus.publish({
+        type: 'node.reference.created',
+        workspace: workspaceRef,
+        nodeReference: mapNodeReference(createdNodeReference),
+      });
+    }
+
+    for (const deletedNodeReference of deletedNodeReferences) {
+      eventBus.publish({
+        type: 'node.reference.deleted',
+        workspace: workspaceRef,
+        nodeReference: mapNodeReference(deletedNodeReference),
+      });
+    }
+  }
+
+  // Applies a node deletion (tombstone) from another local device.
+  public async applyRemoteNodeDelete(
+    tombstone: SyncNodeTombstoneData
+  ): Promise<void> {
+    const { deletedNode } = await this.workspace.database
+      .transaction()
+      .execute(async (trx) => {
+        const deletedNode = await trx
+          .deleteFrom('nodes')
+          .returningAll()
+          .where('id', '=', tombstone.id)
+          .executeTakeFirst();
+
+        await trx
+          .deleteFrom('collaborations')
+          .where('node_id', '=', tombstone.id)
+          .execute();
+
+        await trx
+          .insertInto('tombstones')
+          .values({
+            id: tombstone.id,
+            data: JSON.stringify(tombstone),
+            deleted_at: tombstone.deletedAt,
+          })
+          .onConflict((cb) => cb.doNothing())
+          .execute();
+
+        await deleteNodeRelations(trx, tombstone.id);
+
+        return { deletedNode };
+      });
+
+    if (!deletedNode) {
+      return;
+    }
+
+    await this.workspace.nodeCounters.checkCountersForDeletedNode(deletedNode);
+
+    if (deletedNode.type === 'file') {
+      await this.workspace.files.deleteFile(deletedNode);
+    }
+
+    eventBus.publish({
+      type: 'node.deleted',
+      workspace: {
+        workspaceId: this.workspace.workspaceId,
+        userId: this.workspace.userId,
+        accountId: this.workspace.accountId,
+      },
+      node: mapNode(deletedNode),
+    });
+  }
+
   public async revertNodeCreate(mutation: CreateNodeMutationData) {
     const { deletedNode, deletedCollaborations } = await this.workspace.database
       .transaction()

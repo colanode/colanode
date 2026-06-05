@@ -28,7 +28,7 @@ import {
   SyncDocumentUpdateData,
   UpdateDocumentMutationData,
 } from '@colanode/core';
-import { encodeState, YDoc } from '@colanode/crdt';
+import { encodeState, decodeState, YDoc } from '@colanode/crdt';
 
 const UPDATE_RETRIES_LIMIT = 10;
 
@@ -667,6 +667,232 @@ export class DocumentService {
     }
 
     return true;
+  }
+
+  // Applies a document update originating from another local device (peer-to-peer
+  // sync). Like applyRemoteNodeUpdate, there is no authoritative server revision:
+  // the raw update is stored and the document is rebuilt from the full local
+  // update log. Order-independent and idempotent.
+  public async applyRemoteDocumentUpdate(
+    data: SyncDocumentUpdateData
+  ): Promise<void> {
+    const existingUpdate = await this.workspace.database
+      .selectFrom('document_updates')
+      .select('id')
+      .where('id', '=', data.id)
+      .executeTakeFirst();
+
+    if (existingUpdate) {
+      return;
+    }
+
+    const updateBytes = decodeState(data.data);
+
+    await this.workspace.database
+      .insertInto('document_updates')
+      .values({
+        id: data.id,
+        document_id: data.documentId,
+        data: updateBytes,
+        created_at: data.createdAt,
+      })
+      .onConflict((cb) => cb.doNothing())
+      .execute();
+
+    const node = await this.workspace.database
+      .selectFrom('nodes')
+      .selectAll()
+      .where('id', '=', data.documentId)
+      .executeTakeFirst();
+
+    if (!node) {
+      // The owning node has not arrived yet; keep the raw update for later.
+      return;
+    }
+
+    const model = getNodeModel(node.type);
+    if (!model.documentSchema) {
+      return;
+    }
+
+    const documentUpdates = await this.workspace.database
+      .selectFrom('document_updates')
+      .selectAll()
+      .where('document_id', '=', data.documentId)
+      .orderBy('id', 'asc')
+      .execute();
+
+    const ydoc = new YDoc();
+    for (const documentUpdate of documentUpdates) {
+      ydoc.applyUpdate(documentUpdate.data);
+    }
+
+    const content = ydoc.getObject<DocumentContent>();
+    if (!model.documentSchema.safeParse(content).success) {
+      return;
+    }
+
+    const existingDocument = await this.workspace.database
+      .selectFrom('documents')
+      .selectAll()
+      .where('id', '=', data.documentId)
+      .executeTakeFirst();
+
+    const text = extractDocumentText(data.documentId, content);
+    const afterMentions =
+      extractBlocksMentions(data.documentId, content.blocks) ?? [];
+
+    const workspaceRef = {
+      workspaceId: this.workspace.workspaceId,
+      userId: this.workspace.userId,
+      accountId: this.workspace.accountId,
+    };
+
+    if (!existingDocument) {
+      const nodeReferencesToCreate: CreateNodeReference[] = afterMentions.map(
+        (mention) => ({
+          node_id: data.documentId,
+          reference_id: mention.target,
+          inner_id: mention.id,
+          type: 'mention',
+          created_at: data.createdAt,
+          created_by: data.createdBy,
+        })
+      );
+
+      const { createdDocument, createdNodeReferences } =
+        await this.workspace.database.transaction().execute(async (trx) => {
+          const createdDocument = await trx
+            .insertInto('documents')
+            .returningAll()
+            .values({
+              id: data.documentId,
+              content: JSON.stringify(content),
+              local_revision: '0',
+              server_revision: '0',
+              created_at: data.createdAt,
+              created_by: data.createdBy,
+            })
+            .onConflict((cb) => cb.doNothing())
+            .executeTakeFirst();
+
+          if (!createdDocument) {
+            return {
+              createdDocument: undefined,
+              createdNodeReferences: [] as CreateNodeReference[],
+            };
+          }
+
+          await trx
+            .deleteFrom('document_texts')
+            .where('id', '=', data.documentId)
+            .execute();
+
+          await trx
+            .insertInto('document_texts')
+            .values({ id: data.documentId, text })
+            .execute();
+
+          let createdNodeReferences: CreateNodeReference[] = [];
+          if (nodeReferencesToCreate.length > 0) {
+            createdNodeReferences = await trx
+              .insertInto('node_references')
+              .returningAll()
+              .values(nodeReferencesToCreate)
+              .execute();
+          }
+
+          return { createdDocument, createdNodeReferences };
+        });
+
+      if (!createdDocument) {
+        return;
+      }
+
+      eventBus.publish({
+        type: 'document.updated',
+        workspace: workspaceRef,
+        document: mapDocument(createdDocument),
+      });
+
+      for (const createdNodeReference of createdNodeReferences) {
+        eventBus.publish({
+          type: 'node.reference.created',
+          workspace: workspaceRef,
+          nodeReference: mapNodeReference(createdNodeReference),
+        });
+      }
+
+      return;
+    }
+
+    const beforeContent = JSON.parse(existingDocument.content) as DocumentContent;
+    const beforeMentions =
+      extractBlocksMentions(data.documentId, beforeContent.blocks) ?? [];
+    const mentionChanges = checkMentionChanges(beforeMentions, afterMentions);
+    const localRevision = BigInt(existingDocument.local_revision) + BigInt(1);
+
+    const { updatedDocument, createdNodeReferences, deletedNodeReferences } =
+      await this.workspace.database.transaction().execute(async (trx) => {
+        const updatedDocument = await trx
+          .updateTable('documents')
+          .returningAll()
+          .set({
+            content: JSON.stringify(content),
+            local_revision: localRevision.toString(),
+            updated_at: data.createdAt,
+            updated_by: data.createdBy,
+          })
+          .where('id', '=', data.documentId)
+          .executeTakeFirst();
+
+        if (!updatedDocument) {
+          throw new Error('Failed to apply remote document update');
+        }
+
+        await trx
+          .updateTable('document_texts')
+          .set({ text })
+          .where('id', '=', data.documentId)
+          .execute();
+
+        const { createdNodeReferences, deletedNodeReferences } =
+          await applyMentionUpdates(
+            trx,
+            data.documentId,
+            data.createdBy,
+            data.createdAt,
+            mentionChanges
+          );
+
+        return { updatedDocument, createdNodeReferences, deletedNodeReferences };
+      });
+
+    if (!updatedDocument) {
+      return;
+    }
+
+    eventBus.publish({
+      type: 'document.updated',
+      workspace: workspaceRef,
+      document: mapDocument(updatedDocument),
+    });
+
+    for (const createdNodeReference of createdNodeReferences) {
+      eventBus.publish({
+        type: 'node.reference.created',
+        workspace: workspaceRef,
+        nodeReference: mapNodeReference(createdNodeReference),
+      });
+    }
+
+    for (const deletedNodeReference of deletedNodeReferences) {
+      eventBus.publish({
+        type: 'node.reference.deleted',
+        workspace: workspaceRef,
+        nodeReference: mapNodeReference(deletedNodeReference),
+      });
+    }
   }
 
   public async syncServerDocumentUpdate(data: SyncDocumentUpdateData) {

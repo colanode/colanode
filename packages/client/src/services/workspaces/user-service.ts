@@ -1,7 +1,12 @@
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapUser } from '@colanode/client/lib/mappers';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
-import { createDebugger, SyncUserData, UserOutput } from '@colanode/core';
+import {
+  createDebugger,
+  SyncUserData,
+  UserOutput,
+  UserStatus,
+} from '@colanode/core';
 
 const debug = createDebugger('desktop:service:user');
 
@@ -10,6 +15,56 @@ export class UserService {
 
   constructor(workspaceService: WorkspaceService) {
     this.workspace = workspaceService;
+  }
+
+  public async ensureLocalUser() {
+    const existing = await this.workspace.database
+      .selectFrom('users')
+      .select('id')
+      .where('id', '=', this.workspace.userId)
+      .executeTakeFirst();
+
+    if (existing) {
+      return;
+    }
+
+    const account = this.workspace.account.account;
+    const now = new Date().toISOString();
+
+    debug(
+      `Seeding local user ${this.workspace.userId} in workspace ${this.workspace.workspaceId}`
+    );
+
+    const createdUser = await this.workspace.database
+      .insertInto('users')
+      .returningAll()
+      .values({
+        id: this.workspace.userId,
+        email: account.email,
+        name: account.name,
+        avatar: account.avatar ?? null,
+        custom_name: null,
+        custom_avatar: null,
+        role: this.workspace.role,
+        status: UserStatus.Active,
+        revision: '1',
+        created_at: now,
+        updated_at: null,
+      })
+      .onConflict((oc) => oc.column('id').doNothing())
+      .executeTakeFirst();
+
+    if (createdUser) {
+      eventBus.publish({
+        type: 'user.created',
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
+        user: mapUser(createdUser),
+      });
+    }
   }
 
   public async upsert(user: UserOutput) {

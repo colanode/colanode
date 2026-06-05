@@ -222,6 +222,17 @@ export type SelectCursor = Selectable<CursorTable>;
 export type CreateCursor = Insertable<CursorTable>;
 export type UpdateCursor = Updateable<CursorTable>;
 
+interface SyncStateTable {
+  key: ColumnType<string, string, never>;
+  value: ColumnType<string, string, string>;
+  created_at: ColumnType<string, string, never>;
+  updated_at: ColumnType<string | null, string | null, string | null>;
+}
+
+export type SelectSyncState = Selectable<SyncStateTable>;
+export type CreateSyncState = Insertable<SyncStateTable>;
+export type UpdateSyncState = Updateable<SyncStateTable>;
+
 interface LocalFileTable {
   id: ColumnType<string, string, never>;
   version: ColumnType<string, string, string>;
@@ -307,4 +318,5 @@ export interface WorkspaceDatabaseSchema {
   mutations: MutationTable;
   tombstones: TombstoneTable;
   cursors: CursorTable;
+  sync_state: SyncStateTable;
 }
