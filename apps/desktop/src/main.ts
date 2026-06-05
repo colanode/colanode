@@ -287,48 +287,6 @@ let appBadge: AppBadge | null = null;
 electronApp.setName('Colapp');
 electronApp.setAppUserModelId('com.colapp.desktop');
 
-// Main-process event-loop lag monitor: writes >200ms stalls to freeze.log
-(() => {
-  const FREEZE_LOG_PATH = path.join(pathService.app, 'freeze.log');
-  try {
-    fs.mkdirSync(pathService.app, { recursive: true });
-    fs.appendFileSync(
-      FREEZE_LOG_PATH,
-      `[${new Date().toISOString()}] === app start, pid=${process.pid} ===\n`
-    );
-  } catch {
-    /* ignore */
-  }
-  const SAMPLE_MS = 100;
-  const THRESHOLD_MS = 200;
-  let last = Date.now();
-  setInterval(() => {
-    const now = Date.now();
-    const lag = now - last - SAMPLE_MS;
-    last = now;
-    if (lag >= THRESHOLD_MS) {
-      const mem = process.memoryUsage();
-      const line = `[${new Date(now).toISOString()}] [main] lag=${lag}ms rss=${Math.round(mem.rss / 1048576)}MB heap=${Math.round(mem.heapUsed / 1048576)}/${Math.round(mem.heapTotal / 1048576)}MB\n`;
-      try {
-        fs.appendFileSync(FREEZE_LOG_PATH, line);
-      } catch {
-        /* ignore */
-      }
-    }
-  }, SAMPLE_MS).unref();
-
-  ipcMain.on('freeze-log-renderer', (_evt, msg: string) => {
-    try {
-      fs.appendFileSync(
-        FREEZE_LOG_PATH,
-        `[${new Date().toISOString()}] [renderer] ${msg}\n`
-      );
-    } catch {
-      /* ignore */
-    }
-  });
-})();
-
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (started) {
   electronApp.quit();
