@@ -19,7 +19,7 @@ import {
   NodeReference,
 } from '@colanode/client/types/nodes';
 import { User } from '@colanode/client/types/users';
-import { Workspace } from '@colanode/client/types/workspaces';
+import { LocalSyncStatus, Workspace } from '@colanode/client/types/workspaces';
 
 export type WorkspaceEventData = {
   workspaceId: string;
@@ -269,6 +269,12 @@ export type TabDeletedEvent = {
   tab: Tab;
 };
 
+export type LocalSyncStatusUpdatedEvent = {
+  type: 'local.sync.status.updated';
+  workspace: WorkspaceEventData;
+  status: LocalSyncStatus;
+};
+
 export type Event =
   | UserCreatedEvent
   | UserUpdatedEvent
@@ -312,4 +318,5 @@ export type Event =
   | TempFileDeletedEvent
   | TabCreatedEvent
   | TabUpdatedEvent
-  | TabDeletedEvent;
+  | TabDeletedEvent
+  | LocalSyncStatusUpdatedEvent;

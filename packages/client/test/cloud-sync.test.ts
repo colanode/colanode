@@ -328,6 +328,33 @@ describe('CloudSyncService (local-folder peer sync)', () => {
             .executeTakeFirst();
         expect(tombstone).toBeTruthy();
     });
+
+    it('tracks export/import timestamps in the published status', async () => {
+        const spaceId = generateId(IdType.Space);
+        await seedNode(
+            deviceA,
+            { type: 'page', name: 'Status Probe', parentId: spaceId },
+            spaceId
+        );
+
+        const baseline = deviceA.cloudSync.getStatus();
+        expect(baseline.enabled).toBe(true);
+        expect(baseline.lastExportAt).toBeNull();
+        expect(baseline.lastImportAt).toBeNull();
+
+        await deviceA.cloudSync.exportLocal();
+        await deviceB.cloudSync.importRemote();
+
+        const afterA = deviceA.cloudSync.getStatus();
+        const afterB = deviceB.cloudSync.getStatus();
+
+        expect(afterA.lastExportAt).not.toBeNull();
+        expect(afterA.lastExportError).toBeNull();
+        expect(afterB.lastImportAt).not.toBeNull();
+        expect(afterB.lastImportError).toBeNull();
+        expect(afterA.isRunning).toBe(false);
+        expect(afterB.isRunning).toBe(false);
+    });
 });
 
 // End-to-end Stage-2 join flow: device A boots into an empty storage and

@@ -13,3 +13,13 @@ export type Workspace = {
 };
 
 export type SidebarMenuType = 'chats' | 'spaces' | 'settings';
+
+export type LocalSyncStatus = {
+  enabled: boolean;
+  deviceId: string;
+  isRunning: boolean;
+  lastExportAt: string | null;
+  lastExportError: string | null;
+  lastImportAt: string | null;
+  lastImportError: string | null;
+};

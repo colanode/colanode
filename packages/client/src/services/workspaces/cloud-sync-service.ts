@@ -1,10 +1,12 @@
 
+import { eventBus } from '@colanode/client/lib/event-bus';
 import type { LocalSyncConfig } from '@colanode/client/services/app-meta';
 import {
     createStorageProvider,
     StorageProvider,
 } from '@colanode/client/services/backup';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
+import type { LocalSyncStatus } from '@colanode/client/types/workspaces';
 import {
     createDebugger,
     generateId,
@@ -44,12 +46,39 @@ export class CloudSyncService {
     private timer: NodeJS.Timeout | null = null;
     private running = false;
     private initialized = false;
+    private status: LocalSyncStatus;
 
     constructor(workspace: WorkspaceService, config: LocalSyncConfig) {
         this.workspace = workspace;
         this.config = config;
         this.deviceId = config.deviceId;
         this.provider = createStorageProvider(config.storage);
+        this.status = {
+            enabled: true,
+            deviceId: this.deviceId,
+            isRunning: false,
+            lastExportAt: null,
+            lastExportError: null,
+            lastImportAt: null,
+            lastImportError: null,
+        };
+    }
+
+    public getStatus(): LocalSyncStatus {
+        return { ...this.status };
+    }
+
+    private updateStatus(patch: Partial<LocalSyncStatus>): void {
+        this.status = { ...this.status, ...patch };
+        eventBus.publish({
+            type: 'local.sync.status.updated',
+            workspace: {
+                workspaceId: this.workspace.workspaceId,
+                userId: this.workspace.userId,
+                accountId: this.workspace.accountId,
+            },
+            status: { ...this.status },
+        });
     }
 
     private get logPrefix(): string {
@@ -99,6 +128,7 @@ export class CloudSyncService {
             clearInterval(this.timer);
             this.timer = null;
         }
+        this.updateStatus({ enabled: false, isRunning: false });
     }
 
     // Runs one full sync cycle: pull remote logs first (so local state is fresh),
@@ -109,6 +139,7 @@ export class CloudSyncService {
         }
 
         this.running = true;
+        this.updateStatus({ isRunning: true });
         try {
             await this.importRemote();
             await this.exportLocal();
@@ -116,6 +147,7 @@ export class CloudSyncService {
             debug(`Cloud sync cycle failed: ${error}`);
         } finally {
             this.running = false;
+            this.updateStatus({ isRunning: false });
         }
     }
 
@@ -128,33 +160,49 @@ export class CloudSyncService {
 
         const records: SyncRecord[] = [];
 
-        const nodeUpdateCursor = await this.exportNodeUpdates(records);
-        const documentUpdateCursor = await this.exportDocumentUpdates(records);
-        const tombstoneCursor = await this.exportTombstones(records);
+        try {
+            const nodeUpdateCursor = await this.exportNodeUpdates(records);
+            const documentUpdateCursor = await this.exportDocumentUpdates(records);
+            const tombstoneCursor = await this.exportTombstones(records);
 
-        if (records.length === 0) {
-            return;
+            if (records.length === 0) {
+                this.updateStatus({
+                    lastExportAt: new Date().toISOString(),
+                    lastExportError: null,
+                });
+                return;
+            }
+
+            const seq = generateId(IdType.Update);
+            const key = `${this.deviceLogPrefix}${seq}.jsonl`;
+            const body = records.map((record) => JSON.stringify(record)).join('\n');
+
+            await this.provider.upload(key, Buffer.from(body, 'utf8'));
+
+            // Advance cursors only after the upload succeeds, so a failed upload is
+            // retried on the next cycle.
+            if (nodeUpdateCursor) {
+                await this.setSyncState('export.node_updates', nodeUpdateCursor);
+            }
+            if (documentUpdateCursor) {
+                await this.setSyncState('export.document_updates', documentUpdateCursor);
+            }
+            if (tombstoneCursor) {
+                await this.setSyncState('export.tombstones', tombstoneCursor);
+            }
+
+            this.updateStatus({
+                lastExportAt: new Date().toISOString(),
+                lastExportError: null,
+            });
+            debug(`Exported ${records.length} record(s) to ${key}`);
+        } catch (error) {
+            this.updateStatus({
+                lastExportAt: new Date().toISOString(),
+                lastExportError: error instanceof Error ? error.message : String(error),
+            });
+            throw error;
         }
-
-        const seq = generateId(IdType.Update);
-        const key = `${this.deviceLogPrefix}${seq}.jsonl`;
-        const body = records.map((record) => JSON.stringify(record)).join('\n');
-
-        await this.provider.upload(key, Buffer.from(body, 'utf8'));
-
-        // Advance cursors only after the upload succeeds, so a failed upload is
-        // retried on the next cycle.
-        if (nodeUpdateCursor) {
-            await this.setSyncState('export.node_updates', nodeUpdateCursor);
-        }
-        if (documentUpdateCursor) {
-            await this.setSyncState('export.document_updates', documentUpdateCursor);
-        }
-        if (tombstoneCursor) {
-            await this.setSyncState('export.tombstones', tombstoneCursor);
-        }
-
-        debug(`Exported ${records.length} record(s) to ${key}`);
     }
 
     private async exportNodeUpdates(
@@ -311,76 +359,97 @@ export class CloudSyncService {
             return;
         }
 
-        const keys = await this.provider.list(this.logPrefix);
+        try {
+            const keys = await this.provider.list(this.logPrefix);
 
-        const applied = await this.getAppliedKeys();
+            const applied = await this.getAppliedKeys();
 
-        const pending = keys
-            .filter((key) => key.endsWith('.jsonl'))
-            .filter((key) => !key.startsWith(this.deviceLogPrefix))
-            .filter((key) => !applied.has(key))
-            .sort();
+            const pending = keys
+                .filter((key) => key.endsWith('.jsonl'))
+                .filter((key) => !key.startsWith(this.deviceLogPrefix))
+                .filter((key) => !applied.has(key))
+                .sort();
 
-        if (pending.length === 0) {
-            return;
-        }
-
-        const nodeUpdates: SyncNodeUpdateData[] = [];
-        const documentUpdates: SyncDocumentUpdateData[] = [];
-        const nodeDeletes: SyncNodeTombstoneData[] = [];
-
-        for (const key of pending) {
-            try {
-                const buffer = await this.provider.download(key);
-                const lines = buffer
-                    .toString('utf8')
-                    .split('\n')
-                    .filter((line) => line.trim().length > 0);
-
-                for (const line of lines) {
-                    const record = JSON.parse(line) as SyncRecord;
-                    if (record.kind === 'node.update') {
-                        nodeUpdates.push(record.data);
-                    } else if (record.kind === 'document.update') {
-                        documentUpdates.push(record.data);
-                    } else if (record.kind === 'node.delete') {
-                        nodeDeletes.push(record.data);
-                    }
-                }
-            } catch (error) {
-                debug(`Failed to download/parse remote log ${key}: ${error}`);
+            if (pending.length === 0) {
+                this.updateStatus({
+                    lastImportAt: new Date().toISOString(),
+                    lastImportError: null,
+                });
                 return;
             }
-        }
 
-        // Apply in a dependency-friendly order: node updates (so nodes exist), then
-        // document updates (which reference their node), then deletions last.
-        nodeUpdates.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-        documentUpdates.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-        nodeDeletes.sort((a, b) =>
-            a.deletedAt < b.deletedAt ? -1 : a.deletedAt > b.deletedAt ? 1 : 0
-        );
+            const nodeUpdates: SyncNodeUpdateData[] = [];
+            const documentUpdates: SyncDocumentUpdateData[] = [];
+            const nodeDeletes: SyncNodeTombstoneData[] = [];
 
-        for (const data of nodeUpdates) {
-            await this.workspace.nodes.applyRemoteNodeUpdate(data);
-        }
-        for (const data of documentUpdates) {
-            await this.workspace.documents.applyRemoteDocumentUpdate(data);
-        }
-        for (const data of nodeDeletes) {
-            await this.workspace.nodes.applyRemoteNodeDelete(data);
-        }
+            for (const key of pending) {
+                try {
+                    const buffer = await this.provider.download(key);
+                    const lines = buffer
+                        .toString('utf8')
+                        .split('\n')
+                        .filter((line) => line.trim().length > 0);
 
-        // Mark every processed log file as applied so it is not replayed again.
-        for (const key of pending) {
-            await this.setSyncState(`applied.${key}`, '1');
-        }
+                    for (const line of lines) {
+                        const record = JSON.parse(line) as SyncRecord;
+                        if (record.kind === 'node.update') {
+                            nodeUpdates.push(record.data);
+                        } else if (record.kind === 'document.update') {
+                            documentUpdates.push(record.data);
+                        } else if (record.kind === 'node.delete') {
+                            nodeDeletes.push(record.data);
+                        }
+                    }
+                } catch (error) {
+                    debug(`Failed to download/parse remote log ${key}: ${error}`);
+                    this.updateStatus({
+                        lastImportAt: new Date().toISOString(),
+                        lastImportError: `Failed to read ${key}: ${error instanceof Error ? error.message : String(error)}`,
+                    });
+                    return;
+                }
+            }
 
-        debug(
-            `Imported ${nodeUpdates.length} node update(s), ` +
-            `${documentUpdates.length} document update(s), ` +
-            `${nodeDeletes.length} deletion(s) from ${pending.length} file(s)`
-        );
+            // Apply in a dependency-friendly order: node updates (so nodes exist), then
+            // document updates (which reference their node), then deletions last.
+            nodeUpdates.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+            documentUpdates.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+            nodeDeletes.sort((a, b) =>
+                a.deletedAt < b.deletedAt ? -1 : a.deletedAt > b.deletedAt ? 1 : 0
+            );
+
+            for (const data of nodeUpdates) {
+                await this.workspace.nodes.applyRemoteNodeUpdate(data);
+            }
+            for (const data of documentUpdates) {
+                await this.workspace.documents.applyRemoteDocumentUpdate(data);
+            }
+            for (const data of nodeDeletes) {
+                await this.workspace.nodes.applyRemoteNodeDelete(data);
+            }
+
+            // Mark every processed log file as applied so it is not replayed again.
+            for (const key of pending) {
+                await this.setSyncState(`applied.${key}`, '1');
+            }
+
+            this.updateStatus({
+                lastImportAt: new Date().toISOString(),
+                lastImportError: null,
+            });
+
+            debug(
+                `Imported ${nodeUpdates.length} node update(s), ` +
+                `${documentUpdates.length} document update(s), ` +
+                `${nodeDeletes.length} deletion(s) from ${pending.length} file(s)`
+            );
+        } catch (error) {
+            this.updateStatus({
+                lastImportAt: new Date().toISOString(),
+                lastImportError: error instanceof Error ? error.message : String(error),
+            });
+            throw error;
+        }
     }
 
     // ---- sync_state helpers ----

@@ -6,6 +6,7 @@ import { Container } from '@colanode/ui/components/layouts/containers/container'
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { WorkspaceDelete } from '@colanode/ui/components/workspaces/workspace-delete';
 import { WorkspaceForm } from '@colanode/ui/components/workspaces/workspace-form';
+import { WorkspaceLocalSync } from '@colanode/ui/components/workspaces/workspace-local-sync';
 import { WorkspaceNotFound } from '@colanode/ui/components/workspaces/workspace-not-found';
 import { WorkspaceSettingsBreadcrumb } from '@colanode/ui/components/workspaces/workspace-settings-breadcrumb';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
@@ -74,6 +75,16 @@ export const WorkspaceSettingsContainer = () => {
             isSaving={isPending}
             saveText="Update"
           />
+        </div>
+
+        <div className="space-y-6">
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">
+              Local Sync
+            </h2>
+            <Separator className="mt-3" />
+          </div>
+          <WorkspaceLocalSync />
         </div>
 
         <div className="space-y-6">

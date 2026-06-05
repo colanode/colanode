@@ -32,6 +32,7 @@ export * from './icons/icon-svg-get';
 export * from './emojis/emoji-svg-get';
 export * from './apps/tabs-list';
 export * from './nodes/node-list';
+export * from './workspaces/local-sync-status-get';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
 export interface QueryMap { }

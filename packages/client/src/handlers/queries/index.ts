@@ -33,6 +33,7 @@ import { RecordFieldValueCountQueryHandler } from './records/record-field-value-
 import { RecordSearchQueryHandler } from './records/record-search';
 import { UserListQueryHandler } from './users/user-list';
 import { UserSearchQueryHandler } from './users/user-search';
+import { LocalSyncStatusGetQueryHandler } from './workspaces/local-sync-status-get';
 import { WorkspaceListQueryHandler } from './workspaces/workspace-list';
 
 export type QueryHandlerMap = {
@@ -73,5 +74,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'icon.svg.get': new IconSvgGetQueryHandler(app),
     'emoji.svg.get': new EmojiSvgGetQueryHandler(app),
     'tabs.list': new TabsListQueryHandler(app),
+    'local.sync.status.get': new LocalSyncStatusGetQueryHandler(app),
   };
 };
