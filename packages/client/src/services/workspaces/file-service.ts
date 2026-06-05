@@ -216,7 +216,17 @@ export class FileService {
 
     const localExists = await this.app.fs.exists(localPath);
     if (!localExists) {
-      return null;
+      // For local-only workspaces with peer sync, try fetching the bytes from
+      // the shared storage on first open. Other clients still need to manually
+      // request a download.
+      const remoteData = this.workspace.cloudSync
+        ? await this.workspace.cloudSync.downloadFile(fileId, file.extension)
+        : null;
+      if (!remoteData) {
+        return null;
+      }
+      await this.app.fs.makeDirectory(this.filesDir);
+      await this.app.fs.writeFile(localPath, remoteData);
     }
 
     const createdLocalFile = await this.workspace.database

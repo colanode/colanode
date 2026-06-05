@@ -6,6 +6,7 @@ import {
     StorageProvider,
 } from '@colanode/client/services/backup';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
+import { DownloadStatus } from '@colanode/client/types/files';
 import type { LocalSyncStatus } from '@colanode/client/types/workspaces';
 import {
     createDebugger,
@@ -89,6 +90,46 @@ export class CloudSyncService {
         return `${this.logPrefix}${this.deviceId}/`;
     }
 
+    private fileKey(fileId: string, extension: string): string {
+        return `workspaces/${this.workspace.workspaceId}/files/${fileId}${extension}`;
+    }
+
+    // Content-addressed file upload. Each fileId is a workspace-unique ULID so
+    // the same key uniquely identifies the same bytes across devices.
+    public async uploadFile(
+        fileId: string,
+        extension: string,
+        data: Uint8Array | Buffer
+    ): Promise<void> {
+        if (!(await this.ensureInitialized())) {
+            return;
+        }
+        const buf = Buffer.isBuffer(data) ? data : Buffer.from(data);
+        await this.provider.upload(this.fileKey(fileId, extension), buf);
+    }
+
+    // Fetches the bytes for a previously uploaded file. Returns null if the
+    // remote object is absent or the provider is unavailable.
+    public async downloadFile(
+        fileId: string,
+        extension: string
+    ): Promise<Uint8Array | null> {
+        if (!(await this.ensureInitialized())) {
+            return null;
+        }
+        const key = this.fileKey(fileId, extension);
+        if (!(await this.provider.exists(key))) {
+            return null;
+        }
+        try {
+            const buf = await this.provider.download(key);
+            return new Uint8Array(buf);
+        } catch (error) {
+            debug(`Failed to download file ${key}: ${error}`);
+            return null;
+        }
+    }
+
     // Lazily initializes the storage provider. Idempotent and safe to call from
     // any public entry point (init/sync/exportLocal/importRemote).
     private async ensureInitialized(): Promise<boolean> {
@@ -158,50 +199,103 @@ export class CloudSyncService {
             return;
         }
 
-        const records: SyncRecord[] = [];
-
         try {
-            const nodeUpdateCursor = await this.exportNodeUpdates(records);
-            const documentUpdateCursor = await this.exportDocumentUpdates(records);
-            const tombstoneCursor = await this.exportTombstones(records);
-
-            if (records.length === 0) {
-                this.updateStatus({
-                    lastExportAt: new Date().toISOString(),
-                    lastExportError: null,
-                });
-                return;
-            }
-
-            const seq = generateId(IdType.Update);
-            const key = `${this.deviceLogPrefix}${seq}.jsonl`;
-            const body = records.map((record) => JSON.stringify(record)).join('\n');
-
-            await this.provider.upload(key, Buffer.from(body, 'utf8'));
-
-            // Advance cursors only after the upload succeeds, so a failed upload is
-            // retried on the next cycle.
-            if (nodeUpdateCursor) {
-                await this.setSyncState('export.node_updates', nodeUpdateCursor);
-            }
-            if (documentUpdateCursor) {
-                await this.setSyncState('export.document_updates', documentUpdateCursor);
-            }
-            if (tombstoneCursor) {
-                await this.setSyncState('export.tombstones', tombstoneCursor);
-            }
-
+            await this.exportRecords();
+            await this.exportFiles();
             this.updateStatus({
                 lastExportAt: new Date().toISOString(),
                 lastExportError: null,
             });
-            debug(`Exported ${records.length} record(s) to ${key}`);
         } catch (error) {
             this.updateStatus({
                 lastExportAt: new Date().toISOString(),
                 lastExportError: error instanceof Error ? error.message : String(error),
             });
             throw error;
+        }
+    }
+
+    private async exportRecords(): Promise<void> {
+        const records: SyncRecord[] = [];
+
+        const nodeUpdateCursor = await this.exportNodeUpdates(records);
+        const documentUpdateCursor = await this.exportDocumentUpdates(records);
+        const tombstoneCursor = await this.exportTombstones(records);
+
+        if (records.length === 0) {
+            return;
+        }
+
+        const seq = generateId(IdType.Update);
+        const key = `${this.deviceLogPrefix}${seq}.jsonl`;
+        const body = records.map((record) => JSON.stringify(record)).join('\n');
+
+        await this.provider.upload(key, Buffer.from(body, 'utf8'));
+
+        // Advance cursors only after the upload succeeds, so a failed upload is
+        // retried on the next cycle.
+        if (nodeUpdateCursor) {
+            await this.setSyncState('export.node_updates', nodeUpdateCursor);
+        }
+        if (documentUpdateCursor) {
+            await this.setSyncState('export.document_updates', documentUpdateCursor);
+        }
+        if (tombstoneCursor) {
+            await this.setSyncState('export.tombstones', tombstoneCursor);
+        }
+
+        debug(`Exported ${records.length} record(s) to ${key}`);
+    }
+
+    // Uploads locally-cached file bytes for any file nodes whose ULID is past
+    // the last advanced cursor. Bytes are content-addressed at
+    // workspaces/<wsId>/files/<fileId><ext>, so concurrent uploads from other
+    // devices simply overwrite the same key with identical contents.
+    private async exportFiles(): Promise<void> {
+        const cursor = (await this.getSyncState('export.files')) ?? '';
+
+        const rows = await this.workspace.database
+            .selectFrom('local_files as lf')
+            .innerJoin('nodes as n', 'n.id', 'lf.id')
+            .select([
+                'lf.id as id',
+                'lf.path as path',
+                'n.attributes as attributes',
+            ])
+            .where('n.type', '=', 'file')
+            .where('lf.id', '>', cursor)
+            .where('lf.download_status', '=', DownloadStatus.Completed)
+            .orderBy('lf.id', 'asc')
+            .limit(EXPORT_BATCH_SIZE)
+            .execute();
+
+        if (rows.length === 0) {
+            return;
+        }
+
+        let lastUploadedId: string | null = null;
+        for (const row of rows) {
+            let extension = '';
+            try {
+                const parsed = JSON.parse(row.attributes) as { extension?: string };
+                extension = parsed?.extension ?? '';
+            } catch {
+                // Malformed attributes — best effort.
+            }
+
+            try {
+                const data = await this.workspace.account.app.fs.readFile(row.path);
+                await this.uploadFile(row.id, extension, data);
+                lastUploadedId = row.id;
+            } catch (error) {
+                debug(`Failed to upload file ${row.id}: ${error}`);
+                break;
+            }
+        }
+
+        if (lastUploadedId) {
+            await this.setSyncState('export.files', lastUploadedId);
+            debug(`Uploaded ${rows.length} file(s) up to ${lastUploadedId}`);
         }
     }
 

@@ -355,6 +355,103 @@ describe('CloudSyncService (local-folder peer sync)', () => {
         expect(afterA.isRunning).toBe(false);
         expect(afterB.isRunning).toBe(false);
     });
+
+    it('uploads and downloads file bytes between devices', async () => {
+        const fileId = generateId(IdType.File);
+        const bytes = new Uint8Array([1, 2, 3, 4, 5]);
+
+        await deviceA.cloudSync.uploadFile(fileId, '.bin', bytes);
+
+        const fetched = await deviceB.cloudSync.downloadFile(fileId, '.bin');
+        expect(fetched).not.toBeNull();
+        expect(Array.from(fetched!)).toEqual(Array.from(bytes));
+
+        const missing = await deviceB.cloudSync.downloadFile(
+            generateId(IdType.File),
+            '.bin'
+        );
+        expect(missing).toBeNull();
+    });
+
+    it('uploads completed local files during exportLocal and advances the cursor', async () => {
+        const fileId = generateId(IdType.File);
+        const spaceId = generateId(IdType.Space);
+        const bytes = new Uint8Array([10, 20, 30, 40]);
+        const localPath = `/virtual/${fileId}.bin`;
+
+        // Stub the filesystem read used by exportFiles.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (deviceA.workspace.account.app as any).fs = {
+            readFile: async (p: string) => {
+                if (p !== localPath) {
+                    throw new Error(`Unexpected read ${p}`);
+                }
+                return bytes;
+            },
+        };
+
+        const now = new Date().toISOString();
+        await deviceA.database
+            .insertInto('nodes')
+            .values({
+                id: fileId,
+                root_id: spaceId,
+                attributes: JSON.stringify({
+                    type: 'file',
+                    subtype: 'other',
+                    parentId: spaceId,
+                    name: 'note.bin',
+                    originalName: 'note.bin',
+                    mimeType: 'application/octet-stream',
+                    extension: '.bin',
+                    size: bytes.length,
+                    version: generateId(IdType.Version),
+                    status: 0,
+                }),
+                created_at: now,
+                created_by: deviceA.userId,
+                local_revision: '0',
+                server_revision: '0',
+            })
+            .execute();
+
+        await deviceA.database
+            .insertInto('local_files')
+            .values({
+                id: fileId,
+                version: generateId(IdType.Version),
+                path: localPath,
+                created_at: now,
+                opened_at: now,
+                download_status: 2,
+                download_progress: 100,
+                download_retries: 0,
+                download_completed_at: now,
+            })
+            .execute();
+
+        await deviceA.cloudSync.exportLocal();
+
+        const fetched = await deviceB.cloudSync.downloadFile(fileId, '.bin');
+        expect(fetched).not.toBeNull();
+        expect(Array.from(fetched!)).toEqual(Array.from(bytes));
+
+        const cursor = await deviceA.database
+            .selectFrom('sync_state')
+            .selectAll()
+            .where('key', '=', 'export.files')
+            .executeTakeFirst();
+        expect(cursor?.value).toBe(fileId);
+
+        // A second export with no new files must remain a no-op.
+        await deviceA.cloudSync.exportLocal();
+        const cursorAfter = await deviceA.database
+            .selectFrom('sync_state')
+            .selectAll()
+            .where('key', '=', 'export.files')
+            .executeTakeFirst();
+        expect(cursorAfter?.value).toBe(fileId);
+    });
 });
 
 // End-to-end Stage-2 join flow: device A boots into an empty storage and
