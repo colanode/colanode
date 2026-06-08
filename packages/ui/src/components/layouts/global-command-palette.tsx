@@ -33,7 +33,7 @@ import {
 } from '@colanode/ui/components/ui/command';
 import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import { useQuery } from '@colanode/ui/hooks/use-query';
-import { getDefaultWorkspaceUserId } from '@colanode/ui/routes/utils';
+import { getDefaultWorkspaceUserId, isLocalOnlyMode } from '@colanode/ui/routes/utils';
 
 const typeIconMap: Record<string, ReactNode> = {
     channel: <Hash className="size-4" />,
@@ -63,6 +63,7 @@ export const GlobalCommandPalette = ({
 
     const defaultWorkspaceUserId = getDefaultWorkspaceUserId();
     const activeWorkspaceUserId = workspaceUserId ?? defaultWorkspaceUserId;
+    const localOnly = isLocalOnlyMode();
 
     const workspacesQuery = useLiveQuery(
         (q) =>
@@ -132,12 +133,15 @@ export const GlobalCommandPalette = ({
             }
 
             if (item.type === 'user') {
+                if (localOnly) {
+                    return;
+                }
                 openLocation(`/workspace/${activeWorkspaceUserId}/users`);
             } else {
                 openLocation(`/workspace/${activeWorkspaceUserId}/${item.id}`);
             }
         },
-        [activeWorkspaceUserId, openLocation]
+        [activeWorkspaceUserId, localOnly, openLocation]
     );
 
     useEffect(() => {
@@ -204,15 +208,17 @@ export const GlobalCommandPalette = ({
                             <Settings className="size-4" />
                             <span>Open workspace settings</span>
                         </CommandItem>
-                        <CommandItem
-                            value="Open workspace users"
-                            onSelect={() => {
-                                openLocation(`/workspace/${activeWorkspaceUserId}/users`);
-                            }}
-                        >
-                            <Users className="size-4" />
-                            <span>Open workspace users</span>
-                        </CommandItem>
+                        {!localOnly && (
+                            <CommandItem
+                                value="Open workspace users"
+                                onSelect={() => {
+                                    openLocation(`/workspace/${activeWorkspaceUserId}/users`);
+                                }}
+                            >
+                                <Users className="size-4" />
+                                <span>Open workspace users</span>
+                            </CommandItem>
+                        )}
                     </CommandGroup>
                 )}
 
