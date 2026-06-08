@@ -8,6 +8,7 @@ import {
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapMetadata } from '@colanode/client/lib/mappers';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
+import { LocalSyncConfig } from '@colanode/client/services/app-meta';
 import { CloudSyncService } from '@colanode/client/services/workspaces/cloud-sync-service';
 import { CollaborationService } from '@colanode/client/services/workspaces/collaboration-service';
 import { DocumentService } from '@colanode/client/services/workspaces/document-service';
@@ -99,6 +100,23 @@ export class WorkspaceService {
     this.workspace.description = workspace.description;
     this.workspace.avatar = workspace.avatar;
     this.workspace.role = workspace.role;
+  }
+
+  // Replaces the active CloudSyncService with a freshly-configured one (or
+  // tears it down entirely when `config` is null). Safe to call repeatedly;
+  // the previous instance is destroyed before the new one is initialized.
+  public async applyLocalSync(config: LocalSyncConfig | null): Promise<void> {
+    if (this.cloudSync) {
+      this.cloudSync.destroy();
+      this.cloudSync = null;
+    }
+
+    if (!this.account.app.meta.localOnly || !config) {
+      return;
+    }
+
+    this.cloudSync = new CloudSyncService(this, config);
+    await this.cloudSync.init();
   }
 
   public async init() {

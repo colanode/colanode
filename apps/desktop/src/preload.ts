@@ -101,6 +101,18 @@ contextBridge.exposeInMainWorld('colanode', {
       ipcRenderer.removeListener('backup-progress', handler);
     };
   },
+
+  localSyncGetConfig: async () => {
+    return ipcRenderer.invoke('local-sync-get-config');
+  },
+
+  localSyncConfigure: async (storage: Record<string, unknown>) => {
+    return ipcRenderer.invoke('local-sync-configure', storage);
+  },
+
+  localSyncClear: async () => {
+    return ipcRenderer.invoke('local-sync-clear');
+  },
 });
 
 contextBridge.exposeInMainWorld('eventBus', {

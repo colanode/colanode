@@ -1,6 +1,7 @@
 import { EventBus } from '@colanode/client/lib';
 import { MutationInput, MutationResult } from '@colanode/client/mutations';
 import { QueryInput, QueryMap } from '@colanode/client/queries';
+import type { LocalSyncConfig } from '@colanode/client/services';
 import type {
   BackupListItem,
   BackupProgress,
@@ -51,6 +52,11 @@ export interface ColanodeWindowApi {
   onBackupProgress: (
     callback: (progress: BackupProgress) => void
   ) => () => void;
+  localSyncGetConfig: () => Promise<LocalSyncConfig | null>;
+  localSyncConfigure: (
+    storage: LocalSyncConfig['storage']
+  ) => Promise<LocalSyncConfig>;
+  localSyncClear: () => Promise<void>;
 }
 
 declare global {

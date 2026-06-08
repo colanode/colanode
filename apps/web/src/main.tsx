@@ -70,6 +70,13 @@ const initializeApp = async () => {
     onBackupProgress: () => () => {
       // No-op on web
     },
+    localSyncGetConfig: async () => null,
+    localSyncConfigure: async () => {
+      throw new Error('Local sync is not available on the web');
+    },
+    localSyncClear: async () => {
+      // No-op on web
+    },
   };
 
   window.eventBus = eventBus;

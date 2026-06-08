@@ -304,13 +304,57 @@ const ensureLocalOnlyBootstrap = async (app: AppService): Promise<void> => {
 
 configureStoragePath();
 
+// Returns the absolute path to the sync-config.json file that lives alongside
+// the active local storage directory. Centralized so init and runtime
+// configuration updates agree on a single source of truth.
+const syncConfigPath = (): string => {
+  const finalStoragePath =
+    resolveConfiguredStoragePath() ?? resolveDefaultStoragePath();
+  return path.join(finalStoragePath, SYNC_CONFIG_FILE);
+};
+
+// Persists the given sync config (or deletes the file entirely when null).
+// Always re-resolves the storage path so a runtime change to the local
+// storage directory is honored.
+const persistSyncConfig = (
+  config: LocalSyncConfig | null
+): LocalSyncConfig | null => {
+  const configPath = syncConfigPath();
+
+  if (!config) {
+    try {
+      if (fs.existsSync(configPath)) {
+        fs.unlinkSync(configPath);
+      }
+    } catch (error) {
+      debug(`Failed to remove sync config: ${error}`);
+    }
+    return null;
+  }
+
+  try {
+    fs.mkdirSync(path.dirname(configPath), { recursive: true });
+    fs.writeFileSync(
+      configPath,
+      JSON.stringify(
+        { deviceId: config.deviceId, storage: config.storage },
+        null,
+        2
+      ),
+      'utf-8'
+    );
+  } catch (error) {
+    debug(`Failed to persist sync config: ${error}`);
+  }
+
+  return config;
+};
+
 // Resolves the peer-to-peer local sync configuration. The device id is
 // generated once and persisted; the storage credentials come from the same
 // JSON file or, as a convenience for testing, from environment variables.
 const resolveLocalSyncConfig = (): LocalSyncConfig | undefined => {
-  const finalStoragePath =
-    resolveConfiguredStoragePath() ?? resolveDefaultStoragePath();
-  const configPath = path.join(finalStoragePath, SYNC_CONFIG_FILE);
+  const configPath = syncConfigPath();
 
   let fileConfig: {
     deviceId?: string;
@@ -358,20 +402,9 @@ const resolveLocalSyncConfig = (): LocalSyncConfig | undefined => {
     deviceId = generateId(IdType.Device);
   }
 
-  // Persist the (possibly newly generated) device id so this machine keeps a
-  // stable identity across restarts.
-  try {
-    fs.mkdirSync(path.dirname(configPath), { recursive: true });
-    fs.writeFileSync(
-      configPath,
-      JSON.stringify({ deviceId, storage }, null, 2),
-      'utf-8'
-    );
-  } catch (error) {
-    debug(`Failed to persist sync config: ${error}`);
-  }
-
-  return { deviceId, storage };
+  const resolved: LocalSyncConfig = { deviceId, storage };
+  persistSyncConfig(resolved);
+  return resolved;
 };
 
 appMeta.localSync = resolveLocalSyncConfig();
@@ -805,3 +838,55 @@ ipcMain.handle(
     electronApp.exit(0);
   }
 );
+
+// ---- Local Sync configuration IPC ----
+
+ipcMain.handle('local-sync-get-config', async (): Promise<LocalSyncConfig | null> => {
+  return appMeta.localSync ?? null;
+});
+
+// When the user points local sync at a plain directory we tuck the data into a
+// `sync/` subfolder so it can comfortably share a parent with `backups/`. We
+// skip this if the path already ends in `sync` (re-save / explicit pick).
+const normalizeLocalSyncStorage = (
+  storage: LocalSyncConfig['storage']
+): LocalSyncConfig['storage'] => {
+  if (storage.type !== 'local') return storage;
+  const trimmed = storage.path.replace(/[\\/]+$/, '');
+  if (!trimmed) return storage;
+  if (path.basename(trimmed).toLowerCase() === 'sync') return { ...storage, path: trimmed };
+  return { ...storage, path: path.join(trimmed, 'sync') };
+};
+
+ipcMain.handle(
+  'local-sync-configure',
+  async (
+    _,
+    storage: LocalSyncConfig['storage']
+  ): Promise<LocalSyncConfig> => {
+    const existingDeviceId = appMeta.localSync?.deviceId;
+    const deviceId = existingDeviceId ?? generateId(IdType.Device);
+    const next: LocalSyncConfig = {
+      deviceId,
+      storage: normalizeLocalSyncStorage(storage),
+    };
+
+    persistSyncConfig(next);
+    appMeta.localSync = next;
+
+    if (app) {
+      await app.reloadLocalSync(next);
+    }
+
+    return next;
+  }
+);
+
+ipcMain.handle('local-sync-clear', async (): Promise<void> => {
+  persistSyncConfig(null);
+  appMeta.localSync = undefined;
+
+  if (app) {
+    await app.reloadLocalSync(null);
+  }
+});

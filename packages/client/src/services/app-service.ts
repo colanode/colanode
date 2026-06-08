@@ -10,7 +10,7 @@ import { Mediator } from '@colanode/client/handlers';
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
-import { AppMeta } from '@colanode/client/services/app-meta';
+import { AppMeta, LocalSyncConfig } from '@colanode/client/services/app-meta';
 import { AssetService } from '@colanode/client/services/asset-service';
 import { FileSystem } from '@colanode/client/services/file-system';
 import { JobService } from '@colanode/client/services/job-service';
@@ -103,6 +103,18 @@ export class AppService {
 
   public getWorkspaces(): WorkspaceService[] {
     return Array.from(this.workspaces.values());
+  }
+
+  // Swap the active local-sync configuration at runtime. Mutates `meta.localSync`
+  // in place (other services read it via `app.meta`), then asks every workspace
+  // service to tear down its CloudSyncService and rebuild it against the new
+  // config. Pass `null` to disable peer-to-peer sync entirely.
+  public async reloadLocalSync(config: LocalSyncConfig | null): Promise<void> {
+    this.meta.localSync = config ?? undefined;
+
+    for (const workspace of this.workspaces.values()) {
+      await workspace.applyLocalSync(config);
+    }
   }
 
 
