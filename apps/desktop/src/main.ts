@@ -846,8 +846,22 @@ ipcMain.handle('local-sync-get-config', async (): Promise<LocalSyncConfig | null
 });
 
 // When the user points local sync at a plain directory we tuck the data into a
-// `sync/` subfolder so it can comfortably share a parent with `backups/`. We
-// skip this if the path already ends in `sync` (re-save / explicit pick).
+// `sync/` subfolder so it can comfortably share a parent with `backups/`.
+// However, if the chosen directory already looks like an existing sync root
+// (contains `manifest.json` or `workspaces/`), we leave it alone so we don't
+// silently orphan the user's data.
+const looksLikeSyncRoot = (dir: string): boolean => {
+  try {
+    if (fs.existsSync(path.join(dir, 'manifest.json'))) return true;
+    const ws = path.join(dir, 'workspaces');
+    if (fs.existsSync(ws) && fs.statSync(ws).isDirectory()) return true;
+  } catch {
+    // If we can't stat the directory we err on the side of "do nothing".
+    return true;
+  }
+  return false;
+};
+
 const normalizeLocalSyncStorage = (
   storage: LocalSyncConfig['storage']
 ): LocalSyncConfig['storage'] => {
@@ -855,6 +869,7 @@ const normalizeLocalSyncStorage = (
   const trimmed = storage.path.replace(/[\\/]+$/, '');
   if (!trimmed) return storage;
   if (path.basename(trimmed).toLowerCase() === 'sync') return { ...storage, path: trimmed };
+  if (looksLikeSyncRoot(trimmed)) return { ...storage, path: trimmed };
   return { ...storage, path: path.join(trimmed, 'sync') };
 };
 
