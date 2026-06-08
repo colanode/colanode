@@ -242,6 +242,24 @@ export class CloudSyncService {
             debug(`Manifest check failed (continuing best-effort): ${error}`);
         }
 
+        // If this device has never written to the current transport (e.g. the
+        // user just pointed local-sync at a brand-new folder/bucket), reset
+        // our export cursors so the next exportLocal() re-emits the full
+        // op-log. Without this, the cursors in the local sqlite would claim
+        // "already exported up to X" against the previous transport and the
+        // new transport would end up with only the seed manifest.json.
+        try {
+            const existing = await this.provider.list(this.deviceLogPrefix);
+            if (existing.length === 0) {
+                await this.workspace.database
+                    .deleteFrom('sync_state')
+                    .where('key', 'like', 'export.%')
+                    .execute();
+            }
+        } catch (error) {
+            debug(`Export-cursor freshness check failed (continuing): ${error}`);
+        }
+
         this.initialized = true;
         return true;
     }
