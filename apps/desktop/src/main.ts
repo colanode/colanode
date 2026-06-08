@@ -27,7 +27,6 @@ import type {
   LocalProviderConfig,
   S3ProviderConfig,
 } from '@colanode/client/services/backup';
-import { acquireWorkspaceIdentity } from '@colanode/client/services/workspaces/workspace-manifest';
 import { AppInitOutput, TempFile, ThemeMode } from '@colanode/client/types';
 import {
   build,
@@ -236,34 +235,14 @@ const ensureLocalOnlyBootstrap = async (app: AppService): Promise<void> => {
     .execute();
 
   if (workspaces.length === 0) {
-    // When peer-to-peer sync is enabled, consult the shared storage manifest
-    // first so every device adopts the same workspace_id/user_id and the
-    // replayed op-log materializes consistently. Otherwise fall back to a
-    // freshly generated identity for a standalone local-only install.
-    let workspaceId = generateId(IdType.Workspace);
-    let userId = generateId(IdType.User);
-    let workspaceName = LOCAL_WORKSPACE_NAME;
-
-    if (appMeta.localSync) {
-      try {
-        const provider = createStorageProvider(appMeta.localSync.storage);
-        await provider.init();
-        const manifest = await acquireWorkspaceIdentity(
-          provider,
-          appMeta.localSync.deviceId,
-          () => ({
-            workspaceId,
-            userId,
-            name: workspaceName,
-          })
-        );
-        workspaceId = manifest.workspaceId;
-        userId = manifest.userId;
-        workspaceName = manifest.name;
-      } catch (error) {
-        debug(`Failed to read workspace manifest: ${error}`);
-      }
-    }
+    // Each device starts with a freshly generated workspace identity. To
+    // join an existing remote workspace, the user either clones an existing
+    // device's userData directory or, in the future, uses an explicit
+    // "join workspace" flow. A shared sync root may host multiple
+    // workspaces, so there is no single manifest to auto-adopt here.
+    const workspaceId = generateId(IdType.Workspace);
+    const userId = generateId(IdType.User);
+    const workspaceName = LOCAL_WORKSPACE_NAME;
 
     const createdWorkspace = await app.database
       .insertInto('workspaces')

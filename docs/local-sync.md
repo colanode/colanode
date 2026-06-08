@@ -50,22 +50,26 @@ tombstones (按游标)            │                          │
 
 ## 4. 存储布局
 
-共享存储的根目录结构：
+共享存储的根目录是 **workspace-scoped** 的，一个根目录可以同时承载多个 workspace：
 
 ```
 <sync-root>/
-├── manifest.json                              # 身份卡：workspaceId/userId/createdAt
 └── workspaces/
-    └── <workspaceId>/
-        ├── devices/
-        │   ├── <deviceIdA>/
-        │   │   ├── 01ktk39js20ze...ud.jsonl   # 一次 sync 周期产出的一批操作
-        │   │   ├── 01ktk3a9ztqdr...ud.jsonl
-        │   │   └── ...
-        │   └── <deviceIdB>/
-        │       └── ...
-        └── files/
-            └── <fileId>.<ext>                  # 内容寻址的附件 blob
+    ├── <workspaceIdA>/
+    │   ├── manifest.json                      # workspace A 的身份卡
+    │   ├── devices/
+    │   │   ├── <deviceIdA1>/
+    │   │   │   ├── 01ktk39js20ze...ud.jsonl   # 一次 sync 周期产出的一批操作
+    │   │   │   ├── 01ktk3a9ztqdr...ud.jsonl
+    │   │   │   └── ...
+    │   │   └── <deviceIdA2>/
+    │   │       └── ...
+    │   └── files/
+    │       └── <fileId>.<ext>                  # 内容寻址的附件 blob
+    └── <workspaceIdB>/
+        ├── manifest.json                      # workspace B 的身份卡（与 A 互不干扰）
+        ├── devices/...
+        └── files/...
 ```
 
 `manifest.json` 示例：
@@ -80,7 +84,9 @@ tombstones (按游标)            │                          │
 }
 ```
 
-第一次配置同步时，第一台设备写下 manifest；之后任何设备 attach 到这个存储时，本地 `workspaceId/userId` 必须与 manifest 完全相等，否则同步会停在 `Local workspace identity does not match the shared manifest` 错误。
+第一次配置同步时，每个 workspace 的第一台设备在自己的 `workspaces/<wsId>/` 子树下写入 manifest；之后任何设备 attach 到这个 workspace 时，本地 `workspaceId/userId` 必须与该子树下的 manifest 完全相等，否则同步会停在 `Local workspace identity does not match the shared manifest` 错误。**不同 workspace 共享同一根目录不会冲突**，它们各自只看自己的 `workspaces/<自己 wsId>/` 子树。
+
+> 旧版本曾把 manifest 放在根目录（`<sync-root>/manifest.json`）。新版本会在首次 attach 时自动把旧布局迁移到 `workspaces/<wsId>/manifest.json`，并删除根级文件。这是一次性、幂等的迁移，无需手工处理。
 
 `.jsonl` 每行一条 [`SyncRecord`](../packages/client/src/services/workspaces/cloud-sync-service.ts)：
 
@@ -131,31 +137,31 @@ tombstones (按游标)            │                          │
 1. 打开 Colapp，注册本地账号并创建一个 workspace
 2. 进入 Settings → Local Sync → **Configure storage**
 3. 选择存储方式：
-   - **Local**：填一个目录路径（建议以 `/sync` 结尾；若选中已存在的同步根目录会自动检测并跳过自动重写）
+   - **Local**：填一个目录路径（可以是 iCloud Drive / OneDrive / 局域网共享盘上的任意目录；可以是已经被其他 workspace 用过的同步根目录——不同 workspace 互不干扰）
    - **S3**：填 endpoint / region / bucket / 访问密钥
    - **GitHub**：填 owner / repo / PAT
-4. Save。设备 A 立即写入 `manifest.json` + 第一批 `.jsonl`
+4. Save。设备 A 立即在 `workspaces/<本 wsId>/` 子树下写入 manifest + 第一批 jsonl
 
-> 注意：选 Local 时如果填的是一个还没有 manifest 的空目录，主进程会在路径末尾追加 `sync/` 子目录（避免污染用户已有目录）。已经存在 manifest 或 `workspaces/` 的目录会被识别为同步根，**不再追加**。
+> 多个 workspace 可以共用同一个根目录：每个 workspace 只看 `workspaces/<自己 wsId>/` 子树，配置时不需要为每个 workspace 单独建子文件夹。
+
+> 选 Local 时如果填的是一个还没有任何 manifest 的全新目录，主进程会在路径末尾追加 `sync/` 子目录避免污染。已经存在 `workspaces/` 的目录会被识别为同步根，**不再追加**。
 
 ### 6.2 让第二台设备加入
 
-这里有两条路径：
+`LOCAL_ONLY` 模式下每台设备本地都有独立的 `workspaceId/userId`，不会自动 adopt 远端身份。让另一台设备加入同一个 workspace，目前最简单的路径是：
 
-**路径 A：克隆设备身份（推荐，最简单）**
-
-适用于「同一个人的另一台机器」。在第二台设备上：
+**克隆设备身份（推荐）**
 
 1. 关闭设备 A
 2. 把设备 A 的 `userData` 整个拷到设备 B（Mac 默认在 `~/Library/Application Support/Colapp-Local/`）
-3. 删除拷过去的 `sync-config.json`（让 B 重新生成自己的 `deviceId`，避免两台共用同一前缀）
+3. 删除拷过去的 `sync-config.json`（让 B 重新生成自己的 `deviceId`，避免两台共用同一日志前缀）
 4. 启动 Colapp（自动进入 A 已登录的 workspace）
 5. Settings → Local Sync → Configure storage → 填**同一个**共享路径 → Save
 6. 因为 manifest 里的 `workspaceId/userId` 和 B 本地完全一致，校验通过，开始双向同步
 
-**路径 B：通过 invite/share 让另一个用户加入**
+> 也可以走「同一根目录 + 多 workspace」模式：两台设备各自有独立 workspace，但共用一个 iCloud Drive 目录。这种情况下他们不会互相同步，只是各自的 workspace 跨自己的多设备时复用同一根目录。
 
-目前 `LOCAL_ONLY` 没有内置 invite 流程；要让另一个独立账号加入同一个 workspace，需要走 backup/restore 把对方的本地状态初始化成同一身份。建议使用路径 A。
+> 目前没有「在 UI 里浏览同步根目录下所有 workspace 让用户选择加入」的功能；后续可能加入。
 
 ### 6.3 日常使用
 
@@ -207,17 +213,20 @@ scripts/dev/sync-e2e.sh inspect         # 列出共享目录下的所有文件
 
 ## 10. 排错速查
 
-| 现象                                                         | 可能原因                                               | 处理                                        |
-| ------------------------------------------------------------ | ------------------------------------------------------ | ------------------------------------------- |
-| Status: Error，"identity does not match the shared manifest" | B 设备的 workspaceId/userId 与 manifest 不一致         | 用克隆设备身份流程，或换一个干净的存储路径  |
-| Sync now 后共享目录只多了 manifest，没有 jsonl               | 本地没有新数据，或游标已经走到表尾                     | 在 A 加内容再 Sync；若切换了存储应自动重置  |
-| B 收到了数据但 UI 不显示                                     | UI hook 未 invalidate（罕见）                          | Cmd+Q 重启窗口；记下复现步骤反馈            |
-| Import error: FOREIGN KEY constraint failed                  | 旧版本，未关闭 SQLite 外键                             | 升级到本次修复后的构建                      |
-| 两台都在写，前缀互相覆盖                                     | 两台共用同一个 deviceId（克隆时未删 sync-config.json） | 在 B 上删 `sync-config.json` 并 Reconfigure |
+| 现象                                                         | 可能原因                                                              | 处理                                                                 |
+| ------------------------------------------------------------ | --------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Status: Error，"identity does not match the shared manifest" | 本地 `workspaceId/userId` 与 `workspaces/<wsId>/manifest.json` 不一致 | 克隆设备身份流程加入；或删掉远端那个 wsId 子树让自己成为新 authority |
+| 两个不同的 workspace 配同一个目录会冲突吗                    | 不会，新版本是 per-workspace 子树，互不干扰                           | 直接配；首次启动会自动迁移旧的根级 manifest                          |
+| Sync now 后共享目录只多了 manifest，没有 jsonl               | 本地没有新数据，或游标已经走到表尾                                    | 在 A 加内容再 Sync；若切换了存储应自动重置                           |
+| B 收到了数据但 UI 不显示                                     | UI hook 未 invalidate（罕见）                                         | Cmd+Q 重启窗口；记下复现步骤反馈                                     |
+| Import error: FOREIGN KEY constraint failed                  | 旧版本，未关闭 SQLite 外键                                            | 升级到本次修复后的构建                                               |
+| 两台都在写，前缀互相覆盖                                     | 两台共用同一个 deviceId（克隆时未删 sync-config.json）                | 在 B 上删 `sync-config.json` 并 Reconfigure                          |
+| 旧版本升级后，原来根目录的 `manifest.json` 不见了            | 已被自动迁移到 `workspaces/<wsId>/manifest.json`                      | 正常现象，无需处理                                                   |
 
 ## 11. 后续改进方向
 
 - UI 实时刷新：`applyRemoteNodeUpdate` 已发 `eventBus.publish('node.created'/'node.updated')`，但部分 query hook 的订阅粒度不够；待逐一审查
+- 「浏览同步根目录」UI：列出 `workspaces/*/manifest.json` 让用户选择加入哪一个 workspace（当前只支持克隆设备身份）
 - 压缩 / 归档历史 jsonl（log compaction）以控制远端体积
 - 端到端加密：当前 jsonl 是明文 Yjs binary，敏感场景需要在 StorageProvider 层加一层信封加密
 - 自动冲突告警：CRDT 不会产生「冲突」，但删除/恢复这类语义边界还是值得给用户提示

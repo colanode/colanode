@@ -799,17 +799,27 @@ describe('CloudSyncService (manifest-based join flow)', () => {
         await fs.promises.rm(tempDir, { recursive: true, force: true });
     });
 
-    const bootDevice = async (deviceId: string): Promise<Device> => {
+    const bootDevice = async (
+        deviceId: string,
+        identity?: { workspaceId: string; userId: string }
+    ): Promise<Device> => {
         const provider = new LocalStorageProvider({
             type: 'local',
             path: storagePath,
         });
         await provider.init();
-        const manifest = await acquireWorkspaceIdentity(provider, deviceId, () => ({
-            workspaceId: generateId(IdType.Workspace),
-            userId: generateId(IdType.User),
-            name: 'My Workspace',
-        }));
+        const workspaceId = identity?.workspaceId ?? generateId(IdType.Workspace);
+        const userId = identity?.userId ?? generateId(IdType.User);
+        const manifest = await acquireWorkspaceIdentity(
+            provider,
+            workspaceId,
+            deviceId,
+            () => ({
+                workspaceId,
+                userId,
+                name: 'My Workspace',
+            })
+        );
         return createDeviceWithIds(deviceId, storagePath, {
             workspaceId: manifest.workspaceId,
             userId: manifest.userId,
@@ -834,7 +844,10 @@ describe('CloudSyncService (manifest-based join flow)', () => {
 
         await deviceA.cloudSync.exportLocal();
 
-        const deviceB = await bootDevice(generateId(IdType.Device));
+        const deviceB = await bootDevice(generateId(IdType.Device), {
+            workspaceId: deviceA.workspaceId,
+            userId: deviceA.userId,
+        });
 
         try {
             expect(deviceB.workspaceId).toBe(deviceA.workspaceId);
@@ -901,7 +914,10 @@ describe('CloudSyncService (identity drift)', () => {
             });
             await provider.init();
 
-            const manifest = await readWorkspaceManifest(provider);
+            const manifest = await readWorkspaceManifest(
+                provider,
+                device.workspaceId
+            );
             expect(manifest).toBeTruthy();
             expect(manifest!.workspaceId).toBe(device.workspaceId);
             expect(manifest!.userId).toBe(device.userId);
@@ -916,25 +932,27 @@ describe('CloudSyncService (identity drift)', () => {
         }
     });
 
-    it('disables sync and reports drift when the manifest already belongs to a different workspace', async () => {
-        // Pre-seed the shared manifest with someone else's identity.
+    it('disables sync and reports drift when the per-workspace manifest belongs to a different user', async () => {
+        // Pre-seed the per-workspace manifest under the local workspaceId
+        // subtree but with a different userId. This simulates two different
+        // accounts that happen to claim the same workspaceId, or a manual
+        // tamper of the manifest.
         const provider = new LocalStorageProvider({
             type: 'local',
             path: storagePath,
         });
         await provider.init();
-        const foreignWorkspaceId = generateId(IdType.Workspace);
+        const localWorkspaceId = generateId(IdType.Workspace);
         const foreignUserId = generateId(IdType.User);
         const foreignDeviceId = generateId(IdType.Device);
         await writeWorkspaceManifest(provider, {
-            workspaceId: foreignWorkspaceId,
+            workspaceId: localWorkspaceId,
             userId: foreignUserId,
             name: 'Foreign Workspace',
             createdAt: new Date().toISOString(),
             createdByDeviceId: foreignDeviceId,
         });
 
-        const localWorkspaceId = generateId(IdType.Workspace);
         const localUserId = generateId(IdType.User);
         const device = await createDeviceWithIds(
             generateId(IdType.Device),
@@ -964,7 +982,7 @@ describe('CloudSyncService (identity drift)', () => {
             expect(status.identityDrift!.localWorkspaceId).toBe(localWorkspaceId);
             expect(status.identityDrift!.localUserId).toBe(localUserId);
             expect(status.identityDrift!.manifestWorkspaceId).toBe(
-                foreignWorkspaceId
+                localWorkspaceId
             );
             expect(status.identityDrift!.manifestUserId).toBe(foreignUserId);
             expect(status.identityDrift!.manifestCreatedByDeviceId).toBe(
@@ -992,6 +1010,61 @@ describe('CloudSyncService (identity drift)', () => {
         } finally {
             device.cloudSync.destroy();
             await device.database.destroy();
+        }
+    });
+
+    it('allows multiple workspaces to coexist under the same storage root', async () => {
+        // Two completely independent workspaces share storagePath. They each
+        // own a workspaces/<wsId>/ subtree, so the presence of one workspace's
+        // manifest must not trigger identity drift for the other.
+        const wsAId = generateId(IdType.Workspace);
+        const userAId = generateId(IdType.User);
+        const deviceA = await createDeviceWithIds(
+            generateId(IdType.Device),
+            storagePath,
+            {
+                workspaceId: wsAId,
+                userId: userAId,
+                accountId: generateId(IdType.Account),
+            }
+        );
+
+        const wsBId = generateId(IdType.Workspace);
+        const userBId = generateId(IdType.User);
+        const deviceB = await createDeviceWithIds(
+            generateId(IdType.Device),
+            storagePath,
+            {
+                workspaceId: wsBId,
+                userId: userBId,
+                accountId: generateId(IdType.Account),
+            }
+        );
+
+        try {
+            await deviceA.cloudSync.exportLocal();
+            await deviceB.cloudSync.exportLocal();
+
+            expect(deviceA.cloudSync.getStatus().enabled).toBe(true);
+            expect(deviceA.cloudSync.getStatus().identityDrift).toBeNull();
+            expect(deviceB.cloudSync.getStatus().enabled).toBe(true);
+            expect(deviceB.cloudSync.getStatus().identityDrift).toBeNull();
+
+            const provider = new LocalStorageProvider({
+                type: 'local',
+                path: storagePath,
+            });
+            await provider.init();
+
+            const manifestA = await readWorkspaceManifest(provider, wsAId);
+            const manifestB = await readWorkspaceManifest(provider, wsBId);
+            expect(manifestA!.userId).toBe(userAId);
+            expect(manifestB!.userId).toBe(userBId);
+        } finally {
+            deviceA.cloudSync.destroy();
+            deviceB.cloudSync.destroy();
+            await deviceA.database.destroy();
+            await deviceB.database.destroy();
         }
     });
 });

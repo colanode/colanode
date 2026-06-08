@@ -6,6 +6,7 @@ import {
     StorageProvider,
 } from '@colanode/client/services/backup';
 import {
+    migrateLegacyRootManifest,
     readWorkspaceManifest,
     writeWorkspaceManifest,
 } from '@colanode/client/services/workspaces/workspace-manifest';
@@ -203,12 +204,28 @@ export class CloudSyncService {
             return false;
         }
 
+        // One-shot migration: storage roots created by older single-workspace
+        // builds keep manifest.json at the root. Move it under
+        // workspaces/<wsId>/manifest.json so the root can host multiple
+        // workspaces. Idempotent; cheap once migrated.
+        try {
+            const migrated = await migrateLegacyRootManifest(this.provider);
+            if (migrated) {
+                debug('Migrated legacy root manifest into per-workspace subtree');
+            }
+        } catch (error) {
+            debug(`Legacy manifest migration failed (continuing): ${error}`);
+        }
+
         // Verify the local workspace identity matches the shared manifest. If
         // the manifest is absent, claim authorship by writing our identity
         // (first-write-wins). If it disagrees with the local workspace, refuse
         // to sync to avoid corrupting the op-log under a foreign identity.
         try {
-            const manifest = await readWorkspaceManifest(this.provider);
+            const manifest = await readWorkspaceManifest(
+                this.provider,
+                this.workspace.workspaceId
+            );
             if (!manifest) {
                 await writeWorkspaceManifest(this.provider, {
                     workspaceId: this.workspace.workspaceId,
