@@ -18,6 +18,12 @@ export class DesktopKyselyService implements KyselyService {
       readonly: options.readonly,
     });
 
+    // better-sqlite3 enables foreign keys by default, but the app's write
+    // paths intentionally violate child-before-parent ordering (e.g.
+    // applyRemoteNodeUpdate inserts node_updates before the owning nodes row)
+    // and rely on explicit deleteNodeRelations cleanup instead of CASCADE.
+    database.pragma('foreign_keys = OFF');
+
     if (!options.readonly) {
       database.pragma('journal_mode = WAL');
     }
