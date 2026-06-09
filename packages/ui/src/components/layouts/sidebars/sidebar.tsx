@@ -8,9 +8,27 @@ import { SidebarSpaces } from '@colanode/ui/components/layouts/sidebars/sidebar-
 import { useApp } from '@colanode/ui/contexts/app';
 import { cn } from '@colanode/ui/lib/utils';
 
-export const Sidebar = () => {
+interface SidebarProps {
+  collapsed?: boolean;
+  onToggleCollapse?: () => void;
+}
+
+export const Sidebar = ({ collapsed = false, onToggleCollapse }: SidebarProps) => {
   const app = useApp();
   const [menu, setMenu] = useState<SidebarMenuType>('spaces');
+
+  const handleMenuChange = (next: SidebarMenuType) => {
+    if (collapsed) {
+      onToggleCollapse?.();
+      setMenu(next);
+      return;
+    }
+    if (next === menu) {
+      onToggleCollapse?.();
+      return;
+    }
+    setMenu(next);
+  };
 
   return (
     <div
@@ -19,12 +37,14 @@ export const Sidebar = () => {
         app.type === 'mobile' ? 'bg-background' : 'bg-sidebar'
       )}
     >
-      <SidebarMenu value={menu} onChange={setMenu} />
-      <div className="min-h-0 grow overflow-auto border-l border-sidebar-border">
-        {menu === 'spaces' && <SidebarSpaces />}
-        {menu === 'chats' && <SidebarChats />}
-        {menu === 'settings' && <SidebarSettings />}
-      </div>
+      <SidebarMenu value={menu} onChange={handleMenuChange} />
+      {!collapsed && (
+        <div className="min-h-0 grow overflow-auto border-l border-sidebar-border">
+          {menu === 'spaces' && <SidebarSpaces />}
+          {menu === 'chats' && <SidebarChats />}
+          {menu === 'settings' && <SidebarSettings />}
+        </div>
+      )}
     </div>
   );
 };
