@@ -25,14 +25,7 @@ export const ToggleNodeView = ({ node, updateAttributes }: NodeViewProps) => {
                     }
                 />
             </button>
-            <NodeViewContent
-                className={
-                    'min-w-0 flex-1 ' +
-                    (open
-                        ? '[&>*:not(:first-child)]:block'
-                        : '[&>*:not(:first-child)]:hidden')
-                }
-            />
+            <NodeViewContent className="toggle-content min-w-0 flex-1" />
         </NodeViewWrapper>
     );
 };
