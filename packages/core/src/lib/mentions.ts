@@ -23,7 +23,11 @@ const collectBlockMentions = (
   if (block) {
     if (block.content) {
       for (const leaf of block.content) {
-        if (leaf.type === 'mention' && leaf.attrs?.target && leaf.attrs?.id) {
+        if (
+          (leaf.type === 'mention' || leaf.type === 'resourceLink') &&
+          leaf.attrs?.target &&
+          leaf.attrs?.id
+        ) {
           mentions.push({
             id: leaf.attrs.id,
             target: leaf.attrs.target,

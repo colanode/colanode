@@ -28,6 +28,7 @@ import { MentionSearchQueryHandler } from './mentions/mention-search';
 import { MessageActivityDatesQueryHandler } from './messages/message-activity-dates';
 import { MessageSearchQueryHandler } from './messages/message-search';
 import { NodeListQueryHandler } from './nodes/node-list';
+import { NodeBacklinksGetQueryHandler } from './nodes/node-backlinks-get';
 import { NodeReactionsListQueryHandler } from './nodes/node-reaction-list';
 import { RecordFieldValueCountQueryHandler } from './records/record-field-value-count';
 import { RecordSearchQueryHandler } from './records/record-search';
@@ -47,6 +48,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'account.list': new AccountListQueryHandler(app),
     'node.reaction.list': new NodeReactionsListQueryHandler(app),
     'node.list': new NodeListQueryHandler(app),
+    'node.backlinks.get': new NodeBacklinksGetQueryHandler(app),
     'record.field.value.count': new RecordFieldValueCountQueryHandler(app),
     'user.search': new UserSearchQueryHandler(app),
     'workspace.list': new WorkspaceListQueryHandler(app),
