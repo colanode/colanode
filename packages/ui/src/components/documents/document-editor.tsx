@@ -85,6 +85,7 @@ import {
   HardBreakNode,
   ParserExtension,
   Markdown,
+  ResourceLinkExtension,
 } from '@colanode/ui/editor/extensions';
 import { ToolbarMenu, ActionMenu } from '@colanode/ui/editor/menus';
 
@@ -294,6 +295,15 @@ export const DocumentEditor = ({
         DropcursorExtension,
         DatabaseNode,
         AutoJoiner,
+        ResourceLinkExtension.configure({
+          context: {
+            userId: workspace.userId,
+            accountId: workspace.accountId,
+            workspaceId: workspace.workspaceId,
+            documentId: node.id,
+            rootId: node.rootId,
+          },
+        }),
         CommanderExtension.configure({
           commands: [
             ParagraphCommand,

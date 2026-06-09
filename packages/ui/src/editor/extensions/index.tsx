@@ -35,6 +35,7 @@ import { PageNode } from '@colanode/ui/editor/extensions/page';
 import { ParagraphNode } from '@colanode/ui/editor/extensions/paragraph';
 import { ParserExtension } from '@colanode/ui/editor/extensions/parser';
 import { PlaceholderExtension } from '@colanode/ui/editor/extensions/placeholder';
+import { ResourceLinkExtension } from '@colanode/ui/editor/extensions/resource-link';
 import { TabKeymapExtension } from '@colanode/ui/editor/extensions/tab-keymap';
 import { TableNode } from '@colanode/ui/editor/extensions/table';
 import { TableCellNode } from '@colanode/ui/editor/extensions/table-cell';
@@ -91,4 +92,5 @@ export {
   HardBreakNode,
   ParserExtension,
   Markdown,
+  ResourceLinkExtension,
 };
