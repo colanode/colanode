@@ -2,10 +2,7 @@
   padding: 0;
 }
 
-div[data-type='toggle'][data-open='false']
-  .toggle-content
-  [data-node-view-content-react]
-  > *:not(:first-child) {
+div[data-type='toggle'][data-open='false'] .toggle-content [data-node-view-content-react]>*:not(:first-child) {
   display: none;
 }
 
