@@ -25,6 +25,7 @@ import { TableRowRenderer } from '@colanode/ui/editor/renderers/table-row';
 import { TaskItemRenderer } from '@colanode/ui/editor/renderers/task-item';
 import { TaskListRenderer } from '@colanode/ui/editor/renderers/task-list';
 import { TextRenderer } from '@colanode/ui/editor/renderers/text';
+import { ToggleRenderer } from '@colanode/ui/editor/renderers/toggle';
 
 interface NodeRendererProps {
   node: JSONContent;
@@ -99,6 +100,9 @@ export const NodeRenderer = ({
         ))
         .with('tableHeader', () => (
           <TableHeaderRenderer node={node} keyPrefix={keyPrefix} />
+        ))
+        .with('toggle', () => (
+          <ToggleRenderer node={node} keyPrefix={keyPrefix} />
         ))
         .otherwise(() => null)}
     </MarkRenderer>

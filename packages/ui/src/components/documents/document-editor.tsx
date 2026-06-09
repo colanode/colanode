@@ -43,6 +43,11 @@ import {
   DatabaseInlineCommand,
 } from '@colanode/ui/editor/commands';
 import {
+  DateCommand,
+  ResourceLinkCommand,
+  ToggleCommand,
+} from '@colanode/ui/editor/commands';
+import {
   BlockquoteNode,
   BoldMark,
   BulletListNode,
@@ -86,6 +91,7 @@ import {
   ParserExtension,
   Markdown,
   ResourceLinkExtension,
+  ToggleNode,
 } from '@colanode/ui/editor/extensions';
 import { ToolbarMenu, ActionMenu } from '@colanode/ui/editor/menus';
 
@@ -295,6 +301,7 @@ export const DocumentEditor = ({
         DropcursorExtension,
         DatabaseNode,
         AutoJoiner,
+        ToggleNode,
         ResourceLinkExtension.configure({
           context: {
             userId: workspace.userId,
@@ -320,6 +327,9 @@ export const DocumentEditor = ({
             DatabaseCommand,
             DividerCommand,
             TodoCommand,
+            ToggleCommand,
+            ResourceLinkCommand,
+            DateCommand,
             FileCommand,
             FolderCommand,
           ],
