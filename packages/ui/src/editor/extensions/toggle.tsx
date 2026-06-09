@@ -11,10 +11,50 @@ declare module '@tiptap/core' {
     }
 }
 
+export const ToggleSummaryNode = Node.create({
+    name: 'toggleSummary',
+    content: 'inline*',
+    defining: true,
+    selectable: false,
+    parseHTML() {
+        return [{ tag: 'div[data-type="toggle-summary"]' }];
+    },
+    renderHTML({ HTMLAttributes }) {
+        return [
+            'div',
+            mergeAttributes(HTMLAttributes, {
+                'data-type': 'toggle-summary',
+                class: 'toggle-summary font-medium',
+            }),
+            0,
+        ];
+    },
+});
+
+export const ToggleBodyNode = Node.create({
+    name: 'toggleBody',
+    content: 'block+',
+    defining: true,
+    selectable: false,
+    parseHTML() {
+        return [{ tag: 'div[data-type="toggle-body"]' }];
+    },
+    renderHTML({ HTMLAttributes }) {
+        return [
+            'div',
+            mergeAttributes(HTMLAttributes, {
+                'data-type': 'toggle-body',
+                class: 'toggle-body pl-2',
+            }),
+            0,
+        ];
+    },
+});
+
 export const ToggleNode = Node.create({
     name: 'toggle',
     group: 'block',
-    content: 'block+',
+    content: 'toggleSummary toggleBody',
     defining: true,
     draggable: true,
     addAttributes() {
@@ -45,8 +85,8 @@ export const ToggleNode = Node.create({
                             type: 'toggle',
                             attrs: { open: true },
                             content: [
-                                { type: 'paragraph' },
-                                { type: 'paragraph' },
+                                { type: 'toggleSummary' },
+                                { type: 'toggleBody', content: [{ type: 'paragraph' }] },
                             ],
                         }),
         };

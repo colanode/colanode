@@ -9,13 +9,18 @@ export const ToggleNodeView = ({ node, updateAttributes }: NodeViewProps) => {
         <NodeViewWrapper
             data-type="toggle"
             data-open={open ? 'true' : 'false'}
-            className="my-1 flex w-full flex-row items-start gap-1 group/toggle"
+            className={
+                'my-1 flex w-full flex-row items-start gap-1 ' +
+                (open
+                    ? '[&_[data-type=toggle-body]]:block'
+                    : '[&_[data-type=toggle-body]]:hidden')
+            }
         >
             <button
                 type="button"
                 contentEditable={false}
                 onClick={() => updateAttributes({ open: !open })}
-                className="mt-[0.4rem] flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted"
+                className="mt-[0.3rem] flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted"
                 aria-label={open ? 'Collapse' : 'Expand'}
             >
                 <ChevronRight
@@ -24,12 +29,7 @@ export const ToggleNodeView = ({ node, updateAttributes }: NodeViewProps) => {
                     }
                 />
             </button>
-            <NodeViewContent
-                className={
-                    'toggle-body min-w-0 flex-1 ' +
-                    (open ? '' : '[&>*:not(:first-child)]:hidden')
-                }
-            />
+            <NodeViewContent className="min-w-0 flex-1" />
         </NodeViewWrapper>
     );
 };

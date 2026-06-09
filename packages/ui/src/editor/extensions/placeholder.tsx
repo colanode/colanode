@@ -11,6 +11,10 @@ export const PlaceholderExtension =
         return `Heading ${node.attrs.level}`;
       }
 
+      if (node.type.name === 'toggleSummary') {
+        return 'Toggle title';
+      }
+
       if (node.type.name === 'paragraph') {
         const extension = editor.extensionManager.extensions.find(
           (f) => f.name === 'placeholder'
