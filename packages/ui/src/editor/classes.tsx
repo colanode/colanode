@@ -20,6 +20,10 @@ export const defaultClasses = {
   dropcursor: 'text-primary-foreground bg-blue-500',
   mention:
     'inline-flex flex-row items-center gap-1 rounded-md bg-muted px-0.5 py-0',
+  resourceLink:
+    'inline-flex flex-row items-center gap-1 rounded-md border border-border bg-muted/40 px-1 py-0 text-foreground hover:bg-muted',
+  resourceLinkMissing:
+    'inline-flex flex-row items-center gap-1 rounded-md border border-dashed border-border bg-muted/20 px-1 py-0 text-muted-foreground line-through decoration-dotted',
   table: 'w-full',
   tableRow: 'min-w-full',
   tableCellWrapper: 'border',
