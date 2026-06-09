@@ -14,6 +14,7 @@ export const ToggleNodeView = ({ node, updateAttributes }: NodeViewProps) => {
             <button
                 type="button"
                 contentEditable={false}
+                onMouseDown={(e) => e.preventDefault()}
                 onClick={() => updateAttributes({ open: !open })}
                 className="mt-[0.3rem] flex size-5 shrink-0 items-center justify-center rounded text-muted-foreground hover:bg-muted"
                 aria-label={open ? 'Collapse' : 'Expand'}
