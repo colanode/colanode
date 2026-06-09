@@ -164,6 +164,17 @@ export const mapBlocksToContents = (
     .sort((a, b) => compareString(a.index, b.index));
 
   for (const child of children) {
+    // Skip legacy/corrupt blocks that should never exist as standalone blocks.
+    // 'text' was accidentally persisted as a block by an earlier toggle schema;
+    // 'toggleSummary' / 'toggleBody' are dropped node types from that attempt —
+    // unwrap them so their content survives in the parent toggle.
+    if (child.type === 'text') {
+      continue;
+    }
+    if (child.type === 'toggleSummary' || child.type === 'toggleBody') {
+      contents.push(...mapBlocksToContents(child.id, blocks));
+      continue;
+    }
     contents.push(mapBlockToContent(child, blocks));
   }
 
@@ -334,20 +345,20 @@ export const findBlockFromPos = (pos: ResolvedPos) => {
 
 export type RelativeSelection =
   | {
-      type: 'node';
-      nodeId: string;
-    }
+    type: 'node';
+    nodeId: string;
+  }
   | {
-      type: 'text';
-      anchor: {
-        nodeId: string;
-        offset: number;
-      };
-      head: {
-        nodeId: string;
-        offset: number;
-      };
+    type: 'text';
+    anchor: {
+      nodeId: string;
+      offset: number;
     };
+    head: {
+      nodeId: string;
+      offset: number;
+    };
+  };
 
 export const getRelativeSelection = (
   editor: Editor

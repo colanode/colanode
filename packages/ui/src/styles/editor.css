@@ -2,6 +2,10 @@
   padding: 0;
 }
 
+div[data-type='toggle'][data-open='false'] .toggle-content [data-node-view-content-react]>*:not(:first-child) {
+  display: none;
+}
+
 .ProseMirror .is-editor-empty:first-child::before {
   content: attr(data-placeholder);
   float: left;
@@ -20,18 +24,18 @@
   opacity: 10;
 }
 
-ul[data-type='taskList'] li > label {
+ul[data-type='taskList'] li>label {
   margin-right: 0.2rem;
   user-select: none;
 }
 
 @media screen and (max-width: 768px) {
-  ul[data-type='taskList'] li > label {
+  ul[data-type='taskList'] li>label {
     margin-right: 0.5rem;
   }
 }
 
-ul[data-type='taskList'] li > label input[type='checkbox'] {
+ul[data-type='taskList'] li>label input[type='checkbox'] {
   -webkit-appearance: none;
   appearance: none;
   background-color: var(--background);
@@ -69,7 +73,7 @@ ul[data-type='taskList'] li > label input[type='checkbox'] {
   }
 }
 
-ul[data-type='taskList'] li[data-checked='true'] > div > p {
+ul[data-type='taskList'] li[data-checked='true']>div>p {
   color: var(--novel-stone-400);
   text-decoration: line-through;
   text-decoration-thickness: 2px;

@@ -9,6 +9,7 @@ import { TableNodeView } from '@colanode/ui/editor/views/table';
 import { TableCellNodeView } from '@colanode/ui/editor/views/table-cell';
 import { TableHeaderNodeView } from '@colanode/ui/editor/views/table-header';
 import { TempFileNodeView } from '@colanode/ui/editor/views/temp-file';
+import { ToggleNodeView } from '@colanode/ui/editor/views/toggle';
 
 export {
   CodeBlockNodeView,
@@ -22,4 +23,5 @@ export {
   TableCellNodeView,
   TableNodeView,
   TableHeaderNodeView,
+  ToggleNodeView,
 };
