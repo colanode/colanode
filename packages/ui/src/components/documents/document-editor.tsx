@@ -92,8 +92,6 @@ import {
   Markdown,
   ResourceLinkExtension,
   ToggleNode,
-  ToggleSummaryNode,
-  ToggleBodyNode,
 } from '@colanode/ui/editor/extensions';
 import { ToolbarMenu, ActionMenu } from '@colanode/ui/editor/menus';
 
@@ -304,8 +302,6 @@ export const DocumentEditor = ({
         DatabaseNode,
         AutoJoiner,
         ToggleNode,
-        ToggleSummaryNode,
-        ToggleBodyNode,
         ResourceLinkExtension.configure({
           context: {
             userId: workspace.userId,

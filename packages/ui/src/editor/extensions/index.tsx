@@ -44,11 +44,7 @@ import { TableRowNode } from '@colanode/ui/editor/extensions/table-row';
 import { TaskItemNode } from '@colanode/ui/editor/extensions/task-item';
 import { TaskListNode } from '@colanode/ui/editor/extensions/task-list';
 import { TempFileNode } from '@colanode/ui/editor/extensions/temp-file';
-import {
-  ToggleNode,
-  ToggleSummaryNode,
-  ToggleBodyNode,
-} from '@colanode/ui/editor/extensions/toggle';
+import { ToggleNode } from '@colanode/ui/editor/extensions/toggle';
 import { TrailingNode } from '@colanode/ui/editor/extensions/trailing-node';
 
 export {
@@ -99,6 +95,4 @@ export {
   Markdown,
   ResourceLinkExtension,
   ToggleNode,
-  ToggleSummaryNode,
-  ToggleBodyNode,
 };
