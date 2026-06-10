@@ -18,7 +18,9 @@ import {
   UserStatus,
 } from '@colanode/core';
 
-import { createWorkspaceDatabase } from './helpers/sqlite';
+import { ensureNodesMetaTypeIdColumn } from '@colanode/client/databases/workspace/migrations/meta-type-id-column';
+
+import { createWorkspaceDatabase, createWorkspaceDatabaseUpTo } from './helpers/sqlite';
 
 const insertNode = async (
   database: Kysely<WorkspaceDatabaseSchema>,
@@ -42,6 +44,40 @@ const insertNode = async (
     })
     .execute();
 };
+
+describe('meta_type_id migration', () => {
+  it('adds a virtual meta_type_id column to existing nodes tables', async () => {
+    const database = await createWorkspaceDatabaseUpTo(
+      '00024-create-node-reaction-updates-table'
+    );
+    const metaTypeId = generateId(IdType.Database);
+    const pageId = generateId(IdType.Page);
+
+    await insertNode(
+      database,
+      pageId,
+      {
+        type: 'page',
+        name: 'Legacy',
+        parentId: generateId(IdType.Space),
+        metaTypeId,
+        fields: {},
+      },
+      generateId(IdType.User)
+    );
+
+    await ensureNodesMetaTypeIdColumn(database);
+
+    const row = await database
+      .selectFrom('nodes')
+      .where('id', '=', pageId)
+      .selectAll()
+      .executeTakeFirstOrThrow();
+
+    expect(row.meta_type_id).toBe(metaTypeId);
+    await database.destroy();
+  });
+});
 
 describe('page meta types', () => {
   let database: Kysely<WorkspaceDatabaseSchema>;

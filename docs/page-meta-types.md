@@ -24,7 +24,7 @@ The default `Page` meta type cannot be deleted (`databaseModel.canDelete`).
 
 ## Queries
 
-- `page.byMetaType` — SQL list via `nodes.meta_type_id` index (used by search and subscriptions)
+- `page.byMetaType` — SQL list via `nodes.meta_type_id` (VIRTUAL generated column + index; migration `00025`/`00026`)
 - Meta type **collection views** load pages via TanStack DB (`metaTypeId` filter on `nodes` collection)
 - Meta type views apply client-side filters/sorts in `applyCollectionViewQuery`
 - Field value counts for Board/Table/List grouping use client-side `useFieldValueCounts`

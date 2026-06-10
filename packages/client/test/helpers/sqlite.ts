@@ -60,6 +60,32 @@ class NodeSqliteDatabase {
     }
 }
 
+export const createWorkspaceDatabaseUpTo = async (
+    lastMigration: string
+): Promise<Kysely<WorkspaceDatabaseSchema>> => {
+    const sqlite = new DatabaseSync(':memory:', {
+        enableForeignKeyConstraints: false,
+    });
+
+    const database = new Kysely<WorkspaceDatabaseSchema>({
+        dialect: new SqliteDialect({
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            database: new NodeSqliteDatabase(sqlite) as any,
+        }),
+    });
+
+    const names = Object.keys(workspaceDatabaseMigrations).sort();
+    for (const name of names) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await workspaceDatabaseMigrations[name]!.up(database as Kysely<any>);
+        if (name === lastMigration) {
+            break;
+        }
+    }
+
+    return database;
+};
+
 export const createWorkspaceDatabase = async (): Promise<
     Kysely<WorkspaceDatabaseSchema>
 > => {

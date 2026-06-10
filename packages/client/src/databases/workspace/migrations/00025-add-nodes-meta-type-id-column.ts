@@ -1,21 +1,10 @@
-import { Migration, sql } from 'kysely';
+import { Migration } from 'kysely';
+
+import { ensureNodesMetaTypeIdColumn } from './meta-type-id-column';
 
 export const addNodesMetaTypeIdColumn: Migration = {
   up: async (db) => {
-    await db.schema
-      .alterTable('nodes')
-      .addColumn('meta_type_id', 'text', (col) =>
-        col.generatedAlwaysAs(
-          sql`json_extract(attributes, '$.metaTypeId')`
-        ).stored()
-      )
-      .execute();
-
-    await db.schema
-      .createIndex('nodes_meta_type_id_type_index')
-      .on('nodes')
-      .columns(['meta_type_id', 'type'])
-      .execute();
+    await ensureNodesMetaTypeIdColumn(db);
   },
   down: async (db) => {
     await db.schema.dropIndex('nodes_meta_type_id_type_index').execute();

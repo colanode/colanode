@@ -172,7 +172,17 @@ export class WorkspaceService {
       },
     });
 
-    await migrator.migrateToLatest();
+    const { error, results } = await migrator.migrateToLatest();
+
+    if (error) {
+      throw error;
+    }
+
+    if (results?.some((result) => result.status === 'Error')) {
+      throw new Error(
+        `Workspace migration failed for ${this.workspace.workspaceId}`
+      );
+    }
   }
 
   public async delete(): Promise<void> {
