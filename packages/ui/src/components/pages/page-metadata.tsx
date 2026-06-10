@@ -1,8 +1,9 @@
 import { Fragment } from 'react';
 
 import { LocalPageNode } from '@colanode/client/types';
-import { NodeRole } from '@colanode/core';
+import { NodeRole, hasNodeRole } from '@colanode/core';
 import { PageFieldsProvider } from '@colanode/ui/components/pages/page-fields-provider';
+import { PageMetaTypePicker } from '@colanode/ui/components/pages/page-meta-type-picker';
 import { RecordField } from '@colanode/ui/components/records/record-field';
 import { RecordFieldValue } from '@colanode/ui/components/records/record-field-value';
 import { RecordDatabase } from '@colanode/ui/components/records/record-database';
@@ -14,17 +15,22 @@ interface PageMetadataProps {
 }
 
 export const PageMetadata = ({ page, role }: PageMetadataProps) => {
+  const canEdit = hasNodeRole(role, 'editor');
+
   return (
-    <RecordDatabase id={page.metaTypeId} role={role}>
-      <PageFieldsProvider page={page} role={role}>
-        <div className="flex flex-col gap-2 border-b pb-3">
-          <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
-            Properties
+    <div className="flex flex-col gap-2 border-b pb-3">
+      <PageMetaTypePicker page={page} canEdit={canEdit} />
+      <RecordDatabase id={page.metaTypeId} role={role}>
+        <PageFieldsProvider page={page} role={role}>
+          <div className="flex flex-col gap-2">
+            <div className="text-xs font-medium uppercase tracking-wide text-muted-foreground">
+              Properties
+            </div>
+            <PageMetadataFields />
           </div>
-          <PageMetadataFields />
-        </div>
-      </PageFieldsProvider>
-    </RecordDatabase>
+        </PageFieldsProvider>
+      </RecordDatabase>
+    </div>
   );
 };
 

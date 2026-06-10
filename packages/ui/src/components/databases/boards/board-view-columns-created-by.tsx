@@ -1,18 +1,13 @@
 import { eq, useLiveQuery as useLiveQueryTanstack } from '@tanstack/react-db';
 import { CircleAlert } from 'lucide-react';
 
-import {
-  CreatedByFieldAttributes,
-  DatabaseViewFilterAttributes,
-} from '@colanode/core';
+import { CreatedByFieldAttributes, DatabaseViewFilterAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
 import { BoardViewContext } from '@colanode/ui/contexts/board-view';
-import { useDatabase } from '@colanode/ui/contexts/database';
-import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useFieldValueCounts } from '@colanode/ui/hooks/use-field-value-counts';
 
 interface BoardViewColumnsCreatedByProps {
   field: CreatedByFieldAttributes;
@@ -21,23 +16,11 @@ interface BoardViewColumnsCreatedByProps {
 export const BoardViewColumnsCreatedBy = ({
   field,
 }: BoardViewColumnsCreatedByProps) => {
-  const workspace = useWorkspace();
-  const database = useDatabase();
-  const view = useDatabaseView();
+  const { values: users, isPending } = useFieldValueCounts(field);
 
-  const createdByCountQuery = useLiveQuery({
-    type: 'record.field.value.count',
-    databaseId: database.id,
-    filters: view.filters,
-    fieldId: field.id,
-    userId: workspace.userId,
-  });
-
-  if (createdByCountQuery.isPending) {
+  if (isPending) {
     return null;
   }
-
-  const users = createdByCountQuery.data?.values ?? [];
 
   return (
     <>

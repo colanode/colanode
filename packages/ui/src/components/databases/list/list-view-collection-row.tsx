@@ -7,6 +7,8 @@ import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { RecordFieldValue } from '@colanode/ui/components/records/record-field-value';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Link } from '@colanode/ui/components/ui/link';
+import { CollectionViewPageId } from '@colanode/ui/components/databases/collection-view-page-id';
+import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { CollectionRow } from '@colanode/ui/lib/collection-row';
@@ -18,8 +20,11 @@ interface ListViewCollectionRowProps {
 
 export const ListViewCollectionRow = ({ row }: ListViewCollectionRowProps) => {
   const workspace = useWorkspace();
+  const database = useDatabase();
   const view = useDatabaseView();
   const navigate = useNavigate();
+  const showPageId =
+    row.nodeType === 'page' && (database.purpose ?? 'records') === 'meta_type';
 
   const name = row.name;
   const hasName = name !== null && name !== '';
@@ -57,12 +62,17 @@ export const ListViewCollectionRow = ({ row }: ListViewCollectionRowProps) => {
         avatar={row.source.avatar}
         size="small"
       />
-      <Input
-        value={name ?? ''}
-        onChange={(event) => mutate(event.target.value)}
-        className="h-7 min-w-0 flex-1 border-none bg-transparent pl-1 shadow-none focus-visible:ring-0"
-        placeholder="Unnamed"
-      />
+      <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+        <Input
+          value={name ?? ''}
+          onChange={(event) => mutate(event.target.value)}
+          className="h-7 border-none bg-transparent pl-1 shadow-none focus-visible:ring-0"
+          placeholder="Unnamed"
+        />
+        {showPageId && (
+          <CollectionViewPageId pageId={row.id} className="max-w-xs px-1" />
+        )}
+      </div>
       {view.fields.length > 0 && (
         <div className="flex shrink-0 flex-row items-center gap-4">
           {view.fields.map((viewField) => {

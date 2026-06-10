@@ -201,7 +201,11 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
               isSameDay(props.day.date, new Date())) ||
               field.type === 'date');
           const canCreatePage =
-            isMetaType && database.canCreatePage && field.type === 'date';
+            isMetaType &&
+            database.canCreatePage &&
+            (field.type === 'date' ||
+              (field.type === 'created_at' &&
+                isSameDay(props.day.date, new Date())));
 
           const onCreate = canCreateRecord
             ? database.canCreateRecord

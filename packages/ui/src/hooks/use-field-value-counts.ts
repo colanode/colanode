@@ -71,6 +71,37 @@ const useMetaTypeSelectFieldValueCounts = (
   }, [data, database.fields, enabled, field, workspace.userId]);
 };
 
+const useMetaTypeCreatedByFieldValueCounts = (
+  enabled: boolean
+): FieldValueCounts | null => {
+  const view = useDatabaseView();
+  const { data } = useCollectionQuery(view.filters, view.sorts);
+
+  return useMemo(() => {
+    if (!enabled) {
+      return null;
+    }
+
+    const counts = new Map<string, number>();
+
+    for (const row of data) {
+      counts.set(row.createdBy, (counts.get(row.createdBy) ?? 0) + 1);
+    }
+
+    const values = [...counts.entries()]
+      .map(([value, count]) => ({ value, count }))
+      .sort((left, right) => {
+        if (right.count !== left.count) {
+          return right.count - left.count;
+        }
+
+        return left.value.localeCompare(right.value);
+      });
+
+    return { values, noValueCount: 0 };
+  }, [data, enabled]);
+};
+
 const useMetaTypeCollaboratorFieldValueCounts = (
   field: CollaboratorFieldAttributes,
   enabled: boolean
@@ -148,7 +179,18 @@ export const useFieldValueCounts = (
     isMetaType && field.type === 'collaborator'
   );
 
+  const metaCreatedByCounts = useMetaTypeCreatedByFieldValueCounts(
+    isMetaType && field.type === 'created_by'
+  );
+
   if (isMetaType) {
+    if (field.type === 'created_by') {
+      return {
+        ...(metaCreatedByCounts ?? emptyCounts),
+        isPending: false,
+      };
+    }
+
     if (field.type === 'collaborator') {
       return {
         ...(metaCollaboratorCounts ?? emptyCounts),

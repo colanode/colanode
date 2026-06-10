@@ -1,6 +1,8 @@
 import { useNavigate } from '@tanstack/react-router';
 
+import { CollectionViewPageId } from '@colanode/ui/components/databases/collection-view-page-id';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
+import { useDatabase } from '@colanode/ui/contexts/database';
 import { RecordFieldValue } from '@colanode/ui/components/records/record-field-value';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
@@ -20,8 +22,11 @@ export const CollectionViewCard = ({
   compact = false,
 }: CollectionViewCardProps) => {
   const view = useDatabaseView();
+  const database = useDatabase();
   const workspace = useWorkspace();
   const navigate = useNavigate();
+  const showPageId =
+    row.nodeType === 'page' && (database.purpose ?? 'records') === 'meta_type';
 
   const name = row.name;
   const hasName = name !== null && name !== '';
@@ -41,6 +46,9 @@ export const CollectionViewCard = ({
       >
         {hasName ? name : 'Unnamed'}
       </p>
+      {showPageId && (
+        <CollectionViewPageId pageId={row.id} className="max-w-full" />
+      )}
       {view.fields.length > 0 && (
         <div className={cn('flex flex-col', compact ? 'mt-2 gap-1' : 'gap-1.5')}>
           {view.fields.map((viewField) => {
