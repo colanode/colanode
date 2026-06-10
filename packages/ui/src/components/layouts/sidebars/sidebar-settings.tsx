@@ -1,4 +1,5 @@
 import {
+  Tags,
   Download,
   Info,
   Palette,
@@ -25,6 +26,16 @@ export const SidebarSettings = () => {
             <SidebarSettingsItem
               title="General"
               icon={Settings}
+              isActive={isActive}
+            />
+          )}
+        </Link>
+
+        <Link from="/workspace/$userId" to="settings/tags">
+          {({ isActive }) => (
+            <SidebarSettingsItem
+              title="Tags"
+              icon={Tags}
               isActive={isActive}
             />
           )}

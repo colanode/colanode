@@ -100,6 +100,7 @@ export class WorkspaceService {
     this.workspace.description = workspace.description;
     this.workspace.avatar = workspace.avatar;
     this.workspace.role = workspace.role;
+    this.workspace.tags = workspace.tags;
   }
 
   // Replaces the active CloudSyncService with a freshly-configured one (or

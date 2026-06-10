@@ -9,6 +9,7 @@ export const folderAttributesSchema = z.object({
   name: z.string(),
   avatar: z.string().nullable().optional(),
   parentId: z.string(),
+  tagIds: z.array(z.string()).optional(),
 });
 
 export type FolderAttributes = z.infer<typeof folderAttributesSchema>;

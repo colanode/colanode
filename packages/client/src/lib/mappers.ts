@@ -149,6 +149,7 @@ export const mapWorkspace = (row: SelectWorkspace): Workspace => {
     description: row.description,
     maxFileSize: row.max_file_size?.toString() ?? undefined,
     status: row.status,
+    tags: row.tags ? JSON.parse(row.tags) : undefined,
   };
 };
 

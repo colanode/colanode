@@ -8,6 +8,8 @@ import { MessageAttributes, messageModel } from './message';
 import { PageAttributes, pageModel } from './page';
 import { RecordAttributes, recordModel } from './record';
 import { SpaceAttributes, spaceModel } from './space';
+import { TagAttributes } from './tag';
+export type { TagAttributes };
 
 type NodeBase = {
   id: string;

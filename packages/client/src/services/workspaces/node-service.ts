@@ -11,9 +11,9 @@ import {
   mapNodeReference,
 } from '@colanode/client/lib/mappers';
 import {
-  applyMentionUpdates,
-  checkMentionChanges,
-} from '@colanode/client/lib/mentions';
+  applyNodeReferenceUpdates,
+  buildNodeReferencesToCreate,
+} from '@colanode/client/lib/tags';
 import { deleteNodeRelations, fetchNodeTree } from '@colanode/client/lib/utils';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import { DownloadStatus, LocalNode } from '@colanode/client/types';
@@ -92,16 +92,12 @@ export class NodeService {
     const createdAt = new Date().toISOString();
     const rootId = tree[0]?.id ?? input.id;
     const nodeText = model.extractText(input.id, input.attributes);
-    const mentions = model.extractMentions(input.id, input.attributes);
-    const nodeReferencesToCreate: CreateNodeReference[] = mentions.map(
-      (mention) => ({
-        node_id: input.id,
-        reference_id: mention.target,
-        inner_id: mention.id,
-        type: 'mention',
-        created_at: createdAt,
-        created_by: this.workspace.userId,
-      })
+    const nodeReferencesToCreate = buildNodeReferencesToCreate(
+      input.id,
+      input.attributes,
+      model,
+      this.workspace.userId,
+      createdAt
     );
 
     const { createdNode, createdMutation, createdNodeReferences } =
@@ -268,16 +264,12 @@ export class NodeService {
     const createdAt = new Date().toISOString();
     const rootId = tree[0]?.id ?? id;
     const nodeText = model.extractText(id, attributes);
-    const mentions = model.extractMentions(id, attributes);
-    const nodeReferencesToCreate: CreateNodeReference[] = mentions.map(
-      (mention) => ({
-        node_id: id,
-        reference_id: mention.target,
-        inner_id: mention.id,
-        type: 'mention',
-        created_at: createdAt,
-        created_by: this.workspace.userId,
-      })
+    const nodeReferencesToCreate = buildNodeReferencesToCreate(
+      id,
+      attributes,
+      model,
+      this.workspace.userId,
+      createdAt
     );
 
     const { createdNode, createdMutation, createdNodeReferences } =
@@ -480,9 +472,7 @@ export class NodeService {
     const localRevision = BigInt(node.localRevision) + BigInt(1);
     const nodeText = model.extractText(nodeId, attributes);
 
-    const beforeMentions = model.extractMentions(nodeId, node);
-    const afterMentions = model.extractMentions(nodeId, attributes);
-    const mentionChanges = checkMentionChanges(beforeMentions, afterMentions);
+    const beforeAttributes = mapNodeAttributes(node);
 
     const {
       updatedNode,
@@ -560,12 +550,14 @@ export class NodeService {
       }
 
       const { createdNodeReferences, deletedNodeReferences } =
-        await applyMentionUpdates(
+        await applyNodeReferenceUpdates(
           trx,
           nodeId,
           this.workspace.userId,
           updatedAt,
-          mentionChanges
+          model,
+          beforeAttributes,
+          attributes
         );
 
       return {
@@ -791,15 +783,13 @@ export class NodeService {
 
     const model = getNodeModel(attributes.type);
     const nodeText = model.extractText(update.nodeId, attributes);
-    const mentions = model.extractMentions(update.nodeId, attributes);
-    const nodeReferencesToCreate = mentions.map((mention) => ({
-      node_id: update.nodeId,
-      reference_id: mention.target,
-      inner_id: mention.id,
-      type: 'mention',
-      created_at: update.createdAt,
-      created_by: update.createdBy,
-    }));
+    const nodeReferencesToCreate = buildNodeReferencesToCreate(
+      update.nodeId,
+      attributes,
+      model,
+      update.createdBy,
+      update.createdAt
+    );
 
     const { createdNode, createdNodeReferences } = await this.workspace.database
       .transaction()
@@ -929,12 +919,6 @@ export class NodeService {
     const nodeText = model.extractText(existingNode.id, attributes);
 
     const beforeAttributes = JSON.parse(existingNode.attributes);
-    const beforeMentions = model.extractMentions(
-      existingNode.id,
-      beforeAttributes
-    );
-    const afterMentions = model.extractMentions(existingNode.id, attributes);
-    const mentionChanges = checkMentionChanges(beforeMentions, afterMentions);
 
     const mergedUpdateIds = update.mergedUpdates?.map((u) => u.id) ?? [];
     const updatesToDelete = [update.id, ...mergedUpdateIds];
@@ -1000,12 +984,14 @@ export class NodeService {
         }
 
         const { createdNodeReferences, deletedNodeReferences } =
-          await applyMentionUpdates(
+          await applyNodeReferenceUpdates(
             trx,
             existingNode.id,
             update.createdBy,
             update.createdAt,
-            mentionChanges
+            model,
+            beforeAttributes,
+            attributes
           );
 
         return { updatedNode, createdNodeReferences, deletedNodeReferences };
@@ -1202,7 +1188,6 @@ export class NodeService {
 
     const model = getNodeModel(attributes.type);
     const nodeText = model.extractText(data.nodeId, attributes);
-    const afterMentions = model.extractMentions(data.nodeId, attributes);
 
     const existingNode = await this.workspace.database
       .selectFrom('nodes')
@@ -1217,15 +1202,12 @@ export class NodeService {
     };
 
     if (!existingNode) {
-      const nodeReferencesToCreate: CreateNodeReference[] = afterMentions.map(
-        (mention) => ({
-          node_id: data.nodeId,
-          reference_id: mention.target,
-          inner_id: mention.id,
-          type: 'mention',
-          created_at: data.createdAt,
-          created_by: data.createdBy,
-        })
+      const nodeReferencesToCreate = buildNodeReferencesToCreate(
+        data.nodeId,
+        attributes,
+        model,
+        data.createdBy,
+        data.createdAt
       );
 
       const { createdNode, createdNodeReferences } =
@@ -1309,11 +1291,6 @@ export class NodeService {
     const localRevision = BigInt(existingNode.local_revision) + BigInt(1);
     const beforeAttributes = JSON.parse(existingNode.attributes);
     const beforeModel = getNodeModel(beforeAttributes.type ?? attributes.type);
-    const beforeMentions = beforeModel.extractMentions(
-      data.nodeId,
-      beforeAttributes
-    );
-    const mentionChanges = checkMentionChanges(beforeMentions, afterMentions);
 
     const { updatedNode, createdNodeReferences, deletedNodeReferences } =
       await this.workspace.database.transaction().execute(async (trx) => {
@@ -1350,12 +1327,14 @@ export class NodeService {
         }
 
         const { createdNodeReferences, deletedNodeReferences } =
-          await applyMentionUpdates(
+          await applyNodeReferenceUpdates(
             trx,
             data.nodeId,
             data.createdBy,
             data.createdAt,
-            mentionChanges
+            beforeModel,
+            beforeAttributes,
+            attributes
           );
 
         return { updatedNode, createdNodeReferences, deletedNodeReferences };
@@ -1560,9 +1539,6 @@ export class NodeService {
     const localRevision = BigInt(node.local_revision) + BigInt(1);
 
     const beforeAttributes = JSON.parse(node.attributes);
-    const beforeMentions = model.extractMentions(node.id, beforeAttributes);
-    const afterMentions = model.extractMentions(node.id, attributes);
-    const mentionChanges = checkMentionChanges(beforeMentions, afterMentions);
 
     const { updatedNode, createdNodeReferences, deletedNodeReferences } =
       await this.workspace.database.transaction().execute(async (trx) => {
@@ -1598,12 +1574,14 @@ export class NodeService {
         }
 
         const { createdNodeReferences, deletedNodeReferences } =
-          await applyMentionUpdates(
+          await applyNodeReferenceUpdates(
             trx,
             node.id,
             this.workspace.userId,
             mutation.createdAt,
-            mentionChanges
+            model,
+            beforeAttributes,
+            attributes
           );
 
         return { updatedNode, createdNodeReferences, deletedNodeReferences };

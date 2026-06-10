@@ -9,6 +9,8 @@ import {
 import { Mediator } from '@colanode/client/handlers';
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
+import { migrateLegacySpaceTags } from '@colanode/client/lib/workspace-tags';
+import { syncTagReferences } from '@colanode/client/lib/tag-references-sync';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
 import { AppMeta, LocalSyncConfig } from '@colanode/client/services/app-meta';
 import { AssetService } from '@colanode/client/services/asset-service';
@@ -195,6 +197,8 @@ export class AppService {
       account
     );
     await workspaceService.init();
+    await migrateLegacySpaceTags(this, workspace);
+    await syncTagReferences(workspaceService);
 
     this.workspaces.set(workspace.user_id, workspaceService);
     return workspaceService;

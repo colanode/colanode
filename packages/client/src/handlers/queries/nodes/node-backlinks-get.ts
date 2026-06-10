@@ -30,12 +30,12 @@ export class NodeBacklinksGetQueryHandler
         }
 
         if (
-            event.workspace?.userId === input.userId &&
             (event.type === 'node.reference.created' ||
                 event.type === 'node.reference.deleted' ||
                 event.type === 'node.created' ||
                 event.type === 'node.updated' ||
-                event.type === 'node.deleted')
+                event.type === 'node.deleted') &&
+            event.workspace.userId === input.userId
         ) {
             return {
                 hasChanges: true,

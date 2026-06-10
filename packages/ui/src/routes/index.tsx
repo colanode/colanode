@@ -31,6 +31,14 @@ import {
   workspaceSettingsRoute,
 } from '@colanode/ui/routes/workspace/settings';
 import {
+  tagNodesMaskRoute,
+  tagNodesRoute,
+} from '@colanode/ui/routes/workspace/tag-nodes';
+import {
+  workspaceTagsMaskRoute,
+  workspaceTagsRoute,
+} from '@colanode/ui/routes/workspace/tags';
+import {
   workspaceUsersMaskRoute,
   workspaceUsersRoute,
 } from '@colanode/ui/routes/workspace/users';
@@ -45,6 +53,8 @@ export const routeTree = rootRoute.addChildren([
     workspaceDownloadsRoute,
     workspaceUsersRoute,
     workspaceSettingsRoute,
+    tagNodesRoute,
+    workspaceTagsRoute,
     infoRoute,
     appAppearanceRoute,
   ]),
@@ -53,6 +63,8 @@ export const routeTree = rootRoute.addChildren([
     workspaceHomeMaskRoute,
     nodeMaskRoute,
     workspaceSettingsMaskRoute,
+    tagNodesMaskRoute,
+    workspaceTagsMaskRoute,
     workspaceUsersMaskRoute,
     workspaceDownloadsMaskRoute,
     infoMaskRoute,

@@ -16,6 +16,7 @@ export * from './registry/nodes/message';
 export * from './registry/nodes/page';
 export * from './registry/nodes/record';
 export * from './registry/nodes/space';
+export * from './registry/nodes/tag';
 export * from './registry/nodes/file';
 export * from './registry/documents/index';
 export * from './registry/documents/rich-text';

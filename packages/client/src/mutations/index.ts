@@ -20,6 +20,7 @@ export * from './spaces/space-child-reorder';
 export * from './workspaces/workspace-create';
 export * from './workspaces/workspace-delete';
 export * from './workspaces/workspace-update';
+export * from './workspaces/workspace-tags-update';
 export * from './workspaces/local-sync-trigger';
 export * from './workspaces/local-sync-set-paused';
 export * from './files/temp-file-create';

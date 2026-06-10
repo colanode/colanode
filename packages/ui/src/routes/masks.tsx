@@ -51,6 +51,31 @@ export const workspaceSettingsRouteMask = createRouteMask({
   },
 });
 
+export const tagNodesRouteMask = createRouteMask({
+  routeTree: routeTree,
+  from: '/workspace/$userId/tags/$tagId',
+  to: '/$workspaceId/tags/$tagId',
+  params: (ctx) => {
+    const workspace = collections.workspaces.get(ctx.userId);
+    return {
+      workspaceId: workspace?.workspaceId ?? 'unknown',
+      tagId: ctx.tagId,
+    };
+  },
+});
+
+export const workspaceTagsRouteMask = createRouteMask({
+  routeTree: routeTree,
+  from: '/workspace/$userId/settings/tags',
+  to: '/$workspaceId/settings/tags',
+  params: (ctx) => {
+    const workspace = collections.workspaces.get(ctx.userId);
+    return {
+      workspaceId: workspace?.workspaceId ?? 'unknown',
+    };
+  },
+});
+
 export const workspaceUsersRouteMask = createRouteMask({
   routeTree: routeTree,
   from: '/workspace/$userId/users',
@@ -118,6 +143,8 @@ export const routeMasks = [
   nodeRouteMask,
   modalNodeRouteMask,
   workspaceSettingsRouteMask,
+  tagNodesRouteMask,
+  workspaceTagsRouteMask,
   workspaceUsersRouteMask,
   workspaceDownloadsRouteMask,
   appAppearanceRouteMask,

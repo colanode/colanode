@@ -32,6 +32,7 @@ import { LocalSyncSetPausedMutationHandler } from './workspaces/local-sync-set-p
 import { LocalSyncTriggerMutationHandler } from './workspaces/local-sync-trigger';
 import { WorkspaceCreateMutationHandler } from './workspaces/workspace-create';
 import { WorkspaceDeleteMutationHandler } from './workspaces/workspace-delete';
+import { WorkspaceTagsUpdateMutationHandler } from './workspaces/workspace-tags-update';
 import { WorkspaceUpdateMutationHandler } from './workspaces/workspace-update';
 
 export type MutationHandlerMap = {
@@ -59,6 +60,7 @@ export const buildMutationHandlerMap = (
     'node.reaction.delete': new NodeReactionDeleteMutationHandler(app),
     'workspace.create': new WorkspaceCreateMutationHandler(app),
     'workspace.update': new WorkspaceUpdateMutationHandler(app),
+    'workspace.tags.update': new WorkspaceTagsUpdateMutationHandler(app),
     'avatar.upload': new AvatarUploadMutationHandler(app),
     'file.create': new FileCreateMutationHandler(app),
     'file.download': new FileDownloadMutationHandler(app),

@@ -1,6 +1,7 @@
 import { BasicIndex, createCollection } from '@tanstack/react-db';
 
 import { Workspace } from '@colanode/client/types';
+import { applyWorkspaceTagsTransaction } from '@colanode/ui/lib/workspaces';
 
 export const createWorkspacesCollection = () => {
   return createCollection<Workspace, string>({
@@ -48,6 +49,9 @@ export const createWorkspacesCollection = () => {
           },
         };
       },
+    },
+    onUpdate: async ({ transaction }) => {
+      await applyWorkspaceTagsTransaction(transaction);
     },
   });
 };

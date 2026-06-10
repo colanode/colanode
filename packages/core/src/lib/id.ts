@@ -21,6 +21,7 @@ export enum IdType {
   DatabaseView = 'dv',
   Field = 'fd',
   SelectOption = 'so',
+  Tag = 'tg',
   ViewFilter = 'vf',
   ViewSort = 'vs',
   Query = 'qu',

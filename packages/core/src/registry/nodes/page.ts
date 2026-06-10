@@ -10,6 +10,7 @@ export const pageAttributesSchema = z.object({
   name: z.string(),
   avatar: z.string().nullable().optional(),
   parentId: z.string(),
+  tagIds: z.array(z.string()).optional(),
 });
 
 export type PageAttributes = z.infer<typeof pageAttributesSchema>;

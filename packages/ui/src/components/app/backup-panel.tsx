@@ -1,3 +1,4 @@
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 
@@ -5,6 +6,7 @@ import type {
     BackupListItem,
     BackupProgress,
 } from '@colanode/client/services/backup';
+import { collections } from '@colanode/ui/collections';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -19,7 +21,18 @@ import { Button } from '@colanode/ui/components/ui/button';
 import { Input } from '@colanode/ui/components/ui/input';
 import { Separator } from '@colanode/ui/components/ui/separator';
 import { Spinner } from '@colanode/ui/components/ui/spinner';
+import { useMetadata } from '@colanode/ui/hooks/use-metadata';
 import type { BackupProviderConfig } from '@colanode/ui/window';
+
+const BACKUP_CONFIG_NAMESPACE = 'app';
+const BACKUP_CONFIG_KEY = 'backup.config';
+
+type PersistedBackupPanelConfig = {
+    providerType: ProviderType;
+    local: LocalFields;
+    github: GitHubFields;
+    s3: S3Fields;
+};
 
 function formatBytes(bytes: number): string {
     if (bytes === 0) return '0 B';
@@ -54,6 +67,25 @@ interface S3Fields {
 }
 
 export const BackupPanel = () => {
+    const [savedConfig, setSavedConfig] = useMetadata<PersistedBackupPanelConfig>(
+        BACKUP_CONFIG_NAMESPACE,
+        BACKUP_CONFIG_KEY
+    );
+    const [hydrated, setHydrated] = useState(false);
+
+    const metadataQuery = useLiveQuery(
+        (q) =>
+            q
+                .from({ metadata: collections.metadata })
+                .where(
+                    ({ metadata }) =>
+                        eq(metadata.namespace, BACKUP_CONFIG_NAMESPACE) &&
+                        eq(metadata.key, BACKUP_CONFIG_KEY)
+                )
+                .findOne(),
+        []
+    );
+
     const [providerType, setProviderType] = useState<ProviderType>('local');
     const [localFields, setLocalFields] = useState<LocalFields>({
         path: '',
@@ -79,6 +111,47 @@ export const BackupPanel = () => {
     const [restoreTarget, setRestoreTarget] = useState<string | null>(null);
 
     const unsubRef = useRef<(() => void) | null>(null);
+
+    useEffect(() => {
+        if (!metadataQuery.isReady || hydrated) {
+            return;
+        }
+
+        setHydrated(true);
+
+        if (savedConfig) {
+            setProviderType(savedConfig.providerType);
+            setLocalFields(savedConfig.local);
+            setGithubFields(savedConfig.github);
+            setS3Fields(savedConfig.s3);
+        }
+    }, [metadataQuery.isReady, savedConfig, hydrated]);
+
+    useEffect(() => {
+        if (!hydrated) {
+            return;
+        }
+
+        const timer = setTimeout(() => {
+            setSavedConfig({
+                providerType,
+                local: localFields,
+                github: githubFields,
+                s3: s3Fields,
+            });
+        }, 500);
+
+        return () => {
+            clearTimeout(timer);
+        };
+    }, [
+        hydrated,
+        providerType,
+        localFields,
+        githubFields,
+        s3Fields,
+        setSavedConfig,
+    ]);
 
     useEffect(() => {
         return () => {

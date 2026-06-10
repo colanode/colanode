@@ -108,6 +108,7 @@ interface WorkspacesTable {
   created_at: ColumnType<string, string, string>;
   updated_at: ColumnType<string | null, string | null, string | null>;
   status: ColumnType<WorkspaceStatus, WorkspaceStatus, WorkspaceStatus>;
+  tags: ColumnType<string | null, string | null, string | null>;
 }
 
 export type SelectWorkspace = Selectable<WorkspacesTable>;

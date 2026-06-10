@@ -36,6 +36,7 @@ import { UserListQueryHandler } from './users/user-list';
 import { UserSearchQueryHandler } from './users/user-search';
 import { LocalSyncStatusGetQueryHandler } from './workspaces/local-sync-status-get';
 import { WorkspaceListQueryHandler } from './workspaces/workspace-list';
+import { TagNodesListQueryHandler } from './tags/tag-nodes-list';
 
 export type QueryHandlerMap = {
   [K in keyof QueryMap]: QueryHandler<QueryMap[K]['input']>;
@@ -77,5 +78,6 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'emoji.svg.get': new EmojiSvgGetQueryHandler(app),
     'tabs.list': new TabsListQueryHandler(app),
     'local.sync.status.get': new LocalSyncStatusGetQueryHandler(app),
+    'tag.nodes.list': new TagNodesListQueryHandler(app),
   };
 };

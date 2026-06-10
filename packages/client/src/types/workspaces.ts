@@ -1,4 +1,4 @@
-import { WorkspaceRole, WorkspaceStatus } from '@colanode/core';
+import { TagAttributes, WorkspaceRole, WorkspaceStatus } from '@colanode/core';
 
 export type Workspace = {
   userId: string;
@@ -10,6 +10,7 @@ export type Workspace = {
   role: WorkspaceRole;
   maxFileSize?: string | null;
   status: WorkspaceStatus;
+  tags?: Record<string, TagAttributes>;
 };
 
 export type SidebarMenuType = 'chats' | 'spaces' | 'settings';
