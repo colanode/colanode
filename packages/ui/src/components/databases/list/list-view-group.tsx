@@ -4,7 +4,7 @@ import { InView } from 'react-intersection-observer';
 
 import { DatabaseViewFilterAttributes, extractNodeRole } from '@colanode/core';
 import { ListViewCollectionRow } from '@colanode/ui/components/databases/list/list-view-collection-row';
-import { MetaTypePageCreateButton } from '@colanode/ui/components/pages/meta-type-page-create-button';
+import { MetaTypePageCreateFromFilter } from '@colanode/ui/components/pages/meta-type-page-create-from-filter';
 import { PageFieldsProvider } from '@colanode/ui/components/pages/page-fields-provider';
 import { RecordProvider } from '@colanode/ui/components/records/record-provider';
 import { useDatabase } from '@colanode/ui/contexts/database';
@@ -78,7 +78,8 @@ export const ListViewGroup = ({ header, filter }: ListViewGroupProps) => {
               <span className="text-sm">Add record</span>
             </button>
           )}
-          <MetaTypePageCreateButton
+          <MetaTypePageCreateFromFilter
+            filters={filters}
             className="animate-fade-in mt-1 flex h-9 w-full cursor-pointer flex-row items-center gap-1 rounded-md px-2 text-muted-foreground hover:bg-accent"
           />
           <InView

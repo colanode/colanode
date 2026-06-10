@@ -1,6 +1,7 @@
 import { eq, useLiveQuery } from '@tanstack/react-db';
 
 import { LocalSpaceNode } from '@colanode/client/types';
+import { META_TYPES_SPACE_MARKER } from '@colanode/core';
 import { SidebarHeader } from '@colanode/ui/components/layouts/sidebars/sidebar-header';
 import { SpaceCreateButton } from '@colanode/ui/components/spaces/space-create-button';
 import { SpaceSidebarItem } from '@colanode/ui/components/spaces/space-sidebar-item';
@@ -20,7 +21,9 @@ export const SidebarSpaces = () => {
     [workspace.userId]
   );
 
-  const spaces = spaceListQuery.data.map((node) => node as LocalSpaceNode);
+  const spaces = spaceListQuery.data
+    .map((node) => node as LocalSpaceNode)
+    .filter((space) => space.description !== META_TYPES_SPACE_MARKER);
 
   return (
     <div className="flex flex-col group/sidebar h-full px-2">

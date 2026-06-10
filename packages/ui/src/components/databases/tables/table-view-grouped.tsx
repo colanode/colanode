@@ -6,10 +6,7 @@ import {
     SelectFieldAttributes,
 } from '@colanode/core';
 import { TableViewGroup } from '@colanode/ui/components/databases/tables/table-view-group';
-import { useDatabase } from '@colanode/ui/contexts/database';
-import { useDatabaseView } from '@colanode/ui/contexts/database-view';
-import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useFieldValueCounts } from '@colanode/ui/hooks/use-field-value-counts';
 import { getSelectOptionStrongStyle } from '@colanode/ui/lib/databases';
 
 interface TableViewGroupedProps {
@@ -23,20 +20,7 @@ const GroupCountBadge = ({ count }: { count: number }) => (
 );
 
 export const TableViewGrouped = ({ field }: TableViewGroupedProps) => {
-    const workspace = useWorkspace();
-    const database = useDatabase();
-    const view = useDatabaseView();
-
-    const countQuery = useLiveQuery({
-        type: 'record.field.value.count',
-        databaseId: database.id,
-        filters: view.filters,
-        fieldId: field.id,
-        userId: workspace.userId,
-    });
-
-    const values = countQuery.data?.values ?? [];
-    const noValueCount = countQuery.data?.noValueCount ?? 0;
+    const { values, noValueCount } = useFieldValueCounts(field);
     const options = Object.values(field.options ?? {});
 
     return (

@@ -1,5 +1,6 @@
 import { z } from 'zod/v4';
 
+import { DEFAULT_PAGE_META_TYPE_NAME } from '@colanode/core/lib/meta-types';
 import { extractNodeRole } from '@colanode/core/lib/nodes';
 import { hasNodeRole } from '@colanode/core/lib/permissions';
 import { NodeModel } from '@colanode/core/registry/nodes/core';
@@ -64,6 +65,16 @@ export const databaseModel: NodeModel = {
   canDelete: (context) => {
     if (context.tree.length === 0) {
       return false;
+    }
+
+    if (context.node.type === 'database') {
+      const purpose = context.node.purpose ?? 'records';
+      if (
+        purpose === 'meta_type' &&
+        context.node.name === DEFAULT_PAGE_META_TYPE_NAME
+      ) {
+        return false;
+      }
     }
 
     const role = extractNodeRole(context.tree, context.user.id);

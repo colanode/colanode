@@ -1,10 +1,8 @@
-import { InView } from 'react-intersection-observer';
-
 import { DatabaseViewFilterAttributes, FieldAttributes } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
-import { useRecordsQuery } from '@colanode/ui/hooks/use-records-query';
+import { useCollectionQuery } from '@colanode/ui/hooks/use-collection-query';
 
 interface CalendarViewNoValueListProps {
   filters: DatabaseViewFilterAttributes[];
@@ -17,46 +15,58 @@ export const CalendarViewNoValueList = ({
 }: CalendarViewNoValueListProps) => {
   const view = useDatabaseView();
 
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useRecordsQuery(filters, view.sorts);
-
-  const records = data;
+  const { data } = useCollectionQuery(filters, view.sorts);
+  const rows = data;
 
   return (
     <div className="flex flex-col gap-2 overflow-y-auto">
-      {records.length === 0 && (
+      {rows.length === 0 && (
         <div className="text-center text-sm text-muted-foreground">
           No records with no {field.name} value
         </div>
       )}
-      {records.map((record) => {
-        const name = record.name ?? 'Unnamed';
+      {rows.map((row) => {
+        const name = row.name ?? 'Unnamed';
+        const avatar = row.source.avatar;
+
+        if (row.nodeType === 'page') {
+          return (
+            <Link
+              from="/workspace/$userId"
+              to="$nodeId"
+              params={{ nodeId: row.id }}
+              key={row.id}
+              className="flex flex-row items-center border rounded-md p-1 gap-2 cursor-pointer hover:bg-muted"
+            >
+              <Avatar
+                id={row.id}
+                name={name}
+                avatar={avatar}
+                size="small"
+              />
+              <p>{name}</p>
+            </Link>
+          );
+        }
+
         return (
           <Link
-            from="/workspace/$userId"
-            to="$nodeId"
-            params={{ nodeId: record.id }}
-            key={record.id}
+            from="/workspace/$userId/$nodeId"
+            to="modal/$modalNodeId"
+            params={{ modalNodeId: row.id }}
+            key={row.id}
             className="flex flex-row items-center border rounded-md p-1 gap-2 cursor-pointer hover:bg-muted"
           >
             <Avatar
-              id={record.id}
+              id={row.id}
               name={name}
-              avatar={record.avatar}
+              avatar={avatar}
               size="small"
             />
             <p>{name}</p>
           </Link>
         );
       })}
-      <InView
-        rootMargin="200px"
-        onChange={(inView) => {
-          if (inView && hasNextPage && !isFetchingNextPage) {
-            fetchNextPage();
-          }
-        }}
-      ></InView>
     </div>
   );
 };

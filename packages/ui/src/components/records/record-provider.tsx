@@ -18,15 +18,23 @@ export const RecordProvider = ({
   const canEdit =
     record.createdBy === workspace.userId || hasNodeRole(role, 'editor');
 
+  const entityValue = {
+    entityType: 'record' as const,
+    id: record.id,
+    name: record.name,
+    avatar: record.avatar,
+    fields: record.fields,
+    createdBy: record.createdBy,
+    createdAt: record.createdAt,
+    updatedBy: record.updatedBy,
+    updatedAt: record.updatedAt,
+    schemaId: record.databaseId,
+    localRevision: record.localRevision,
+    canEdit,
+  };
+
   return (
-    <EntityFieldsContext.Provider
-      value={{
-        entityType: 'record',
-        id: record.id,
-        fields: record.fields,
-        canEdit,
-      }}
-    >
+    <EntityFieldsContext.Provider value={entityValue}>
       <RecordContext.Provider
         value={{
           id: record.id,

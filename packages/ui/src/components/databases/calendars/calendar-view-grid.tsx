@@ -4,16 +4,19 @@ import { DayPicker, DayProps, getDefaultClassNames } from 'react-day-picker';
 
 import {
   FieldAttributes,
+  FieldValue,
   isSameDay,
   DatabaseViewFilterAttributes,
 } from '@colanode/core';
 import { CalendarViewDay } from '@colanode/ui/components/databases/calendars/calendar-view-day';
+import { MetaTypePageCreateDialog } from '@colanode/ui/components/pages/meta-type-page-create-dialog';
 import { buttonVariants } from '@colanode/ui/components/ui/button';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useRecordsQuery } from '@colanode/ui/hooks/use-records-query';
-import { filterRecords } from '@colanode/ui/lib/databases';
+import { useCollectionQuery } from '@colanode/ui/hooks/use-collection-query';
+import { generateFieldValuesFromFilters } from '@colanode/ui/lib/databases';
+import { filterCollectionRows } from '@colanode/ui/lib/collection-view-query';
 import { cn, getDisplayedDates } from '@colanode/ui/lib/utils';
 
 const toUTCDate = (dateParam: Date | string): Date => {
@@ -34,10 +37,15 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
   const view = useDatabaseView();
+  const isMetaType = (database.purpose ?? 'records') === 'meta_type';
 
   const defaultClassNames = getDefaultClassNames();
 
   const [month, setMonth] = useState(new Date());
+  const [pageCreateOpen, setPageCreateOpen] = useState(false);
+  const [pageCreateFields, setPageCreateFields] = useState<
+    Record<string, FieldValue>
+  >({});
   const { first, last } = useMemo(() => getDisplayedDates(month), [month]);
 
   const filters: DatabaseViewFilterAttributes[] = useMemo(
@@ -61,10 +69,11 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
     [view.filters, field.id, first, last]
   );
 
-  const { data } = useRecordsQuery(filters, view.sorts, 200);
-  const records = data;
+  const { data } = useCollectionQuery(filters, view.sorts, 200);
+  const rows = data;
 
   return (
+    <>
     <DayPicker
       showOutsideDays
       className="p-3"
@@ -179,27 +188,42 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
             value: day.toISOString(),
           };
 
-          const dayRecords = filterRecords(
-            records,
+          const dayRows = filterCollectionRows(
+            rows,
             filter,
-            field,
+            database.fields,
             workspace.userId
           );
 
-          const canCreate =
-            (field.type === 'created_at' &&
+          const canCreateRecord =
+            !isMetaType &&
+            ((field.type === 'created_at' &&
               isSameDay(props.day.date, new Date())) ||
-            field.type === 'date';
+              field.type === 'date');
+          const canCreatePage =
+            isMetaType && database.canCreatePage && field.type === 'date';
 
-          const onCreate =
-            database.canCreateRecord && canCreate
+          const onCreate = canCreateRecord
+            ? database.canCreateRecord
               ? () => view.createRecord([filter])
+              : undefined
+            : canCreatePage
+              ? () => {
+                  setPageCreateFields(
+                    generateFieldValuesFromFilters(
+                      database.fields,
+                      [filter],
+                      workspace.userId
+                    )
+                  );
+                  setPageCreateOpen(true);
+                }
               : undefined;
 
           return (
             <CalendarViewDay
               date={props.day.date}
-              records={dayRecords}
+              rows={dayRows}
               onCreate={onCreate}
               isOutside={props.day.outside}
             />
@@ -207,5 +231,12 @@ export const CalendarViewGrid = ({ field }: CalendarViewGridProps) => {
         },
       }}
     />
+    <MetaTypePageCreateDialog
+      metaTypeId={database.id}
+      open={pageCreateOpen}
+      onOpenChange={setPageCreateOpen}
+      initialFields={pageCreateFields}
+    />
+    </>
   );
 };

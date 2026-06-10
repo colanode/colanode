@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
 import { LocalPageNode } from '@colanode/client/types';
-import { generateId, IdType } from '@colanode/core';
+import { FieldValue, generateId, IdType } from '@colanode/core';
 import {
   PageForm,
   PageFormValues,
@@ -24,12 +24,14 @@ interface MetaTypePageCreateDialogProps {
   metaTypeId: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  initialFields?: Record<string, FieldValue>;
 }
 
 export const MetaTypePageCreateDialog = ({
   metaTypeId,
   open,
   onOpenChange,
+  initialFields,
 }: MetaTypePageCreateDialogProps) => {
   const workspace = useWorkspace();
   const navigate = useNavigate({ from: '/workspace/$userId' });
@@ -58,7 +60,7 @@ export const MetaTypePageCreateDialog = ({
         avatar: values.avatar,
         parentId: spaceId,
         metaTypeId,
-        fields: {},
+        fields: initialFields ?? {},
         rootId: spaceId,
         createdAt: new Date().toISOString(),
         createdBy: workspace.userId,

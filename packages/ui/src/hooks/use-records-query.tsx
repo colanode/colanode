@@ -69,10 +69,12 @@ const DEFAULT_ORDERING: OrderByDefinition = {
 export const useRecordsQuery = (
   filters: DatabaseViewFilterAttributes[],
   sorts: DatabaseViewSortAttributes[],
-  count?: number
+  count?: number,
+  options?: { enabled?: boolean }
 ) => {
   const workspace = useWorkspace();
   const database = useDatabase();
+  const enabled = options?.enabled ?? true;
 
   const pageSize = count ?? RECORDS_PER_PAGE;
   const fieldsById = useMemo(
@@ -87,6 +89,12 @@ export const useRecordsQuery = (
 
   const result = useLiveInfiniteQuery(
     (q) => {
+      if (!enabled) {
+        return q
+          .from({ nodes: workspace.collections.nodes })
+          .where(({ nodes }) => eq(nodes.id, '__disabled__'));
+      }
+
       let query = q
         .from({ nodes: workspace.collections.nodes })
         .where(({ nodes }) => eq(nodes.type, 'record'))
@@ -125,12 +133,14 @@ export const useRecordsQuery = (
       getNextPageParam: (lastPage, allPages) =>
         lastPage.length === pageSize ? allPages.length : undefined,
     },
-    [database.id, database.fields, pageSize, filters, sorts]
+    [database.id, database.fields, pageSize, filters, sorts, enabled]
   );
 
   return {
     ...result,
-    data: result.data.map((node) => node as LocalRecordNode),
+    data: enabled
+      ? result.data.map((node) => node as LocalRecordNode)
+      : [],
   };
 };
 

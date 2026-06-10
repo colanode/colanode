@@ -1,23 +1,24 @@
 import { Plus } from 'lucide-react';
 
-import { LocalRecordNode } from '@colanode/client/types';
 import { extractNodeRole, isSameDay } from '@colanode/core';
-import { CalendarViewRecordCard } from '@colanode/ui/components/databases/calendars/calendar-view-record-card';
+import { CollectionViewCard } from '@colanode/ui/components/databases/collection-view-card';
+import { PageFieldsProvider } from '@colanode/ui/components/pages/page-fields-provider';
 import { RecordProvider } from '@colanode/ui/components/records/record-provider';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { CollectionRow } from '@colanode/ui/lib/collection-row';
 import { cn } from '@colanode/ui/lib/utils';
 
 interface CalendarViewDayProps {
   date: Date;
-  records: LocalRecordNode[];
+  rows: CollectionRow[];
   isOutside: boolean;
   onCreate?: () => void;
 }
 
 export const CalendarViewDay = ({
   date,
-  records,
+  rows,
   isOutside,
   onCreate,
 }: CalendarViewDayProps) => {
@@ -52,12 +53,21 @@ export const CalendarViewDay = ({
           {date.getDate()}
         </p>
       </div>
-      {records.map((record) => {
-        const role = extractNodeRole(record, workspace.userId) ?? database.role;
+      {rows.map((row) => {
+        const role =
+          extractNodeRole(row.source, workspace.userId) ?? database.role;
+
+        if (row.nodeType === 'page') {
+          return (
+            <PageFieldsProvider key={row.id} page={row.source} role={role}>
+              <CollectionViewCard row={row} compact />
+            </PageFieldsProvider>
+          );
+        }
 
         return (
-          <RecordProvider key={record.id} record={record} role={role}>
-            <CalendarViewRecordCard />
+          <RecordProvider key={row.id} record={row.source} role={role}>
+            <CollectionViewCard row={row} compact />
           </RecordProvider>
         );
       })}

@@ -4,6 +4,7 @@ import { InView } from 'react-intersection-observer';
 
 import { DatabaseViewFilterAttributes } from '@colanode/core';
 import { TableViewRow } from '@colanode/ui/components/databases/tables/table-view-row';
+import { MetaTypePageCreateFromFilter } from '@colanode/ui/components/pages/meta-type-page-create-from-filter';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useCollectionQuery } from '@colanode/ui/hooks/use-collection-query';
@@ -58,6 +59,10 @@ export const TableViewGroup = ({ header, filter }: TableViewGroupProps) => {
                             <span className="text-sm">Add record</span>
                         </button>
                     )}
+                    <MetaTypePageCreateFromFilter
+                        filters={filters}
+                        className="animate-fade-in flex h-8 w-full cursor-pointer flex-row items-center gap-1 border-b pl-2 text-muted-foreground hover:bg-accent"
+                    />
                     <InView
                         rootMargin="200px"
                         onChange={(inView) => {

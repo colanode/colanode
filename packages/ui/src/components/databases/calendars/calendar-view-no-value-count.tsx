@@ -1,4 +1,5 @@
 import { CircleDashed } from 'lucide-react';
+import { useMemo } from 'react';
 
 import { DatabaseViewFilterAttributes, FieldAttributes } from '@colanode/core';
 import { CalendarViewNoValueList } from '@colanode/ui/components/databases/calendars/calendar-view-no-value-list';
@@ -18,7 +19,9 @@ import {
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { useCollectionQuery } from '@colanode/ui/hooks/use-collection-query';
 import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { filterCollectionRows } from '@colanode/ui/lib/collection-view-query';
 
 interface CalendarViewNoValueCountProps {
   field: FieldAttributes;
@@ -30,6 +33,7 @@ export const CalendarViewNoValueCount = ({
   const workspace = useWorkspace();
   const database = useDatabase();
   const view = useDatabaseView();
+  const isMetaType = (database.purpose ?? 'records') === 'meta_type';
 
   const filters: DatabaseViewFilterAttributes[] = [
     ...view.filters,
@@ -41,15 +45,40 @@ export const CalendarViewNoValueCount = ({
     },
   ];
 
-  const noValueCountQuery = useLiveQuery({
-    type: 'record.field.value.count',
-    databaseId: database.id,
-    filters: filters,
-    fieldId: field.id,
-    userId: workspace.userId,
-  });
+  const noValueCountQuery = useLiveQuery(
+    {
+      type: 'record.field.value.count',
+      databaseId: database.id,
+      filters: filters,
+      fieldId: field.id,
+      userId: workspace.userId,
+    },
+    { enabled: !isMetaType }
+  );
 
-  const noValueCount = noValueCountQuery.data?.noValueCount ?? 0;
+  const { data } = useCollectionQuery(view.filters, view.sorts);
+  const metaTypeNoValueCount = useMemo(() => {
+    if (!isMetaType) {
+      return 0;
+    }
+
+    return filterCollectionRows(
+      data,
+      {
+        id: 'no_value',
+        type: 'field',
+        fieldId: field.id,
+        operator: 'is_empty',
+      },
+      database.fields,
+      workspace.userId
+    ).length;
+  }, [data, database.fields, field.id, isMetaType, workspace.userId]);
+
+  const noValueCount = isMetaType
+    ? metaTypeNoValueCount
+    : (noValueCountQuery.data?.noValueCount ?? 0);
+
   if (noValueCount === 0) {
     return null;
   }

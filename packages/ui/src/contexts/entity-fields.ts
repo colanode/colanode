@@ -7,7 +7,15 @@ export type EntityFieldType = 'record' | 'page';
 export interface EntityFieldsContextValue {
   entityType: EntityFieldType;
   id: string;
+  name: string;
+  avatar?: string | null;
   fields: Record<string, FieldValue>;
+  createdBy: string;
+  createdAt: string;
+  updatedBy?: string | null;
+  updatedAt?: string | null;
+  schemaId: string;
+  localRevision: string;
   canEdit: boolean;
 }
 

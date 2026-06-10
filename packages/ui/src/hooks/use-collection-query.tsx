@@ -13,6 +13,7 @@ import {
   pageToCollectionRow,
   recordToCollectionRow,
 } from '@colanode/ui/lib/collection-row';
+import { applyCollectionViewQuery } from '@colanode/ui/lib/collection-view-query';
 import { useRecordsQuery } from '@colanode/ui/hooks/use-records-query';
 
 export const useCollectionQuery = (
@@ -24,7 +25,9 @@ export const useCollectionQuery = (
   const database = useDatabase();
   const isMetaType = (database.purpose ?? 'records') === 'meta_type';
 
-  const recordsQuery = useRecordsQuery(filters, sorts, count);
+  const recordsQuery = useRecordsQuery(filters, sorts, count, {
+    enabled: !isMetaType,
+  });
 
   const pagesQuery = useLiveQuery(
     {
@@ -39,13 +42,29 @@ export const useCollectionQuery = (
 
   const data: CollectionRow[] = useMemo(() => {
     if (isMetaType) {
-      return (pagesQuery.data ?? []).map((page) =>
+      const rows = (pagesQuery.data ?? []).map((page) =>
         pageToCollectionRow(page as LocalPageNode)
+      );
+
+      return applyCollectionViewQuery(
+        rows,
+        filters,
+        sorts,
+        database.fields,
+        workspace.userId
       );
     }
 
     return recordsQuery.data.map(recordToCollectionRow);
-  }, [isMetaType, pagesQuery.data, recordsQuery.data]);
+  }, [
+    isMetaType,
+    pagesQuery.data,
+    recordsQuery.data,
+    filters,
+    sorts,
+    database.fields,
+    workspace.userId,
+  ]);
 
   if (isMetaType) {
     return {

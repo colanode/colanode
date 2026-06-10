@@ -12,7 +12,8 @@ import { BoardViewContext } from '@colanode/ui/contexts/board-view';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useFieldValueCounts } from '@colanode/ui/hooks/use-field-value-counts';
+import { applyFieldValueToNode } from '@colanode/ui/lib/entity-node-fields';
 
 interface BoardViewColumnsCollaboratorProps {
   field: CollaboratorFieldAttributes;
@@ -25,27 +26,18 @@ export const BoardViewColumnsCollaborator = ({
   const database = useDatabase();
   const view = useDatabaseView();
 
-  const collaboratorCountQuery = useLiveQuery({
-    type: 'record.field.value.count',
-    databaseId: database.id,
-    filters: view.filters,
-    fieldId: field.id,
-    userId: workspace.userId,
-  });
+  const { values: collaborators, noValueCount, isPending } =
+    useFieldValueCounts(field);
 
-  if (collaboratorCountQuery.isPending) {
+  if (isPending) {
     return null;
   }
-
-  const collaborators = collaboratorCountQuery.data?.values ?? [];
   const noValueFilter: DatabaseViewFilterAttributes = {
     id: '1',
     type: 'field',
     fieldId: field.id,
     operator: 'is_empty',
   };
-  const noValueCount = collaboratorCountQuery.data?.noValueCount ?? 0;
-
   return (
     <>
       {collaborators.map((collaborator) => {
@@ -82,12 +74,7 @@ export const BoardViewColumnsCollaborator = ({
                 const nodes = workspace.collections.nodes;
                 if (!value) {
                   nodes.update(record.id, (draft) => {
-                    if (draft.type !== 'record') {
-                      return;
-                    }
-
-                    const { [field.id]: _removed, ...rest } = draft.fields;
-                    draft.fields = rest;
+                    applyFieldValueToNode(draft, field.id, null);
                   });
                 } else {
                   if (value.type !== 'string_array') {
@@ -112,11 +99,7 @@ export const BoardViewColumnsCollaborator = ({
                   }
 
                   nodes.update(record.id, (draft) => {
-                    if (draft.type !== 'record') {
-                      return;
-                    }
-
-                    draft.fields[field.id] = newValue;
+                    applyFieldValueToNode(draft, field.id, newValue);
                   });
                 }
               },
@@ -144,24 +127,9 @@ export const BoardViewColumnsCollaborator = ({
           canDrag: () => true,
           onDragEnd: async (record, value) => {
             const nodes = workspace.collections.nodes;
-            if (!value) {
-              nodes.update(record.id, (draft) => {
-                if (draft.type !== 'record') {
-                  return;
-                }
-
-                const { [field.id]: _removed, ...rest } = draft.fields;
-                draft.fields = rest;
-              });
-            } else {
-              nodes.update(record.id, (draft) => {
-                if (draft.type !== 'record') {
-                  return;
-                }
-
-                draft.fields[field.id] = value;
-              });
-            }
+            nodes.update(record.id, (draft) => {
+              applyFieldValueToNode(draft, field.id, value);
+            });
           },
         }}
       >

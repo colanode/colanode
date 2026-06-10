@@ -9,10 +9,9 @@ import {
 import { BoardViewColumn } from '@colanode/ui/components/databases/boards/board-view-column';
 import { SelectOptionBadge } from '@colanode/ui/components/databases/fields/select-option-badge';
 import { BoardViewContext } from '@colanode/ui/contexts/board-view';
-import { useDatabase } from '@colanode/ui/contexts/database';
-import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
+import { useFieldValueCounts } from '@colanode/ui/hooks/use-field-value-counts';
+import { applyFieldValueToNode } from '@colanode/ui/lib/entity-node-fields';
 import { getSelectOptionLightColorClass } from '@colanode/ui/lib/databases';
 
 interface BoardViewColumnsMultiSelectProps {
@@ -23,16 +22,8 @@ export const BoardViewColumnsMultiSelect = ({
   field,
 }: BoardViewColumnsMultiSelectProps) => {
   const workspace = useWorkspace();
-  const database = useDatabase();
-  const view = useDatabaseView();
 
-  const selectOptionCountQuery = useLiveQuery({
-    type: 'record.field.value.count',
-    databaseId: database.id,
-    filters: view.filters,
-    fieldId: field.id,
-    userId: workspace.userId,
-  });
+  const { values: selectOptionCount, noValueCount } = useFieldValueCounts(field);
 
   const selectOptions = Object.values(field.options ?? {});
   const noValueFilter: DatabaseViewFilterAttributes = {
@@ -41,9 +32,6 @@ export const BoardViewColumnsMultiSelect = ({
     fieldId: field.id,
     operator: 'is_empty',
   };
-
-  const selectOptionCount = selectOptionCountQuery.data?.values ?? [];
-  const noValueCount = selectOptionCountQuery.data?.noValueCount ?? 0;
 
   const noValueDraggingClass = getSelectOptionLightColorClass('gray');
 
@@ -92,12 +80,7 @@ export const BoardViewColumnsMultiSelect = ({
                 const nodes = workspace.collections.nodes;
                 if (!value) {
                   nodes.update(record.id, (draft) => {
-                    if (draft.type !== 'record') {
-                      return;
-                    }
-
-                    const { [field.id]: _removed, ...rest } = draft.fields;
-                    draft.fields = rest;
+                    applyFieldValueToNode(draft, field.id, null);
                   });
                 } else {
                   if (value.type !== 'string_array') {
@@ -121,11 +104,7 @@ export const BoardViewColumnsMultiSelect = ({
                   }
 
                   nodes.update(record.id, (draft) => {
-                    if (draft.type !== 'record') {
-                      return;
-                    }
-
-                    draft.fields[field.id] = newValue;
+                    applyFieldValueToNode(draft, field.id, newValue);
                   });
                 }
               },
@@ -154,24 +133,9 @@ export const BoardViewColumnsMultiSelect = ({
           canDrag: () => true,
           onDragEnd: async (record, value) => {
             const nodes = workspace.collections.nodes;
-            if (!value) {
-              nodes.update(record.id, (draft) => {
-                if (draft.type !== 'record') {
-                  return;
-                }
-
-                const { [field.id]: _removed, ...rest } = draft.fields;
-                draft.fields = rest;
-              });
-            } else {
-              nodes.update(record.id, (draft) => {
-                if (draft.type !== 'record') {
-                  return;
-                }
-
-                draft.fields[field.id] = value;
-              });
-            }
+            nodes.update(record.id, (draft) => {
+              applyFieldValueToNode(draft, field.id, value);
+            });
           },
         }}
       >

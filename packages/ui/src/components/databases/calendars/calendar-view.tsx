@@ -1,6 +1,7 @@
 import { Fragment } from 'react';
 
 import { CalendarViewGrid } from '@colanode/ui/components/databases/calendars/calendar-view-grid';
+import { MetaTypePageCreateButton } from '@colanode/ui/components/pages/meta-type-page-create-button';
 import { CalendarViewNoGroup } from '@colanode/ui/components/databases/calendars/calendar-view-no-group';
 import { CalendarViewNoValueCount } from '@colanode/ui/components/databases/calendars/calendar-view-no-value-count';
 import { CalendarViewSettings } from '@colanode/ui/components/databases/calendars/calendar-view-settings';
@@ -39,6 +40,10 @@ export const CalendarView = () => {
         ) : (
           <CalendarViewNoGroup />
         )}
+        <MetaTypePageCreateButton
+          label="Add page"
+          className="mt-4 flex min-h-10 w-full max-w-xs cursor-pointer flex-row items-center justify-center gap-1 rounded-md border border-dashed text-muted-foreground hover:bg-accent"
+        />
       </div>
     </Fragment>
   );
