@@ -1,3 +1,4 @@
+// One-time migration: merge legacy space.attributes.tags into workspaces.tags.
 import { SelectWorkspace } from '@colanode/client/databases/app';
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapWorkspace } from '@colanode/client/lib/mappers';
