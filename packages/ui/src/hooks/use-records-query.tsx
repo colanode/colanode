@@ -92,7 +92,8 @@ export const useRecordsQuery = (
       if (!enabled) {
         return q
           .from({ nodes: workspace.collections.nodes })
-          .where(({ nodes }) => eq(nodes.id, '__disabled__'));
+          .where(({ nodes }) => eq(nodes.id, '__disabled__'))
+          .orderBy(({ nodes }) => nodes.id, 'asc');
       }
 
       let query = q

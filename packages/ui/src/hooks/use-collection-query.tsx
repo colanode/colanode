@@ -1,3 +1,4 @@
+import { eq, useLiveQuery as useTanstackLiveQuery } from '@tanstack/react-db';
 import { useMemo } from 'react';
 
 import { LocalPageNode } from '@colanode/client/types';
@@ -6,7 +7,6 @@ import {
   DatabaseViewSortAttributes,
 } from '@colanode/core';
 import { useDatabase } from '@colanode/ui/contexts/database';
-import { useLiveQuery } from '@colanode/ui/hooks/use-live-query';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import {
   CollectionRow,
@@ -29,21 +29,30 @@ export const useCollectionQuery = (
     enabled: !isMetaType,
   });
 
-  const pagesQuery = useLiveQuery(
-    {
-      type: 'page.byMetaType',
-      userId: workspace.userId,
-      metaTypeId: database.id,
+  const pagesQuery = useTanstackLiveQuery(
+    (q) => {
+      if (!isMetaType) {
+        return q
+          .from({ nodes: workspace.collections.nodes })
+          .where(({ nodes }) => eq(nodes.id, '__disabled__'))
+          .orderBy(({ nodes }) => nodes.id, 'asc');
+      }
+
+      return q
+        .from({ nodes: workspace.collections.nodes })
+        .where(({ nodes }) => eq(nodes.type, 'page'))
+        .where(({ nodes }) =>
+          eq((nodes as unknown as LocalPageNode).metaTypeId, database.id)
+        )
+        .orderBy(({ nodes }) => nodes.id, 'asc');
     },
-    {
-      enabled: isMetaType,
-    }
+    [workspace.userId, database.id, isMetaType]
   );
 
   const data: CollectionRow[] = useMemo(() => {
     if (isMetaType) {
-      const rows = (pagesQuery.data ?? []).map((page) =>
-        pageToCollectionRow(page as LocalPageNode)
+      const rows = ((pagesQuery.data ?? []) as LocalPageNode[]).map(
+        pageToCollectionRow
       );
 
       return applyCollectionViewQuery(

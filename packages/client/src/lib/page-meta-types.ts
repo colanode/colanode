@@ -11,6 +11,8 @@ import {
   SpaceAttributes,
 } from '@colanode/core';
 
+import { eventBus } from '@colanode/client/lib/event-bus';
+import { mapNode } from '@colanode/client/lib/mappers';
 import { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 
 const debug = createDebugger('desktop:page-meta-types');
@@ -101,6 +103,75 @@ const createDefaultPageMetaType = async (
   return databaseId;
 };
 
+const readPageMetaTypeId = (
+  attributes: PageAttributes & { metaTypeId?: string }
+): string | null => {
+  return typeof attributes.metaTypeId === 'string' && attributes.metaTypeId.length > 0
+    ? attributes.metaTypeId
+    : null;
+};
+
+const forcePageMetaTypeId = async (
+  workspace: WorkspaceService,
+  pageId: string,
+  metaTypeId: string
+): Promise<void> => {
+  const row = await workspace.database
+    .selectFrom('nodes')
+    .selectAll()
+    .where('id', '=', pageId)
+    .where('type', '=', 'page')
+    .executeTakeFirst();
+
+  if (!row) {
+    return;
+  }
+
+  const attributes = JSON.parse(row.attributes) as PageAttributes & {
+    metaTypeId?: string;
+  };
+
+  if (readPageMetaTypeId(attributes) === metaTypeId) {
+    return;
+  }
+
+  const nextAttributes: PageAttributes = {
+    ...attributes,
+    type: 'page',
+    name: attributes.name,
+    parentId: attributes.parentId,
+    metaTypeId,
+    fields: attributes.fields ?? {},
+  };
+
+  const updatedRow = await workspace.database
+    .updateTable('nodes')
+    .set({
+      attributes: JSON.stringify(nextAttributes),
+      updated_at: new Date().toISOString(),
+      updated_by: workspace.userId,
+    })
+    .where('id', '=', pageId)
+    .returningAll()
+    .executeTakeFirst();
+
+  if (!updatedRow) {
+    return;
+  }
+
+  debug(`Backfilled page ${pageId} with meta type ${metaTypeId}`);
+
+  eventBus.publish({
+    type: 'node.updated',
+    workspace: {
+      workspaceId: workspace.workspaceId,
+      userId: workspace.userId,
+      accountId: workspace.accountId,
+    },
+    node: mapNode(updatedRow),
+  });
+};
+
 export const ensurePageMetaTypes = async (
   workspace: WorkspaceService
 ): Promise<void> => {
@@ -135,8 +206,9 @@ export const ensurePageMetaTypes = async (
     const attributes = JSON.parse(page.attributes) as PageAttributes & {
       metaTypeId?: string;
     };
+    const metaTypeId = readPageMetaTypeId(attributes);
 
-    if (attributes.metaTypeId && metaTypeIds.has(attributes.metaTypeId)) {
+    if (metaTypeId && metaTypeIds.has(metaTypeId)) {
       continue;
     }
 
@@ -152,6 +224,8 @@ export const ensurePageMetaTypes = async (
 
       return draft;
     });
+
+    await forcePageMetaTypeId(workspace, page.id, defaultMetaTypeId);
   }
 
   for (const database of databases) {

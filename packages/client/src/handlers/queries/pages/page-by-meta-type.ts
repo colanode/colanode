@@ -40,9 +40,7 @@ export class PageByMetaTypeQueryHandler
         event.type === 'node.updated' ||
         event.type === 'node.deleted') &&
       event.workspace.userId === input.userId &&
-      event.node.type === 'page' &&
-      (event.type === 'node.deleted' ||
-        event.node.metaTypeId === input.metaTypeId)
+      event.node.type === 'page'
     ) {
       return {
         hasChanges: true,

@@ -34,6 +34,7 @@ const NODE_COLUMN_FIELDS: Record<string, string> = {
   type: 'type',
   parentId: 'parent_id',
   rootId: 'root_id',
+  metaTypeId: 'meta_type_id',
   createdAt: 'created_at',
   createdBy: 'created_by',
   updatedAt: 'updated_at',

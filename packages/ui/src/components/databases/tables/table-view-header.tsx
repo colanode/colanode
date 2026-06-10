@@ -9,10 +9,19 @@ import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 export const TableViewHeader = () => {
   const database = useDatabase();
   const view = useDatabaseView();
+  const isMetaType = (database.purpose ?? 'records') === 'meta_type';
 
   return (
     <div className="flex flex-row items-center gap-0.5">
       <div style={{ width: '30px', minWidth: '30px' }} />
+      {isMetaType && (
+        <div
+          className="flex h-8 items-center border-r px-2 text-xs font-medium text-muted-foreground"
+          style={{ width: '200px', minWidth: '200px' }}
+        >
+          Page ID
+        </div>
+      )}
       <TableViewNameHeader />
       {view.fields.map((field) => {
         return <TableViewFieldHeader viewField={field} key={field.field.id} />;

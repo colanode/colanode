@@ -1,5 +1,6 @@
 import { extractNodeRole } from '@colanode/core';
 import { TableViewNameCell } from '@colanode/ui/components/databases/tables/table-view-name-cell';
+import { TableViewPageIdCell } from '@colanode/ui/components/databases/tables/table-view-page-id-cell';
 import { PageFieldsProvider } from '@colanode/ui/components/pages/page-fields-provider';
 import { RecordFieldValue } from '@colanode/ui/components/records/record-field-value';
 import { RecordProvider } from '@colanode/ui/components/records/record-provider';
@@ -17,6 +18,7 @@ export const TableViewRow = ({ index, row }: TableViewRowProps) => {
   const workspace = useWorkspace();
   const database = useDatabase();
   const view = useDatabaseView();
+  const isMetaType = (database.purpose ?? 'records') === 'meta_type';
   const role =
     extractNodeRole(row.source, workspace.userId) ?? database.role;
 
@@ -38,6 +40,14 @@ export const TableViewRow = ({ index, row }: TableViewRowProps) => {
       >
         {index + 1}
       </span>
+      {isMetaType && (
+        <div
+          className="h-8 overflow-hidden border-r"
+          style={{ width: '200px', minWidth: '200px' }}
+        >
+          <TableViewPageIdCell row={row} />
+        </div>
+      )}
       <div
         className="h-8 overflow-hidden border-r"
         style={{ width: `${view.nameWidth}px`, minWidth: '300px' }}
