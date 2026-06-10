@@ -33,6 +33,7 @@ export * from './icons/icon-svg-get';
 export * from './emojis/emoji-svg-get';
 export * from './apps/tabs-list';
 export * from './nodes/node-list';
+export * from './pages/page-by-meta-type';
 export * from './tags/tag-nodes-list';
 export * from './workspaces/local-sync-status-get';
 

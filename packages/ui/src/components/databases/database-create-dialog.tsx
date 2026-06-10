@@ -47,6 +47,7 @@ export const DatabaseCreateDialog = ({
         type: 'database',
         name: values.name,
         parentId: spaceId,
+        purpose: 'records',
         fields: {
           [fieldId]: {
             id: fieldId,

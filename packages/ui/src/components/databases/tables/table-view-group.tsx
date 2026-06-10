@@ -6,7 +6,7 @@ import { DatabaseViewFilterAttributes } from '@colanode/core';
 import { TableViewRow } from '@colanode/ui/components/databases/tables/table-view-row';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
-import { useRecordsQuery } from '@colanode/ui/hooks/use-records-query';
+import { useCollectionQuery } from '@colanode/ui/hooks/use-collection-query';
 
 interface TableViewGroupProps {
     header: ReactNode;
@@ -25,8 +25,8 @@ export const TableViewGroup = ({ header, filter }: TableViewGroupProps) => {
     );
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-        useRecordsQuery(filters, view.sorts);
-    const records = data;
+        useCollectionQuery(filters, view.sorts);
+    const rows = data;
 
     return (
         <div className="flex flex-col">
@@ -44,8 +44,8 @@ export const TableViewGroup = ({ header, filter }: TableViewGroupProps) => {
             {open && (
                 <>
                     <div className="border-t">
-                        {records.map((record, index) => (
-                            <TableViewRow key={record.id} index={index} record={record} />
+                        {rows.map((row, index) => (
+                            <TableViewRow key={row.id} index={index} row={row} />
                         ))}
                     </div>
                     {database.canCreateRecord && (

@@ -3,6 +3,7 @@ import { z } from 'zod/v4';
 import { extractNodeRole } from '@colanode/core/lib/nodes';
 import { hasNodeRole } from '@colanode/core/lib/permissions';
 import { richTextContentSchema } from '@colanode/core/registry/documents/rich-text';
+import { fieldValueSchema } from '@colanode/core/registry/nodes/field-value';
 import { NodeModel } from '@colanode/core/registry/nodes/core';
 
 export const pageAttributesSchema = z.object({
@@ -10,6 +11,8 @@ export const pageAttributesSchema = z.object({
   name: z.string(),
   avatar: z.string().nullable().optional(),
   parentId: z.string(),
+  metaTypeId: z.string(),
+  fields: z.record(z.string(), fieldValueSchema).optional(),
   tagIds: z.array(z.string()).optional(),
 });
 
@@ -75,9 +78,18 @@ export const pageModel: NodeModel = {
       throw new Error('Invalid node type');
     }
 
+    const texts: string[] = [];
+    if (attributes.fields) {
+      for (const field of Object.values(attributes.fields)) {
+        if (field.type === 'string' || field.type === 'text') {
+          texts.push(field.value);
+        }
+      }
+    }
+
     return {
       name: attributes.name,
-      attributes: null,
+      attributes: texts.length > 0 ? texts.join('\n') : null,
     };
   },
   extractMentions: () => {

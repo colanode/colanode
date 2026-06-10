@@ -1,4 +1,5 @@
 import {
+  Database,
   Tags,
   Download,
   Info,
@@ -36,6 +37,16 @@ export const SidebarSettings = () => {
             <SidebarSettingsItem
               title="Tags"
               icon={Tags}
+              isActive={isActive}
+            />
+          )}
+        </Link>
+
+        <Link from="/workspace/$userId" to="settings/meta-types">
+          {({ isActive }) => (
+            <SidebarSettingsItem
+              title="Meta Types"
+              icon={Database}
               isActive={isActive}
             />
           )}

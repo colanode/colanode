@@ -31,6 +31,7 @@ export const DatabaseInlineCommand: EditorCommand = {
       type: 'database',
       name: 'Untitled',
       parentId: documentId,
+      purpose: 'records',
       fields: {
         [fieldId]: {
           id: fieldId,

@@ -14,9 +14,12 @@ interface DatabaseProps {
 export const Database = ({ database, role, children }: DatabaseProps) => {
   const workspace = useWorkspace();
 
+  const purpose = database.purpose ?? 'records';
+  const isMetaType = purpose === 'meta_type';
   const canEdit = hasNodeRole(role, 'editor');
   const isLocked = database.locked ?? false;
-  const canCreateRecord = hasNodeRole(role, 'editor');
+  const canCreateRecord = hasNodeRole(role, 'editor') && !isMetaType;
+  const canCreatePage = hasNodeRole(role, 'editor') && isMetaType;
 
   const toggleLock = useCallback(() => {
     if (!canEdit) {
@@ -42,9 +45,11 @@ export const Database = ({ database, role, children }: DatabaseProps) => {
         nameField: database.nameField,
         role,
         fields: Object.values(database.fields),
+        purpose,
         canEdit: canEdit,
         isLocked,
         canCreateRecord,
+        canCreatePage,
         rootId: database.rootId,
         toggleLock,
       }}

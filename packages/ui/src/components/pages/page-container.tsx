@@ -4,6 +4,7 @@ import { Document } from '@colanode/ui/components/documents/document';
 import { NodeBacklinks } from '@colanode/ui/components/nodes/node-backlinks';
 import { NodeOutline } from '@colanode/ui/components/nodes/node-outline';
 import { NodeTagBar } from '@colanode/ui/components/nodes/node-tag-bar';
+import { PageMetadata } from '@colanode/ui/components/pages/page-metadata';
 
 interface PageContainerProps {
   page: LocalPageNode;
@@ -16,6 +17,7 @@ export const PageContainer = ({ page, role }: PageContainerProps) => {
     <div className="flex flex-row items-start gap-4">
       <div className="min-w-0 flex-1">
         <NodeTagBar node={page} canEdit={canEdit} />
+        <PageMetadata page={page} role={role} />
         <Document node={page} canEdit={canEdit} autoFocus="start" />
         <NodeBacklinks nodeId={page.id} />
       </div>

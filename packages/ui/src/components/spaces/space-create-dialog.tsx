@@ -3,6 +3,7 @@ import { toast } from 'sonner';
 
 import { LocalPageNode, LocalSpaceNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
+import { fetchDefaultPageMetaTypeId } from '@colanode/ui/lib/page-meta-types';
 import {
   SpaceForm,
   SpaceFormValues,
@@ -53,11 +54,14 @@ export const SpaceCreateDialog = ({
       };
 
       const pageId = generateId(IdType.Page);
+      const metaTypeId = await fetchDefaultPageMetaTypeId(workspace.userId);
       const page: LocalPageNode = {
         id: pageId,
         type: 'page',
         name: 'Home',
         parentId: spaceId,
+        metaTypeId,
+        fields: {},
         rootId: spaceId,
         createdAt: new Date().toISOString(),
         createdBy: workspace.userId,

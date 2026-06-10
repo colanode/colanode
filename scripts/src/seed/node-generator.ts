@@ -165,6 +165,8 @@ export class NodeGenerator {
       name,
       parentId,
       avatar,
+      metaTypeId: generateId(IdType.Database),
+      fields: {},
     };
 
     const documentContent: DocumentContent = {

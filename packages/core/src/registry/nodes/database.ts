@@ -13,11 +13,16 @@ export type DatabaseNameFieldAttributes = z.infer<
   typeof databaseNameFieldAttributesSchema
 >;
 
+export const databasePurposeSchema = z.enum(['records', 'meta_type']);
+
+export type DatabasePurpose = z.infer<typeof databasePurposeSchema>;
+
 export const databaseAttributesSchema = z.object({
   type: z.literal('database'),
   name: z.string(),
   avatar: z.string().nullable().optional(),
   parentId: z.string(),
+  purpose: databasePurposeSchema.default('records'),
   fields: z.record(z.string(), fieldAttributesSchema),
   nameField: databaseNameFieldAttributesSchema.nullable().optional(),
   locked: z.boolean().nullable().optional(),

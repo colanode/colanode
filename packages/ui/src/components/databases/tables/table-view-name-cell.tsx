@@ -1,10 +1,11 @@
 import isHotkey from 'is-hotkey';
 import { SquareArrowOutUpRight } from 'lucide-react';
 import React, { Fragment } from 'react';
+import { useNavigate } from '@tanstack/react-router';
 
-import { RecordNode } from '@colanode/core';
 import { Link } from '@colanode/ui/components/ui/link';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
+import { CollectionRow } from '@colanode/ui/lib/collection-row';
 
 interface NameEditorProps {
   initialValue: string;
@@ -51,35 +52,57 @@ const NameEditor = ({ initialValue, onSave, onCancel }: NameEditorProps) => {
 };
 
 interface TableViewNameCellProps {
-  record: RecordNode;
+  row: CollectionRow;
 }
 
-export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
+export const TableViewNameCell = ({ row }: TableViewNameCellProps) => {
   const workspace = useWorkspace();
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = React.useState(false);
 
   const canEdit = true;
-  const hasName = record.name && record.name.length > 0;
+  const hasName = row.name && row.name.length > 0;
 
   const handleSave = (newName: string) => {
-    if (newName === record.name) return;
+    if (newName === row.name) {
+      return;
+    }
 
-    const nodes = workspace.collections.nodes;
-    nodes.update(record.id, (draft) => {
-      if (draft.type !== 'record') {
+    workspace.collections.nodes.update(row.id, (draft) => {
+      if (draft.type !== row.nodeType) {
         return;
       }
+
       draft.name = newName;
     });
 
     setIsEditing(false);
   };
 
+  const openNode = () => {
+    if (row.nodeType === 'page') {
+      navigate({
+        to: '/workspace/$userId/$nodeId',
+        params: { userId: workspace.userId, nodeId: row.id },
+      });
+      return;
+    }
+
+    navigate({
+      to: '/workspace/$userId/$nodeId/modal/$modalNodeId',
+      params: {
+        userId: workspace.userId,
+        nodeId: row.source.parentId ?? row.id,
+        modalNodeId: row.id,
+      },
+    });
+  };
+
   return (
     <div className="group relative flex h-full w-full items-center">
       {isEditing ? (
         <NameEditor
-          initialValue={record.name ?? ''}
+          initialValue={row.name ?? ''}
           onSave={handleSave}
           onCancel={() => setIsEditing(false)}
         />
@@ -90,19 +113,29 @@ export const TableViewNameCell = ({ record }: TableViewNameCellProps) => {
             className="flex h-full w-full cursor-pointer flex-row items-center gap-1 p-1 text-sm"
           >
             {hasName ? (
-              <span className="truncate">{record.name}</span>
+              <span className="truncate">{row.name}</span>
             ) : (
               <span className="text-muted-foreground">Unnamed</span>
             )}
           </div>
-          <Link
-            from="/workspace/$userId/$nodeId"
-            to="modal/$modalNodeId"
-            params={{ modalNodeId: record.id }}
-            className="absolute right-2 flex h-6 cursor-pointer flex-row items-center gap-1 rounded-md border p-1 text-sm text-muted-foreground opacity-0 hover:bg-accent group-hover:opacity-100"
-          >
-            <SquareArrowOutUpRight className="mr-1 size-4" /> <p>Open</p>
-          </Link>
+          {row.nodeType === 'record' ? (
+            <Link
+              from="/workspace/$userId/$nodeId"
+              to="modal/$modalNodeId"
+              params={{ modalNodeId: row.id }}
+              className="absolute right-2 flex h-6 cursor-pointer flex-row items-center gap-1 rounded-md border p-1 text-sm text-muted-foreground opacity-0 hover:bg-accent group-hover:opacity-100"
+            >
+              <SquareArrowOutUpRight className="mr-1 size-4" /> <p>Open</p>
+            </Link>
+          ) : (
+            <button
+              type="button"
+              onClick={openNode}
+              className="absolute right-2 flex h-6 cursor-pointer flex-row items-center gap-1 rounded-md border p-1 text-sm text-muted-foreground opacity-0 hover:bg-accent group-hover:opacity-100"
+            >
+              <SquareArrowOutUpRight className="mr-1 size-4" /> <p>Open</p>
+            </button>
+          )}
         </Fragment>
       )}
     </div>

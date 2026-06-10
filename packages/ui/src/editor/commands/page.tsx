@@ -3,6 +3,7 @@ import { FileText } from 'lucide-react';
 import { EditorCommand, LocalPageNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
 import { collections } from '@colanode/ui/collections';
+import { fetchDefaultPageMetaTypeId } from '@colanode/ui/lib/page-meta-types';
 
 export const PageCommand: EditorCommand = {
   key: 'page',
@@ -19,6 +20,11 @@ export const PageCommand: EditorCommand = {
     const { userId, documentId, rootId } = context;
     const pageId = generateId(IdType.Page);
     const nodes = collections.workspace(userId).nodes;
+    const parentPage = nodes.get(documentId);
+    const metaTypeId =
+      parentPage?.type === 'page' && parentPage.metaTypeId
+        ? parentPage.metaTypeId
+        : await fetchDefaultPageMetaTypeId(userId);
 
     const page: LocalPageNode = {
       id: pageId,
@@ -26,6 +32,8 @@ export const PageCommand: EditorCommand = {
       name: 'Untitled',
       avatar: null,
       parentId: documentId,
+      metaTypeId,
+      fields: {},
       rootId: rootId,
       createdAt: new Date().toISOString(),
       createdBy: userId,

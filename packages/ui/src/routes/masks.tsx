@@ -64,6 +64,18 @@ export const tagNodesRouteMask = createRouteMask({
   },
 });
 
+export const workspaceMetaTypesRouteMask = createRouteMask({
+  routeTree: routeTree,
+  from: '/workspace/$userId/settings/meta-types',
+  to: '/$workspaceId/settings/meta-types',
+  params: (ctx) => {
+    const workspace = collections.workspaces.get(ctx.userId);
+    return {
+      workspaceId: workspace?.workspaceId ?? 'unknown',
+    };
+  },
+});
+
 export const workspaceTagsRouteMask = createRouteMask({
   routeTree: routeTree,
   from: '/workspace/$userId/settings/tags',
@@ -144,6 +156,7 @@ export const routeMasks = [
   modalNodeRouteMask,
   workspaceSettingsRouteMask,
   tagNodesRouteMask,
+  workspaceMetaTypesRouteMask,
   workspaceTagsRouteMask,
   workspaceUsersRouteMask,
   workspaceDownloadsRouteMask,

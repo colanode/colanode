@@ -3,20 +3,20 @@ import { InView } from 'react-intersection-observer';
 import { TableViewEmptyPlaceholder } from '@colanode/ui/components/databases/tables/table-view-empty-placeholder';
 import { TableViewRow } from '@colanode/ui/components/databases/tables/table-view-row';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
-import { useRecordsQuery } from '@colanode/ui/hooks/use-records-query';
+import { useCollectionQuery } from '@colanode/ui/hooks/use-collection-query';
 
 export const TableViewBody = () => {
   const view = useDatabaseView();
   const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useRecordsQuery(view.filters, view.sorts);
+    useCollectionQuery(view.filters, view.sorts);
 
-  const records = data;
+  const rows = data;
 
   return (
     <div className="border-t">
-      {records.length === 0 && <TableViewEmptyPlaceholder />}
-      {records.map((record, index) => (
-        <TableViewRow key={record.id} index={index} record={record} />
+      {rows.length === 0 && <TableViewEmptyPlaceholder />}
+      {rows.map((row, index) => (
+        <TableViewRow key={row.id} index={index} row={row} />
       ))}
       <InView
         rootMargin="200px"

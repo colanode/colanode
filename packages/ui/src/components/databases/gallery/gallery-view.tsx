@@ -10,11 +10,14 @@ import { ViewSortButton } from '@colanode/ui/components/databases/search/view-so
 import { ViewBasicSettings } from '@colanode/ui/components/databases/view-basic-settings';
 import { ViewFullscreenButton } from '@colanode/ui/components/databases/view-fullscreen-button';
 import { ViewTabs } from '@colanode/ui/components/databases/view-tabs';
+import { GalleryViewCollectionCard } from '@colanode/ui/components/databases/gallery/gallery-view-collection-card';
+import { MetaTypePageCreateButton } from '@colanode/ui/components/pages/meta-type-page-create-button';
+import { PageFieldsProvider } from '@colanode/ui/components/pages/page-fields-provider';
 import { RecordProvider } from '@colanode/ui/components/records/record-provider';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useDatabaseView } from '@colanode/ui/contexts/database-view';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
-import { useRecordsQuery } from '@colanode/ui/hooks/use-records-query';
+import { useCollectionQuery } from '@colanode/ui/hooks/use-collection-query';
 
 export const GalleryView = () => {
     const workspace = useWorkspace();
@@ -22,8 +25,8 @@ export const GalleryView = () => {
     const view = useDatabaseView();
 
     const { data, fetchNextPage, hasNextPage, isFetchingNextPage } =
-        useRecordsQuery(view.filters, view.sorts);
-    const records = data;
+        useCollectionQuery(view.filters, view.sorts);
+    const rows = data;
 
     return (
         <Fragment>
@@ -38,17 +41,27 @@ export const GalleryView = () => {
             </div>
             <ViewSearchBar />
             <div className="mt-2 w-full overflow-auto pr-5 pb-4">
-                {records.length === 0 && (
-                    <p className="p-4 text-sm text-muted-foreground">No records</p>
+                {rows.length === 0 && (
+                    <p className="p-4 text-sm text-muted-foreground">
+                        {database.purpose === 'meta_type' ? 'No pages' : 'No records'}
+                    </p>
                 )}
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {records.map((record) => {
+                    {rows.map((row) => {
                         const role =
-                            extractNodeRole(record, workspace.userId) ?? database.role;
+                            extractNodeRole(row.source, workspace.userId) ?? database.role;
+
+                        if (row.nodeType === 'page') {
+                            return (
+                                <PageFieldsProvider key={row.id} page={row.source} role={role}>
+                                    <GalleryViewCollectionCard row={row} />
+                                </PageFieldsProvider>
+                            );
+                        }
 
                         return (
-                            <RecordProvider key={record.id} record={record} role={role}>
-                                <GalleryViewRecordCard />
+                            <RecordProvider key={row.id} record={row.source} role={role}>
+                                <GalleryViewCollectionCard row={row} />
                             </RecordProvider>
                         );
                     })}
@@ -62,6 +75,10 @@ export const GalleryView = () => {
                             <span className="text-sm">Add record</span>
                         </button>
                     )}
+                    <MetaTypePageCreateButton
+                        label="Add page"
+                        className="animate-fade-in flex min-h-20 cursor-pointer flex-row items-center justify-center gap-1 rounded-md border border-dashed text-muted-foreground hover:bg-accent"
+                    />
                 </div>
                 <InView
                     rootMargin="200px"

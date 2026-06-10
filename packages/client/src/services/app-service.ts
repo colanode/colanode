@@ -9,6 +9,7 @@ import {
 import { Mediator } from '@colanode/client/handlers';
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapAccount, mapWorkspace } from '@colanode/client/lib/mappers';
+import { ensurePageMetaTypes } from '@colanode/client/lib/page-meta-types';
 import { migrateLegacySpaceTags } from '@colanode/client/lib/workspace-tags';
 import { syncTagReferences } from '@colanode/client/lib/tag-references-sync';
 import { AccountService } from '@colanode/client/services/accounts/account-service';
@@ -184,7 +185,9 @@ export class AppService {
     workspace: SelectWorkspace
   ): Promise<WorkspaceService> {
     if (this.workspaces.has(workspace.user_id)) {
-      return this.workspaces.get(workspace.user_id)!;
+      const existing = this.workspaces.get(workspace.user_id)!;
+      await ensurePageMetaTypes(existing);
+      return existing;
     }
 
     const account = this.accounts.get(workspace.account_id);
@@ -199,6 +202,7 @@ export class AppService {
     await workspaceService.init();
     await migrateLegacySpaceTags(this, workspace);
     await syncTagReferences(workspaceService);
+    await ensurePageMetaTypes(workspaceService);
 
     this.workspaces.set(workspace.user_id, workspaceService);
     return workspaceService;

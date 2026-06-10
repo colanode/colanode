@@ -27,6 +27,7 @@ import { RadarDataGetQueryHandler } from './interactions/radar-data-get';
 import { MentionSearchQueryHandler } from './mentions/mention-search';
 import { MessageActivityDatesQueryHandler } from './messages/message-activity-dates';
 import { MessageSearchQueryHandler } from './messages/message-search';
+import { PageByMetaTypeQueryHandler } from './pages/page-by-meta-type';
 import { NodeListQueryHandler } from './nodes/node-list';
 import { NodeBacklinksGetQueryHandler } from './nodes/node-backlinks-get';
 import { NodeReactionsListQueryHandler } from './nodes/node-reaction-list';
@@ -49,6 +50,7 @@ export const buildQueryHandlerMap = (app: AppService): QueryHandlerMap => {
     'account.list': new AccountListQueryHandler(app),
     'node.reaction.list': new NodeReactionsListQueryHandler(app),
     'node.list': new NodeListQueryHandler(app),
+    'page.byMetaType': new PageByMetaTypeQueryHandler(app),
     'node.backlinks.get': new NodeBacklinksGetQueryHandler(app),
     'record.field.value.count': new RecordFieldValueCountQueryHandler(app),
     'user.search': new UserSearchQueryHandler(app),

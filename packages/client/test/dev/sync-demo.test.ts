@@ -82,11 +82,20 @@ const seedNode = async (
     attributes: NodeAttributes,
     rootId: string
 ): Promise<string> => {
+    const resolvedAttributes =
+        attributes.type === 'page' && !('metaTypeId' in attributes)
+            ? {
+                  ...attributes,
+                  metaTypeId: generateId(IdType.Database),
+                  fields: {},
+              }
+            : attributes;
+
     const nodeId = generateId(IdType.Page);
     const now = new Date().toISOString();
-    const model = getNodeModel(attributes.type);
+    const model = getNodeModel(resolvedAttributes.type);
     const ydoc = new YDoc();
-    const update = ydoc.update(model.attributesSchema, attributes);
+    const update = ydoc.update(model.attributesSchema, resolvedAttributes);
     if (!update) throw new Error('failed to build update');
 
     await device.database
@@ -94,7 +103,7 @@ const seedNode = async (
         .values({
             id: nodeId,
             root_id: rootId,
-            attributes: JSON.stringify(attributes),
+            attributes: JSON.stringify(resolvedAttributes),
             created_at: now,
             created_by: userId,
             local_revision: '0',

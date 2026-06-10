@@ -10,7 +10,7 @@ import {
 import { Fragment, useCallback, useState } from 'react';
 
 import { LocalDatabaseNode } from '@colanode/client/types';
-import { NodeRole, hasNodeRole } from '@colanode/core';
+import { DEFAULT_PAGE_META_TYPE_NAME, NodeRole, hasNodeRole } from '@colanode/core';
 import { NodeCollaboratorAudit } from '@colanode/ui/components/collaborators/node-collaborator-audit';
 import { DatabaseUpdateDialog } from '@colanode/ui/components/databases/database-update-dialog';
 import { NodeDeleteDialog } from '@colanode/ui/components/nodes/node-delete-dialog';
@@ -35,7 +35,10 @@ export const DatabaseSettings = ({ database, role }: DatabaseSettingsProps) => {
   const [showDeleteDialog, setShowDeleteModal] = useState(false);
 
   const canEdit = hasNodeRole(role, 'editor');
-  const canDelete = hasNodeRole(role, 'admin');
+  const isDefaultMetaType =
+    (database.purpose ?? 'records') === 'meta_type' &&
+    database.name === DEFAULT_PAGE_META_TYPE_NAME;
+  const canDelete = hasNodeRole(role, 'admin') && !isDefaultMetaType;
   const isLocked = database.locked ?? false;
 
   const handleLockDatabase = useCallback(() => {

@@ -32,6 +32,7 @@ interface NodeTable {
   id: ColumnType<string, string, never>;
   type: ColumnType<NodeType, never, never>;
   parent_id: ColumnType<string | null, never, never>;
+  meta_type_id: ColumnType<string | null, never, never>;
   root_id: ColumnType<string, string, never>;
   attributes: ColumnType<string, string, string>;
   local_revision: ColumnType<string, string, string>;
