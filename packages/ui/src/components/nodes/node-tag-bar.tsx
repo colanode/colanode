@@ -2,7 +2,12 @@ import { eq, useLiveQuery } from '@tanstack/react-db';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 
-import { LocalPageNode } from '@colanode/client/types';
+import {
+  LocalChannelNode,
+  LocalDatabaseNode,
+  LocalFolderNode,
+  LocalPageNode,
+} from '@colanode/client/types';
 import { TagAttributes } from '@colanode/core';
 import { TagLink } from '@colanode/ui/components/tags/tag-link';
 import { Button } from '@colanode/ui/components/ui/button';
@@ -15,12 +20,18 @@ import { WorkspaceTagOptions } from '@colanode/ui/components/workspaces/workspac
 import { collections } from '@colanode/ui/collections';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 
+type TaggableNode =
+  | LocalPageNode
+  | LocalChannelNode
+  | LocalFolderNode
+  | LocalDatabaseNode;
+
 interface NodeTagBarProps {
-  page: LocalPageNode;
+  node: TaggableNode;
   canEdit?: boolean;
 }
 
-export const NodeTagBar = ({ page, canEdit = false }: NodeTagBarProps) => {
+export const NodeTagBar = ({ node, canEdit = false }: NodeTagBarProps) => {
   const workspace = useWorkspace();
   const [open, setOpen] = useState(false);
 
@@ -40,7 +51,7 @@ export const NodeTagBar = ({ page, canEdit = false }: NodeTagBarProps) => {
   }
 
   const workspaceTags = workspaceTagsQuery.data?.[0]?.tags ?? {};
-  const tagIds = page.tagIds ?? [];
+  const tagIds = node.tagIds ?? [];
 
   const matchedTags = tagIds
     .map((id) => workspaceTags[id])
@@ -55,20 +66,24 @@ export const NodeTagBar = ({ page, canEdit = false }: NodeTagBarProps) => {
       return;
     }
 
-    workspace.collections.nodes.update(page.id, (draft) => {
-      if (draft.type !== 'page') {
-        return;
-      }
+    workspace.collections.nodes.update(node.id, (draft) => {
+      switch (draft.type) {
+        case 'page':
+        case 'channel':
+        case 'folder':
+        case 'database': {
+          const currentIds = draft.tagIds ?? [];
+          const newIds = currentIds.includes(id)
+            ? currentIds.filter((tagId: string) => tagId !== id)
+            : [...currentIds, id];
 
-      const currentIds = draft.tagIds ?? [];
-      const newIds = currentIds.includes(id)
-        ? currentIds.filter((tagId) => tagId !== id)
-        : [...currentIds, id];
-
-      if (newIds.length === 0) {
-        delete draft.tagIds;
-      } else {
-        draft.tagIds = newIds;
+          if (newIds.length === 0) {
+            delete draft.tagIds;
+          } else {
+            draft.tagIds = newIds;
+          }
+          break;
+        }
       }
     });
   };

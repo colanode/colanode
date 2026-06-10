@@ -1,4 +1,4 @@
-import { useLiveQuery } from '@tanstack/react-db';
+import { eq, useLiveQuery } from '@tanstack/react-db';
 import {
     Database,
     File,
@@ -8,6 +8,7 @@ import {
     MessageSquare,
     Search,
     Settings,
+    Tags,
     Users,
 } from 'lucide-react';
 import {
@@ -20,6 +21,7 @@ import {
 } from 'react';
 
 import { MentionSearchItem } from '@colanode/client/types';
+import { TagAttributes } from '@colanode/core';
 import { collections } from '@colanode/ui/collections';
 import {
     CommandDialog,
@@ -78,6 +80,44 @@ export const GlobalCommandPalette = ({
         []
     );
 
+    const tagSearchActive = query.startsWith('#');
+    const tagSearchTerm = tagSearchActive ? query.slice(1).trim().toLowerCase() : '';
+
+    const workspaceTagsQuery = useLiveQuery(
+        (q) =>
+            q
+                .from({ workspaces: collections.workspaces })
+                .where(({ workspaces }) =>
+                    eq(workspaces.userId, activeWorkspaceUserId ?? '')
+                )
+                .select(({ workspaces }) => ({
+                    tags: workspaces.tags,
+                }))
+                .findOne(),
+        [activeWorkspaceUserId]
+    );
+
+    const tagResults = useMemo(() => {
+        if (!tagSearchActive || !activeWorkspaceUserId) {
+            return [] as TagAttributes[];
+        }
+
+        const tags = Object.values(workspaceTagsQuery.data?.tags ?? {});
+
+        if (!tagSearchTerm) {
+            return tags;
+        }
+
+        return tags.filter((tag) =>
+            tag.name.toLowerCase().includes(tagSearchTerm)
+        );
+    }, [
+        activeWorkspaceUserId,
+        tagSearchActive,
+        tagSearchTerm,
+        workspaceTagsQuery.data?.tags,
+    ]);
+
     const mentionSearchQuery = useQuery(
         {
             type: 'mention.search',
@@ -86,7 +126,7 @@ export const GlobalCommandPalette = ({
             limit: 30,
         },
         {
-            enabled: open && !!activeWorkspaceUserId,
+            enabled: open && !!activeWorkspaceUserId && !tagSearchActive,
         }
     );
 
@@ -124,6 +164,17 @@ export const GlobalCommandPalette = ({
             openLocation(`/workspace/${userId}/home`);
         },
         [openLocation]
+    );
+
+    const openTag = useCallback(
+        (tagId: string) => {
+            if (!activeWorkspaceUserId) {
+                return;
+            }
+
+            openLocation(`/workspace/${activeWorkspaceUserId}/tags/${tagId}`);
+        },
+        [activeWorkspaceUserId, openLocation]
     );
 
     const openNode = useCallback(
@@ -180,11 +231,15 @@ export const GlobalCommandPalette = ({
             <CommandInput
                 value={query}
                 onValueChange={setQuery}
-                placeholder="Search channels, pages, records, users... (⌘Enter/Ctrl+Enter in new tab)"
+                placeholder="Search resources, #tags, users... (⌘Enter/Ctrl+Enter in new tab)"
             />
             <CommandList>
                 <CommandEmpty>
-                    {mentionSearchQuery.isPending ? 'Searching...' : 'No results found.'}
+                    {mentionSearchQuery.isPending
+                        ? 'Searching...'
+                        : tagSearchActive
+                          ? 'No matching tags.'
+                          : 'No results found.'}
                 </CommandEmpty>
 
                 {activeWorkspaceUserId && (
@@ -240,8 +295,30 @@ export const GlobalCommandPalette = ({
                     ))}
                 </CommandGroup>
 
-                <CommandSeparator />
+                {tagSearchActive && tagResults.length > 0 && (
+                    <>
+                        <CommandSeparator />
+                        <CommandGroup heading="Tags">
+                            {tagResults.map((tag) => (
+                                <CommandItem
+                                    key={`tag:${tag.id}`}
+                                    value={`#${tag.name}`}
+                                    onSelect={() => {
+                                        openTag(tag.id);
+                                    }}
+                                >
+                                    <Tags className="size-4" />
+                                    <span>{tag.name}</span>
+                                    <CommandShortcut>tag</CommandShortcut>
+                                </CommandItem>
+                            ))}
+                        </CommandGroup>
+                    </>
+                )}
 
+                {!tagSearchActive && <CommandSeparator />}
+
+                {!tagSearchActive && (
                 <CommandGroup heading="Resources">
                     {resourceResults.map((item) => (
                         <CommandItem
@@ -257,8 +334,9 @@ export const GlobalCommandPalette = ({
                         </CommandItem>
                     ))}
                 </CommandGroup>
+                )}
 
-                {userResults.length > 0 && (
+                {!tagSearchActive && userResults.length > 0 && (
                     <CommandGroup heading="People">
                         {userResults.map((item) => (
                             <CommandItem

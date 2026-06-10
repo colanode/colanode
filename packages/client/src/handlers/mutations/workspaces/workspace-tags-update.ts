@@ -1,5 +1,7 @@
 import { eventBus } from '@colanode/client/lib/event-bus';
 import { mapWorkspace } from '@colanode/client/lib/mappers';
+import { cleanupDeletedWorkspaceTags } from '@colanode/client/lib/workspace-tag-cleanup';
+import { TagAttributes } from '@colanode/core';
 import { MutationHandler } from '@colanode/client/lib/types';
 import {
   MutationError,
@@ -31,6 +33,19 @@ export class WorkspaceTagsUpdateMutationHandler
       );
     }
 
+    const existingWorkspace = await this.app.database
+      .selectFrom('workspaces')
+      .select(['tags'])
+      .where('user_id', '=', input.userId)
+      .executeTakeFirst();
+
+    const previousTags: Record<string, TagAttributes> = existingWorkspace?.tags
+      ? JSON.parse(existingWorkspace.tags)
+      : {};
+    const removedTagIds = Object.keys(previousTags).filter(
+      (tagId) => !(tagId in input.tags)
+    );
+
     const updatedWorkspace = await this.app.database
       .updateTable('workspaces')
       .returningAll()
@@ -50,6 +65,8 @@ export class WorkspaceTagsUpdateMutationHandler
 
     const workspace = mapWorkspace(updatedWorkspace);
     workspaceService.updateWorkspace(workspace);
+
+    await cleanupDeletedWorkspaceTags(workspaceService, removedTagIds);
 
     eventBus.publish({
       type: 'workspace.updated',

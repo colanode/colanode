@@ -10,8 +10,9 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 
 import { LocalFolderNode, FolderLayoutType } from '@colanode/client/types';
-import { NodeRole } from '@colanode/core';
+import { NodeRole, hasNodeRole } from '@colanode/core';
 import { FolderFiles } from '@colanode/ui/components/folders/folder-files';
+import { NodeTagBar } from '@colanode/ui/components/nodes/node-tag-bar';
 import { Button } from '@colanode/ui/components/ui/button';
 import {
   DropdownMenu,
@@ -62,8 +63,9 @@ interface FolderBodyProps {
   role: NodeRole;
 }
 
-export const FolderBody = ({ folder }: FolderBodyProps) => {
+export const FolderBody = ({ folder, role }: FolderBodyProps) => {
   const workspace = useWorkspace();
+  const canEdit = hasNodeRole(role, 'editor');
 
   const [layout, setLayout] = useState<FolderLayoutType>('grid');
 
@@ -101,6 +103,7 @@ export const FolderBody = ({ folder }: FolderBodyProps) => {
       }}
     >
       <div className="flex h-full max-h-full flex-col gap-4 overflow-y-auto">
+        <NodeTagBar node={folder} canEdit={canEdit} />
         <div className="flex flex-row justify-between">
           <div className="flex flex-row gap-2">
             <Button type="button" variant="outline" onClick={handleUploadClick}>

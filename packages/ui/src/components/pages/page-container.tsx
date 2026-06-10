@@ -15,7 +15,7 @@ export const PageContainer = ({ page, role }: PageContainerProps) => {
   return (
     <div className="flex flex-row items-start gap-4">
       <div className="min-w-0 flex-1">
-        <NodeTagBar page={page} canEdit={canEdit} />
+        <NodeTagBar node={page} canEdit={canEdit} />
         <Document node={page} canEdit={canEdit} autoFocus="start" />
         <NodeBacklinks nodeId={page.id} />
       </div>
