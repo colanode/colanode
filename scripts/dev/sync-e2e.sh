@@ -36,7 +36,7 @@ SHARED_SYNC="$SANDBOX_ROOT/shared/sync"
 launch_instance() {
   local data_dir="$1"
   COLANODE_DATA_DIR="$data_dir" \
-    open -n "$APP_PATH" --args "--storage-dir=$data_dir"
+    open -n "$APP_PATH" --args "--colanode-storage-dir=$data_dir"
 }
 
 case "$SUBCMD" in

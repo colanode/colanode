@@ -30,6 +30,8 @@ export type CanUpdateAttributesContext = {
   tree: Node[];
   node: Node;
   attributes: NodeAttributes;
+  /** System backfill/consolidation only; UI must not set this. */
+  allowMetaTypeIdChange?: boolean;
 };
 
 export type CanUpdateDocumentContext = {

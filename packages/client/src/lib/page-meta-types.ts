@@ -19,26 +19,206 @@ const isMetaTypeDatabase = (attributes: NodeAttributes): boolean =>
   attributes.type === 'database' &&
   (attributes.purpose ?? 'records') === 'meta_type';
 
-export const findDefaultPageMetaTypeId = async (
+type PageMetaTypeRow = {
+  id: string;
+  attributes: DatabaseAttributes;
+  createdAt: string;
+};
+
+const listPageMetaTypes = async (
   workspace: WorkspaceService
-): Promise<string | null> => {
+): Promise<PageMetaTypeRow[]> => {
   const databases = await workspace.database
     .selectFrom('nodes')
-    .selectAll()
+    .select(['id', 'attributes', 'created_at'])
     .where('type', '=', 'database')
     .execute();
 
-  for (const row of databases) {
+  return databases.flatMap((row) => {
     const attributes = JSON.parse(row.attributes) as DatabaseAttributes;
     if (
-      isMetaTypeDatabase(attributes) &&
-      attributes.name === DEFAULT_PAGE_META_TYPE_NAME
+      !isMetaTypeDatabase(attributes) ||
+      attributes.name !== DEFAULT_PAGE_META_TYPE_NAME
     ) {
-      return row.id;
+      return [];
+    }
+
+    return [
+      {
+        id: row.id,
+        attributes,
+        createdAt: row.created_at,
+      },
+    ];
+  });
+};
+
+const countPagesByMetaTypeId = async (
+  workspace: WorkspaceService
+): Promise<Map<string, number>> => {
+  const pages = await workspace.database
+    .selectFrom('nodes')
+    .select(['meta_type_id'])
+    .where('type', '=', 'page')
+    .execute();
+
+  const counts = new Map<string, number>();
+  for (const page of pages) {
+    if (!page.meta_type_id) {
+      continue;
+    }
+
+    counts.set(page.meta_type_id, (counts.get(page.meta_type_id) ?? 0) + 1);
+  }
+
+  return counts;
+};
+
+const readPageMetaTypeId = (
+  attributes: PageAttributes & { metaTypeId?: string }
+): string | null => {
+  return typeof attributes.metaTypeId === 'string' && attributes.metaTypeId.length > 0
+    ? attributes.metaTypeId
+    : null;
+};
+
+const pickCanonicalPageMetaType = (
+  pageMetaTypes: PageMetaTypeRow[],
+  pageCounts: Map<string, number>
+): PageMetaTypeRow => {
+  return [...pageMetaTypes].sort((left, right) => {
+    const leftFieldCount = Object.keys(left.attributes.fields ?? {}).length;
+    const rightFieldCount = Object.keys(right.attributes.fields ?? {}).length;
+    if (leftFieldCount !== rightFieldCount) {
+      return rightFieldCount - leftFieldCount;
+    }
+
+    const leftPageCount = pageCounts.get(left.id) ?? 0;
+    const rightPageCount = pageCounts.get(right.id) ?? 0;
+    if (leftPageCount !== rightPageCount) {
+      return rightPageCount - leftPageCount;
+    }
+
+    const createdAtCompare = left.createdAt.localeCompare(right.createdAt);
+    if (createdAtCompare !== 0) {
+      return createdAtCompare;
+    }
+
+    return left.id.localeCompare(right.id);
+  })[0]!;
+};
+
+const removeDuplicatePageMetaType = async (
+  workspace: WorkspaceService,
+  duplicateId: string
+): Promise<void> => {
+  const childViews = await workspace.database
+    .selectFrom('nodes')
+    .select(['id'])
+    .where('parent_id', '=', duplicateId)
+    .where('type', '=', 'database_view')
+    .execute();
+
+  for (const view of childViews) {
+    await workspace.nodes.deleteNode(view.id);
+  }
+
+  await workspace.nodes.updateNode(duplicateId, (draft) => {
+    if (draft.type !== 'database') {
+      return draft;
+    }
+
+    draft.name = 'Page (duplicate)';
+    return draft;
+  });
+
+  await workspace.nodes.deleteNode(duplicateId);
+  debug(`Removed duplicate Page meta type ${duplicateId}`);
+};
+
+export const consolidateDuplicatePageMetaTypes = async (
+  workspace: WorkspaceService
+): Promise<string | null> => {
+  const pageMetaTypes = await listPageMetaTypes(workspace);
+  if (pageMetaTypes.length === 0) {
+    return null;
+  }
+
+  if (pageMetaTypes.length === 1) {
+    return pageMetaTypes[0]!.id;
+  }
+
+  const pageCounts = await countPagesByMetaTypeId(workspace);
+  const canonical = pickCanonicalPageMetaType(pageMetaTypes, pageCounts);
+  const duplicateIds = pageMetaTypes
+    .map((metaType) => metaType.id)
+    .filter((id) => id !== canonical.id);
+
+  const pages = await workspace.database
+    .selectFrom('nodes')
+    .select(['id', 'attributes'])
+    .where('type', '=', 'page')
+    .execute();
+
+  for (const page of pages) {
+    const attributes = JSON.parse(page.attributes) as PageAttributes & {
+      metaTypeId?: string;
+    };
+    const metaTypeId = readPageMetaTypeId(attributes);
+
+    if (!metaTypeId || !duplicateIds.includes(metaTypeId)) {
+      continue;
+    }
+
+    const result = await workspace.nodes.updateNode(
+      page.id,
+      (draft) => {
+        if (draft.type !== 'page') {
+          return draft;
+        }
+
+        draft.metaTypeId = canonical.id;
+        if (!draft.fields) {
+          draft.fields = {};
+        }
+
+        return draft;
+      },
+      { allowMetaTypeIdChange: true }
+    );
+
+    if (result !== 'success') {
+      debug(
+        `Failed to re-point page ${page.id} from duplicate meta type ${metaTypeId} to ${canonical.id}: ${result}`
+      );
     }
   }
 
-  return null;
+  for (const duplicateId of duplicateIds) {
+    await removeDuplicatePageMetaType(workspace, duplicateId);
+  }
+
+  debug(
+    `Consolidated ${duplicateIds.length} duplicate Page meta type(s) into ${canonical.id}`
+  );
+
+  return canonical.id;
+};
+
+export const findDefaultPageMetaTypeId = async (
+  workspace: WorkspaceService
+): Promise<string | null> => {
+  const pageMetaTypes = await listPageMetaTypes(workspace);
+  if (pageMetaTypes.length === 0) {
+    return null;
+  }
+
+  if (pageMetaTypes.length === 1) {
+    return pageMetaTypes[0]!.id;
+  }
+
+  const pageCounts = await countPagesByMetaTypeId(workspace);
+  return pickCanonicalPageMetaType(pageMetaTypes, pageCounts).id;
 };
 
 const findOrCreateMetaTypesSpace = async (
@@ -101,18 +281,14 @@ const createDefaultPageMetaType = async (
   return databaseId;
 };
 
-const readPageMetaTypeId = (
-  attributes: PageAttributes & { metaTypeId?: string }
-): string | null => {
-  return typeof attributes.metaTypeId === 'string' && attributes.metaTypeId.length > 0
-    ? attributes.metaTypeId
-    : null;
-};
-
 export const ensurePageMetaTypes = async (
   workspace: WorkspaceService
 ): Promise<void> => {
-  let defaultMetaTypeId = await findDefaultPageMetaTypeId(workspace);
+  let defaultMetaTypeId = await consolidateDuplicatePageMetaTypes(workspace);
+
+  if (!defaultMetaTypeId) {
+    defaultMetaTypeId = await findDefaultPageMetaTypeId(workspace);
+  }
 
   if (!defaultMetaTypeId) {
     const spaceId = await findOrCreateMetaTypesSpace(workspace);
@@ -149,18 +325,22 @@ export const ensurePageMetaTypes = async (
       continue;
     }
 
-    const result = await workspace.nodes.updateNode(page.id, (draft) => {
-      if (draft.type !== 'page') {
+    const result = await workspace.nodes.updateNode(
+      page.id,
+      (draft) => {
+        if (draft.type !== 'page') {
+          return draft;
+        }
+
+        draft.metaTypeId = defaultMetaTypeId!;
+        if (!draft.fields) {
+          draft.fields = {};
+        }
+
         return draft;
-      }
-
-      draft.metaTypeId = defaultMetaTypeId!;
-      if (!draft.fields) {
-        draft.fields = {};
-      }
-
-      return draft;
-    });
+      },
+      { allowMetaTypeIdChange: true }
+    );
 
     if (result !== 'success') {
       debug(

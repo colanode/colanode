@@ -51,6 +51,10 @@ export type UpdateNodeResult =
   | 'failed'
   | 'invalid_attributes';
 
+export type UpdateNodeOptions = {
+  allowMetaTypeIdChange?: boolean;
+};
+
 const debug = createDebugger('desktop:service:node');
 
 export class NodeService {
@@ -402,10 +406,11 @@ export class NodeService {
 
   public async updateNode<T extends NodeAttributes>(
     nodeId: string,
-    updater: (attributes: T) => T
+    updater: (attributes: T) => T,
+    options?: UpdateNodeOptions
   ): Promise<UpdateNodeResult> {
     for (let count = 0; count < UPDATE_RETRIES_LIMIT; count++) {
-      const result = await this.tryUpdateNode(nodeId, updater);
+      const result = await this.tryUpdateNode(nodeId, updater, options);
       if (result) {
         return result;
       }
@@ -416,7 +421,8 @@ export class NodeService {
 
   private async tryUpdateNode<T extends NodeAttributes>(
     nodeId: string,
-    updater: (attributes: T) => T
+    updater: (attributes: T) => T,
+    options?: UpdateNodeOptions
   ): Promise<UpdateNodeResult | null> {
     debug(`Updating node ${nodeId}`);
 
@@ -440,6 +446,7 @@ export class NodeService {
       tree: tree,
       node: node,
       attributes: updatedAttributes,
+      allowMetaTypeIdChange: options?.allowMetaTypeIdChange,
     };
 
     const model = getNodeModel(updatedAttributes.type);
@@ -735,7 +742,7 @@ export class NodeService {
 
       return 'success';
     } catch {
-      return null;
+      return 'failed';
     }
   }
 

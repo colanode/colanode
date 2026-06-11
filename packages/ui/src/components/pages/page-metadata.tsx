@@ -1,7 +1,7 @@
 import { Fragment } from 'react';
 
 import { LocalPageNode } from '@colanode/client/types';
-import { NodeRole, hasNodeRole } from '@colanode/core';
+import { NodeRole } from '@colanode/core';
 import { PageFieldsProvider } from '@colanode/ui/components/pages/page-fields-provider';
 import { PageMetaTypePicker } from '@colanode/ui/components/pages/page-meta-type-picker';
 import { RecordField } from '@colanode/ui/components/records/record-field';
@@ -15,11 +15,9 @@ interface PageMetadataProps {
 }
 
 export const PageMetadata = ({ page, role }: PageMetadataProps) => {
-  const canEdit = hasNodeRole(role, 'editor');
-
   return (
     <div className="flex flex-col gap-2 border-b pb-3">
-      <PageMetaTypePicker page={page} canEdit={canEdit} />
+      <PageMetaTypePicker page={page} />
       <RecordDatabase id={page.metaTypeId} role={role}>
         <PageFieldsProvider page={page} role={role}>
           <div className="flex flex-col gap-2">

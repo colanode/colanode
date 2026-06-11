@@ -8,7 +8,10 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 
 import type { WorkspaceDatabaseSchema } from '@colanode/client/databases';
-import { ensurePageMetaTypes } from '@colanode/client/lib/page-meta-types';
+import {
+    ensurePageMetaTypes,
+    findDefaultPageMetaTypeId,
+} from '@colanode/client/lib/page-meta-types';
 import type { LocalSyncConfig } from '@colanode/client/services/app-meta';
 import { LocalStorageProvider } from '@colanode/client/services/backup';
 import { CloudSyncService } from '@colanode/client/services/workspaces/cloud-sync-service';
@@ -19,6 +22,7 @@ import { NodeService } from '@colanode/client/services/workspaces/node-service';
 import { acquireWorkspaceIdentity, readWorkspaceManifest, writeWorkspaceManifest } from '@colanode/client/services/workspaces/workspace-manifest';
 import type { WorkspaceService } from '@colanode/client/services/workspaces/workspace-service';
 import {
+    DEFAULT_PAGE_META_TYPE_NAME,
     generateId,
     getNodeModel,
     IdType,
@@ -206,6 +210,30 @@ const seedCollaborativeSpace = async (
     return { spaceId };
 };
 
+const addTextFieldToMetaType = async (
+    device: Device,
+    metaTypeId: string
+): Promise<void> => {
+    const fieldId = generateId(IdType.Field);
+
+    await device.workspace.nodes.updateNode(metaTypeId, (draft) => {
+        if (draft.type !== 'database') {
+            return draft;
+        }
+
+        draft.fields = {
+            [fieldId]: {
+                id: fieldId,
+                type: 'text',
+                name: 'Category',
+                index: 'a0',
+            },
+        };
+
+        return draft;
+    });
+};
+
 const seedLegacyPageWithoutMetaType = async (
     device: Device,
     parentId: string
@@ -384,6 +412,85 @@ describe('CloudSyncService (local-folder peer sync)', () => {
             .where('node_id', '=', pageId)
             .execute();
         expect(updatesOnB.length).toBeGreaterThan(1);
+    });
+
+    it('does not create a duplicate Page meta type after importing from peer', async () => {
+        const { spaceId } = await seedCollaborativeSpace(deviceA);
+        await seedLegacyPageWithoutMetaType(deviceA, spaceId);
+
+        await ensurePageMetaTypes(deviceA.workspace);
+
+        const metaTypeOnA = await findDefaultPageMetaTypeId(deviceA.workspace);
+        expect(metaTypeOnA).toBeTruthy();
+
+        await addTextFieldToMetaType(deviceA, metaTypeOnA!);
+
+        await deviceA.cloudSync.exportLocal();
+        await deviceB.cloudSync.importRemote();
+        await ensurePageMetaTypes(deviceB.workspace);
+
+        const pageMetaTypesOnB = await deviceB.database
+            .selectFrom('nodes')
+            .selectAll()
+            .where('type', '=', 'database')
+            .execute()
+            .then((rows) =>
+                rows.filter((row) => {
+                    const attributes = JSON.parse(row.attributes) as {
+                        purpose?: string;
+                        name?: string;
+                    };
+                    return (
+                        attributes.purpose === 'meta_type' &&
+                        attributes.name === DEFAULT_PAGE_META_TYPE_NAME
+                    );
+                })
+            );
+
+        expect(pageMetaTypesOnB).toHaveLength(1);
+        expect(pageMetaTypesOnB[0]?.id).toBe(metaTypeOnA);
+    });
+
+    it('repairs duplicate Page meta types created before import', async () => {
+        const { spaceId } = await seedCollaborativeSpace(deviceA);
+        await seedLegacyPageWithoutMetaType(deviceA, spaceId);
+
+        await ensurePageMetaTypes(deviceA.workspace);
+
+        const metaTypeOnA = await findDefaultPageMetaTypeId(deviceA.workspace);
+        expect(metaTypeOnA).toBeTruthy();
+
+        await addTextFieldToMetaType(deviceA, metaTypeOnA!);
+
+        await ensurePageMetaTypes(deviceB.workspace);
+        const duplicateOnB = await findDefaultPageMetaTypeId(deviceB.workspace);
+        expect(duplicateOnB).toBeTruthy();
+        expect(duplicateOnB).not.toBe(metaTypeOnA);
+
+        await deviceA.cloudSync.exportLocal();
+        await deviceB.cloudSync.importRemote();
+        await ensurePageMetaTypes(deviceB.workspace);
+
+        const pageMetaTypesOnB = await deviceB.database
+            .selectFrom('nodes')
+            .selectAll()
+            .where('type', '=', 'database')
+            .execute()
+            .then((rows) =>
+                rows.filter((row) => {
+                    const attributes = JSON.parse(row.attributes) as {
+                        purpose?: string;
+                        name?: string;
+                    };
+                    return (
+                        attributes.purpose === 'meta_type' &&
+                        attributes.name === DEFAULT_PAGE_META_TYPE_NAME
+                    );
+                })
+            );
+
+        expect(pageMetaTypesOnB).toHaveLength(1);
+        expect(pageMetaTypesOnB[0]?.id).toBe(metaTypeOnA);
     });
 
     it('converges a subsequent update from device A onto device B', async () => {

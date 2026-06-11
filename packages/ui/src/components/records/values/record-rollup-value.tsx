@@ -1,7 +1,7 @@
 import { inArray, useLiveQuery } from '@tanstack/react-db';
 import { useMemo } from 'react';
 
-import { LocalRecordNode } from '@colanode/client/types';
+import { LocalPageNode, LocalRecordNode } from '@colanode/client/types';
 import { RollupFieldAttributes } from '@colanode/core';
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useRecord } from '@colanode/ui/contexts/record';
@@ -68,12 +68,15 @@ export const RecordRollupValue = ({ field }: RecordRollupValueProps) => {
 
         const numbers: number[] = [];
         for (const node of recordsQuery.data) {
-            if (node.type !== 'record') {
+            if (node.type !== 'record' && node.type !== 'page') {
                 continue;
             }
 
-            const recordNode = node as LocalRecordNode;
-            const value = recordNode.fields?.[field.rolledUpFieldId];
+            const fields =
+                node.type === 'record'
+                    ? (node as LocalRecordNode).fields
+                    : (node as LocalPageNode).fields;
+            const value = fields?.[field.rolledUpFieldId];
             if (value && value.type === 'number') {
                 numbers.push(value.value);
             }

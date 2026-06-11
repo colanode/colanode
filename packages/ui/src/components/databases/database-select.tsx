@@ -96,7 +96,12 @@ export const DatabaseSelect = ({ id, onChange }: DatabaseSelectProps) => {
                       avatar={database.avatar}
                       className="size-4"
                     />
-                    <p>{database.name}</p>
+                    <p>
+                      {database.name}
+                      {(database.purpose ?? 'records') === 'meta_type'
+                        ? ' · meta type'
+                        : ''}
+                    </p>
                     <Check
                       className={cn(
                         'ml-auto size-4',

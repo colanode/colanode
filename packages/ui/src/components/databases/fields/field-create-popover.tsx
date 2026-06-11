@@ -64,6 +64,7 @@ const formSchema = z.object({
     .enum(['count', 'sum', 'average', 'min', 'max'])
     .optional()
     .nullable(),
+  fieldDefault: z.string().optional().nullable(),
 });
 
 const defaultValues: FieldCreateFormValues = {
@@ -74,9 +75,55 @@ const defaultValues: FieldCreateFormValues = {
   rolledUpFieldId: null,
   resourceAllowedTypes: null,
   aggregation: null,
+  fieldDefault: '',
 };
 
 type FieldCreateFormValues = z.infer<typeof formSchema>;
+
+const supportsCreateTimeDefault = (type: FieldCreateFormValues['type']) => {
+  return (
+    type === 'text' ||
+    type === 'email' ||
+    type === 'phone' ||
+    type === 'url' ||
+    type === 'date' ||
+    type === 'number' ||
+    type === 'boolean'
+  );
+};
+
+const applyFieldDefault = (
+  field: FieldAttributes,
+  rawDefault: string | null | undefined
+) => {
+  if (!rawDefault || rawDefault.length === 0) {
+    return;
+  }
+
+  switch (field.type) {
+    case 'boolean':
+      if (rawDefault === 'true' || rawDefault === 'false') {
+        field.default = rawDefault === 'true';
+      }
+      break;
+    case 'number': {
+      const parsed = Number(rawDefault);
+      if (!Number.isNaN(parsed)) {
+        field.default = parsed;
+      }
+      break;
+    }
+    case 'text':
+    case 'email':
+    case 'phone':
+    case 'url':
+    case 'date':
+      field.default = rawDefault;
+      break;
+    default:
+      break;
+  }
+};
 
 interface FieldCreatePopoverProps {
   button: React.ReactNode;
@@ -183,6 +230,8 @@ export const FieldCreatePopover = ({
           newField.aggregation = values.aggregation;
         }
 
+        applyFieldDefault(newField, values.fieldDefault);
+
         draft.fields[fieldId] = newField;
       });
 
@@ -285,6 +334,44 @@ export const FieldCreatePopover = ({
                         value={field.state.value ?? null}
                         onChange={(value) => field.handleChange(value)}
                       />
+                    </Field>
+                  )}
+                />
+              )}
+              {supportsCreateTimeDefault(type) && (
+                <form.Field
+                  name="fieldDefault"
+                  children={(field) => (
+                    <Field>
+                      <FieldLabel htmlFor={field.name}>
+                        Default value (optional)
+                      </FieldLabel>
+                      {type === 'boolean' ? (
+                        <select
+                          id={field.name}
+                          className="border-input flex h-9 w-full rounded-md border bg-transparent px-3 py-1 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                          value={field.state.value ?? ''}
+                          onChange={(event) =>
+                            field.handleChange(event.target.value)
+                          }
+                        >
+                          <option value="">No default</option>
+                          <option value="true">True</option>
+                          <option value="false">False</option>
+                        </select>
+                      ) : (
+                        <Input
+                          id={field.name}
+                          name={field.name}
+                          type={type === 'number' ? 'number' : 'text'}
+                          value={field.state.value ?? ''}
+                          onBlur={field.handleBlur}
+                          onChange={(event) =>
+                            field.handleChange(event.target.value)
+                          }
+                          placeholder="Default for new pages"
+                        />
+                      )}
                     </Field>
                   )}
                 />

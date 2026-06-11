@@ -3,8 +3,9 @@ import { useNavigate } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 
-import { LocalPageNode } from '@colanode/client/types';
+import { LocalDatabaseNode, LocalPageNode } from '@colanode/client/types';
 import { FieldValue, generateId, IdType } from '@colanode/core';
+import { resolveInitialPageFields } from '@colanode/ui/lib/page-field-values';
 import {
   PageForm,
   PageFormValues,
@@ -52,6 +53,11 @@ export const MetaTypePageCreateDialog = ({
 
       const pageId = generateId(IdType.Page);
       const nodes = workspace.collections.nodes;
+      const metaTypeNode = nodes.get(metaTypeId);
+      const metaType =
+        metaTypeNode?.type === 'database'
+          ? (metaTypeNode as LocalDatabaseNode)
+          : null;
 
       const page: LocalPageNode = {
         id: pageId,
@@ -60,7 +66,9 @@ export const MetaTypePageCreateDialog = ({
         avatar: values.avatar,
         parentId: spaceId,
         metaTypeId,
-        fields: initialFields ?? {},
+        fields: resolveInitialPageFields(metaType, {
+          initialFields,
+        }),
         rootId: spaceId,
         createdAt: new Date().toISOString(),
         createdBy: workspace.userId,

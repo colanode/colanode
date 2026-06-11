@@ -7,6 +7,7 @@ import {
 import { PageByMetaTypeQueryHandler } from '@colanode/client/handlers/queries/pages/page-by-meta-type';
 import { NodeService } from '@colanode/client/services/workspaces/node-service';
 import {
+  consolidateDuplicatePageMetaTypes,
   ensurePageMetaTypes,
   findDefaultPageMetaTypeId,
 } from '@colanode/client/lib/page-meta-types';
@@ -188,6 +189,129 @@ describe('page meta types', () => {
       .execute();
 
     expect(rows.map((row) => row.id)).toEqual([pageWithMeta]);
+  });
+
+  it('consolidates duplicate default Page meta types', async () => {
+    const spaceId = generateId(IdType.Space);
+    const canonicalMetaTypeId = generateId(IdType.Database);
+    const duplicateMetaTypeId = generateId(IdType.Database);
+    const duplicateViewId = generateId(IdType.DatabaseView);
+    const pageId = generateId(IdType.Page);
+
+    await insertNode(
+      database,
+      spaceId,
+      {
+        type: 'space',
+        name: 'Main',
+        description: '',
+        collaborators: { [userId]: 'admin' },
+        visibility: 'private',
+      },
+      userId
+    );
+
+    await insertNode(
+      database,
+      canonicalMetaTypeId,
+      {
+        type: 'database',
+        name: DEFAULT_PAGE_META_TYPE_NAME,
+        parentId: spaceId,
+        purpose: 'meta_type',
+        fields: { category: {} },
+      },
+      userId
+    );
+
+    await insertNode(
+      database,
+      duplicateMetaTypeId,
+      {
+        type: 'database',
+        name: DEFAULT_PAGE_META_TYPE_NAME,
+        parentId: spaceId,
+        purpose: 'meta_type',
+        fields: {},
+      },
+      userId
+    );
+
+    await insertNode(
+      database,
+      duplicateViewId,
+      {
+        type: 'database_view',
+        name: 'Default',
+        parentId: duplicateMetaTypeId,
+        layout: 'table',
+      },
+      userId
+    );
+
+    await insertNode(
+      database,
+      pageId,
+      {
+        type: 'page',
+        name: 'Doc',
+        parentId: spaceId,
+        metaTypeId: duplicateMetaTypeId,
+        fields: {},
+      },
+      userId
+    );
+
+    const workspace = {
+      userId,
+      workspaceId: generateId(IdType.Workspace),
+      accountId: generateId(IdType.Account),
+      role: 'owner',
+      database,
+      account: { app: { meta: { localOnly: true } } },
+    } as unknown as WorkspaceService;
+
+    workspace.nodes = new NodeService(workspace);
+
+    const consolidatedId = await consolidateDuplicatePageMetaTypes(workspace);
+    expect(consolidatedId).toBe(canonicalMetaTypeId);
+
+    const pageMetaTypes = await database
+      .selectFrom('nodes')
+      .selectAll()
+      .where('type', '=', 'database')
+      .execute()
+      .then((rows) =>
+        rows.filter((row) => {
+          const attributes = JSON.parse(row.attributes) as {
+            purpose?: string;
+            name?: string;
+          };
+          return (
+            attributes.purpose === 'meta_type' &&
+            attributes.name === DEFAULT_PAGE_META_TYPE_NAME
+          );
+        })
+      );
+
+    expect(pageMetaTypes).toHaveLength(1);
+    expect(pageMetaTypes[0]?.id).toBe(canonicalMetaTypeId);
+
+    const pageRow = await database
+      .selectFrom('nodes')
+      .where('id', '=', pageId)
+      .selectAll()
+      .executeTakeFirstOrThrow();
+
+    const pageAttributes = JSON.parse(pageRow.attributes) as PageAttributes;
+    expect(pageAttributes.metaTypeId).toBe(canonicalMetaTypeId);
+
+    const duplicateRow = await database
+      .selectFrom('nodes')
+      .where('id', '=', duplicateMetaTypeId)
+      .selectAll()
+      .executeTakeFirst();
+    expect(duplicateRow).toBeUndefined();
   });
 
   it('backfills missing metaTypeId on existing pages', async () => {

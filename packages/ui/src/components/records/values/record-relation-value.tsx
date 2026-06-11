@@ -2,10 +2,9 @@ import { eq, inArray, useLiveQuery } from '@tanstack/react-db';
 import { X } from 'lucide-react';
 import { Fragment, useMemo, useState } from 'react';
 
-import { LocalRecordNode } from '@colanode/client/types';
 import { RelationFieldAttributes, StringArrayFieldValue } from '@colanode/core';
 import { Avatar } from '@colanode/ui/components/avatars/avatar';
-import { RecordSearch } from '@colanode/ui/components/records/record-search';
+import { RelationTargetSearch } from '@colanode/ui/components/records/relation-target-search';
 import { Badge } from '@colanode/ui/components/ui/badge';
 import {
   Popover,
@@ -22,11 +21,17 @@ interface RecordRelationValueProps {
   readOnly?: boolean;
 }
 
-const RelationBadge = ({ record }: { record: LocalRecordNode }) => {
-  const name = record.name ?? 'Unnamed';
+type RelationTarget = {
+  id: string;
+  name: string;
+  avatar?: string | null;
+};
+
+const RelationBadge = ({ target }: { target: RelationTarget }) => {
+  const name = target.name ?? 'Unnamed';
   return (
     <div className="flex flex-row items-center gap-1">
-      <Avatar id={record.id} name={name} avatar={record.avatar} size="small" />
+      <Avatar id={target.id} name={name} avatar={target.avatar} size="small" />
       <p className="text-sm line-clamp-1 w-full">{name}</p>
     </div>
   );
@@ -62,7 +67,19 @@ export const RecordRelationValue = ({
     [workspace.userId, field.databaseId, relationIds]
   );
 
-  const relations = relationsQuery.data.map((node) => node as LocalRecordNode);
+  const relations = relationsQuery.data.flatMap((node) => {
+    if (node.type !== 'page' && node.type !== 'record') {
+      return [];
+    }
+
+    return [
+      {
+        id: node.id,
+        name: node.name ?? 'Unnamed',
+        avatar: node.avatar,
+      },
+    ];
+  });
   if (!field.databaseId) {
     return null;
   }
@@ -72,7 +89,7 @@ export const RecordRelationValue = ({
       <PopoverTrigger asChild>
         <div className="flex h-full w-full cursor-pointer flex-wrap gap-1 p-0 overflow-hidden">
           {relations.slice(0, 1).map((relation) => (
-            <RelationBadge key={relation.id} record={relation} />
+            <RelationBadge key={relation.id} target={relation} />
           ))}
           {relations.length === 0 && ' '}
           {relations.length > 1 && (
@@ -94,7 +111,7 @@ export const RecordRelationValue = ({
                   key={relation.id}
                   className="flex w-full flex-row items-center gap-2"
                 >
-                  <RelationBadge record={relation} />
+                  <RelationBadge target={relation} />
                   {record.canEdit && !readOnly && (
                     <X
                       className="size-4 cursor-pointer"
@@ -125,15 +142,15 @@ export const RecordRelationValue = ({
           )}
         </div>
         {record.canEdit && !readOnly && (
-          <RecordSearch
+          <RelationTargetSearch
             databaseId={field.databaseId}
             exclude={relationIds}
-            onSelect={(selectedRecord) => {
+            onSelect={(selectedTarget) => {
               if (!record.canEdit || readOnly) return;
 
-              const newRelations = relationIds.includes(selectedRecord.id)
-                ? relationIds.filter((id) => id !== selectedRecord.id)
-                : [...relationIds, selectedRecord.id];
+              const newRelations = relationIds.includes(selectedTarget.id)
+                ? relationIds.filter((id) => id !== selectedTarget.id)
+                : [...relationIds, selectedTarget.id];
 
               if (newRelations.length === 0) {
                 clearValue();

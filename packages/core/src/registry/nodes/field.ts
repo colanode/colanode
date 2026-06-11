@@ -16,6 +16,7 @@ export const booleanFieldAttributesSchema = z.object({
   type: z.literal('boolean'),
   name: z.string(),
   index: z.string(),
+  default: z.boolean().optional(),
 });
 
 export type BooleanFieldAttributes = z.infer<
@@ -27,6 +28,7 @@ export const collaboratorFieldAttributesSchema = z.object({
   type: z.literal('collaborator'),
   name: z.string(),
   index: z.string(),
+  default: z.string().optional(),
 });
 
 export type CollaboratorFieldAttributes = z.infer<
@@ -60,6 +62,7 @@ export const dateFieldAttributesSchema = z.object({
   type: z.literal('date'),
   name: z.string(),
   index: z.string(),
+  default: z.string().optional(),
 });
 
 export type DateFieldAttributes = z.infer<typeof dateFieldAttributesSchema>;
@@ -69,6 +72,7 @@ export const emailFieldAttributesSchema = z.object({
   type: z.literal('email'),
   name: z.string(),
   index: z.string(),
+  default: z.string().optional(),
 });
 
 export type EmailFieldAttributes = z.infer<typeof emailFieldAttributesSchema>;
@@ -88,6 +92,7 @@ export const multiSelectFieldAttributesSchema = z.object({
   name: z.string(),
   index: z.string(),
   options: z.record(z.string(), selectOptionAttributesSchema).optional(),
+  default: z.array(z.string()).optional(),
 });
 
 export type MultiSelectFieldAttributes = z.infer<
@@ -99,6 +104,7 @@ export const numberFieldAttributesSchema = z.object({
   type: z.literal('number'),
   name: z.string(),
   index: z.string(),
+  default: z.number().optional(),
 });
 
 export type NumberFieldAttributes = z.infer<typeof numberFieldAttributesSchema>;
@@ -108,6 +114,7 @@ export const phoneFieldAttributesSchema = z.object({
   type: z.literal('phone'),
   name: z.string(),
   index: z.string(),
+  default: z.string().optional(),
 });
 
 export type PhoneFieldAttributes = z.infer<typeof phoneFieldAttributesSchema>;
@@ -164,6 +171,7 @@ export const selectFieldAttributesSchema = z.object({
   name: z.string(),
   index: z.string(),
   options: z.record(z.string(), selectOptionAttributesSchema).optional(),
+  default: z.string().optional(),
 });
 
 export type SelectFieldAttributes = z.infer<typeof selectFieldAttributesSchema>;
@@ -173,6 +181,7 @@ export const textFieldAttributesSchema = z.object({
   type: z.literal('text'),
   name: z.string(),
   index: z.string(),
+  default: z.string().optional(),
 });
 
 export type TextFieldAttributes = z.infer<typeof textFieldAttributesSchema>;
@@ -182,6 +191,7 @@ export const urlFieldAttributesSchema = z.object({
   type: z.literal('url'),
   name: z.string(),
   index: z.string(),
+  default: z.string().optional(),
 });
 
 export type UrlFieldAttributes = z.infer<typeof urlFieldAttributesSchema>;

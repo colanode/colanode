@@ -5,6 +5,7 @@ import { toast } from 'sonner';
 
 import { LocalPageNode } from '@colanode/client/types';
 import { generateId, IdType } from '@colanode/core';
+import { resolveInitialPageFields } from '@colanode/ui/lib/page-field-values';
 import {
   PageForm,
   PageFormValues,
@@ -57,6 +58,10 @@ export const PageCreateDialog = ({
         throw new Error('No page meta type is available.');
       }
 
+      const resolvedMetaType =
+        metaTypes.find((metaType) => metaType.id === resolvedMetaTypeId) ??
+        null;
+
       const pageId = generateId(IdType.Page);
       const nodes = workspace.collections.nodes;
 
@@ -67,7 +72,7 @@ export const PageCreateDialog = ({
         avatar: values.avatar,
         parentId: spaceId,
         metaTypeId: resolvedMetaTypeId,
-        fields: {},
+        fields: resolveInitialPageFields(resolvedMetaType),
         rootId: spaceId,
         createdAt: new Date().toISOString(),
         createdBy: workspace.userId,

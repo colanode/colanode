@@ -44,6 +44,16 @@ export const pageModel: NodeModel = {
       return false;
     }
 
+    if (
+      !context.allowMetaTypeIdChange &&
+      context.node.type === 'page' &&
+      context.attributes.type === 'page' &&
+      context.node.metaTypeId &&
+      context.node.metaTypeId !== context.attributes.metaTypeId
+    ) {
+      return false;
+    }
+
     return hasNodeRole(role, 'editor');
   },
   canUpdateDocument: (context) => {

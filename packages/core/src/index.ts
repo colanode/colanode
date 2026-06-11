@@ -1,5 +1,6 @@
 export * from './lib/constants';
 export * from './lib/meta-types';
+export * from './lib/field-defaults';
 export * from './lib/files';
 export * from './lib/id';
 export * from './lib/utils';

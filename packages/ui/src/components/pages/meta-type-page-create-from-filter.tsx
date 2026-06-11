@@ -6,6 +6,7 @@ import { MetaTypePageCreateDialog } from '@colanode/ui/components/pages/meta-typ
 import { useDatabase } from '@colanode/ui/contexts/database';
 import { useWorkspace } from '@colanode/ui/contexts/workspace';
 import { generateFieldValuesFromFilters } from '@colanode/ui/lib/databases';
+import { resolveInitialPageFields } from '@colanode/ui/lib/page-field-values';
 
 interface MetaTypePageCreateFromFilterProps {
   filters: DatabaseViewFilterAttributes[];
@@ -24,12 +25,14 @@ export const MetaTypePageCreateFromFilter = ({
 
   const initialFields = useMemo(
     () =>
-      generateFieldValuesFromFilters(
-        database.fields,
-        filters,
-        workspace.userId
-      ),
-    [database.fields, filters, workspace.userId]
+      resolveInitialPageFields(database, {
+        filterValues: generateFieldValuesFromFilters(
+          database.fields,
+          filters,
+          workspace.userId
+        ),
+      }),
+    [database, database.fields, filters, workspace.userId]
   );
 
   if (!database.canCreatePage) {

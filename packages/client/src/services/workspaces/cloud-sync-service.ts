@@ -290,8 +290,9 @@ export class CloudSyncService {
             return;
         }
 
-        // Kick off an immediate cycle, then schedule periodic syncs.
-        void this.sync();
+        // Await the first cycle so remote meta types are imported before workspace
+        // init continues (e.g. ensurePageMetaTypes).
+        await this.sync();
 
         this.timer = setInterval(() => {
             void this.sync();
