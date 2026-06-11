@@ -2,11 +2,13 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 
+import * as Y from 'yjs';
 import { Kysely } from 'kysely';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
 
 import type { WorkspaceDatabaseSchema } from '@colanode/client/databases';
+import { ensurePageMetaTypes } from '@colanode/client/lib/page-meta-types';
 import type { LocalSyncConfig } from '@colanode/client/services/app-meta';
 import { LocalStorageProvider } from '@colanode/client/services/backup';
 import { CloudSyncService } from '@colanode/client/services/workspaces/cloud-sync-service';
@@ -56,6 +58,7 @@ const createDeviceWithIds = async (
         workspaceId: ids.workspaceId,
         userId: ids.userId,
         accountId: ids.accountId,
+        role: 'owner',
         database,
         account: { app: { meta: { localOnly: true } } },
         files: { deleteFile: async () => { } },
@@ -143,6 +146,103 @@ const seedNode = async (
         .execute();
 
     return { nodeId, update };
+};
+
+const buildLegacyPageYdocUpdate = (
+    name: string,
+    parentId: string
+): Uint8Array => {
+    const doc = new Y.Doc();
+    const map = doc.getMap('object');
+    map.set('type', 'page');
+    map.set('name', name);
+    map.set('parentId', parentId);
+    return Y.encodeStateAsUpdate(doc);
+};
+
+const seedCollaborativeSpace = async (
+    device: Device
+): Promise<{ spaceId: string }> => {
+    const spaceId = generateId(IdType.Space);
+    const now = new Date().toISOString();
+    const attributes = {
+        type: 'space',
+        name: 'Main',
+        description: '',
+        collaborators: { [device.userId]: 'admin' },
+        visibility: 'private',
+    };
+
+    const model = getNodeModel('space');
+    const ydoc = new YDoc();
+    const update = ydoc.update(model.attributesSchema, attributes);
+    if (!update) {
+        throw new Error('Failed to generate space update');
+    }
+
+    await device.database
+        .insertInto('nodes')
+        .values({
+            id: spaceId,
+            root_id: spaceId,
+            attributes: JSON.stringify(attributes),
+            created_at: now,
+            created_by: device.userId,
+            local_revision: '0',
+            server_revision: '0',
+        })
+        .execute();
+
+    await device.database
+        .insertInto('node_updates')
+        .values({
+            id: generateId(IdType.Update),
+            node_id: spaceId,
+            data: update,
+            created_at: now,
+        })
+        .execute();
+
+    return { spaceId };
+};
+
+const seedLegacyPageWithoutMetaType = async (
+    device: Device,
+    parentId: string
+): Promise<{ pageId: string }> => {
+    const pageId = generateId(IdType.Page);
+    const now = new Date().toISOString();
+    const sqliteAttributes = {
+        type: 'page',
+        name: 'Legacy',
+        parentId,
+        fields: {},
+    };
+
+    await device.database
+        .insertInto('nodes')
+        .values({
+            id: pageId,
+            root_id: parentId,
+            attributes: JSON.stringify(sqliteAttributes),
+            created_at: now,
+            created_by: device.userId,
+            local_revision: '0',
+            server_revision: '0',
+        })
+        .execute();
+
+    await device.database
+        .insertInto('node_updates')
+        .values({
+            id: generateId(IdType.Update),
+            node_id: pageId,
+            data: buildLegacyPageYdocUpdate('Legacy', parentId),
+            created_at: now,
+        })
+        .execute();
+
+    return { pageId };
 };
 
 describe('CloudSyncService (local-folder peer sync)', () => {
@@ -236,6 +336,54 @@ describe('CloudSyncService (local-folder peer sync)', () => {
             .where('id', '=', nodeId)
             .execute();
         expect(nodes).toHaveLength(1);
+    });
+
+    it('syncs metaTypeId backfill from device A to device B', async () => {
+        const { spaceId } = await seedCollaborativeSpace(deviceA);
+        const { pageId } = await seedLegacyPageWithoutMetaType(deviceA, spaceId);
+
+        await ensurePageMetaTypes(deviceA.workspace);
+
+        const pageOnA = await deviceA.database
+            .selectFrom('nodes')
+            .selectAll()
+            .where('id', '=', pageId)
+            .executeTakeFirstOrThrow();
+
+        const attributesOnA = JSON.parse(pageOnA.attributes) as {
+            metaTypeId?: string;
+        };
+        expect(attributesOnA.metaTypeId).toBeTruthy();
+        expect(pageOnA.meta_type_id).toBe(attributesOnA.metaTypeId);
+
+        const updatesOnA = await deviceA.database
+            .selectFrom('node_updates')
+            .selectAll()
+            .where('node_id', '=', pageId)
+            .execute();
+        expect(updatesOnA.length).toBeGreaterThan(1);
+
+        await deviceA.cloudSync.exportLocal();
+        await deviceB.cloudSync.importRemote();
+
+        const pageOnB = await deviceB.database
+            .selectFrom('nodes')
+            .selectAll()
+            .where('id', '=', pageId)
+            .executeTakeFirstOrThrow();
+
+        const attributesOnB = JSON.parse(pageOnB.attributes) as {
+            metaTypeId?: string;
+        };
+        expect(attributesOnB.metaTypeId).toBe(attributesOnA.metaTypeId);
+        expect(pageOnB.meta_type_id).toBe(attributesOnA.metaTypeId);
+
+        const updatesOnB = await deviceB.database
+            .selectFrom('node_updates')
+            .selectAll()
+            .where('node_id', '=', pageId)
+            .execute();
+        expect(updatesOnB.length).toBeGreaterThan(1);
     });
 
     it('converges a subsequent update from device A onto device B', async () => {
