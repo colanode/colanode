@@ -18,7 +18,7 @@ On workspace init, `ensurePageMetaTypes` creates:
 
 1. Hidden space `Meta Types` (`description: __colanode_meta_types__`) — hidden from the Spaces sidebar
 2. Default meta type database named `Page`
-3. Backfills missing or invalid `metaTypeId` on existing pages (SQLite force-write when YDoc update no-ops)
+3. Backfills missing or invalid `metaTypeId` on existing pages via `node.update` (creates syncable `node_updates`; SQLite is reconciled from YDoc when CRDT and SQLite drift)
 
 The default `Page` meta type cannot be deleted (`databaseModel.canDelete`).
 

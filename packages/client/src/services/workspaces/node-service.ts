@@ -32,6 +32,8 @@ import {
   CanUpdateAttributesContext,
   CanDeleteNodeContext,
 } from '@colanode/core';
+import { isEqual } from 'lodash-es';
+
 import { decodeState, encodeState, YDoc } from '@colanode/crdt';
 
 const UPDATE_RETRIES_LIMIT = 20;
@@ -465,6 +467,17 @@ export class NodeService {
     const update = ydoc.update(model.attributesSchema, updatedAttributes);
 
     if (!update) {
+      const ydocAttributes = ydoc.getObject<NodeAttributes>();
+      const sqliteAttributes = mapNodeAttributes(node);
+
+      if (!isEqual(sqliteAttributes, ydocAttributes)) {
+        return this.reconcileSqliteAttributesFromYdoc(
+          nodeId,
+          node,
+          ydocAttributes
+        );
+      }
+
       return 'success';
     }
 
@@ -617,6 +630,113 @@ export class NodeService {
     }
 
     return null;
+  }
+
+  private async reconcileSqliteAttributesFromYdoc(
+    nodeId: string,
+    node: LocalNode,
+    attributes: NodeAttributes
+  ): Promise<UpdateNodeResult> {
+    const model = getNodeModel(attributes.type);
+    const updatedAt = new Date().toISOString();
+    const localRevision = BigInt(node.localRevision) + BigInt(1);
+    const nodeText = model.extractText(nodeId, attributes);
+    const beforeAttributes = mapNodeAttributes(node);
+
+    try {
+      const {
+        updatedNode,
+        createdNodeReferences,
+        deletedNodeReferences,
+      } = await this.workspace.database.transaction().execute(async (trx) => {
+        const updatedNode = await trx
+          .updateTable('nodes')
+          .returningAll()
+          .set({
+            attributes: JSON.stringify(attributes),
+            updated_at: updatedAt,
+            updated_by: this.workspace.userId,
+            local_revision: localRevision.toString(),
+          })
+          .where('id', '=', nodeId)
+          .where('local_revision', '=', node.localRevision)
+          .executeTakeFirst();
+
+        if (!updatedNode) {
+          throw new Error('Failed to reconcile node');
+        }
+
+        await trx.deleteFrom('node_texts').where('id', '=', nodeId).execute();
+
+        if (nodeText) {
+          await trx
+            .insertInto('node_texts')
+            .values({
+              id: nodeId,
+              name: nodeText.name,
+              attributes: nodeText.attributes,
+            })
+            .execute();
+        }
+
+        const { createdNodeReferences, deletedNodeReferences } =
+          await applyNodeReferenceUpdates(
+            trx,
+            nodeId,
+            this.workspace.userId,
+            updatedAt,
+            model,
+            beforeAttributes,
+            attributes
+          );
+
+        return {
+          updatedNode,
+          createdNodeReferences,
+          deletedNodeReferences,
+        };
+      });
+
+      debug(`Reconciled node ${nodeId} SQLite from YDoc`);
+
+      eventBus.publish({
+        type: 'node.updated',
+        workspace: {
+          workspaceId: this.workspace.workspaceId,
+          userId: this.workspace.userId,
+          accountId: this.workspace.accountId,
+        },
+        node: mapNode(updatedNode),
+      });
+
+      for (const createdNodeReference of createdNodeReferences) {
+        eventBus.publish({
+          type: 'node.reference.created',
+          workspace: {
+            workspaceId: this.workspace.workspaceId,
+            userId: this.workspace.userId,
+            accountId: this.workspace.accountId,
+          },
+          nodeReference: mapNodeReference(createdNodeReference),
+        });
+      }
+
+      for (const deletedNodeReference of deletedNodeReferences) {
+        eventBus.publish({
+          type: 'node.reference.deleted',
+          workspace: {
+            workspaceId: this.workspace.workspaceId,
+            userId: this.workspace.userId,
+            accountId: this.workspace.accountId,
+          },
+          nodeReference: mapNodeReference(deletedNodeReference),
+        });
+      }
+
+      return 'success';
+    } catch {
+      return null;
+    }
   }
 
   public async deleteNode(nodeId: string) {

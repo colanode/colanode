@@ -1,10 +1,11 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { Kysely } from 'kysely';
 
 import {
   WorkspaceDatabaseSchema,
 } from '@colanode/client/databases';
 import { PageByMetaTypeQueryHandler } from '@colanode/client/handlers/queries/pages/page-by-meta-type';
+import { NodeService } from '@colanode/client/services/workspaces/node-service';
 import {
   ensurePageMetaTypes,
   findDefaultPageMetaTypeId,
@@ -222,14 +223,13 @@ describe('page meta types', () => {
       userId,
       workspaceId: generateId(IdType.Workspace),
       accountId: generateId(IdType.Account),
+      role: 'owner',
       database,
-      nodes: {
-        insertNode: async (id: string, attributes: Record<string, unknown>) => {
-          await insertNode(database, id, attributes, userId);
-        },
-        updateNode: vi.fn().mockResolvedValue('success'),
-      },
+      account: { app: { meta: { localOnly: true } } },
     } as unknown as WorkspaceService;
+
+    const nodeService = new NodeService(workspace);
+    workspace.nodes = nodeService;
 
     await ensurePageMetaTypes(workspace);
 
@@ -245,6 +245,14 @@ describe('page meta types', () => {
     const attributes = JSON.parse(pageRow.attributes) as PageAttributes;
     expect(attributes.metaTypeId).toBe(defaultMetaTypeId);
     expect(pageRow.meta_type_id).toBe(defaultMetaTypeId);
+
+    const updateCount = await database
+      .selectFrom('node_updates')
+      .where('node_id', '=', pageId)
+      .select(({ fn }) => fn.countAll().as('count'))
+      .executeTakeFirstOrThrow();
+
+    expect(Number(updateCount.count)).toBeGreaterThan(0);
   });
 
   it('PageByMetaTypeQueryHandler returns pages for a meta type', async () => {
