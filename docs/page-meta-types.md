@@ -34,7 +34,7 @@ Meta type field schemas may define an optional `default` on supported field type
 2. View filter prefill (`generateFieldValuesFromFilters`) when creating from a filtered/board/calendar cell
 3. Explicit `initialFields` overrides
 
-Set defaults when creating a field in the meta type schema editor (optional **Default value** input).
+Set defaults when creating a field (optional **Default value** input) or from a select/multi-select field header menu after options exist.
 
 ## Queries
 

@@ -8,6 +8,7 @@ import { LocalNode, ViewField } from '@colanode/client/types';
 import { FieldDeleteDialog } from '@colanode/ui/components/databases/fields/field-delete-dialog';
 import { FieldIcon } from '@colanode/ui/components/databases/fields/field-icon';
 import { FieldRenameInput } from '@colanode/ui/components/databases/fields/field-rename-input';
+import { FieldSchemaDefaultSettings } from '@colanode/ui/components/databases/fields/field-schema-default-settings';
 import {
   Popover,
   PopoverContent,
@@ -226,6 +227,13 @@ export const TableViewFieldHeader = ({
           </PopoverTrigger>
           <PopoverContent className="ml-1 flex w-72 flex-col gap-1 p-2 text-sm">
             <FieldRenameInput field={viewField.field} />
+            {(viewField.field.type === 'select' ||
+              viewField.field.type === 'multi_select') && (
+              <>
+                <Separator />
+                <FieldSchemaDefaultSettings field={viewField.field} />
+              </>
+            )}
             <Separator />
             {canSort && (
               <Fragment>

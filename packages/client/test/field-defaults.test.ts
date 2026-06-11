@@ -59,6 +59,52 @@ describe('field defaults', () => {
     expect(value).toBeNull();
   });
 
+  it('applies select and multi_select defaults', () => {
+    const values = generateSchemaDefaultFieldValues([
+      {
+        id: 'select-1',
+        type: 'select',
+        name: 'Status',
+        index: 'a0',
+        default: 'open',
+        options: {
+          open: {
+            id: 'open',
+            name: 'Open',
+            color: 'blue',
+            index: 'a0',
+          },
+        },
+      },
+      {
+        id: 'multi-1',
+        type: 'multi_select',
+        name: 'Tags',
+        index: 'a1',
+        default: ['red', 'blue'],
+        options: {
+          red: {
+            id: 'red',
+            name: 'Red',
+            color: 'red',
+            index: 'a0',
+          },
+          blue: {
+            id: 'blue',
+            name: 'Blue',
+            color: 'blue',
+            index: 'a1',
+          },
+        },
+      },
+    ]);
+
+    expect(values).toEqual({
+      'select-1': { type: 'string', value: 'open' },
+      'multi-1': { type: 'string_array', value: ['red', 'blue'] },
+    });
+  });
+
   it('merges schema defaults with filter overrides', () => {
     const merged = mergeFieldValues(
       {

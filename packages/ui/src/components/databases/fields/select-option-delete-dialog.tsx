@@ -62,15 +62,39 @@ export const SelectOptionDeleteDialog = ({
                   return;
                 }
 
-                const selectOptions = {
+                const { [optionId]: _removed, ...rest } = {
                   ...(fieldAttributes.options ?? {}),
                 };
 
-                const { [optionId]: _removed, ...rest } = selectOptions;
-                draft.fields[fieldId] = {
+                if (fieldAttributes.type === 'select') {
+                  const updated = {
+                    ...fieldAttributes,
+                    options: rest,
+                  };
+
+                  if (updated.default === optionId) {
+                    delete updated.default;
+                  }
+
+                  draft.fields[fieldId] = updated;
+                  return;
+                }
+
+                const nextDefaults = (fieldAttributes.default ?? []).filter(
+                  (id) => id !== optionId
+                );
+                const updated = {
                   ...fieldAttributes,
                   options: rest,
                 };
+
+                if (nextDefaults.length > 0) {
+                  updated.default = nextDefaults;
+                } else {
+                  delete updated.default;
+                }
+
+                draft.fields[fieldId] = updated;
               });
 
               onOpenChange(false);
