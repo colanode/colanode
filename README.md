@@ -72,6 +72,11 @@ If you prefer to host your own Colanode server, check out the [`hosting/`](hosti
 
 Environment variables no longer override regular config fields—only values explicitly tagged with `env://` are read from the environment. Refer to [`hosting/docker/docker-compose.yaml`](hosting/docker/docker-compose.yaml) and [`hosting/kubernetes/README.md`](hosting/kubernetes/README.md) for mounting instructions and the handful of required secrets.
 
+#### One-Click Deploy
+
+<a href="https://repocloud.io/details/Colanode/"><img src="https://d16t0pc4846x52.cloudfront.net/deploylobe.svg" alt="Deploy on RepoCloud" height="42"></a>
+<a href="https://railway.com/deploy/colanode"><img src="https://railway.com/button.svg" alt="Deploy on Railway" height="42"></a>
+
 ### Running locally
 
 To run Colanode locally in development mode:
